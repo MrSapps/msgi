@@ -5,81 +5,81 @@
 
 void __cdecl CheckForMmf(int a1, int a2)
 {
-    using fn = decltype(&CheckForMmf);
+    typedef decltype(&CheckForMmf) fn;
     ((fn)(0x0051D120))(a1, a2);
 }
 
 signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
 {
-    using fn = decltype(&MainWindowProc);
+    typedef decltype(&MainWindowProc) fn;
     return ((fn)(0x0051C2D3))(hWnd, Msg, wParam, lParam);
 }
 
 void __cdecl ShutdownEngine()
 {
-    using fn = decltype(&ShutdownEngine);
+    typedef decltype(&ShutdownEngine) fn;
     ((fn)(0x0051D180))();
 }
 
 BOOL __cdecl SetWindowSize(HWND hWnd, int nWidth, int nHeight)
 {
-    using fn = decltype(&SetWindowSize);
+    typedef decltype(&SetWindowSize) fn;
     return ((fn)(0x0051D09D))(hWnd, nWidth, nHeight);
 }
 
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
-    using fn = decltype(&DoInitAll);
+    typedef decltype(&DoInitAll) fn;
     return ((fn)(0x00420810))();
 }
 
 // 0x0052269C
 signed int __cdecl SoundInit(HWND hwnd)
 {
-    using fn = decltype(&SoundInit);
+    typedef decltype(&SoundInit) fn;
     return ((fn)(0x0052269C))(hwnd);
 }
 
 // 0x004397D7
 bool __cdecl AskUserToContinueIfNoSoundCard()
 {
-    using fn = decltype(&AskUserToContinueIfNoSoundCard);
+    typedef decltype(&AskUserToContinueIfNoSoundCard) fn;
     return ((fn)(0x004397D7))();
 }
 
 // 0x5224C8
 int __cdecl sub_5224C8(int a1)
 {
-    using fn = decltype(&sub_5224C8);
+    typedef decltype(&sub_5224C8) fn;
     return ((fn)(0x5224C8))(a1);
 }
 
 // 0x52255B
 int __cdecl sub_52255B(int a1)
 {
-    using fn = decltype(&sub_52255B);
+    typedef decltype(&sub_52255B) fn;
     return ((fn)(0x52255B))(a1);
 }
 
 // 0x00421680
 signed __int64 __cdecl FpsTimerSetupQ()
 {
-    using fn = decltype(&FpsTimerSetupQ);
+    typedef decltype(&FpsTimerSetupQ) fn;
     return ((fn)(0x00421680))();
 }
 
 // 0x00401000
 int __cdecl DoMain()
 {
-    using fn = decltype(&DoMain);
+    typedef decltype(&DoMain) fn;
     return ((fn)(0x00401000))();
 }
 
 // 0x004232B0
 void __cdecl DoClearAll()
 {
-    using fn = decltype(&DoClearAll);
+    typedef decltype(&DoClearAll) fn;
     ((fn)(0x004232B0))();
 }
 
