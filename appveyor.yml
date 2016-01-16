@@ -23,6 +23,6 @@ install:
 
 artifacts:
  - path: %configuration%\MSGI.dll
-   name: MSG-$(configuration)-$(APPVEYOR_REPO_COMMIT)
+ - name: MSG-$(configuration)-$(APPVEYOR_REPO_COMMIT)
 
 test: off
