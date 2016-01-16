@@ -21,8 +21,8 @@ install:
  - 7z x SDL2-devel-2.0.4-VC.zip
  - set SDL2DIR=C:\msg\SDL2-2.0.4
 
-artifacts:
- - path: %configuration%\MSGI.dll
- - name: MSG-$(configuration)-$(APPVEYOR_REPO_COMMIT)
+#artifacts:
+# - path: %configuration%\MSGI.dll
+# - name: MSG-$(configuration)-$(APPVEYOR_REPO_COMMIT)
 
 test: off
