@@ -3,69 +3,114 @@
 #include <stdlib.h>
 #include <direct.h>
 
+void __cdecl CheckForMmf(int a1, int a2)
+{
+    using fn = decltype(&CheckForMmf);
+    ((fn)(0x0051D120))(a1, a2);
+}
 
-// 0x0051D120
-void __cdecl CheckForMmf(int a1, int a2);
+signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
+{
+    using fn = decltype(&MainWindowProc);
+    return ((fn)(0x0051C2D3))(hWnd, Msg, wParam, lParam);
+}
 
-// 0x0051C2D3
-signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam);
+void __cdecl ShutdownEngine()
+{
+    using fn = decltype(&ShutdownEngine);
+    ((fn)(0x0051D180))();
+}
 
-// 0x0051D180
-void __cdecl ShutdownEngine();
-
-// 0x0051D09D
-BOOL __cdecl SetWindowSize(HWND hWnd, int nWidth, int nHeight);
+BOOL __cdecl SetWindowSize(HWND hWnd, int nWidth, int nHeight)
+{
+    using fn = decltype(&SetWindowSize);
+    return ((fn)(0x0051D09D))(hWnd, nWidth, nHeight);
+}
 
 // 0x00420810
-signed int __cdecl DoInitAll();
+signed int __cdecl DoInitAll()
+{
+    using fn = decltype(&DoInitAll);
+    return ((fn)(0x00420810))();
+}
 
 // 0x0052269C
-signed int __cdecl SoundInit(HWND hwnd);
+signed int __cdecl SoundInit(HWND hwnd)
+{
+    using fn = decltype(&SoundInit);
+    return ((fn)(0x0052269C))(hwnd);
+}
 
 // 0x004397D7
-bool __cdecl AskUserToContinueIfNoSoundCard();
+bool __cdecl AskUserToContinueIfNoSoundCard()
+{
+    using fn = decltype(&AskUserToContinueIfNoSoundCard);
+    return ((fn)(0x004397D7))();
+}
 
 // 0x5224C8
-int __cdecl sub_5224C8(int a1);
+int __cdecl sub_5224C8(int a1)
+{
+    using fn = decltype(&sub_5224C8);
+    return ((fn)(0x5224C8))(a1);
+}
 
 // 0x52255B
-int __cdecl sub_52255B(int a1);
+int __cdecl sub_52255B(int a1)
+{
+    using fn = decltype(&sub_52255B);
+    return ((fn)(0x52255B))(a1);
+}
 
 // 0x00421680
-signed __int64 __cdecl FpsTimerSetupQ();
+signed __int64 __cdecl FpsTimerSetupQ()
+{
+    using fn = decltype(&FpsTimerSetupQ);
+    return ((fn)(0x00421680))();
+}
 
 // 0x00401000
-int __cdecl DoMain();
+int __cdecl DoMain()
+{
+    using fn = decltype(&DoMain);
+    return ((fn)(0x00401000))();
+}
 
 // 0x004232B0
-void __cdecl DoClearAll();
+void __cdecl DoClearAll()
+{
+    using fn = decltype(&DoClearAll);
+    ((fn)(0x004232B0))();
+}
 
-extern char* gCmdLine; // 0x0071D16C;
-extern DWORD dword_787774;
-extern DWORD dword_787778; // 0x787778;
-extern WORD* dword_78E7E4; // 2 elements
-extern DWORD dword_78D7B0;
-extern DWORD gNoCrashCheck;
-extern DWORD gCheatsEnabled;
-extern DWORD gNoCdEnabled;
-extern DWORD gWindowedMode;
-extern char* off_688DB8;
-extern DWORD dword_6FC7A0;
-extern DWORD gNoEffects;
-extern float gXRes;
-extern DWORD gNoFilter;
-extern DWORD gModX2;
-extern DWORD gNoTrueType;
-extern DWORD gFps;
-extern DWORD gColourKey;
-extern DWORD gBlendMode;
-extern DWORD gLowRes;
-extern char* off_688D40;
-extern DWORD gSoftwareRendering;
-extern HWND gHwnd;
-extern HINSTANCE gHInstance;
-extern DWORD dword_651D98;
-extern DWORD dword_716F68;
+char* gCmdLinePtr = (char*)0x0071D16C;
+char*& gCmdLine = gCmdLinePtr;
+
+DWORD dword_787774;
+DWORD dword_787778; // 0x787778;
+WORD* dword_78E7E4; // 2 elements
+DWORD dword_78D7B0;
+DWORD gNoCrashCheck;
+DWORD gCheatsEnabled;
+DWORD gNoCdEnabled;
+DWORD gWindowedMode;
+char* off_688DB8;
+DWORD dword_6FC7A0;
+DWORD gNoEffects;
+float gXRes;
+DWORD gNoFilter;
+DWORD gModX2;
+DWORD gNoTrueType;
+DWORD gFps;
+DWORD gColourKey;
+DWORD gBlendMode;
+DWORD gLowRes;
+char* off_688D40;
+DWORD gSoftwareRendering;
+HWND gHwnd;
+HINSTANCE gHInstance;
+DWORD dword_651D98;
+DWORD dword_716F68;
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
