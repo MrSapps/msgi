@@ -83,19 +83,18 @@ void __cdecl DoClearAll()
     ((fn)(0x004232B0))();
 }
 
-char* gCmdLinePtr = (char*)0x0071D16C;
-char*& gCmdLine = gCmdLinePtr;
+char*& gCmdLine = *((char**)0x0071D16C);
 
-DWORD dword_787774;
-DWORD dword_787778; // 0x787778;
+DWORD& dword_787774 = *((DWORD*)0x787774);
+DWORD& dword_787778 = *((DWORD*)0x787778);; // 0x787778;
 WORD* dword_78E7E4; // 2 elements
-DWORD dword_78D7B0;
+DWORD& dword_78D7B0 = *((DWORD*)0x78D7B0);
 DWORD gNoCrashCheck;
 DWORD gCheatsEnabled;
 DWORD gNoCdEnabled;
 DWORD gWindowedMode;
-char* off_688DB8;
-DWORD dword_6FC7A0;
+char* off_688DB8 = (char*)0x688DB8;
+DWORD& dword_6FC7A0 = *((DWORD*)0x6FC7A0);
 DWORD gNoEffects;
 float gXRes;
 DWORD gNoFilter;
@@ -109,8 +108,8 @@ char* off_688D40;
 DWORD gSoftwareRendering;
 HWND gHwnd;
 HINSTANCE gHInstance;
-DWORD dword_651D98;
-DWORD dword_716F68;
+DWORD& dword_651D98 = *((DWORD*)0x651D98);
+DWORD& dword_716F68 = *((DWORD*)0x716F68);
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
