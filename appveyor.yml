@@ -1,0 +1,28 @@
+version: 1.0.{build}
+
+platform: 
+ - x86
+
+configuration: 
+ - Debug
+ - Release
+
+clone_folder: c:\msg
+
+before_build:
+ - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %platform%
+
+build_script:
+ - msbuild MSGI.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+ 
+install:
+ - git submodule update --init --recursive
+ - ps: Start-FileDownload 'https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip'
+ - 7z x SDL2-devel-2.0.4-VC.zip
+ - set SDL2DIR=C:\msg\SDL2-2.0.4
+
+#artifacts:
+# - path: %configuration%\MSGI.dll
+# - name: MSG-$(configuration)-$(APPVEYOR_REPO_COMMIT)
+
+test: off
