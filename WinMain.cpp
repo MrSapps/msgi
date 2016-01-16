@@ -86,7 +86,7 @@ void __cdecl DoClearAll()
 char*& gCmdLine = *((char**)0x0071D16C);
 DWORD& dword_787774 = *((DWORD*)0x787774);
 DWORD& dword_787778 = *((DWORD*)0x787778);
-WORD*& dword_78E7E4 = *(WORD**)0x78E7E4; // 2 elements
+WORD& dword_78E7E4 = *(WORD*)0x78E7E4;
 DWORD& dword_78D7B0 = *((DWORD*)0x78D7B0);
 DWORD& gNoCrashCheck = *((DWORD*)0x006DEF94);
 DWORD& gCheatsEnabled = *(DWORD*)0x0071687C;
@@ -155,8 +155,10 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                 FreeLibrary(hKernel32);
             }
             CheckForMmf(dword_787774, dword_787778);
-            dword_78E7E4[0] |= 0x4000u;
-            dword_78E7E4[0] |= 0x100u;
+            
+            dword_78E7E4 |= 0x4000u;
+            dword_78E7E4 |= 0x100u;
+
             _strlwr(lpCmdLine);
             _chdir(".");
             dword_78D7B0 = -1;
