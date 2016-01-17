@@ -3,6 +3,83 @@
 #include <stdlib.h>
 #include <direct.h>
 
+struct actor_related_struct
+{
+    actor_related_struct* field_0;
+    actor_related_struct* actor_struct_ptr1;
+    void(__cdecl *fn_unknown)(actor_related_struct *);
+    void(__cdecl *fnUnknown3)(actor_related_struct *);
+    void(__cdecl *fnUnknown2)(actor_related_struct *);
+    char* mNamePtr;
+    DWORD field_18;
+    DWORD field_1C;
+    actor_related_struct* actor_struct_ptr2;
+    DWORD field_24;
+    DWORD field_28;
+    DWORD field_2C;
+    DWORD field_30;
+    DWORD field_34;
+    DWORD field_38;
+    DWORD field_3C;
+    WORD mPause;
+    WORD mKill;
+};
+static_assert(sizeof(actor_related_struct) == 0x44, "actor_related_struct should be 0x44");
+
+struct Rect16
+{
+    WORD x1, y1, x2, y2;
+};
+static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
+
+DWORD& dword_995344 = *(DWORD*)0x995344;
+DWORD& dword_7227A4 = *(DWORD*)0x7227A4;
+DWORD& dword_9942B8 = *(DWORD*)0x9942B8;
+DWORD& dword_78D7B0 = *(DWORD*)0x78D7B0;
+WORD& word_78E7E8 = *(WORD*)0x78E7E8;
+DWORD& dword_995324 = *(DWORD*)0x995324;
+DWORD& dword_7919C0 = *(DWORD*)0x7919C0;
+
+actor_related_struct& stru_722760 = *(actor_related_struct*)0x722760;
+actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
+
+WORD& word_78E7FC = *(WORD*)0x78E7FC;
+WORD& word_78E7FE = *(WORD*)0x78E7FE;
+DWORD& gResidentTop_dword_78E960 = *(DWORD*)0x78E960;
+DWORD& dword_78E964 = *(DWORD*)0x78E964;
+DWORD& dword_791A0C = *(DWORD*)0x791A0C;
+DWORD& dword_9942A0 = *(DWORD*)0x9942A0;
+DWORD& gExitMainGameLoop = *(DWORD*)0x0073492C;
+WORD& word_994320 = *(WORD*)0x994320;
+WORD& word_669AE0 = *(WORD*)0x669AE0;
+DWORD& dword_993F44 = *(DWORD*)0x993F44;
+
+char*& gCmdLine = *((char**)0x0071D16C);
+DWORD& dword_787774 = *((DWORD*)0x787774);
+DWORD& dword_787778 = *((DWORD*)0x787778);
+WORD& dword_78E7E4 = *(WORD*)0x78E7E4;
+DWORD& gNoCrashCheck = *((DWORD*)0x006DEF94);
+DWORD& gCheatsEnabled = *(DWORD*)0x0071687C;
+DWORD& gNoCdEnabled = *(DWORD*)0x006FD1F8;
+DWORD& gWindowedMode = *(DWORD*)0x00650D14;
+char*& off_688DB8 = *(char**)0x688DB8;
+DWORD& dword_6FC7A0 = *((DWORD*)0x6FC7A0);
+DWORD& gNoEffects = *(DWORD*)0x00650D24;
+float& gXRes = *(float*)0x00650D28;
+DWORD& gNoFilter = *(DWORD*)0x00650D34;
+DWORD& gModX2 = *(DWORD*)0x00650D30;
+DWORD& gNoTrueType = *(DWORD*)0x00650D40;
+DWORD& gFps = *(DWORD*)0x006FC76C;
+DWORD& gColourKey = *(DWORD*)0x006FC7A4;
+DWORD& gBlendMode = *(DWORD*)0x00650D38;
+DWORD& gLowRes = *(DWORD*)0x00650D20;
+char*& off_688D40 = *(char**)0x688D40;
+DWORD& gSoftwareRendering = *(DWORD*)0x006FC794;
+HWND& gHwnd = *(HWND*)0x009ADDA0;
+HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
+DWORD& dword_651D98 = *((DWORD*)0x651D98);
+DWORD& dword_716F68 = *((DWORD*)0x716F68);
+
 void __cdecl CheckForMmf(int a1, int a2)
 {
     typedef decltype(&CheckForMmf) fn;
@@ -68,12 +145,6 @@ signed __int64 __cdecl FpsTimerSetupQ()
     typedef decltype(&FpsTimerSetupQ) fn;
     return ((fn)(0x00421680))();
 }
-
-struct Rect16
-{
-    WORD x1, y1, x2, y2;
-};
-static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
 
 // 0x0044A7B0
 signed int __cdecl Resetgraph(int a1)
@@ -185,10 +256,173 @@ int __cdecl sub_40B725()
     return ((fn)(0x40B725))();
 }
 
+
+// 0x00459A9A
+int __cdecl Menu_Related1()
+{
+    typedef decltype(&Menu_Related1) fn;
+    return ((fn)(0x00459A9A))();
+}
+
+WORD& word_7227C8 = *(WORD*)0x7227C8;
+
+// 0x44EAED
+void *__cdecl sub_44EAED()
+{
+    return memset(&word_7227C8, 0, 0x10u);
+}
+
+// 0x457B5B
+void *__cdecl sub_457B5B()
+{
+    void *result; // eax@1
+
+    result = memcpy(&word_994320, &word_669AE0, 0x1000u);
+    dword_993F44 = (int)&word_994320;
+    return result;
+}
+
+// 0x452610
+int __cdecl sub_452610()
+{
+    typedef decltype(&sub_452610) fn;
+    return ((fn)(0x452610))();
+}
+
+// 0x44E9D2
+signed int __cdecl sub_44E9D2(int a1)
+{
+    typedef decltype(&sub_44E9D2) fn;
+    return ((fn)(0x44E9D2))(a1);
+}
+
+// 0x40A68D
+int __cdecl sub_40A68D(int number, int fn)
+{
+    int result; // eax@1
+
+    result = fn;
+    *((DWORD *)&gActors[4].field_0 + number) = fn;
+    return result;
+}
+
+// 0x44E1E0
+__int16 __cdecl sub_44E1E0()
+{
+    __int16 result; // ax@1
+
+    word_78E7FC = -1;
+    result = word_78E7FC;
+    word_78E7FE = word_78E7FC;
+    return result;
+}
+
+// 0x0040A2AF
+actor_related_struct *__cdecl Actor_Unknown4(int actorIdx, actor_related_struct *a2, void(__cdecl *actorFn)(actor_related_struct*))
+{
+    typedef decltype(&Actor_Unknown4) fn;
+    return ((fn)(0x0040A2AF))(actorIdx, a2, actorFn);
+    /*
+    actor_related_struct *result; // eax@1
+    actor_related_struct *v4; // ST04_4@1
+
+    v4 = gActors[actorIdx].actor_struct_ptr2;
+    gActors[actorIdx].actor_struct_ptr2 = a2;
+    v4->actor_struct_ptr1 = a2;
+    a2->actor_struct_ptr1 = &gActors[actorIdx] + 8;
+    a2->field_0 = v4;
+    a2->fnUnknown3 = 0;
+    a2->fn_unknown = 0;
+    result = a2;
+    a2->fnUnknown2 = actorFn;
+    return result;
+    */
+}
+
+// 0x44E381
+void *__cdecl sub_44E381(int a1)
+{
+    typedef decltype(&sub_44E381) fn;
+    return ((fn)(0x44E381))(a1);
+}
+
+actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, int fn2, char *srcFileName)
+{
+    actor_related_struct *result; // eax@1
+
+    a1->fn_unknown = (void(__cdecl *)(actor_related_struct*))fn1;
+    a1->fnUnknown3 = (void(__cdecl *)(actor_related_struct*))fn2;
+    a1->mNamePtr = srcFileName;
+    a1->field_1C = 0;
+    result = a1;
+    a1->field_18 = 0;
+    return result;
+}
+
+// 0x0044E1F9
+int __cdecl unknown_libname_3() // Note: Not a CRT func!!
+{
+    typedef decltype(&unknown_libname_3) fn;
+    return ((fn)(0x0044E1F9))();
+}
+
+// 0x44E287
+void __cdecl sub_44E287()
+{
+    typedef decltype(&sub_44E287) fn;
+    ((fn)(0x44E287))();
+}
+
+// 0x44E212
+void *__cdecl sub_44E212()
+{
+    typedef decltype(&sub_44E212) fn;
+    return ((fn)(0x44E212))();
+}
+
+
+// 0x0040B36E
+int __cdecl GetResidentTop()
+{
+    int result; // eax@1
+
+    result = gResidentTop_dword_78E960;
+    dword_78E964 = gResidentTop_dword_78E960;
+    return result;
+}
+
+// 0x44E226
+actor_related_struct *__cdecl sub_44E226()
+{
+    typedef decltype(&sub_44E226) fn;
+    return ((fn)(0x44E226))();
+}
+
+// 0x44E12B
 void *__cdecl sub_44E12B()
 {
-    typedef decltype(&sub_44E12B) fn;
-    return ((fn)(0x44E12B))();
+    dword_995344 = 0;
+    dword_7227A4 = 0;
+    *(DWORD *)&stru_722760.mPause = 0;
+    dword_9942B8 = 0;
+    Menu_Related1();
+    sub_44EAED();
+    sub_457B5B();
+    sub_452610();
+    sub_40A68D(98, (int)sub_44E9D2);
+    sub_44E1E0();
+    Actor_Unknown4(1, &stru_722760, 0);
+    Actor_Unknown6(&stru_722760, (int)sub_44E381, 0, "C:\\mgs\\source\\Game\\gamed.c");
+
+    unknown_libname_3();
+    sub_44E287();
+    sub_44E212();
+    word_78E7E8 = (WORD)(dword_78D7B0 + 1);
+    dword_995324 = (int)&dword_7919C0;
+    GetResidentTop();
+    stru_722760.actor_struct_ptr2 = 0;
+    stru_722760.field_24 = 0;
+    return sub_44E226();
 }
 
 // 0x0051C9A2
@@ -197,34 +431,6 @@ signed int __cdecl MainLoop()
     typedef decltype(&MainLoop) fn;
     return ((fn)(0x0051C9A2))();
 }
-
-struct actor_related_struct
-{
-    DWORD field_0;
-    actor_related_struct* actor_struct_ptr1;
-    void(__cdecl *fn_unknown)(actor_related_struct *);
-    void(__cdecl *fnUnknown3)(actor_related_struct *);
-    void(__cdecl *fnUnknown2)(actor_related_struct *);
-    DWORD mNamePtr;
-    DWORD field_18;
-    DWORD field_1C;
-    actor_related_struct* actor_struct_ptr2;
-    DWORD field_24;
-    DWORD field_28;
-    DWORD field_2C;
-    DWORD field_30;
-    DWORD field_34;
-    DWORD field_38;
-    DWORD field_3C;
-    WORD mPause;
-    WORD mKill;
-};
-
-static_assert(sizeof(actor_related_struct) == 0x44, "actor_related_struct should be 0x44");
-
-actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items
-DWORD& dword_791A0C = *(DWORD*)0x791A0C;
-DWORD& dword_9942A0 = *(DWORD*)0x9942A0;
 
 // 0x0040A1BF
 int __cdecl Actor_Unknown()
@@ -260,7 +466,6 @@ int __cdecl Actor_Unknown()
     return result;
 }
 
-DWORD& gExitMainGameLoop = *(DWORD*)0x0073492C;
 
 // 0x00401005
 signed int __cdecl Main()
@@ -318,32 +523,6 @@ void __cdecl DoClearAll()
     ((fn)(0x004232B0))();
 }
 
-char*& gCmdLine = *((char**)0x0071D16C);
-DWORD& dword_787774 = *((DWORD*)0x787774);
-DWORD& dword_787778 = *((DWORD*)0x787778);
-WORD& dword_78E7E4 = *(WORD*)0x78E7E4;
-DWORD& dword_78D7B0 = *((DWORD*)0x78D7B0);
-DWORD& gNoCrashCheck = *((DWORD*)0x006DEF94);
-DWORD& gCheatsEnabled = *(DWORD*)0x0071687C;
-DWORD& gNoCdEnabled = *(DWORD*)0x006FD1F8;
-DWORD& gWindowedMode = *(DWORD*)0x00650D14;
-char*& off_688DB8 = *(char**)0x688DB8;
-DWORD& dword_6FC7A0 = *((DWORD*)0x6FC7A0);
-DWORD& gNoEffects = *(DWORD*)0x00650D24;
-float& gXRes = *(float*)0x00650D28;
-DWORD& gNoFilter = *(DWORD*)0x00650D34;
-DWORD& gModX2 = *(DWORD*)0x00650D30;
-DWORD& gNoTrueType = *(DWORD*)0x00650D40;
-DWORD& gFps = *(DWORD*)0x006FC76C;
-DWORD& gColourKey = *(DWORD*)0x006FC7A4;
-DWORD& gBlendMode = *(DWORD*)0x00650D38;
-DWORD& gLowRes = *(DWORD*)0x00650D20;
-char*& off_688D40 = *(char**)0x688D40;
-DWORD& gSoftwareRendering = *(DWORD*)0x006FC794;
-HWND& gHwnd = *(HWND*)0x009ADDA0;
-HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
-DWORD& dword_651D98 = *((DWORD*)0x651D98);
-DWORD& dword_716F68 = *((DWORD*)0x716F68);
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
