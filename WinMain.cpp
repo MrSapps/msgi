@@ -1,7 +1,13 @@
+#undef UNICODE
+
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <direct.h>
+#include <assert.h>
+
+#define DIRECTINPUT_VERSION 0x700
+#include <dinput.h>
 
 struct actor_related_struct
 {
@@ -1411,6 +1417,109 @@ signed int __cdecl Resetgraph(int a1)
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_TPAGE", 8, 8, 2, 2);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_STP", 12, 12, 3, 3);
     return 1;
+}
+
+// 0x00553090
+signed int __cdecl DirectInputCreateExMGS(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter)
+{
+    typedef decltype(&DirectInputCreateExMGS) fn;
+    return ((fn)(0x00553090))(hinst, dwVersion, riidltf, ppvOut, punkOuter);
+}
+
+LPDIENUMDEVICESCALLBACKA EnumDevicesCallback = (LPDIENUMDEVICESCALLBACKA)0x0043B078;
+LPDIENUMDEVICEOBJECTSCALLBACKA EnumDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0C8;
+LPDIENUMDEVICEOBJECTSCALLBACKA CountDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0B3;
+
+VAR(DWORD, dword_71D670, 0x71D670);
+VAR(DWORD, dword_71D790, 0x71D790);
+VAR(LPDIRECTINPUT7, pDirectInput, 0x71D664);
+VAR(LPDIRECTINPUTDEVICE7, pJoystickDevice, 0x71D66C);
+VAR(DIDEVICEINSTANCEA, JoystickDeviceInfos, 0x71D420);
+VAR(DIDATAFORMAT, JoystickDataFormat, 0x64DA88);
+VAR(DIDEVCAPS, JoystickDeviceCaps, 0x71D1D8);
+DWORD* dword_65714C = (DWORD*)0x65714C;
+DWORD* dword_657184 = (DWORD*)0x657184;
+char* sidewinderEtc = (char*)0x657298;
+GUID& IID_IDirectInput7A_MGS = *((GUID*)0x64B028);
+
+
+// 0x0043B1D1
+int __cdecl InitDirectInput(HWND hWnd)
+{
+    char productName[0x80];
+    char instanceName[0x20];
+    dword_71D670 = 0;
+    //fputs("InitDirectInput {\n", gLogFile);
+    // I'll do log prints later
+    HRESULT hr = DirectInputCreateExMGS(gHInstance, DIRECTINPUT_VERSION, IID_IDirectInput7A_MGS, (LPVOID*)&pDirectInput, 0);
+    if (hr < 0)
+        return hr;
+
+    hr = pDirectInput->EnumDevices(DIDEVTYPE_JOYSTICK, EnumDevicesCallback, 0, DIEDFL_ATTACHEDONLY);
+    if (hr >= 0)
+    {
+        if (pJoystickDevice != 0)
+        {
+            memset(&JoystickDeviceInfos, 0, sizeof(DIDEVICEINSTANCEA));
+            assert(sizeof(DIDEVICEINSTANCEA) == 0x244);
+            JoystickDeviceInfos.dwSize = sizeof(DIDEVICEINSTANCEA);
+            HRESULT hGetInfosRes = pJoystickDevice->GetDeviceInfo(&JoystickDeviceInfos);
+            hr = pJoystickDevice->SetDataFormat(&JoystickDataFormat);
+            if (hr >= 0)
+            {
+                hr = pJoystickDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
+                if (hr >= 0)
+                {
+                    hr = pJoystickDevice->GetCapabilities(&JoystickDeviceCaps);
+                    if (hr >= 0)
+                    {
+                        pJoystickDevice->EnumObjects(EnumDeviceObjectsCallback, hWnd, DIDFT_AXIS);
+                        pJoystickDevice->EnumObjects(CountDeviceObjectsCallback, hWnd, DIDFT_BUTTON);
+                        hr = pJoystickDevice->Acquire();
+                        if (hr >= 0)
+                        {
+                            if (hGetInfosRes >= 0)
+                            {
+                                strcpy((char*)0x71D690, JoystickDeviceInfos.tszInstanceName);
+
+                                for (int i = 0; i < 6; i++)
+                                {
+                                    strcpy(productName, JoystickDeviceInfos.tszProductName);
+                                    _strlwr(productName);
+                                    strcpy(instanceName, JoystickDeviceInfos.tszInstanceName);
+                                    _strlwr(instanceName);
+
+                                    for (int j = 0; j < 5; j++)
+                                    {
+                                        size_t offset = i * 0x140 + j * 0x40;
+                                        if (strstr(productName, &sidewinderEtc[offset]) == 0)
+                                        {
+                                            // 0x43B707
+                                        }
+                                        else
+                                        {
+                                            // 0x43B734
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                dword_71D790 = 0;
+                                for (int i = 0; i < 14; i++)
+                                {
+                                    dword_65714C[i] = 0;
+                                    dword_657184[i] = 0;
+                                }
+                            }
+                            // 0x43B832
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 0;
 }
 
 // 0x0044AB30
