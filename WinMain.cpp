@@ -73,7 +73,6 @@ struct Rect16
 {
     WORD x1, y1, x2, y2;
 };
-
 static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
 
 // 0x0044A7B0
@@ -199,11 +198,66 @@ signed int __cdecl MainLoop()
     return ((fn)(0x0051C9A2))();
 }
 
+struct actor_related_struct
+{
+    DWORD field_0;
+    actor_related_struct* actor_struct_ptr1;
+    void(__cdecl *fn_unknown)(actor_related_struct *);
+    void(__cdecl *fnUnknown3)(actor_related_struct *);
+    void(__cdecl *fnUnknown2)(actor_related_struct *);
+    DWORD mNamePtr;
+    DWORD field_18;
+    DWORD field_1C;
+    actor_related_struct* actor_struct_ptr2;
+    DWORD field_24;
+    DWORD field_28;
+    DWORD field_2C;
+    DWORD field_30;
+    DWORD field_34;
+    DWORD field_38;
+    DWORD field_3C;
+    WORD mPause;
+    WORD mKill;
+};
+
+static_assert(sizeof(actor_related_struct) == 0x44, "actor_related_struct should be 0x44");
+
+actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items
+DWORD& dword_791A0C = *(DWORD*)0x791A0C;
+DWORD& dword_9942A0 = *(DWORD*)0x9942A0;
+
 // 0x0040A1BF
 int __cdecl Actor_Unknown()
 {
-    typedef decltype(&Actor_Unknown) fn;
-    return ((fn)(0x0040A1BF))();
+    int result; // eax@8
+    actor_related_struct *v1; // [sp+0h] [bp-18h]@5
+    actor_related_struct *v2; // [sp+4h] [bp-14h]@4
+    void(__cdecl *fn)(actor_related_struct *); // [sp+8h] [bp-10h]@5
+    signed int i; // [sp+10h] [bp-8h]@1
+    actor_related_struct *pActor; // [sp+14h] [bp-4h]@1
+
+    pActor = gActors;
+    for (i = 9; i > 0; --i)
+    {
+        if (!(dword_791A0C & pActor->mPause))
+        {
+            v2 = pActor;
+            do
+            {
+                v1 = v2->actor_struct_ptr1;
+                fn = v2->fn_unknown;
+                if (fn)
+                {
+                    fn(v2);
+                }
+                dword_9942A0 = 0;
+                v2 = v1;
+            } while (v1);
+        }
+        ++pActor;
+        result = i - 1;
+    }
+    return result;
 }
 
 DWORD& gExitMainGameLoop = *(DWORD*)0x0073492C;
