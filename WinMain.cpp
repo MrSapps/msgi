@@ -69,11 +69,192 @@ signed __int64 __cdecl FpsTimerSetupQ()
     return ((fn)(0x00421680))();
 }
 
+struct Rect16
+{
+    WORD x1, y1, x2, y2;
+};
+
+static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
+
+// 0x0044A7B0
+signed int __cdecl Resetgraph(int a1)
+{
+    printf(".Resetgraph(%d)\n", a1);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT", 8, 8, 2, 2);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT32", 16, 16, 4, 4);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_ENV", 64, 64, 16, 16);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DRAWENV", 92, 92, 23, 23);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DISPENV", 20, 20, 5, 5);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_TAG", 8, 8, 2, 2);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_CODE", 4, 4, 1, 1);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F3", 20, 20, 5, 5);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F4", 24, 24, 6, 6);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT3", 32, 32, 8, 8);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT4", 40, 40, 10, 10);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_G3", 28, 28, 7, 7);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_G4", 36, 36, 9, 9);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_GT3", 40, 40, 10, 10);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_GT4", 52, 52, 13, 13);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_F2", 16, 16, 4, 4);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_G2", 20, 20, 5, 5);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_F3", 24, 24, 6, 6);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_G3", 32, 32, 8, 8);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_F4", 28, 28, 7, 7);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_G4", 40, 40, 10, 10);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "SPRT", 20, 20, 5, 5);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "SPRT_16", 16, 16, 4, 4);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "SPRT_8", 16, 16, 4, 4);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE", 16, 16, 4, 4);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE_16", 12, 12, 3, 3);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE_8", 12, 12, 3, 3);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE_1", 12, 12, 3, 3);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_MODE", 12, 12, 3, 3);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_TWIN", 12, 12, 3, 3);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_AREA", 12, 12, 3, 3);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_OFFSET", 12, 12, 3, 3);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_MOVE", 24, 24, 6, 6);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_LOAD", 68, 68, 17, 17);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_TPAGE", 8, 8, 2, 2);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_STP", 12, 12, 3, 3);
+    return 1;
+}
+
+// 0x0044AB30
+int __cdecl SetGraphDebug(int a1)
+{
+    printf(".SetGraphDebug(%d)\n", a1);
+    return 0;
+}
+
+// 0x0044AC40
+int __cdecl SetDispMask(int a1)
+{
+    return printf(".SetDispMask(%d)\n", a1);
+}
+
+// 0x00520157
+void DebugLog(const char *Format, ...)
+{
+    char Dest[512]; // [sp+0h] [bp-400h]@1
+    va_list va; // [sp+40Ch] [bp+Ch]@1
+
+    va_start(va, Format);
+    vsprintf(Dest, Format, va);
+    OutputDebugStringA(Dest);
+}
+
+int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsigned __int8 b)
+{
+    DebugLog(".ClearImage((%d,%d,%d,%d),r=%d,g=%d,b=%d)\n", rect->x1, rect->y1, rect->x2, rect->y2, r, g, b);
+    return 0;
+}
+
+// 0x0040815E
+void __cdecl MemCardsInit()
+{
+    typedef decltype(&MemCardsInit) fn;
+    ((fn)(0x0040815E))();
+}
+
+void __cdecl sub_40A4F6()
+{
+    typedef decltype(&sub_40A4F6) fn;
+    ((fn)(0x40A4F6))();
+}
+
+int __cdecl sub_408086()
+{
+    typedef decltype(&sub_408086) fn;
+    return ((fn)(0x408086))();
+}
+
+int __cdecl sub_40111A()
+{
+    typedef decltype(&sub_40111A) fn;
+    return ((fn)(0x40111A))();
+}
+
+int __cdecl sub_4090A7()
+{
+    typedef decltype(&sub_4090A7) fn;
+    return ((fn)(0x4090A7))();
+}
+
+int __cdecl sub_40B725()
+{
+    typedef decltype(&sub_40B725) fn;
+    return ((fn)(0x40B725))();
+}
+
+void *__cdecl sub_44E12B()
+{
+    typedef decltype(&sub_44E12B) fn;
+    return ((fn)(0x44E12B))();
+}
+
+// 0x0051C9A2
+signed int __cdecl MainLoop()
+{
+    typedef decltype(&MainLoop) fn;
+    return ((fn)(0x0051C9A2))();
+}
+
+// 0x0040A1BF
+int __cdecl Actor_Unknown()
+{
+    typedef decltype(&Actor_Unknown) fn;
+    return ((fn)(0x0040A1BF))();
+}
+
+DWORD& gExitMainGameLoop = *(DWORD*)0x0073492C;
+
+// 0x00401005
+signed int __cdecl Main()
+{
+    signed int result; // eax@2
+    Rect16 clearRect; // [sp+4h] [bp-8h]@1
+
+    Resetgraph(0);
+    SetGraphDebug(0);
+    //null_44AC80();
+    SetDispMask(0);
+    clearRect.x1 = 0;
+    clearRect.y1 = 0;
+    clearRect.x2 = 1024;
+    clearRect.y2 = 511;
+    ClearImage(&clearRect, 0, 0, 0);
+    //null_44AB50();
+    SetDispMask(1);
+    //nullsub_14();
+    //nullsub_13();
+    //nullsub_8();
+    MemCardsInit();
+    //nullsub_9();
+    sub_40A4F6();
+    sub_408086();
+    sub_40111A();
+    sub_4090A7();
+    sub_40B725();
+    sub_44E12B();
+    while (1)
+    {
+        result = MainLoop();
+        if (!result)
+            break;
+        if (gExitMainGameLoop)
+            break;
+
+        // HACK: The game crashes somewhere deep in here, not calling this seems to prevent the game
+        // state from progressing
+        Actor_Unknown();
+    }
+    return result;
+}
+
 // 0x00401000
 int __cdecl DoMain()
 {
-    typedef decltype(&DoMain) fn;
-    return ((fn)(0x00401000))();
+    return Main();
 }
 
 // 0x004232B0
@@ -122,7 +303,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     char *v11; // [sp+434h] [bp-38h]@52
     WNDCLASSA WndClass; // [sp+438h] [bp-34h]@27
     char *bRestart; // [sp+464h] [bp-8h]@8
-    int i; // [sp+468h] [bp-4h]@70
+    //int i; // [sp+468h] [bp-4h]@70
 
 
     if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
@@ -227,6 +408,14 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     gSoftwareRendering = 1;
                 else
                     gSoftwareRendering = 0;
+
+                // HACK: Set some options that allow the game to actually start for now
+                gCheatsEnabled = 1;
+                gNoCrashCheck = 1;
+                gWindowedMode = 1;
+                gSoftwareRendering = 1;
+                gNoCdEnabled = 1;
+
                 gHwnd = CreateWindowExA(
                     0,
                     WndClass.lpszClassName,
@@ -255,10 +444,12 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                             sub_52255B(dword_716F68);
                             FpsTimerSetupQ();
 
+                            /* HACK: Leave cursor showing while developing
                             for (i = 1024; i && ShowCursor(0) >= 0; --i)// some hack to hide the cursor
                             {
 
                             }
+                            */
 
                             DoMain();
                             result = 0;
