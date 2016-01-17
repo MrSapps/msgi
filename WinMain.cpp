@@ -86,10 +86,409 @@ void __cdecl CheckForMmf(int a1, int a2)
     ((fn)(0x0051D120))(a1, a2);
 }
 
+#define VAR(type,name,addr) type& name = *(type*)addr;
+VAR(DWORD, dword_77C934, 0x77C934);
+VAR(BYTE, byte_9AD8A5, 0x9AD8A5);
+VAR(BYTE, byte_9AD8A7, 0x9AD8A7);
+VAR(BYTE, byte_9AD8A6, 0x9AD8A6);
+VAR(BYTE, byte_9AD8A8, 0x9AD8A8);
+VAR(BYTE, byte_9AD8DA, 0x9AD8DA);
+VAR(BYTE, byte_9AD8C1, 0x9AD8C1);
+VAR(DWORD, dword_73490C, 0x73490C);
+VAR(DWORD, dword_734908, 0x734908);
+
+int* gKeys = (int*)0x009AD9A0;
+BYTE* byte_9AD880 = (BYTE*)0x9AD880;
+
+VAR(DWORD, gvirtualKeyRepeatCount, 0x009AD980);
+VAR(DWORD, gVirtualKeyCode, 0x009AD6B0);
+
+VAR(DWORD, gAltPressed, 0x009AD892);
+VAR(DWORD, dword_71D194, 0x71D194);
+VAR(DWORD, gF10Pressed, 0x009AD8F9);
+VAR(DWORD, dword_734900, 0x734900);
+VAR(DWORD, dword_734904, 0x734904);
+VAR(BYTE, byte_9AD988, 0x9AD988);
+VAR(DWORD, dword_688CDC, 0x688CDC);
+VAR(DWORD, dword_71D17C, 0x71D17C);
+VAR(DWORD, dword_688CD0, 0x688CD0);
+VAR(DWORD, dword_688CD4, 0x688CD4);
+VAR(DWORD, dword_688CD8, 0x688CD8);
+VAR(DWORD, dword_791DE4, 0x791DE4);
+VAR(DWORD, dword_717354, 0x717354);
+VAR(DWORD, dword_717348, 0x717348);
+VAR(BYTE, byte_9AD888, 0x9AD888);
+VAR(DWORD, dword_733E34, 0x733E34);
+VAR(DWORD, dword_721E78, 0x721E78);
+VAR(DWORD, dword_7348FC, 0x7348FC);
+VAR(DWORD, dword_650D4C, 0x650D4C);
+VAR(char*, gDest, 0x0078E7C0);
+
+
+
+// 0x00421680
+signed __int64 __cdecl FpsTimerSetupQ()
+{
+    typedef decltype(&FpsTimerSetupQ) fn;
+    return ((fn)(0x00421680))();
+}
+
+// 0x0040A0D4
+int __cdecl Actor_DumpActorSystem()
+{
+    int result; // eax@1
+    int v1; // [sp+0h] [bp-18h]@6
+    actor_related_struct *pNextActor; // [sp+4h] [bp-14h]@4
+    actor_related_struct *pActorCopy; // [sp+8h] [bp-10h]@3
+    signed int i; // [sp+10h] [bp-8h]@1
+    actor_related_struct *pActor; // [sp+14h] [bp-4h]@1
+
+    pActor = gActors;
+    result = printf("--DumpActorSystem--\n");
+    for (i = 0; i < 9; ++i)
+    {
+        printf("Lv %d Pause %d Kill %d\n", i, pActor->mPause, pActor->mKill);
+        pActorCopy = pActor;
+        do
+        {
+            pNextActor = pActorCopy->actor_struct_ptr1;
+            if (pActorCopy->fn_unknown)
+            {
+                if (pActorCopy->field_1C <= 0)
+                    v1 = 0;
+                else
+                    v1 = 100 * pActorCopy->field_18 / pActorCopy->field_1C;
+                printf("Lv%d %04d.%02d %08X %s\n", i, v1 / 100, v1 % 100, pActorCopy->fn_unknown, pActorCopy->mNamePtr);
+                pActorCopy->field_1C = 0;
+                pActorCopy->field_18 = 0;
+            }
+            pActorCopy = pNextActor;
+        } while (pNextActor);
+        ++pActor;
+        result = i + 1;
+    }
+    return result;
+}
+
+// 0x5202FE
+DWORD __cdecl sub_5202FE(float a1, float a2, float a3, float a4)
+{
+    typedef decltype(&sub_5202FE) fn;
+    return ((fn)(0x5202FE))(a1, a2, a3, a4);
+}
+
+// 0x43BCF0 joystick related
+int __cdecl sub_43BCF0()
+{
+    typedef decltype(&sub_43BCF0) fn;
+    return ((fn)(0x43BCF0))();
+}
+
+// 0x521210
+void __cdecl sub_521210()
+{
+    typedef decltype(&sub_521210) fn;
+    return ((fn)(0x521210))();
+}
+
+// 0x452E6E
+int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
+{
+    typedef decltype(&sub_452E6E) fn;
+    return ((fn)(0x452E6E))();
+}
+
+// 0x0043ACC4 
+int __cdecl WmPaint_Handler(HDC hdcDest)
+{
+    typedef decltype(&WmPaint_Handler) fn;
+    return ((fn)(0x0043ACC4))(hdcDest);
+}
+
+// 0x0051C2D3
 signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
 {
-    typedef decltype(&MainWindowProc) fn;
-    return ((fn)(0x0051C2D3))(hWnd, Msg, wParam, lParam);
+    float v4; // ST08_4@14
+    float v5; // ST04_4@14
+    signed int result; // eax@29
+    UINT v7; // [sp+20h] [bp-104h]@54
+    CHAR String[256]; // [sp+24h] [bp-100h]@55
+
+    if (dword_77C934)
+    {
+        if (byte_9AD8A5)
+            sub_5202FE(0.0, -0.003000000026077032, 0.0, 0.0);
+        if (byte_9AD8A7)
+            sub_5202FE(0.0, 0.003000000026077032, 0.0, 0.0);
+        if (byte_9AD8A6)
+            sub_5202FE(0.0, 0.0, -0.003000000026077032, 0.0);
+        if (byte_9AD8A8)
+            sub_5202FE(0.0, 0.0, 0.003000000026077032, 0.0);
+        if (byte_9AD8C1)
+            sub_5202FE(0.02999999932944775, 0.0, 0.0, 0.0);
+        if (byte_9AD8DA)
+            sub_5202FE(-0.02999999932944775, 0.0, 0.0, 0.0);
+        v4 = (double)dword_73490C / 1024.0;
+        v5 = (double)dword_734908 / 1024.0;
+        sub_5202FE(0.0, v5, v4, 0.0);
+        dword_734908 = 9 * dword_734908 / 10;
+        dword_73490C = 9 * dword_73490C / 10;
+    }
+    if (Msg > 0x102)
+    {
+        switch (Msg)
+        {
+        case 0x104u:
+            gKeys[wParam] = lParam;
+            gvirtualKeyRepeatCount = lParam;
+            gVirtualKeyCode = wParam;
+            if (wParam < 0x100)
+                byte_9AD880[wParam] = 1;
+            if ((unsigned __int16)gVirtualKeyCode == 18)
+            {
+                gAltPressed = 1;
+                return 0;
+            }
+            if ((unsigned __int16)gVirtualKeyCode == 121)
+            {
+                dword_71D194 = 1;
+                gF10Pressed = 1;
+                return 0;
+            }
+            break;
+        case 0x105u:                              // WM_SYSKEYUP
+            gvirtualKeyRepeatCount = lParam;
+            gVirtualKeyCode = wParam;
+            if (wParam < 0x100)
+                byte_9AD880[wParam] = 0;
+            if ((unsigned __int16)gVirtualKeyCode == 18)// VK_MENU
+            {
+                gAltPressed = 0;
+                return 0;
+            }
+            if ((unsigned __int16)gVirtualKeyCode == 121)// VK_F10
+            {
+                gF10Pressed = 0;
+                Actor_DumpActorSystem();
+                return 0;
+            }
+            break;
+        case 0x200u:
+            if (dword_77C934)
+            {
+                dword_734908 = (unsigned __int16)lParam - dword_734900;
+                dword_73490C = (unsigned __int16)((unsigned int)lParam >> 16) - dword_734904;
+                dword_734900 = (unsigned __int16)lParam;
+                dword_734904 = (unsigned int)lParam >> 16;
+            }
+            break;
+        case 0x218u:
+            return 1112363332;
+        }
+        return DefWindowProcA(hWnd, Msg, wParam, lParam);
+    }
+    if (Msg == 258)
+    {
+        byte_9AD988 = wParam;
+        return DefWindowProcA(hWnd, Msg, wParam, lParam);
+    }
+    if (Msg == 6)
+    {
+        if ((WORD)wParam)
+        {
+            printf("$jim - WM_ACTIVATE (active)\n");
+            dword_688CDC = 1;
+        }
+        else
+        {
+            printf("$jim - WM_ACTIVATE (inactive)\n");
+            dword_688CDC = 0;
+        }
+        sub_43BCF0();
+        FpsTimerSetupQ();
+        result = 1;
+    }
+    else
+    {
+        if (Msg == 15)
+        {
+            printf("$jim - WM_PAINT\n");
+            if (dword_71D17C)
+            {
+                WmPaint_Handler((HDC)wParam);
+                return 0;
+            }
+            return DefWindowProcA(hWnd, Msg, wParam, lParam);
+        }
+        if (Msg == 16)
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
+        if (Msg != 256)
+        {
+            if (Msg != 257)
+                return DefWindowProcA(hWnd, Msg, wParam, lParam);
+        LABEL_108:
+            if (wParam < 0x100)
+                byte_9AD880[wParam] = Msg == 256;
+            return DefWindowProcA(hWnd, Msg, wParam, lParam);
+        }
+        v7 = MapVirtualKeyA(wParam, 0);
+        if (v7)
+        {
+            GetKeyNameTextA(v7 << 16, String, 256);
+            gKeys[wParam] = lParam;
+        }
+        gKeys[wParam] = lParam;
+        if (wParam > 0x76)
+        {
+            switch (wParam)
+            {
+            case 0x77u:
+                if (gCheatsEnabled)
+                {
+                    dword_688CD0 = 0;
+                    result = 0;
+                }
+                else
+                {
+                    result = 0;
+                }
+                break;
+            case 0x78u:
+                if (gCheatsEnabled)
+                {
+                    dword_688CD0 = 1;
+                    result = 0;
+                }
+                else
+                {
+                    result = 0;
+                }
+                break;
+            case 0x7Au:
+                if (gCheatsEnabled)
+                {
+                    dword_688CD4 ^= 1u;
+                    result = 0;
+                }
+                else
+                {
+                    result = 0;
+                }
+                break;
+            default:
+                if (wParam != 123)
+                    goto LABEL_108;
+                if (gCheatsEnabled)
+                {
+                    dword_688CD8 ^= 1u;
+                    result = 0;
+                }
+                else
+                {
+                    result = 0;
+                }
+                break;
+            }
+        }
+        else
+        {
+            if (wParam == 118)
+            {
+                if (gCheatsEnabled)
+                {
+                    stru_722760.field_3C = 0;
+                    sub_521210();
+                    sub_452E6E();
+                    result = 0;
+                }
+                else
+                {
+                    result = 0;
+                }
+            }
+            else
+            {
+                if (wParam == 27)
+                {
+                    dword_791DE4 = 1;
+                    if (stru_722760.field_3C != 0x20000000 || !strstr(gDest, "s19a"))
+                    {
+                        if (!dword_717354)
+                        {
+                            if (!dword_717348)
+                            {
+                                if (!byte_9AD888)
+                                {
+                                    if (!dword_733E34)
+                                    {
+                                        if (!dword_721E78)
+                                            dword_717354 = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    goto LABEL_108;
+                }
+                switch (wParam)
+                {
+                case 0x71u:
+                    if (gCheatsEnabled)
+                    {
+                        if (dword_7348FC)
+                            dword_7348FC = 0;
+                        else
+                            dword_7348FC = 1;
+                        result = 0;
+                    }
+                    else
+                    {
+                        result = 0;
+                    }
+                    break;
+                case 0x73u:
+                    if (gCheatsEnabled)
+                    {
+                        dword_650D4C ^= 1u;
+                        result = 0;
+                    }
+                    else
+                    {
+                        result = 0;
+                    }
+                    break;
+                case 0x74u:
+                    if (gCheatsEnabled)
+                    {
+                        dword_77C934 = 0;
+                        result = 0;
+                    }
+                    else
+                    {
+                        result = 0;
+                    }
+                    break;
+                default:
+                    if (wParam != 117)
+                        goto LABEL_108;
+                    if (gCheatsEnabled)
+                    {
+                        dword_77C934 = 1;
+                        result = 0;
+                    }
+                    else
+                    {
+                        result = 0;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    return result;
 }
 
 void __cdecl ShutdownEngine()
@@ -137,13 +536,6 @@ int __cdecl sub_52255B(int a1)
 {
     typedef decltype(&sub_52255B) fn;
     return ((fn)(0x52255B))(a1);
-}
-
-// 0x00421680
-signed __int64 __cdecl FpsTimerSetupQ()
-{
-    typedef decltype(&FpsTimerSetupQ) fn;
-    return ((fn)(0x00421680))();
 }
 
 // 0x0044A7B0
@@ -648,6 +1040,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                 gWindowedMode = 1;
                 gSoftwareRendering = 1;
                 gNoCdEnabled = 1;
+                gFps = 1;
 
                 gHwnd = CreateWindowExA(
                     0,
