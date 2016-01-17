@@ -503,11 +503,843 @@ BOOL __cdecl SetWindowSize(HWND hWnd, int nWidth, int nHeight)
     return ((fn)(0x0051D09D))(hWnd, nWidth, nHeight);
 }
 
+DWORD* dword_664EC4 = (DWORD*)0x664EC4;
+DWORD* dword_664EC0 = (DWORD*)0x664EC0;
+char* aHoldDownTheInv = (char*)0x00662EC0;
+
+// 0x0043CBD9
+int __cdecl MessageBox_Sometimes(HWND hWnd, int a2, LPCSTR lpCaption, UINT uType)
+{
+    int result; // eax@2
+    signed int i; // [sp+0h] [bp-8h]@5
+    signed int j; // [sp+0h] [bp-8h]@11
+    signed int v7; // [sp+4h] [bp-4h]@5
+
+    if (a2 <= 0 || (result = a2, dword_664EC4[2 * a2]))
+    {
+        if (a2 == -1)
+        {
+            v7 = -1;
+            for (i = 0; i < 8; ++i)
+            {
+                if (dword_664EC4[2 * i])
+                {
+                    if (dword_664EC0[2 * i])
+                        v7 = i;
+                }
+                result = i + 1;
+            }
+            for (j = 0; j < 8; ++j)
+            {
+                if (dword_664EC4[2 * j])
+                {
+                    if (dword_664EC0[2 * j])
+                    {
+                        if (dword_664EC4[2 * j] < (unsigned int)dword_664EC4[2 * v7])
+                        {
+                            v7 = j;
+                            dword_664EC0[2 * j] = 0;
+                        }
+                    }
+                }
+                result = j + 1;
+            }
+            if (v7 >= 0)
+                result = MessageBoxA(hWnd, &aHoldDownTheInv[1024 * v7], lpCaption, uType); // Hold down the Inventory and Weapon item buttons
+        }
+        else
+        {
+            ++dword_664EC0[2 * a2];
+            result = 2;
+        }
+    }
+    else
+    {
+        result = MessageBoxA(hWnd, &aHoldDownTheInv[1024 * a2], lpCaption, uType);
+    }
+    return result;
+}
+
+// 0x0041ECB0
+signed int __cdecl InitD3d_ProfileGfxHardwareQ()
+{
+    typedef decltype(&InitD3d_ProfileGfxHardwareQ) fn;
+    return ((fn)(0x0041ECB0))();
+    /*
+    signed int result; // eax@41
+    int v1; // edx@115
+    float v2; // STB4_4@163
+    int v3; // [sp+C8h] [bp-388h]@142
+    int v4; // [sp+CCh] [bp-384h]@142
+    int v5; // [sp+D0h] [bp-380h]@142
+    int v6; // [sp+D4h] [bp-37Ch]@142
+    int v7; // [sp+D8h] [bp-378h]@142
+    int v8; // [sp+DCh] [bp-374h]@142
+    int v9; // [sp+E0h] [bp-370h]@142
+    int v10; // [sp+E4h] [bp-36Ch]@142
+    int v11; // [sp+E8h] [bp-368h]@142
+    int v12; // [sp+ECh] [bp-364h]@142
+    int v13; // [sp+F0h] [bp-360h]@142
+    int v14; // [sp+F4h] [bp-35Ch]@142
+    char v15; // [sp+130h] [bp-320h]@142
+    int v16; // [sp+150h] [bp-300h]@142
+    int v17; // [sp+154h] [bp-2FCh]@142
+    int v18; // [sp+164h] [bp-2ECh]@104
+    int v19; // [sp+168h] [bp-2E8h]@104
+    int v20; // [sp+16Ch] [bp-2E4h]@104
+    int v21; // [sp+170h] [bp-2E0h]@104
+    int v22; // [sp+174h] [bp-2DCh]@76
+    int v23; // [sp+178h] [bp-2D8h]@1
+    int v24; // [sp+17Ch] [bp-2D4h]@1
+    int v25; // [sp+180h] [bp-2D0h]@1
+    int v26; // [sp+184h] [bp-2CCh]@1
+    int v27; // [sp+188h] [bp-2C8h]@1
+    int v28; // [sp+18Ch] [bp-2C4h]@1
+    int v29; // [sp+190h] [bp-2C0h]@1
+    int v30; // [sp+194h] [bp-2BCh]@1
+    int v31; // [sp+198h] [bp-2B8h]@114
+    int v32; // [sp+1A0h] [bp-2B0h]@115
+    int v33; // [sp+314h] [bp-13Ch]@1
+    int v34; // [sp+318h] [bp-138h]@3
+    unsigned int i; // [sp+320h] [bp-130h]@34
+    int v36; // [sp+328h] [bp-128h]@86
+    int v37; // [sp+32Ch] [bp-124h]@97
+    int v38; // [sp+330h] [bp-120h]@97
+    int v39; // [sp+334h] [bp-11Ch]@97
+    unsigned int v40; // [sp+37Ch] [bp-D4h]@119
+    int v41; // [sp+390h] [bp-C0h]@91
+    int v42; // [sp+3A4h] [bp-ACh]@30
+    int v43; // [sp+3B0h] [bp-A0h]@70
+    int v44; // [sp+3B4h] [bp-9Ch]@72
+    int v45; // [sp+3C4h] [bp-8Ch]@73
+    int v46; // [sp+418h] [bp-38h]@72
+    int v47; // [sp+42Ch] [bp-24h]@163
+    int v48; // [sp+430h] [bp-20h]@163
+    int v49; // [sp+434h] [bp-1Ch]@163
+    int v50; // [sp+438h] [bp-18h]@163
+    int v51; // [sp+43Ch] [bp-14h]@163
+    int v52; // [sp+440h] [bp-10h]@163
+    int v53; // [sp+444h] [bp-Ch]@40
+    GUID *lpGuid; // [sp+448h] [bp-8h]@1
+    int v55; // [sp+44Ch] [bp-4h]@1
+
+    lpGuid = 0;
+    v33 = 0;
+    v23 = 32;
+    v24 = 65;
+    v25 = 0;
+    v26 = 16;
+    v27 = 31744;
+    v28 = 992;
+    v29 = 31;
+    v30 = 32768;
+    File = fopen("profile.log", "w");
+    fputs("InitAll {\n", File);
+    fflush(File);
+    gLogFile = File;
+    DoDirectInputInit();
+    fputs("jim_enumerate_devices()\n", File);
+    fflush(File);
+    v55 = sub_51F22F();
+    if (!v55)
+    {
+        gSoftwareRendering = 1;
+        dword_716F5C = 1065353216;
+        LODWORD(gXRes) = 1065353216;
+        fputs("No hardware rendering devices were enumerated\n", File);
+        fflush(File);
+        fputs(" #entering software mode\n", File);
+        fflush(File);
+    }
+    v34 = 0;
+    if (gWindowedMode)
+        v34 = 1;
+    fputs("jim_read_config_from_file\n", File);
+    fflush(File);
+    if (ParseMsgCfg())
+    {
+        dword_651CF8 = 0;
+        fputs(" . done\n", File);
+        fflush(File);
+        if (dword_716F78 == 1)
+        {
+            if (gNoCrashCheck)
+            {
+                MessageBoxA(
+                    0,
+                    "Game crashed during previous initialization, game starting software rendering mode...",
+                    "Metal Gear Solid",
+                    0);
+                gSoftwareRendering = 1;
+                dword_716F5C = 1065353216;
+                LODWORD(gXRes) = 1065353216;
+            }
+        }
+    }
+    else
+    {
+        dword_651CF8 = 1;
+        dword_716F78 = 0;
+        fputs(" . fail\n", File);
+        fflush(File);
+    }
+    if (gNoCrashCheck)
+    {
+        dword_716F78 = 1;
+        sub_433801();
+    }
+    if (!dword_651CF8)
+    {
+        if (v55 == -1)
+        {
+            MessageBoxA(
+                0,
+                "Your video configuration has been updated - your system will be re-profiled\n",
+                "Metal Gear Solid (PC)",
+                0);
+            v55 = 0;
+            if (sub_41EC40())
+            {
+                gSoftwareRendering = 0;
+                LODWORD(gXRes) = 1073741824;
+            }
+            else
+            {
+                gSoftwareRendering = 1;
+                lpGuid = 0;
+                LODWORD(gXRes) = 1065353216;
+                dword_716F5C = 1065353216;
+                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+            }
+            gWindowedMode = 0;
+            sub_433801();
+            v34 = gWindowedMode;
+            if (ParseMsgCfg())
+                dword_651CF8 = 0;
+            else
+                dword_651CF8 = 1;
+        }
+    }
+    sub_43C850();
+    if (dword_651CF8)
+    {
+        dword_651D98 = 100;
+        dword_716F68 = 100;
+        fputs("Executing system profiling sequence.\n", File);
+        fflush(File);
+        fputs("Choosing default 3D-accelerator\n", File);
+        fflush(File);
+        if (sub_41EC40())
+        {
+            fputs(" . done\n", File);
+            fflush(File);
+            fprintf(File, " getting selected driver No %d from %d available\n", dword_77C60C + 1, dword_77C608);
+            LODWORD(gXRes) = 1073741824;
+            gWindowedMode = 0;
+            gSoftwareRendering = 0;
+        }
+        else
+        {
+            fputs(" . fail\n", File);
+            fflush(File);
+            fputs(" #entering software mode\n", File);
+            fflush(File);
+            gSoftwareRendering = 1;
+            gWindowedMode = 0;
+            dword_716F5C = 1065353216;
+            LODWORD(gXRes) = 1065353216;
+            lpGuid = 0;
+            MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+        }
+        sub_431C63();
+    }
+    else
+    {
+        dword_77C60C = dword_716F74;
+    }
+    if (v34)
+    {
+        dword_77C60C = 0;
+        LODWORD(gXRes) = 1073741824;
+    }
+    if (gSoftwareRendering)
+    {
+        v42 = gWindowedMode;
+    }
+    else
+    {
+        sub_51F1E1(&lpGuid, &v33);
+        v42 = 0;
+        gWindowedMode = 0;
+    }
+    if (v34)
+    {
+        v42 = 1;
+        gWindowedMode = 1;
+    }
+    fputs("\n(i) List of enumerated devices:\n", File);
+    fflush(File);
+    for (i = 0; i < dword_77C608; ++i)
+    {
+        fprintf(File, "pDriverGUID %x, pDeviceGUID %x\n", dword_776B94[290 * i], dword_776B90[290 * i]);
+        fprintf(File, "D3DDevice description : %s", (char *)&unk_776B68 + 1160 * i);
+        if (dword_77C60C == i)
+        {
+            fputs("   /selected/\n", File);
+            fflush(File);
+        }
+        else
+        {
+            fputs(L"\n", File);
+            fflush(File);
+        }
+    }
+    while (1)
+    {
+        dword_6DF214 = (signed __int64)(320.0 * gXRes);
+        cy = (signed __int64)(240.0 * gXRes);
+        fputs("Creating DirectDraw7\n", File);
+        fflush(File);
+        v53 = DirectDrawCreateEx(lpGuid, &lpDD, &iid, 0);
+        if (v53 < 0)
+        {
+            fputs(" . fail\n", File);
+            fflush(File);
+            return 0;
+        }
+        fputs(" . done\n", File);
+        fflush(File);
+        if (!gSoftwareRendering)
+        {
+            fputs("Query interface...\n", File);
+            fflush(File);
+            (**(void(__stdcall ***)(LPVOID, _UNKNOWN *, int *))lpDD)(lpDD, &unk_64BB98, &dword_6FC748);
+            if (v53 < 0)
+            {
+                fputs(" . fail\n", File);
+                fflush(File);
+                gSoftwareRendering = 1;
+                LODWORD(gXRes) = 1065353216;
+                dword_6DF214 = (signed __int64)(320.0 * gXRes);
+                cy = (signed __int64)(240.0 * gXRes);
+                MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
+            }
+            fputs(" . done\n", File);
+            fflush(File);
+        }
+        if (gSoftwareRendering)
+        {
+            if (gXRes >= 1.1)
+            {
+                LODWORD(gXRes) = 1073741824;
+                dword_650D2C = 17;
+            }
+            else
+            {
+                LODWORD(gXRes) = 1065353216;
+                dword_650D2C = 16;
+            }
+        }
+        if (dword_6FC734)
+        {
+            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC734 + 8))(dword_6FC734);
+            if (v53)
+                PrintDDError((int)"Can't relaese primary surf", v53);
+            dword_6FC734 = 0;
+        }
+        if (dword_6FC738)
+        {
+            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC738 + 8))(dword_6FC738);
+            if (v53)
+                PrintDDError((int)"Can't release render surf", v53);
+            dword_6FC738 = 0;
+        }
+        if (dword_6FC750)
+        {
+            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
+            if (v53)
+                PrintDDError((int)"Can't release clipper", v53);
+            dword_6FC750 = 0;
+        }
+        dword_6FC734 = 0;
+        dword_6FC738 = 0;
+        dword_6FC750 = 0;
+        fputs("Setting cooperative level...\n", File);
+        fflush(File);
+        if (v42)
+        {
+            fputs(" (windowed) \n", File);
+            fflush(File);
+            v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5128);
+        }
+        else
+        {
+            fputs(" (full-screen) \n", File);
+            fflush(File);
+            v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5137);
+        }
+        if (v53 < 0)
+        {
+            fputs(" . fail\n", File);
+            fflush(File);
+            return 0;
+        }
+        fputs(" . done\n", File);
+        fflush(File);
+        if (!v42)
+        {
+            v53 = (*(int(__stdcall **)(LPVOID, int, int, signed int, _DWORD, _DWORD))(*(_DWORD *)lpDD + 84))(
+                lpDD,
+                dword_6DF214,
+                cy,
+                16,
+                0,
+                0);
+            fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", dword_6DF214, cy);
+            if (v53 < 0)
+                return 0;
+        }
+        memset(&v43, 0, 0x7Cu);
+        v43 = 124;
+        if (v42 || gSoftwareRendering)
+        {
+            v44 = 1;
+            v46 = 512;
+        }
+        else
+        {
+            v44 = 33;
+            v46 = 8728;
+            v45 = 1;
+        }
+        fputs("Creating primary surface...\n", File);
+        fflush(File);
+        v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v43, &dword_6FC734, 0);
+        if (v53 < 0)
+        {
+            fputs(" . fail\n", File);
+            fflush(File);
+            return 0;
+        }
+        fputs(" . done\n", File);
+        fflush(File);
+        v22 = 0;
+        sub_431865();
+        if (dword_651CF8)
+        {
+            sub_41CD70();
+            Sleep(0x7D0u);
+        }
+        if (gWindowedMode)
+        {
+            fputs("Creating clipper...\n", File);
+            fflush(File);
+            v53 = (*(int(__stdcall **)(LPVOID, _DWORD, int *, _DWORD))(*(_DWORD *)lpDD + 16))(lpDD, 0, &dword_6FC750, 0);
+            if (v53)
+            {
+                fputs(" . fail\n", File);
+                fflush(File);
+                PrintDDError((int)"Can't create clipper", v53);
+                return 0;
+            }
+            v53 = (*(int(__stdcall **)(int, _DWORD, HWND))(*(_DWORD *)dword_6FC750 + 32))(dword_6FC750, 0, gHwnd);
+            if (v53)
+            {
+                fputs(" . fail\n", File);
+                fflush(File);
+                PrintDDError((int)"Can't obtain clipper zone", v53);
+                return 0;
+            }
+            v53 = (*(int(__stdcall **)(int, int))(*(_DWORD *)dword_6FC734 + 112))(dword_6FC734, dword_6FC750);
+            if (v53)
+            {
+                fputs(" . fail\n", File);
+                fflush(File);
+                PrintDDError((int)"Can't attach clipper", v53);
+                return 0;
+            }
+            (*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
+            fputs(" . done\n", File);
+            fflush(File);
+        }
+        memset(&v36, 0, 0x7Cu);
+        v36 = 124;
+        if (gSoftwareRendering)
+        {
+            if (dword_651CF8 || dword_716F6C && dword_716F6C != 1)
+            {
+                fputs("Testing software render speed to system and to video surface\n", File);
+                fflush(File);
+                if (sub_41CE20())
+                {
+                    fputs(" . rendering to video surface is faster\n", File);
+                    fflush(File);
+                    dword_716F6C = 1;
+                    v41 = 16448;
+                }
+                else
+                {
+                    fputs(" . rendering to system memory surface is faster\n", File);
+                    fflush(File);
+                    dword_716F6C = 0;
+                    v41 = 2112;
+                }
+            }
+            else
+            {
+                if (dword_716F6C)
+                    v41 = 16448;
+                else
+                    v41 = 2112;
+            }
+            v37 = 7;
+            v39 = dword_6DF214;
+            v38 = cy;
+            fputs("Creating back buffer for software rendering...\n", File);
+            fflush(File);
+            v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v36, &dword_6FC738, 0);
+            if (v53 < 0)
+            {
+                fputs(" . fail\n", File);
+                fflush(File);
+                return 0;
+            }
+            fputs(" . done\n", File);
+            fflush(File);
+        }
+        else
+        {
+            if (v42)
+            {
+                v37 = 7;
+                v41 = 8256;
+                v39 = dword_6DF214;
+                v38 = cy;
+                fputs("Creating back buffer for windowed mode...\n", File);
+                fflush(File);
+                v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v36, &dword_6FC738, 0);
+                if (v53 < 0)
+                {
+                    fputs(" . fail\n", File);
+                    fflush(File);
+                    return 0;
+                }
+                fputs(" . done\n", File);
+                fflush(File);
+            }
+            else
+            {
+                v18 = 4;
+                v19 = 0;
+                v20 = 0;
+                v21 = 0;
+                fputs("Getting back buffer from pPrim chain...\n", File);
+                fflush(File);
+                v53 = (*(int(__stdcall **)(int, int *, int *))(*(_DWORD *)dword_6FC734 + 48))(
+                    dword_6FC734,
+                    &v18,
+                    &dword_6FC738);
+                if (v53 < 0)
+                {
+                    fputs(" . fail\n", File);
+                    fflush(File);
+                    return v53;
+                }
+                fputs(" . done\n", File);
+                fflush(File);
+            }
+        }
+        fputs("Restoring surfaces...\n", File);
+        fflush(File);
+        sub_41CC30();
+        if (v53)
+        {
+            fputs(" . fail\n", File);
+            fflush(File);
+            PrintDDError((int)"Restoring caput", v53);
+        }
+        else
+        {
+            fputs(" . done\n", File);
+            fflush(File);
+        }
+        fputs("Querying gamma interface...\n", File);
+        fflush(File);
+        v53 = (**(int(__stdcall ***)(int, _UNKNOWN *, int *))dword_6FC734)(dword_6FC734, &unk_64BCA8, &dword_6C0EF8);
+        if (v53)
+        {
+            fputs(" . fail\n", File);
+            fflush(File);
+            PrintDDError((int)"Can't get GammaControl interface", v53);
+            dword_6FC7C4 = 0;
+        }
+        else
+        {
+            fputs(" . done\n", File);
+            fflush(File);
+            dword_6FC7C4 = 1;
+        }
+        if (lpDD)
+        {
+            memset(&v31, 0, 0x17Cu);
+            v31 = 380;
+            v53 = (*(int(__stdcall **)(LPVOID, int *, _DWORD))(*(_DWORD *)lpDD + 44))(lpDD, &v31, 0);
+            if (v53 || (v1 = v32, !(v1 & 0x20000)))
+                dword_6FC7C4 = 0;
+        }
+        dword_6FC79C = sub_41D1D0();
+        fprintf(File, "565 mode = %i\n", dword_6FC79C);
+        if (gSoftwareRendering)
+            break;
+        v36 = 124;
+        (*(void(__stdcall **)(LPVOID, int *))(*(_DWORD *)lpDD + 48))(lpDD, &v36);
+        if (v40 <= 8)
+        {
+            fputs("Can't render to a palettized surface, exiting.\n", File);
+            fflush(File);
+            return 0;
+        }
+        fputs("Screen mode is ok\n", File);
+        fflush(File);
+        fputs("Creating device...\n", File);
+        fflush(File);
+        v53 = (*(int(__stdcall **)(int, int, int, int *))(*(_DWORD *)dword_6FC748 + 16))(
+            dword_6FC748,
+            v33,
+            dword_6FC738,
+            &dword_6FC74C);
+        if (v53 >= 0)
+        {
+            fputs(" . done\n", File);
+            fflush(File);
+            sub_422A90(22, 1);
+            sub_422A90(26, 0);
+            if (!gSoftwareRendering)
+            {
+                v3 = 32;
+                v4 = 65;
+                v5 = 0;
+                v6 = 16;
+                v7 = 31744;
+                v8 = 992;
+                v9 = 31;
+                v10 = 32768;
+                memset(&v11, 0, 0x7Cu);
+                v11 = 124;
+                v12 = 4103;
+                memcpy(&v15, &v3, 0x20u);
+                v14 = 16;
+                v13 = 16;
+                v16 = 4096;
+                v17 = 16;
+                v53 = (*(int(__stdcall **)(_DWORD, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v11, &dword_6FC740, 0);
+                if (v53)
+                {
+                    dword_6FC740 = 0;
+                }
+                else
+                {
+                    if (!sub_41E990())
+                    {
+                        (*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC740 + 8))(dword_6FC740);
+                        dword_6FC740 = 0;
+                    }
+                }
+            }
+            sub_422BC0(0, 2, 2);
+            sub_422BC0(0, 1, 4);
+            sub_422BC0(0, 3, 0);
+            sub_422BC0(0, 5, 2);
+            sub_422BC0(0, 4, 4);
+            sub_422BC0(0, 6, 0);
+            if (sub_41E3C0())
+            {
+                fprintf(File, "Blend modes = %i \n", gBlendMode);
+                fprintf(File, "Alpha modulate = %i \n", dword_6FC798);
+                gColourKey = sub_41E730();
+                fprintf(File, "ColorKey = %i\n", gColourKey);
+                sub_422BC0(0, 12, 3);
+                if (gModX2 == 2)
+                    gModX2 = sub_41D420();
+                fprintf(File, "MODULATE2X = %i \n", gModX2);
+                if (gColourKey)
+                {
+                    sub_422A90(41, 1);
+                }
+                else
+                {
+                    sub_422A90(15, 1);
+                    sub_422A90(24, 127);
+                    sub_422A90(25, 7);
+                }
+                sub_422A90(26, 1);
+                if (dword_651CF8)
+                {
+                    if (gLowRes != gLowRes)
+                    {
+                        if (!gLowRes)
+                        {
+                            fputs("Not enough video memory for high resolution textures, disabling.\n", File);
+                            fflush(File);
+                        }
+                    }
+                    if (gNoEffects)
+                    {
+                        fputs("Water and ninja effects are on\n", File);
+                        fflush(File);
+                    }
+                    else
+                    {
+                        fputs("Water and ninja effects are unsupported by hardware, disabling.\n", File);
+                        fflush(File);
+                    }
+                    if (gModX2)
+                    {
+                        fputs("Modulate by 2 works correctly, enabling.\n", File);
+                        fflush(File);
+                    }
+                    else
+                    {
+                        fputs("Modulate by 2 doesn't work correctly or unsupported, disabling\n", File);
+                        fflush(File);
+                    }
+                }
+                v47 = 0;
+                v48 = 0;
+                v49 = dword_6DF214;
+                v50 = cy;
+                v51 = 0;
+                v52 = 1065353216;
+                (*(void(__stdcall **)(int, int *))(*(_DWORD *)dword_6FC74C + 52))(dword_6FC74C, &v47);
+                v2 = ((double)dword_651D94 - 50.0) / 100.0;
+                sub_41C820(v2);
+            }
+            else
+            {
+                (*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC74C + 8))(dword_6FC74C);
+                dword_6FC74C = 0;
+                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+                gSoftwareRendering = 1;
+            }
+            break;
+        }
+        fputs("D3D:CreateDevice() failed, switching to SOFTWARE MODE\n", File);
+        fflush(File);
+        dword_6DF214 = 320;
+        cy = 240;
+        fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", dword_6DF214, cy);
+        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
+        gSoftwareRendering = 1;
+        dword_716F5C = 1065353216;
+        LODWORD(gXRes) = dword_716F5C;
+        v53 = (*(int(__stdcall **)(_DWORD, _DWORD, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 8);
+        if (dword_6C0EF8)
+            (*(void(__stdcall **)(int))(*(_DWORD *)dword_6C0EF8 + 8))(dword_6C0EF8);
+        if (dword_6FC738)
+        {
+            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC738 + 8))(dword_6FC738);
+            if (v53)
+                PrintDDError((int)"Can't release render surf", v53);
+            dword_6FC738 = 0;
+        }
+        if (dword_6FC734)
+        {
+            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC734 + 8))(dword_6FC734);
+            if (v53)
+                PrintDDError((int)"Can't relaese primary surf", v53);
+            dword_6FC734 = 0;
+        }
+        if (dword_6FC750)
+        {
+            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
+            if (v53)
+                PrintDDError((int)"Can't release clipper", v53);
+            dword_6FC750 = 0;
+        }
+        dword_6FC734 = 0;
+        dword_6FC738 = 0;
+        dword_6FC750 = 0;
+        if (dword_6FC748)
+        {
+            (*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC748 + 8))(dword_6FC748);
+            dword_6FC748 = 0;
+        }
+        if (lpDD)
+        {
+            (*(void(__stdcall **)(LPVOID))(*(_DWORD *)lpDD + 8))(lpDD);
+            lpDD = 0;
+        }
+    }
+    fputs("other inits\n", File);
+    fflush(File);
+    for (i = 0; (signed int)i < 1500; ++i)
+    {
+        dword_6C0F00[20 * i] = 0;
+        dword_6C0F20[20 * i] = 0;
+        dword_6C0F24[20 * i] = 0;
+    }
+    dword_6FC7C0 = sub_41CA80() == 0;
+    if (dword_6FC7C0)
+    {
+        gNoEffects = 0;
+        dword_716F60 = 0;
+    }
+    sub_423F1B(0, (signed __int64)(14.0 * gXRes));
+    MissionLog_Related2();
+    if (!gSoftwareRendering)
+    {
+        dword_6C0EFC = malloc(0x493E0u);
+        for (i = 0; (signed int)i < 15000; ++i)
+            *((_DWORD *)dword_6C0EFC + 5 * i) = 0;
+        dword_6FC780 = malloc(0x75300u);
+    }
+    dword_6FC728 = malloc(0x100000u);
+    if (dword_6FC728)
+    {
+        memset(dword_6FC728, 0, 0x100000u);
+        dword_6FC72C = malloc(0x100000u);
+        if (dword_6FC728)
+        {
+            memset(dword_6FC728, -1, 0x100000u);
+            _cfltcvt_init();
+            memset(&unk_6C0778, 0, 0x400u);
+            dword_6DEF7C = malloc(0x200u);
+            dword_6DEF90 = malloc(0x200u);
+            memset(dword_6DEF7C, 0, 0x100u);
+            fputs("jim_write_configuration_to_file()\n", File);
+            fflush(File);
+            sub_433801();
+            fputs("InitAll }\n", File);
+            fflush(File);
+            fclose(File);
+            result = 1;
+        }
+        else
+        {
+            PrintDDError((int)"$edq Out of memory", 0);
+            fclose(File);
+            result = 0;
+        }
+    }
+    else
+    {
+        PrintDDError((int)"$edq Out of memory", 0);
+        fclose(File);
+        result = 0;
+    }
+    return result;
+    */
+}
+
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
-    typedef decltype(&DoInitAll) fn;
-    return ((fn)(0x00420810))();
+    signed int v1; // ST10_4@1
+
+    v1 = InitD3d_ProfileGfxHardwareQ();
+    MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", 0);
+    return v1;
+
 }
 
 // 0x0052269C
