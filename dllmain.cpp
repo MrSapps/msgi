@@ -9,7 +9,10 @@ extern "C"
         // TODO: Hook any functions that we don't reimplement but want to log etc
 
         // TODO: Call into the re-implemented WinMain
-        //New_WinMain(
+        
+
+
+        New_WinMain(GetModuleHandle(NULL), NULL, GetCommandLineA(), SW_SHOW);
 
         // Don't allow control to go back to the real WinMain
         ExitProcess(0);

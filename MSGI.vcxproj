@@ -59,7 +59,7 @@
     </Link>
     <PostBuildEvent>
       <Command>del "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"
-copy "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"</Command>
+echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -80,7 +80,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Metal Gear Sol
     </Link>
     <PostBuildEvent>
       <Command>del "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"
-copy "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"</Command>
+echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

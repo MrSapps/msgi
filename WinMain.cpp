@@ -84,30 +84,29 @@ void __cdecl DoClearAll()
 }
 
 char*& gCmdLine = *((char**)0x0071D16C);
-
 DWORD& dword_787774 = *((DWORD*)0x787774);
-DWORD& dword_787778 = *((DWORD*)0x787778);; // 0x787778;
-WORD* dword_78E7E4; // 2 elements
+DWORD& dword_787778 = *((DWORD*)0x787778);
+WORD& dword_78E7E4 = *(WORD*)0x78E7E4;
 DWORD& dword_78D7B0 = *((DWORD*)0x78D7B0);
-DWORD gNoCrashCheck;
-DWORD gCheatsEnabled;
-DWORD gNoCdEnabled;
-DWORD gWindowedMode;
-char* off_688DB8 = (char*)0x688DB8;
+DWORD& gNoCrashCheck = *((DWORD*)0x006DEF94);
+DWORD& gCheatsEnabled = *(DWORD*)0x0071687C;
+DWORD& gNoCdEnabled = *(DWORD*)0x006FD1F8;
+DWORD& gWindowedMode = *(DWORD*)0x00650D14;
+char*& off_688DB8 = *(char**)0x688DB8;
 DWORD& dword_6FC7A0 = *((DWORD*)0x6FC7A0);
-DWORD gNoEffects;
-float gXRes;
-DWORD gNoFilter;
-DWORD gModX2;
-DWORD gNoTrueType;
-DWORD gFps;
-DWORD gColourKey;
-DWORD gBlendMode;
-DWORD gLowRes;
-char* off_688D40;
-DWORD gSoftwareRendering;
-HWND gHwnd;
-HINSTANCE gHInstance;
+DWORD& gNoEffects = *(DWORD*)0x00650D24;
+float& gXRes = *(float*)0x00650D28;
+DWORD& gNoFilter = *(DWORD*)0x00650D34;
+DWORD& gModX2 = *(DWORD*)0x00650D30;
+DWORD& gNoTrueType = *(DWORD*)0x00650D40;
+DWORD& gFps = *(DWORD*)0x006FC76C;
+DWORD& gColourKey = *(DWORD*)0x006FC7A4;
+DWORD& gBlendMode = *(DWORD*)0x00650D38;
+DWORD& gLowRes = *(DWORD*)0x00650D20;
+char*& off_688D40 = *(char**)0x688D40;
+DWORD& gSoftwareRendering = *(DWORD*)0x006FC794;
+HWND& gHwnd = *(HWND*)0x009ADDA0;
+HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
 DWORD& dword_651D98 = *((DWORD*)0x651D98);
 DWORD& dword_716F68 = *((DWORD*)0x716F68);
 
@@ -156,8 +155,10 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                 FreeLibrary(hKernel32);
             }
             CheckForMmf(dword_787774, dword_787778);
-            dword_78E7E4[0] |= 0x4000u;
-            dword_78E7E4[0] |= 0x100u;
+            
+            dword_78E7E4 |= 0x4000u;
+            dword_78E7E4 |= 0x100u;
+
             _strlwr(lpCmdLine);
             _chdir(".");
             dword_78D7B0 = -1;
