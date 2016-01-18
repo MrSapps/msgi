@@ -8,6 +8,10 @@
 
 #define DIRECTINPUT_VERSION 0x700
 #include <dinput.h>
+#define DIRECTDRAW_VERSION 0x700
+#include <ddraw.h>
+#define DIRECT3D_VERSION 0x700
+#include "d3d.h"
 
 struct actor_related_struct
 {
@@ -566,6 +570,18 @@ int __cdecl MessageBox_Sometimes(HWND hWnd, int a2, LPCSTR lpCaption, UINT uType
     return result;
 }
 
+// 0x42B6A0
+signed int __stdcall DirectDrawCreateExMGS(GUID* lpGuid, LPVOID* lplpDD, const IID *const iid, IUnknown* punkOuter)
+{
+    typedef decltype(&DirectDrawCreateExMGS) fn;
+    return ((fn)(0x42B6A0))(lpGuid, lplpDD, iid, punkOuter);
+}
+
+VAR(GUID, IID_IDirectDraw7_MGS, 0x64BDA8);
+VAR(GUID, IID_IDirect3D7_MGS, 0x64BB98);
+VAR(IDirectDraw7*, pDirectDraw, 0x6FC730);
+VAR(IDirect3D7*, pDirect3D, 0x6FC748);
+
 // 0x0041ECB0
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -806,7 +822,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         cy = (signed __int64)(240.0 * gXRes);
         fputs("Creating DirectDraw7\n", File);
         fflush(File);
-        v53 = DirectDrawCreateEx(lpGuid, &lpDD, &iid, 0);
+        //v53 = DirectDrawCreateEx(lpGuid, &lpDD, &iid, 0);
+        v53 = DirectDrawCreateExMGS(lpGuid, &pDirectDraw, IID_IDirectDraw7_MGS, 0);
         if (v53 < 0)
         {
             fputs(" . fail\n", File);
@@ -819,7 +836,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             fputs("Query interface...\n", File);
             fflush(File);
-            (**(void(__stdcall ***)(LPVOID, _UNKNOWN *, int *))lpDD)(lpDD, &unk_64BB98, &dword_6FC748);
+            //(**(void(__stdcall ***)(LPVOID, _UNKNOWN *, int *))lpDD)(lpDD, &unk_64BB98, &dword_6FC748);
+            pDirectDraw->QueryInterface(IID_IDirect3D7, &pDirect3D);
             if (v53 < 0)
             {
                 fputs(" . fail\n", File);
@@ -876,13 +894,15 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             fputs(" (windowed) \n", File);
             fflush(File);
-            v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5128);
+            //v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5128);
+            v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_NORMAL);
         }
         else
         {
             fputs(" (full-screen) \n", File);
             fflush(File);
-            v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5137);
+            //v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5137);
+            v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
         }
         if (v53 < 0)
         {
