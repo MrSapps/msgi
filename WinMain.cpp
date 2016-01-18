@@ -1432,17 +1432,30 @@ LPDIENUMDEVICEOBJECTSCALLBACKA CountDeviceObjectsCallback = (LPDIENUMDEVICEOBJEC
 
 VAR(DWORD, dword_71D670, 0x71D670);
 VAR(DWORD, dword_71D790, 0x71D790);
+VAR(DWORD, dword_71D798, 0x71D798);
 VAR(LPDIRECTINPUT7, pDirectInput, 0x71D664);
 VAR(LPDIRECTINPUTDEVICE7, pJoystickDevice, 0x71D66C);
+VAR(LPDIRECTINPUTDEVICEA, pMouseDevice, 0x71D668);
+VAR(DWORD, dword_71D41C, 0x71D41C);
 VAR(DIDEVICEINSTANCEA, JoystickDeviceInfos, 0x71D420);
 VAR(DIDATAFORMAT, JoystickDataFormat, 0x64DA88);
+VAR(DIDATAFORMAT, MouseDataFormat, 0x64DA70);
 VAR(DIDEVCAPS, JoystickDeviceCaps, 0x71D1D8);
 DWORD* dword_65714C = (DWORD*)0x65714C;
 DWORD* dword_657184 = (DWORD*)0x657184;
+DWORD* dword_6571BC = (DWORD*)0x6571BC;
+DWORD* dword_6571F4 = (DWORD*)0x6571F4;
 char* sidewinderEtc = (char*)0x657298;
 GUID& IID_IDirectInput7A_MGS = *((GUID*)0x64B028);
+GUID& GUID_SysMouse_MGS = *((GUID*)0x64AEE8);
+DWORD* dword_65726C = (DWORD*)0x65726C;
+char* buttonNames = (char*)0x65510C;
+char* buttonList = (char*)0x654A98;
+VAR(DWORD, nJoystickDeviceObjects, 0x71D68C);
+VAR(DWORD, dword_6FD1DC, 0x6FD1DC);
 
 
+// Implementation untested for the moment
 // 0x0043B1D1
 int __cdecl InitDirectInput(HWND hWnd)
 {
@@ -1484,6 +1497,7 @@ int __cdecl InitDirectInput(HWND hWnd)
 
                                 for (int i = 0; i < 6; i++)
                                 {
+                                    int var14 = 1;
                                     strcpy(productName, JoystickDeviceInfos.tszProductName);
                                     _strlwr(productName);
                                     strcpy(instanceName, JoystickDeviceInfos.tszInstanceName);
@@ -1492,14 +1506,27 @@ int __cdecl InitDirectInput(HWND hWnd)
                                     for (int j = 0; j < 5; j++)
                                     {
                                         size_t offset = i * 0x140 + j * 0x40;
-                                        if (strstr(productName, &sidewinderEtc[offset]) == 0)
+                                        if (strstr(productName, &sidewinderEtc[offset]) == 0 && strstr(instanceName, &sidewinderEtc[offset]) == 0)
                                         {
-                                            // 0x43B707
+                                            var14 = 0;
                                         }
-                                        else
+                                    }
+
+                                    if (var14 != 0)
+                                    {
+                                        if (i == 5)
+                                            i = 4;
+
+                                        dword_71D790 = 1;
+                                        dword_71D41C = dword_65726C[i * 2];
+                                        dword_71D798 = i + 1;
+
+                                        for (int nButton = 0; nButton < 0x38; nButton++)
                                         {
-                                            // 0x43B734
+                                            size_t offset = i * 0x672 + nButton * 0x19;
+                                            strcpy(&buttonList[nButton * 0x19], &buttonNames[offset]);
                                         }
+                                        break;
                                     }
                                 }
                             }
@@ -1512,13 +1539,104 @@ int __cdecl InitDirectInput(HWND hWnd)
                                     dword_657184[i] = 0;
                                 }
                             }
-                            // 0x43B832
+                            if (dword_71D798 == 5)
+                            {
+                                for (int i = 0; i < 14; i++)
+                                {
+                                    dword_6571BC[i] = 0xFF;
+                                    dword_6571F4[i] = 0xFF;
+                                }
+                                dword_6571BC[ 0] = dword_6571F4[ 0] = 0;
+                                dword_6571BC[ 1] = dword_6571F4[ 1] = 1;
+                                dword_6571BC[ 2] = dword_6571F4[ 2] = 2;
+                                dword_6571BC[ 3] = dword_6571F4[ 3] = 3;
+                                dword_6571BC[ 4] = dword_6571F4[ 4] = 6;
+                                dword_6571BC[ 5] = dword_6571F4[ 5] = 6;
+                                dword_6571BC[ 6] = dword_6571F4[ 6] = 7;
+                                dword_6571BC[ 7] = dword_6571F4[ 7] = 7;
+                                dword_6571BC[ 8] = dword_6571F4[ 8] = 4;
+                                dword_6571BC[ 9] = dword_6571F4[ 9] = 0x21;
+                                dword_6571BC[10] = dword_6571F4[10] = 0x20;
+                                dword_6571BC[11] = dword_6571F4[11] = 0x23;
+                                dword_6571BC[12] = dword_6571F4[12] = 0x22;
+                                dword_6571BC[13] = dword_6571F4[13] = 5;
+                                for (int i = 0; i < 14; i++)
+                                {
+                                    dword_65714C[i] = dword_657184[i];
+                                }
+                            }
+                            else if (dword_71D798 != 1 && dword_71D798 != 4)
+                            {
+                                for (int i = 0; i < 14; i++)
+                                {
+                                    dword_6571BC[i] = 0xFF;
+                                    dword_6571F4[i] = 0xFF;
+                                }
+                                int var124 = 0;
+                                for (int i = 0; i < 14; i++)
+                                {
+                                    if (dword_71D790 != 0 && var124 == dword_71D41C)
+                                    {
+                                        var124++;
+                                    }
+                                    if (var124 == nJoystickDeviceObjects)
+                                        break;
+
+                                    if (i == 9)
+                                        i = 13;
+
+                                    dword_6571BC[i] = var124;
+                                    dword_6571F4[i] = var124;
+
+                                    var124++;
+                                }
+                                dword_6571BC[ 9] = dword_6571F4[ 9] = 0x21;
+                                dword_6571BC[10] = dword_6571F4[10] = 0x20;
+                                dword_6571BC[11] = dword_6571F4[11] = 0x23;
+                                dword_6571BC[12] = dword_6571F4[12] = 0x22;
+                                for (int i = 0; i < 14; i++)
+                                {
+                                    dword_65714C[i] = 0;
+                                    dword_657184[i] = 0;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
+
+    if (hr < 0)
+    {
+        for (int i = 0; i < dword_6FD1DC; i++)
+        {
+            dword_6571F4[i] = 0xFF;
+        }
+    }
+
+    // 0x43BBEC
+    hr = pDirectInput->CreateDevice(GUID_SysMouse_MGS, &pMouseDevice, 0);
+    if (hr < 0)
+        return hr;
+
+    hr = pMouseDevice->SetDataFormat(&MouseDataFormat);
+    if (hr < 0)
+        return hr;
+
+    if (gWindowedMode != 0)
+    {
+        hr = pMouseDevice->SetCooperativeLevel(hWnd, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
+    }
+    else
+    {
+        hr = pMouseDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
+    }
+    if (hr < 0)
+        return hr;
+
+    hr = pMouseDevice->Acquire();
+
     return 0;
 }
 
