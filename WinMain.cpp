@@ -1065,7 +1065,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             fputs("Query interface...\n", gFile);
             fflush(gFile);
             //(**(void(__stdcall ***)(LPVOID, _UNKNOWN *, int *))lpDD)(lpDD, &unk_64BB98, &dword_6FC748);
-            pDirectDraw->QueryInterface(IID_IDirect3D7, (LPVOID*)&pDirect3D);
+            pDirectDraw->QueryInterface(IID_IDirect3D7_MGS, (LPVOID*)&pDirect3D);
             if (v53 < 0)
             {
                 fputs(" . fail\n", gFile);
