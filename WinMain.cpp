@@ -582,12 +582,12 @@ VAR(GUID, IID_IDirect3D7_MGS, 0x64BB98);
 VAR(IDirectDraw7*, pDirectDraw, 0x6FC730);
 VAR(IDirect3D7*, pDirect3D, 0x6FC748);
 
+FILE* gFile = (FILE*)0x006DEF78;
+
+
 // 0x0041ECB0
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
-    typedef decltype(&InitD3d_ProfileGfxHardwareQ) fn;
-    return ((fn)(0x0041ECB0))();
-    /*
     signed int result; // eax@41
     int v1; // edx@115
     float v2; // STB4_4@163
@@ -655,34 +655,34 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     v28 = 992;
     v29 = 31;
     v30 = 32768;
-    File = fopen("profile.log", "w");
-    fputs("InitAll {\n", File);
-    fflush(File);
-    gLogFile = File;
+    gFile = fopen("profile.log", "w");
+    fputs("InitAll {\n", gFile);
+    fflush(gFile);
+    gLogFile = gFile;
     DoDirectInputInit();
-    fputs("jim_enumerate_devices()\n", File);
-    fflush(File);
+    fputs("jim_enumerate_devices()\n", gFile);
+    fflush(gFile);
     v55 = sub_51F22F();
     if (!v55)
     {
         gSoftwareRendering = 1;
         dword_716F5C = 1065353216;
         LODWORD(gXRes) = 1065353216;
-        fputs("No hardware rendering devices were enumerated\n", File);
-        fflush(File);
-        fputs(" #entering software mode\n", File);
-        fflush(File);
+        fputs("No hardware rendering devices were enumerated\n", gFile);
+        fflush(gFile);
+        fputs(" #entering software mode\n", gFile);
+        fflush(gFile);
     }
     v34 = 0;
     if (gWindowedMode)
         v34 = 1;
-    fputs("jim_read_config_from_file\n", File);
-    fflush(File);
+    fputs("jim_read_config_from_file\n", gFile);
+    fflush(gFile);
     if (ParseMsgCfg())
     {
         dword_651CF8 = 0;
-        fputs(" . done\n", File);
-        fflush(File);
+        fputs(" . done\n", gFile);
+        fflush(gFile);
         if (dword_716F78 == 1)
         {
             if (gNoCrashCheck)
@@ -693,7 +693,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     "Metal Gear Solid",
                     0);
                 gSoftwareRendering = 1;
-                dword_716F5C = 1065353216;
+                dword_716F5C = 1065353216; // TODO: This is actually a float type being set to 1.0!
                 LODWORD(gXRes) = 1065353216;
             }
         }
@@ -702,8 +702,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     {
         dword_651CF8 = 1;
         dword_716F78 = 0;
-        fputs(" . fail\n", File);
-        fflush(File);
+        fputs(" . fail\n", gFile);
+        fflush(gFile);
     }
     if (gNoCrashCheck)
     {
@@ -747,25 +747,25 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     {
         dword_651D98 = 100;
         dword_716F68 = 100;
-        fputs("Executing system profiling sequence.\n", File);
-        fflush(File);
-        fputs("Choosing default 3D-accelerator\n", File);
-        fflush(File);
+        fputs("Executing system profiling sequence.\n", gFile);
+        fflush(gFile);
+        fputs("Choosing default 3D-accelerator\n", gFile);
+        fflush(gFile);
         if (sub_41EC40())
         {
-            fputs(" . done\n", File);
-            fflush(File);
-            fprintf(File, " getting selected driver No %d from %d available\n", dword_77C60C + 1, dword_77C608);
+            fputs(" . done\n", gFile);
+            fflush(gFile);
+            fprintf(gFile, " getting selected driver No %d from %d available\n", dword_77C60C + 1, dword_77C608);
             LODWORD(gXRes) = 1073741824;
             gWindowedMode = 0;
             gSoftwareRendering = 0;
         }
         else
         {
-            fputs(" . fail\n", File);
-            fflush(File);
-            fputs(" #entering software mode\n", File);
-            fflush(File);
+            fputs(" . fail\n", gFile);
+            fflush(gFile);
+            fputs(" #entering software mode\n", gFile);
+            fflush(gFile);
             gSoftwareRendering = 1;
             gWindowedMode = 0;
             dword_716F5C = 1065353216;
@@ -799,57 +799,57 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         v42 = 1;
         gWindowedMode = 1;
     }
-    fputs("\n(i) List of enumerated devices:\n", File);
-    fflush(File);
+    fputs("\n(i) List of enumerated devices:\n", gFile);
+    fflush(gFile);
     for (i = 0; i < dword_77C608; ++i)
     {
-        fprintf(File, "pDriverGUID %x, pDeviceGUID %x\n", dword_776B94[290 * i], dword_776B90[290 * i]);
-        fprintf(File, "D3DDevice description : %s", (char *)&unk_776B68 + 1160 * i);
+        fprintf(gFile, "pDriverGUID %x, pDeviceGUID %x\n", dword_776B94[290 * i], dword_776B90[290 * i]);
+        fprintf(gFile, "D3DDevice description : %s", (char *)&unk_776B68 + 1160 * i);
         if (dword_77C60C == i)
         {
-            fputs("   /selected/\n", File);
-            fflush(File);
+            fputs("   /selected/\n", gFile);
+            fflush(gFile);
         }
         else
         {
-            fputs(L"\n", File);
-            fflush(File);
+            fputs("\n", gFile);
+            fflush(gFile);
         }
     }
     while (1)
     {
         dword_6DF214 = (signed __int64)(320.0 * gXRes);
         cy = (signed __int64)(240.0 * gXRes);
-        fputs("Creating DirectDraw7\n", File);
-        fflush(File);
+        fputs("Creating DirectDraw7\n", gFile);
+        fflush(gFile);
         //v53 = DirectDrawCreateEx(lpGuid, &lpDD, &iid, 0);
-        v53 = DirectDrawCreateExMGS(lpGuid, &pDirectDraw, IID_IDirectDraw7_MGS, 0);
+        v53 = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&pDirectDraw, IID_IDirectDraw7_MGS, 0);
         if (v53 < 0)
         {
-            fputs(" . fail\n", File);
-            fflush(File);
+            fputs(" . fail\n", gFile);
+            fflush(gFile);
             return 0;
         }
-        fputs(" . done\n", File);
-        fflush(File);
+        fputs(" . done\n", gFile);
+        fflush(gFile);
         if (!gSoftwareRendering)
         {
-            fputs("Query interface...\n", File);
-            fflush(File);
+            fputs("Query interface...\n", gFile);
+            fflush(gFile);
             //(**(void(__stdcall ***)(LPVOID, _UNKNOWN *, int *))lpDD)(lpDD, &unk_64BB98, &dword_6FC748);
-            pDirectDraw->QueryInterface(IID_IDirect3D7, &pDirect3D);
+            pDirectDraw->QueryInterface(IID_IDirect3D7, (LPVOID*)&pDirect3D);
             if (v53 < 0)
             {
-                fputs(" . fail\n", File);
-                fflush(File);
+                fputs(" . fail\n", gFile);
+                fflush(gFile);
                 gSoftwareRendering = 1;
                 LODWORD(gXRes) = 1065353216;
                 dword_6DF214 = (signed __int64)(320.0 * gXRes);
                 cy = (signed __int64)(240.0 * gXRes);
                 MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
             }
-            fputs(" . done\n", File);
-            fflush(File);
+            fputs(" . done\n", gFile);
+            fflush(gFile);
         }
         if (gSoftwareRendering)
         {
@@ -866,21 +866,24 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         if (dword_6FC734)
         {
-            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC734 + 8))(dword_6FC734);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC734 + 8))(dword_6FC734);
             if (v53)
                 PrintDDError((int)"Can't relaese primary surf", v53);
             dword_6FC734 = 0;
         }
         if (dword_6FC738)
         {
-            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC738 + 8))(dword_6FC738);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC738 + 8))(dword_6FC738);
             if (v53)
                 PrintDDError((int)"Can't release render surf", v53);
             dword_6FC738 = 0;
         }
         if (dword_6FC750)
         {
-            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
             if (v53)
                 PrintDDError((int)"Can't release clipper", v53);
             dword_6FC750 = 0;
@@ -888,39 +891,41 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         dword_6FC734 = 0;
         dword_6FC738 = 0;
         dword_6FC750 = 0;
-        fputs("Setting cooperative level...\n", File);
-        fflush(File);
+        fputs("Setting cooperative level...\n", gFile);
+        fflush(gFile);
         if (v42)
         {
-            fputs(" (windowed) \n", File);
-            fflush(File);
+            fputs(" (windowed) \n", gFile);
+            fflush(gFile);
             //v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5128);
             v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_NORMAL);
         }
         else
         {
-            fputs(" (full-screen) \n", File);
-            fflush(File);
+            fputs(" (full-screen) \n", gFile);
+            fflush(gFile);
             //v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5137);
             v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
         }
         if (v53 < 0)
         {
-            fputs(" . fail\n", File);
-            fflush(File);
+            fputs(" . fail\n", gFile);
+            fflush(gFile);
             return 0;
         }
-        fputs(" . done\n", File);
-        fflush(File);
+        fputs(" . done\n", gFile);
+        fflush(gFile);
         if (!v42)
         {
+            // FIXME
+            /*
             v53 = (*(int(__stdcall **)(LPVOID, int, int, signed int, _DWORD, _DWORD))(*(_DWORD *)lpDD + 84))(
                 lpDD,
                 dword_6DF214,
                 cy,
                 16,
                 0,
-                0);
+                0);*/
             fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", dword_6DF214, cy);
             if (v53 < 0)
                 return 0;
@@ -938,17 +943,18 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             v46 = 8728;
             v45 = 1;
         }
-        fputs("Creating primary surface...\n", File);
-        fflush(File);
-        v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v43, &dword_6FC734, 0);
+        fputs("Creating primary surface...\n", gFile);
+        fflush(gFile);
+        // FIXME
+        //v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v43, &dword_6FC734, 0);
         if (v53 < 0)
         {
-            fputs(" . fail\n", File);
-            fflush(File);
+            fputs(" . fail\n", gFile);
+            fflush(gFile);
             return 0;
         }
-        fputs(" . done\n", File);
-        fflush(File);
+        fputs(" . done\n", gFile);
+        fflush(gFile);
         v22 = 0;
         sub_431865();
         if (dword_651CF8)
@@ -958,35 +964,39 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         if (gWindowedMode)
         {
-            fputs("Creating clipper...\n", File);
-            fflush(File);
-            v53 = (*(int(__stdcall **)(LPVOID, _DWORD, int *, _DWORD))(*(_DWORD *)lpDD + 16))(lpDD, 0, &dword_6FC750, 0);
+            fputs("Creating clipper...\n", gFile);
+            fflush(gFile);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(LPVOID, _DWORD, int *, _DWORD))(*(_DWORD *)lpDD + 16))(lpDD, 0, &dword_6FC750, 0);
             if (v53)
             {
-                fputs(" . fail\n", File);
-                fflush(File);
+                fputs(" . fail\n", gFile);
+                fflush(gFile);
                 PrintDDError((int)"Can't create clipper", v53);
                 return 0;
             }
-            v53 = (*(int(__stdcall **)(int, _DWORD, HWND))(*(_DWORD *)dword_6FC750 + 32))(dword_6FC750, 0, gHwnd);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(int, _DWORD, HWND))(*(_DWORD *)dword_6FC750 + 32))(dword_6FC750, 0, gHwnd);
             if (v53)
             {
-                fputs(" . fail\n", File);
-                fflush(File);
+                fputs(" . fail\n", gFile);
+                fflush(gFile);
                 PrintDDError((int)"Can't obtain clipper zone", v53);
                 return 0;
             }
-            v53 = (*(int(__stdcall **)(int, int))(*(_DWORD *)dword_6FC734 + 112))(dword_6FC734, dword_6FC750);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(int, int))(*(_DWORD *)dword_6FC734 + 112))(dword_6FC734, dword_6FC750);
             if (v53)
             {
-                fputs(" . fail\n", File);
-                fflush(File);
+                fputs(" . fail\n", gFile);
+                fflush(gFile);
                 PrintDDError((int)"Can't attach clipper", v53);
                 return 0;
             }
-            (*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
-            fputs(" . done\n", File);
-            fflush(File);
+            // FIXME
+            //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
+            fputs(" . done\n", gFile);
+            fflush(gFile);
         }
         memset(&v36, 0, 0x7Cu);
         v36 = 124;
@@ -994,19 +1004,19 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             if (dword_651CF8 || dword_716F6C && dword_716F6C != 1)
             {
-                fputs("Testing software render speed to system and to video surface\n", File);
-                fflush(File);
+                fputs("Testing software render speed to system and to video surface\n", gFile);
+                fflush(gFile);
                 if (sub_41CE20())
                 {
-                    fputs(" . rendering to video surface is faster\n", File);
-                    fflush(File);
+                    fputs(" . rendering to video surface is faster\n", gFile);
+                    fflush(gFile);
                     dword_716F6C = 1;
                     v41 = 16448;
                 }
                 else
                 {
-                    fputs(" . rendering to system memory surface is faster\n", File);
-                    fflush(File);
+                    fputs(" . rendering to system memory surface is faster\n", gFile);
+                    fflush(gFile);
                     dword_716F6C = 0;
                     v41 = 2112;
                 }
@@ -1021,17 +1031,18 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             v37 = 7;
             v39 = dword_6DF214;
             v38 = cy;
-            fputs("Creating back buffer for software rendering...\n", File);
-            fflush(File);
-            v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v36, &dword_6FC738, 0);
+            fputs("Creating back buffer for software rendering...\n", gFile);
+            fflush(gFile);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v36, &dword_6FC738, 0);
             if (v53 < 0)
             {
-                fputs(" . fail\n", File);
-                fflush(File);
+                fputs(" . fail\n", gFile);
+                fflush(gFile);
                 return 0;
             }
-            fputs(" . done\n", File);
-            fflush(File);
+            fputs(" . done\n", gFile);
+            fflush(gFile);
         }
         else
         {
@@ -1041,17 +1052,18 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v41 = 8256;
                 v39 = dword_6DF214;
                 v38 = cy;
-                fputs("Creating back buffer for windowed mode...\n", File);
-                fflush(File);
-                v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v36, &dword_6FC738, 0);
+                fputs("Creating back buffer for windowed mode...\n", gFile);
+                fflush(gFile);
+                // FIXME
+                //v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v36, &dword_6FC738, 0);
                 if (v53 < 0)
                 {
-                    fputs(" . fail\n", File);
-                    fflush(File);
+                    fputs(" . fail\n", gFile);
+                    fflush(gFile);
                     return 0;
                 }
-                fputs(" . done\n", File);
-                fflush(File);
+                fputs(" . done\n", gFile);
+                fflush(gFile);
             }
             else
             {
@@ -1059,85 +1071,93 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v19 = 0;
                 v20 = 0;
                 v21 = 0;
-                fputs("Getting back buffer from pPrim chain...\n", File);
-                fflush(File);
+                fputs("Getting back buffer from pPrim chain...\n", gFile);
+                fflush(gFile);
+                // FIXME
+                /*
                 v53 = (*(int(__stdcall **)(int, int *, int *))(*(_DWORD *)dword_6FC734 + 48))(
                     dword_6FC734,
                     &v18,
-                    &dword_6FC738);
+                    &dword_6FC738);*/
                 if (v53 < 0)
                 {
-                    fputs(" . fail\n", File);
-                    fflush(File);
+                    fputs(" . fail\n", gFile);
+                    fflush(gFile);
                     return v53;
                 }
-                fputs(" . done\n", File);
-                fflush(File);
+                fputs(" . done\n", gFile);
+                fflush(gFile);
             }
         }
-        fputs("Restoring surfaces...\n", File);
-        fflush(File);
+        fputs("Restoring surfaces...\n", gFile);
+        fflush(gFile);
         sub_41CC30();
         if (v53)
         {
-            fputs(" . fail\n", File);
-            fflush(File);
+            fputs(" . fail\n", gFile);
+            fflush(gFile);
             PrintDDError((int)"Restoring caput", v53);
         }
         else
         {
-            fputs(" . done\n", File);
-            fflush(File);
+            fputs(" . done\n", gFile);
+            fflush(gFile);
         }
-        fputs("Querying gamma interface...\n", File);
-        fflush(File);
-        v53 = (**(int(__stdcall ***)(int, _UNKNOWN *, int *))dword_6FC734)(dword_6FC734, &unk_64BCA8, &dword_6C0EF8);
+        fputs("Querying gamma interface...\n", gFile);
+        fflush(gFile);
+        // FIXME
+        //v53 = (**(int(__stdcall ***)(int, _UNKNOWN *, int *))dword_6FC734)(dword_6FC734, &unk_64BCA8, &dword_6C0EF8);
         if (v53)
         {
-            fputs(" . fail\n", File);
-            fflush(File);
+            fputs(" . fail\n", gFile);
+            fflush(gFile);
             PrintDDError((int)"Can't get GammaControl interface", v53);
             dword_6FC7C4 = 0;
         }
         else
         {
-            fputs(" . done\n", File);
-            fflush(File);
+            fputs(" . done\n", gFile);
+            fflush(gFile);
             dword_6FC7C4 = 1;
         }
         if (lpDD)
         {
             memset(&v31, 0, 0x17Cu);
             v31 = 380;
-            v53 = (*(int(__stdcall **)(LPVOID, int *, _DWORD))(*(_DWORD *)lpDD + 44))(lpDD, &v31, 0);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(LPVOID, int *, _DWORD))(*(_DWORD *)lpDD + 44))(lpDD, &v31, 0);
             if (v53 || (v1 = v32, !(v1 & 0x20000)))
                 dword_6FC7C4 = 0;
         }
         dword_6FC79C = sub_41D1D0();
-        fprintf(File, "565 mode = %i\n", dword_6FC79C);
+        fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
         if (gSoftwareRendering)
             break;
         v36 = 124;
-        (*(void(__stdcall **)(LPVOID, int *))(*(_DWORD *)lpDD + 48))(lpDD, &v36);
+        // FIXME
+        //(*(void(__stdcall **)(LPVOID, int *))(*(_DWORD *)lpDD + 48))(lpDD, &v36);
         if (v40 <= 8)
         {
-            fputs("Can't render to a palettized surface, exiting.\n", File);
-            fflush(File);
+            fputs("Can't render to a palettized surface, exiting.\n", gFile);
+            fflush(gFile);
             return 0;
         }
-        fputs("Screen mode is ok\n", File);
-        fflush(File);
-        fputs("Creating device...\n", File);
-        fflush(File);
+        fputs("Screen mode is ok\n", gFile);
+        fflush(gFile);
+        fputs("Creating device...\n", gFile);
+        fflush(gFile);
+
+        // FIXME
+        /*
         v53 = (*(int(__stdcall **)(int, int, int, int *))(*(_DWORD *)dword_6FC748 + 16))(
             dword_6FC748,
             v33,
             dword_6FC738,
-            &dword_6FC74C);
+            &dword_6FC74C);*/
         if (v53 >= 0)
         {
-            fputs(" . done\n", File);
-            fflush(File);
+            fputs(" . done\n", gFile);
+            fflush(gFile);
             sub_422A90(22, 1);
             sub_422A90(26, 0);
             if (!gSoftwareRendering)
@@ -1158,7 +1178,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v13 = 16;
                 v16 = 4096;
                 v17 = 16;
-                v53 = (*(int(__stdcall **)(_DWORD, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v11, &dword_6FC740, 0);
+                // FIX ME
+                //v53 = (*(int(__stdcall **)(_DWORD, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v11, &dword_6FC740, 0);
                 if (v53)
                 {
                     dword_6FC740 = 0;
@@ -1167,7 +1188,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 {
                     if (!sub_41E990())
                     {
-                        (*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC740 + 8))(dword_6FC740);
+                        // FIXME
+                        //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC740 + 8))(dword_6FC740);
                         dword_6FC740 = 0;
                     }
                 }
@@ -1180,14 +1202,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             sub_422BC0(0, 6, 0);
             if (sub_41E3C0())
             {
-                fprintf(File, "Blend modes = %i \n", gBlendMode);
-                fprintf(File, "Alpha modulate = %i \n", dword_6FC798);
+                fprintf(gFile, "Blend modes = %i \n", gBlendMode);
+                fprintf(gFile, "Alpha modulate = %i \n", dword_6FC798);
                 gColourKey = sub_41E730();
-                fprintf(File, "ColorKey = %i\n", gColourKey);
+                fprintf(gFile, "ColorKey = %i\n", gColourKey);
                 sub_422BC0(0, 12, 3);
                 if (gModX2 == 2)
                     gModX2 = sub_41D420();
-                fprintf(File, "MODULATE2X = %i \n", gModX2);
+                fprintf(gFile, "MODULATE2X = %i \n", gModX2);
                 if (gColourKey)
                 {
                     sub_422A90(41, 1);
@@ -1205,29 +1227,29 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     {
                         if (!gLowRes)
                         {
-                            fputs("Not enough video memory for high resolution textures, disabling.\n", File);
-                            fflush(File);
+                            fputs("Not enough video memory for high resolution textures, disabling.\n", gFile);
+                            fflush(gFile);
                         }
                     }
                     if (gNoEffects)
                     {
-                        fputs("Water and ninja effects are on\n", File);
-                        fflush(File);
+                        fputs("Water and ninja effects are on\n", gFile);
+                        fflush(gFile);
                     }
                     else
                     {
-                        fputs("Water and ninja effects are unsupported by hardware, disabling.\n", File);
-                        fflush(File);
+                        fputs("Water and ninja effects are unsupported by hardware, disabling.\n", gFile);
+                        fflush(gFile);
                     }
                     if (gModX2)
                     {
-                        fputs("Modulate by 2 works correctly, enabling.\n", File);
-                        fflush(File);
+                        fputs("Modulate by 2 works correctly, enabling.\n", gFile);
+                        fflush(gFile);
                     }
                     else
                     {
-                        fputs("Modulate by 2 doesn't work correctly or unsupported, disabling\n", File);
-                        fflush(File);
+                        fputs("Modulate by 2 doesn't work correctly or unsupported, disabling\n", gFile);
+                        fflush(gFile);
                     }
                 }
                 v47 = 0;
@@ -1249,8 +1271,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             }
             break;
         }
-        fputs("D3D:CreateDevice() failed, switching to SOFTWARE MODE\n", File);
-        fflush(File);
+        fputs("D3D:CreateDevice() failed, switching to SOFTWARE MODE\n", gFile);
+        fflush(gFile);
         dword_6DF214 = 320;
         cy = 240;
         fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", dword_6DF214, cy);
@@ -1296,8 +1318,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             lpDD = 0;
         }
     }
-    fputs("other inits\n", File);
-    fflush(File);
+    fputs("other inits\n", gFile);
+    fflush(gFile);
     for (i = 0; (signed int)i < 1500; ++i)
     {
         dword_6C0F00[20 * i] = 0;
@@ -1332,29 +1354,28 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             dword_6DEF7C = malloc(0x200u);
             dword_6DEF90 = malloc(0x200u);
             memset(dword_6DEF7C, 0, 0x100u);
-            fputs("jim_write_configuration_to_file()\n", File);
-            fflush(File);
+            fputs("jim_write_configuration_to_file()\n", gFile);
+            fflush(gFile);
             sub_433801();
-            fputs("InitAll }\n", File);
-            fflush(File);
-            fclose(File);
+            fputs("InitAll }\n", gFile);
+            fflush(gFile);
+            fclose(gFile);
             result = 1;
         }
         else
         {
             PrintDDError((int)"$edq Out of memory", 0);
-            fclose(File);
+            fclose(gFile);
             result = 0;
         }
     }
     else
     {
         PrintDDError((int)"$edq Out of memory", 0);
-        fclose(File);
+        fclose(gFile);
         result = 0;
     }
     return result;
-    */
 }
 
 // 0x00420810
