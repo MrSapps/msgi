@@ -1704,7 +1704,7 @@ signed int __cdecl Resetgraph(int a1)
 }
 
 // 0x00553090
-signed int __cdecl DirectInputCreateExMGS(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter)
+signed int __stdcall DirectInputCreateExMGS(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter)
 {
     typedef decltype(&DirectInputCreateExMGS) fn;
     return ((fn)(0x00553090))(hinst, dwVersion, riidltf, ppvOut, punkOuter);
