@@ -579,11 +579,18 @@ signed int __stdcall DirectDrawCreateExMGS(GUID* lpGuid, LPVOID* lplpDD, const I
 
 VAR(IID, IID_IDirectDraw7_MGS, 0x64BDA8);
 VAR(GUID, IID_IDirect3D7_MGS, 0x64BB98);
+VAR(GUID, IID_IDirectDrawGammaControl_MGS, 0x64BCA8);
 VAR(IDirectDraw7*, pDirectDraw, 0x6FC730);
 VAR(IDirect3D7*, pDirect3D, 0x6FC748);
+VAR(IDirectDrawGammaControl*, pGammaControl, 0x6C0EF8);
+VAR(DWORD, dwDisplayWidth, 0x6DF214);
+VAR(DWORD, dwDisplayHeight, 0x6DF1FC);
+VAR(LPDIRECTDRAWSURFACE7, pPrimarySurface, 0x6FC734);
+VAR(LPDIRECTDRAWCLIPPER, pClipper, 0x6FC750);
+VAR(LPDIRECTDRAWSURFACE7, pBackBuffer, 0x6FC738);
 
-FILE* gFile = (FILE*)0x006DEF78;
-FILE* gLogFile = (FILE*)0x71D414;
+VAR(FILE*, gFile, 0x006DEF78);
+VAR(FILE*, gLogFile, 0x71D414);
 
 // TODO
 VAR(DWORD, dword_651CF8, 0x651CF8);
@@ -859,7 +866,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     unsigned int v40; // [sp+37Ch] [bp-D4h]@119
     int v41; // [sp+390h] [bp-C0h]@91
     int v42; // [sp+3A4h] [bp-ACh]@30
-    int v43; // [sp+3B0h] [bp-A0h]@70
+    int v43; // [sp+3B0h] [bp-A0h]@70 = DDSURFACEDESC2 (sizeof = 0x7C)
     int v44; // [sp+3B4h] [bp-9Ch]@72
     int v45; // [sp+3C4h] [bp-8Ch]@73
     int v46; // [sp+418h] [bp-38h]@72
@@ -1064,7 +1071,6 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             fputs("Query interface...\n", gFile);
             fflush(gFile);
-            //(**(void(__stdcall ***)(LPVOID, _UNKNOWN *, int *))lpDD)(lpDD, &unk_64BB98, &dword_6FC748);
             pDirectDraw->QueryInterface(IID_IDirect3D7_MGS, (LPVOID*)&pDirect3D);
             if (v53 < 0)
             {
@@ -1125,14 +1131,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             fputs(" (windowed) \n", gFile);
             fflush(gFile);
-            //v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5128);
             v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_NORMAL);
         }
         else
         {
             fputs(" (full-screen) \n", gFile);
             fflush(gFile);
-            //v53 = (*(int(__stdcall **)(LPVOID, HWND, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 5137);
             v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
         }
         if (v53 < 0)
@@ -1145,15 +1149,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         fflush(gFile);
         if (!v42)
         {
-            // FIXME
-            /*
-            v53 = (*(int(__stdcall **)(LPVOID, int, int, signed int, _DWORD, _DWORD))(*(_DWORD *)lpDD + 84))(
-                lpDD,
-                dword_6DF214,
-                cy,
-                16,
-                0,
-                0);*/
+            v53 = pDirectDraw->SetDisplayMode(dwDisplayWidth, dwDisplayHeight, 0x10, 0, 0);
             fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", gXSize_dword_6DF214, gYSize);
             if (v53 < 0)
                 return 0;
@@ -1173,8 +1169,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         fputs("Creating primary surface...\n", gFile);
         fflush(gFile);
-        // FIXME
-        //v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v43, &dword_6FC734, 0);
+        v53 = pDirectDraw->CreateSurface((DDSURFACEDESC2*)&v43, &pPrimarySurface, 0);
         if (v53 < 0)
         {
             fputs(" . fail\n", gFile);
@@ -1194,8 +1189,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             fputs("Creating clipper...\n", gFile);
             fflush(gFile);
-            // FIXME
-            //v53 = (*(int(__stdcall **)(LPVOID, _DWORD, int *, _DWORD))(*(_DWORD *)lpDD + 16))(lpDD, 0, &dword_6FC750, 0);
+            pDirectDraw->CreateClipper(0, &pClipper, 0);
             if (v53)
             {
                 fputs(" . fail\n", gFile);
@@ -1203,8 +1197,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 PrintDDError("Can't create clipper", v53);
                 return 0;
             }
-            // FIXME
-            //v53 = (*(int(__stdcall **)(int, _DWORD, HWND))(*(_DWORD *)dword_6FC750 + 32))(dword_6FC750, 0, gHwnd);
+            v53 = pClipper->SetHWnd(0, gHwnd);
             if (v53)
             {
                 fputs(" . fail\n", gFile);
@@ -1212,8 +1205,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 PrintDDError("Can't obtain clipper zone", v53);
                 return 0;
             }
-            // FIXME
-            //v53 = (*(int(__stdcall **)(int, int))(*(_DWORD *)dword_6FC734 + 112))(dword_6FC734, dword_6FC750);
+            pPrimarySurface->SetClipper(pClipper);
             if (v53)
             {
                 fputs(" . fail\n", gFile);
@@ -1221,8 +1213,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 PrintDDError("Can't attach clipper", v53);
                 return 0;
             }
-            // FIXME
-            //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
+            pClipper->Release();
             fputs(" . done\n", gFile);
             fflush(gFile);
         }
@@ -1261,8 +1252,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             v38 = gYSize;
             fputs("Creating back buffer for software rendering...\n", gFile);
             fflush(gFile);
-            // FIXME
-            //v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v36, &dword_6FC738, 0);
+            v53 = pDirectDraw->CreateSurface((DDSURFACEDESC2*)&v36, &pBackBuffer, 0);
             if (v53 < 0)
             {
                 fputs(" . fail\n", gFile);
@@ -1282,8 +1272,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v38 = gYSize;
                 fputs("Creating back buffer for windowed mode...\n", gFile);
                 fflush(gFile);
-                // FIXME
-                //v53 = (*(int(__stdcall **)(LPVOID, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v36, &dword_6FC738, 0);
+                v53 = pDirectDraw->CreateSurface((DDSURFACEDESC2*)&v36, &pBackBuffer, 0);
                 if (v53 < 0)
                 {
                     fputs(" . fail\n", gFile);
@@ -1301,12 +1290,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v21 = 0;
                 fputs("Getting back buffer from pPrim chain...\n", gFile);
                 fflush(gFile);
-                // FIXME
-                /*
-                v53 = (*(int(__stdcall **)(int, int *, int *))(*(_DWORD *)dword_6FC734 + 48))(
-                    dword_6FC734,
-                    &v18,
-                    &dword_6FC738);*/
+                pPrimarySurface->GetAttachedSurface((DDSCAPS2*)&v18, &pBackBuffer);
                 if (v53 < 0)
                 {
                     fputs(" . fail\n", gFile);
@@ -1333,8 +1317,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         fputs("Querying gamma interface...\n", gFile);
         fflush(gFile);
-        // FIXME
-        //v53 = (**(int(__stdcall ***)(int, _UNKNOWN *, int *))dword_6FC734)(dword_6FC734, &unk_64BCA8, &dword_6C0EF8);
+        pPrimarySurface->QueryInterface(IID_IDirectDrawGammaControl_MGS, (LPVOID*)&pGammaControl);
         if (v53)
         {
             fputs(" . fail\n", gFile);
@@ -1352,8 +1335,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             memset(&v31, 0, 0x17Cu);
             v31 = 380;
-            // FIXME
-            //v53 = (*(int(__stdcall **)(LPVOID, int *, _DWORD))(*(_DWORD *)lpDD + 44))(lpDD, &v31, 0);
+            pDirectDraw->GetCaps((DDCAPS*)&v31, 0);
             if (v53 || (v1 = v32, !(v1 & 0x20000)))
                 dword_6FC7C4 = 0;
         }
@@ -1362,8 +1344,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         if (gSoftwareRendering)
             break;
         v36 = 124;
-        // FIXME
-        //(*(void(__stdcall **)(LPVOID, int *))(*(_DWORD *)lpDD + 48))(lpDD, &v36);
+        pDirectDraw->GetDisplayMode((DDSURFACEDESC2*)&v36);
         if (v40 <= 8)
         {
             fputs("Can't render to a palettized surface, exiting.\n", gFile);
