@@ -583,7 +583,42 @@ VAR(IDirectDraw7*, pDirectDraw, 0x6FC730);
 VAR(IDirect3D7*, pDirect3D, 0x6FC748);
 
 FILE* gFile = (FILE*)0x006DEF78;
+FILE* gLogFile = (FILE*)0x71D414;
 
+// TODO
+DWORD dword_651CF8;
+DWORD dword_716F5C;
+DWORD dword_716F78;
+DWORD dword_77C60C;
+DWORD dword_77C608;
+DWORD* dword_776B94;
+DWORD* dword_776B90;
+DWORD dword_716F74;
+DWORD dword_6DF214;
+DWORD dword_650D2C;
+DWORD dword_6FC734;
+DWORD dword_6FC738;
+DWORD dword_6FC750;
+DWORD dword_6FC74C;
+void* dword_6C0EFC;
+void* dword_6FC780;
+void* dword_6FC728;
+void* dword_6DEF7C;
+void* dword_6DEF90;
+void* dword_6FC72C;
+DWORD* dword_6C0F00;
+DWORD dword_6FC748;
+DWORD dword_6FC798;
+DWORD dword_6FC7C0;
+DWORD* dword_6C0F20;
+DWORD* dword_6C0F24;
+DWORD dword_716F6C;
+DWORD dword_6FC7C4;
+DWORD dword_6FC740;
+DWORD dword_651D94;
+DWORD dword_6C0EF8;
+DWORD dword_6FC79C;
+DWORD dword_716F60;
 
 // 0x0041ECB0
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
@@ -1258,13 +1293,15 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v50 = cy;
                 v51 = 0;
                 v52 = 1065353216;
-                (*(void(__stdcall **)(int, int *))(*(_DWORD *)dword_6FC74C + 52))(dword_6FC74C, &v47);
+                // FIXME
+                //(*(void(__stdcall **)(int, int *))(*(_DWORD *)dword_6FC74C + 52))(dword_6FC74C, &v47);
                 v2 = ((double)dword_651D94 - 50.0) / 100.0;
                 sub_41C820(v2);
             }
             else
             {
-                (*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC74C + 8))(dword_6FC74C);
+                // FIXME
+                //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC74C + 8))(dword_6FC74C);
                 dword_6FC74C = 0;
                 MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
                 gSoftwareRendering = 1;
@@ -1280,26 +1317,34 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gSoftwareRendering = 1;
         dword_716F5C = 1065353216;
         LODWORD(gXRes) = dword_716F5C;
-        v53 = (*(int(__stdcall **)(_DWORD, _DWORD, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 8);
+        // FIXME
+        //v53 = (*(int(__stdcall **)(_DWORD, _DWORD, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 8);
         if (dword_6C0EF8)
-            (*(void(__stdcall **)(int))(*(_DWORD *)dword_6C0EF8 + 8))(dword_6C0EF8);
+        {
+            // FIXME
+            //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6C0EF8 + 8))(dword_6C0EF8);
+        }
+
         if (dword_6FC738)
         {
-            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC738 + 8))(dword_6FC738);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC738 + 8))(dword_6FC738);
             if (v53)
                 PrintDDError((int)"Can't release render surf", v53);
             dword_6FC738 = 0;
         }
         if (dword_6FC734)
         {
-            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC734 + 8))(dword_6FC734);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC734 + 8))(dword_6FC734);
             if (v53)
                 PrintDDError((int)"Can't relaese primary surf", v53);
             dword_6FC734 = 0;
         }
         if (dword_6FC750)
         {
-            v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
+            // FIXME
+            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
             if (v53)
                 PrintDDError((int)"Can't release clipper", v53);
             dword_6FC750 = 0;
@@ -1309,12 +1354,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         dword_6FC750 = 0;
         if (dword_6FC748)
         {
-            (*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC748 + 8))(dword_6FC748);
+            // FIXME
+            //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC748 + 8))(dword_6FC748);
             dword_6FC748 = 0;
         }
         if (lpDD)
         {
-            (*(void(__stdcall **)(LPVOID))(*(_DWORD *)lpDD + 8))(lpDD);
+            // FIXME
+            //(*(void(__stdcall **)(LPVOID))(*(_DWORD *)lpDD + 8))(lpDD);
             lpDD = 0;
         }
     }
@@ -1338,7 +1385,10 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     {
         dword_6C0EFC = malloc(0x493E0u);
         for (i = 0; (signed int)i < 15000; ++i)
-            *((_DWORD *)dword_6C0EFC + 5 * i) = 0;
+        {
+            // FIXME
+            //*((_DWORD *)dword_6C0EFC + 5 * i) = 0;
+        }
         dword_6FC780 = malloc(0x75300u);
     }
     dword_6FC728 = malloc(0x100000u);
