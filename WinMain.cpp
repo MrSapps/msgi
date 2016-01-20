@@ -1100,33 +1100,30 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dword_650D2C = 16;
             }
         }
-        if (dword_6FC734)
+        if (pPrimarySurface)
         {
-            // FIXME
-            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC734 + 8))(dword_6FC734);
+            pPrimarySurface->Release();
             if (v53)
                 PrintDDError("Can't relaese primary surf", v53);
-            dword_6FC734 = 0;
+            pPrimarySurface = 0;
         }
-        if (dword_6FC738)
+        if (pBackBuffer)
         {
-            // FIXME
-            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC738 + 8))(dword_6FC738);
+            pBackBuffer->Release();
             if (v53)
                 PrintDDError("Can't release render surf", v53);
-            dword_6FC738 = 0;
+            pBackBuffer = 0;
         }
-        if (dword_6FC750)
+        if (pClipper)
         {
-            // FIXME
-            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
+            pClipper->Release();
             if (v53)
                 PrintDDError("Can't release clipper", v53);
-            dword_6FC750 = 0;
+            pClipper = 0;
         }
-        dword_6FC734 = 0;
-        dword_6FC738 = 0;
-        dword_6FC750 = 0;
+        pPrimarySurface = 0;
+        pBackBuffer = 0;
+        pBackBuffer = 0;
         fputs("Setting cooperative level...\n", gFile);
         fflush(gFile);
         if (v42)
@@ -1393,9 +1390,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 {
                     if (!sub_41E990())
                     {
-                        // FIXME
-                        //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC740 + 8))(dword_6FC740);
-                        dword_6FC740 = 0;
+                        pDDSurface->Release();
+                        pDDSurface = 0;
                     }
                 }
             }
@@ -1463,16 +1459,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v50 = gYSize;
                 v51 = 0;
                 v52 = 1065353216;
-                // FIXME
-                //(*(void(__stdcall **)(int, int *))(*(_DWORD *)dword_6FC74C + 52))(dword_6FC74C, &v47);
+                pDirect3DDevice->SetViewport((D3DVIEWPORT7*)&v47);
                 v2 = ((double)dword_651D94 - 50.0) / 100.0;
                 sub_41C820(v2);
             }
             else
             {
-                // FIXME
-                //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC74C + 8))(dword_6FC74C);
-                dword_6FC74C = 0;
+                pDirect3DDevice->Release();
+                pDirect3DDevice = 0;
                 MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
                 gSoftwareRendering = 1;
             }
