@@ -605,10 +605,6 @@ VAR(DWORD*, dword_776B90, 0x776B90);
 VAR(DWORD, dword_716F74, 0x716F74);
 VAR(DWORD, gXSize_dword_6DF214, 0x6DF214);
 VAR(DWORD, dword_650D2C, 0x650D2C);
-VAR(DWORD, dword_6FC734, 0x6FC734);
-VAR(DWORD, dword_6FC738, 0x6FC738);
-VAR(DWORD, dword_6FC750, 0x6FC750);
-VAR(DWORD, dword_6FC74C, 0x6FC74C);
 VAR(void*, dword_6C0EFC, 0x6C0EFC);
 VAR(void*, dword_6FC780, 0x6FC780);
 VAR(void*, dword_6FC728, 0x6FC728);
@@ -616,16 +612,13 @@ VAR(void*, dword_6DEF7C, 0x6DEF7C);
 VAR(void*, dword_6DEF90, 0x6DEF90);
 VAR(void*, dword_6FC72C, 0x6FC72C);
 VAR(DWORD*, dword_6C0F00, 0x6C0F00);
-VAR(DWORD, dword_6FC748, 0x6FC748);
 VAR(DWORD, dword_6FC798, 0x6FC798);
 VAR(DWORD, dword_6FC7C0, 0x6FC7C0);
 VAR(DWORD*, dword_6C0F20, 0x6C0F20);
 VAR(DWORD*, dword_6C0F24, 0x6C0F24);
 VAR(DWORD, dword_716F6C, 0x716F6C);
 VAR(DWORD, dword_6FC7C4, 0x6FC7C4);
-VAR(DWORD, dword_6FC740, 0x6FC740);
 VAR(DWORD, dword_651D94, 0x651D94);
-VAR(DWORD, dword_6C0EF8, 0x6C0EF8);
 VAR(DWORD, dword_6FC79C, 0x6FC79C);
 VAR(DWORD, dword_716F60, 0x716F60);
 VAR(char*, unk_776B68, 0x776B68);
@@ -1384,7 +1377,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc3, &pDDSurface, 0);
                 if (v53)
                 {
-                    dword_6FC740 = 0;
+                    pDDSurface = 0;
                 }
                 else
                 {
@@ -1482,7 +1475,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         dword_716F5C = 1065353216;
         gXRes = dword_716F5C; // TODO: Float
         v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_NORMAL);
-        if (dword_6C0EF8)
+        if (pGammaControl)
         { 
             pGammaControl->Release();
         }
