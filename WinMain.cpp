@@ -593,42 +593,42 @@ VAR(FILE*, gFile, 0x006DEF78);
 VAR(FILE*, gLogFile, 0x71D414);
 
 // TODO
-DWORD dword_651CF8;
-DWORD dword_716F5C;
-DWORD dword_716F78;
-DWORD dword_77C60C;
-DWORD dword_77C608;
-DWORD* dword_776B94;
-DWORD* dword_776B90;
-DWORD dword_716F74;
-DWORD gXSize_dword_6DF214;
-DWORD dword_650D2C;
-DWORD dword_6FC734;
-DWORD dword_6FC738;
-DWORD dword_6FC750;
-DWORD dword_6FC74C;
-void* dword_6C0EFC;
-void* dword_6FC780;
-void* dword_6FC728;
-void* dword_6DEF7C;
-void* dword_6DEF90;
-void* dword_6FC72C;
-DWORD* dword_6C0F00;
-DWORD dword_6FC748;
-DWORD dword_6FC798;
-DWORD dword_6FC7C0;
-DWORD* dword_6C0F20;
-DWORD* dword_6C0F24;
-DWORD dword_716F6C;
-DWORD dword_6FC7C4;
-DWORD dword_6FC740;
-DWORD dword_651D94;
-DWORD dword_6C0EF8;
-DWORD dword_6FC79C;
-DWORD dword_716F60;
-char* unk_776B68;
-DWORD gYSize; // 006DF1FC
-char* unk_6C0778;
+VAR(DWORD, dword_651CF8, 0x651CF8);
+VAR(DWORD, dword_716F5C, 0x716F5C);
+VAR(DWORD, dword_716F78, 0x716F78);
+VAR(DWORD, dword_77C60C, 0x77C60C);
+VAR(DWORD, dword_77C608, 0x77C608);
+VAR(DWORD*, dword_776B94, 0x776B94);
+VAR(DWORD*, dword_776B90, 0x776B90);
+VAR(DWORD, dword_716F74, 0x716F74);
+VAR(DWORD, gXSize_dword_6DF214, 0x6DF214);
+VAR(DWORD, dword_650D2C, 0x650D2C);
+VAR(DWORD, dword_6FC734, 0x6FC734);
+VAR(DWORD, dword_6FC738, 0x6FC738);
+VAR(DWORD, dword_6FC750, 0x6FC750);
+VAR(DWORD, dword_6FC74C, 0x6FC74C);
+VAR(void*, dword_6C0EFC, 0x6C0EFC);
+VAR(void*, dword_6FC780, 0x6FC780);
+VAR(void*, dword_6FC728, 0x6FC728);
+VAR(void*, dword_6DEF7C, 0x6DEF7C);
+VAR(void*, dword_6DEF90, 0x6DEF90);
+VAR(void*, dword_6FC72C, 0x6FC72C);
+VAR(DWORD*, dword_6C0F00, 0x6C0F00);
+VAR(DWORD, dword_6FC748, 0x6FC748);
+VAR(DWORD, dword_6FC798, 0x6FC798);
+VAR(DWORD, dword_6FC7C0, 0x6FC7C0);
+VAR(DWORD*, dword_6C0F20, 0x6C0F20);
+VAR(DWORD*, dword_6C0F24, 0x6C0F24);
+VAR(DWORD, dword_716F6C, 0x716F6C);
+VAR(DWORD, dword_6FC7C4, 0x6FC7C4);
+VAR(DWORD, dword_6FC740, 0x6FC740);
+VAR(DWORD, dword_651D94, 0x651D94);
+VAR(DWORD, dword_6C0EF8, 0x6C0EF8);
+VAR(DWORD, dword_6FC79C, 0x6FC79C);
+VAR(DWORD, dword_716F60, 0x716F60);
+VAR(char*, unk_776B68, 0x776B68);
+VAR(DWORD, gYSize, 0x006DF1FC);
+VAR(char*, unk_6C0778, 0x6C0778);
 
 
 int __cdecl InitDirectInput(HWND hWnd);
@@ -834,14 +834,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     int v8; // [sp+DCh] [bp-374h]@142
     int v9; // [sp+E0h] [bp-370h]@142
     int v10; // [sp+E4h] [bp-36Ch]@142
-    int v11; // [sp+E8h] [bp-368h]@142
+    DDSURFACEDESC2 dxSurfaceDesc3; // [sp+E8h] [bp-368h]@142
     int v12; // [sp+ECh] [bp-364h]@142
     int v13; // [sp+F0h] [bp-360h]@142
     int v14; // [sp+F4h] [bp-35Ch]@142
     char v15; // [sp+130h] [bp-320h]@142
     int v16; // [sp+150h] [bp-300h]@142
     int v17; // [sp+154h] [bp-2FCh]@142
-    int v18; // [sp+164h] [bp-2ECh]@104
+    DDSCAPS2 dxCaps1; // [sp+164h] [bp-2ECh]@104
     int v19; // [sp+168h] [bp-2E8h]@104
     int v20; // [sp+16Ch] [bp-2E4h]@104
     int v21; // [sp+170h] [bp-2E0h]@104
@@ -854,19 +854,19 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     int v28; // [sp+18Ch] [bp-2C4h]@1
     int v29; // [sp+190h] [bp-2C0h]@1
     int v30; // [sp+194h] [bp-2BCh]@1
-    int v31; // [sp+198h] [bp-2B8h]@114
+    DDCAPS_DX7 dxCaps; // [sp+198h] [bp-2B8h]@114
     int v32; // [sp+1A0h] [bp-2B0h]@115
     int v33; // [sp+314h] [bp-13Ch]@1
     int v34; // [sp+318h] [bp-138h]@3
     unsigned int i; // [sp+320h] [bp-130h]@34
-    int v36; // [sp+328h] [bp-128h]@86
+    DDSURFACEDESC2 dxSurfaceDesc; // [sp+328h] [bp-128h]@86
     int v37; // [sp+32Ch] [bp-124h]@97
     int v38; // [sp+330h] [bp-120h]@97
     int v39; // [sp+334h] [bp-11Ch]@97
     unsigned int v40; // [sp+37Ch] [bp-D4h]@119
     int v41; // [sp+390h] [bp-C0h]@91
     int v42; // [sp+3A4h] [bp-ACh]@30
-    int v43; // [sp+3B0h] [bp-A0h]@70 = DDSURFACEDESC2 (sizeof = 0x7C)
+    DDSURFACEDESC2 dxSurfaceDesc2; // [sp+3B0h] [bp-A0h]@70 = DDSURFACEDESC2 (sizeof = 0x7C)
     int v44; // [sp+3B4h] [bp-9Ch]@72
     int v45; // [sp+3C4h] [bp-8Ch]@73
     int v46; // [sp+418h] [bp-38h]@72
@@ -1154,8 +1154,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             if (v53 < 0)
                 return 0;
         }
-        memset(&v43, 0, 0x7Cu);
-        v43 = 124;
+        memset(&dxSurfaceDesc2, 0, 124);
+        dxSurfaceDesc2.dwSize = 124;
         if (v42 || gSoftwareRendering)
         {
             v44 = 1;
@@ -1169,7 +1169,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         fputs("Creating primary surface...\n", gFile);
         fflush(gFile);
-        v53 = pDirectDraw->CreateSurface((DDSURFACEDESC2*)&v43, &pPrimarySurface, 0);
+        v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc2, &pPrimarySurface, 0);
         if (v53 < 0)
         {
             fputs(" . fail\n", gFile);
@@ -1217,8 +1217,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             fputs(" . done\n", gFile);
             fflush(gFile);
         }
-        memset(&v36, 0, 0x7Cu);
-        v36 = 124;
+        memset(&dxSurfaceDesc, 0, 124);
+        dxSurfaceDesc.dwSize = 124;
         if (gSoftwareRendering)
         {
             if (dword_651CF8 || dword_716F6C && dword_716F6C != 1)
@@ -1252,7 +1252,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             v38 = gYSize;
             fputs("Creating back buffer for software rendering...\n", gFile);
             fflush(gFile);
-            v53 = pDirectDraw->CreateSurface((DDSURFACEDESC2*)&v36, &pBackBuffer, 0);
+            v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc, &pBackBuffer, 0);
             if (v53 < 0)
             {
                 fputs(" . fail\n", gFile);
@@ -1272,7 +1272,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v38 = gYSize;
                 fputs("Creating back buffer for windowed mode...\n", gFile);
                 fflush(gFile);
-                v53 = pDirectDraw->CreateSurface((DDSURFACEDESC2*)&v36, &pBackBuffer, 0);
+                v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc, &pBackBuffer, 0);
                 if (v53 < 0)
                 {
                     fputs(" . fail\n", gFile);
@@ -1284,13 +1284,13 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             }
             else
             {
-                v18 = 4;
+                dxCaps1.dwCaps = 4;
                 v19 = 0;
                 v20 = 0;
                 v21 = 0;
                 fputs("Getting back buffer from pPrim chain...\n", gFile);
                 fflush(gFile);
-                pPrimarySurface->GetAttachedSurface((DDSCAPS2*)&v18, &pBackBuffer);
+                pPrimarySurface->GetAttachedSurface(&dxCaps1, &pBackBuffer);
                 if (v53 < 0)
                 {
                     fputs(" . fail\n", gFile);
@@ -1333,9 +1333,9 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         if (pDirectDraw)
         {
-            memset(&v31, 0, 0x17Cu);
-            v31 = 380;
-            pDirectDraw->GetCaps((DDCAPS*)&v31, 0);
+            memset(&dxCaps, 0, 380);
+            dxCaps.dwSize = 380;
+            pDirectDraw->GetCaps(&dxCaps, 0);
             if (v53 || (v1 = v32, !(v1 & 0x20000)))
                 dword_6FC7C4 = 0;
         }
@@ -1343,8 +1343,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
         if (gSoftwareRendering)
             break;
-        v36 = 124;
-        pDirectDraw->GetDisplayMode((DDSURFACEDESC2*)&v36);
+        dxSurfaceDesc.dwSize = 124;
+        pDirectDraw->GetDisplayMode(&dxSurfaceDesc);
         if (v40 <= 8)
         {
             fputs("Can't render to a palettized surface, exiting.\n", gFile);
@@ -1379,14 +1379,15 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v8 = 992;
                 v9 = 31;
                 v10 = 32768;
-                memset(&v11, 0, 0x7Cu);
-                v11 = 124;
-                v12 = 4103;
+                memset(&dxSurfaceDesc3, 0, 124);
+                dxSurfaceDesc3.dwSize = 124;
+                v12 = 4103; // TODO: These are part of the surface desc?
                 memcpy(&v15, &v3, 0x20u);
                 v14 = 16;
                 v13 = 16;
                 v16 = 4096;
                 v17 = 16;
+
                 // FIX ME
                 //v53 = (*(int(__stdcall **)(_DWORD, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v11, &dword_6FC740, 0);
                 if (v53)
