@@ -605,9 +605,9 @@ VAR(DWORD*, dword_776B90, 0x776B90);
 VAR(DWORD, dword_716F74, 0x716F74);
 VAR(DWORD, gXSize_dword_6DF214, 0x6DF214);
 VAR(DWORD, dword_650D2C, 0x650D2C);
-VAR(void*, dword_6C0EFC, 0x6C0EFC);
+VAR(DWORD*, dword_6C0EFC, 0x6C0EFC);
 VAR(void*, dword_6FC780, 0x6FC780);
-VAR(void*, dword_6FC728, 0x6FC728);
+VAR(DWORD*, dword_6FC728, 0x6FC728);
 VAR(void*, dword_6DEF7C, 0x6DEF7C);
 VAR(void*, dword_6DEF90, 0x6DEF90);
 VAR(void*, dword_6FC72C, 0x6FC72C);
@@ -1533,15 +1533,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
-        dword_6C0EFC = malloc(0x493E0u);
-        for (i = 0; (signed int)i < 15000; ++i)
+        dword_6C0EFC = (DWORD*)malloc(0x493E0u);
+        for (i = 0; i < 15000; ++i)
         {
-            // FIXME
-            //*((_DWORD *)dword_6C0EFC + 5 * i) = 0;
+            dword_6C0EFC[5 * i] = 0;
         }
         dword_6FC780 = malloc(0x75300u);
     }
-    dword_6FC728 = malloc(0x100000u);
+    dword_6FC728 = (DWORD*)malloc(0x100000u);
     if (dword_6FC728)
     {
         memset(dword_6FC728, 0, 0x100000u);
