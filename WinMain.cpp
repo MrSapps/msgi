@@ -588,6 +588,8 @@ VAR(DWORD, dwDisplayHeight, 0x6DF1FC);
 VAR(LPDIRECTDRAWSURFACE7, pPrimarySurface, 0x6FC734);
 VAR(LPDIRECTDRAWCLIPPER, pClipper, 0x6FC750);
 VAR(LPDIRECTDRAWSURFACE7, pBackBuffer, 0x6FC738);
+VAR(LPDIRECT3DDEVICE7, pDirect3DDevice, 0x6FC74C);
+VAR(LPDIRECTDRAWSURFACE7, pDDSurface, 0x6FC740);
 
 VAR(FILE*, gFile, 0x006DEF78);
 VAR(FILE*, gLogFile, 0x71D414);
@@ -1356,13 +1358,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         fputs("Creating device...\n", gFile);
         fflush(gFile);
 
-        // FIXME
-        /*
-        v53 = (*(int(__stdcall **)(int, int, int, int *))(*(_DWORD *)dword_6FC748 + 16))(
-            dword_6FC748,
-            v33,
-            dword_6FC738,
-            &dword_6FC74C);*/
+        v53 = pDirect3D->CreateDevice(*((GUID*)(&v33)), pBackBuffer, &pDirect3DDevice);
         if (v53 >= 0)
         {
             fputs(" . done\n", gFile);
@@ -1388,8 +1384,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 v16 = 4096;
                 v17 = 16;
 
-                // FIX ME
-                //v53 = (*(int(__stdcall **)(_DWORD, int *, int *, _DWORD))(*(_DWORD *)lpDD + 24))(lpDD, &v11, &dword_6FC740, 0);
+                v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc3, &pDDSurface, 0);
                 if (v53)
                 {
                     dword_6FC740 = 0;
@@ -1492,51 +1487,44 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gSoftwareRendering = 1;
         dword_716F5C = 1065353216;
         gXRes = dword_716F5C; // TODO: Float
-        // FIXME
-        //v53 = (*(int(__stdcall **)(_DWORD, _DWORD, signed int))(*(_DWORD *)lpDD + 80))(lpDD, gHwnd, 8);
+        v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_NORMAL);
         if (dword_6C0EF8)
-        {
-            // FIXME
-            //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6C0EF8 + 8))(dword_6C0EF8);
+        { 
+            pGammaControl->Release();
         }
 
-        if (dword_6FC738)
+        if (pBackBuffer)
         {
-            // FIXME
-            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC738 + 8))(dword_6FC738);
+            pBackBuffer->Release();
             if (v53)
                 PrintDDError("Can't release render surf", v53);
-            dword_6FC738 = 0;
+            pBackBuffer = 0;
         }
-        if (dword_6FC734)
+        if (pPrimarySurface)
         {
-            // FIXME
-            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC734 + 8))(dword_6FC734);
+            pPrimarySurface->Release();
             if (v53)
                 PrintDDError("Can't relaese primary surf", v53);
-            dword_6FC734 = 0;
+            pPrimarySurface = 0;
         }
-        if (dword_6FC750)
+        if (pClipper)
         {
-            // FIXME
-            //v53 = (*(int(__stdcall **)(int))(*(_DWORD *)dword_6FC750 + 8))(dword_6FC750);
+            pClipper->Release();
             if (v53)
                 PrintDDError("Can't release clipper", v53);
-            dword_6FC750 = 0;
+            pClipper = 0;
         }
-        dword_6FC734 = 0;
-        dword_6FC738 = 0;
-        dword_6FC750 = 0;
-        if (dword_6FC748)
+        pPrimarySurface = 0;
+        pBackBuffer = 0;
+        pClipper = 0;
+        if (pDirect3D)
         {
-            // FIXME
-            //(*(void(__stdcall **)(int))(*(_DWORD *)dword_6FC748 + 8))(dword_6FC748);
-            dword_6FC748 = 0;
+            pDirect3D->Release();
+            pDirect3D = 0;
         }
         if (pDirectDraw)
         {
-            // FIXME
-            //(*(void(__stdcall **)(LPVOID))(*(_DWORD *)lpDD + 8))(lpDD);
+            pDirectDraw->Release();
             pDirectDraw = 0;
         }
     }
