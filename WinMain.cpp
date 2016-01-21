@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <direct.h>
 #include <assert.h>
+#include <iostream>
+#include <memory>
+#include <map>
 
 #define DIRECTINPUT_VERSION 0x700
 #include <dinput.h>
@@ -12,6 +15,127 @@
 #include <ddraw.h>
 #define DIRECT3D_VERSION 0x700
 #include "d3d.h"
+
+template <typename T>
+void doPrint(std::ostream& out, T t)
+{
+    out << t;
+}
+
+template <typename T, typename U, typename... Args>
+void doPrint(std::ostream& out, T t, U u, Args... args)
+{
+    out << t << ',';
+    doPrint(out, u, args...);
+}
+
+class MgsFunctionBase
+{
+public:
+    MgsFunctionBase() = default;
+};
+
+// TODO: Probably need the function name too
+template<DWORD kOldAddr, void* kNewAddr, class ReturnType>
+class MgsFunction;
+
+template <DWORD kOldAddr, void* kNewAddr, class ReturnType, class... Args>
+class MgsFunction<kOldAddr, kNewAddr, ReturnType(Args...)> : public MgsFunctionBase
+{
+public:
+    using TFuncType = ReturnType(*)(Args...);
+
+    MgsFunction()
+    {
+        auto it = gFuncMap.find(kOldAddr);
+        if (it != std::end(gFuncMap))
+        {
+            // duplicated function
+        }
+        else
+        {
+            gFuncMap.insert(std::make_pair(kOldAddr, this));
+        }
+
+        std::cout << "old addr " << kOldAddr << " new addr " << kNewAddr << std::endl;
+
+        if (kNewAddr)
+        {
+            // Hook oldAddr to point to newAddr
+        }
+        else
+        {
+            // point oldAddr to Static_Hook_Impl
+            auto ptr = &Static_Hook_Impl;
+        }
+    }
+
+    ReturnType Hook_Impl(Args ... args)
+    {
+        return operator()(args...);
+    }
+
+    static ReturnType Static_Hook_Impl(Args ... args)
+    {
+        auto it = gFuncMap.find(kOldAddr);
+        if (it == std::end(gFuncMap))
+        {
+            // Impossible situation
+        }
+
+        
+        MgsFunctionBase* baseFunc = it->second;
+        // dont know if this will work or just blow up..
+        return static_cast<MgsFunction*>(baseFunc)->Hook_Impl(args...);
+    }
+
+    ~MgsFunction()
+    {
+        auto it = gFuncMap.find(kOldAddr);
+        if (it != std::end(gFuncMap))
+        {
+            gFuncMap.erase(it);
+        }
+    }
+
+    ReturnType operator()(Args ... args)
+    {
+        doPrint(std::cout, args...);
+
+        if (kNewAddr)
+        {
+            // Call "newAddr" since we've replaced the function completely
+            return reinterpret_cast<TFuncType>(kNewAddr)(args...);
+        }
+        else
+        {
+            // Call "oldAddr" here so that we are calling the "real" function
+
+            // If not running within the game then we can't call real so just return
+            // a default R and log params
+            return reinterpret_cast<TFuncType>(kOldAddr)(args...);
+        }
+    }
+};
+
+std::map<DWORD, MgsFunctionBase*> gFuncMap;
+
+// Case 1, auto generated stub that calls "real"
+MgsFunction<0x0051D120, nullptr, void __cdecl(int, int)> Test_CheckForMmf;
+
+void CallTest()
+{
+    Test_CheckForMmf(1, 2);
+}
+
+void __cdecl Test1_CheckForMmf(int a1, int a2)
+{
+    typedef decltype(&Test1_CheckForMmf) fn;
+    ((fn)(0x0051D120))(a1, a2);
+}
+
+// Case 2 - function is reimplemented, can't call old
+template class MgsFunction<0x0051D120, &Test1_CheckForMmf, decltype(Test1_CheckForMmf)>;
 
 struct actor_related_struct
 {
