@@ -2339,7 +2339,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
     void(__stdcall *pSetThreadExecutionState)(unsigned int); // [sp+Ch] [bp-460h]@13
     HMODULE hKernel32; // [sp+10h] [bp-45Ch]@12
-    char Dest; // [sp+14h] [bp-458h]@11
+    char Dest[256]; // [sp+14h] [bp-458h]@11
     struct _MEMORYSTATUS Buffer; // [sp+414h] [bp-58h]@10
     char *v11; // [sp+434h] [bp-38h]@52
     WNDCLASSA WndClass; // [sp+438h] [bp-34h]@27
@@ -2521,10 +2521,10 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
         else
         {
             sprintf(
-                (char *)&Dest,
+                Dest,
                 "Metal Gear Solid requires over 50mb of hard disk space as Virtual Memory before the game can function correctly. This system currently only has %dmb available.  Please close all open applications not in use,  and refer to the Metal Gear Solid readme for more information on this issue.",
                 (Buffer.dwAvailPageFile - Buffer.dwAvailPhys) >> 20);
-            MessageBoxA(0, &Dest, "Metal Gear Solid PC", 0);
+            MessageBoxA(0, Dest, "Metal Gear Solid PC", 0);
             result = 0;
         }
     }
