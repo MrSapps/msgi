@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <direct.h>
 #include <assert.h>
+#include <iostream>
+#include <memory>
+#include <map>
+#include <detours.h>
 
 #define DIRECTINPUT_VERSION 0x700
 #include <dinput.h>
@@ -12,6 +16,121 @@
 #include <ddraw.h>
 #define DIRECT3D_VERSION 0x700
 #include "d3d.h"
+
+template <typename T>
+void doPrint(std::ostream& out, T t)
+{
+    out << t;
+}
+
+template <typename T, typename U, typename... Args>
+void doPrint(std::ostream& out, T t, U u, Args... args)
+{
+    out << t << ',';
+    doPrint(out, u, args...);
+}
+
+class MgsFunctionBase
+{
+public:
+    MgsFunctionBase() = default;
+};
+
+// TODO: Probably need the function name too
+template<DWORD kOldAddr, void* kNewAddr, class ReturnType>
+class MgsFunction;
+
+template <DWORD kOldAddr, void* kNewAddr, class ReturnType, class... Args>
+class MgsFunction<kOldAddr, kNewAddr, ReturnType(Args...)> : public MgsFunctionBase
+{
+public:
+    using TFuncType = ReturnType(*)(Args...);
+
+    MgsFunction(const char* fnName)
+        : mFnName(fnName)
+    {
+        mRealFuncPtr = (TFuncType)kOldAddr;
+
+        auto it = gFuncMap.find(kOldAddr);
+        if (it != std::end(gFuncMap))
+        {
+            // duplicated function
+            abort();
+        }
+        else
+        {
+            gFuncMap.insert(std::make_pair(kOldAddr, this));
+        }
+
+        std::cout << "old addr " << kOldAddr << " new addr " << kNewAddr << std::endl;
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+        if (kNewAddr)
+        {
+            // Hook oldAddr to point to newAddr
+            DetourAttach(&(PVOID&)mRealFuncPtr, Static_Hook_Impl);
+        }
+        else
+        {
+            // point oldAddr to Static_Hook_Impl
+            DetourAttach(&(PVOID&)mRealFuncPtr, (TFuncType)kNewAddr);
+        }
+        const auto error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            abort();
+        }
+    }
+
+    static ReturnType Static_Hook_Impl(Args ... args)
+    {
+        auto it = gFuncMap.find(kOldAddr);
+        if (it == std::end(gFuncMap))
+        {
+            // Impossible situation
+        }
+
+        
+        MgsFunctionBase* baseFunc = it->second;
+        // dont know if this will work or just blow up..
+        return static_cast<MgsFunction*>(baseFunc)->operator()(args...);
+    }
+
+    ~MgsFunction()
+    {
+        auto it = gFuncMap.find(kOldAddr);
+        if (it != std::end(gFuncMap))
+        {
+            gFuncMap.erase(it);
+        }
+    }
+
+    ReturnType operator()(Args ... args)
+    {
+        //doPrint(std::cout, args...);
+
+        if (kNewAddr)
+        {
+            // Call "newAddr" since we've replaced the function completely
+            return reinterpret_cast<TFuncType>(kNewAddr)(args...);
+        }
+        else
+        {
+            // Call "mRealFuncPtr" here so that we are calling the "real" function
+
+            // If not running within the game then we can't call real so just return
+            // a default R and log params
+            return mRealFuncPtr(args...);
+        }
+    }
+
+private:
+    TFuncType mRealFuncPtr = nullptr;
+    const char* mFnName = nullptr;
+};
+
+std::map<DWORD, MgsFunctionBase*> gFuncMap;
 
 struct actor_related_struct
 {
@@ -90,11 +209,7 @@ HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
 DWORD& dword_651D98 = *((DWORD*)0x651D98);
 DWORD& dword_716F68 = *((DWORD*)0x716F68);
 
-void __cdecl CheckForMmf(int a1, int a2)
-{
-    typedef decltype(&CheckForMmf) fn;
-    ((fn)(0x0051D120))(a1, a2);
-}
+MgsFunction<0x0051D120, nullptr, void __cdecl(int, int)> CheckForMmf("CheckForMmf");
 
 #define VAR(type,name,addr) type& name = *(type*)addr;
 VAR(DWORD, dword_77C934, 0x77C934);
@@ -594,7 +709,6 @@ VAR(LPDIRECTDRAWSURFACE7, pDDSurface, 0x6FC740);
 VAR(FILE*, gFile, 0x006DEF78);
 VAR(FILE*, gLogFile, 0x71D414);
 
-// TODO
 VAR(DWORD, dword_651CF8, 0x651CF8);
 VAR(DWORD, dword_716F5C, 0x716F5C);
 VAR(DWORD, dword_716F78, 0x716F78);
@@ -605,9 +719,9 @@ VAR(DWORD*, dword_776B90, 0x776B90);
 VAR(DWORD, dword_716F74, 0x716F74);
 VAR(DWORD, gXSize_dword_6DF214, 0x6DF214);
 VAR(DWORD, dword_650D2C, 0x650D2C);
-VAR(void*, dword_6C0EFC, 0x6C0EFC);
+VAR(DWORD*, dword_6C0EFC, 0x6C0EFC);
 VAR(void*, dword_6FC780, 0x6FC780);
-VAR(void*, dword_6FC728, 0x6FC728);
+VAR(DWORD*, dword_6FC728, 0x6FC728);
 VAR(void*, dword_6DEF7C, 0x6DEF7C);
 VAR(void*, dword_6DEF90, 0x6DEF90);
 VAR(void*, dword_6FC72C, 0x6FC72C);
@@ -814,6 +928,7 @@ signed int __cdecl MakeFonts()
     typedef decltype(&MakeFonts) fn;
     return ((fn)(0x431865))();
 }
+
 
 // 0x0041ECB0
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
@@ -1533,15 +1648,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
-        dword_6C0EFC = malloc(0x493E0u);
-        for (i = 0; (signed int)i < 15000; ++i)
+        dword_6C0EFC = (DWORD*)malloc(0x493E0u);
+        for (i = 0; i < 15000; ++i)
         {
-            // FIXME
-            //*((_DWORD *)dword_6C0EFC + 5 * i) = 0;
+            dword_6C0EFC[5 * i] = 0;
         }
         dword_6FC780 = malloc(0x75300u);
     }
-    dword_6FC728 = malloc(0x100000u);
+    dword_6FC728 = (DWORD*)malloc(0x100000u);
     if (dword_6FC728)
     {
         memset(dword_6FC728, 0, 0x100000u);
@@ -1578,6 +1692,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     return result;
 }
 
+MgsFunction<0x0041ECB0, InitD3d_ProfileGfxHardwareQ, decltype(InitD3d_ProfileGfxHardwareQ)> InitD3d_ProfileGfxHardwareQ_("InitD3d_ProfileGfxHardwareQ");
+
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
@@ -1586,8 +1702,8 @@ signed int __cdecl DoInitAll()
     v1 = InitD3d_ProfileGfxHardwareQ();
     MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", 0);
     return v1;
-
 }
+MgsFunction<0x00420810, DoInitAll, decltype(DoInitAll)> DoInitAll_("DoInitAll");
 
 // 0x0052269C
 signed int __cdecl SoundInit(HWND hwnd)
@@ -2223,7 +2339,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
     void(__stdcall *pSetThreadExecutionState)(unsigned int); // [sp+Ch] [bp-460h]@13
     HMODULE hKernel32; // [sp+10h] [bp-45Ch]@12
-    char Dest; // [sp+14h] [bp-458h]@11
+    char Dest[256]; // [sp+14h] [bp-458h]@11
     struct _MEMORYSTATUS Buffer; // [sp+414h] [bp-58h]@10
     char *v11; // [sp+434h] [bp-38h]@52
     WNDCLASSA WndClass; // [sp+438h] [bp-34h]@27
@@ -2405,10 +2521,10 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
         else
         {
             sprintf(
-                (char *)&Dest,
+                Dest,
                 "Metal Gear Solid requires over 50mb of hard disk space as Virtual Memory before the game can function correctly. This system currently only has %dmb available.  Please close all open applications not in use,  and refer to the Metal Gear Solid readme for more information on this issue.",
                 (Buffer.dwAvailPageFile - Buffer.dwAvailPhys) >> 20);
-            MessageBoxA(0, &Dest, "Metal Gear Solid PC", 0);
+            MessageBoxA(0, Dest, "Metal Gear Solid PC", 0);
             result = 0;
         }
     }
