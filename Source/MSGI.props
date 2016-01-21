@@ -10,6 +10,9 @@
     <BuildLog>
       <Path>$(SolutionDir)..\Output\$(Configuration)\$(ProjectName)\Build.log</Path>
     </BuildLog>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdParty\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

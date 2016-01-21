@@ -8,6 +8,7 @@
 #include <iostream>
 #include <memory>
 #include <map>
+#include <detours.h>
 
 #define DIRECTINPUT_VERSION 0x700
 #include <dinput.h>
@@ -47,10 +48,13 @@ public:
 
     MgsFunction()
     {
+        mRealFuncPtr = (TFuncType)kOldAddr;
+
         auto it = gFuncMap.find(kOldAddr);
         if (it != std::end(gFuncMap))
         {
             // duplicated function
+            abort();
         }
         else
         {
@@ -65,14 +69,17 @@ public:
         }
         else
         {
-            // point oldAddr to Static_Hook_Impl
-            auto ptr = &Static_Hook_Impl;
-        }
-    }
 
-    ReturnType Hook_Impl(Args ... args)
-    {
-        return operator()(args...);
+            // point oldAddr to Static_Hook_Impl
+            DetourTransactionBegin();
+            DetourUpdateThread(GetCurrentThread());
+            DetourAttach(&(PVOID&)mRealFuncPtr, Static_Hook_Impl);
+            const auto error = DetourTransactionCommit();
+            if (error != NO_ERROR)
+            {
+                abort();
+            }
+        }
     }
 
     static ReturnType Static_Hook_Impl(Args ... args)
@@ -86,7 +93,7 @@ public:
         
         MgsFunctionBase* baseFunc = it->second;
         // dont know if this will work or just blow up..
-        return static_cast<MgsFunction*>(baseFunc)->Hook_Impl(args...);
+        return static_cast<MgsFunction*>(baseFunc)->operator()(args...);
     }
 
     ~MgsFunction()
@@ -109,13 +116,16 @@ public:
         }
         else
         {
-            // Call "oldAddr" here so that we are calling the "real" function
+            // Call "mRealFuncPtr" here so that we are calling the "real" function
 
             // If not running within the game then we can't call real so just return
             // a default R and log params
-            return reinterpret_cast<TFuncType>(kOldAddr)(args...);
+            return mRealFuncPtr(args...);
         }
     }
+
+private:
+    TFuncType mRealFuncPtr = nullptr;
 };
 
 std::map<DWORD, MgsFunctionBase*> gFuncMap;

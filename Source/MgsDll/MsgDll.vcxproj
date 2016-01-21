@@ -89,6 +89,11 @@ echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MgsLib\MgsLib.vcxproj">
+      <Project>{8d2d8161-0574-44e4-ad40-e4e23cd86df1}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

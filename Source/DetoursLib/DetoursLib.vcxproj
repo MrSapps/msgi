@@ -10,6 +10,17 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\3rdParty\Detours\src\creatwth.cpp" />
+    <ClCompile Include="..\..\3rdParty\Detours\src\detours.cpp" />
+    <ClCompile Include="..\..\3rdParty\Detours\src\disasm.cpp" />
+    <ClCompile Include="..\..\3rdParty\Detours\src\image.cpp" />
+    <ClCompile Include="..\..\3rdParty\Detours\src\modules.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\3rdParty\Detours\src\detours.h" />
+    <ClInclude Include="..\..\3rdParty\Detours\src\detver.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{849C6CF7-CDEE-40C5-A3AF-F941A8346ADB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -48,7 +59,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DETOURS_32BIT;DETOURS_X86;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -63,7 +74,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DETOURS_32BIT;DETOURS_X86;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
