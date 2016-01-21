@@ -13,7 +13,7 @@ before_build:
  - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %platform%
 
 build_script:
- - msbuild MSGI.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+ - msbuild Source\MSGI.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
  
 install:
  - git submodule update --init --recursive
@@ -22,7 +22,7 @@ install:
  - set SDL2DIR=C:\msg\SDL2-2.0.4
 
 #artifacts:
-# - path: %configuration%\MSGI.dll
+# - path: Output\%configuration%\MSGI.dll
 # - name: MSG-$(configuration)-$(APPVEYOR_REPO_COMMIT)
 
 test: off
