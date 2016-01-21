@@ -46,7 +46,8 @@ class MgsFunction<kOldAddr, kNewAddr, ReturnType(Args...)> : public MgsFunctionB
 public:
     using TFuncType = ReturnType(*)(Args...);
 
-    MgsFunction()
+    MgsFunction(const char* fnName)
+        : mFnName(fnName)
     {
         mRealFuncPtr = (TFuncType)kOldAddr;
 
@@ -63,22 +64,22 @@ public:
 
         std::cout << "old addr " << kOldAddr << " new addr " << kNewAddr << std::endl;
 
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
         if (kNewAddr)
         {
             // Hook oldAddr to point to newAddr
+            DetourAttach(&(PVOID&)mRealFuncPtr, Static_Hook_Impl);
         }
         else
         {
-
             // point oldAddr to Static_Hook_Impl
-            DetourTransactionBegin();
-            DetourUpdateThread(GetCurrentThread());
-            DetourAttach(&(PVOID&)mRealFuncPtr, Static_Hook_Impl);
-            const auto error = DetourTransactionCommit();
-            if (error != NO_ERROR)
-            {
-                abort();
-            }
+            DetourAttach(&(PVOID&)mRealFuncPtr, (TFuncType)kNewAddr);
+        }
+        const auto error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            abort();
         }
     }
 
@@ -107,7 +108,7 @@ public:
 
     ReturnType operator()(Args ... args)
     {
-        doPrint(std::cout, args...);
+        //doPrint(std::cout, args...);
 
         if (kNewAddr)
         {
@@ -126,26 +127,10 @@ public:
 
 private:
     TFuncType mRealFuncPtr = nullptr;
+    const char* mFnName = nullptr;
 };
 
 std::map<DWORD, MgsFunctionBase*> gFuncMap;
-
-// Case 1, auto generated stub that calls "real"
-MgsFunction<0x0051D120, nullptr, void __cdecl(int, int)> Test_CheckForMmf;
-
-void CallTest()
-{
-    Test_CheckForMmf(1, 2);
-}
-
-void __cdecl Test1_CheckForMmf(int a1, int a2)
-{
-    typedef decltype(&Test1_CheckForMmf) fn;
-    ((fn)(0x0051D120))(a1, a2);
-}
-
-// Case 2 - function is reimplemented, can't call old
-template class MgsFunction<0x0051D120, &Test1_CheckForMmf, decltype(Test1_CheckForMmf)>;
 
 struct actor_related_struct
 {
@@ -224,11 +209,7 @@ HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
 DWORD& dword_651D98 = *((DWORD*)0x651D98);
 DWORD& dword_716F68 = *((DWORD*)0x716F68);
 
-void __cdecl CheckForMmf(int a1, int a2)
-{
-    typedef decltype(&CheckForMmf) fn;
-    ((fn)(0x0051D120))(a1, a2);
-}
+MgsFunction<0x0051D120, nullptr, void __cdecl(int, int)> CheckForMmf("CheckForMmf");
 
 #define VAR(type,name,addr) type& name = *(type*)addr;
 VAR(DWORD, dword_77C934, 0x77C934);
@@ -728,7 +709,6 @@ VAR(LPDIRECTDRAWSURFACE7, pDDSurface, 0x6FC740);
 VAR(FILE*, gFile, 0x006DEF78);
 VAR(FILE*, gLogFile, 0x71D414);
 
-// TODO
 VAR(DWORD, dword_651CF8, 0x651CF8);
 VAR(DWORD, dword_716F5C, 0x716F5C);
 VAR(DWORD, dword_716F78, 0x716F78);
@@ -948,6 +928,7 @@ signed int __cdecl MakeFonts()
     typedef decltype(&MakeFonts) fn;
     return ((fn)(0x431865))();
 }
+
 
 // 0x0041ECB0
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
@@ -1711,7 +1692,10 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     return result;
 }
 
+MgsFunction<0x0041ECB0, InitD3d_ProfileGfxHardwareQ, decltype(InitD3d_ProfileGfxHardwareQ)> InitD3d_ProfileGfxHardwareQ_("InitD3d_ProfileGfxHardwareQ");
+
 // 0x00420810
+/*
 signed int __cdecl DoInitAll()
 {
     signed int v1; // ST10_4@1
@@ -1719,8 +1703,10 @@ signed int __cdecl DoInitAll()
     v1 = InitD3d_ProfileGfxHardwareQ();
     MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", 0);
     return v1;
-
 }
+*/
+
+MgsFunction<0x00420810, nullptr, signed int __cdecl()> DoInitAll("DoInitAll");
 
 // 0x0052269C
 signed int __cdecl SoundInit(HWND hwnd)
