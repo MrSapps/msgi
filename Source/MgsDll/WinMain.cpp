@@ -1695,7 +1695,6 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 MgsFunction<0x0041ECB0, InitD3d_ProfileGfxHardwareQ, decltype(InitD3d_ProfileGfxHardwareQ)> InitD3d_ProfileGfxHardwareQ_("InitD3d_ProfileGfxHardwareQ");
 
 // 0x00420810
-/*
 signed int __cdecl DoInitAll()
 {
     signed int v1; // ST10_4@1
@@ -1704,9 +1703,7 @@ signed int __cdecl DoInitAll()
     MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", 0);
     return v1;
 }
-*/
-
-MgsFunction<0x00420810, nullptr, signed int __cdecl()> DoInitAll("DoInitAll");
+MgsFunction<0x00420810, DoInitAll, decltype(DoInitAll)> DoInitAll_("DoInitAll");
 
 // 0x0052269C
 signed int __cdecl SoundInit(HWND hwnd)
