@@ -21,6 +21,12 @@
 
 #include "logger.hpp"
 
+std::ostream& operator<<(std::ostream& out, IID id)
+{
+    out << id; // TODO: Check what this actually becomes
+    return out;
+}
+
 // No arguments case
 void doPrint(std::ostream& out)
 {
@@ -39,39 +45,36 @@ void doPrint(std::ostream& out, T t, U u, Args... args)
     out << t << ',';
     doPrint(out, u, args...);
 }
+const extern bool gbIsDll;
 
 class MgsFunctionBase
 {
 public:
     MgsFunctionBase() = default;
+protected:
+    static std::map<DWORD, MgsFunctionBase*> mFuncMap;
 };
 
-const extern bool gbIsDll;
-
-// TODO: Probably need the function name too
-template<DWORD kOldAddr, void* kNewAddr, class ReturnType>
-class MgsFunction;
-
-template <DWORD kOldAddr, void* kNewAddr, class ReturnType, class... Args>
-class MgsFunction<kOldAddr, kNewAddr, ReturnType(Args...)> : public MgsFunctionBase
+template <DWORD kOldAddr, void* kNewAddr, class Signature, class ReturnType, class... Args>
+class MgsFunctionImpl : public MgsFunctionBase
 {
 public:
-    using TFuncType = ReturnType(*)(Args...);
+    using TFuncType = Signature*;
 
-    MgsFunction(const char* fnName)
+    MgsFunctionImpl(const char* fnName)
         : mFnName(fnName)
     {
         mRealFuncPtr = (TFuncType)kOldAddr;
 
-        auto it = gFuncMap.find(kOldAddr);
-        if (it != std::end(gFuncMap))
+        auto it = mFuncMap.find(kOldAddr);
+        if (it != std::end(mFuncMap))
         {
             // duplicated function
             abort();
         }
         else
         {
-            gFuncMap.insert(std::make_pair(kOldAddr, this));
+            mFuncMap.insert(std::make_pair(kOldAddr, this));
         }
 
         std::cout << "old addr " << kOldAddr << " new addr " << kNewAddr << std::endl;
@@ -97,24 +100,24 @@ public:
 
     static ReturnType Static_Hook_Impl(Args ... args)
     {
-        auto it = gFuncMap.find(kOldAddr);
-        if (it == std::end(gFuncMap))
+        auto it = mFuncMap.find(kOldAddr);
+        if (it == std::end(mFuncMap))
         {
             // Impossible situation
         }
 
         
-        MgsFunctionBase* baseFunc = it->second;
+        auto baseFunc = it->second;
         // dont know if this will work or just blow up..
-        return static_cast<MgsFunction*>(baseFunc)->operator()(args...);
+        return static_cast<MgsFunctionImpl*>(baseFunc)->operator()(args...);
     }
 
-    ~MgsFunction()
+    ~MgsFunctionImpl()
     {
-        auto it = gFuncMap.find(kOldAddr);
-        if (it != std::end(gFuncMap))
+        auto it = mFuncMap.find(kOldAddr);
+        if (it != std::end(mFuncMap))
         {
-            gFuncMap.erase(it);
+            mFuncMap.erase(it);
         }
     }
 
@@ -142,7 +145,28 @@ private:
     const char* mFnName = nullptr;
 };
 
-std::map<DWORD, MgsFunctionBase*> gFuncMap;
+template<DWORD kOldAddr, void* kNewAddr, class ReturnType>
+class MgsFunction;
+
+// __cdecl partial specialization
+template<DWORD kOldAddr, void* kNewAddr, class ReturnType, class... Args>
+class MgsFunction    <kOldAddr, kNewAddr, ReturnType __cdecl(Args...) > : public 
+      MgsFunctionImpl<kOldAddr, kNewAddr, ReturnType __cdecl(Args...), ReturnType, Args...>
+{
+public:
+    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
+};
+
+// __stdcall partial specialization
+template<DWORD kOldAddr, void* kNewAddr, class ReturnType, class ... Args>
+class MgsFunction    <kOldAddr, kNewAddr, ReturnType __stdcall(Args...) > : public
+    MgsFunctionImpl<kOldAddr, kNewAddr, ReturnType __stdcall(Args...), ReturnType, Args...>
+{
+public:
+    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
+};
+
+/*static*/ std::map<DWORD, MgsFunctionBase*> MgsFunctionBase::mFuncMap;
 
 struct actor_related_struct
 {
@@ -1768,13 +1792,10 @@ signed int __cdecl Resetgraph(int a1)
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_STP", 12, 12, 3, 3);
     return 1;
 }
+MSG_FUNC_IMPL(0x0044A7B0, Resetgraph);
 
-// 0x00553090
-signed int __stdcall DirectInputCreateExMGS(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter)
-{
-    typedef decltype(&DirectInputCreateExMGS) fn;
-    return ((fn)(0x00553090))(hinst, dwVersion, riidltf, ppvOut, punkOuter);
-}
+MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
+
 
 LPDIENUMDEVICESCALLBACKA EnumDevicesCallback = (LPDIENUMDEVICESCALLBACKA)0x0043B078;
 LPDIENUMDEVICEOBJECTSCALLBACKA EnumDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0C8;
