@@ -17,6 +17,12 @@
 #define DIRECT3D_VERSION 0x700
 #include "d3d.h"
 
+// No arguments case
+void doPrint(std::ostream& out)
+{
+
+}
+
 template <typename T>
 void doPrint(std::ostream& out, T t)
 {
@@ -108,7 +114,7 @@ public:
 
     ReturnType operator()(Args ... args)
     {
-        //doPrint(std::cout, args...);
+        doPrint(std::cout, args...);
 
         if (kNewAddr)
         {
