@@ -53,15 +53,17 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>del "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"
-echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"</Command>
+      <Command>if exist "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll" (
+del "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"
+echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -72,7 +74,7 @@ echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -81,13 +83,14 @@ echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>del "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"
-echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"</Command>
+      <Command>if exist "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll" (
+del "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"
+echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Metal Gear Solid\ebueula.dll"
+)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MgsLib\MgsLib.vcxproj">

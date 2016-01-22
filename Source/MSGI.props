@@ -11,7 +11,8 @@
       <Path>$(SolutionDir)..\Output\$(Configuration)\$(ProjectName)\Build.log</Path>
     </BuildLog>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdParty\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdParty\Detours\include;$(SolutionDir)MgsDll;$(SolutionDir)MgsExe;$(SolutionDir)MgsLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
