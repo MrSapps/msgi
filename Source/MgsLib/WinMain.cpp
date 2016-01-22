@@ -46,6 +46,8 @@ public:
     MgsFunctionBase() = default;
 };
 
+const extern bool gbIsDll;
+
 // TODO: Probably need the function name too
 template<DWORD kOldAddr, void* kNewAddr, class ReturnType>
 class MgsFunction;
@@ -219,7 +221,6 @@ HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
 DWORD& dword_651D98 = *((DWORD*)0x651D98);
 DWORD& dword_716F68 = *((DWORD*)0x716F68);
 
-MgsFunction<0x0051D120, nullptr, void __cdecl(int, int)> CheckForMmf("CheckForMmf");
 
 #define VAR(type,name,addr) type& name = *(type*)addr;
 VAR(DWORD, dword_77C934, 0x77C934);
@@ -1702,7 +1703,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     return result;
 }
 
-MgsFunction<0x0041ECB0, InitD3d_ProfileGfxHardwareQ, decltype(InitD3d_ProfileGfxHardwareQ)> InitD3d_ProfileGfxHardwareQ_("InitD3d_ProfileGfxHardwareQ");
+#define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, signature> name(#name);
+#define MSG_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, decltype(funcName)> funcName##_(#funcName);
+
+MSG_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
+MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
+
 
 // 0x00420810
 signed int __cdecl DoInitAll()
@@ -1713,35 +1719,12 @@ signed int __cdecl DoInitAll()
     MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", 0);
     return v1;
 }
-MgsFunction<0x00420810, DoInitAll, decltype(DoInitAll)> DoInitAll_("DoInitAll");
 
-// 0x0052269C
-signed int __cdecl SoundInit(HWND hwnd)
-{
-    typedef decltype(&SoundInit) fn;
-    return ((fn)(0x0052269C))(hwnd);
-}
-
-// 0x004397D7
-bool __cdecl AskUserToContinueIfNoSoundCard()
-{
-    typedef decltype(&AskUserToContinueIfNoSoundCard) fn;
-    return ((fn)(0x004397D7))();
-}
-
-// 0x5224C8
-int __cdecl sub_5224C8(int a1)
-{
-    typedef decltype(&sub_5224C8) fn;
-    return ((fn)(0x5224C8))(a1);
-}
-
-// 0x52255B
-int __cdecl sub_52255B(int a1)
-{
-    typedef decltype(&sub_52255B) fn;
-    return ((fn)(0x52255B))(a1);
-}
+MSG_FUNC_IMPL(0x00420810, DoInitAll);
+MSG_FUNC_NOT_IMPL(0x0052269C, signed int __cdecl(HWND), SoundInit);
+MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
+MSG_FUNC_NOT_IMPL(0x005224C8, int __cdecl (int), sub_5224C8);
+MSG_FUNC_NOT_IMPL(0x0052255B, int __cdecl (int), sub_52255B);
 
 // 0x0044A7B0
 signed int __cdecl Resetgraph(int a1)
