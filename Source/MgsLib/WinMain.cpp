@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #undef UNICODE
 
 #include <windows.h>
