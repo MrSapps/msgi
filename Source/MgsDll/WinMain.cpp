@@ -17,6 +17,8 @@
 #define DIRECT3D_VERSION 0x700
 #include "d3d.h"
 
+#include "logger.hpp"
+
 // No arguments case
 void doPrint(std::ostream& out)
 {
