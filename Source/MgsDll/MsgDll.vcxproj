@@ -91,7 +91,6 @@ echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MgsLib\MgsLib.vcxproj">
