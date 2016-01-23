@@ -110,7 +110,9 @@ public:
 
     ReturnType operator()(Args ... args)
     {
+        std::cout << mFnName << " (";
         doPrint(std::cout, args...);
+        std::cout << ")" << std::endl;
 
         if (kNewAddr)
         {
