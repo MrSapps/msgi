@@ -673,25 +673,9 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     signed int result; // eax@41
     int v1; // edx@115
     float v2; // STB4_4@163
-    int v3; // [sp+C8h] [bp-388h]@142
-    int v4; // [sp+CCh] [bp-384h]@142
-    int v5; // [sp+D0h] [bp-380h]@142
-    int v6; // [sp+D4h] [bp-37Ch]@142
-    int v7; // [sp+D8h] [bp-378h]@142
-    int v8; // [sp+DCh] [bp-374h]@142
-    int v9; // [sp+E0h] [bp-370h]@142
-    int v10; // [sp+E4h] [bp-36Ch]@142
+    DDPIXELFORMAT pixelFormat; // [sp+C8h] [bp-388h]@142
     DDSURFACEDESC2 dxSurfaceDesc3; // [sp+E8h] [bp-368h]@142
-    int v12; // [sp+ECh] [bp-364h]@142
-    int v13; // [sp+F0h] [bp-360h]@142
-    int v14; // [sp+F4h] [bp-35Ch]@142
-    char v15; // [sp+130h] [bp-320h]@142
-    int v16; // [sp+150h] [bp-300h]@142
-    int v17; // [sp+154h] [bp-2FCh]@142
     DDSCAPS2 dxCaps1; // [sp+164h] [bp-2ECh]@104
-    int v19; // [sp+168h] [bp-2E8h]@104
-    int v20; // [sp+16Ch] [bp-2E4h]@104
-    int v21; // [sp+170h] [bp-2E0h]@104
     int v22; // [sp+174h] [bp-2DCh]@76
     int v23; // [sp+178h] [bp-2D8h]@1
     int v24; // [sp+17Ch] [bp-2D4h]@1
@@ -701,29 +685,15 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     int v28; // [sp+18Ch] [bp-2C4h]@1
     int v29; // [sp+190h] [bp-2C0h]@1
     int v30; // [sp+194h] [bp-2BCh]@1
-    DDCAPS_DX7 dxCaps; // [sp+198h] [bp-2B8h]@114
-    int v32; // [sp+1A0h] [bp-2B0h]@115
+    DDCAPS_DX7 dxCaps; // [sp+198h] [bp-2B8h]@114  sizeof = 0x17C
     int v33; // [sp+314h] [bp-13Ch]@1
     int v34; // [sp+318h] [bp-138h]@3
     unsigned int i; // [sp+320h] [bp-130h]@34
     DDSURFACEDESC2 dxSurfaceDesc; // [sp+328h] [bp-128h]@86
-    int v37; // [sp+32Ch] [bp-124h]@97
-    int v38; // [sp+330h] [bp-120h]@97
-    int v39; // [sp+334h] [bp-11Ch]@97
-    unsigned int v40; // [sp+37Ch] [bp-D4h]@119
-    int v41; // [sp+390h] [bp-C0h]@91
     int v42; // [sp+3A4h] [bp-ACh]@30
     DDSURFACEDESC2 dxSurfaceDesc2; // [sp+3B0h] [bp-A0h]@70 = DDSURFACEDESC2 (sizeof = 0x7C)
-    int v44; // [sp+3B4h] [bp-9Ch]@72
-    int v45; // [sp+3C4h] [bp-8Ch]@73
-    int v46; // [sp+418h] [bp-38h]@72
-    int v47; // [sp+42Ch] [bp-24h]@163
-    int v48; // [sp+430h] [bp-20h]@163
-    int v49; // [sp+434h] [bp-1Ch]@163
-    int v50; // [sp+438h] [bp-18h]@163
-    int v51; // [sp+43Ch] [bp-14h]@163
-    int v52; // [sp+440h] [bp-10h]@163
-    int v53; // [sp+444h] [bp-Ch]@40
+    D3DVIEWPORT7 dxViewport; // [sp+42Ch] [bp-24h]@163
+    HRESULT hr; // [sp+444h] [bp-Ch]@40
     GUID *lpGuid; // [sp+448h] [bp-8h]@1
     int v55; // [sp+44Ch] [bp-4h]@1
 
@@ -904,9 +874,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gYSize = (signed __int64)(240.0 * gXRes);
         fputs("Creating DirectDraw7\n", gFile);
         fflush(gFile);
-        //v53 = DirectDrawCreateEx(lpGuid, &lpDD, &iid, 0);
-        v53 = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&pDirectDraw, &IID_IDirectDraw7_MGS, 0);
-        if (v53 < 0)
+        hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&pDirectDraw, &IID_IDirectDraw7_MGS, 0);
+        if (hr < 0)
         {
             fputs(" . fail\n", gFile);
             fflush(gFile);
@@ -919,7 +888,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             fputs("Query interface...\n", gFile);
             fflush(gFile);
             pDirectDraw->QueryInterface(IID_IDirect3D7_MGS, (LPVOID*)&pDirect3D);
-            if (v53 < 0)
+            if (hr < 0)
             {
                 fputs(" . fail\n", gFile);
                 fflush(gFile);
@@ -947,23 +916,23 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         if (pPrimarySurface)
         {
-            pPrimarySurface->Release();
-            if (v53)
-                PrintDDError("Can't relaese primary surf", v53);
+            hr = pPrimarySurface->Release();
+            if (hr)
+                PrintDDError("Can't release primary surf", hr);
             pPrimarySurface = 0;
         }
         if (pBackBuffer)
         {
-            pBackBuffer->Release();
-            if (v53)
-                PrintDDError("Can't release render surf", v53);
+            hr = pBackBuffer->Release();
+            if (hr)
+                PrintDDError("Can't release render surf", hr);
             pBackBuffer = 0;
         }
         if (pClipper)
         {
-            pClipper->Release();
-            if (v53)
-                PrintDDError("Can't release clipper", v53);
+            hr = pClipper->Release();
+            if (hr)
+                PrintDDError("Can't release clipper", hr);
             pClipper = 0;
         }
         pPrimarySurface = 0;
@@ -975,15 +944,15 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             fputs(" (windowed) \n", gFile);
             fflush(gFile);
-            v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_NORMAL);
+            hr = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_NORMAL);
         }
         else
         {
             fputs(" (full-screen) \n", gFile);
             fflush(gFile);
-            v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
+            hr = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
         }
-        if (v53 < 0)
+        if (hr < 0)
         {
             fputs(" . fail\n", gFile);
             fflush(gFile);
@@ -993,28 +962,28 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         fflush(gFile);
         if (!v42)
         {
-            v53 = pDirectDraw->SetDisplayMode(dwDisplayWidth, dwDisplayHeight, 0x10, 0, 0);
+            hr = pDirectDraw->SetDisplayMode(dwDisplayWidth, dwDisplayHeight, 0x10, 0, 0);
             fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", gXSize_dword_6DF214, gYSize);
-            if (v53 < 0)
+            if (hr < 0)
                 return 0;
         }
         memset(&dxSurfaceDesc2, 0, 124);
         dxSurfaceDesc2.dwSize = 124;
         if (v42 || gSoftwareRendering)
         {
-            v44 = 1;
-            v46 = 512;
+            dxSurfaceDesc2.dwFlags = DDSD_CAPS;
+            dxSurfaceDesc2.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
         }
         else
         {
-            v44 = 33;
-            v46 = 8728;
-            v45 = 1;
+            dxSurfaceDesc2.dwFlags = DDSD_CAPS | DDSD_BACKBUFFERCOUNT;
+            dxSurfaceDesc2.ddsCaps.dwCaps = DDSCAPS_3DDEVICE | DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
+            dxSurfaceDesc2.dwBackBufferCount = 1;
         }
         fputs("Creating primary surface...\n", gFile);
         fflush(gFile);
-        v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc2, &pPrimarySurface, 0);
-        if (v53 < 0)
+        hr = pDirectDraw->CreateSurface(&dxSurfaceDesc2, &pPrimarySurface, 0);
+        if (hr < 0)
         {
             fputs(" . fail\n", gFile);
             fflush(gFile);
@@ -1033,28 +1002,28 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             fputs("Creating clipper...\n", gFile);
             fflush(gFile);
-            pDirectDraw->CreateClipper(0, &pClipper, 0);
-            if (v53)
+            hr = pDirectDraw->CreateClipper(0, &pClipper, 0);
+            if (hr)
             {
                 fputs(" . fail\n", gFile);
                 fflush(gFile);
-                PrintDDError("Can't create clipper", v53);
+                PrintDDError("Can't create clipper", hr);
                 return 0;
             }
-            v53 = pClipper->SetHWnd(0, gHwnd);
-            if (v53)
+            hr = pClipper->SetHWnd(0, gHwnd);
+            if (hr)
             {
                 fputs(" . fail\n", gFile);
                 fflush(gFile);
-                PrintDDError("Can't obtain clipper zone", v53);
+                PrintDDError("Can't obtain clipper zone", hr);
                 return 0;
             }
-            pPrimarySurface->SetClipper(pClipper);
-            if (v53)
+            hr = pPrimarySurface->SetClipper(pClipper);
+            if (hr)
             {
                 fputs(" . fail\n", gFile);
                 fflush(gFile);
-                PrintDDError("Can't attach clipper", v53);
+                PrintDDError("Can't attach clipper", hr);
                 return 0;
             }
             pClipper->Release();
@@ -1074,30 +1043,30 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     fputs(" . rendering to video surface is faster\n", gFile);
                     fflush(gFile);
                     dword_716F6C = 1;
-                    v41 = 16448;
+                    dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_VIDEOMEMORY | DDSCAPS_OFFSCREENPLAIN;
                 }
                 else
                 {
                     fputs(" . rendering to system memory surface is faster\n", gFile);
                     fflush(gFile);
                     dword_716F6C = 0;
-                    v41 = 2112;
+                    dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_OFFSCREENPLAIN;
                 }
             }
             else
             {
                 if (dword_716F6C)
-                    v41 = 16448;
+                    dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_VIDEOMEMORY | DDSCAPS_OFFSCREENPLAIN;
                 else
-                    v41 = 2112;
+                    dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_OFFSCREENPLAIN;
             }
-            v37 = 7;
-            v39 = gXSize_dword_6DF214;
-            v38 = gYSize;
+            dxSurfaceDesc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
+            dxSurfaceDesc.dwWidth = gXSize_dword_6DF214;
+            dxSurfaceDesc.dwHeight = gYSize;
             fputs("Creating back buffer for software rendering...\n", gFile);
             fflush(gFile);
-            v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc, &pBackBuffer, 0);
-            if (v53 < 0)
+            hr = pDirectDraw->CreateSurface(&dxSurfaceDesc, &pBackBuffer, 0);
+            if (hr < 0)
             {
                 fputs(" . fail\n", gFile);
                 fflush(gFile);
@@ -1110,14 +1079,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             if (v42)
             {
-                v37 = 7;
-                v41 = 8256;
-                v39 = gXSize_dword_6DF214;
-                v38 = gYSize;
+                dxSurfaceDesc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
+                dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_3DDEVICE | DDSCAPS_PALETTE | DDSCAPS_OFFSCREENPLAIN | DDSCAPS_COMPLEX | DDSCAPS_BACKBUFFER | DDSCAPS_ALPHA;
+                dxSurfaceDesc.dwWidth = gXSize_dword_6DF214;
+                dxSurfaceDesc.dwHeight = gYSize;
                 fputs("Creating back buffer for windowed mode...\n", gFile);
                 fflush(gFile);
-                v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc, &pBackBuffer, 0);
-                if (v53 < 0)
+                hr = pDirectDraw->CreateSurface(&dxSurfaceDesc, &pBackBuffer, 0);
+                if (hr < 0)
                 {
                     fputs(" . fail\n", gFile);
                     fflush(gFile);
@@ -1129,17 +1098,17 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             else
             {
                 dxCaps1.dwCaps = 4;
-                v19 = 0;
-                v20 = 0;
-                v21 = 0;
+                dxCaps1.dwCaps2 = 0;
+                dxCaps1.dwCaps3 = 0;
+                dxCaps1.dwCaps4 = 0;
                 fputs("Getting back buffer from pPrim chain...\n", gFile);
                 fflush(gFile);
                 pPrimarySurface->GetAttachedSurface(&dxCaps1, &pBackBuffer);
-                if (v53 < 0)
+                if (hr < 0)
                 {
                     fputs(" . fail\n", gFile);
                     fflush(gFile);
-                    return v53;
+                    return hr;
                 }
                 fputs(" . done\n", gFile);
                 fflush(gFile);
@@ -1148,11 +1117,11 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         fputs("Restoring surfaces...\n", gFile);
         fflush(gFile);
         sub_41CC30();
-        if (v53)
+        if (hr)
         {
             fputs(" . fail\n", gFile);
             fflush(gFile);
-            PrintDDError("Restoring caput", v53);
+            PrintDDError("Restoring caput", hr);
         }
         else
         {
@@ -1162,11 +1131,11 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         fputs("Querying gamma interface...\n", gFile);
         fflush(gFile);
         pPrimarySurface->QueryInterface(IID_IDirectDrawGammaControl_MGS, (LPVOID*)&pGammaControl);
-        if (v53)
+        if (hr)
         {
             fputs(" . fail\n", gFile);
             fflush(gFile);
-            PrintDDError("Can't get GammaControl interface", v53);
+            PrintDDError("Can't get GammaControl interface", hr);
             dword_6FC7C4 = 0;
         }
         else
@@ -1179,8 +1148,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             memset(&dxCaps, 0, 380);
             dxCaps.dwSize = 380;
-            pDirectDraw->GetCaps(&dxCaps, 0);
-            if (v53 || (v1 = v32, !(v1 & 0x20000)))
+            hr = pDirectDraw->GetCaps(&dxCaps, 0);
+            if (hr || (v1 = dxCaps.dwCaps2, !(v1 & 0x20000)))
                 dword_6FC7C4 = 0;
         }
         dword_6FC79C = sub_41D1D0();
@@ -1189,7 +1158,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             break;
         dxSurfaceDesc.dwSize = 124;
         pDirectDraw->GetDisplayMode(&dxSurfaceDesc);
-        if (v40 <= 8)
+        if (dxSurfaceDesc.ddpfPixelFormat.dwRGBBitCount <= 8)
         {
             fputs("Can't render to a palettized surface, exiting.\n", gFile);
             fflush(gFile);
@@ -1200,8 +1169,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         fputs("Creating device...\n", gFile);
         fflush(gFile);
 
-        v53 = pDirect3D->CreateDevice(*((GUID*)(&v33)), pBackBuffer, &pDirect3DDevice);
-        if (v53 >= 0)
+        hr = pDirect3D->CreateDevice(*((GUID*)(&v33)), pBackBuffer, &pDirect3DDevice);
+        if (hr >= 0)
         {
             fputs(" . done\n", gFile);
             fflush(gFile);
@@ -1209,25 +1178,26 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             Render_Unknown1(26, 0);
             if (!gSoftwareRendering)
             {
-                v3 = 32;
-                v4 = 65;
-                v5 = 0;
-                v6 = 16;
-                v7 = 31744;
-                v8 = 992;
-                v9 = 31;
-                v10 = 32768;
+                assert(sizeof(DDPIXELFORMAT) == 32);
+                pixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+                pixelFormat.dwFlags = DDPF_ALPHAPIXELS | DDPF_RGB;
+                pixelFormat.dwFourCC = 0;
+                pixelFormat.dwRGBBitCount = 16;
+                pixelFormat.dwRBitMask = 0x7C00;
+                pixelFormat.dwGBitMask = 0x03E0;
+                pixelFormat.dwBBitMask = 0x001F;
+                pixelFormat.dwRGBAlphaBitMask = 0x8000;
                 memset(&dxSurfaceDesc3, 0, 124);
                 dxSurfaceDesc3.dwSize = 124;
-                v12 = 4103; // TODO: These are part of the surface desc?
-                memcpy(&v15, &v3, 0x20u);
-                v14 = 16;
-                v13 = 16;
-                v16 = 4096;
-                v17 = 16;
+                dxSurfaceDesc3.dwFlags = DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
+                memcpy(&dxSurfaceDesc3.ddpfPixelFormat, &pixelFormat, sizeof(DDPIXELFORMAT));
+                dxSurfaceDesc3.dwWidth = 16;
+                dxSurfaceDesc3.dwHeight = 16;
+                dxSurfaceDesc3.ddsCaps.dwCaps = DDSCAPS_TEXTURE;
+                dxSurfaceDesc3.ddsCaps.dwCaps2 = DDSCAPS2_TEXTUREMANAGE;
 
-                v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc3, &pDDSurface, 0);
-                if (v53)
+                hr = pDirectDraw->CreateSurface(&dxSurfaceDesc3, &pDDSurface, 0);
+                if (hr)
                 {
                     pDDSurface = 0;
                 }
@@ -1298,13 +1268,13 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                         fflush(gFile);
                     }
                 }
-                v47 = 0;
-                v48 = 0;
-                v49 = gXSize_dword_6DF214;
-                v50 = gYSize;
-                v51 = 0;
-                v52 = 1065353216;
-                pDirect3DDevice->SetViewport((D3DVIEWPORT7*)&v47);
+                dxViewport.dwX = 0;
+                dxViewport.dwY = 0;
+                dxViewport.dwWidth = gXSize_dword_6DF214;
+                dxViewport.dwHeight = gYSize;
+                dxViewport.dvMinZ = 0;
+                dxViewport.dvMaxZ = 1.0f;
+                pDirect3DDevice->SetViewport(&dxViewport);
                 v2 = ((double)dword_651D94 - 50.0) / 100.0;
                 sub_41C820(v2);
             }
@@ -1326,7 +1296,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gSoftwareRendering = 1;
         dword_716F5C = 1065353216;
         gXRes = dword_716F5C; // TODO: Float
-        v53 = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_NORMAL);
+        hr = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_NORMAL);
         if (pGammaControl)
         { 
             pGammaControl->Release();
@@ -1334,23 +1304,23 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
         if (pBackBuffer)
         {
-            pBackBuffer->Release();
-            if (v53)
-                PrintDDError("Can't release render surf", v53);
+            hr = pBackBuffer->Release();
+            if (hr)
+                PrintDDError("Can't release render surf", hr);
             pBackBuffer = 0;
         }
         if (pPrimarySurface)
         {
-            pPrimarySurface->Release();
-            if (v53)
-                PrintDDError("Can't relaese primary surf", v53);
+            hr = pPrimarySurface->Release();
+            if (hr)
+                PrintDDError("Can't relaese primary surf", hr);
             pPrimarySurface = 0;
         }
         if (pClipper)
         {
-            pClipper->Release();
-            if (v53)
-                PrintDDError("Can't release clipper", v53);
+            hr = pClipper->Release();
+            if (hr)
+                PrintDDError("Can't release clipper", hr);
             pClipper = 0;
         }
         pPrimarySurface = 0;
