@@ -947,21 +947,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     signed int result; // eax@41
     int v1; // edx@115
     float v2; // STB4_4@163
-    int v3; // [sp+C8h] [bp-388h]@142
-    int v4; // [sp+CCh] [bp-384h]@142
-    int v5; // [sp+D0h] [bp-380h]@142
-    int v6; // [sp+D4h] [bp-37Ch]@142
-    int v7; // [sp+D8h] [bp-378h]@142
-    int v8; // [sp+DCh] [bp-374h]@142
-    int v9; // [sp+E0h] [bp-370h]@142
-    int v10; // [sp+E4h] [bp-36Ch]@142
+    DDPIXELFORMAT pixelFormat; // [sp+C8h] [bp-388h]@142
     DDSURFACEDESC2 dxSurfaceDesc3; // [sp+E8h] [bp-368h]@142
-    int v12; // [sp+ECh] [bp-364h]@142
-    int v13; // [sp+F0h] [bp-360h]@142
-    int v14; // [sp+F4h] [bp-35Ch]@142
-    char v15; // [sp+130h] [bp-320h]@142
-    int v16; // [sp+150h] [bp-300h]@142
-    int v17; // [sp+154h] [bp-2FCh]@142
     DDSCAPS2 dxCaps1; // [sp+164h] [bp-2ECh]@104
     int v19; // [sp+168h] [bp-2E8h]@104
     int v20; // [sp+16Ch] [bp-2E4h]@104
@@ -1483,22 +1470,23 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             Render_Unknown1(26, 0);
             if (!gSoftwareRendering)
             {
-                v3 = 32;
-                v4 = 65;
-                v5 = 0;
-                v6 = 16;
-                v7 = 31744;
-                v8 = 992;
-                v9 = 31;
-                v10 = 32768;
+                assert(sizeof(DDPIXELFORMAT) == 32);
+                pixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+                pixelFormat.dwFlags = DDPF_ALPHAPIXELS | DDPF_RGB;
+                pixelFormat.dwFourCC = 0;
+                pixelFormat.dwRGBBitCount = 16;
+                pixelFormat.dwRBitMask = 0x7C00;
+                pixelFormat.dwGBitMask = 0x03E0;
+                pixelFormat.dwBBitMask = 0x001F;
+                pixelFormat.dwRGBAlphaBitMask = 0x8000;
                 memset(&dxSurfaceDesc3, 0, 124);
                 dxSurfaceDesc3.dwSize = 124;
-                v12 = 4103; // TODO: These are part of the surface desc?
-                memcpy(&v15, &v3, 0x20u);
-                v14 = 16;
-                v13 = 16;
-                v16 = 4096;
-                v17 = 16;
+                dxSurfaceDesc3.dwFlags = DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
+                memcpy(&dxSurfaceDesc3.ddpfPixelFormat, &pixelFormat, sizeof(DDPIXELFORMAT));
+                dxSurfaceDesc3.dwWidth = 16;
+                dxSurfaceDesc3.dwHeight = 16;
+                dxSurfaceDesc3.ddsCaps.dwCaps = DDSCAPS_TEXTURE;
+                dxSurfaceDesc3.ddsCaps.dwCaps2 = DDSCAPS2_TEXTUREMANAGE;
 
                 v53 = pDirectDraw->CreateSurface(&dxSurfaceDesc3, &pDDSurface, 0);
                 if (v53)
