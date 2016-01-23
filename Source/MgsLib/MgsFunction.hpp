@@ -129,6 +129,11 @@ public:
         }
     }
 
+    TFuncType Ptr() const
+    {
+        return &Static_Hook_Impl;
+    }
+
 private:
     TFuncType mRealFuncPtr = nullptr;
     const char* mFnName = nullptr;
