@@ -4,6 +4,8 @@
 #include <ostream>
 #include <map>
 #include <memory>
+#include "logger.hpp"
+#include "detours.h"
 
 inline std::ostream& operator<<(std::ostream& out, IID id)
 {
@@ -37,9 +39,38 @@ class MgsFunctionBase
 {
 public:
     MgsFunctionBase() = default;
-protected:
-    static std::map<DWORD, MgsFunctionBase*>& GetMgsFunctionTable();
+    virtual ~MgsFunctionBase() = default;
+    static void ApplyFunctions()
+    {
+        TRACE_ENTRYEXIT;
+        LONG err = DetourTransactionBegin();
+        
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
+        
+        err = DetourUpdateThread(GetCurrentThread());
+        
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
 
+        auto& funcs = GetMgsFunctionTable();
+        for (auto func : funcs)
+        {
+            func.second->Apply();
+        }
+        err = DetourTransactionCommit();
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
+    }
+protected:
+    virtual void Apply() = 0;
+    static std::map<DWORD, MgsFunctionBase*>& GetMgsFunctionTable();
 };
 
 template <DWORD kOldAddr, void* kNewAddr, class Signature, class ReturnType, class... Args>
@@ -51,8 +82,6 @@ public:
     MgsFunctionImpl(const char* fnName)
         : mFnName(fnName)
     {
-        mRealFuncPtr = (TFuncType)kOldAddr;
-
         auto it = GetMgsFunctionTable().find(kOldAddr);
         if (it != std::end(GetMgsFunctionTable()))
         {
@@ -63,26 +92,6 @@ public:
         {
             GetMgsFunctionTable().insert(std::make_pair(kOldAddr, this));
         }
-
-        std::cout << "old addr " << kOldAddr << " new addr " << kNewAddr << std::endl;
-
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-        if (kNewAddr)
-        {
-            // Hook oldAddr to point to newAddr
-            DetourAttach(&(PVOID&)mRealFuncPtr, Static_Hook_Impl);
-        }
-        else
-        {
-            // point oldAddr to Static_Hook_Impl
-            DetourAttach(&(PVOID&)mRealFuncPtr, (TFuncType)kNewAddr);
-        }
-        const auto error = DetourTransactionCommit();
-        if (error != NO_ERROR)
-        {
-            abort();
-        }
     }
 
     static ReturnType Static_Hook_Impl(Args ... args)
@@ -91,15 +100,15 @@ public:
         if (it == std::end(GetMgsFunctionTable()))
         {
             // Impossible situation
+            abort();
         }
-
 
         auto baseFunc = it->second;
         // dont know if this will work or just blow up..
         return static_cast<MgsFunctionImpl*>(baseFunc)->operator()(args...);
     }
 
-    ~MgsFunctionImpl()
+    virtual ~MgsFunctionImpl()
     {
         auto it = GetMgsFunctionTable().find(kOldAddr);
         if (it != std::end(GetMgsFunctionTable()))
@@ -132,6 +141,32 @@ public:
     TFuncType Ptr() const
     {
         return &Static_Hook_Impl;
+    }
+
+protected:
+    virtual void Apply() override
+    {
+        TRACE_ENTRYEXIT;
+
+        std::cout << "old addr " << kOldAddr << " new addr " << kNewAddr << std::endl;
+
+        mRealFuncPtr = (TFuncType)kOldAddr;
+
+        LONG err = 0;
+        if (kNewAddr)
+        {
+            // point oldAddr to Static_Hook_Impl
+            err = DetourAttach(&(PVOID&)mRealFuncPtr, (TFuncType)kNewAddr);
+        }
+        else
+        {
+            err = DetourAttach(&(PVOID&)mRealFuncPtr, Static_Hook_Impl);
+        }
+
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
     }
 
 private:

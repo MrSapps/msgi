@@ -1,5 +1,6 @@
 #include <windows.h>
 #include "logger.hpp"
+#include "MgsFunction.hpp"
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
 
@@ -56,6 +57,10 @@ BOOL WINAPI DllMain(
         sb = std::cout.rdbuf(&ob);
 
         LOG_INFO("DLL_PROCESS_ATTACH");
+
+        LOG_INFO("Applying detours...");
+        MgsFunctionBase::ApplyFunctions();
+        LOG_INFO("Detours done");
     }
     else if(fdwReason == DLL_PROCESS_DETACH)
     {
