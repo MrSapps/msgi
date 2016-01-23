@@ -35,6 +35,7 @@ void doPrint(std::ostream& out, T t, U u, Args... args)
 
 extern bool gbIsDll;
 
+
 class MgsFunctionBase
 {
 public:
@@ -73,7 +74,13 @@ protected:
     static std::map<DWORD, MgsFunctionBase*>& GetMgsFunctionTable();
 };
 
-template <DWORD kOldAddr, void* kNewAddr, class Signature, class ReturnType, class... Args>
+enum CallingConvention
+{
+    eCDecl,
+    eStdCall
+};
+
+template <DWORD kOldAddr, void* kNewAddr, CallingConvention convention, class Signature, class ReturnType, class... Args>
 class MgsFunctionImpl : public MgsFunctionBase
 {
 public:
@@ -92,20 +99,6 @@ public:
         {
             GetMgsFunctionTable().insert(std::make_pair(kOldAddr, this));
         }
-    }
-
-    static ReturnType Static_Hook_Impl(Args ... args)
-    {
-        auto it = GetMgsFunctionTable().find(kOldAddr);
-        if (it == std::end(GetMgsFunctionTable()))
-        {
-            // Impossible situation
-            abort();
-        }
-
-        auto baseFunc = it->second;
-        // dont know if this will work or just blow up..
-        return static_cast<MgsFunctionImpl*>(baseFunc)->operator()(args...);
     }
 
     virtual ~MgsFunctionImpl()
@@ -138,12 +131,38 @@ public:
         }
     }
 
-    TFuncType Ptr() const
+    Signature* Ptr() const
     {
-        return &Static_Hook_Impl;
+        return mRealFuncPtr;
     }
 
 protected:
+    static ReturnType __cdecl Cdecl_Static_Hook_Impl(Args ... args)
+    {
+        auto it = GetMgsFunctionTable().find(kOldAddr);
+        if (it == std::end(GetMgsFunctionTable()))
+        {
+            // Impossible situation
+            abort();
+        }
+
+        auto baseFunc = it->second;
+        return static_cast<MgsFunctionImpl*>(baseFunc)->operator()(args...);
+    }
+
+    static ReturnType __stdcall StdCall_Static_Hook_Impl(Args ... args)
+    {
+        auto it = GetMgsFunctionTable().find(kOldAddr);
+        if (it == std::end(GetMgsFunctionTable()))
+        {
+            // Impossible situation
+            abort();
+        }
+
+        auto baseFunc = it->second;
+        return static_cast<MgsFunctionImpl*>(baseFunc)->operator()(args...);
+    }
+
     virtual void Apply() override
     {
         TRACE_ENTRYEXIT;
@@ -160,7 +179,18 @@ protected:
         }
         else
         {
-            err = DetourAttach(&(PVOID&)mRealFuncPtr, Static_Hook_Impl);
+            if (convention == eCDecl)
+            {
+                err = DetourAttach(&(PVOID&)mRealFuncPtr, Cdecl_Static_Hook_Impl);
+            }
+            else if (convention == eStdCall)
+            {
+                err = DetourAttach(&(PVOID&)mRealFuncPtr, StdCall_Static_Hook_Impl);
+            }
+            else
+            {
+                abort();
+            }
         }
 
         if (err != NO_ERROR)
@@ -180,7 +210,7 @@ class MgsFunction;
 // __cdecl partial specialization
 template<DWORD kOldAddr, void* kNewAddr, class ReturnType, class... Args>
 class MgsFunction    <kOldAddr, kNewAddr, ReturnType __cdecl(Args...) > : public
-    MgsFunctionImpl<kOldAddr, kNewAddr, ReturnType __cdecl(Args...), ReturnType, Args...>
+    MgsFunctionImpl<kOldAddr, kNewAddr, eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
 {
 public:
     MgsFunction(const char* name) : MgsFunctionImpl(name) { }
@@ -189,7 +219,7 @@ public:
 // __stdcall partial specialization
 template<DWORD kOldAddr, void* kNewAddr, class ReturnType, class ... Args>
 class MgsFunction    <kOldAddr, kNewAddr, ReturnType __stdcall(Args...) > : public
-    MgsFunctionImpl<kOldAddr, kNewAddr, ReturnType __stdcall(Args...), ReturnType, Args...>
+    MgsFunctionImpl<kOldAddr, kNewAddr, eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
 {
 public:
     MgsFunction(const char* name) : MgsFunctionImpl(name) { }

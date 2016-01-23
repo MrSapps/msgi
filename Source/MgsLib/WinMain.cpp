@@ -1436,6 +1436,7 @@ signed int __cdecl DoInitAll()
 {
     signed int v1; // ST10_4@1
 
+    //v1 = InitD3d_ProfileGfxHardwareQ_Test();
     v1 = InitD3d_ProfileGfxHardwareQ();
     MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", 0);
     return v1;
