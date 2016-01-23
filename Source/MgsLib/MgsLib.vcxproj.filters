@@ -24,12 +24,18 @@
     <ClInclude Include="logger.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MgsFunction.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WinMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MgsFunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

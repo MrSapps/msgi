@@ -20,129 +20,86 @@
 #include "d3d.h"
 
 #include "logger.hpp"
+#include "MgsFunction.hpp"
 
-// No arguments case
-void doPrint(std::ostream& out)
+struct actor_related_struct;
+
+MSG_FUNC_NOT_IMPL(0x0052269C, signed int __cdecl(HWND), SoundInit);
+MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
+MSG_FUNC_NOT_IMPL(0x005224C8, int __cdecl(int), sub_5224C8);
+MSG_FUNC_NOT_IMPL(0x0052255B, int __cdecl(int), sub_52255B);
+MSG_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
+MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
+MSG_FUNC_NOT_IMPL(0x00421680, signed __int64 __cdecl(), FpsTimerSetupQ);
+MSG_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
+MSG_FUNC_NOT_IMPL(0x0043BCF0, int __cdecl(), sub_43BCF0); // Joystick related
+MSG_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
+MSG_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
+MSG_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
+MSG_FUNC_NOT_IMPL(0x0040A4F6, void __cdecl(), sub_40A4F6);
+MSG_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
+MSG_FUNC_NOT_IMPL(0x0040111A, int __cdecl(), sub_40111A);
+MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
+MSG_FUNC_NOT_IMPL(0x0040B725, int __cdecl(), sub_40B725);
+MSG_FUNC_NOT_IMPL(0x00452610, int __cdecl(), sub_452610);
+MSG_FUNC_NOT_IMPL(0x0044E9D2, int __cdecl(), sub_44E9D2);
+MSG_FUNC_NOT_IMPL(0x0044E381, void* __cdecl(int), sub_44E381);
+MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), unknown_libname_3); // Note: Not a CRT func!!
+MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
+MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
+MSG_FUNC_NOT_IMPL(0x0044E226, actor_related_struct* __cdecl(), sub_44E226);
+MSG_FUNC_NOT_IMPL(0x0051C9A2, int __cdecl(), MainLoop);
+MSG_FUNC_NOT_IMPL(0x004232B0, void __cdecl(), DoClearAll);
+MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
+MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
+MSG_FUNC_NOT_IMPL(0x0051D180, void __cdecl(), ShutdownEngine);
+MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
+MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices);
+MSG_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
+MSG_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
+MSG_FUNC_NOT_IMPL(0x0041EC40, signed int __cdecl(), sub_41EC40);
+MSG_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), sub_43C850);
+MSG_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
+MSG_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, int*), sub_51F1E1);
+MSG_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
+MSG_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
+MSG_FUNC_NOT_IMPL(0x00422D40, char *__cdecl(char*, signed int), PrintDDError);
+MSG_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), sub_41C820);
+MSG_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), sub_41CA80);
+MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), sub_41CC30);
+MSG_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), sub_41CD70);
+MSG_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), sub_41CE20);
+MSG_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), sub_41D1D0);
+MSG_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), sub_41D420);
+MSG_FUNC_NOT_IMPL(0x0041E3C0, int __cdecl(), sub_41E3C0);
+MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), sub_41E730);
+MSG_FUNC_NOT_IMPL(0x0041E990, bool __cdecl(), sub_41E990);
+MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_Unknown1);
+MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), sub_422BC0);
+
+// 0x0040A2AF
+actor_related_struct *__cdecl Actor_Unknown4(int actorIdx, actor_related_struct *a2, void(__cdecl *actorFn)(actor_related_struct*))
 {
-
+    typedef decltype(&Actor_Unknown4) fn;
+    return ((fn)(0x0040A2AF))(actorIdx, a2, actorFn);
 }
 
-template <typename T>
-void doPrint(std::ostream& out, T t)
+// 0x431865
+signed int __cdecl MakeFonts()
 {
-    out << t;
+    typedef decltype(&MakeFonts) fn;
+    return ((fn)(0x431865))();
 }
 
-template <typename T, typename U, typename... Args>
-void doPrint(std::ostream& out, T t, U u, Args... args)
+
+// FIX ME - need a way to handle non standard calling conventions
+// 0x452E6E
+int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
 {
-    out << t << ',';
-    doPrint(out, u, args...);
+    typedef decltype(&sub_452E6E) fn;
+    return ((fn)(0x452E6E))();
 }
 
-class MgsFunctionBase
-{
-public:
-    MgsFunctionBase() = default;
-};
-
-const extern bool gbIsDll;
-
-// TODO: Probably need the function name too
-template<DWORD kOldAddr, void* kNewAddr, class ReturnType>
-class MgsFunction;
-
-template <DWORD kOldAddr, void* kNewAddr, class ReturnType, class... Args>
-class MgsFunction<kOldAddr, kNewAddr, ReturnType(Args...)> : public MgsFunctionBase
-{
-public:
-    using TFuncType = ReturnType(*)(Args...);
-
-    MgsFunction(const char* fnName)
-        : mFnName(fnName)
-    {
-        mRealFuncPtr = (TFuncType)kOldAddr;
-
-        auto it = gFuncMap.find(kOldAddr);
-        if (it != std::end(gFuncMap))
-        {
-            // duplicated function
-            abort();
-        }
-        else
-        {
-            gFuncMap.insert(std::make_pair(kOldAddr, this));
-        }
-
-        std::cout << "old addr " << kOldAddr << " new addr " << kNewAddr << std::endl;
-
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-        if (kNewAddr)
-        {
-            // Hook oldAddr to point to newAddr
-            DetourAttach(&(PVOID&)mRealFuncPtr, Static_Hook_Impl);
-        }
-        else
-        {
-            // point oldAddr to Static_Hook_Impl
-            DetourAttach(&(PVOID&)mRealFuncPtr, (TFuncType)kNewAddr);
-        }
-        const auto error = DetourTransactionCommit();
-        if (error != NO_ERROR)
-        {
-            abort();
-        }
-    }
-
-    static ReturnType Static_Hook_Impl(Args ... args)
-    {
-        auto it = gFuncMap.find(kOldAddr);
-        if (it == std::end(gFuncMap))
-        {
-            // Impossible situation
-        }
-
-        
-        MgsFunctionBase* baseFunc = it->second;
-        // dont know if this will work or just blow up..
-        return static_cast<MgsFunction*>(baseFunc)->operator()(args...);
-    }
-
-    ~MgsFunction()
-    {
-        auto it = gFuncMap.find(kOldAddr);
-        if (it != std::end(gFuncMap))
-        {
-            gFuncMap.erase(it);
-        }
-    }
-
-    ReturnType operator()(Args ... args)
-    {
-        doPrint(std::cout, args...);
-
-        if (kNewAddr)
-        {
-            // Call "newAddr" since we've replaced the function completely
-            return reinterpret_cast<TFuncType>(kNewAddr)(args...);
-        }
-        else
-        {
-            // Call "mRealFuncPtr" here so that we are calling the "real" function
-
-            // If not running within the game then we can't call real so just return
-            // a default R and log params
-            return mRealFuncPtr(args...);
-        }
-    }
-
-private:
-    TFuncType mRealFuncPtr = nullptr;
-    const char* mFnName = nullptr;
-};
-
-std::map<DWORD, MgsFunctionBase*> gFuncMap;
 
 struct actor_related_struct
 {
@@ -260,15 +217,6 @@ VAR(DWORD, dword_7348FC, 0x7348FC);
 VAR(DWORD, dword_650D4C, 0x650D4C);
 VAR(char*, gDest, 0x0078E7C0);
 
-
-
-// 0x00421680
-signed __int64 __cdecl FpsTimerSetupQ()
-{
-    typedef decltype(&FpsTimerSetupQ) fn;
-    return ((fn)(0x00421680))();
-}
-
 // 0x0040A0D4
 int __cdecl Actor_DumpActorSystem()
 {
@@ -306,40 +254,6 @@ int __cdecl Actor_DumpActorSystem()
     return result;
 }
 
-// 0x5202FE
-DWORD __cdecl sub_5202FE(float a1, float a2, float a3, float a4)
-{
-    typedef decltype(&sub_5202FE) fn;
-    return ((fn)(0x5202FE))(a1, a2, a3, a4);
-}
-
-// 0x43BCF0 joystick related
-int __cdecl sub_43BCF0()
-{
-    typedef decltype(&sub_43BCF0) fn;
-    return ((fn)(0x43BCF0))();
-}
-
-// 0x521210
-void __cdecl sub_521210()
-{
-    typedef decltype(&sub_521210) fn;
-    return ((fn)(0x521210))();
-}
-
-// 0x452E6E
-int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
-{
-    typedef decltype(&sub_452E6E) fn;
-    return ((fn)(0x452E6E))();
-}
-
-// 0x0043ACC4 
-int __cdecl WmPaint_Handler(HDC hdcDest)
-{
-    typedef decltype(&WmPaint_Handler) fn;
-    return ((fn)(0x0043ACC4))(hdcDest);
-}
 
 // 0x0051C2D3
 signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
@@ -627,17 +541,6 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
     return result;
 }
 
-void __cdecl ShutdownEngine()
-{
-    typedef decltype(&ShutdownEngine) fn;
-    ((fn)(0x0051D180))();
-}
-
-BOOL __cdecl SetWindowSize(HWND hWnd, int nWidth, int nHeight)
-{
-    typedef decltype(&SetWindowSize) fn;
-    return ((fn)(0x0051D09D))(hWnd, nWidth, nHeight);
-}
 
 DWORD* dword_664EC4 = (DWORD*)0x664EC4;
 DWORD* dword_664EC0 = (DWORD*)0x664EC0;
@@ -696,12 +599,7 @@ int __cdecl MessageBox_Sometimes(HWND hWnd, int a2, LPCSTR lpCaption, UINT uType
     return result;
 }
 
-// 0x42B6A0
-signed int __stdcall DirectDrawCreateExMGS(GUID* lpGuid, LPVOID* lplpDD, const IID *const iid, IUnknown* punkOuter)
-{
-    typedef decltype(&DirectDrawCreateExMGS) fn;
-    return ((fn)(0x42B6A0))(lpGuid, lplpDD, iid, punkOuter);
-}
+
 
 VAR(IID, IID_IDirectDraw7_MGS, 0x64BDA8);
 VAR(GUID, IID_IDirect3D7_MGS, 0x64BB98);
@@ -751,173 +649,6 @@ VAR(DWORD, gYSize, 0x006DF1FC);
 VAR(char*, unk_6C0778, 0x6C0778);
 
 
-int __cdecl InitDirectInput(HWND hWnd);
-
-// 0x0042D69E
-int __cdecl DoDirectInputInit()
-{
-    int result; // eax@1
-
-    dword_717348 = 0;
-    result = InitDirectInput(gHwnd);
-    if (result < 0)
-        result = printf("$jim failed to init direct input");
-    return result;
-}
-
-// 0x0051F22F
-int __cdecl jim_enumerate_devices()
-{
-    typedef decltype(&jim_enumerate_devices) fn;
-    return ((fn)(0x0051F22F))();
-}
-
-// 0x004331D4
-signed int __cdecl ParseMsgCfg()
-{
-    typedef decltype(&ParseMsgCfg) fn;
-    return ((fn)(0x004331D4))();
-}
-
-// 0x433801
-signed int __cdecl sub_433801()
-{
-    typedef decltype(&sub_433801) fn;
-    return ((fn)(0x433801))();
-}
-
-// 0x41EC40
-signed int __cdecl sub_41EC40()
-{
-    typedef decltype(&sub_41EC40) fn;
-    return ((fn)(0x41EC40))();
-}
-
-// 0x43C850
-unsigned int __cdecl sub_43C850()
-{
-    typedef decltype(&sub_43C850) fn;
-    return ((fn)(0x43C850))();
-}
-
-// 0x431C63
-int __cdecl sub_431C63()
-{
-    typedef decltype(&sub_431C63) fn;
-    return ((fn)(0x431C63))();
-}
-
-// 0x51F1E1
-int __cdecl sub_51F1E1(GUID** a1, int* a2)
-{
-    typedef decltype(&sub_51F1E1) fn;
-    return ((fn)(0x51F1E1))(a1, a2);
-}
-
-// 0x0042A630
-void __cdecl _cfltcvt_init()
-{
-    typedef decltype(&_cfltcvt_init) fn;
-    ((fn)(0x0042A630))();
-}
-
-// 0x0041EA60
-signed int __cdecl MissionLog_Related2()
-{
-    typedef decltype(&MissionLog_Related2) fn;
-    return ((fn)(0x0041EA60))();
-}
-
-// 0x00422D40
-char *__cdecl PrintDDError(char *a1, signed int a2)
-{
-    typedef decltype(&PrintDDError) fn;
-    return ((fn)(0x00422D40))(a1, a2);
-}
-
-// 0x41C820
-void __cdecl sub_41C820(float a1)
-{
-    typedef decltype(&sub_41C820) fn;
-    return ((fn)(0x41C820))(a1);
-}
-
-// 0x41CA80
-signed int __cdecl sub_41CA80()
-{
-    typedef decltype(&sub_41CA80) fn;
-    return ((fn)(0x41CA80))();
-}
-
-// 0x41CC30
-__int16 __cdecl sub_41CC30()
-{
-    typedef decltype(&sub_41CC30) fn;
-    return ((fn)(0x41CC30))();
-}
-
-// 0x41CD70
-int __cdecl sub_41CD70()
-{
-    typedef decltype(&sub_41CD70) fn;
-    return ((fn)(0x41CD70))();
-}
-
-// 0x41CE20
-bool __cdecl sub_41CE20()
-{
-    typedef decltype(&sub_41CE20) fn;
-    return ((fn)(0x41CE20))();
-}
-
-// 0x41D1D0
-signed int __cdecl sub_41D1D0()
-{
-    typedef decltype(&sub_41D1D0) fn;
-    return ((fn)(0x41D1D0))();
-}
-
-// 0x41D420
-signed int __cdecl sub_41D420()
-{
-    typedef decltype(&sub_41D420) fn;
-    return ((fn)(0x41D420))();
-}
-
-// 0x41E3C0
-signed int __cdecl sub_41E3C0()
-{
-    typedef decltype(&sub_41E3C0) fn;
-    return ((fn)(0x41E3C0))();
-}
-
-// 0x41E730
-bool __cdecl sub_41E730()
-{
-    typedef decltype(&sub_41E730) fn;
-    return ((fn)(0x41E730))();
-}
-
-// 0x41E990
-bool __cdecl sub_41E990()
-{
-    typedef decltype(&sub_41E990) fn;
-    return ((fn)(0x41E990))();
-}
-
-// 0x00422A90
-int __cdecl Render_Unknown1 (signed int a1, int a2)
-{
-    typedef decltype(&Render_Unknown1) fn;
-    return ((fn)(0x00422A90))(a1, a2);
-}
-
-// 0x422BC0
-int __cdecl sub_422BC0(unsigned int a1, signed int a2, int a3)
-{
-    typedef decltype(&sub_422BC0) fn;
-    return ((fn)(0x422BC0))(a1, a2, a3);
-}
 
 HFONT& gFont = *(HFONT*)0x006FC7E8;
 
@@ -933,13 +664,8 @@ HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
     return result;
 }
 
-// 0x431865
-signed int __cdecl MakeFonts()
-{
-    typedef decltype(&MakeFonts) fn;
-    return ((fn)(0x431865))();
-}
-
+// 0x0042D69E
+int __cdecl DoDirectInputInit();
 
 // 0x0041ECB0
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
@@ -1672,29 +1398,30 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     return result;
 }
-
-#define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, signature> name(#name);
-#define MSG_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, decltype(funcName)> funcName##_(#funcName);
-
-MSG_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
 MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
-
+//MSG_FUNC_NOT_IMPL(0x0041ECB0, decltype(InitD3d_ProfileGfxHardwareQ), InitD3d_ProfileGfxHardwareQ_Test);
 
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
     signed int v1; // ST10_4@1
 
+    //v1 = InitD3d_ProfileGfxHardwareQ_Test();
     v1 = InitD3d_ProfileGfxHardwareQ();
     MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", 0);
     return v1;
 }
-
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
-MSG_FUNC_NOT_IMPL(0x0052269C, signed int __cdecl(HWND), SoundInit);
-MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
-MSG_FUNC_NOT_IMPL(0x005224C8, int __cdecl (int), sub_5224C8);
-MSG_FUNC_NOT_IMPL(0x0052255B, int __cdecl (int), sub_52255B);
+
+// 0x457B5B
+void *__cdecl sub_457B5B()
+{
+    void *result; // eax@1
+
+    result = memcpy(&word_994320, &word_669AE0, 0x1000u);
+    dword_993F44 = (int)&word_994320;
+    return result;
+}
 
 // 0x0044A7B0
 signed int __cdecl Resetgraph(int a1)
@@ -1738,13 +1465,8 @@ signed int __cdecl Resetgraph(int a1)
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_STP", 12, 12, 3, 3);
     return 1;
 }
+MSG_FUNC_IMPL(0x0044A7B0, Resetgraph);
 
-// 0x00553090
-signed int __stdcall DirectInputCreateExMGS(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter)
-{
-    typedef decltype(&DirectInputCreateExMGS) fn;
-    return ((fn)(0x00553090))(hinst, dwVersion, riidltf, ppvOut, punkOuter);
-}
 
 LPDIENUMDEVICESCALLBACKA EnumDevicesCallback = (LPDIENUMDEVICESCALLBACKA)0x0043B078;
 LPDIENUMDEVICEOBJECTSCALLBACKA EnumDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0C8;
@@ -1960,6 +1682,18 @@ int __cdecl InitDirectInput(HWND hWnd)
     return 0;
 }
 
+// 0x0042D69E
+int __cdecl DoDirectInputInit()
+{
+    int result; // eax@1
+
+    dword_717348 = 0;
+    result = InitDirectInput(gHwnd);
+    if (result < 0)
+        result = printf("$jim failed to init direct input");
+    return result;
+}
+
 // 0x0044AB30
 int __cdecl SetGraphDebug(int a1)
 {
@@ -1990,81 +1724,12 @@ int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsig
     return 0;
 }
 
-// 0x0040815E
-void __cdecl MemCardsInit()
-{
-    typedef decltype(&MemCardsInit) fn;
-    ((fn)(0x0040815E))();
-}
-
-void __cdecl sub_40A4F6()
-{
-    typedef decltype(&sub_40A4F6) fn;
-    ((fn)(0x40A4F6))();
-}
-
-int __cdecl sub_408086()
-{
-    typedef decltype(&sub_408086) fn;
-    return ((fn)(0x408086))();
-}
-
-int __cdecl sub_40111A()
-{
-    typedef decltype(&sub_40111A) fn;
-    return ((fn)(0x40111A))();
-}
-
-int __cdecl sub_4090A7()
-{
-    typedef decltype(&sub_4090A7) fn;
-    return ((fn)(0x4090A7))();
-}
-
-int __cdecl sub_40B725()
-{
-    typedef decltype(&sub_40B725) fn;
-    return ((fn)(0x40B725))();
-}
-
-
-// 0x00459A9A
-int __cdecl Menu_Related1()
-{
-    typedef decltype(&Menu_Related1) fn;
-    return ((fn)(0x00459A9A))();
-}
-
 WORD& word_7227C8 = *(WORD*)0x7227C8;
 
 // 0x44EAED
 void *__cdecl sub_44EAED()
 {
     return memset(&word_7227C8, 0, 0x10u);
-}
-
-// 0x457B5B
-void *__cdecl sub_457B5B()
-{
-    void *result; // eax@1
-
-    result = memcpy(&word_994320, &word_669AE0, 0x1000u);
-    dword_993F44 = (int)&word_994320;
-    return result;
-}
-
-// 0x452610
-int __cdecl sub_452610()
-{
-    typedef decltype(&sub_452610) fn;
-    return ((fn)(0x452610))();
-}
-
-// 0x44E9D2
-signed int __cdecl sub_44E9D2(int a1)
-{
-    typedef decltype(&sub_44E9D2) fn;
-    return ((fn)(0x44E9D2))(a1);
 }
 
 // 0x40A68D
@@ -2088,35 +1753,6 @@ __int16 __cdecl sub_44E1E0()
     return result;
 }
 
-// 0x0040A2AF
-actor_related_struct *__cdecl Actor_Unknown4(int actorIdx, actor_related_struct *a2, void(__cdecl *actorFn)(actor_related_struct*))
-{
-    typedef decltype(&Actor_Unknown4) fn;
-    return ((fn)(0x0040A2AF))(actorIdx, a2, actorFn);
-    /*
-    actor_related_struct *result; // eax@1
-    actor_related_struct *v4; // ST04_4@1
-
-    v4 = gActors[actorIdx].actor_struct_ptr2;
-    gActors[actorIdx].actor_struct_ptr2 = a2;
-    v4->actor_struct_ptr1 = a2;
-    a2->actor_struct_ptr1 = &gActors[actorIdx] + 8;
-    a2->field_0 = v4;
-    a2->fnUnknown3 = 0;
-    a2->fn_unknown = 0;
-    result = a2;
-    a2->fnUnknown2 = actorFn;
-    return result;
-    */
-}
-
-// 0x44E381
-void *__cdecl sub_44E381(int a1)
-{
-    typedef decltype(&sub_44E381) fn;
-    return ((fn)(0x44E381))(a1);
-}
-
 actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, int fn2, char *srcFileName)
 {
     actor_related_struct *result; // eax@1
@@ -2130,28 +1766,6 @@ actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, 
     return result;
 }
 
-// 0x0044E1F9
-int __cdecl unknown_libname_3() // Note: Not a CRT func!!
-{
-    typedef decltype(&unknown_libname_3) fn;
-    return ((fn)(0x0044E1F9))();
-}
-
-// 0x44E287
-void __cdecl sub_44E287()
-{
-    typedef decltype(&sub_44E287) fn;
-    ((fn)(0x44E287))();
-}
-
-// 0x44E212
-void *__cdecl sub_44E212()
-{
-    typedef decltype(&sub_44E212) fn;
-    return ((fn)(0x44E212))();
-}
-
-
 // 0x0040B36E
 int __cdecl GetResidentTop()
 {
@@ -2160,13 +1774,6 @@ int __cdecl GetResidentTop()
     result = gResidentTop_dword_78E960;
     dword_78E964 = gResidentTop_dword_78E960;
     return result;
-}
-
-// 0x44E226
-actor_related_struct *__cdecl sub_44E226()
-{
-    typedef decltype(&sub_44E226) fn;
-    return ((fn)(0x44E226))();
 }
 
 // 0x44E12B
@@ -2180,10 +1787,10 @@ void *__cdecl sub_44E12B()
     sub_44EAED();
     sub_457B5B();
     sub_452610();
-    sub_40A68D(98, (int)sub_44E9D2);
+    sub_40A68D(98, (int)sub_44E9D2.Ptr());
     sub_44E1E0();
     Actor_Unknown4(1, &stru_722760, 0);
-    Actor_Unknown6(&stru_722760, (int)sub_44E381, 0, "C:\\mgs\\source\\Game\\gamed.c");
+    Actor_Unknown6(&stru_722760, (int)sub_44E381.Ptr(), 0, "C:\\mgs\\source\\Game\\gamed.c");
 
     unknown_libname_3();
     sub_44E287();
@@ -2194,13 +1801,6 @@ void *__cdecl sub_44E12B()
     stru_722760.actor_struct_ptr2 = 0;
     stru_722760.field_24 = 0;
     return sub_44E226();
-}
-
-// 0x0051C9A2
-signed int __cdecl MainLoop()
-{
-    typedef decltype(&MainLoop) fn;
-    return ((fn)(0x0051C9A2))();
 }
 
 // 0x0040A1BF
@@ -2286,14 +1886,6 @@ int __cdecl DoMain()
 {
     return Main();
 }
-
-// 0x004232B0
-void __cdecl DoClearAll()
-{
-    typedef decltype(&DoClearAll) fn;
-    ((fn)(0x004232B0))();
-}
-
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
@@ -2436,7 +2028,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     0);
                 if (gHwnd)
                 {
-                    atexit(ShutdownEngine);
+                    atexit(ShutdownEngine.Ptr());
                     SetWindowSize(gHwnd, 640, 480);
                     ShowWindow(gHwnd, 5);
                     UpdateWindow(gHwnd);
