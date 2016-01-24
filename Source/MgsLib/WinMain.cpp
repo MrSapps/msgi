@@ -1080,7 +1080,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             if (v42)
             {
                 dxSurfaceDesc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-                dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_3DDEVICE | DDSCAPS_PALETTE | DDSCAPS_OFFSCREENPLAIN | DDSCAPS_COMPLEX | DDSCAPS_BACKBUFFER | DDSCAPS_ALPHA;
+                dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_3DDEVICE | DDSCAPS_OFFSCREENPLAIN;
                 dxSurfaceDesc.dwWidth = gXSize_dword_6DF214;
                 dxSurfaceDesc.dwHeight = gYSize;
                 fputs("Creating back buffer for windowed mode...\n", gFile);
@@ -1097,7 +1097,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             }
             else
             {
-                dxCaps1.dwCaps = 4;
+                dxCaps1.dwCaps = DDSCAPS_BACKBUFFER;
                 dxCaps1.dwCaps2 = 0;
                 dxCaps1.dwCaps3 = 0;
                 dxCaps1.dwCaps4 = 0;
