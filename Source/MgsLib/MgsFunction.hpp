@@ -14,6 +14,19 @@ inline std::ostream& operator<<(std::ostream& out, IID id)
     return out;
 }
 
+inline std::ostream& operator<<(std::ostream& out, const char* ptr)
+{
+    if (ptr)
+    {
+        out.write(ptr, strlen(ptr));
+    }
+    else
+    {
+        out << "(null char*)";
+    }
+    return out;
+}
+
 // No arguments case
 inline void doPrint(std::ostream& out)
 {
