@@ -1519,8 +1519,8 @@ VAR(DWORD, dword_6FD1DC, 0x6FD1DC);
 // 0x0043B1D1
 int __cdecl InitDirectInput(HWND hWnd)
 {
-    char productName[0x80];
-    char instanceName[0x20];
+    char productName[300];
+    char instanceName[300];
     dword_71D670 = 0;
     //fputs("InitDirectInput {\n", gLogFile);
     // I'll do log prints later
@@ -1543,6 +1543,8 @@ int __cdecl InitDirectInput(HWND hWnd)
                 hr = pJoystickDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
                 if (hr >= 0)
                 {
+                    memset(&JoystickDeviceCaps, 0, 0x2Cu);
+                    JoystickDeviceCaps.dwSize = 0x2C;
                     hr = pJoystickDevice->GetCapabilities(&JoystickDeviceCaps);
                     if (hr >= 0)
                     {
