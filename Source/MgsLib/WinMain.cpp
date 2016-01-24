@@ -74,20 +74,25 @@ MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), sub_41E730);
 MSG_FUNC_NOT_IMPL(0x0041E990, bool __cdecl(), sub_41E990);
 MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_Unknown1);
 MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), sub_422BC0);
+MSG_FUNC_NOT_IMPL(0x0040A2AF, actor_related_struct *__cdecl(int, actor_related_struct *, void(__cdecl *)(actor_related_struct*)), Actor_Unknown4);
+MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 
-// 0x0040A2AF
-actor_related_struct *__cdecl Actor_Unknown4(int actorIdx, actor_related_struct *a2, void(__cdecl *actorFn)(actor_related_struct*))
-{
-    typedef decltype(&Actor_Unknown4) fn;
-    return ((fn)(0x0040A2AF))(actorIdx, a2, actorFn);
-}
 
-// 0x431865
-signed int __cdecl MakeFonts()
-{
-    typedef decltype(&MakeFonts) fn;
-    return ((fn)(0x431865))();
-}
+// We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
+// stdlib used by MSGI.exe isn't the same as ours, mixing them will lead to a bad time.
+MSG_FUNC_NOT_IMPL(0x0053CB40, FILE* __cdecl(const char*, const char*), mgs_fopen);
+MSG_FUNC_NOT_IMPL(0x0053C970, int __cdecl(const char*, FILE*), mgs_fputs);
+MSG_FUNC_NOT_IMPL(0x0053C6C0, int __cdecl(FILE*), mgs_fflush);
+MSG_FUNC_NOT_IMPL(0x0053C4A0, int __cdecl(FILE *File), mgs_fclose);
+
+// Can't seem to make this work, calling this will crash due to issue mentioned above
+//MSG_FUNC_NOT_IMPL(0x0053C5F0, int __cdecl(FILE*, const char*, ...), mgs_fprintf);
+// So temp HACK - just get a pointer to the MSG func and call directly, remove when all funcs using it
+// are re-impled
+int msg_internal_fprintf(FILE *File, const char *Format, ...);
+
+using TMgs_fprintf = decltype(&msg_internal_fprintf);
+TMgs_fprintf mgs_fprintf = (TMgs_fprintf)0x0053C5F0;
 
 
 // FIX ME - need a way to handle non standard calling conventions
@@ -97,7 +102,6 @@ int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
     typedef decltype(&sub_452E6E) fn;
     return ((fn)(0x452E6E))();
 }
-
 
 struct actor_related_struct
 {
@@ -665,15 +669,6 @@ HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
 // 0x0042D69E
 int __cdecl DoDirectInputInit();
 
-// We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
-// stdlib used by MSGI.exe isn't the same as ours, mixing them will lead to a bad time.
-MSG_FUNC_NOT_IMPL(0x0053CB40, FILE* __cdecl(const char*, const char*), mgs_fopen);
-MSG_FUNC_NOT_IMPL(0x0053C970, int __cdecl(const char*, FILE*), mgs_fputs);
-MSG_FUNC_NOT_IMPL(0x0053C6C0, int __cdecl(FILE*), mgs_fflush);
-
-// Can't seem to make this work, calling this will crash due to issue mentioned above
-//MSG_FUNC_NOT_IMPL(0x0053C5F0, int __cdecl(FILE*, const char*, ...), mgs_fprintf);
-
 // 0x0041ECB0
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -814,7 +809,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
-            fprintf(gFile, " getting selected driver No %d from %d available\n", dword_77C60C + 1, dword_77C608);
+            mgs_fprintf(gFile, " getting selected driver No %d from %d available\n", dword_77C60C + 1, dword_77C608);
             gXRes = 2.0f;
             gWindowedMode = 0;
             gSoftwareRendering = 0;
@@ -862,8 +857,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     mgs_fflush(gFile);
     for (i = 0; i < dword_77C608; ++i)
     {
-        fprintf(gFile, "pDriverGUID %x, pDeviceGUID %x\n", dword_776B94[290 * i], dword_776B90[290 * i]);
-        fprintf(gFile, "D3DDevice description : %s", (char *)&unk_776B68 + 1160 * i);
+        mgs_fprintf(gFile, "pDriverGUID %x, pDeviceGUID %x\n", dword_776B94[290 * i], dword_776B90[290 * i]);
+        mgs_fprintf(gFile, "D3DDevice description : %s", (char *)&unk_776B68 + 1160 * i);
         if (dword_77C60C == i)
         {
             mgs_fputs("   /selected/\n", gFile);
@@ -970,7 +965,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         if (!v42)
         {
             hr = pDirectDraw->SetDisplayMode(dwDisplayWidth, dwDisplayHeight, 0x10, 0, 0);
-            fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", gXSize_dword_6DF214, gYSize);
+            mgs_fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", gXSize_dword_6DF214, gYSize);
             if (hr < 0)
                 return 0;
         }
@@ -1168,7 +1163,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dword_6FC7C4 = 0;
         }
         dword_6FC79C = sub_41D1D0();
-        fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
+        mgs_fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
         if (gSoftwareRendering)
             break;
         dxSurfaceDesc.dwSize = 124;
@@ -1234,14 +1229,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             sub_422BC0(0, 6, 0);
             if (sub_41E3C0())
             {
-                fprintf(gFile, "Blend modes = %i \n", gBlendMode);
-                fprintf(gFile, "Alpha modulate = %i \n", dword_6FC798);
+                mgs_fprintf(gFile, "Blend modes = %i \n", gBlendMode);
+                mgs_fprintf(gFile, "Alpha modulate = %i \n", dword_6FC798);
                 gColourKey = sub_41E730();
-                fprintf(gFile, "ColorKey = %i\n", gColourKey);
+                mgs_fprintf(gFile, "ColorKey = %i\n", gColourKey);
                 sub_422BC0(0, 12, 3);
                 if (gModX2 == 2)
                     gModX2 = sub_41D420();
-                fprintf(gFile, "MODULATE2X = %i \n", gModX2);
+                mgs_fprintf(gFile, "MODULATE2X = %i \n", gModX2);
                 if (gColourKey)
                 {
                     Render_Unknown1(41, 1);
@@ -1307,7 +1302,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fflush(gFile);
         gXSize_dword_6DF214 = 320;
         gYSize = 240;
-        fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", gXSize_dword_6DF214, gYSize);
+        mgs_fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", gXSize_dword_6DF214, gYSize);
         MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
         gSoftwareRendering = 1;
         dword_716F5C = 1.0f;
@@ -1404,20 +1399,20 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             sub_433801();
             mgs_fputs("InitAll }\n", gFile);
             mgs_fflush(gFile);
-            fclose(gFile);
+            mgs_fclose(gFile);
             result = 1;
         }
         else
         {
             PrintDDError("$edq Out of memory", 0);
-            fclose(gFile);
+            mgs_fclose(gFile);
             result = 0;
         }
     }
     else
     {
         PrintDDError("$edq Out of memory", 0);
-        fclose(gFile);
+        mgs_fclose(gFile);
         result = 0;
     }
     return result;
@@ -1704,8 +1699,6 @@ int __cdecl InitDirectInput(HWND hWnd)
 
     return 0;
 }
-//MSG_FUNC_NOT_IMPL(0x0043B1D1, int __cdecl(HWND), InitDirectInput);
-
 
 //MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID , const char*, int, int, int), DeviceEnumCallBack);
 
