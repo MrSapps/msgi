@@ -1667,7 +1667,7 @@ int __cdecl InitDirectInput(HWND hWnd)
         }
     }
 
-    if (hr < 0)
+    if (hr < 0 || pJoystickDevice == 0)
     {
         for (unsigned int i = 0; i < dword_6FD1DC; i++)
         {
