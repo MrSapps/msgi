@@ -275,11 +275,11 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
         if (byte_9AD8A8)
             sub_5202FE(0.0, 0.0, 0.003000000026077032, 0.0);
         if (byte_9AD8C1)
-            sub_5202FE(0.02999999932944775, 0.0, 0.0, 0.0);
+            sub_5202FE(0.02999999932944775f, 0.0f, 0.0f, 0.0f);
         if (byte_9AD8DA)
-            sub_5202FE(-0.02999999932944775, 0.0, 0.0, 0.0);
-        v4 = (double)dword_73490C / 1024.0;
-        v5 = (double)dword_734908 / 1024.0;
+            sub_5202FE(-0.02999999932944775f, 0.0f, 0.0f, 0.0f);
+        v4 = (float)dword_73490C / 1024.0f;
+        v5 = (float)dword_734908 / 1024.0f;
         sub_5202FE(0.0, v5, v4, 0.0);
         dword_734908 = 9 * dword_734908 / 10;
         dword_73490C = 9 * dword_73490C / 10;
@@ -619,7 +619,7 @@ VAR(FILE*, gFile, 0x006DEF78);
 VAR(FILE*, gLogFile, 0x71D414);
 
 VAR(DWORD, dword_651CF8, 0x651CF8);
-VAR(DWORD, dword_716F5C, 0x716F5C);
+VAR(float, dword_716F5C, 0x716F5C);
 VAR(DWORD, dword_716F78, 0x716F78);
 VAR(DWORD, dword_77C60C, 0x77C60C);
 VAR(DWORD, dword_77C608, 0x77C608);
@@ -676,15 +676,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     DDPIXELFORMAT pixelFormat; // [sp+C8h] [bp-388h]@142
     DDSURFACEDESC2 dxSurfaceDesc3; // [sp+E8h] [bp-368h]@142
     DDSCAPS2 dxCaps1; // [sp+164h] [bp-2ECh]@104
-    int v22; // [sp+174h] [bp-2DCh]@76
-    int v23; // [sp+178h] [bp-2D8h]@1
-    int v24; // [sp+17Ch] [bp-2D4h]@1
-    int v25; // [sp+180h] [bp-2D0h]@1
-    int v26; // [sp+184h] [bp-2CCh]@1
-    int v27; // [sp+188h] [bp-2C8h]@1
-    int v28; // [sp+18Ch] [bp-2C4h]@1
-    int v29; // [sp+190h] [bp-2C0h]@1
-    int v30; // [sp+194h] [bp-2BCh]@1
+
     DDCAPS_DX7 dxCaps; // [sp+198h] [bp-2B8h]@114  sizeof = 0x17C
     int v33; // [sp+314h] [bp-13Ch]@1
     int v34; // [sp+318h] [bp-138h]@3
@@ -699,14 +691,22 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
     lpGuid = 0;
     v33 = 0;
-    v23 = 32;
-    v24 = 65;
-    v25 = 0;
-    v26 = 16;
-    v27 = 31744;
-    v28 = 992;
-    v29 = 31;
-    v30 = 32768;
+
+    pixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+    pixelFormat.dwFlags = DDPF_ALPHAPIXELS | DDPF_RGB;
+    pixelFormat.dwFourCC = 0;
+    pixelFormat.dwRGBBitCount = 16;
+    pixelFormat.dwRBitMask = 0x7C00;
+    pixelFormat.dwGBitMask = 0x03E0;
+    pixelFormat.dwBBitMask = 0x001F;
+    pixelFormat.dwRGBAlphaBitMask = 0x8000;
+
+    static_assert(sizeof(DDPIXELFORMAT) == 32, "wrong pixel format size");
+
+    DDPIXELFORMAT pixelFormat2 = pixelFormat;
+    DDPIXELFORMAT pixelFormat3 = pixelFormat;
+
+
     gFile = fopen("profile.log", "w");
     fputs("InitAll {\n", gFile);
     fflush(gFile);
@@ -714,12 +714,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     DoDirectInputInit();
     fputs("jim_enumerate_devices()\n", gFile);
     fflush(gFile);
-    v55 = jim_enumerate_devices();
+    v55 = 0;// jim_enumerate_devices(); // HACK/FIX ME: Crashes when calling DirectDrawEnumerateExA
     if (!v55)
     {
         gSoftwareRendering = 1;
-        dword_716F5C = 1065353216; // TODO: float
-        gXRes = 1065353216; // TODO: float
+        dword_716F5C = 1.0f;
+        gXRes = 1.0f;
         fputs("No hardware rendering devices were enumerated\n", gFile);
         fflush(gFile);
         fputs(" #entering software mode\n", gFile);
@@ -745,8 +745,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     "Metal Gear Solid",
                     0);
                 gSoftwareRendering = 1;
-                dword_716F5C = 1065353216; // TODO: This is actually a float type being set to 1.0!
-                gXRes = 1065353216; // TODO: float
+                dword_716F5C = 1.0f;
+                gXRes = 1.0f;
             }
         }
     }
@@ -775,14 +775,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             if (sub_41EC40())
             {
                 gSoftwareRendering = 0;
-                gXRes = 1073741824; // TODO: float
+                gXRes = 2.0f;
             }
             else
             {
                 gSoftwareRendering = 1;
                 lpGuid = 0;
-                gXRes = 1065353216; // TODO: float
-                dword_716F5C = 1065353216;
+                gXRes = 1.0f;
+                dword_716F5C = 1.0f;
                 MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
             }
             gWindowedMode = 0;
@@ -808,7 +808,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             fputs(" . done\n", gFile);
             fflush(gFile);
             fprintf(gFile, " getting selected driver No %d from %d available\n", dword_77C60C + 1, dword_77C608);
-            gXRes = 1073741824; // TODO: float
+            gXRes = 2.0f;
             gWindowedMode = 0;
             gSoftwareRendering = 0;
         }
@@ -820,8 +820,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             fflush(gFile);
             gSoftwareRendering = 1;
             gWindowedMode = 0;
-            dword_716F5C = 1065353216; // TODO: float
-            gXRes = 1065353216; // TODO: float
+            dword_716F5C = 1.0f;
+            gXRes = 1.0f;
             lpGuid = 0;
             MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
         }
@@ -834,7 +834,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     if (v34)
     {
         dword_77C60C = 0;
-        gXRes = 1073741824; // TODO: Float
+        gXRes = 2.0f;
     }
     if (gSoftwareRendering)
     {
@@ -893,7 +893,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 fputs(" . fail\n", gFile);
                 fflush(gFile);
                 gSoftwareRendering = 1;
-                gXRes = 1065353216; // TODO: Float
+                gXRes = 1.0f;
                 gXSize_dword_6DF214 = (signed __int64)(320.0 * gXRes);
                 gYSize = (signed __int64)(240.0 * gXRes);
                 MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
@@ -905,12 +905,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             if (gXRes >= 1.1)
             {
-                gXRes = 1073741824; // TODO: Float
+                gXRes = 2.0f;
                 dword_650D2C = 17;
             }
             else
             {
-                gXRes = 1065353216; // TODO: Float
+                gXRes = 1.0f;
                 dword_650D2C = 16;
             }
         }
@@ -980,6 +980,9 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             dxSurfaceDesc2.ddsCaps.dwCaps = DDSCAPS_3DDEVICE | DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
             dxSurfaceDesc2.dwBackBufferCount = 1;
         }
+
+        memcpy(&dxSurfaceDesc2.ddpfPixelFormat, &pixelFormat2, sizeof(DDPIXELFORMAT));
+
         fputs("Creating primary surface...\n", gFile);
         fflush(gFile);
         hr = pDirectDraw->CreateSurface(&dxSurfaceDesc2, &pPrimarySurface, 0);
@@ -991,7 +994,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         fputs(" . done\n", gFile);
         fflush(gFile);
-        v22 = 0;
+       // v22 = 0;
         MakeFonts();
         if (dword_651CF8)
         {
@@ -1063,8 +1066,13 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             dxSurfaceDesc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
             dxSurfaceDesc.dwWidth = gXSize_dword_6DF214;
             dxSurfaceDesc.dwHeight = gYSize;
+
             fputs("Creating back buffer for software rendering...\n", gFile);
             fflush(gFile);
+
+
+            memcpy(&dxSurfaceDesc.ddpfPixelFormat, &pixelFormat3, sizeof(DDPIXELFORMAT));
+
             hr = pDirectDraw->CreateSurface(&dxSurfaceDesc, &pBackBuffer, 0);
             if (hr < 0)
             {
@@ -1178,7 +1186,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             Render_Unknown1(26, 0);
             if (!gSoftwareRendering)
             {
-                assert(sizeof(DDPIXELFORMAT) == 32);
+
                 pixelFormat.dwSize = sizeof(DDPIXELFORMAT);
                 pixelFormat.dwFlags = DDPF_ALPHAPIXELS | DDPF_RGB;
                 pixelFormat.dwFourCC = 0;
@@ -1187,6 +1195,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 pixelFormat.dwGBitMask = 0x03E0;
                 pixelFormat.dwBBitMask = 0x001F;
                 pixelFormat.dwRGBAlphaBitMask = 0x8000;
+
                 memset(&dxSurfaceDesc3, 0, 124);
                 dxSurfaceDesc3.dwSize = 124;
                 dxSurfaceDesc3.dwFlags = DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
@@ -1275,7 +1284,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxViewport.dvMinZ = 0;
                 dxViewport.dvMaxZ = 1.0f;
                 pDirect3DDevice->SetViewport(&dxViewport);
-                v2 = ((double)dword_651D94 - 50.0) / 100.0;
+                v2 = ((float)dword_651D94 - 50.0f) / 100.0f;
                 sub_41C820(v2);
             }
             else
@@ -1294,7 +1303,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", gXSize_dword_6DF214, gYSize);
         MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
         gSoftwareRendering = 1;
-        dword_716F5C = 1065353216;
+        dword_716F5C = 1.0f;
         gXRes = dword_716F5C; // TODO: Float
         hr = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_NORMAL);
         if (pGammaControl)
@@ -1339,11 +1348,19 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     fputs("other inits\n", gFile);
     fflush(gFile);
+
+
     for (i = 0; (signed int)i < 1500; ++i)
     {
+        DWORD* ptr = (DWORD*)0x6C0F00;
+        ptr[(20 * i) + 0] = 0;
+        ptr[(20 * i) + 1] = 0;
+        ptr[(20 * i) + 2] = 0;
+        /* TODO: FIX ME this shouldn't crash! Also it appears to be part of the same data structure
         dword_6C0F00[20 * i] = 0;
         dword_6C0F20[20 * i] = 0;
         dword_6C0F24[20 * i] = 0;
+        */
     }
     dword_6FC7C0 = sub_41CA80() == 0;
     if (dword_6FC7C0)
@@ -1651,7 +1668,7 @@ int __cdecl InitDirectInput(HWND hWnd)
 
     if (hr < 0)
     {
-        for (int i = 0; i < dword_6FD1DC; i++)
+        for (unsigned int i = 0; i < dword_6FD1DC; i++)
         {
             dword_6571F4[i] = 0xFF;
         }
@@ -1681,6 +1698,7 @@ int __cdecl InitDirectInput(HWND hWnd)
 
     return 0;
 }
+//MSG_FUNC_NOT_IMPL(0x0043B1D1, int __cdecl(HWND), InitDirectInput);
 
 // 0x0042D69E
 int __cdecl DoDirectInputInit()
