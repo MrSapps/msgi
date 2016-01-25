@@ -46,7 +46,7 @@ MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), unknown_libname_3); // Note: Not a 
 MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
 MSG_FUNC_NOT_IMPL(0x0044E226, actor_related_struct* __cdecl(), sub_44E226);
-MSG_FUNC_NOT_IMPL(0x0051C9A2, int __cdecl(), MainLoop);
+MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
 MSG_FUNC_NOT_IMPL(0x004232B0, void __cdecl(), DoClearAll);
 MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
@@ -219,7 +219,7 @@ VAR(DWORD, dword_7348FC, 0x7348FC);
 VAR(DWORD, dword_650D4C, 0x650D4C);
 VAR(char*, gDest, 0x0078E7C0);
 
-// 0x0040A0D4
+//MSG_FUNC_NOT_IMPL(0x0040A0D4, int __cdecl(), Actor_DumpActorSystem);
 int __cdecl Actor_DumpActorSystem()
 {
     int result; // eax@1
@@ -257,7 +257,7 @@ int __cdecl Actor_DumpActorSystem()
 }
 
 
-// 0x0051C2D3
+//MSG_FUNC_NOT_IMPL(0x0051C2D3, signed int __stdcall(HWND, UINT, UINT, LPARAM), MainWindowProc);
 signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
 {
     float v4; // ST08_4@14
@@ -669,7 +669,7 @@ HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
 // 0x0042D69E
 int __cdecl DoDirectInputInit();
 
-// 0x0041ECB0
+//MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
     signed int result; // eax@41
@@ -1417,7 +1417,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     return result;
 }
-MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
+//MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
 // 0x00420810
 signed int __cdecl DoInitAll()
@@ -1517,6 +1517,7 @@ VAR(DWORD, dword_6FD1DC, 0x6FD1DC);
 
 // Implementation untested for the moment
 // 0x0043B1D1
+//MSG_FUNC_NOT_IMPL(0x0043B1D1, int __cdecl(HWND), InitDirectInput);
 int __cdecl InitDirectInput(HWND hWnd)
 {
     char productName[300];
@@ -1755,6 +1756,7 @@ void *__cdecl sub_44EAED()
 }
 
 // 0x40A68D
+//MSG_FUNC_NOT_IMPL(0x40A68D, int __cdecl(int, int), sub_40A68D);
 int __cdecl sub_40A68D(int number, int fn)
 {
     int result; // eax@1
@@ -1764,7 +1766,7 @@ int __cdecl sub_40A68D(int number, int fn)
     return result;
 }
 
-// 0x44E1E0
+//MSG_FUNC_NOT_IMPL(0x44E1E0, __int16 __cdecl(), sub_44E1E0);
 __int16 __cdecl sub_44E1E0()
 {
     __int16 result; // ax@1
@@ -1775,6 +1777,7 @@ __int16 __cdecl sub_44E1E0()
     return result;
 }
 
+//MSG_FUNC_NOT_IMPL(0x0040A347, actor_related_struct *__cdecl (actor_related_struct*, int, int, char *), Actor_Unknown6);
 actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, int fn2, char *srcFileName)
 {
     actor_related_struct *result; // eax@1
@@ -1787,8 +1790,9 @@ actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, 
     a1->field_18 = 0;
     return result;
 }
+MSG_FUNC_IMPL(0x0040A347, Actor_Unknown6);
 
-// 0x0040B36E
+//MSG_FUNC_NOT_IMPL(0x0040B36E, int __cdecl(), GetResidentTop);
 int __cdecl GetResidentTop()
 {
     int result; // eax@1
@@ -1799,6 +1803,7 @@ int __cdecl GetResidentTop()
 }
 
 // 0x44E12B
+//MSG_FUNC_NOT_IMPL(0x44E12B, void *__cdecl(), sub_44E12B);
 void *__cdecl sub_44E12B()
 {
     dword_995344 = 0;
@@ -1825,7 +1830,7 @@ void *__cdecl sub_44E12B()
     return sub_44E226();
 }
 
-// 0x0040A1BF
+//MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_Unknown);
 int __cdecl Actor_Unknown()
 {
     int result; // eax@8
@@ -1861,6 +1866,7 @@ int __cdecl Actor_Unknown()
 
 
 // 0x00401005
+//MSG_FUNC_NOT_IMPL(0x00401005, signed int __cdecl(), Main);
 signed int __cdecl Main()
 {
     signed int result; // eax@2
@@ -1904,6 +1910,7 @@ signed int __cdecl Main()
 }
 
 // 0x00401000
+//MSG_FUNC_NOT_IMPL(0x00401000, int __cdecl(), DoMain);
 int __cdecl DoMain()
 {
     return Main();
