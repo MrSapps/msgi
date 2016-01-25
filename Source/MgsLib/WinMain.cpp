@@ -74,8 +74,15 @@ MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), sub_41E730);
 MSG_FUNC_NOT_IMPL(0x0041E990, bool __cdecl(), sub_41E990);
 MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_Unknown1);
 MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), sub_422BC0);
-MSG_FUNC_NOT_IMPL(0x0040A2AF, actor_related_struct *__cdecl(int, actor_related_struct *, void(__cdecl *)(actor_related_struct*)), Actor_Unknown4);
 MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
+MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
+MSG_FUNC_NOT_IMPL(0x0051EE8F, FILE *__cdecl(const char*, signed int), File_LoadDirFileQ);
+MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
+MSG_FUNC_NOT_IMPL(0x0040A37C, void(__cdecl *__cdecl(actor_related_struct*))(actor_related_struct*), Actor_Unknown2);
+MSG_FUNC_NOT_IMPL(0x0040A3FC, int __cdecl (actor_related_struct*), Actor_Unknown3);
+MSG_FUNC_NOT_IMPL(0x0040A2AF, actor_related_struct *__cdecl(int, actor_related_struct *, void(__cdecl *)(actor_related_struct*)), Actor_Unknown4);
+MSG_FUNC_NOT_IMPL(0x0040A3ED, actor_related_struct *__cdecl(actor_related_struct*), Actor_SetFnPtr);
+MSG_FUNC_NOT_IMPL(0x0040A006, int __cdecl(), Actor_Init);
 
 
 // We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
@@ -1705,8 +1712,6 @@ int __cdecl InitDirectInput(HWND hWnd)
     return 0;
 }
 
-//MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID , const char*, int, int, int), DeviceEnumCallBack);
-
 // 0x0042D69E
 int __cdecl DoDirectInputInit()
 {
@@ -1916,6 +1921,9 @@ int __cdecl DoMain()
 {
     return Main();
 }
+
+
+
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
