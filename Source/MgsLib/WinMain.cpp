@@ -84,6 +84,8 @@ MSG_FUNC_NOT_IMPL(0x0053CB40, FILE* __cdecl(const char*, const char*), mgs_fopen
 MSG_FUNC_NOT_IMPL(0x0053C970, int __cdecl(const char*, FILE*), mgs_fputs);
 MSG_FUNC_NOT_IMPL(0x0053C6C0, int __cdecl(FILE*), mgs_fflush);
 MSG_FUNC_NOT_IMPL(0x0053C4A0, int __cdecl(FILE *File), mgs_fclose);
+MSG_FUNC_NOT_IMPL(0x00539990, void *__cdecl(size_t), mgs_malloc);
+
 
 // Can't seem to make this work, calling this will crash due to issue mentioned above
 //MSG_FUNC_NOT_IMPL(0x0053C5F0, int __cdecl(FILE*, const char*, ...), mgs_fprintf);
@@ -1374,25 +1376,25 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
-        dword_6C0EFC = (DWORD*)malloc(0x493E0u);
+        dword_6C0EFC = (DWORD*)mgs_malloc(0x493E0u);
         for (i = 0; i < 15000; ++i)
         {
             dword_6C0EFC[5 * i] = 0;
         }
-        dword_6FC780 = malloc(0x75300u);
+        dword_6FC780 = mgs_malloc(0x75300u);
     }
-    dword_6FC728 = (DWORD*)malloc(0x100000u);
+    dword_6FC728 = (DWORD*)mgs_malloc(0x100000u);
     if (dword_6FC728)
     {
         memset(dword_6FC728, 0, 0x100000u);
-        dword_6FC72C = malloc(0x100000u);
+        dword_6FC72C = mgs_malloc(0x100000u);
         if (dword_6FC728)
         {
             memset(dword_6FC728, -1, 0x100000u);
             _cfltcvt_init();
             memset(&unk_6C0778, 0, 0x400u);
-            dword_6DEF7C = malloc(0x200u);
-            dword_6DEF90 = malloc(0x200u);
+            dword_6DEF7C = mgs_malloc(0x200u);
+            dword_6DEF90 = mgs_malloc(0x200u);
             memset(dword_6DEF7C, 0, 0x100u);
             mgs_fputs("jim_write_configuration_to_file()\n", gFile);
             mgs_fflush(gFile);
@@ -1802,7 +1804,6 @@ int __cdecl GetResidentTop()
     return result;
 }
 
-// 0x44E12B
 //MSG_FUNC_NOT_IMPL(0x44E12B, void *__cdecl(), sub_44E12B);
 void *__cdecl sub_44E12B()
 {
