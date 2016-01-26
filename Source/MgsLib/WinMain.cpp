@@ -52,7 +52,6 @@ MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
 MSG_FUNC_NOT_IMPL(0x0051D180, void __cdecl(), ShutdownEngine);
 MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
-MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices);
 MSG_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
 MSG_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
 MSG_FUNC_NOT_IMPL(0x0041EC40, signed int __cdecl(), sub_41EC40);
@@ -255,7 +254,6 @@ int __cdecl Actor_DumpActorSystem()
     }
     return result;
 }
-
 
 // 0x0051C2D3
 signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
@@ -669,6 +667,145 @@ HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
 // 0x0042D69E
 int __cdecl DoDirectInputInit();
 
+MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
+LPDDENUMCALLBACKEXA DeviceEnumCallback = (LPDDENUMCALLBACKEXA)0x0051F5B8;
+MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
+MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
+
+VAR(DWORD, dword_68C3B8, 0x68C3B8);
+
+// offsets inside the same structure array (different fields)
+uint8_t* array_776FEC = (uint8_t*)0x776FEC;
+uint8_t* array_776FE8 = (uint8_t*)0x776FE8;
+char* array_776DB8 = (char*)0x776DB8;
+uint8_t* array_776BB8 = (uint8_t*)0x776BB8;
+uint8_t* array_776BA8 = (uint8_t*)0x776BA8;
+uint8_t* array_776B98 = (uint8_t*)0x776B98;
+uint8_t* array_776B94 = (uint8_t*)0x776B94;
+uint8_t* array_776B90 = (uint8_t*)0x776B90;
+uint8_t* array_776B68 = (uint8_t*)0x776B68;     // Struct starts here probably
+
+
+struct jimUnk0x204
+{
+    char    string[512];
+    DWORD   field200;
+};
+static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
+
+jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
+
+
+//MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices);
+int __cdecl jim_enumerate_devices()
+{
+    int varC;
+    int var8 = 0;
+    char Dst[0x438];
+    char Buf1[0x438];
+
+    dword_77C608 = 0;
+    dword_77C60C = 0;
+    DirectDrawEnumerateExA_MGS(DeviceEnumCallback, 0, DDENUM_NONDISPLAYDEVICES);
+
+    for (varC = 0; varC < dword_77C608; varC++)
+    {
+        DWORD* pValue = (DWORD*)(&array_776FE8[varC * 0x488]);
+        *pValue = (*pValue) | 0x80;
+    }
+
+    int var4 = 0x41;
+    varC = 0;
+    while (true)
+    {
+        if (varC >= dword_77C608)
+            break;
+
+        DWORD* pValue = (DWORD*)(&array_776FE8[varC * 0x488]);
+
+        if ((*pValue & var4) != 0)
+        {
+            memset(Dst, 0, 0x438);
+            memcpy(Dst, &array_776BB8[varC * 0x488], 0x434);    // Copy of var18 is included by memcpying 4 bytes more
+            if (File_msgvideocfg_Write(Dst, -1) == 0)
+                var8++;
+
+            memset(&array_776B68[varC * 0x488], 0, 0x488);
+
+            if (varC < dword_77C608)
+            {
+                int size = (dword_77C608 - (varC + 1)) * 0x488;
+                memcpy(&array_776B68[varC * 0x488], &array_776B68[(varC + 1) * 0x488], size);   // This should be a memmove by all means. I keep the original memcpy call for now
+            }
+            dword_77C608--;
+            continue;
+        }
+
+        pValue = (DWORD*)(&array_776B94[varC * 0x488]);
+        if (*pValue != 0)
+        {
+            DWORD* pOtherValue = (DWORD*)(&array_776BA8[varC * 0x488]);
+            *pValue = *pOtherValue;
+        }
+
+        pValue = (DWORD*)(&array_776B90[varC * 0x488]);
+        if (*pValue != 0)
+        {
+            DWORD* pOtherValue = (DWORD*)(&array_776B98[varC * 0x488]);
+            *pValue = *pOtherValue;
+        }
+
+        varC++;
+    }
+
+    for (varC = 0; varC < 4; varC++)
+    {
+        memset(Buf1, 0, 0x438);
+
+        if (varC < dword_77C608)
+        {
+            memcpy(Buf1, &array_776BB8[varC * 0x488], 0x434);   // Copy of var_450 included same way as earlier
+            if (file_msgvideocfg_Write2(Buf1, -1) == 1)
+                var8++;
+        }
+        if (File_msgvideocfg_Write(Buf1, varC) == 0)
+            var8++;
+    }
+
+    if (dword_77C608 > 2)
+        dword_77C608 = 2;
+
+    dword_68C3B8 = 1;
+    for (varC = 0; varC < dword_77C608; varC++)
+    {
+        memset(&array_689B68[dword_68C3B8], 0, 0x204);
+        strncpy(array_689B68[dword_68C3B8].string, &array_776DB8[varC * 0x488], 0x200);
+        array_689B68[dword_68C3B8].field200 = *((DWORD*)array_776FEC[varC * 0x488]);
+        
+        int value = *((DWORD*)array_776FE8[varC * 0x488]);
+        if (value & 2)
+        {
+            array_689B68[dword_68C3B8].field200 |= 0x10;
+        }
+
+        dword_68C3B8++;
+    }
+
+    if (dword_77C608 != 0)
+    {
+        if (var8 != 0)
+        {
+            return -1;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 // 0x0041ECB0
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -939,7 +1076,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         pPrimarySurface = 0;
         pBackBuffer = 0;
-        pBackBuffer = 0;
+        pClipper = 0;
         mgs_fputs("Setting cooperative level...\n", gFile);
         mgs_fflush(gFile);
         if (v42)
@@ -1515,7 +1652,6 @@ VAR(DWORD, nJoystickDeviceObjects, 0x71D68C);
 VAR(DWORD, dword_6FD1DC, 0x6FD1DC);
 
 
-// Implementation untested for the moment
 // 0x0043B1D1
 int __cdecl InitDirectInput(HWND hWnd)
 {
