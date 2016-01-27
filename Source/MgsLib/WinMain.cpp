@@ -1529,8 +1529,8 @@ VAR(DWORD, dword_6FD1DC, 0x6FD1DC);
 //MSG_FUNC_NOT_IMPL(0x0043B1D1, int __cdecl(HWND), InitDirectInput);
 int __cdecl InitDirectInput(HWND hWnd)
 {
-    char productName[300];
-    char instanceName[300];
+    char productName[0x80];
+    char instanceName[0x80];
     dword_71D670 = 0;
     //fputs("InitDirectInput {\n", gLogFile);
     // I'll do log prints later
