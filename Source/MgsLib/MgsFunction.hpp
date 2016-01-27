@@ -93,7 +93,7 @@ enum CallingConvention
     eStdCall
 };
 
-template <DWORD kOldAddr, void* kNewAddr, CallingConvention convention, class Signature, class ReturnType, class... Args>
+template <DWORD kOldAddr, void* kNewAddr, bool kLogArgs, CallingConvention convention, class Signature, class ReturnType, class... Args>
 class MgsFunctionImpl : public MgsFunctionBase
 {
 public:
@@ -125,9 +125,12 @@ public:
 
     ReturnType operator()(Args ... args)
     {
-        std::cout << mFnName << " (";
-        doPrint(std::cout, args...);
-        std::cout << ")" << std::endl;
+        if (kLogArgs)
+        {
+            std::cout << mFnName << " (";
+            doPrint(std::cout, args...);
+            std::cout << ")" << std::endl;
+        }
 
         if (kNewAddr)
         {
@@ -185,25 +188,18 @@ protected:
         mRealFuncPtr = (TFuncType)kOldAddr;
 
         LONG err = 0;
-        if (kNewAddr)
+
+        if (convention == eCDecl)
         {
-            // point oldAddr to Static_Hook_Impl
-            err = DetourAttach(&(PVOID&)mRealFuncPtr, (TFuncType)kNewAddr);
+            err = DetourAttach(&(PVOID&)mRealFuncPtr, Cdecl_Static_Hook_Impl);
+        }
+        else if (convention == eStdCall)
+        {
+            err = DetourAttach(&(PVOID&)mRealFuncPtr, StdCall_Static_Hook_Impl);
         }
         else
         {
-            if (convention == eCDecl)
-            {
-                err = DetourAttach(&(PVOID&)mRealFuncPtr, Cdecl_Static_Hook_Impl);
-            }
-            else if (convention == eStdCall)
-            {
-                err = DetourAttach(&(PVOID&)mRealFuncPtr, StdCall_Static_Hook_Impl);
-            }
-            else
-            {
-                abort();
-            }
+            abort();
         }
 
         if (err != NO_ERROR)
@@ -217,26 +213,27 @@ private:
     const char* mFnName = nullptr;
 };
 
-template<DWORD kOldAddr, void* kNewAddr, class ReturnType>
+template<DWORD kOldAddr, void* kNewAddr, bool kLogArgs, class ReturnType>
 class MgsFunction;
 
 // __cdecl partial specialization
-template<DWORD kOldAddr, void* kNewAddr, class ReturnType, class... Args>
-class MgsFunction    <kOldAddr, kNewAddr, ReturnType __cdecl(Args...) > : public
-    MgsFunctionImpl<kOldAddr, kNewAddr, eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
+template<DWORD kOldAddr, bool kLogArgs, void* kNewAddr, class ReturnType, class... Args>
+class MgsFunction    <kOldAddr, kNewAddr, kLogArgs, ReturnType __cdecl(Args...) > : public
+    MgsFunctionImpl<kOldAddr, kNewAddr, kLogArgs, eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
 {
 public:
     MgsFunction(const char* name) : MgsFunctionImpl(name) { }
 };
 
 // __stdcall partial specialization
-template<DWORD kOldAddr, void* kNewAddr, class ReturnType, class ... Args>
-class MgsFunction    <kOldAddr, kNewAddr, ReturnType __stdcall(Args...) > : public
-    MgsFunctionImpl<kOldAddr, kNewAddr, eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
+template<DWORD kOldAddr, void* kNewAddr, bool kLogArgs, class ReturnType, class ... Args>
+class MgsFunction    <kOldAddr, kNewAddr, kLogArgs, ReturnType __stdcall(Args...) > : public
+    MgsFunctionImpl<kOldAddr, kNewAddr, kLogArgs, eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
 {
 public:
     MgsFunction(const char* name) : MgsFunctionImpl(name) { }
 };
 
-#define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, signature> name(#name);
-#define MSG_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, decltype(funcName)> funcName##_(#funcName);
+#define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);
+#define MSG_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, signature> name(#name);
+#define MSG_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, true, decltype(funcName)> funcName##_(#funcName);
