@@ -52,7 +52,6 @@ MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
 MSG_FUNC_NOT_IMPL(0x0051D180, void __cdecl(), ShutdownEngine);
 MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
-MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices);
 MSG_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
 MSG_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
 MSG_FUNC_NOT_IMPL(0x0041EC40, signed int __cdecl(), sub_41EC40);
@@ -678,6 +677,143 @@ HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
 // 0x0042D69E
 int __cdecl DoDirectInputInit();
 
+MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
+LPDDENUMCALLBACKEXA DeviceEnumCallback = (LPDDENUMCALLBACKEXA)0x0051F5B8;
+MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
+MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
+
+VAR(DWORD, dword_68C3B8, 0x68C3B8);
+
+struct jimUnk0x488
+{
+    uint8_t field0[0x28];
+    DWORD field28;
+    DWORD field2C;
+    DWORD field30;
+    uint8_t field34[0xC];
+    DWORD field40;
+    uint8_t field44[0xC];
+    uint8_t field50[0x200];
+    char field250[0x200];
+    uint8_t field450[0x30];
+    DWORD field480;
+    DWORD field484;
+};
+static_assert(sizeof(jimUnk0x488) == 0x488, "jimUnk0x488 should be of size 0x488");
+
+struct jimUnk0x204
+{
+    char    string[512];
+    DWORD   field200;
+};
+static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
+
+jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
+jimUnk0x488* array_776B68 = (jimUnk0x488*)0x776B68;
+
+
+//MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices);
+int __cdecl jim_enumerate_devices()
+{
+    int varC;
+    int var8 = 0;
+    char Dst[0x438];
+    char Buf1[0x438];
+
+    dword_77C608 = 0;
+    dword_77C60C = 0;
+    DirectDrawEnumerateExA_MGS(DeviceEnumCallback, 0, DDENUM_NONDISPLAYDEVICES);
+
+    for (varC = 0; varC < dword_77C608; varC++)
+    {
+        array_776B68[varC].field480 |= 0x80;
+    }
+
+    int var4 = 0x41;
+    varC = 0;
+    while (true)
+    {
+        if (varC >= dword_77C608)
+            break;
+
+        if ((array_776B68[varC].field480 & var4) != 0)
+        {
+            memset(Dst, 0, 0x438);
+            memcpy(Dst, array_776B68[varC].field50, 0x434);    // Copy of var18 is included by memcpying 4 bytes more
+            if (File_msgvideocfg_Write(Dst, -1) == 0)
+                var8++;
+
+            memset(&array_776B68[varC], 0, 0x488);
+
+            if (varC < dword_77C608)
+            {
+                int size = (dword_77C608 - (varC + 1)) * 0x488;
+                memmove(&array_776B68[varC], &array_776B68[varC + 1], size);
+            }
+            dword_77C608--;
+            continue;
+        }
+
+        if (array_776B68[varC].field2C != 0)
+        {
+            array_776B68[varC].field2C = array_776B68[varC].field40;
+        }
+
+        if (array_776B68[varC].field28 != 0)
+        {
+            array_776B68[varC].field28 = array_776B68[varC].field30;
+        }
+
+        varC++;
+    }
+
+    for (varC = 0; varC < 4; varC++)
+    {
+        memset(Buf1, 0, 0x438);
+
+        if (varC < dword_77C608)
+        {
+            memcpy(Buf1, array_776B68[varC].field50, 0x434);   // Copy of var_450 included same way as earlier
+            if (file_msgvideocfg_Write2(Buf1, -1) == 1)
+                var8++;
+        }
+        if (File_msgvideocfg_Write(Buf1, varC) == 0)
+            var8++;
+    }
+
+    if (dword_77C608 > 2)
+        dword_77C608 = 2;
+
+    dword_68C3B8 = 1;
+    for (varC = 0; varC < dword_77C608; varC++)
+    {
+        memset(&array_689B68[dword_68C3B8], 0, 0x204);
+        strncpy(array_689B68[dword_68C3B8].string, array_776B68[varC].field250, 0x200);
+        array_689B68[dword_68C3B8].field200 = array_776B68[varC].field484;
+        
+        if (array_776B68[varC].field480 & 2)
+        {
+            array_689B68[dword_68C3B8].field200 |= 0x10;
+        }
+
+        dword_68C3B8++;
+    }
+
+    if (dword_77C608 != 0)
+    {
+        if (var8 != 0)
+        {
+            return -1;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -948,7 +1084,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         pPrimarySurface = 0;
         pBackBuffer = 0;
-        pBackBuffer = 0;
+        pClipper = 0;
         mgs_fputs("Setting cooperative level...\n", gFile);
         mgs_fflush(gFile);
         if (v42)
@@ -1524,7 +1660,6 @@ VAR(DWORD, nJoystickDeviceObjects, 0x71D68C);
 VAR(DWORD, dword_6FD1DC, 0x6FD1DC);
 
 
-// Implementation untested for the moment
 // 0x0043B1D1
 //MSG_FUNC_NOT_IMPL(0x0043B1D1, int __cdecl(HWND), InitDirectInput);
 int __cdecl InitDirectInput(HWND hWnd)
