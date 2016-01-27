@@ -674,17 +674,22 @@ MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
 
 VAR(DWORD, dword_68C3B8, 0x68C3B8);
 
-// offsets inside the same structure array (different fields)
-uint8_t* array_776FEC = (uint8_t*)0x776FEC;
-uint8_t* array_776FE8 = (uint8_t*)0x776FE8;
-char* array_776DB8 = (char*)0x776DB8;
-uint8_t* array_776BB8 = (uint8_t*)0x776BB8;
-uint8_t* array_776BA8 = (uint8_t*)0x776BA8;
-uint8_t* array_776B98 = (uint8_t*)0x776B98;
-uint8_t* array_776B94 = (uint8_t*)0x776B94;
-uint8_t* array_776B90 = (uint8_t*)0x776B90;
-uint8_t* array_776B68 = (uint8_t*)0x776B68;     // Struct starts here probably
-
+struct jimUnk0x488
+{
+    uint8_t field0[0x28];
+    DWORD field28;
+    DWORD field2C;
+    DWORD field30;
+    uint8_t field34[0xC];
+    DWORD field40;
+    uint8_t field44[0xC];
+    uint8_t field50[0x200];
+    char field250[0x200];
+    uint8_t field450[0x30];
+    DWORD field480;
+    DWORD field484;
+};
+static_assert(sizeof(jimUnk0x488) == 0x488, "jimUnk0x488 should be of size 0x488");
 
 struct jimUnk0x204
 {
@@ -694,6 +699,7 @@ struct jimUnk0x204
 static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
 
 jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
+jimUnk0x488* array_776B68 = (jimUnk0x488*)0x776B68;
 
 
 //MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices);
@@ -710,8 +716,7 @@ int __cdecl jim_enumerate_devices()
 
     for (varC = 0; varC < dword_77C608; varC++)
     {
-        DWORD* pValue = (DWORD*)(&array_776FE8[varC * 0x488]);
-        *pValue = (*pValue) | 0x80;
+        array_776B68[varC].field480 |= 0x80;
     }
 
     int var4 = 0x41;
@@ -721,38 +726,32 @@ int __cdecl jim_enumerate_devices()
         if (varC >= dword_77C608)
             break;
 
-        DWORD* pValue = (DWORD*)(&array_776FE8[varC * 0x488]);
-
-        if ((*pValue & var4) != 0)
+        if ((array_776B68[varC].field480 & var4) != 0)
         {
             memset(Dst, 0, 0x438);
-            memcpy(Dst, &array_776BB8[varC * 0x488], 0x434);    // Copy of var18 is included by memcpying 4 bytes more
+            memcpy(Dst, array_776B68[varC].field50, 0x434);    // Copy of var18 is included by memcpying 4 bytes more
             if (File_msgvideocfg_Write(Dst, -1) == 0)
                 var8++;
 
-            memset(&array_776B68[varC * 0x488], 0, 0x488);
+            memset(&array_776B68[varC], 0, 0x488);
 
             if (varC < dword_77C608)
             {
                 int size = (dword_77C608 - (varC + 1)) * 0x488;
-                memcpy(&array_776B68[varC * 0x488], &array_776B68[(varC + 1) * 0x488], size);   // This should be a memmove by all means. I keep the original memcpy call for now
+                memmove(&array_776B68[varC], &array_776B68[varC + 1], size);
             }
             dword_77C608--;
             continue;
         }
 
-        pValue = (DWORD*)(&array_776B94[varC * 0x488]);
-        if (*pValue != 0)
+        if (array_776B68[varC].field2C != 0)
         {
-            DWORD* pOtherValue = (DWORD*)(&array_776BA8[varC * 0x488]);
-            *pValue = *pOtherValue;
+            array_776B68[varC].field2C = array_776B68[varC].field40;
         }
 
-        pValue = (DWORD*)(&array_776B90[varC * 0x488]);
-        if (*pValue != 0)
+        if (array_776B68[varC].field28 != 0)
         {
-            DWORD* pOtherValue = (DWORD*)(&array_776B98[varC * 0x488]);
-            *pValue = *pOtherValue;
+            array_776B68[varC].field28 = array_776B68[varC].field30;
         }
 
         varC++;
@@ -764,7 +763,7 @@ int __cdecl jim_enumerate_devices()
 
         if (varC < dword_77C608)
         {
-            memcpy(Buf1, &array_776BB8[varC * 0x488], 0x434);   // Copy of var_450 included same way as earlier
+            memcpy(Buf1, array_776B68[varC].field50, 0x434);   // Copy of var_450 included same way as earlier
             if (file_msgvideocfg_Write2(Buf1, -1) == 1)
                 var8++;
         }
@@ -779,11 +778,10 @@ int __cdecl jim_enumerate_devices()
     for (varC = 0; varC < dword_77C608; varC++)
     {
         memset(&array_689B68[dword_68C3B8], 0, 0x204);
-        strncpy(array_689B68[dword_68C3B8].string, &array_776DB8[varC * 0x488], 0x200);
-        array_689B68[dword_68C3B8].field200 = *((DWORD*)array_776FEC[varC * 0x488]);
+        strncpy(array_689B68[dword_68C3B8].string, array_776B68[varC].field250, 0x200);
+        array_689B68[dword_68C3B8].field200 = array_776B68[varC].field484;
         
-        int value = *((DWORD*)array_776FE8[varC * 0x488]);
-        if (value & 2)
+        if (array_776B68[varC].field480 & 2)
         {
             array_689B68[dword_68C3B8].field200 |= 0x10;
         }
