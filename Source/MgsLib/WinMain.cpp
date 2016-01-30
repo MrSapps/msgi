@@ -614,16 +614,16 @@ int __cdecl MessageBox_Sometimes(HWND hWnd, int a2, LPCSTR lpCaption, UINT uType
 VAR(IID, IID_IDirectDraw7_MGS, 0x64BDA8);
 VAR(GUID, IID_IDirect3D7_MGS, 0x64BB98);
 VAR(GUID, IID_IDirectDrawGammaControl_MGS, 0x64BCA8);
-VAR(IDirectDraw7*, pDirectDraw, 0x6FC730);
-VAR(IDirect3D7*, pDirect3D, 0x6FC748);
-VAR(IDirectDrawGammaControl*, pGammaControl, 0x6C0EF8);
-VAR(DWORD, dwDisplayWidth, 0x6DF214);
-VAR(DWORD, dwDisplayHeight, 0x6DF1FC);
-VAR(LPDIRECTDRAWSURFACE7, pPrimarySurface, 0x6FC734);
-VAR(LPDIRECTDRAWCLIPPER, pClipper, 0x6FC750);
-VAR(LPDIRECTDRAWSURFACE7, pBackBuffer, 0x6FC738);
-VAR(LPDIRECT3DDEVICE7, pDirect3DDevice, 0x6FC74C);
-VAR(LPDIRECTDRAWSURFACE7, pDDSurface, 0x6FC740);
+VAR(IDirectDraw7*, g_pDirectDraw, 0x6FC730);
+VAR(IDirect3D7*, g_pDirect3D, 0x6FC748);
+VAR(IDirectDrawGammaControl*, g_pGammaControl, 0x6C0EF8);
+VAR(DWORD, g_dwDisplayWidth, 0x6DF214);
+VAR(DWORD, g_dwDisplayHeight, 0x6DF1FC);
+VAR(LPDIRECTDRAWSURFACE7, g_pPrimarySurface, 0x6FC734);
+VAR(LPDIRECTDRAWCLIPPER, g_pClipper, 0x6FC750);
+VAR(LPDIRECTDRAWSURFACE7, g_pBackBuffer, 0x6FC738);
+VAR(LPDIRECT3DDEVICE7, g_pDirect3DDevice, 0x6FC74C);
+VAR(LPDIRECTDRAWSURFACE7, g_pDDSurface, 0x6FC740);
 
 VAR(FILE*, gFile, 0x006DEF78);
 VAR(FILE*, gLogFile, 0x71D414);
@@ -678,11 +678,28 @@ HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
 int __cdecl DoDirectInputInit();
 
 MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
-LPDDENUMCALLBACKEXA DeviceEnumCallback = (LPDDENUMCALLBACKEXA)0x0051F5B8;
 MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
 MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
+MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(void*, void*, int), File_msgvideocfg_Read);
 
 VAR(DWORD, dword_68C3B8, 0x68C3B8);
+LPDDENUMMODESCALLBACK2 EnumModesCallback = (LPDDENUMMODESCALLBACK2)0x51F9A6;
+LPD3DENUMDEVICESCALLBACK7 Enum3DDevicesCallback = (LPD3DENUMDEVICESCALLBACK7)0x51FA74;
+
+// TODO : make jim_enumerate_devices use this structure too
+struct jimDeviceIdentifier
+{
+    char pDriverDescription[0x28];
+    DWORD field28;
+    DWORD field2C;
+    DWORD field30;
+    uint8_t field34[0xC];
+    DWORD field40;
+    uint8_t field44[0xC];
+    DDDEVICEIDENTIFIER2 ddIdentifier;
+    DWORD field480;
+    DWORD field484;
+};
 
 struct jimUnk0x488
 {
@@ -708,9 +725,129 @@ struct jimUnk0x204
 };
 static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
 
+struct jimUnk0x438
+{
+    DDDEVICEIDENTIFIER2 identifier;
+    DWORD field430;
+    DWORD field434;
+};
+static_assert(sizeof(jimUnk0x438) == 0x438, "jimUnk0x438 should be of size 0x438");
+
 jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
 jimUnk0x488* array_776B68 = (jimUnk0x488*)0x776B68;
 
+// 0x51F5B8
+BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDriverName, LPVOID lpContext, HMONITOR hm)
+{
+    HRESULT hr;
+    IDirectDraw7* pDirectDraw;
+    IDirect3D7* pDirect3D;
+    DDDEVICEIDENTIFIER2 DDrawDeviceIdentifier;
+    DDSCAPS2 ddCaps;
+    DWORD dwMemTotal;
+    DWORD dwMemFree;
+    DWORD dwTexTotal;
+    DWORD dwTexFree;
+    jimDeviceIdentifier identifier;
+    jimUnk0x438 Buf2;
+    
+    if (hm != 0)
+        return TRUE;
+
+    hr = DirectDrawCreateExMGS(lpGUID, (LPVOID*)&pDirectDraw, &IID_IDirectDraw7_MGS, 0);
+    if (hr < 0)
+        return TRUE;
+
+    memset(&DDrawDeviceIdentifier, 0, sizeof(DDDEVICEIDENTIFIER2));
+    pDirectDraw->GetDeviceIdentifier(&DDrawDeviceIdentifier, 0);
+
+    mgs_fprintf(gLogFile, "$DriverName   = %s\n", DDrawDeviceIdentifier.szDriver);
+    mgs_fprintf(gLogFile, "$Description  = %s\n", DDrawDeviceIdentifier.szDescription);
+    mgs_fprintf(gLogFile, "$DriverVersion= %i\n", DDrawDeviceIdentifier.liDriverVersion);
+    mgs_fprintf(gLogFile, "$VendorId     = %i\n", DDrawDeviceIdentifier.dwVendorId);
+    mgs_fprintf(gLogFile, "$DeviceId     = %i\n", DDrawDeviceIdentifier.dwDeviceId);
+    mgs_fprintf(gLogFile, "$SubSysId     = %i\n", DDrawDeviceIdentifier.dwSubSysId);
+    mgs_fprintf(gLogFile, "$Revision     = %i\n", DDrawDeviceIdentifier.dwRevision);
+    mgs_fprintf(gLogFile, "$WHQLLevel    = %i\n", DDrawDeviceIdentifier.dwWHQLLevel);
+
+    if (DDrawDeviceIdentifier.dwVendorId = 0x8086)
+    {
+        mgs_fprintf(gLogFile, "Intel device found. Do not enumerate it as a valid rendering device.\n");
+    }
+
+    hr = pDirectDraw->QueryInterface(IID_IDirect3D7_MGS, (LPVOID*)&pDirect3D);
+    if (hr < 0)
+    {
+        pDirectDraw->Release();
+        return TRUE;
+    }
+
+    memset(&ddCaps, 0, sizeof(DDSCAPS2));
+    ddCaps.dwCaps = DDSCAPS_VIDEOMEMORY;
+    pDirectDraw->GetAvailableVidMem(&ddCaps, &dwMemTotal, &dwMemFree);
+
+    memset(&ddCaps, 0, sizeof(DDSCAPS2));
+    ddCaps.dwCaps = DDSCAPS_TEXTURE;
+    pDirectDraw->GetAvailableVidMem(&ddCaps, &dwTexTotal, &dwTexFree);
+
+    if (!(dwMemTotal != 0 && dwTexTotal != 0))
+    {
+        pDirect3D->Release();
+        pDirectDraw->Release();
+        return TRUE;
+    }
+
+    memset(&identifier, 0, sizeof(identifier));
+    strncpy(identifier.pDriverDescription, lpDriverDescription, 0x27);
+    pDirectDraw->GetDeviceIdentifier(&identifier.ddIdentifier, 0);
+
+    int result = File_msgvideocfg_Read(&identifier.ddIdentifier, &Buf2, -1);
+    if (result != 0)
+    {
+        identifier.field480 = Buf2.field430;
+    }
+    else
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            result = File_msgvideocfg_Read(&identifier.ddIdentifier, &Buf2, i);
+            if (result != 0)
+            {
+                identifier.field480 = Buf2.field430;
+                break;
+            }
+        }
+    }
+
+    if (dwTexTotal < 0x200000)
+    {
+        if ((identifier.field480 & 0x40) == 0 && (identifier.field480 & 1) == 0)
+        {
+            MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", 0);
+        }
+        identifier.field480 |= 0x40;
+    }
+    else
+    {
+        identifier.field480 &= 0xBF;
+    }
+
+    pDirectDraw->EnumDisplayModes(0, 0, &identifier, EnumModesCallback);
+
+    if (dwMemTotal < 0x300000)
+        identifier.field484 &= 0xF7;
+    if (dwMemTotal < 0x258000)
+        identifier.field484 &= 0xFB;
+    if (dwMemTotal < 0x1E0000)
+        identifier.field484 &= 0xFD;
+
+    pDirect3D->EnumDevices(Enum3DDevicesCallback, &identifier);
+
+    pDirect3D->Release();
+    pDirectDraw->Release();
+
+    return TRUE;
+}
 
 //MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices);
 int __cdecl jim_enumerate_devices()
@@ -722,7 +859,7 @@ int __cdecl jim_enumerate_devices()
 
     dword_77C608 = 0;
     dword_77C60C = 0;
-    DirectDrawEnumerateExA_MGS(DeviceEnumCallback, 0, DDENUM_NONDISPLAYDEVICES);
+    DirectDrawEnumerateExA_MGS(DDEnumCallbackEx, 0, DDENUM_NONDISPLAYDEVICES);
 
     for (varC = 0; varC < dword_77C608; varC++)
     {
@@ -1021,7 +1158,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gYSize = (signed __int64)(240.0 * gXRes);
         mgs_fputs("Creating DirectDraw7\n", gFile);
         mgs_fflush(gFile);
-        hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&pDirectDraw, &IID_IDirectDraw7_MGS, 0);
+        hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
         if (hr < 0)
         {
             mgs_fputs(" . fail\n", gFile);
@@ -1034,7 +1171,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             mgs_fputs("Query interface...\n", gFile);
             mgs_fflush(gFile);
-            pDirectDraw->QueryInterface(IID_IDirect3D7_MGS, (LPVOID*)&pDirect3D);
+            g_pDirectDraw->QueryInterface(IID_IDirect3D7_MGS, (LPVOID*)&g_pDirect3D);
             if (hr < 0)
             {
                 mgs_fputs(" . fail\n", gFile);
@@ -1061,43 +1198,43 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dword_650D2C = 16;
             }
         }
-        if (pPrimarySurface)
+        if (g_pPrimarySurface)
         {
-            hr = pPrimarySurface->Release();
+            hr = g_pPrimarySurface->Release();
             if (hr)
                 PrintDDError("Can't release primary surf", hr);
-            pPrimarySurface = 0;
+            g_pPrimarySurface = 0;
         }
-        if (pBackBuffer)
+        if (g_pBackBuffer)
         {
-            hr = pBackBuffer->Release();
+            hr = g_pBackBuffer->Release();
             if (hr)
                 PrintDDError("Can't release render surf", hr);
-            pBackBuffer = 0;
+            g_pBackBuffer = 0;
         }
-        if (pClipper)
+        if (g_pClipper)
         {
-            hr = pClipper->Release();
+            hr = g_pClipper->Release();
             if (hr)
                 PrintDDError("Can't release clipper", hr);
-            pClipper = 0;
+            g_pClipper = 0;
         }
-        pPrimarySurface = 0;
-        pBackBuffer = 0;
-        pClipper = 0;
+        g_pPrimarySurface = 0;
+        g_pBackBuffer = 0;
+        g_pClipper = 0;
         mgs_fputs("Setting cooperative level...\n", gFile);
         mgs_fflush(gFile);
         if (v42)
         {
             mgs_fputs(" (windowed) \n", gFile);
             mgs_fflush(gFile);
-            hr = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_NORMAL);
+            hr = g_pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_NORMAL);
         }
         else
         {
             mgs_fputs(" (full-screen) \n", gFile);
             mgs_fflush(gFile);
-            hr = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
+            hr = g_pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
         }
         if (hr < 0)
         {
@@ -1109,7 +1246,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fflush(gFile);
         if (!v42)
         {
-            hr = pDirectDraw->SetDisplayMode(dwDisplayWidth, dwDisplayHeight, 0x10, 0, 0);
+            hr = g_pDirectDraw->SetDisplayMode(g_dwDisplayWidth, g_dwDisplayHeight, 0x10, 0, 0);
             mgs_fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", gXSize_dword_6DF214, gYSize);
             if (hr < 0)
                 return 0;
@@ -1132,7 +1269,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
         mgs_fputs("Creating primary surface...\n", gFile);
         mgs_fflush(gFile);
-        hr = pDirectDraw->CreateSurface(&dxSurfaceDesc2, &pPrimarySurface, 0);
+        hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc2, &g_pPrimarySurface, 0);
         if (hr < 0)
         {
             mgs_fputs(" . fail\n", gFile);
@@ -1152,7 +1289,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             mgs_fputs("Creating clipper...\n", gFile);
             mgs_fflush(gFile);
-            hr = pDirectDraw->CreateClipper(0, &pClipper, 0);
+            hr = g_pDirectDraw->CreateClipper(0, &g_pClipper, 0);
             if (hr)
             {
                 mgs_fputs(" . fail\n", gFile);
@@ -1160,7 +1297,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 PrintDDError("Can't create clipper", hr);
                 return 0;
             }
-            hr = pClipper->SetHWnd(0, gHwnd);
+            hr = g_pClipper->SetHWnd(0, gHwnd);
             if (hr)
             {
                 mgs_fputs(" . fail\n", gFile);
@@ -1168,7 +1305,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 PrintDDError("Can't obtain clipper zone", hr);
                 return 0;
             }
-            hr = pPrimarySurface->SetClipper(pClipper);
+            hr = g_pPrimarySurface->SetClipper(g_pClipper);
             if (hr)
             {
                 mgs_fputs(" . fail\n", gFile);
@@ -1176,7 +1313,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 PrintDDError("Can't attach clipper", hr);
                 return 0;
             }
-            pClipper->Release();
+            g_pClipper->Release();
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
         }
@@ -1220,7 +1357,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
             memcpy(&dxSurfaceDesc.ddpfPixelFormat, &pixelFormat3, sizeof(DDPIXELFORMAT));
 
-            hr = pDirectDraw->CreateSurface(&dxSurfaceDesc, &pBackBuffer, 0);
+            hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc, &g_pBackBuffer, 0);
             if (hr < 0)
             {
                 mgs_fputs(" . fail\n", gFile);
@@ -1240,7 +1377,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxSurfaceDesc.dwHeight = gYSize;
                 mgs_fputs("Creating back buffer for windowed mode...\n", gFile);
                 mgs_fflush(gFile);
-                hr = pDirectDraw->CreateSurface(&dxSurfaceDesc, &pBackBuffer, 0);
+                hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc, &g_pBackBuffer, 0);
                 if (hr < 0)
                 {
                     mgs_fputs(" . fail\n", gFile);
@@ -1258,7 +1395,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxCaps1.dwCaps4 = 0;
                 mgs_fputs("Getting back buffer from pPrim chain...\n", gFile);
                 mgs_fflush(gFile);
-                pPrimarySurface->GetAttachedSurface(&dxCaps1, &pBackBuffer);
+                g_pPrimarySurface->GetAttachedSurface(&dxCaps1, &g_pBackBuffer);
                 if (hr < 0)
                 {
                     mgs_fputs(" . fail\n", gFile);
@@ -1285,7 +1422,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         mgs_fputs("Querying gamma interface...\n", gFile);
         mgs_fflush(gFile);
-        pPrimarySurface->QueryInterface(IID_IDirectDrawGammaControl_MGS, (LPVOID*)&pGammaControl);
+        g_pPrimarySurface->QueryInterface(IID_IDirectDrawGammaControl_MGS, (LPVOID*)&g_pGammaControl);
         if (hr)
         {
             mgs_fputs(" . fail\n", gFile);
@@ -1299,11 +1436,11 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             mgs_fflush(gFile);
             dword_6FC7C4 = 1;
         }
-        if (pDirectDraw)
+        if (g_pDirectDraw)
         {
             memset(&dxCaps, 0, 380);
             dxCaps.dwSize = 380;
-            hr = pDirectDraw->GetCaps(&dxCaps, 0);
+            hr = g_pDirectDraw->GetCaps(&dxCaps, 0);
             if (hr || (v1 = dxCaps.dwCaps2, !(v1 & 0x20000)))
                 dword_6FC7C4 = 0;
         }
@@ -1312,7 +1449,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         if (gSoftwareRendering)
             break;
         dxSurfaceDesc.dwSize = 124;
-        pDirectDraw->GetDisplayMode(&dxSurfaceDesc);
+        g_pDirectDraw->GetDisplayMode(&dxSurfaceDesc);
         if (dxSurfaceDesc.ddpfPixelFormat.dwRGBBitCount <= 8)
         {
             mgs_fputs("Can't render to a palettized surface, exiting.\n", gFile);
@@ -1324,7 +1461,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs("Creating device...\n", gFile);
         mgs_fflush(gFile);
 
-        hr = pDirect3D->CreateDevice(*((GUID*)(&v33)), pBackBuffer, &pDirect3DDevice);
+        hr = g_pDirect3D->CreateDevice(*((GUID*)(&v33)), g_pBackBuffer, &g_pDirect3DDevice);
         if (hr >= 0)
         {
             mgs_fputs(" . done\n", gFile);
@@ -1352,17 +1489,17 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxSurfaceDesc3.ddsCaps.dwCaps = DDSCAPS_TEXTURE;
                 dxSurfaceDesc3.ddsCaps.dwCaps2 = DDSCAPS2_TEXTUREMANAGE;
 
-                hr = pDirectDraw->CreateSurface(&dxSurfaceDesc3, &pDDSurface, 0);
+                hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc3, &g_pDDSurface, 0);
                 if (hr)
                 {
-                    pDDSurface = 0;
+                    g_pDDSurface = 0;
                 }
                 else
                 {
                     if (!sub_41E990())
                     {
-                        pDDSurface->Release();
-                        pDDSurface = 0;
+                        g_pDDSurface->Release();
+                        g_pDDSurface = 0;
                     }
                 }
             }
@@ -1430,14 +1567,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxViewport.dwHeight = gYSize;
                 dxViewport.dvMinZ = 0;
                 dxViewport.dvMaxZ = 1.0f;
-                pDirect3DDevice->SetViewport(&dxViewport);
+                g_pDirect3DDevice->SetViewport(&dxViewport);
                 v2 = ((float)dword_651D94 - 50.0f) / 100.0f;
                 sub_41C820(v2);
             }
             else
             {
-                pDirect3DDevice->Release();
-                pDirect3DDevice = 0;
+                g_pDirect3DDevice->Release();
+                g_pDirect3DDevice = 0;
                 MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
                 gSoftwareRendering = 1;
             }
@@ -1452,45 +1589,45 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gSoftwareRendering = 1;
         dword_716F5C = 1.0f;
         gXRes = dword_716F5C; // TODO: Float
-        hr = pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_NORMAL);
-        if (pGammaControl)
+        hr = g_pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_NORMAL);
+        if (g_pGammaControl)
         { 
-            pGammaControl->Release();
+            g_pGammaControl->Release();
         }
 
-        if (pBackBuffer)
+        if (g_pBackBuffer)
         {
-            hr = pBackBuffer->Release();
+            hr = g_pBackBuffer->Release();
             if (hr)
                 PrintDDError("Can't release render surf", hr);
-            pBackBuffer = 0;
+            g_pBackBuffer = 0;
         }
-        if (pPrimarySurface)
+        if (g_pPrimarySurface)
         {
-            hr = pPrimarySurface->Release();
+            hr = g_pPrimarySurface->Release();
             if (hr)
                 PrintDDError("Can't relaese primary surf", hr);
-            pPrimarySurface = 0;
+            g_pPrimarySurface = 0;
         }
-        if (pClipper)
+        if (g_pClipper)
         {
-            hr = pClipper->Release();
+            hr = g_pClipper->Release();
             if (hr)
                 PrintDDError("Can't release clipper", hr);
-            pClipper = 0;
+            g_pClipper = 0;
         }
-        pPrimarySurface = 0;
-        pBackBuffer = 0;
-        pClipper = 0;
-        if (pDirect3D)
+        g_pPrimarySurface = 0;
+        g_pBackBuffer = 0;
+        g_pClipper = 0;
+        if (g_pDirect3D)
         {
-            pDirect3D->Release();
-            pDirect3D = 0;
+            g_pDirect3D->Release();
+            g_pDirect3D = 0;
         }
-        if (pDirectDraw)
+        if (g_pDirectDraw)
         {
-            pDirectDraw->Release();
-            pDirectDraw = 0;
+            g_pDirectDraw->Release();
+            g_pDirectDraw = 0;
         }
     }
     mgs_fputs("other inits\n", gFile);
