@@ -82,6 +82,8 @@ MSG_FUNC_NOT_IMPL(0x0040A3FC, int __cdecl (actor_related_struct*), Actor_Unknown
 MSG_FUNC_NOT_IMPL(0x0040A2AF, actor_related_struct *__cdecl(int, actor_related_struct *, void(__cdecl *)(actor_related_struct*)), Actor_Unknown4);
 MSG_FUNC_NOT_IMPL(0x0040A3ED, actor_related_struct *__cdecl(actor_related_struct*), Actor_SetFnPtr);
 MSG_FUNC_NOT_IMPL(0x0040A006, int __cdecl(), Actor_Init);
+MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
+
 
 
 // We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
@@ -226,6 +228,71 @@ VAR(DWORD, dword_721E78, 0x721E78);
 VAR(DWORD, dword_7348FC, 0x7348FC);
 VAR(DWORD, dword_650D4C, 0x650D4C);
 VAR(char*, gDest, 0x0078E7C0);
+
+struct weapon_famas
+{
+    actor_related_struct mActor;
+    DWORD field_44_a1;
+    DWORD field_48_a2;
+    DWORD field_4C_a3;
+    DWORD field_50_a4;
+    DWORD field_54;
+    DWORD field_58;
+    DWORD mbIsMp5;
+};
+static_assert(sizeof(weapon_famas) == 96, "weapon_famas should be 96");
+
+VAR(WORD, word_995368, 0x995368);
+VAR(WORD, word_995320, 0x995320);
+VAR(WORD, word_78E804, 0x78E804);
+
+MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
+MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
+MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
+
+actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, int fn2, char *srcFileName);
+
+// 640C24
+weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(actor_related_struct *a1, actor_related_struct *a2, void(__cdecl *a3)(actor_related_struct *), void(__cdecl *a4)(DWORD), int bMp5)
+{
+    weapon_famas *pFamas; // eax@1 MAPDST
+    int v8; // eax@5
+    __int16 v9; // cx@6
+
+    pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
+    if (pFamas)
+    {
+        Actor_Unknown6(&pFamas->mActor, (int)Res_famas_sub_640CDC.Ptr(), (int)sub_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
+        if (Res_Weapon_famas_init_sub_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
+        {
+            Actor_SetFnPtr(&pFamas->mActor);
+            return 0;
+        }
+        pFamas->field_58 = 0;
+        pFamas->field_44_a1 = (int)a1;
+        pFamas->field_48_a2 = (int)a2;
+        pFamas->field_4C_a3 = (int)a3;
+        pFamas->field_50_a4 = (int)a4;
+        pFamas->field_54 = 1;
+        pFamas->mbIsMp5 = bMp5;
+    }
+    v8 = (word_995368 != 0) + 25;                 // 25 is the ammo clip size
+    if (bMp5)
+    {
+        word_995368 = (word_995368 != 0) + 25; // Remainder in clip
+        word_995320 = v8; // clip size?
+    }
+    else
+    {
+        v9 = word_78E804;
+        if (v8 > 0 && word_78E804 > v8)
+            v9 = (word_995368 != 0) + 25;
+        word_995320 = (word_995368 != 0) + 25;
+        word_995368 = v9;
+    }
+    return pFamas;
+}
+MSG_FUNC_IMPL(0x640C24, Res_Weapon_famas_96_sub_640C24);
 
 //MSG_FUNC_NOT_IMPL(0x0040A0D4, int __cdecl(), Actor_DumpActorSystem);
 int __cdecl Actor_DumpActorSystem()
@@ -2119,6 +2186,8 @@ int __cdecl Actor_Unknown()
     actor_related_struct *pActor; // [sp+14h] [bp-4h]@1
 
     pActor = gActors;
+
+
     for (i = 9; i > 0; --i)
     {
         if (!(dword_791A0C & pActor->mPause))
@@ -2128,6 +2197,9 @@ int __cdecl Actor_Unknown()
             {
                 v1 = v2->actor_struct_ptr1;
                 fn = v2->fn_unknown;
+
+               // bool isFamasFunc = fn == (void*)0x640CDC;
+
                 if (fn)
                 {
                     fn(v2);
