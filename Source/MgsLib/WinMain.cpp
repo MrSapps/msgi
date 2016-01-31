@@ -248,11 +248,38 @@ VAR(WORD, word_78E804, 0x78E804);
 
 MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
 MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
-MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
 
 actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, int fn2, char *srcFileName);
 
-// 640C24
+MSG_FUNC_NOT_IMPL(0x0040B38E, int __cdecl(char*), ResourceRequestQ);
+MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
+MSG_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
+
+//MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
+signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, int a3, int bMp5)
+{
+    int v4; // esi@1
+    int res; // eax@2
+    signed int result; // eax@5
+
+    v4 = (int)&a1->mActor.actor_struct_ptr2;
+    if (bMp5)
+        res = ResourceRequestQ("mpfive");
+    else
+        res = ResourceRequestQ("famas");
+    sub_44FF7C(v4, res, 109);
+    if (*(DWORD *)v4)
+    {
+        sub_45011B(v4, a2, a3);
+        result = 0;
+    }
+    else
+    {
+        result = -1;
+    }
+    return result;
+}
+
 weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(actor_related_struct *a1, actor_related_struct *a2, void(__cdecl *a3)(actor_related_struct *), void(__cdecl *a4)(DWORD), int bMp5)
 {
     weapon_famas *pFamas; // eax@1 MAPDST
