@@ -683,7 +683,6 @@ MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
 MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(void*, void*, int), File_msgvideocfg_Read);
 
 VAR(DWORD, dword_68C3B8, 0x68C3B8);
-LPDDENUMMODESCALLBACK2 EnumModesCallback = (LPDDENUMMODESCALLBACK2)0x51F9A6;
 LPD3DENUMDEVICESCALLBACK7 Enum3DDevicesCallback = (LPD3DENUMDEVICESCALLBACK7)0x51FA74;
 
 // TODO : make jim_enumerate_devices use this structure too
@@ -735,6 +734,35 @@ static_assert(sizeof(jimUnk0x438) == 0x438, "jimUnk0x438 should be of size 0x438
 
 jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
 jimUnk0x488* array_776B68 = (jimUnk0x488*)0x776B68;
+
+HRESULT __stdcall EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
+{
+    jimDeviceIdentifier* pIdentifier = (jimDeviceIdentifier*)pUser;
+
+    if (pDesc->ddpfPixelFormat.dwRGBBitCount != 0x10)
+    {
+        return 1;
+    }
+
+    if (pDesc->dwWidth == 320 && pDesc->dwHeight == 240)
+    {
+        pIdentifier->field484 |= 1;
+    }
+    if (pDesc->dwWidth == 640 && pDesc->dwHeight == 480)
+    {
+        pIdentifier->field484 |= 2;
+    }
+    if (pDesc->dwWidth == 800 && pDesc->dwHeight == 600)
+    {
+        pIdentifier->field484 |= 4;
+    }
+    if (pDesc->dwWidth == 1024 && pDesc->dwHeight == 768)
+    {
+        pIdentifier->field484 |= 8;
+    }
+
+    return 1;
+}
 
 // 0x51F5B8
 BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDriverName, LPVOID lpContext, HMONITOR hm)
