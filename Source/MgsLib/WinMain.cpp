@@ -683,22 +683,20 @@ MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
 MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(void*, void*, int), File_msgvideocfg_Read);
 
 VAR(DWORD, dword_68C3B8, 0x68C3B8);
-LPD3DENUMDEVICESCALLBACK7 Enum3DDevicesCallback = (LPD3DENUMDEVICESCALLBACK7)0x51FA74;
 
 // TODO : make jim_enumerate_devices use this structure too
 struct jimDeviceIdentifier
 {
-    char pDriverDescription[0x28];
-    DWORD field28;
-    DWORD field2C;
-    DWORD field30;
-    uint8_t field34[0xC];
-    DWORD field40;
-    uint8_t field44[0xC];
-    DDDEVICEIDENTIFIER2 ddIdentifier;
-    DWORD field480;
-    DWORD field484;
+    char pDriverDescription[0x28];      // 0x000
+    GUID* pDeviceGUID;                  // 0x028
+    GUID* pOtherGUID;                   // 0x02C
+    GUID deviceGUID;                    // 0x030
+    GUID otherGUID;                     // 0x040
+    DDDEVICEIDENTIFIER2 ddIdentifier;   // 0x050
+    DWORD field480;                     // 0x480
+    DWORD field484;                     // 0x484
 };
+static_assert(sizeof(jimDeviceIdentifier) == 0x488, "jimDeviceIdentifier should be of size 0x488");
 
 struct jimUnk0x488
 {
@@ -734,8 +732,11 @@ static_assert(sizeof(jimUnk0x438) == 0x438, "jimUnk0x438 should be of size 0x438
 
 jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
 jimUnk0x488* array_776B68 = (jimUnk0x488*)0x776B68;
+jimDeviceIdentifier* g_pDeviceIdentifiers = (jimDeviceIdentifier*)0x776B68;
 
-HRESULT __stdcall EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
+MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), sub_51E7FC);
+
+HRESULT CALLBACK EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
 {
     jimDeviceIdentifier* pIdentifier = (jimDeviceIdentifier*)pUser;
 
@@ -760,6 +761,46 @@ HRESULT __stdcall EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
     {
         pIdentifier->field484 |= 8;
     }
+
+    return 1;
+}
+
+// 0x51FA74
+HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDeviceName, LPD3DDEVICEDESC7 pDesc, LPVOID pUser)
+{
+    jimDeviceIdentifier* pIdentifier = (jimDeviceIdentifier*)pUser;
+    jimDeviceIdentifier* pGlobalIdentifier = &g_pDeviceIdentifiers[dword_77C608];
+
+    memset(pGlobalIdentifier, 0, sizeof(jimDeviceIdentifier));
+    
+    if ((pDesc->dwDevCaps & D3DDEVCAPS_HWRASTERIZATION) && !(pDesc->dwDevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) && (pDesc->dwDeviceRenderBitDepth & DDBD_16))
+    {
+        if (pIdentifier->field484 == 0)
+            return 1;
+    }
+    else
+    {
+        return 1;
+    }
+
+    memcpy(&pGlobalIdentifier->deviceGUID, &pDesc->deviceGUID, sizeof(GUID));
+    pGlobalIdentifier->pDeviceGUID = &pGlobalIdentifier->deviceGUID;
+
+    strncpy(pGlobalIdentifier->pDriverDescription, lpDeviceName, 0x28);
+
+    if (pIdentifier->pOtherGUID != 0)
+    {
+        memcpy(&pGlobalIdentifier->otherGUID, &pIdentifier->otherGUID, sizeof(GUID));
+        pGlobalIdentifier->pOtherGUID = &pGlobalIdentifier->otherGUID;
+        strncpy(pGlobalIdentifier->pDriverDescription, pIdentifier->pDriverDescription, 0x28);
+    }
+    memcpy(&pGlobalIdentifier->ddIdentifier, &pIdentifier->ddIdentifier, sizeof(pGlobalIdentifier->ddIdentifier));
+    pGlobalIdentifier->field480 = pIdentifier->field480;
+    pGlobalIdentifier->field484 = pIdentifier->field484;
+
+    sub_51E7FC(pDesc, lpDeviceDescription, lpDeviceName, pGlobalIdentifier);
+
+    dword_77C608++;
 
     return 1;
 }
