@@ -26,11 +26,17 @@ LONG gSndVolume_dword_77D88C = 0;
 DWORD qword_77E1A8 = 0;
 DWORD dword_77D874 = 0;
 DWORD qword_77D898 = 0;
+IDirectSoundBuffer* gSndSamp1_dword_77E2C4 = nullptr;
+DWORD gSamp1PlayPos_dword_77E1D0 = 0;
+DWORD dword_68E318 = 0;
+DWORD dword_77E2CC = 0;
+DWORD dword_77E2F8 = 0;
 
 void Sound_LoadBufferFromFile(const char*)
 {
     // TODO
     abort();
+
 }
 
 // 0x0052269C
@@ -275,6 +281,38 @@ __int64 __cdecl Sound_FadeQ(int a1)
             qword_77D898 = static_cast<DWORD>(freq * v5 / 1000);
             dword_77E2D8 = 1;
         }
+    }
+    return result;
+}
+
+// 0x005234EA
+bool __cdecl Sound_GetSamp1PosQ()
+{
+    bool result; // eax@2
+
+    if (dword_68E318 == -1)
+    {
+        if (dword_77E2CC)
+        {
+            result = 0;
+        }
+        else if (gSndSamp1_dword_77E2C4)
+        {
+            gSndSamp1_dword_77E2C4->GetCurrentPosition(&gSamp1PlayPos_dword_77E1D0, 0);
+            if (gSamp1PlayPos_dword_77E1D0 <= dword_77E2F8)
+            {
+                gSamp1PlayPos_dword_77E1D0 += 176400;
+            }
+            result = dword_77E2F8 + 28672 <= gSamp1PlayPos_dword_77E1D0;
+        }
+        else
+        {
+            result = 0;
+        }
+    }
+    else
+    {
+        result = 1;
     }
     return result;
 }

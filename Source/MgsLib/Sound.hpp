@@ -13,6 +13,8 @@ signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample
 bool __cdecl Sound_CreatePrimarySoundBuffer();
 signed int __cdecl Sound_CreateSecondarySoundBuffer();
 __int64 __cdecl Sound_FadeQ(int a1);
+bool __cdecl Sound_GetSamp1PosQ();
+
 //
 int __cdecl Sound_InitFx();
 //
