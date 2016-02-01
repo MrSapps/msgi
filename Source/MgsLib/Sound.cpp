@@ -317,6 +317,12 @@ bool __cdecl Sound_GetSamp1PosQ()
     return result;
 }
 
+// 0x005224BE
+int __cdecl Sound_GetSomeStateQ()
+{
+    return gSndState_dword_77E2D4;
+}
+
 int __cdecl Sound_InitFx()
 {
     int result;

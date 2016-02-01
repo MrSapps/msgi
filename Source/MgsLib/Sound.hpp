@@ -14,9 +14,9 @@ bool __cdecl Sound_CreatePrimarySoundBuffer();
 signed int __cdecl Sound_CreateSecondarySoundBuffer();
 __int64 __cdecl Sound_FadeQ(int a1);
 bool __cdecl Sound_GetSamp1PosQ();
-
-//
+int __cdecl Sound_GetSomeStateQ();
 int __cdecl Sound_InitFx();
+
 //
 int __cdecl Sound_PlaySample();
 void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, int a3, signed int a4);
