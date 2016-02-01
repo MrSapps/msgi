@@ -411,6 +411,33 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
     return result;
 }
 
+// 0x0052313B
+int __cdecl Sound_StopSample()
+{
+    int result;
+
+    if (gSoundFxIdx_dword_77D884 != -1)
+    {
+        result = gSoundFxIdx_dword_77D884;
+        if (g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884])
+        {
+            result = g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884]->Stop();
+        }
+    }
+
+    if (gSndBuffer_dword_77E2D0)
+    {
+        result = gSndBuffer_dword_77E2D0->Stop();
+    }
+
+    if (gSndBuffer_dword_77E0A0)
+    {
+        result = gSndBuffer_dword_77E0A0->Stop();
+    }
+
+    return result;
+}
+
 // 0x00521898
 int __cdecl Sound_TableUnknown1(int a1, int rate, int vol)
 {

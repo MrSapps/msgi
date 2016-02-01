@@ -22,4 +22,5 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName);
 int __cdecl Sound_PlaySample();
 void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, int a3, signed int a4);
 //
+int __cdecl Sound_StopSample();
 int __cdecl Sound_TableUnknown1(int a1, int rate, int vol);
