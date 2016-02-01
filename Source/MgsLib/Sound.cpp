@@ -18,6 +18,10 @@ DWORD dword_77E2D8;
 IDirectSound* gDSound_dword_77E2C0 = nullptr;
 IDirectSoundBuffer* gSoundBuffer_dword_77E1B0 = nullptr;
 DWORD* gFxState_dword_77D8A0 = 0;
+DWORD dword_77E1B4 = 0;
+DWORD dword_77E1C4 = 0;
+DWORD dword_77D87C = 0;
+DWORD gBlockAlign_dword_77E1DC = 0;
 
 void Sound_LoadBufferFromFile(const char*)
 {
@@ -123,6 +127,43 @@ int __cdecl Sound_CloseWavStopQ()
     gSndState_dword_77E2D4 = 0;
     dword_77E2D8 = 0;
     return result;
+}
+
+// 0x00523A44
+signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample, int samplesPerSecond, int a4, int a5)
+{
+    DSBUFFERDESC bufferDesc;
+    WAVEFORMATEX waveFormat;
+
+    int blockAlign = bitsPerSample / 8 * numChannels;
+    dword_77E1B4 = (a5 + 4) * blockAlign * a4;
+
+    if (gDSound_dword_77E2C0)
+    {
+        waveFormat.wFormatTag = 1;
+        waveFormat.nChannels = numChannels;
+        waveFormat.nSamplesPerSec = samplesPerSecond;
+        waveFormat.nAvgBytesPerSec = blockAlign * samplesPerSecond;
+        waveFormat.nBlockAlign = blockAlign;
+        waveFormat.wBitsPerSample = bitsPerSample;
+        waveFormat.cbSize = 0;
+        memset(&bufferDesc, 0, 36u);
+        bufferDesc.dwSize = 36;
+        bufferDesc.dwFlags = 0x100C8;
+        bufferDesc.dwBufferBytes = dword_77E1B4;
+        bufferDesc.lpwfxFormat = &waveFormat;
+        gDSound_dword_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndBuffer_dword_77E0A0, 0);
+    }
+
+    dword_77E1C4 = a5;
+    dword_77D87C = a4;
+    gBlockAlign_dword_77E1DC = blockAlign;
+
+    if (gSndBuffer_dword_77E0A0)
+    {
+        gSndBuffer_dword_77E0A0->SetCurrentPosition(0);
+    }
+    return 1;
 }
 
 // 0x00522601
