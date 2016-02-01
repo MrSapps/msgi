@@ -412,6 +412,67 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
     return result;
 }
 
+
+// 0x005231A9
+int __cdecl Sound_PlaySample()
+{
+    int result;
+
+    if (gSoundFxIdx_dword_77D884 != -1)
+    {
+        result = gSoundFxIdx_dword_77D884;
+        if (g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884])
+            result = g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884]->Play(
+            0,
+            0,
+            1);
+    }
+
+    if (gSndBuffer_dword_77E2D0)
+    {
+        if (gSndState_dword_77E2D4 == 1)
+        {
+            result = gSndBuffer_dword_77E2D0->Play(0, 0, 1);
+        }
+    }
+
+    if (gSndBuffer_dword_77E0A0)
+    {
+        result = gSndBuffer_dword_77E0A0->Play(0, 0, 1);
+    }
+
+    return result;
+}
+
+// 0x0052307F
+void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, int a3, signed int a4)
+{
+    int pan;
+    int vol;
+
+    if (pSoundBuffer)
+    {
+        if (a2 < 0)
+        {
+            pan = Sound_TableUnknown1(100 * (a2 + 32) / 32, -10000, 0);
+        }
+        else
+        {
+            pan = -Sound_TableUnknown1(100 * (32 - a2) / 32, -10000, 0);
+        }
+        if (a4 > -2500)
+        {
+            vol = Sound_TableUnknown1(100 * a3 / 63, -2500, a4);
+        }
+        else
+        {
+            vol = a4;
+        }
+        pSoundBuffer->SetPan(pan);
+        pSoundBuffer->SetVolume(vol);
+    }
+}
+
 // 0x0052313B
 int __cdecl Sound_StopSample()
 {
@@ -487,64 +548,4 @@ signed int __cdecl Sound_Stop2Samples()
     }
 
     return 1;
-}
-
-// 0x005231A9
-int __cdecl Sound_PlaySample()
-{
-    int result;
-
-    if (gSoundFxIdx_dword_77D884 != -1)
-    {
-        result = gSoundFxIdx_dword_77D884;
-        if (g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884])
-            result = g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884]->Play(
-            0,
-            0,
-            1);
-    }
-
-    if (gSndBuffer_dword_77E2D0)
-    {
-        if (gSndState_dword_77E2D4 == 1)
-        {
-            result = gSndBuffer_dword_77E2D0->Play(0, 0, 1);
-        }
-    }
-
-    if (gSndBuffer_dword_77E0A0)
-    {
-        result = gSndBuffer_dword_77E0A0->Play(0, 0, 1);
-    }
-
-    return result;
-}
-
-// 0x0052307F
-void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, int a3, signed int a4)
-{
-    int pan;
-    int vol;
-
-    if (pSoundBuffer)
-    {
-        if (a2 < 0)
-        {
-            pan = Sound_TableUnknown1(100 * (a2 + 32) / 32, -10000, 0);
-        }
-        else
-        {
-            pan = -Sound_TableUnknown1(100 * (32 - a2) / 32, -10000, 0);
-        }
-        if (a4 > -2500)
-        {
-            vol = Sound_TableUnknown1(100 * a3 / 63, -2500, a4);
-        }
-        else
-        {
-            vol = a4;
-        }
-        pSoundBuffer->SetPan(pan);
-        pSoundBuffer->SetVolume(vol);
-    }
 }
