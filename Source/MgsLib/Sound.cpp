@@ -22,6 +22,10 @@ DWORD dword_77E1B4 = 0;
 DWORD dword_77E1C4 = 0;
 DWORD dword_77D87C = 0;
 DWORD gBlockAlign_dword_77E1DC = 0;
+LONG gSndVolume_dword_77D88C = 0;
+DWORD qword_77E1A8 = 0;
+DWORD dword_77D874 = 0;
+DWORD qword_77D898 = 0;
 
 void Sound_LoadBufferFromFile(const char*)
 {
@@ -225,6 +229,52 @@ signed int __cdecl Sound_CreateSecondarySoundBuffer()
     {
         gSndBuffer_dword_77E2D0->SetCurrentPosition(0);
         result = 1;
+    }
+    return result;
+}
+
+// 0x0052236D
+__int64 __cdecl Sound_FadeQ(int a1)
+{
+    __int64 result;
+    LARGE_INTEGER Frequency;
+    __int64 freq;
+    LARGE_INTEGER PerformanceCount;
+    __int64 v5;
+
+    if (gSndBuffer_dword_77E2D0)
+    {
+        if (gSndState_dword_77E2D4)
+        {
+            gSndBuffer_dword_77E2D0->GetVolume(&gSndVolume_dword_77D88C);
+            QueryPerformanceFrequency(&Frequency);
+            freq = Frequency.QuadPart;
+            QueryPerformanceCounter(&PerformanceCount);
+            qword_77E1A8 = static_cast<DWORD>(PerformanceCount.QuadPart);
+            dword_77D874 = -10000;
+            if (a1)
+            {
+                switch (a1)
+                {
+                case 1:
+                    v5 = 750i64;
+                    break;
+                case 2:
+                    v5 = 2000i64;
+                    break;
+                case 3:
+                    v5 = 3000i64;
+                    break;
+                }
+            }
+            else
+            {
+                v5 = 250i64;
+            }
+            result = freq * v5 / 1000;
+            qword_77D898 = static_cast<DWORD>(freq * v5 / 1000);
+            dword_77E2D8 = 1;
+        }
     }
     return result;
 }

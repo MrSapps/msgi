@@ -12,6 +12,7 @@ int __cdecl Sound_CloseWavStopQ();
 signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample, int samplesPerSecond, int a4, int a5);
 bool __cdecl Sound_CreatePrimarySoundBuffer();
 signed int __cdecl Sound_CreateSecondarySoundBuffer();
+__int64 __cdecl Sound_FadeQ(int a1);
 //
 int __cdecl Sound_InitFx();
 //
