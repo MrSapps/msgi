@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Sound.hpp"
+#include "File.hpp"
 
 IDirectSoundBuffer* gSndBuffer_dword_77E2D0 = nullptr;
 IDirectSoundBuffer* g128_Sound_buffers_dword_77DCA0[256] = {};
@@ -31,13 +32,6 @@ DWORD gSamp1PlayPos_dword_77E1D0 = 0;
 DWORD dword_68E318 = 0;
 DWORD dword_77E2CC = 0;
 DWORD dword_77E2F8 = 0;
-
-void Sound_LoadBufferFromFile(const char*)
-{
-    // TODO
-    abort();
-
-}
 
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
@@ -323,6 +317,7 @@ int __cdecl Sound_GetSomeStateQ()
     return gSndState_dword_77E2D4;
 }
 
+// 0x00522A33
 int __cdecl Sound_InitFx()
 {
     int result;
@@ -333,6 +328,85 @@ int __cdecl Sound_InitFx()
         Sound_LoadBufferFromFile(fxFileName);
         gFxState_dword_77D8A0[fxNum] = 0;
         result = fxNum + 1;
+    }
+    return result;
+}
+
+// 0x005227FF
+signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
+{
+    signed int result;
+    size_t v3;
+    char v4;
+    DWORD sizeToRead;
+    DSBUFFERDESC bufferDesc;
+    void* v9;
+    DWORD v10;
+    size_t fileNameLength; 
+    WAVEFORMATEX waveFormat;
+    void *soundBuffer;
+
+    gSoundFxIdx_dword_77D884 = -1;
+    fileNameLength = strlen(fileName) - 6;
+    const char v1 = 16 * Sound_CharUpperChangeQ(fileName[fileNameLength]);
+    const unsigned __int8 idx = Sound_CharUpperChangeQ(fileName[fileNameLength + 1]) + v1;
+    memset(&bufferDesc, 0, 36u);
+    bufferDesc.dwSize = 36;
+    bufferDesc.dwFlags = 0x100C8;
+    bufferDesc.lpwfxFormat = &waveFormat;
+    FILE* File = File_LoadDirFileQ(fileName, 0);
+    if (File
+        && (File_NormalRead(File, &v4, 20u), File_NormalRead(File, &waveFormat, 18u) == 18)
+        && (File_NormalRead(File, &v4, 2u), File_NormalRead(File, &sizeToRead, 4u) == 4))
+    {
+        bufferDesc.dwBufferBytes = sizeToRead;
+        if (gDSound_dword_77E2C0)
+        {
+            if (gDSound_dword_77E2C0->CreateSoundBuffer(
+                &bufferDesc,
+                (IDirectSoundBuffer **)g128_Sound_buffers_dword_77DCA0[idx],
+                0))
+            {
+                return 0;
+            }
+            g128_Sound_buffers_dword_77DCA0[idx]->SetCurrentPosition(0);
+            if (g128_Sound_buffers_dword_77DCA0[idx]->Lock(
+                0,
+                sizeToRead,
+                &soundBuffer,
+                &sizeToRead,
+                &v9,
+                &v10,
+                0) == 0x88780096)
+            {
+                g128_Sound_buffers_dword_77DCA0[idx]->Restore();
+                g128_Sound_buffers_dword_77DCA0[idx]->Lock(
+                    0,
+                    sizeToRead,
+                    &soundBuffer,
+                    &sizeToRead,
+                    &v9,
+                    &v10,
+                    0);
+            }
+            v3 = File_NormalRead(File, soundBuffer, sizeToRead);
+            if (v3 != sizeToRead)
+            {
+                return 0;
+            }
+            g128_Sound_buffers_dword_77DCA0[idx]->Unlock(
+                soundBuffer,
+                sizeToRead,
+                v9,
+                v10);
+        }
+        File_CloseQ(File);
+        result = 1;
+    }
+    else
+    {
+        File_CloseQ(File);
+        result = 0;
     }
     return result;
 }

@@ -235,5 +235,6 @@ public:
 };
 
 #define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);
+#define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, true, signature> name;
 #define MSG_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, signature> name(#name);
 #define MSG_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, true, decltype(funcName)> funcName##_(#funcName);

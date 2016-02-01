@@ -16,6 +16,7 @@ __int64 __cdecl Sound_FadeQ(int a1);
 bool __cdecl Sound_GetSamp1PosQ();
 int __cdecl Sound_GetSomeStateQ();
 int __cdecl Sound_InitFx();
+signed int __cdecl Sound_LoadBufferFromFile(const char *fileName);
 
 //
 int __cdecl Sound_PlaySample();

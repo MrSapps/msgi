@@ -20,6 +20,7 @@
 #include "logger.hpp"
 #include "MgsFunction.hpp"
 #include "Sound.hpp"
+#include "File.hpp"
 
 struct actor_related_struct;
 
@@ -77,7 +78,6 @@ MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_Unknown1);
 MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), sub_422BC0);
 MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
-MSG_FUNC_NOT_IMPL(0x0051EE8F, FILE *__cdecl(const char*, signed int), File_LoadDirFileQ);
 MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
 MSG_FUNC_NOT_IMPL(0x0040A37C, void(__cdecl *__cdecl(actor_related_struct*))(actor_related_struct*), Actor_Unknown2);
 MSG_FUNC_NOT_IMPL(0x0040A3FC, int __cdecl (actor_related_struct*), Actor_Unknown3);
