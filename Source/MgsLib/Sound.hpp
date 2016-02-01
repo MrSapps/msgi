@@ -38,7 +38,7 @@ int __cdecl Sound_TableUnknown1(int a1, int rate, int vol);
 // bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
 // bool __cdecl Sound_Unknown4()
 // int __cdecl Sound_Unknown5(int a1, int a2, int (__cdecl *a3)(_DWORD))
-// int __cdecl Sound_Unknown6()
+void __cdecl Sound_Unknown6();
 // void Sound_music_relatedQ()
 // int __cdecl Sound_music_set()
 // _BYTE *__cdecl Sound_set_noise_sound(int a2)

@@ -33,6 +33,7 @@ DWORD gSamp1PlayPos_dword_77E1D0 = 0;
 DWORD dword_68E318 = 0;
 DWORD dword_77E2CC = 0;
 DWORD dword_77E2F8 = 0;
+DWORD dword_68CE18 = 0;
 
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
@@ -473,6 +474,29 @@ void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, i
     }
 }
 
+// 0x00523466
+signed int __cdecl Sound_Stop2Samples()
+{
+    //sprintf(byte_77E0A4, "Play Stopped\n");
+    //OutputDebugStringA(byte_77E0A4);
+
+    if (gSndSamp1_dword_77E2C4)
+    {
+        gSndSamp1_dword_77E2C4->Stop();
+        gSndSamp1_dword_77E2C4->Release();
+        gSndSamp1_dword_77E2C4 = 0;
+    }
+
+    if (gSndSamp2_dword_77E2C8)
+    {
+        gSndSamp2_dword_77E2C8->Stop();
+        gSndSamp2_dword_77E2C8->Release();
+        gSndSamp2_dword_77E2C8 = 0;
+    }
+
+    return 1;
+}
+
 // 0x0052313B
 int __cdecl Sound_StopSample()
 {
@@ -527,25 +551,12 @@ int __cdecl Sound_TableUnknown1(int a1, int rate, int vol)
     return (a1 - 100 * (10 * a1 / 100) / 10) * v5 / 10 + v6;
 }
 
-// 0x00523466
-signed int __cdecl Sound_Stop2Samples()
+// 0x00523CB9
+void __cdecl Sound_Unknown6()
 {
-    //sprintf(byte_77E0A4, "Play Stopped\n");
-    //OutputDebugStringA(byte_77E0A4);
-
-    if (gSndSamp1_dword_77E2C4)
+    if (gSndBuffer_dword_77E0A0)
     {
-        gSndSamp1_dword_77E2C4->Stop();
-        gSndSamp1_dword_77E2C4->Release();
-        gSndSamp1_dword_77E2C4 = 0;
+        gSndBuffer_dword_77E0A0->SetVolume(dword_68CE18);
+        gSndBuffer_dword_77E0A0->Play(0, 0, 1);
     }
-
-    if (gSndSamp2_dword_77E2C8)
-    {
-        gSndSamp2_dword_77E2C8->Stop();
-        gSndSamp2_dword_77E2C8->Release();
-        gSndSamp2_dword_77E2C8 = 0;
-    }
-
-    return 1;
 }
