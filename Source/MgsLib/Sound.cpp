@@ -474,6 +474,35 @@ void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, i
     }
 }
 
+// 0x005226EB
+void __cdecl Sound_ShutDown()
+{
+    Sound_ReleaseSecondaryBuffer();
+
+    for (int i = 0; i < 128; ++i)
+    {
+        if (g128_Sound_buffers_dword_77DCA0[i])
+        {
+            g128_Sound_buffers_dword_77DCA0[i]->Stop();
+            g128_Sound_buffers_dword_77DCA0[i]->Release();
+            g128_Sound_buffers_dword_77DCA0[i] = 0;
+        }
+    }
+
+    if (gSoundBuffer_dword_77E1B0)
+    {
+        gSoundBuffer_dword_77E1B0->Stop();
+        gSoundBuffer_dword_77E1B0->Release();
+        gSoundBuffer_dword_77E1B0 = 0;
+    }
+
+    if (gDSound_dword_77E2C0)
+    {
+        gDSound_dword_77E2C0->Release();
+        gDSound_dword_77E2C0 = 0;
+    }
+}
+
 // 0x00523466
 signed int __cdecl Sound_Stop2Samples()
 {

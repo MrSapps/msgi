@@ -28,7 +28,7 @@ void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, i
 // signed int __cdecl Sound_RestoreRelatedQ(int a1, int (__cdecl *a2)(_DWORD), int (__cdecl *a3)(_DWORD))
 //signed int __cdecl Sound_Samp1Related(void *a1, unsigned int a2, IDirectSoundBuffer *snd, int a4)
 // signed int __cdecl Sound_Samp1Related_2(void *a1, unsigned int a2)
-// signed int __cdecl Sound_ShutDown()
+void __cdecl Sound_ShutDown();
 // signed int __cdecl Sound_Start2SamplesQ(_BYTE *a1)
 signed int __cdecl Sound_Stop2Samples();
 int __cdecl Sound_StopSample();
