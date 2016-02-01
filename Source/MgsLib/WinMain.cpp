@@ -19,10 +19,12 @@
 
 #include "logger.hpp"
 #include "MgsFunction.hpp"
+#include "Sound.hpp"
 
 struct actor_related_struct;
 
-MSG_FUNC_NOT_IMPL(0x0052269C, signed int __cdecl(HWND), SoundInit);
+MSG_FUNC_NOT_IMPL(0x0052269C, signed int __cdecl(HWND), Real_Sound_Init); // TODO: Remove and replace with calls to Sound_Init when completed
+
 MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
 MSG_FUNC_NOT_IMPL(0x005224C8, int __cdecl(int), sub_5224C8);
 MSG_FUNC_NOT_IMPL(0x0052255B, int __cdecl(int), sub_52255B);
@@ -2451,7 +2453,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     gHInstance = hInstance;
                     if (DoInitAll())
                     {
-                        if (SoundInit(gHwnd) || AskUserToContinueIfNoSoundCard())
+                        if (Real_Sound_Init(gHwnd) || AskUserToContinueIfNoSoundCard())
                         {
                             sub_5224C8(dword_651D98);
                             sub_52255B(dword_716F68);
