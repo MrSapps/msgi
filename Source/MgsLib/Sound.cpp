@@ -474,6 +474,18 @@ void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, i
     }
 }
 
+// 0x00521A18
+void __cdecl Sound_ReleaseSecondaryBuffer()
+{
+    dword_77E2F0 = 0;
+    if (gSndBuffer_dword_77E2D0)
+    {
+        gSndBuffer_dword_77E2D0->Stop();
+        gSndBuffer_dword_77E2D0->Release();
+        gSndBuffer_dword_77E2D0 = 0;
+    }
+}
+
 // 0x005226EB
 void __cdecl Sound_ShutDown()
 {
