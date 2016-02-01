@@ -864,7 +864,8 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     mgs_fprintf(gLogFile, "$Revision     = %i\n", DDrawDeviceIdentifier.dwRevision);
     mgs_fprintf(gLogFile, "$WHQLLevel    = %i\n", DDrawDeviceIdentifier.dwWHQLLevel);
 
-    if (DDrawDeviceIdentifier.dwVendorId = 0x8086)
+
+    if (DDrawDeviceIdentifier.dwVendorId == 0x8086)
     {
         mgs_fprintf(gLogFile, "Intel device found. Do not enumerate it as a valid rendering device.\n");
     }
@@ -875,6 +876,8 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
         pDirectDraw->Release();
         return TRUE;
     }
+
+    // These methods report junk on modern hardware
 
     memset(&ddCaps, 0, sizeof(DDSCAPS2));
     ddCaps.dwCaps = DDSCAPS_VIDEOMEMORY;
@@ -919,7 +922,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
         {
             MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", 0);
         }
-        identifier.field480 |= 0x40;
+        identifier.field480 |= 0x40; // Must mean "low vram" ?
     }
     else
     {
@@ -2417,10 +2420,14 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                 // HACK: Set some options that allow the game to actually start for now
                 gCheatsEnabled = 1;
                 gNoCrashCheck = 1;
-                gWindowedMode = 1;
                 gSoftwareRendering = 1;
                 gNoCdEnabled = 1;
                 gFps = 1;
+                
+                gWindowedMode = 1;
+                gModX2 = 1;
+                gLowRes = 1;
+              
 
                 gHwnd = CreateWindowExA(
                     0,
