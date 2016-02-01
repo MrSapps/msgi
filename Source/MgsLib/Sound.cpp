@@ -28,6 +28,7 @@ DWORD qword_77E1A8 = 0;
 DWORD dword_77D874 = 0;
 DWORD qword_77D898 = 0;
 IDirectSoundBuffer* gSndSamp1_dword_77E2C4 = nullptr;
+IDirectSoundBuffer* gSndSamp2_dword_77E2C8 = nullptr;
 DWORD gSamp1PlayPos_dword_77E1D0 = 0;
 DWORD dword_68E318 = 0;
 DWORD dword_77E2CC = 0;
@@ -465,6 +466,28 @@ int __cdecl Sound_TableUnknown1(int a1, int rate, int vol)
     return (a1 - 100 * (10 * a1 / 100) / 10) * v5 / 10 + v6;
 }
 
+// 0x00523466
+signed int __cdecl Sound_Stop2Samples()
+{
+    //sprintf(byte_77E0A4, "Play Stopped\n");
+    //OutputDebugStringA(byte_77E0A4);
+
+    if (gSndSamp1_dword_77E2C4)
+    {
+        gSndSamp1_dword_77E2C4->Stop();
+        gSndSamp1_dword_77E2C4->Release();
+        gSndSamp1_dword_77E2C4 = 0;
+    }
+
+    if (gSndSamp2_dword_77E2C8)
+    {
+        gSndSamp2_dword_77E2C8->Stop();
+        gSndSamp2_dword_77E2C8->Release();
+        gSndSamp2_dword_77E2C8 = 0;
+    }
+
+    return 1;
+}
 
 // 0x005231A9
 int __cdecl Sound_PlaySample()
