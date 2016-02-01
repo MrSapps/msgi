@@ -474,6 +474,16 @@ void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, i
     }
 }
 
+// 0x00523A1F
+void __cdecl Sound_ReleaseBufferQ()
+{
+    if (gSndBuffer_dword_77E0A0)
+    {
+        gSndBuffer_dword_77E0A0->Release();
+        gSndBuffer_dword_77E0A0 = 0;
+    }
+}
+
 // 0x00521A18
 void __cdecl Sound_ReleaseSecondaryBuffer()
 {

@@ -23,7 +23,7 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName);
 int __cdecl Sound_PlaySample();
 void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, int a3, signed int a4);
 // void __cdecl Sound_PopulateBufferQ()
-// int __cdecl Sound_ReleaseBufferQ()
+void __cdecl Sound_ReleaseBufferQ();
 void __cdecl Sound_ReleaseSecondaryBuffer();
 // signed int __cdecl Sound_RestoreRelatedQ(int a1, int (__cdecl *a2)(_DWORD), int (__cdecl *a3)(_DWORD))
 //signed int __cdecl Sound_Samp1Related(void *a1, unsigned int a2, IDirectSoundBuffer *snd, int a4)
