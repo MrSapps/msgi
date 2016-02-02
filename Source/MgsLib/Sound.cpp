@@ -68,6 +68,7 @@ DWORD* dword_68D030 = nullptr;
 DWORD* dword_68D000 = nullptr;
 DWORD* dword_68D004 = nullptr;
 
+DWORD* dword_68CEE4 = nullptr;
 
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
@@ -985,6 +986,112 @@ int __cdecl Sound_Unknown2(int a1)
 
     result = (a1 - 100 * (10 * a1 / 100) / 10) * v3 / 10;
     dword_68CE18 = result + v4;
+    return result;
+}
+
+// 0x00522CB2
+bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
+{
+    bool result; 
+    DWORD status;
+    int playFlags;
+    DWORD index;
+
+    if (!g128_Sound_buffers_dword_77DCA0[idx])
+    {
+        if (dword_68CEE4[dword_68CE34])
+        {
+            if (dword_68CE34 == 2)
+            {
+                switch (idx)
+                {
+                case 160u:
+                    idx += 2;
+                    break;
+                case 163u:
+                    idx -= 2;
+                    break;
+                case 164u:
+                case 165u:
+                    idx -= 3;
+                    break;
+                }
+            }
+            else if (idx != 162 && idx != 163)
+            {
+                if (idx == 164 || idx == 165)
+                {
+                    idx -= 4;
+                }
+            }
+            else
+            {
+                idx -= 2;
+            }
+        }
+    }
+
+    if (g128_Sound_buffers_dword_77DCA0[idx])
+    {
+        g128_Sound_buffers_dword_77DCA0[idx]->GetStatus(&status);
+        if (gFxState_dword_77D8A0[idx] && status & 1)
+        {
+            if (g64_dword_77D774[dword_77D894])
+            {
+                g64_dword_77D774[dword_77D894]->Stop();
+                g64_dword_77D774[dword_77D894]->Release();
+            }
+
+            gDSound_dword_77E2C0->DuplicateSoundBuffer(
+                g128_Sound_buffers_dword_77DCA0[idx],
+                &g64_dword_77D774[dword_77D894]);
+
+            index = dword_77D894++;
+            
+            if (dword_77D894 == 64)
+            {
+                dword_77D894 = 0;
+            }
+
+            Sound_PlaySampleRelated(g64_dword_77D774[index], a2, a3, dword_68CE18);
+            g64_dword_77D774[index]->SetCurrentPosition(0);
+            result = g64_dword_77D774[index]->Play( 0, 0, 0) == 0;
+        }
+        else
+        {
+            playFlags = 0;
+            if (gSoundFxIdx_dword_77D884 == -1)
+            {
+                if (dword_68CE34 == 10 && idx == 179
+                    || dword_68CE34 == 43 && idx == 192
+                    || dword_68CE34 == 38 && idx == 128
+                    || dword_68CE34 == 64 && idx == 183
+                    || (!dword_68CE34 || dword_68CE34 == 2 || dword_68CE34 == 16) && idx == 178)
+                {
+                    gSoundFxIdx_dword_77D884 = idx;
+                    playFlags = DSBPLAY_LOOPING;
+                }
+            }
+            else if (dword_68CE34 == 10 && idx == 181
+                || dword_68CE34 == 43 && idx == 182
+                || dword_68CE34 == 38 && idx == 181
+                || dword_68CE34 == 64 && (idx == 15 || idx == 195)
+                || (!dword_68CE34 || dword_68CE34 == 2 || dword_68CE34 == 16) && idx == 179
+                || idx == 26
+                || idx == 107)
+            {
+                g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884]->Stop();
+                gSoundFxIdx_dword_77D884 = -1;
+            }
+            Sound_PlaySampleRelated(g128_Sound_buffers_dword_77DCA0[idx], a2, a3, dword_68CE18);
+            g128_Sound_buffers_dword_77DCA0[idx]->SetCurrentPosition(0);
+            result = g128_Sound_buffers_dword_77DCA0[idx]->Play(0, 0, playFlags) == 0;
+        }
+    }
+    else
+    {
+        result = true;
+    }
     return result;
 }
 

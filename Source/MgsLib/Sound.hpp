@@ -35,8 +35,8 @@ int __cdecl Sound_StopSample();
 int __cdecl Sound_TableUnknown1(int a1, int rate, int vol);
 int __cdecl Sound_Unknown1(int a1);
 int __cdecl Sound_Unknown2(int a1);
+bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3);
 
-// bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
 // bool __cdecl Sound_Unknown4()
 // int __cdecl Sound_Unknown5(int a1, int a2, int (__cdecl *a3)(_DWORD))
 
