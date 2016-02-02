@@ -35,6 +35,16 @@ static DWORD gSamp1PlayPos_dword_77E1D0 = 0;
 static DWORD dword_68E318 = 0;
 static DWORD dword_77E2F8 = 0;
 static DWORD dword_68CE18 = 0;
+DWORD dword_77D894 = 0;
+DWORD dword_77E2F4 = 0;
+
+// Many unknowns in these
+char** off_68D0B4 = 0;
+char* byte_68D0B1 = 0;
+char* byte_68D0B0 = 0;
+__int16 unk_68D630[1550] = {};
+DWORD dword_68CE34 = 0;
+
 
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
@@ -416,7 +426,37 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
     return result;
 }
 
-DWORD dword_77D894 = 0;
+void __cdecl Sound_LoadFxRelatedQ(const char *Str1)
+{
+    char soundFileName[256];
+    unsigned __int16 soundNum;
+    int sampleSet;
+    int v5;
+
+    v5 = 0;
+    sampleSet = 0xFF;
+    for (int i = 0; i < 176; ++i)
+    {
+        if (!strcmp(Str1, off_68D0B4[2 * i]))
+        {
+            v5 = byte_68D0B1[8 * i];
+            sampleSet = byte_68D0B0[8 * i];
+            break;
+        }
+    }
+    dword_77E2F4 = v5;
+    for (int i = 0; i < 1550; ++i) // 82 is biggest samples in a set, 1550 is total number of sample set samples, excluding main/ones in root dir
+    {
+        soundNum = unk_68D630[i];
+        if ((((signed int)soundNum >> 8) & 127) == sampleSet)
+        {
+            sprintf(soundFileName, "%ssample%02x/0x%02x.wav", "efx/", sampleSet, soundNum);
+            Sound_LoadBufferFromFile(soundFileName);
+            gFxState_dword_77D8A0[soundNum] = 0;
+        }
+    }
+    dword_68CE34 = sampleSet;
+}
 
 // 0x00522B8D
 void __cdecl Sound_LoadFxRelatedQ2(const char *Str1)
