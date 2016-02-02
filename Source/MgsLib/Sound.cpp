@@ -2,38 +2,41 @@
 #include "Sound.hpp"
 #include "File.hpp"
 
-IDirectSoundBuffer* gSndBuffer_dword_77E2D0 = nullptr;
-IDirectSoundBuffer* g128_Sound_buffers_dword_77DCA0[256] = {};
-IDirectSoundBuffer* gSndBuffer_dword_77E0A0 = nullptr;
-DWORD gSndState_dword_77E2D4 = 0;
-DWORD gSoundFxIdx_dword_77D884 = 0;
-DWORD* dword_68D084;
-DWORD* dword_68D088;
-DWORD* dword_68D058;
-DWORD* dword_68D05C;
-IDirectSoundBuffer* g64_dword_77D774[64] = {};
-DWORD dword_77E2DC = 0;
-DWORD dword_77E2F0 = 0;
-DWORD gWaveFile_dword_68CE30 = 0;
-DWORD dword_77E2D8;
-IDirectSound* gDSound_dword_77E2C0 = nullptr;
-IDirectSoundBuffer* gSoundBuffer_dword_77E1B0 = nullptr;
-DWORD* gFxState_dword_77D8A0 = 0;
-DWORD dword_77E1B4 = 0;
-DWORD dword_77E1C4 = 0;
-DWORD dword_77D87C = 0;
-DWORD gBlockAlign_dword_77E1DC = 0;
-LONG gSndVolume_dword_77D88C = 0;
-DWORD qword_77E1A8 = 0;
-DWORD dword_77D874 = 0;
-DWORD qword_77D898 = 0;
-IDirectSoundBuffer* gSndSamp1_dword_77E2C4 = nullptr;
-IDirectSoundBuffer* gSndSamp2_dword_77E2C8 = nullptr;
-DWORD gSamp1PlayPos_dword_77E1D0 = 0;
-DWORD dword_68E318 = 0;
-DWORD dword_77E2CC = 0;
-DWORD dword_77E2F8 = 0;
-DWORD dword_68CE18 = 0;
+using QWORD = __int64;
+
+static IDirectSoundBuffer* gSndBuffer_dword_77E2D0 = nullptr;
+static IDirectSoundBuffer* g128_Sound_buffers_dword_77DCA0[256] = {};
+static IDirectSoundBuffer* gSndBuffer_dword_77E0A0 = nullptr;
+static DWORD gSndState_dword_77E2D4 = 0;
+static DWORD gSoundFxIdx_dword_77D884 = 0;
+static DWORD* dword_68D058; // part of below array?
+static DWORD* dword_68D05C; // 21 array?
+static DWORD* dword_68D084; // part of below array?
+static DWORD* dword_68D088; // 10 array?
+static IDirectSoundBuffer* g64_dword_77D774[64] = {};
+static DWORD dword_77E2DC = 0;
+static DWORD dword_77E2F0 = 0;
+static DWORD gWaveFile_dword_68CE30 = 0;
+static DWORD dword_77E2D8;
+static IDirectSound* gDSound_dword_77E2C0 = nullptr;
+static IDirectSoundBuffer* gSoundBuffer_dword_77E1B0 = nullptr;
+static DWORD* gFxState_dword_77D8A0 = 0; // 256 array?
+static DWORD dword_77E1B4 = 0;
+static DWORD dword_77E1C4 = 0;
+static DWORD dword_77D87C = 0;
+static DWORD gBlockAlign_dword_77E1DC = 0;
+static LONG gSndVolume_dword_77D88C = 0;
+static QWORD qword_77E1A8 = 0;
+static DWORD dword_77D874 = 0;
+static QWORD qword_77D898 = 0;
+static IDirectSoundBuffer* gSndSamp1_dword_77E2C4 = nullptr;
+static IDirectSoundBuffer* gSndSamp2_dword_77E2C8 = nullptr;
+static DWORD gSamp1PlayPos_dword_77E1D0 = 0;
+static DWORD dword_68E318 = 0;
+static DWORD dword_77E2F8 = 0;
+static DWORD dword_68CE18 = 0;
+
+VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
@@ -252,7 +255,7 @@ __int64 __cdecl Sound_FadeQ(int a1)
             QueryPerformanceFrequency(&Frequency);
             freq = Frequency.QuadPart;
             QueryPerformanceCounter(&PerformanceCount);
-            qword_77E1A8 = static_cast<DWORD>(PerformanceCount.QuadPart);
+            qword_77E1A8 = PerformanceCount.QuadPart;
             dword_77D874 = -10000;
             if (a1)
             {
@@ -274,7 +277,7 @@ __int64 __cdecl Sound_FadeQ(int a1)
                 v5 = 250i64;
             }
             result = freq * v5 / 1000;
-            qword_77D898 = static_cast<DWORD>(freq * v5 / 1000);
+            qword_77D898 = freq * v5 / 1000;
             dword_77E2D8 = 1;
         }
     }
@@ -413,6 +416,18 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
     return result;
 }
 
+DWORD dword_77D894 = 0;
+
+// 0x00522B8D
+void __cdecl Sound_LoadFxRelatedQ2(const char *Str1)
+{
+    for (int i = 0; i < 64; ++i)
+    {
+        g64_dword_77D774[i] = 0;
+    }
+    dword_77D894 = 0;
+    Sound_LoadFxRelatedQ(Str1);
+}
 
 // 0x005231A9
 int __cdecl Sound_PlaySample()
@@ -423,23 +438,25 @@ int __cdecl Sound_PlaySample()
     {
         result = gSoundFxIdx_dword_77D884;
         if (g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884])
+        {
             result = g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884]->Play(
-            0,
-            0,
-            1);
+                0,
+                0,
+                DSBPLAY_LOOPING);
+        }
     }
 
     if (gSndBuffer_dword_77E2D0)
     {
         if (gSndState_dword_77E2D4 == 1)
         {
-            result = gSndBuffer_dword_77E2D0->Play(0, 0, 1);
+            result = gSndBuffer_dword_77E2D0->Play(0, 0, DSBPLAY_LOOPING);
         }
     }
-
+    
     if (gSndBuffer_dword_77E0A0)
     {
-        result = gSndBuffer_dword_77E0A0->Play(0, 0, 1);
+        result = gSndBuffer_dword_77E0A0->Play(0, 0, DSBPLAY_LOOPING);
     }
 
     return result;
@@ -608,6 +625,6 @@ void __cdecl Sound_Unknown6()
     if (gSndBuffer_dword_77E0A0)
     {
         gSndBuffer_dword_77E0A0->SetVolume(dword_68CE18);
-        gSndBuffer_dword_77E0A0->Play(0, 0, 1);
+        gSndBuffer_dword_77E0A0->Play(0, 0, DSBPLAY_LOOPING);
     }
 }

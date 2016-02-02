@@ -7,6 +7,8 @@
 #include "logger.hpp"
 #include "detours.h"
 
+#define VAR(type,name,addr) type& name = *(type*)addr;
+
 inline std::ostream& operator<<(std::ostream& out, IID id)
 {
     // TODO: Print GUIDS properly

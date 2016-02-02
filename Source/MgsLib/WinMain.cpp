@@ -193,7 +193,6 @@ DWORD& dword_651D98 = *((DWORD*)0x651D98);
 DWORD& dword_716F68 = *((DWORD*)0x716F68);
 
 
-#define VAR(type,name,addr) type& name = *(type*)addr;
 VAR(DWORD, dword_77C934, 0x77C934);
 VAR(BYTE, byte_9AD8A5, 0x9AD8A5);
 VAR(BYTE, byte_9AD8A7, 0x9AD8A7);
