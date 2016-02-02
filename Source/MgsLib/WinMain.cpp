@@ -19,10 +19,13 @@
 
 #include "logger.hpp"
 #include "MgsFunction.hpp"
+#include "Sound.hpp"
+#include "File.hpp"
 
 struct actor_related_struct;
 
-MSG_FUNC_NOT_IMPL(0x0052269C, signed int __cdecl(HWND), SoundInit);
+MSG_FUNC_NOT_IMPL(0x0052269C, signed int __cdecl(HWND), Real_Sound_Init); // TODO: Remove and replace with calls to Sound_Init when completed
+
 MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
 MSG_FUNC_NOT_IMPL(0x005224C8, int __cdecl(int), sub_5224C8);
 MSG_FUNC_NOT_IMPL(0x0052255B, int __cdecl(int), sub_52255B);
@@ -75,13 +78,14 @@ MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_Unknown1);
 MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), sub_422BC0);
 MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
-MSG_FUNC_NOT_IMPL(0x0051EE8F, FILE *__cdecl(const char*, signed int), File_LoadDirFileQ);
 MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
 MSG_FUNC_NOT_IMPL(0x0040A37C, void(__cdecl *__cdecl(actor_related_struct*))(actor_related_struct*), Actor_Unknown2);
 MSG_FUNC_NOT_IMPL(0x0040A3FC, int __cdecl (actor_related_struct*), Actor_Unknown3);
 MSG_FUNC_NOT_IMPL(0x0040A2AF, actor_related_struct *__cdecl(int, actor_related_struct *, void(__cdecl *)(actor_related_struct*)), Actor_Unknown4);
 MSG_FUNC_NOT_IMPL(0x0040A3ED, actor_related_struct *__cdecl(actor_related_struct*), Actor_SetFnPtr);
 MSG_FUNC_NOT_IMPL(0x0040A006, int __cdecl(), Actor_Init);
+MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
+
 
 
 // We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
@@ -189,7 +193,6 @@ DWORD& dword_651D98 = *((DWORD*)0x651D98);
 DWORD& dword_716F68 = *((DWORD*)0x716F68);
 
 
-#define VAR(type,name,addr) type& name = *(type*)addr;
 VAR(DWORD, dword_77C934, 0x77C934);
 VAR(BYTE, byte_9AD8A5, 0x9AD8A5);
 VAR(BYTE, byte_9AD8A7, 0x9AD8A7);
@@ -226,6 +229,98 @@ VAR(DWORD, dword_721E78, 0x721E78);
 VAR(DWORD, dword_7348FC, 0x7348FC);
 VAR(DWORD, dword_650D4C, 0x650D4C);
 VAR(char*, gDest, 0x0078E7C0);
+
+struct weapon_famas
+{
+    actor_related_struct mActor;
+    DWORD field_44_a1;
+    DWORD field_48_a2;
+    DWORD field_4C_a3;
+    DWORD field_50_a4;
+    DWORD field_54;
+    DWORD field_58;
+    DWORD mbIsMp5;
+};
+static_assert(sizeof(weapon_famas) == 96, "weapon_famas should be 96");
+
+VAR(WORD, word_995368, 0x995368);
+VAR(WORD, word_995320, 0x995320);
+VAR(WORD, word_78E804, 0x78E804);
+
+MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
+MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
+
+actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, int fn2, char *srcFileName);
+
+MSG_FUNC_NOT_IMPL(0x0040B38E, int __cdecl(char*), ResourceRequestQ);
+MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
+MSG_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
+
+//MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
+signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, int a3, int bMp5)
+{
+    int v4; // esi@1
+    int res; // eax@2
+    signed int result; // eax@5
+
+    v4 = (int)&a1->mActor.actor_struct_ptr2;
+    if (bMp5)
+        res = ResourceRequestQ("mpfive");
+    else
+        res = ResourceRequestQ("famas");
+    sub_44FF7C(v4, res, 109);
+    if (*(DWORD *)v4)
+    {
+        sub_45011B(v4, a2, a3);
+        result = 0;
+    }
+    else
+    {
+        result = -1;
+    }
+    return result;
+}
+
+weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(actor_related_struct *a1, actor_related_struct *a2, void(__cdecl *a3)(actor_related_struct *), void(__cdecl *a4)(DWORD), int bMp5)
+{
+    weapon_famas *pFamas; // eax@1 MAPDST
+    int v8; // eax@5
+    __int16 v9; // cx@6
+
+    pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
+    if (pFamas)
+    {
+        Actor_Unknown6(&pFamas->mActor, (int)Res_famas_sub_640CDC.Ptr(), (int)sub_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
+        if (Res_Weapon_famas_init_sub_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
+        {
+            Actor_SetFnPtr(&pFamas->mActor);
+            return 0;
+        }
+        pFamas->field_58 = 0;
+        pFamas->field_44_a1 = (int)a1;
+        pFamas->field_48_a2 = (int)a2;
+        pFamas->field_4C_a3 = (int)a3;
+        pFamas->field_50_a4 = (int)a4;
+        pFamas->field_54 = 1;
+        pFamas->mbIsMp5 = bMp5;
+    }
+    v8 = (word_995368 != 0) + 25;                 // 25 is the ammo clip size
+    if (bMp5)
+    {
+        word_995368 = (word_995368 != 0) + 25; // Remainder in clip
+        word_995320 = v8; // clip size?
+    }
+    else
+    {
+        v9 = word_78E804;
+        if (v8 > 0 && word_78E804 > v8)
+            v9 = (word_995368 != 0) + 25;
+        word_995320 = (word_995368 != 0) + 25;
+        word_995368 = v9;
+    }
+    return pFamas;
+}
+MSG_FUNC_IMPL(0x640C24, Res_Weapon_famas_96_sub_640C24);
 
 //MSG_FUNC_NOT_IMPL(0x0040A0D4, int __cdecl(), Actor_DumpActorSystem);
 int __cdecl Actor_DumpActorSystem()
@@ -964,7 +1059,8 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     mgs_fprintf(gLogFile, "$Revision     = %i\n", DDrawDeviceIdentifier.dwRevision);
     mgs_fprintf(gLogFile, "$WHQLLevel    = %i\n", DDrawDeviceIdentifier.dwWHQLLevel);
 
-    if (DDrawDeviceIdentifier.dwVendorId = 0x8086)
+
+    if (DDrawDeviceIdentifier.dwVendorId == 0x8086)
     {
         mgs_fprintf(gLogFile, "Intel device found. Do not enumerate it as a valid rendering device.\n");
     }
@@ -975,6 +1071,8 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
         pDirectDraw->Release();
         return TRUE;
     }
+
+    // These methods report junk on modern hardware
 
     memset(&ddCaps, 0, sizeof(DDSCAPS2));
     ddCaps.dwCaps = DDSCAPS_VIDEOMEMORY;
@@ -1019,7 +1117,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
         {
             MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", 0);
         }
-        identifier.field480 |= 0x40;
+        identifier.field480 |= 0x40; // Must mean "low vram" ?
     }
     else
     {
@@ -2313,6 +2411,8 @@ int __cdecl Actor_Unknown()
     actor_related_struct *pActor; // [sp+14h] [bp-4h]@1
 
     pActor = gActors;
+
+
     for (i = 9; i > 0; --i)
     {
         if (!(dword_791A0C & pActor->mPause))
@@ -2322,6 +2422,9 @@ int __cdecl Actor_Unknown()
             {
                 v1 = v2->actor_struct_ptr1;
                 fn = v2->fn_unknown;
+
+               // bool isFamasFunc = fn == (void*)0x640CDC;
+
                 if (fn)
                 {
                     fn(v2);
@@ -2512,10 +2615,14 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                 // HACK: Set some options that allow the game to actually start for now
                 gCheatsEnabled = 1;
                 gNoCrashCheck = 1;
-                gWindowedMode = 1;
                 gSoftwareRendering = 1;
                 gNoCdEnabled = 1;
                 gFps = 1;
+                
+                gWindowedMode = 1;
+                gModX2 = 1;
+                gLowRes = 1;
+              
 
                 gHwnd = CreateWindowExA(
                     0,
@@ -2539,7 +2646,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     gHInstance = hInstance;
                     if (DoInitAll())
                     {
-                        if (SoundInit(gHwnd) || AskUserToContinueIfNoSoundCard())
+                        if (Real_Sound_Init(gHwnd) || AskUserToContinueIfNoSoundCard())
                         {
                             sub_5224C8(dword_651D98);
                             sub_52255B(dword_716F68);
