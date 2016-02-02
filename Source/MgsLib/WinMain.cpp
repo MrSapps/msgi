@@ -683,6 +683,9 @@ MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
 MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(void*, void*, int), File_msgvideocfg_Read);
 
 VAR(DWORD, dword_68C3B8, 0x68C3B8);
+VAR(uint8_t, byte_775F48, 0x775F48);
+VAR(uint8_t, byte_774B48, 0x774B48);
+VAR(uint8_t, byte_776450, 0x776450);
 
 // TODO : make jim_enumerate_devices use this structure too
 struct jimDeviceIdentifier
@@ -734,7 +737,129 @@ jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
 jimUnk0x488* array_776B68 = (jimUnk0x488*)0x776B68;
 jimDeviceIdentifier* g_pDeviceIdentifiers = (jimDeviceIdentifier*)0x776B68;
 
-MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), sub_51E7FC);
+//MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), validateDeviceCaps);
+int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription, LPSTR lpDeviceName, jimDeviceIdentifier* pIdentifier)
+{
+    byte_775F48 = 0;
+    byte_774B48 = 0;
+    byte_776450 = 0;
+
+    char* pStringError = (char*)&byte_776450;
+    char* pStringWarning = (char*)&byte_774B48;
+    char localString[0x100];
+    uint32_t status = 0;
+
+    if (pIdentifier->ddIdentifier.dwVendorId == 0x8086)
+    {
+        strcat(pStringError, "Intel device found. Software only.\n");
+        status = 1;
+    }
+
+    if (pDesc->dwMaxTextureWidth < 0x100 || pDesc->dwMaxTextureHeight < 0x100)
+    {
+        strcat(pStringError, "E2a:\tMaximum Texture Width/Height is below game requirement of 256\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_ALPHA))
+    {
+        strcat(pStringError, "E2b:\tNo Texture Alpha Channel support\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_POW2))
+    {
+        strcat(pStringError, "E2e:\tBilinear filtering not supported\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_TRANSPARENCY) || !(pDesc->dpcTriCaps.dwAlphaCmpCaps & D3DPCMPCAPS_GREATEREQUAL))
+    {
+        strcat(pStringError, "E3a:\tNo Texture Transparency or Alpha Test (GREATEROREQUAL) support\n");
+        status = 1;
+    }
+    if (pDesc->dpcTriCaps.dwRasterCaps & D3DPRASTERCAPS_ZBUFFERLESSHSR)
+    {
+        strcat(pStringError, "E5a:\tDevice is PoverVR like, which is not supported\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwShadeCaps & (D3DPSHADECAPS_ALPHAFLATBLEND || D3DPSHADECAPS_ALPHAGOURAUDBLEND)))
+    {
+        strcat(pStringError, "E6a:\tFlat or Gourad Alpha Flat Blending required\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwShadeCaps & D3DPSHADECAPS_COLORGOURAUDRGB))
+    {
+        strcat(pStringError, "E6b:\tRGB Color Gouraud Shading required\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwSrcBlendCaps & D3DPBLENDCAPS_ONE))
+    {
+        strcat(pStringError, "E7a:\tSRCBLEND_ONE required\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwSrcBlendCaps & D3DPBLENDCAPS_ZERO))
+    {
+        strcat(pStringError, "E7a:\tSRCBLEND_ZERO required\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwDestBlendCaps & D3DPBLENDCAPS_ONE))
+    {
+        strcat(pStringError, "E7a:\tSRCBLEND_ONE required\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwDestBlendCaps & D3DPBLENDCAPS_ZERO))
+    {
+        strcat(pStringError, "E7a:\tSRCBLEND_ZERO required\n");
+        status = 1;
+    }
+    if (!(pDesc->dpcTriCaps.dwSrcBlendCaps & D3DPBLENDCAPS_ONE))
+    {
+        strcat(pStringError, "E7a:\tSRCBLEND_ONE required\n");
+        status = 1;
+    }
+    
+    if (!(pDesc->dpcTriCaps.dwSrcBlendCaps & D3DPBLENDCAPS_SRCALPHA) || !(pDesc->dpcTriCaps.dwDestBlendCaps & (D3DPBLENDCAPS_INVSRCCOLOR | D3DPBLENDCAPS_SRCALPHA)))
+    {
+        strcat(pStringWarning, "W1:\tDevice doesn't support minimum blending modes required\n");
+        status |= 2;
+    }
+    if (pDesc->dwDevCaps & D3DDEVCAPS_SORTEXACT)
+    {
+        strcat(pStringWarning, "W2:\tDevice requires SORTEXACT feature, which may cause visual artifacts\n");
+        status |= 2;
+    }
+    if (pDesc->dwDevCaps & D3DDEVCAPS_SORTDECREASINGZ)
+    {
+        strcat(pStringWarning, "W3:\tDevice requires SORTDECREASINGZ\n");
+        status |= 2;
+    }
+    if (!(pDesc->dpcTriCaps.dwRasterCaps & D3DPRASTERCAPS_SUBPIXEL))
+    {
+        strcat(pStringWarning, "W4:\tDevice can't render with subpixel accurate\n");
+        status |= 2;
+    }
+    if (!(pDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_PERSPECTIVE))
+    {
+        strcat(pStringWarning, "W5:\tDevice can't render with perspective correct texture mapping\n");
+        status |= 2;
+    }
+    
+    uint32_t field480 = pIdentifier->field480;
+    if (((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (byte_776450 != 0))
+    {
+        sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.szDescription, lpDeviceName);
+        strcat(pStringError, "\n\tDevice doesn't meet minimum requirements, and will be ignored by the game\n");
+        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
+    }
+    else if (((field480 & 2) == 0) && ((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (byte_774B48 != 0))
+    {
+        sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.szDescription, lpDeviceName);
+        strcat(pStringWarning, "\n\tDevice doesn't support everything the game needs\nBut it will be allowed for selection in Option/Advanced Menu\n");
+        MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+    }
+
+    pIdentifier->field480 |= status;
+
+    return pIdentifier->field480;
+}
 
 HRESULT CALLBACK EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
 {
@@ -798,7 +923,7 @@ HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDevice
     pGlobalIdentifier->field480 = pIdentifier->field480;
     pGlobalIdentifier->field484 = pIdentifier->field484;
 
-    sub_51E7FC(pDesc, lpDeviceDescription, lpDeviceName, pGlobalIdentifier);
+    validateDeviceCaps(pDesc, lpDeviceDescription, lpDeviceName, pGlobalIdentifier);
 
     dword_77C608++;
 
