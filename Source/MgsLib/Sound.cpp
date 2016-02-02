@@ -55,6 +55,13 @@ DWORD dword_77E2EC = 0;
 DWORD dword_77E2E8 = 0;
 DWORD dword_77E1C0 = 0;
 
+DWORD dword_77E1C8 = 0;
+DWORD dword_77E1BC = 0;
+DWORD dword_77D770 = 0;
+DWORD dword_77D878 = 0;
+DWORD dword_77E1A4 = 0;
+BYTE byte_77D888 = 0;
+
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
 // 0x0052269C
@@ -772,6 +779,74 @@ void __cdecl Sound_ShutDown()
         gDSound_dword_77E2C0->Release();
         gDSound_dword_77E2C0 = 0;
     }
+}
+
+// 0x00523232
+signed int __cdecl Sound_Start2SamplesQ(BYTE *a1)
+{
+    DSBUFFERDESC bufferDesc;
+    WAVEFORMATEX waveFormat;
+    
+    if (gSoundFxIdx_dword_77D884 != -1 && dword_68CE34 == 38)
+    {
+        g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884]->Stop();
+        gSoundFxIdx_dword_77D884 = -1;
+    }
+
+    if (gSndSamp1_dword_77E2C4)
+    {
+        Sound_Stop2Samples();
+    }
+    
+    if (!a1)
+    {
+        return 0;
+    }
+
+    dword_77E1C8 = *a1 << 24;
+    dword_77E1C8 |= a1[1] << 16;
+    dword_77E1C8 |= a1[2] << 8;
+    dword_77E1C8 |= a1[3];
+    dword_77E1BC = a1[4] << 8;
+    dword_77E1BC |= a1[5];
+    dword_77D770 = a1[6] << 8;
+    dword_77D770 |= a1[7];
+    dword_77D878 = a1[9];
+    dword_77E1A4 = a1[8] != 1;
+    waveFormat.wFormatTag = 1;
+    waveFormat.nChannels = 1;
+    waveFormat.nSamplesPerSec = 21 * dword_77D770 / 2;
+    waveFormat.nAvgBytesPerSec = 2 * waveFormat.nSamplesPerSec;
+    waveFormat.nBlockAlign = 2;
+    waveFormat.wBitsPerSample = 16;
+    waveFormat.cbSize = 0;
+    memset(&bufferDesc, 0, 36u);
+    bufferDesc.dwSize = 36;
+    bufferDesc.dwFlags = 65736;
+    bufferDesc.dwBufferBytes = 176400;
+    bufferDesc.lpwfxFormat = &waveFormat;
+    
+    if (gDSound_dword_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndSamp1_dword_77E2C4, 0))
+    {
+        return 0;
+    }
+
+    gSndSamp1_dword_77E2C4->SetCurrentPosition(0);
+    if (dword_77E1A4)
+    {
+        if (gDSound_dword_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndSamp2_dword_77E2C8, 0))
+        {
+            return 0;
+        }
+        gSndSamp2_dword_77E2C8->SetCurrentPosition(0);
+        gSndSamp1_dword_77E2C4->SetPan(-10000);
+        gSndSamp2_dword_77E2C8->SetPan(10000);
+    }
+    dword_77E2F8 = 0;
+    dword_68E318 = -1;
+    dword_77E2CC = 0;
+    byte_77D888 = 0;
+    return 1;
 }
 
 // 0x00523466
