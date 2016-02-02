@@ -70,6 +70,12 @@ DWORD* dword_68D004 = nullptr;
 
 DWORD* dword_68CEE4 = nullptr;
 
+DWORD dword_77D880 = 0;
+DWORD dword_77E1B8 = 0;
+DWORD dword_77E1CC = 0;
+DWORD dword_77E1D8 = 0;
+DWORD gSndTime_dword_77D890 = 0;
+
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
 // 0x0052269C
@@ -1093,6 +1099,50 @@ bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
         result = true;
     }
     return result;
+}
+
+// 0x00523E12
+bool __cdecl Sound_Unknown4()
+{
+    DWORD v2;
+    bool ret;
+    int v4;
+    DWORD pos;
+
+    if (gSndBuffer_dword_77E0A0)
+    {
+        v4 = gBlockAlign_dword_77E1DC * dword_77D87C;
+        dword_77D880 += gBlockAlign_dword_77E1DC * dword_77D87C;
+        gSndBuffer_dword_77E0A0->GetCurrentPosition(&pos, 0);
+        if (dword_77E1B8 - pos > dword_77E1B4 / 2)
+        {
+            ++dword_77E1CC;
+        }
+        dword_77E1B8 = pos;
+        v2 = dword_77E1C4 * v4 + pos + dword_77E1B4 * dword_77E1CC;
+        ret = dword_77D880 < v2 || dword_77D880 > v4 + v2;
+        while (dword_77D880 >= v2 && dword_77D880 <= v4 + v2)
+        {
+            gSndBuffer_dword_77E0A0->GetCurrentPosition(&pos, 0);
+            if (dword_77E1B8 - pos > dword_77E1B4 / 2)
+            {
+                ++dword_77E1CC;
+            }
+            dword_77E1B8 = pos;
+
+            // dead statement?
+            v2 = dword_77E1C4 * v4 + pos + dword_77E1B4 * dword_77E1CC;
+        }
+    }
+    else
+    {
+        ret = 1000 * dword_77E1D8 / 15 < timeGetTime() - gSndTime_dword_77D890;
+        while (timeGetTime() - gSndTime_dword_77D890 <= 1000 * dword_77E1D8 / 15)
+        {
+
+        }
+    }
+    return ret;
 }
 
 // 0x00523CB9
