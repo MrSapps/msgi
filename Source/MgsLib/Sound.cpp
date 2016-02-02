@@ -78,6 +78,8 @@ DWORD gSndTime_dword_77D890 = 0;
 
 DWORD dword_77E1D4 = 0;
 
+DWORD dword_77E2E4 = 0;
+
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
 // 0x0052269C
@@ -743,6 +745,155 @@ void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, i
         }
         pSoundBuffer->SetPan(pan);
         pSoundBuffer->SetVolume(vol);
+    }
+}
+
+// 0x00521F82
+void __cdecl Sound_PopulateBufferQ()
+{
+    DWORD v0;
+    DWORD v1;
+    LARGE_INTEGER PerformanceCount;
+    __int64 v3;
+    void* v4;
+    void* v5;
+    DWORD v6;
+    DWORD nNumberOfBytesToRead;
+    DWORD a1;
+    int v9;
+    LONG lDistanceToMove;
+    BYTE buffer[18];
+    int v12;
+    int v13;
+
+    if (gSndBuffer_dword_77E2D0)
+    {
+        if (gSndState_dword_77E2D4)
+        {
+            QueryPerformanceCounter(&PerformanceCount);
+            v3 = PerformanceCount.QuadPart;
+            if (PerformanceCount.QuadPart - qword_77E1A8 <= qword_77D898)
+            {
+                a1 = static_cast<DWORD>(100 * (v3 - qword_77E1A8) / qword_77D898);
+                v13 = Sound_TableUnknown1(a1, gSndVolume_dword_77D88C, dword_77D874);
+                gSndBuffer_dword_77E2D0->SetVolume(v13);
+            }
+            else
+            {
+                gSndBuffer_dword_77E2D0->SetVolume(dword_77D874);
+                if (dword_77E2D8)
+                {
+                    Sound_CloseWavStopQ();
+                }
+            }
+
+            v12 = 0x2000;
+
+            if (dword_77E2EC < 0x2000)
+            {
+                v12 = dword_77E2EC;
+            }
+
+            gSndBuffer_dword_77E2D0->GetCurrentPosition(&dword_77E2E4, 0);
+
+            if (dword_77E2E4 <= dword_77E2E8)
+            {
+                dword_77E2E4 += 176400;
+            }
+
+            if (dword_68CE2C == -1 || dword_77E2E4 < dword_77E2E8 || dword_77E2E4 >= dword_68CE2C)
+            {
+                if (v12 + dword_77E2E8 <= dword_77E2E4)
+                {
+                    if (gSndBuffer_dword_77E2D0->Lock(
+                        dword_77E2E8,
+                        v12,
+                        &v5,
+                        &nNumberOfBytesToRead,
+                        &v4,
+                        &v6,
+                        0) == 0x88780096)
+                    {
+                        gSndBuffer_dword_77E2D0->Restore();
+                        gSndBuffer_dword_77E2D0->Lock(
+                            dword_77E2E8,
+                            v12,
+                            &v5,
+                            &nNumberOfBytesToRead,
+                            &v4,
+                            &v6,
+                            0);
+                    }
+                    
+                    v0 = _read(gWaveFile_dword_68CE30, v5, nNumberOfBytesToRead);
+                    
+                    if (v0 != nNumberOfBytesToRead)
+                    {
+                        _close(gWaveFile_dword_68CE30);
+                        gWaveFile_dword_68CE30 = -1;
+                        gSndState_dword_77E2D4 = 0;
+                    }
+
+                    if (nNumberOfBytesToRead < 0x2000)
+                    {
+                        v1 = _read(gWaveFile_dword_68CE30, v4, v6);
+                        if (v1 != v6)
+                        {
+                            _close(gWaveFile_dword_68CE30);
+                            gWaveFile_dword_68CE30 = -1;
+                            gSndState_dword_77E2D4 = 0;
+                        }
+                    }
+
+                    gSndBuffer_dword_77E2D0->Unlock(v5, nNumberOfBytesToRead, v4, v6);
+                    dword_77E2E8 += v12;
+
+                    if (dword_77E2E8 >= 0x2B110)
+                    {
+                        dword_77E2E8 -= 176400;
+                    }
+
+                    if (dword_77E2EC == v12)
+                    {
+                        dword_77E2EC = 0;
+                        v9 = 1;
+                    }
+                    else
+                    {
+                        dword_77E2EC -= 0x2000;
+                        v9 = 0;
+                    }
+
+                    if (v9)
+                    {
+                        lDistanceToMove = 0;
+                        if (_read(gWaveFile_dword_68CE30, buffer, 68u) == 68 && _read(gWaveFile_dword_68CE30, buffer, 12u) == 12)
+                        {
+                            buffer[11] = 0;
+                            lDistanceToMove = 441
+                                * (10
+                                * (10 * (10 * (10 * (buffer[5] - 48) + buffer[6] - 48) + buffer[8] - 48) + buffer[9] - 48)
+                                + buffer[10]
+                                - 48)
+                                / 10;
+                        }
+                        _lseek(gWaveFile_dword_68CE30, 40, 0);
+                        _read(gWaveFile_dword_68CE30, &dword_77E2EC, 4u);
+                        _lseek(gWaveFile_dword_68CE30, lDistanceToMove, 1u);
+                        dword_77E2EC -= lDistanceToMove;
+
+                        if (dword_77E2E0)
+                        {
+                            dword_68CE2C = dword_77E2E8;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Sound_CloseWavStopQ();
+            }
+        }
     }
 }
 
