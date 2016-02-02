@@ -76,6 +76,8 @@ DWORD dword_77E1CC = 0;
 DWORD dword_77E1D8 = 0;
 DWORD gSndTime_dword_77D890 = 0;
 
+DWORD dword_77E1D4 = 0;
+
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
 // 0x0052269C
@@ -1143,6 +1145,64 @@ bool __cdecl Sound_Unknown4()
         }
     }
     return ret;
+}
+
+// 0x00523CF3
+int __cdecl Sound_Unknown5(int a1, int a2, BYTE*(__cdecl* fnRead)(DWORD))
+{
+    void *sndPtr;
+    DWORD sndBufSize;
+    void *Dst;
+    DWORD Size;
+    int v8;
+    BYTE *Src;
+
+    Src = fnRead(a1);
+    if (Src)
+    {
+        v8 = gBlockAlign_dword_77E1DC * dword_77D87C;
+        if (gSndBuffer_dword_77E0A0)
+        {
+            if (gSndBuffer_dword_77E0A0->Lock(
+                dword_77E1D4,
+                v8,
+                &Dst,
+                &Size,
+                &sndPtr,
+                &sndBufSize,
+                0) == 0x88780096)
+            {
+                gSndBuffer_dword_77E0A0->Restore();
+                gSndBuffer_dword_77E0A0->Lock(
+                    dword_77E1D4,
+                    v8,
+                    &Dst,
+                    &Size,
+                    &sndPtr,
+                    &sndBufSize,
+                    0);
+            }
+            if (Dst)
+            {
+                memcpy(Dst, Src, Size);
+            }
+            
+            if (sndPtr)
+            {
+                memcpy(sndPtr, Src + Size, sndBufSize);
+            }
+
+            gSndBuffer_dword_77E0A0->Unlock(Dst, Size, sndPtr, sndBufSize);
+        }
+        
+        dword_77E1D4 += v8;
+
+        if (dword_77E1D4 >= dword_77E1B4)
+        {
+            dword_77E1D4 = 0;
+        }
+    }
+    return dword_77E1D8++ + 1;
 }
 
 // 0x00523CB9
