@@ -65,6 +65,9 @@ BYTE byte_77D888 = 0;
 DWORD* dword_68D02C = nullptr;
 DWORD* dword_68D030 = nullptr;
 
+DWORD* dword_68D000 = nullptr;
+DWORD* dword_68D004 = nullptr;
+
 
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
@@ -957,6 +960,31 @@ int __cdecl Sound_Unknown1(int a1)
         result = dword_77E1C0;
         dword_77D874 = dword_77E1C0;
     }
+    return result;
+}
+
+// 0x005224C8
+int __cdecl Sound_Unknown2(int a1)
+{
+    int result;
+    int v2;
+    int v3;
+    int v4;
+
+    v2 = 10 * a1 / 100;
+    v4 = 10000 * dword_68D000[v2] / 100 - 10000;
+
+    if (v2 == 10)
+    {
+        v3 = 0;
+    }
+    else
+    {
+        v3 = 10000 * dword_68D004[v2] / 100 - 10000 - v4;
+    }
+
+    result = (a1 - 100 * (10 * a1 / 100) / 10) * v3 / 10;
+    dword_68CE18 = result + v4;
     return result;
 }
 
