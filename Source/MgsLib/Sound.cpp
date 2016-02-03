@@ -919,6 +919,68 @@ void __cdecl Sound_ReleaseSecondaryBuffer()
     }
 }
 
+// 0x00523B2C
+signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BYTE*(__cdecl *a3)(DWORD))
+{
+    BYTE* v4;
+    void* v6;
+    BYTE* v7;
+    DWORD v8;
+    DWORD v9;
+    BYTE *pDst;
+    size_t Size;
+
+    Size = gBlockAlign_dword_77E1DC * dword_77D87C;
+    pDst = 0;
+    if (gSndBuffer_dword_77E0A0)
+    {
+        if (gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0) == 0x88780096)
+        {
+            gSndBuffer_dword_77E0A0->Restore();
+            gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0);
+        }
+        pDst = v7;
+    }
+    for (unsigned int i = 0; i < dword_77E1C4; ++i)
+    {
+        if (!fnRead(a1))
+        {
+            if (gSndBuffer_dword_77E0A0)
+            {
+                gSndBuffer_dword_77E0A0->Unlock(v7, v9, v6, v8);
+            }
+            return 0;
+        }
+        
+        v4 = a3(a1);
+
+        if (v4)
+        {
+            if (gSndBuffer_dword_77E0A0)
+            {
+                if (pDst)
+                {
+                    memcpy(pDst, v4, Size);
+                    pDst = pDst + Size;
+                }
+            }
+        }
+    }
+
+    if (gSndBuffer_dword_77E0A0)
+    {
+        gSndBuffer_dword_77E0A0->Unlock(v7, v9, v6, v8);
+    }
+
+    dword_77E1D4 = dword_77E1C4 * Size;
+    dword_77D880 = dword_77E1C4 * Size;
+    dword_77E1CC = 0;
+    dword_77E1B8 = 0;
+    gSndTime_dword_77D890 = timeGetTime();
+    dword_77E1D8 = 0;
+    return 1;
+}
+
 // 0x005226EB
 void __cdecl Sound_ShutDown()
 {
