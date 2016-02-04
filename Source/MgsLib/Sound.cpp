@@ -80,6 +80,16 @@ DWORD dword_77E1D4 = 0;
 
 DWORD dword_77E2E4 = 0;
 
+
+float* byte_68E2D0 = nullptr; // XA K0
+double dbl_77E300;
+double dbl_77E308;
+double dbl_77E310;
+double dbl_77E318;
+double* dbl_77E1E0;
+double* dbl_77E1E8;
+DWORD* dword_68E2C8;
+
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
 // 0x0052269C
@@ -979,6 +989,192 @@ signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BY
     gSndTime_dword_77D890 = timeGetTime();
     dword_77E1D8 = 0;
     return 1;
+}
+
+// 0x00523563
+signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuffer *snd, int a4)
+{
+    signed int result;
+    signed int v5;
+    double v6;
+    size_t v7;
+    double v8;
+    unsigned int Size;
+    signed int i;
+    signed int j;
+    WORD *v12;
+    int v13;
+    WORD *Dst;
+    DWORD v15;
+    DWORD v16;
+    int v17;
+    int v18;
+    unsigned int v19;
+    int v20;
+    int v21;
+    WORD *v22;
+    char *v23;
+
+    if (!a1)
+    {
+        a2 = 4096;
+    }
+
+    if (a2 & 0xF)
+    {
+        result = 0;
+    }
+    else
+    {
+        Size = 7 * a2 >> 1;
+        if (snd)
+        {
+            snd->GetCurrentPosition(&gSamp1PlayPos_dword_77E1D0, 0);
+            
+            if (gSamp1PlayPos_dword_77E1D0 <= dword_77E2F8)
+            {
+                gSamp1PlayPos_dword_77E1D0 += 176400;
+            }
+
+            if (dword_68E318 == -1)
+            {
+                if (Size + dword_77E2F8 <= gSamp1PlayPos_dword_77E1D0)
+                {
+                    if (snd->Lock(dword_77E2F8, Size, (LPVOID*)&Dst, &v16, (LPVOID*)&v12, &v15, 0) == 0x88780096)
+                    {
+                        snd->Restore();
+                        snd->Lock(dword_77E2F8, Size, (LPVOID*)&Dst, &v16, (LPVOID*)&v12, &v15, 0);
+                    }
+                    if (a1)
+                    {
+                        if (a4)
+                        {
+                            v8 = dbl_77E300;
+                            v6 = dbl_77E308;
+                        }
+                        else
+                        {
+                            v8 = dbl_77E310;
+                            v6 = dbl_77E318;
+                        }
+                        if (a4)
+                            dword_77E2F8 += Size;
+                        if (dword_77E2F8 >= 0x2B110)
+                            dword_77E2F8 -= 176400;
+                        v22 = Dst;
+                        v7 = v16;
+                        v19 = 0;
+                        v5 = 0;
+                        while (v19 < a2)
+                        {
+                            v20 = *a1;
+                            v23 = a1 + 1;
+                            v13 = v20 & 0xF;
+                            v20 >>= 4;
+                            v21 = *v23;
+                            a1 = v23 + 1;
+                            if (v21 == 7)
+                                v5 = 1;
+                            if (!v13)
+                                memset(a1, 0, 0xEu);
+                            if (v5)
+                            {
+                                v13 = 12;
+                                v20 = 0;
+                                v21 = 2;
+                                memset(a1, 0, 0xEu);
+                                break;
+                            }
+                            for (i = 0; i < 28; i += 2)
+                            {
+                                v17 = *a1;
+                                a1 = a1 + 1;
+                                v18 = (v17 & 0xF) << 12;
+                                if (((v17 & 0xF) << 12) & 0x8000)
+                                    v18 |= 0xFFFF0000;
+                                dbl_77E1E0[i] = (v18 >> v13);
+                                v18 = (v17 & 0xF0) << 8;
+                                if (((v17 & 0xF0) << 8) & 0x8000)
+                                    v18 |= 0xFFFF0000;
+                                dbl_77E1E8[i] = (v18 >> v13);
+                            }
+                            for (j = 0; j < 28; ++j)        // xa 28?
+                            {
+                                dbl_77E1E0[j] = v8 * *&dword_68E2C8[4 * v20] + dbl_77E1E0[j] + v6 * byte_68E2D0[2 * v20];
+                                v6 = v8;
+                                v8 = dbl_77E1E0[j];
+                                if (!v7)
+                                {
+                                    v22 = v12;
+                                    v7 = v15;
+                                }
+                                *v22 = dbl_77E1E0[j];
+                                ++v22;
+                                v7 -= 2;
+                            }
+                            v19 += 16;
+                        }
+                    }
+                    else
+                    {
+                        if (Size == v16)
+                        {
+                            memset(Dst, 0, Size);
+                        }
+                        else
+                        {
+                            memset(Dst, 0, v16);
+                            memset(v12, 0, v15);
+                        }
+
+                        if (a4)
+                        {
+                            dword_68E318 = gSamp1PlayPos_dword_77E1D0;
+                        }
+                    }
+                    snd->Unlock(Dst, v16, v12, v15);
+                    if (!byte_77D888)
+                    {
+                        snd->SetVolume(dword_68CE18);
+                        snd->Play(0, 0, 1);
+                        if (a4)
+                        {
+                            byte_77D888 = 1;
+                        }
+                    }
+                    if (a4)
+                    {
+                        dbl_77E300 = v8;
+                        dbl_77E308 = v6;
+                    }
+                    else
+                    {
+                        dbl_77E310 = v8;
+                        dbl_77E318 = v6;
+                    }
+                    result = 1;
+                }
+                else
+                {
+                    result = 0;
+                }
+            }
+            else
+            {
+                if (gSamp1PlayPos_dword_77E1D0 >= dword_77E2F8 && gSamp1PlayPos_dword_77E1D0 < dword_68E318)
+                {
+                    dword_77E2CC = 1;
+                    dword_68E318 = -1;
+                }
+                result = 1;
+            }
+        }
+        else
+        {
+            result = 0;
+        }
+    }
+    return result;
 }
 
 // 0x005226EB
