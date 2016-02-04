@@ -58,7 +58,7 @@ struct prim_struct
     DWORD field_0;
     WORD field_4;
     WORD field_6;
-    DWORD field_8;
+    DWORD mShadeMode;
     DWORD mPrimTypeQ;
     DWORD dwVertexCount;
 };
