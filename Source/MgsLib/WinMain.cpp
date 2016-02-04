@@ -60,7 +60,7 @@ struct prim_struct
     WORD field_6;
     DWORD field_8;
     DWORD mPrimTypeQ;
-    DWORD field_10;
+    DWORD dwVertexCount;
 };
 static_assert(sizeof(prim_struct) == 0x14, "prim_struct should be 0x14");
 prim_struct* gPrimBuffer_dword_6C0EFC = (prim_struct*)0x6C0EFC; // Array of 15000 items?
