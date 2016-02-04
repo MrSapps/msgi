@@ -92,6 +92,43 @@ DWORD* dword_68E2C8;
 
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
+/*
+MSG_FUNC_IMPL(0x0052269C, Sound_Init);
+MSG_FUNC_IMPL(0x005227AD, Sound_CharUpperChangeQ);
+MSG_FUNC_IMPL(0x00522BCE, Sound_CleanUpRelated);
+MSG_FUNC_IMPL(0x00522466, Sound_CloseWavStopQ);
+MSG_FUNC_IMPL(0x00523A44, Sound_CreateBufferQ);
+MSG_FUNC_IMPL(0x00522601, Sound_CreatePrimarySoundBuffer);
+MSG_FUNC_IMPL(0x00521982, Sound_CreateSecondarySoundBuffer);
+MSG_FUNC_IMPL(0x0052236D, Sound_FadeQ);
+MSG_FUNC_IMPL(0x005234EA, Sound_GetSamp1PosQ);
+MSG_FUNC_IMPL(0x005224BE, Sound_GetSomeStateQ);
+MSG_FUNC_IMPL(0x00522A33, Sound_InitFx);
+MSG_FUNC_IMPL(0x005227FF, Sound_LoadBufferFromFile);
+MSG_FUNC_IMPL(0x00522A9C, Sound_LoadFxRelatedQ);
+MSG_FUNC_IMPL(0x00522B8D, Sound_LoadFxRelatedQ2);
+MSG_FUNC_IMPL(0x00521A54, Sound_MxdWavRelated);
+MSG_FUNC_IMPL(0x005231A9, Sound_PlaySample);
+MSG_FUNC_IMPL(0x0052307F, Sound_PlaySampleRelated);
+MSG_FUNC_IMPL(0x00521F82, Sound_PopulateBufferQ);
+MSG_FUNC_IMPL(0x00523A1F, Sound_ReleaseBufferQ);
+MSG_FUNC_IMPL(0x00521A18, Sound_ReleaseSecondaryBuffer);
+MSG_FUNC_IMPL(0x00523B2C, Sound_RestoreRelatedQ);
+MSG_FUNC_IMPL(0x00523563, Sound_Samp1Related);
+MSG_FUNC_IMPL(0x005239B5, Sound_Samp1Related_2);
+MSG_FUNC_IMPL(0x005226EB, Sound_ShutDown);
+MSG_FUNC_IMPL(0x00523232, Sound_Start2SamplesQ);
+MSG_FUNC_IMPL(0x00523466, Sound_Stop2Samples);
+MSG_FUNC_IMPL(0x0052313B, Sound_StopSample);
+MSG_FUNC_IMPL(0x00521898, Sound_TableUnknown1);
+MSG_FUNC_IMPL(0x0052255B, Sound_Unknown1);
+MSG_FUNC_IMPL(0x005224C8, Sound_Unknown2);
+MSG_FUNC_IMPL(0x00522CB2, Sound_Unknown3);
+MSG_FUNC_IMPL(0x00523E12, Sound_Unknown4);
+MSG_FUNC_IMPL(0x00523CF3, Sound_Unknown5);
+MSG_FUNC_IMPL(0x00523CB9, Sound_Unknown6);
+*/
+
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
 {
@@ -122,13 +159,16 @@ signed int __cdecl Sound_Init(HWND hwnd)
 char __cdecl Sound_CharUpperChangeQ(char value)
 {
     char ret;
-
     if (value < '0' || value > '9')
     {
         if (toupper(value) < 'A' || toupper(value) > 'F')
+        {
             ret = 0;
+        }
         else
+        {
             ret = toupper(value) - '7';
+        }
     }
     else
     {
@@ -470,6 +510,7 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
     return result;
 }
 
+// 0x00522A9C
 void __cdecl Sound_LoadFxRelatedQ(const char *Str1)
 {
     char soundFileName[256];
