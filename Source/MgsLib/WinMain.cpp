@@ -791,10 +791,10 @@ VAR(DWORD*, dword_776B90, 0x776B90);
 VAR(DWORD, dword_716F74, 0x716F74);
 VAR(DWORD, gXSize_dword_6DF214, 0x6DF214);
 VAR(DWORD, dword_650D2C, 0x650D2C);
-VAR(DWORD*, dword_6FC728, 0x6FC728);
+VAR(DWORD*, gImageBufer_dword_6FC728, 0x6FC728);
 VAR(void*, dword_6DEF7C, 0x6DEF7C);
 VAR(void*, dword_6DEF90, 0x6DEF90);
-VAR(void*, dword_6FC72C, 0x6FC72C);
+VAR(void*, gPixelBuffer_dword_6FC72C, 0x6FC72C);
 VAR(DWORD, dword_6FC798, 0x6FC798);
 VAR(DWORD, dword_6FC7C0, 0x6FC7C0);
 VAR(DWORD, dword_716F6C, 0x716F6C);
@@ -2003,14 +2003,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         gRenderRelated_dword_6FC780 = (rend_struct*)mgs_malloc(0x75300u); // 15000 items
     }
-    dword_6FC728 = (DWORD*)mgs_malloc(0x100000u);
-    if (dword_6FC728)
+    gImageBufer_dword_6FC728 = (DWORD*)mgs_malloc(0x100000u);
+    if (gImageBufer_dword_6FC728)
     {
-        memset(dword_6FC728, 0, 0x100000u);
-        dword_6FC72C = mgs_malloc(0x100000u);
-        if (dword_6FC728)
+        memset(gImageBufer_dword_6FC728, 0, 0x100000u);
+        gPixelBuffer_dword_6FC72C = mgs_malloc(0x100000u);
+        if (gImageBufer_dword_6FC728)
         {
-            memset(dword_6FC728, -1, 0x100000u);
+            memset(gImageBufer_dword_6FC728, -1, 0x100000u);
             _cfltcvt_init();
             memset(&unk_6C0778, 0, 0x400u);
             dword_6DEF7C = mgs_malloc(0x200u);
