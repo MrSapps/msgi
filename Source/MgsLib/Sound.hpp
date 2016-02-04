@@ -27,7 +27,7 @@ void __cdecl Sound_ReleaseBufferQ();
 void __cdecl Sound_ReleaseSecondaryBuffer();
 signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *a2)(DWORD), BYTE*(__cdecl *a3)(DWORD));
 signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuffer *snd, int a4); // Seems to do XA conversion
-// signed int __cdecl Sound_Samp1Related_2(void *a1, unsigned int a2);
+signed int __cdecl Sound_Samp1Related_2(char *a1, unsigned int a2);
 void __cdecl Sound_ShutDown();
 signed int __cdecl Sound_Start2SamplesQ(BYTE *a1);
 signed int __cdecl Sound_Stop2Samples();
@@ -39,6 +39,7 @@ bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3);
 bool __cdecl Sound_Unknown4();
 int __cdecl Sound_Unknown5(int a1, int a2, BYTE*(__cdecl *a3)(DWORD));
 void __cdecl Sound_Unknown6();
+
 // void Sound_music_relatedQ()
 // int __cdecl Sound_music_set()
 // _BYTE *__cdecl Sound_set_noise_sound(int a2)

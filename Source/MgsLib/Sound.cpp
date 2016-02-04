@@ -1108,7 +1108,7 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
                                     v22 = v12;
                                     v7 = v15;
                                 }
-                                *v22 = dbl_77E1E0[j];
+                                *v22 = static_cast<WORD>(dbl_77E1E0[j]);
                                 ++v22;
                                 v7 -= 2;
                             }
@@ -1173,6 +1173,25 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
         {
             result = 0;
         }
+    }
+    return result;
+}
+
+// 0x005239B5
+signed int __cdecl Sound_Samp1Related_2(char *a1, unsigned int a2)
+{
+    signed int result;
+
+    if (!a1)
+        a2 = 0;
+    if (dword_77E1A4)
+    {
+        Sound_Samp1Related(a1, a2 >> 1, gSndSamp1_dword_77E2C4, 0);
+        result = Sound_Samp1Related(&a1[a2 >> 1], a2 >> 1, gSndSamp2_dword_77E2C8, 1);
+    }
+    else
+    {
+        result = Sound_Samp1Related(a1, a2, gSndSamp1_dword_77E2C4, 1);
     }
     return result;
 }
