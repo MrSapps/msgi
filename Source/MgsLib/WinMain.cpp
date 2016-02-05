@@ -557,11 +557,11 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             gKeys[wParam] = lParam;
         }
         gKeys[wParam] = lParam;
-        if (wParam > 0x76)
+        if (wParam > VK_F7)
         {
             switch (wParam)
             {
-            case 0x77u:
+            case VK_F8:
                 if (gCheatsEnabled)
                 {
                     dword_688CD0 = 0;
@@ -572,7 +572,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                     result = 0;
                 }
                 break;
-            case 0x78u:
+            case VK_F9:
                 if (gCheatsEnabled)
                 {
                     dword_688CD0 = 1;
@@ -583,7 +583,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                     result = 0;
                 }
                 break;
-            case 0x7Au:
+            case VK_F11:
                 if (gCheatsEnabled)
                 {
                     dword_688CD4 ^= 1u;
@@ -595,7 +595,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                 }
                 break;
             default:
-                if (wParam != 123)
+                if (wParam != VK_F12)
                     goto LABEL_108;
                 if (gCheatsEnabled)
                 {
@@ -611,7 +611,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
         }
         else
         {
-            if (wParam == 118)
+            if (wParam == VK_F7)
             {
                 if (gCheatsEnabled)
                 {
@@ -627,7 +627,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             }
             else
             {
-                if (wParam == 27)
+                if (wParam == VK_ESCAPE)
                 {
                     dword_791DE4 = 1;
                     if (stru_722760.field_3C != 0x20000000 || !strstr(gDest, "s19a"))
@@ -641,7 +641,9 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                                     if (!dword_733E34)
                                     {
                                         if (!dword_721E78)
+                                        {
                                             dword_717354 = 1;
+                                        }
                                     }
                                 }
                             }
@@ -651,7 +653,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                 }
                 switch (wParam)
                 {
-                case 0x71u:
+                case VK_F2:
                     if (gCheatsEnabled)
                     {
                         if (dword_7348FC)
@@ -665,7 +667,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                         result = 0;
                     }
                     break;
-                case 0x73u:
+                case VK_F4:
                     if (gCheatsEnabled)
                     {
                         dword_650D4C ^= 1u;
@@ -676,7 +678,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                         result = 0;
                     }
                     break;
-                case 0x74u:
+                case VK_F5:
                     if (gCheatsEnabled)
                     {
                         dword_77C934 = 0;
@@ -688,7 +690,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                     }
                     break;
                 default:
-                    if (wParam != 117)
+                    if (wParam != VK_F6)
                         goto LABEL_108;
                     if (gCheatsEnabled)
                     {
