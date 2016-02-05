@@ -1000,13 +1000,13 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
     {
         sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.szDescription, lpDeviceName);
         strcat(pStringError, "\n\tDevice doesn't meet minimum requirements, and will be ignored by the game\n");
-        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
+        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
     }
     else if (((field480 & 2) == 0) && ((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (byte_774B48 != 0))
     {
         sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.szDescription, lpDeviceName);
         strcat(pStringWarning, "\n\tDevice doesn't support everything the game needs\nBut it will be allowed for selection in Option/Advanced Menu\n");
-        MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+        MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
     }
 
     pIdentifier->field480 |= status;
@@ -1173,7 +1173,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     {
         if ((identifier.field480 & 0x40) == 0 && (identifier.field480 & 1) == 0)
         {
-            MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", 0);
+            MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", MB_OK);
         }
         identifier.field480 |= 0x40; // Must mean "low vram" ?
     }
@@ -1341,7 +1341,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     DDPIXELFORMAT pixelFormat3 = pixelFormat;
 
 
-    gFile = mgs_fopen("profile.log", "w"); // TODO: Other un-impl funcs using this file handle seem to blow up
+    gFile = mgs_fopen("profile.log", "w");
     mgs_fputs("InitAll {\n", gFile);
     mgs_fflush(gFile);
     gLogFile = gFile;
@@ -1377,7 +1377,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     0,
                     "Game crashed during previous initialization, game starting software rendering mode...",
                     "Metal Gear Solid",
-                    0);
+                    MB_OK);
                 gSoftwareRendering = 1;
                 dword_716F5C = 1.0f;
                 gXRes = 1.0f;
@@ -1404,7 +1404,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 0,
                 "Your video configuration has been updated - your system will be re-profiled\n",
                 "Metal Gear Solid (PC)",
-                0);
+                MB_OK);
             v55 = 0;
             if (sub_41EC40())
             {
@@ -1417,7 +1417,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 lpGuid = 0;
                 gXRes = 1.0f;
                 dword_716F5C = 1.0f;
-                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
             }
             gWindowedMode = 0;
             sub_433801();
@@ -1457,7 +1457,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             dword_716F5C = 1.0f;
             gXRes = 1.0f;
             lpGuid = 0;
-            MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+            MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
         }
         sub_431C63();
     }
@@ -1530,7 +1530,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 gXRes = 1.0f;
                 gXSize_dword_6DF214 = (signed __int64)(320.0 * gXRes);
                 gYSize = (signed __int64)(240.0 * gXRes);
-                MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
+                MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
@@ -1925,7 +1925,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             {
                 g_pDirect3DDevice->Release();
                 g_pDirect3DDevice = 0;
-                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
                 gSoftwareRendering = 1;
             }
             break;
@@ -1935,7 +1935,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gXSize_dword_6DF214 = 320;
         gYSize = 240;
         mgs_fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", gXSize_dword_6DF214, gYSize);
-        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
+        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
         gSoftwareRendering = 1;
         dword_716F5C = 1.0f;
         gXRes = dword_716F5C; // TODO: Float
@@ -2053,7 +2053,7 @@ signed int __cdecl DoInitAll()
 
     //v1 = InitD3d_ProfileGfxHardwareQ_Test();
     v1 = InitD3d_ProfileGfxHardwareQ();
-    MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", 0);
+    MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
     return v1;
 }
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
@@ -2530,8 +2530,9 @@ signed int __cdecl Main()
         if (gExitMainGameLoop)
             break;
 
-        // HACK: The game crashes somewhere deep in here, not calling this seems to prevent the game
-        // state from progressing
+        // HACK: Somtimes the game crashes somewhere deep in here, not calling this seems to prevent the game
+        // state from progressing.
+        // In software rendering mode when gameover it will crash, but this is an existing bug of the game.
         Actor_Unknown();
     }
     return result;
@@ -2682,11 +2683,11 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     0,
                     WndClass.lpszClassName,
                     "Metal Gear Solid PC",
-                    0x80C80000u,
-                    0x80000000u,
-                    0x80000000u,
-                    0x80000000u,
-                    0x80000000u,
+                    WS_POPUP | WS_CAPTION | WS_SYSMENU,
+                    CW_USEDEFAULT, // x
+                    CW_USEDEFAULT, // y
+                    CW_USEDEFAULT, // w
+                    CW_USEDEFAULT, // h
                     0,
                     0,
                     hInstance,
@@ -2744,7 +2745,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                 Dest,
                 "Metal Gear Solid requires over 50mb of hard disk space as Virtual Memory before the game can function correctly. This system currently only has %dmb available.  Please close all open applications not in use,  and refer to the Metal Gear Solid readme for more information on this issue.",
                 (Buffer.dwAvailPageFile - Buffer.dwAvailPhys) >> 20);
-            MessageBoxA(0, Dest, "Metal Gear Solid PC", 0);
+            MessageBoxA(0, Dest, "Metal Gear Solid PC", MB_OK);
             result = 0;
         }
     }
@@ -2754,7 +2755,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             0,
             "Another copy of Metal Gear Solid Integral or VR missions is running, please exit first.",
             "Metal Gear Solid PC",
-            0);
+            MB_OK);
         result = 0;
     }
 
