@@ -132,8 +132,8 @@ MSG_FUNC_IMPL(0x00522CB2, Sound_PlayEffect);
 MSG_FUNC_IMPL(0x00523E12, Sound_Unknown4);
 MSG_FUNC_IMPL(0x00523CF3, Sound_Unknown5);
 MSG_FUNC_IMPL(0x00523CB9, Sound_Unknown6);
-
-
+MSG_FUNC_IMPL(0x00646660, Sound_Play);
+MSG_FUNC_IMPL(0x0044FF6C, Sound_jPlay);
 
 #pragma comment(lib, "Winmm.lib") // timegettime()
 
@@ -1697,4 +1697,28 @@ void __cdecl Sound_Unknown6()
         gSndBuffer_dword_77E0A0->SetVolume(dword_68CE18);
         gSndBuffer_dword_77E0A0->Play(0, 0, DSBPLAY_LOOPING);
     }
+}
+
+// 0x00646660
+int __cdecl Sound_Play(unsigned int playingFlags)
+{
+    int result;
+    if (playingFlags & 0xFF000000)
+    {
+        if ((playingFlags & 0xFF000000) == 0x1000000)
+            Sound_PlayMusic(playingFlags & 0xFFFFFF);
+        result = 0;
+    }
+    else
+    {
+        Sound_PlayEffect(playingFlags, (playingFlags >> 16), playingFlags >> 8);
+        result = 0;
+    }
+    return result;
+}
+
+// 0x0044FF6C
+int __cdecl Sound_jPlay(int playingFlags)
+{
+    return Sound_Play(playingFlags);
 }

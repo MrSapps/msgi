@@ -41,7 +41,8 @@ bool __cdecl Sound_PlayEffect(unsigned __int8 idx, int a2, int a3);
 bool __cdecl Sound_Unknown4();
 int __cdecl Sound_Unknown5(int a1, int a2, BYTE*(__cdecl *a3)(DWORD));
 void __cdecl Sound_Unknown6();
-
+int __cdecl Sound_Play(unsigned int playingFlags);
+int __cdecl Sound_jPlay(int playingFlags);
 
 // void Sound_music_relatedQ()
 // int __cdecl Sound_music_set()
