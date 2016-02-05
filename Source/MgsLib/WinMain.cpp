@@ -361,7 +361,7 @@ int __cdecl Actor_DumpActorSystem()
 
 
 //MSG_FUNC_NOT_IMPL(0x0051C2D3, signed int __stdcall(HWND, UINT, UINT, LPARAM), MainWindowProc);
-signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
+LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
 {
     float v4; // ST08_4@14
     float v5; // ST04_4@14
@@ -389,46 +389,48 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
         dword_734908 = 9 * dword_734908 / 10;
         dword_73490C = 9 * dword_73490C / 10;
     }
-    if (Msg > 0x102)
+    if (Msg > WM_CHAR)
     {
         switch (Msg)
         {
-        case 0x104u:
+        case WM_SYSKEYDOWN:
             gKeys[wParam] = lParam;
             gvirtualKeyRepeatCount = lParam;
             gVirtualKeyCode = wParam;
             if (wParam < 0x100)
                 byte_9AD880[wParam] = 1;
-            if ((unsigned __int16)gVirtualKeyCode == 18)
+            if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
             {
                 gAltPressed = 1;
                 return 0;
             }
-            if ((unsigned __int16)gVirtualKeyCode == 121)
+            if ((unsigned __int16)gVirtualKeyCode == VK_F10)
             {
                 dword_71D194 = 1;
                 gF10Pressed = 1;
                 return 0;
             }
             break;
-        case 0x105u:                              // WM_SYSKEYUP
+
+        case WM_SYSKEYUP:
             gvirtualKeyRepeatCount = lParam;
             gVirtualKeyCode = wParam;
             if (wParam < 0x100)
                 byte_9AD880[wParam] = 0;
-            if ((unsigned __int16)gVirtualKeyCode == 18)// VK_MENU
+            if ((unsigned __int16)gVirtualKeyCode == VK_MENU) 
             {
                 gAltPressed = 0;
                 return 0;
             }
-            if ((unsigned __int16)gVirtualKeyCode == 121)// VK_F10
+            if ((unsigned __int16)gVirtualKeyCode == VK_F10) 
             {
                 gF10Pressed = 0;
                 Actor_DumpActorSystem();
                 return 0;
             }
             break;
-        case 0x200u:
+
+        case WM_MOUSEMOVE:
             if (dword_77C934)
             {
                 dword_734908 = (unsigned __int16)lParam - dword_734900;
@@ -437,17 +439,18 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                 dword_734904 = (unsigned int)lParam >> 16;
             }
             break;
-        case 0x218u:
-            return 1112363332;
+
+        case WM_POWERBROADCAST:
+            return BROADCAST_QUERY_DENY;
         }
         return DefWindowProcA(hWnd, Msg, wParam, lParam);
     }
-    if (Msg == 258)
+    if (Msg == WM_CHAR)
     {
         byte_9AD988 = wParam;
         return DefWindowProcA(hWnd, Msg, wParam, lParam);
     }
-    if (Msg == 6)
+    if (Msg == WM_ACTIVATE)
     {
         if ((WORD)wParam)
         {
@@ -465,7 +468,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
     }
     else
     {
-        if (Msg == 15)
+        if (Msg == WM_PAINT)
         {
             printf("$jim - WM_PAINT\n");
             if (dword_71D17C)
@@ -475,18 +478,18 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
             }
             return DefWindowProcA(hWnd, Msg, wParam, lParam);
         }
-        if (Msg == 16)
+        if (Msg == WM_CLOSE)
         {
             PostQuitMessage(0);
             return 0;
         }
-        if (Msg != 256)
+        if (Msg != WM_KEYDOWN)
         {
-            if (Msg != 257)
+            if (Msg != WM_KEYUP)
                 return DefWindowProcA(hWnd, Msg, wParam, lParam);
         LABEL_108:
             if (wParam < 0x100)
-                byte_9AD880[wParam] = Msg == 256;
+                byte_9AD880[wParam] = Msg == WM_KEYDOWN;
             return DefWindowProcA(hWnd, Msg, wParam, lParam);
         }
         v7 = MapVirtualKeyA(wParam, 0);
@@ -2497,7 +2500,6 @@ int __cdecl DoMain()
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     int result; // eax@2
-    HANDLE currentProcess; // eax@14
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
     void(__stdcall *pSetThreadExecutionState)(unsigned int); // [sp+Ch] [bp-460h]@13
     HMODULE hKernel32; // [sp+10h] [bp-45Ch]@12
@@ -2531,11 +2533,13 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     "SetThreadExecutionState");
                 if (pSetProcessAffinityMask)
                 {
-                    currentProcess = GetCurrentProcess();
-                    pSetProcessAffinityMask(currentProcess, 1);
+                    // Only execute on the first CPU
+                    pSetProcessAffinityMask(GetCurrentProcess(), 1);
                 }
                 if (pSetThreadExecutionState)
-                    pSetThreadExecutionState(0x80000003u);
+                {
+                    pSetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
+                }
                 FreeLibrary(hKernel32);
             }
             CheckForMmf(dword_787774, dword_787778);
@@ -2559,7 +2563,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             else
                 gNoCdEnabled = 0;
             WndClass.style = 3;
-            WndClass.lpfnWndProc = (WNDPROC)MainWindowProc;
+            WndClass.lpfnWndProc = MainWindowProc;
             WndClass.cbClsExtra = 0;
             WndClass.cbWndExtra = 0;
             WndClass.hInstance = hInstance;
