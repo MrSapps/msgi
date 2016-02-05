@@ -416,7 +416,7 @@ int __cdecl Actor_DumpActorSystem()
 
 
 //MSG_FUNC_NOT_IMPL(0x0051C2D3, signed int __stdcall(HWND, UINT, UINT, LPARAM), MainWindowProc);
-signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
+LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
 {
     float v4; // ST08_4@14
     float v5; // ST04_4@14
@@ -444,46 +444,48 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
         dword_734908 = 9 * dword_734908 / 10;
         dword_73490C = 9 * dword_73490C / 10;
     }
-    if (Msg > 0x102)
+    if (Msg > WM_CHAR)
     {
         switch (Msg)
         {
-        case 0x104u:
+        case WM_SYSKEYDOWN:
             gKeys[wParam] = lParam;
             gvirtualKeyRepeatCount = lParam;
             gVirtualKeyCode = wParam;
             if (wParam < 0x100)
                 byte_9AD880[wParam] = 1;
-            if ((unsigned __int16)gVirtualKeyCode == 18)
+            if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
             {
                 gAltPressed = 1;
                 return 0;
             }
-            if ((unsigned __int16)gVirtualKeyCode == 121)
+            if ((unsigned __int16)gVirtualKeyCode == VK_F10)
             {
                 dword_71D194 = 1;
                 gF10Pressed = 1;
                 return 0;
             }
             break;
-        case 0x105u:                              // WM_SYSKEYUP
+
+        case WM_SYSKEYUP:
             gvirtualKeyRepeatCount = lParam;
             gVirtualKeyCode = wParam;
             if (wParam < 0x100)
                 byte_9AD880[wParam] = 0;
-            if ((unsigned __int16)gVirtualKeyCode == 18)// VK_MENU
+            if ((unsigned __int16)gVirtualKeyCode == VK_MENU) 
             {
                 gAltPressed = 0;
                 return 0;
             }
-            if ((unsigned __int16)gVirtualKeyCode == 121)// VK_F10
+            if ((unsigned __int16)gVirtualKeyCode == VK_F10) 
             {
                 gF10Pressed = 0;
                 Actor_DumpActorSystem();
                 return 0;
             }
             break;
-        case 0x200u:
+
+        case WM_MOUSEMOVE:
             if (dword_77C934)
             {
                 dword_734908 = (unsigned __int16)lParam - dword_734900;
@@ -492,17 +494,18 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                 dword_734904 = (unsigned int)lParam >> 16;
             }
             break;
-        case 0x218u:
-            return 1112363332;
+
+        case WM_POWERBROADCAST:
+            return BROADCAST_QUERY_DENY;
         }
         return DefWindowProcA(hWnd, Msg, wParam, lParam);
     }
-    if (Msg == 258)
+    if (Msg == WM_CHAR)
     {
         byte_9AD988 = wParam;
         return DefWindowProcA(hWnd, Msg, wParam, lParam);
     }
-    if (Msg == 6)
+    if (Msg == WM_ACTIVATE)
     {
         if ((WORD)wParam)
         {
@@ -520,7 +523,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
     }
     else
     {
-        if (Msg == 15)
+        if (Msg == WM_PAINT)
         {
             printf("$jim - WM_PAINT\n");
             if (dword_71D17C)
@@ -530,18 +533,18 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
             }
             return DefWindowProcA(hWnd, Msg, wParam, lParam);
         }
-        if (Msg == 16)
+        if (Msg == WM_CLOSE)
         {
             PostQuitMessage(0);
             return 0;
         }
-        if (Msg != 256)
+        if (Msg != WM_KEYDOWN)
         {
-            if (Msg != 257)
+            if (Msg != WM_KEYUP)
                 return DefWindowProcA(hWnd, Msg, wParam, lParam);
         LABEL_108:
             if (wParam < 0x100)
-                byte_9AD880[wParam] = Msg == 256;
+                byte_9AD880[wParam] = Msg == WM_KEYDOWN;
             return DefWindowProcA(hWnd, Msg, wParam, lParam);
         }
         v7 = MapVirtualKeyA(wParam, 0);
@@ -551,11 +554,11 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
             gKeys[wParam] = lParam;
         }
         gKeys[wParam] = lParam;
-        if (wParam > 0x76)
+        if (wParam > VK_F7)
         {
             switch (wParam)
             {
-            case 0x77u:
+            case VK_F8:
                 if (gCheatsEnabled)
                 {
                     dword_688CD0 = 0;
@@ -566,7 +569,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                     result = 0;
                 }
                 break;
-            case 0x78u:
+            case VK_F9:
                 if (gCheatsEnabled)
                 {
                     dword_688CD0 = 1;
@@ -577,7 +580,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                     result = 0;
                 }
                 break;
-            case 0x7Au:
+            case VK_F11:
                 if (gCheatsEnabled)
                 {
                     dword_688CD4 ^= 1u;
@@ -589,7 +592,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                 }
                 break;
             default:
-                if (wParam != 123)
+                if (wParam != VK_F12)
                     goto LABEL_108;
                 if (gCheatsEnabled)
                 {
@@ -605,7 +608,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
         }
         else
         {
-            if (wParam == 118)
+            if (wParam == VK_F7)
             {
                 if (gCheatsEnabled)
                 {
@@ -621,7 +624,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
             }
             else
             {
-                if (wParam == 27)
+                if (wParam == VK_ESCAPE)
                 {
                     dword_791DE4 = 1;
                     if (stru_722760.field_3C != 0x20000000 || !strstr(gDest, "s19a"))
@@ -635,7 +638,9 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                                     if (!dword_733E34)
                                     {
                                         if (!dword_721E78)
+                                        {
                                             dword_717354 = 1;
+                                        }
                                     }
                                 }
                             }
@@ -645,7 +650,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                 }
                 switch (wParam)
                 {
-                case 0x71u:
+                case VK_F2:
                     if (gCheatsEnabled)
                     {
                         if (dword_7348FC)
@@ -659,7 +664,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                         result = 0;
                     }
                     break;
-                case 0x73u:
+                case VK_F4:
                     if (gCheatsEnabled)
                     {
                         dword_650D4C ^= 1u;
@@ -670,7 +675,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                         result = 0;
                     }
                     break;
-                case 0x74u:
+                case VK_F5:
                     if (gCheatsEnabled)
                     {
                         dword_77C934 = 0;
@@ -682,7 +687,7 @@ signed int __stdcall MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lPa
                     }
                     break;
                 default:
-                    if (wParam != 117)
+                    if (wParam != VK_F6)
                         goto LABEL_108;
                     if (gCheatsEnabled)
                     {
@@ -992,13 +997,13 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
     {
         sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.szDescription, lpDeviceName);
         strcat(pStringError, "\n\tDevice doesn't meet minimum requirements, and will be ignored by the game\n");
-        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
+        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
     }
     else if (((field480 & 2) == 0) && ((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (byte_774B48 != 0))
     {
         sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.szDescription, lpDeviceName);
         strcat(pStringWarning, "\n\tDevice doesn't support everything the game needs\nBut it will be allowed for selection in Option/Advanced Menu\n");
-        MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+        MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
     }
 
     pIdentifier->field480 |= status;
@@ -1165,7 +1170,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     {
         if ((identifier.field480 & 0x40) == 0 && (identifier.field480 & 1) == 0)
         {
-            MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", 0);
+            MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", MB_OK);
         }
         identifier.field480 |= 0x40; // Must mean "low vram" ?
     }
@@ -1333,7 +1338,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     DDPIXELFORMAT pixelFormat3 = pixelFormat;
 
 
-    gFile = mgs_fopen("profile.log", "w"); // TODO: Other un-impl funcs using this file handle seem to blow up
+    gFile = mgs_fopen("profile.log", "w");
     mgs_fputs("InitAll {\n", gFile);
     mgs_fflush(gFile);
     gLogFile = gFile;
@@ -1369,7 +1374,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     0,
                     "Game crashed during previous initialization, game starting software rendering mode...",
                     "Metal Gear Solid",
-                    0);
+                    MB_OK);
                 gSoftwareRendering = 1;
                 dword_716F5C = 1.0f;
                 gXRes = 1.0f;
@@ -1396,7 +1401,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 0,
                 "Your video configuration has been updated - your system will be re-profiled\n",
                 "Metal Gear Solid (PC)",
-                0);
+                MB_OK);
             v55 = 0;
             if (sub_41EC40())
             {
@@ -1409,7 +1414,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 lpGuid = 0;
                 gXRes = 1.0f;
                 dword_716F5C = 1.0f;
-                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
             }
             gWindowedMode = 0;
             sub_433801();
@@ -1449,7 +1454,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             dword_716F5C = 1.0f;
             gXRes = 1.0f;
             lpGuid = 0;
-            MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+            MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
         }
         sub_431C63();
     }
@@ -1522,7 +1527,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 gXRes = 1.0f;
                 gXSize_dword_6DF214 = (signed __int64)(320.0 * gXRes);
                 gYSize = (signed __int64)(240.0 * gXRes);
-                MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
+                MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
@@ -1917,7 +1922,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             {
                 g_pDirect3DDevice->Release();
                 g_pDirect3DDevice = 0;
-                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
+                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
                 gSoftwareRendering = 1;
             }
             break;
@@ -1927,7 +1932,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gXSize_dword_6DF214 = 320;
         gYSize = 240;
         mgs_fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", gXSize_dword_6DF214, gYSize);
-        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
+        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
         gSoftwareRendering = 1;
         dword_716F5C = 1.0f;
         gXRes = dword_716F5C; // TODO: Float
@@ -2045,7 +2050,7 @@ signed int __cdecl DoInitAll()
 
     //v1 = InitD3d_ProfileGfxHardwareQ_Test();
     v1 = InitD3d_ProfileGfxHardwareQ();
-    MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", 0);
+    MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
     return v1;
 }
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
@@ -2522,8 +2527,9 @@ signed int __cdecl Main()
         if (gExitMainGameLoop)
             break;
 
-        // HACK: The game crashes somewhere deep in here, not calling this seems to prevent the game
-        // state from progressing
+        // HACK: Somtimes the game crashes somewhere deep in here, not calling this seems to prevent the game
+        // state from progressing.
+        // In software rendering mode when gameover it will crash, but this is an existing bug of the game.
         Actor_Unknown();
     }
     return result;
@@ -2542,7 +2548,6 @@ int __cdecl DoMain()
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     int result; // eax@2
-    HANDLE currentProcess; // eax@14
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
     void(__stdcall *pSetThreadExecutionState)(unsigned int); // [sp+Ch] [bp-460h]@13
     HMODULE hKernel32; // [sp+10h] [bp-45Ch]@12
@@ -2577,11 +2582,13 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     "SetThreadExecutionState");
                 if (pSetProcessAffinityMask)
                 {
-                    currentProcess = GetCurrentProcess();
-                    pSetProcessAffinityMask(currentProcess, 1);
+                    // Only execute on the first CPU
+                    pSetProcessAffinityMask(GetCurrentProcess(), 1);
                 }
                 if (pSetThreadExecutionState)
-                    pSetThreadExecutionState(0x80000003u);
+                {
+                    pSetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
+                }
                 FreeLibrary(hKernel32);
             }
             CheckForMmf(dword_787774, dword_787778);
@@ -2605,7 +2612,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             else
                 gNoCdEnabled = 0;
             WndClass.style = 3;
-            WndClass.lpfnWndProc = (WNDPROC)MainWindowProc;
+            WndClass.lpfnWndProc = MainWindowProc;
             WndClass.cbClsExtra = 0;
             WndClass.cbWndExtra = 0;
             WndClass.hInstance = hInstance;
@@ -2674,11 +2681,11 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     0,
                     WndClass.lpszClassName,
                     "Metal Gear Solid PC",
-                    0x80C80000u,
-                    0x80000000u,
-                    0x80000000u,
-                    0x80000000u,
-                    0x80000000u,
+                    WS_POPUP | WS_CAPTION | WS_SYSMENU,
+                    CW_USEDEFAULT, // x
+                    CW_USEDEFAULT, // y
+                    CW_USEDEFAULT, // w
+                    CW_USEDEFAULT, // h
                     0,
                     0,
                     hInstance,
@@ -2736,7 +2743,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                 Dest,
                 "Metal Gear Solid requires over 50mb of hard disk space as Virtual Memory before the game can function correctly. This system currently only has %dmb available.  Please close all open applications not in use,  and refer to the Metal Gear Solid readme for more information on this issue.",
                 (Buffer.dwAvailPageFile - Buffer.dwAvailPhys) >> 20);
-            MessageBoxA(0, Dest, "Metal Gear Solid PC", 0);
+            MessageBoxA(0, Dest, "Metal Gear Solid PC", MB_OK);
             result = 0;
         }
     }
@@ -2746,7 +2753,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             0,
             "Another copy of Metal Gear Solid Integral or VR missions is running, please exit first.",
             "Metal Gear Solid PC",
-            0);
+            MB_OK);
         result = 0;
     }
 
