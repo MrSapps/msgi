@@ -5,6 +5,8 @@
 #include <mmreg.h>
 #include <dsound.h>
 
+void SoundCpp_ForceLink();
+
 signed int __cdecl Sound_Init(HWND hwnd);
 char __cdecl Sound_CharUpperChangeQ(char value);
 signed int __cdecl Sound_CleanUpRelated();
@@ -33,9 +35,9 @@ signed int __cdecl Sound_Start2SamplesQ(BYTE *a1);
 signed int __cdecl Sound_Stop2Samples();
 int __cdecl Sound_StopSample();
 int __cdecl Sound_TableUnknown1(int a1, int rate, int vol);
-int __cdecl Sound_Unknown1(int a1);
-int __cdecl Sound_Unknown2(int a1);
-bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3);
+int __cdecl Sound_SetMusicVolume(int a1);
+int __cdecl Sound_SetSoundFxVolume(int a1);
+bool __cdecl Sound_PlayEffect(unsigned __int8 idx, int a2, int a3);
 bool __cdecl Sound_Unknown4();
 int __cdecl Sound_Unknown5(int a1, int a2, BYTE*(__cdecl *a3)(DWORD));
 void __cdecl Sound_Unknown6();

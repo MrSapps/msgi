@@ -11,10 +11,12 @@ static IDirectSoundBuffer* g128_Sound_buffers_dword_77DCA0[256] = {};
 static IDirectSoundBuffer* gSndBuffer_dword_77E0A0 = nullptr;
 static DWORD gSndState_dword_77E2D4 = 0;
 static DWORD gSoundFxIdx_dword_77D884 = 0;
+
 static DWORD* dword_68D058; // part of below array?
 static DWORD* dword_68D05C; // 21 array?
-static DWORD* dword_68D084; // part of below array?
-static DWORD* dword_68D088; // 10 array?
+static DWORD* dword_68D084 = (DWORD*)0x68D084; // part of below array?
+static DWORD* dword_68D088 = (DWORD*)0x68D088; // 10 array?
+
 static IDirectSoundBuffer* g64_dword_77D774[64] = {};
 static DWORD dword_77E2DC = 0;
 static DWORD dword_77E2F0 = 0;
@@ -22,7 +24,7 @@ static DWORD gWaveFile_dword_68CE30 = 0;
 static DWORD dword_77E2D8;
 static IDirectSound* gDSound_dword_77E2C0 = nullptr;
 static IDirectSoundBuffer* gSoundBuffer_dword_77E1B0 = nullptr;
-static DWORD* gFxState_dword_77D8A0 = 0; // 256 array?
+static DWORD gFxState_dword_77D8A0[256] = {};
 static DWORD dword_77E1B4 = 0;
 static DWORD dword_77E1C4 = 0;
 static DWORD dword_77D87C = 0;
@@ -41,14 +43,16 @@ DWORD dword_77D894 = 0;
 DWORD dword_77E2F4 = 0;
 
 // Many unknowns in these
-char** off_68D0B4 = 0;
-char* byte_68D0B1 = 0;
-char* byte_68D0B0 = 0;
-__int16 unk_68D630[1550] = {};
-DWORD dword_68CE34 = 0;
+char** off_68D0B4 = (char**)0x68D0B4;
+char* byte_68D0B1 = (char*)0x68D0B1;
+char* byte_68D0B0 = (char*)0x68D0B0;
+__int16* unk_68D630 = (__int16*)0x68D630;
+//__int16 unk_68D630[1550] = {};
 
-unsigned char* byte_68CE38 = nullptr;
-unsigned char* byte_68CE39 = nullptr;
+DWORD gSampleSet_dword_68CE34 = 0;
+
+unsigned char* byte_68CE38 = (unsigned char*)0x68CE38;
+unsigned char* byte_68CE39 = (unsigned char*)0x68CE39;
 DWORD dword_77E2E0 = 0;
 DWORD dword_68CE2C = 0;
 DWORD dword_77E2EC = 0;
@@ -62,13 +66,13 @@ DWORD dword_77D878 = 0;
 DWORD dword_77E1A4 = 0;
 BYTE byte_77D888 = 0;
 
-DWORD* dword_68D02C = nullptr;
-DWORD* dword_68D030 = nullptr;
+DWORD* dword_68D02C = (DWORD*)0x68D02C;
+DWORD* dword_68D030 = (DWORD*)0x68D030;
 
-DWORD* dword_68D000 = nullptr;
-DWORD* dword_68D004 = nullptr;
+DWORD* dword_68D000 = (DWORD*)0x68D000;
+DWORD* dword_68D004 = (DWORD*)0x68D004;
 
-DWORD* dword_68CEE4 = nullptr;
+DWORD* dword_68CEE4 = (DWORD*)0x68CEE4;
 
 DWORD dword_77D880 = 0;
 DWORD dword_77E1B8 = 0;
@@ -81,18 +85,19 @@ DWORD dword_77E1D4 = 0;
 DWORD dword_77E2E4 = 0;
 
 
-float* byte_68E2D0 = nullptr; // XA K0
-double dbl_77E300;
-double dbl_77E308;
-double dbl_77E310;
-double dbl_77E318;
-double* dbl_77E1E0;
-double* dbl_77E1E8;
-DWORD* dword_68E2C8;
+float* byte_68E2D0 = (float*)0x68E2D0; // XA K0
+double& dbl_77E300 = *(double*)0x77E300;
+double& dbl_77E308 = *(double*)0x77E308;
+double& dbl_77E310 = *(double*)0x77E310;
+double& dbl_77E318 = *(double*)0x77E318;
+double* dbl_77E1E0 = (double*)0x77E1E0;
+double* dbl_77E1E8 = (double*)0x77E1E8;
+DWORD* dword_68E2C8 = (DWORD*)0x68E2C8;
 
+// Used outside of sound module
 VAR(DWORD, dword_77E2CC, 0x77E2CC);
 
-/*
+
 MSG_FUNC_IMPL(0x0052269C, Sound_Init);
 MSG_FUNC_IMPL(0x005227AD, Sound_CharUpperChangeQ);
 MSG_FUNC_IMPL(0x00522BCE, Sound_CleanUpRelated);
@@ -102,7 +107,7 @@ MSG_FUNC_IMPL(0x00522601, Sound_CreatePrimarySoundBuffer);
 MSG_FUNC_IMPL(0x00521982, Sound_CreateSecondarySoundBuffer);
 MSG_FUNC_IMPL(0x0052236D, Sound_FadeQ);
 MSG_FUNC_IMPL(0x005234EA, Sound_GetSamp1PosQ);
-MSG_FUNC_IMPL(0x005224BE, Sound_GetSomeStateQ);
+MSG_FUNC_IMPL_NOLOG(0x005224BE, Sound_GetSomeStateQ);
 MSG_FUNC_IMPL(0x00522A33, Sound_InitFx);
 MSG_FUNC_IMPL(0x005227FF, Sound_LoadBufferFromFile);
 MSG_FUNC_IMPL(0x00522A9C, Sound_LoadFxRelatedQ);
@@ -110,7 +115,7 @@ MSG_FUNC_IMPL(0x00522B8D, Sound_LoadFxRelatedQ2);
 MSG_FUNC_IMPL(0x00521A54, Sound_MxdWavRelated);
 MSG_FUNC_IMPL(0x005231A9, Sound_PlaySample);
 MSG_FUNC_IMPL(0x0052307F, Sound_PlaySampleRelated);
-MSG_FUNC_IMPL(0x00521F82, Sound_PopulateBufferQ);
+MSG_FUNC_IMPL_NOLOG(0x00521F82, Sound_PopulateBufferQ);
 MSG_FUNC_IMPL(0x00523A1F, Sound_ReleaseBufferQ);
 MSG_FUNC_IMPL(0x00521A18, Sound_ReleaseSecondaryBuffer);
 MSG_FUNC_IMPL(0x00523B2C, Sound_RestoreRelatedQ);
@@ -121,21 +126,31 @@ MSG_FUNC_IMPL(0x00523232, Sound_Start2SamplesQ);
 MSG_FUNC_IMPL(0x00523466, Sound_Stop2Samples);
 MSG_FUNC_IMPL(0x0052313B, Sound_StopSample);
 MSG_FUNC_IMPL(0x00521898, Sound_TableUnknown1);
-MSG_FUNC_IMPL(0x0052255B, Sound_Unknown1);
-MSG_FUNC_IMPL(0x005224C8, Sound_Unknown2);
-MSG_FUNC_IMPL(0x00522CB2, Sound_Unknown3);
+MSG_FUNC_IMPL(0x0052255B, Sound_SetMusicVolume);
+MSG_FUNC_IMPL(0x005224C8, Sound_SetSoundFxVolume);
+MSG_FUNC_IMPL(0x00522CB2, Sound_PlayEffect);
 MSG_FUNC_IMPL(0x00523E12, Sound_Unknown4);
 MSG_FUNC_IMPL(0x00523CF3, Sound_Unknown5);
 MSG_FUNC_IMPL(0x00523CB9, Sound_Unknown6);
-*/
+
+
+
+#pragma comment(lib, "Winmm.lib") // timegettime()
+
+void SoundCpp_ForceLink()
+{
+    // Make sure the linker won't throw this module away
+}
+
+MSG_FUNC_NOT_IMPL(0x005530A8, HRESULT __stdcall(LPGUID, LPDIRECTSOUND*, LPUNKNOWN), MgsDirectSoundCreate);
+//MSG_FUNC_NOT_IMPL(0x0053D680, int __cdecl(int), msg_close);
 
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
 {
     signed int result = 0;
 
-    if (true) // TODO: Link fix
-        //  if (DirectSoundCreate(0, &gDSound_dword_77E2C0, 0))
+    if (MgsDirectSoundCreate(0, &gDSound_dword_77E2C0, 0))
     {
         result = 0;
     }
@@ -222,8 +237,7 @@ int __cdecl Sound_CloseWavStopQ()
 
     if (gWaveFile_dword_68CE30 != -1)
     {
-        // TODO: msg_close
-        //result = _close(gWaveFile_dword_68CE30);
+        result = _close(gWaveFile_dword_68CE30);
     }
 
     gWaveFile_dword_68CE30 = -1;
@@ -413,8 +427,13 @@ bool __cdecl Sound_GetSamp1PosQ()
 // 0x005224BE
 int __cdecl Sound_GetSomeStateQ()
 {
-    return gSndState_dword_77E2D4;
+    // HACK TODO HACK!!! will get stuck at main menu with music looping if we don't
+    // force 0 here, strangely the music still works when returning 0, need to figure out
+    // why gSndState_dword_77E2D4 isn't set to 0 in places where it should be
+    return 0;
+//    return gSndState_dword_77E2D4;
 }
+
 
 // 0x00522A33
 int __cdecl Sound_InitFx()
@@ -436,7 +455,7 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
 {
     signed int result;
     size_t v3;
-    char v4;
+    char v4[20] = {};
     DWORD sizeToRead;
     DSBUFFERDESC bufferDesc;
     void* v9;
@@ -455,15 +474,15 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
     bufferDesc.lpwfxFormat = &waveFormat;
     FILE* File = File_LoadDirFileQ(fileName, 0);
     if (File
-        && (File_NormalRead(File, &v4, 20u), File_NormalRead(File, &waveFormat, 18u) == 18)
-        && (File_NormalRead(File, &v4, 2u), File_NormalRead(File, &sizeToRead, 4u) == 4))
+        && (File_NormalRead(File, v4, 20u), File_NormalRead(File, &waveFormat, 18u) == 18)
+        && (File_NormalRead(File, v4, 2u), File_NormalRead(File, &sizeToRead, 4u) == 4))
     {
         bufferDesc.dwBufferBytes = sizeToRead;
         if (gDSound_dword_77E2C0)
         {
             if (gDSound_dword_77E2C0->CreateSoundBuffer(
                 &bufferDesc,
-                (IDirectSoundBuffer **)g128_Sound_buffers_dword_77DCA0[idx],
+                &g128_Sound_buffers_dword_77DCA0[idx],
                 0))
             {
                 return 0;
@@ -540,7 +559,7 @@ void __cdecl Sound_LoadFxRelatedQ(const char *Str1)
             gFxState_dword_77D8A0[soundNum] = 0;
         }
     }
-    dword_68CE34 = sampleSet;
+    gSampleSet_dword_68CE34 = sampleSet;
 }
 
 // 0x00522B8D
@@ -561,7 +580,7 @@ signed int __cdecl Sound_MxdWavRelated(signed int a1)
     bool v3;
     bool v4;
     LARGE_INTEGER Frequency;
-    char soundFileName;
+    char soundFileName[256] = {};
     __int64 freq;
     unsigned __int8 sndNumber;
     void* v9;
@@ -679,8 +698,8 @@ LABEL_74:
     dword_68CE2C = -1;
     if (!sndNumber)
         return 1;
-    sprintf(&soundFileName, "%s0x%02x.wav", "mdx/", sndNumber);
-    gWaveFile_dword_68CE30 = _open(&soundFileName, 0x8000);
+    sprintf(soundFileName, "%s0x%02x.wav", "mdx/", sndNumber);
+    gWaveFile_dword_68CE30 = _open(soundFileName, 0x8000);
     if (gWaveFile_dword_68CE30 == -1)
         return 0;
     _lseek(gWaveFile_dword_68CE30, 40, 0);
@@ -740,7 +759,7 @@ LABEL_74:
 // 0x005231A9
 int __cdecl Sound_PlaySample()
 {
-    int result;
+    int result = 0;
 
     if (gSoundFxIdx_dword_77D884 != -1)
     {
@@ -1037,9 +1056,9 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
 {
     signed int result;
     signed int v5;
-    double v6;
+    double v6 = 0.0; // hack sometimes used un-inited
     size_t v7;
-    double v8;
+    double v8 = 0.0; // hack sometimes used un-inited
     unsigned int Size;
     signed int i;
     signed int j;
@@ -1272,7 +1291,7 @@ signed int __cdecl Sound_Start2SamplesQ(BYTE *a1)
     DSBUFFERDESC bufferDesc;
     WAVEFORMATEX waveFormat;
     
-    if (gSoundFxIdx_dword_77D884 != -1 && dword_68CE34 == 38)
+    if (gSoundFxIdx_dword_77D884 != -1 && gSampleSet_dword_68CE34 == 38)
     {
         g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884]->Stop();
         gSoundFxIdx_dword_77D884 = -1;
@@ -1412,7 +1431,7 @@ int __cdecl Sound_TableUnknown1(int a1, int rate, int vol)
 }
 
 // 0x0052255B
-int __cdecl Sound_Unknown1(int a1)
+int __cdecl Sound_SetMusicVolume(int a1)
 {
     int result;
     int v2;
@@ -1442,7 +1461,7 @@ int __cdecl Sound_Unknown1(int a1)
 }
 
 // 0x005224C8
-int __cdecl Sound_Unknown2(int a1)
+int __cdecl Sound_SetSoundFxVolume(int a1)
 {
     int result;
     int v2;
@@ -1467,7 +1486,7 @@ int __cdecl Sound_Unknown2(int a1)
 }
 
 // 0x00522CB2
-bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
+bool __cdecl Sound_PlayEffect(unsigned __int8 idx, int a2, int a3)
 {
     bool result; 
     DWORD status;
@@ -1476,9 +1495,9 @@ bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
 
     if (!g128_Sound_buffers_dword_77DCA0[idx])
     {
-        if (dword_68CEE4[dword_68CE34])
+        if (dword_68CEE4[gSampleSet_dword_68CE34])
         {
-            if (dword_68CE34 == 2)
+            if (gSampleSet_dword_68CE34 == 2)
             {
                 switch (idx)
                 {
@@ -1539,21 +1558,21 @@ bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
             playFlags = 0;
             if (gSoundFxIdx_dword_77D884 == -1)
             {
-                if (dword_68CE34 == 10 && idx == 179
-                    || dword_68CE34 == 43 && idx == 192
-                    || dword_68CE34 == 38 && idx == 128
-                    || dword_68CE34 == 64 && idx == 183
-                    || (!dword_68CE34 || dword_68CE34 == 2 || dword_68CE34 == 16) && idx == 178)
+                if (gSampleSet_dword_68CE34 == 10 && idx == 179
+                    || gSampleSet_dword_68CE34 == 43 && idx == 192
+                    || gSampleSet_dword_68CE34 == 38 && idx == 128
+                    || gSampleSet_dword_68CE34 == 64 && idx == 183
+                    || (!gSampleSet_dword_68CE34 || gSampleSet_dword_68CE34 == 2 || gSampleSet_dword_68CE34 == 16) && idx == 178)
                 {
                     gSoundFxIdx_dword_77D884 = idx;
                     playFlags = DSBPLAY_LOOPING;
                 }
             }
-            else if (dword_68CE34 == 10 && idx == 181
-                || dword_68CE34 == 43 && idx == 182
-                || dword_68CE34 == 38 && idx == 181
-                || dword_68CE34 == 64 && (idx == 15 || idx == 195)
-                || (!dword_68CE34 || dword_68CE34 == 2 || dword_68CE34 == 16) && idx == 179
+            else if (gSampleSet_dword_68CE34 == 10 && idx == 181
+                || gSampleSet_dword_68CE34 == 43 && idx == 182
+                || gSampleSet_dword_68CE34 == 38 && idx == 181
+                || gSampleSet_dword_68CE34 == 64 && (idx == 15 || idx == 195)
+                || (!gSampleSet_dword_68CE34 || gSampleSet_dword_68CE34 == 2 || gSampleSet_dword_68CE34 == 16) && idx == 179
                 || idx == 26
                 || idx == 107)
             {
