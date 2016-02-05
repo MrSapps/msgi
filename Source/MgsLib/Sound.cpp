@@ -9,7 +9,7 @@ using QWORD = __int64;
 static IDirectSoundBuffer* gSndBuffer_dword_77E2D0 = nullptr;
 static IDirectSoundBuffer* g128_Sound_buffers_dword_77DCA0[256] = {};
 static IDirectSoundBuffer* gSndBuffer_dword_77E0A0 = nullptr;
-static DWORD gSndState_dword_77E2D4 = 0;
+static DWORD& gSndState_dword_77E2D4 = *(DWORD*)0x77E2D4;
 static DWORD gSoundFxIdx_dword_77D884 = 0;
 
 static DWORD* dword_68D058; // part of below array?
@@ -112,7 +112,7 @@ MSG_FUNC_IMPL(0x00522A33, Sound_InitFx);
 MSG_FUNC_IMPL(0x005227FF, Sound_LoadBufferFromFile);
 MSG_FUNC_IMPL(0x00522A9C, Sound_LoadFxRelatedQ);
 MSG_FUNC_IMPL(0x00522B8D, Sound_LoadFxRelatedQ2);
-MSG_FUNC_IMPL(0x00521A54, Sound_MxdWavRelated);
+MSG_FUNC_IMPL(0x00521A54, Sound_PlayMusic);
 MSG_FUNC_IMPL(0x005231A9, Sound_PlaySample);
 MSG_FUNC_IMPL(0x0052307F, Sound_PlaySampleRelated);
 MSG_FUNC_IMPL_NOLOG(0x00521F82, Sound_PopulateBufferQ);
@@ -427,11 +427,7 @@ bool __cdecl Sound_GetSamp1PosQ()
 // 0x005224BE
 int __cdecl Sound_GetSomeStateQ()
 {
-    // HACK TODO HACK!!! will get stuck at main menu with music looping if we don't
-    // force 0 here, strangely the music still works when returning 0, need to figure out
-    // why gSndState_dword_77E2D4 isn't set to 0 in places where it should be
-    return 0;
-//    return gSndState_dword_77E2D4;
+    return gSndState_dword_77E2D4;
 }
 
 
@@ -574,7 +570,7 @@ void __cdecl Sound_LoadFxRelatedQ2(const char *Str1)
 }
 
 // 0x00521A54
-signed int __cdecl Sound_MxdWavRelated(signed int a1)
+signed int __cdecl Sound_PlayMusic(signed int a1)
 {
     int v2;
     bool v3;

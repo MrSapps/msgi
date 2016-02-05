@@ -21,7 +21,7 @@ int __cdecl Sound_InitFx();
 signed int __cdecl Sound_LoadBufferFromFile(const char *fileName);
 void __cdecl Sound_LoadFxRelatedQ(const char *Str1);
 void __cdecl Sound_LoadFxRelatedQ2(const char *Str1);
-signed int __cdecl Sound_MxdWavRelated(signed int a1);
+signed int __cdecl Sound_PlayMusic(signed int a1);
 int __cdecl Sound_PlaySample();
 void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, int a3, signed int a4);
 void __cdecl Sound_PopulateBufferQ();
