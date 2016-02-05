@@ -22,6 +22,64 @@
 #include "Sound.hpp"
 #include "File.hpp"
 
+struct texture_struct
+{
+    IDirectDrawSurface7* mSurface;
+    WORD field_4;
+    WORD field_6;
+    WORD field_8;
+    WORD field_A;
+    WORD field_C;
+    WORD field_E;
+    WORD field_10;
+    WORD field_12;
+    DWORD float_field_14;
+    DWORD float_field_18;
+    DWORD mSurfaceType;
+    DWORD field_20;
+    DWORD field_24;
+    DWORD field_28;
+    DWORD field_2C;
+    DWORD field_30;
+    DWORD field_34;
+    DWORD field_38;
+    DWORD field_3C;
+    DWORD field_40;
+    DWORD field_44;
+    DWORD field_48;
+    DWORD field_4C;
+};
+static_assert(sizeof(texture_struct) == 0x50, "texture_struct should be 0x50");
+
+texture_struct* gTextures_dword_6C0F00 = (texture_struct*)0x6C0F00; // Array of 1500 items?
+
+struct prim_struct
+{
+    DWORD field_0;
+    WORD field_4;
+    WORD field_6;
+    DWORD mShadeMode;
+    DWORD mPrimTypeQ;
+    DWORD dwVertexCount;
+};
+static_assert(sizeof(prim_struct) == 0x14, "prim_struct should be 0x14");
+prim_struct* gPrimBuffer_dword_6C0EFC = (prim_struct*)0x6C0EFC; // Array of 15000 items?
+
+struct rend_struct
+{
+    DWORD field_0;
+    DWORD field_4;
+    DWORD field_8;
+    DWORD float_field_C;
+    DWORD field_10;
+    DWORD field_14;
+    DWORD field_18;
+    DWORD field_1C;
+};
+static_assert(sizeof(rend_struct) == 0x20, "rend_struct should be 0x20");
+
+rend_struct* gRenderRelated_dword_6FC780 = (rend_struct*)0x6FC780; // Array of 15000 items?
+
 struct actor_related_struct;
 
 MSG_FUNC_NOT_IMPL(0x0052269C, signed int __cdecl(HWND), Real_Sound_Init); // TODO: Remove and replace with calls to Sound_Init when completed
@@ -736,17 +794,12 @@ VAR(DWORD*, dword_776B90, 0x776B90);
 VAR(DWORD, dword_716F74, 0x716F74);
 VAR(DWORD, gXSize_dword_6DF214, 0x6DF214);
 VAR(DWORD, dword_650D2C, 0x650D2C);
-VAR(DWORD*, dword_6C0EFC, 0x6C0EFC);
-VAR(void*, dword_6FC780, 0x6FC780);
-VAR(DWORD*, dword_6FC728, 0x6FC728);
+VAR(DWORD*, gImageBufer_dword_6FC728, 0x6FC728);
 VAR(void*, dword_6DEF7C, 0x6DEF7C);
 VAR(void*, dword_6DEF90, 0x6DEF90);
-VAR(void*, dword_6FC72C, 0x6FC72C);
-VAR(DWORD*, dword_6C0F00, 0x6C0F00);
+VAR(void*, gPixelBuffer_dword_6FC72C, 0x6FC72C);
 VAR(DWORD, dword_6FC798, 0x6FC798);
 VAR(DWORD, dword_6FC7C0, 0x6FC7C0);
-VAR(DWORD*, dword_6C0F20, 0x6C0F20);
-VAR(DWORD*, dword_6C0F24, 0x6C0F24);
 VAR(DWORD, dword_716F6C, 0x716F6C);
 VAR(DWORD, dword_6FC7C4, 0x6FC7C4);
 VAR(DWORD, dword_651D94, 0x651D94);
@@ -1929,18 +1982,13 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     mgs_fflush(gFile);
 
 
-    for (i = 0; (signed int)i < 1500; ++i)
+    for (i = 0; i < 1500; ++i)
     {
-        DWORD* ptr = (DWORD*)0x6C0F00;
-        ptr[(20 * i) + 0] = 0;
-        ptr[(20 * i) + 1] = 0;
-        ptr[(20 * i) + 2] = 0;
-        /* TODO: FIX ME this shouldn't crash! Also it appears to be part of the same data structure
-        dword_6C0F00[20 * i] = 0;
-        dword_6C0F20[20 * i] = 0;
-        dword_6C0F24[20 * i] = 0;
-        */
+        gTextures_dword_6C0F00[i].mSurface = 0;
+        gTextures_dword_6C0F00[i].field_20 = 0;
+        gTextures_dword_6C0F00[i].field_24 = 0;
     }
+    
     dword_6FC7C0 = sub_41CA80() == 0;
     if (dword_6FC7C0)
     {
@@ -1951,21 +1999,21 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
-        dword_6C0EFC = (DWORD*)mgs_malloc(0x493E0u);
+        gPrimBuffer_dword_6C0EFC = (prim_struct*)mgs_malloc(0x493E0u);
         for (i = 0; i < 15000; ++i)
         {
-            dword_6C0EFC[5 * i] = 0;
+            gPrimBuffer_dword_6C0EFC[i].field_0 = 0;
         }
-        dword_6FC780 = mgs_malloc(0x75300u);
+        gRenderRelated_dword_6FC780 = (rend_struct*)mgs_malloc(0x75300u); // 15000 items
     }
-    dword_6FC728 = (DWORD*)mgs_malloc(0x100000u);
-    if (dword_6FC728)
+    gImageBufer_dword_6FC728 = (DWORD*)mgs_malloc(0x100000u);
+    if (gImageBufer_dword_6FC728)
     {
-        memset(dword_6FC728, 0, 0x100000u);
-        dword_6FC72C = mgs_malloc(0x100000u);
-        if (dword_6FC728)
+        memset(gImageBufer_dword_6FC728, 0, 0x100000u);
+        gPixelBuffer_dword_6FC72C = mgs_malloc(0x100000u);
+        if (gImageBufer_dword_6FC728)
         {
-            memset(dword_6FC728, -1, 0x100000u);
+            memset(gImageBufer_dword_6FC728, -1, 0x100000u);
             _cfltcvt_init();
             memset(&unk_6C0778, 0, 0x400u);
             dword_6DEF7C = mgs_malloc(0x200u);
