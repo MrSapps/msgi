@@ -22,6 +22,7 @@
 #include "Sound.hpp"
 #include "File.hpp"
 
+
 struct texture_struct
 {
     IDirectDrawSurface7* mSurface;
@@ -82,11 +83,7 @@ rend_struct* gRenderRelated_dword_6FC780 = (rend_struct*)0x6FC780; // Array of 1
 
 struct actor_related_struct;
 
-MSG_FUNC_NOT_IMPL(0x0052269C, signed int __cdecl(HWND), Real_Sound_Init); // TODO: Remove and replace with calls to Sound_Init when completed
-
 MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
-MSG_FUNC_NOT_IMPL(0x005224C8, int __cdecl(int), sub_5224C8);
-MSG_FUNC_NOT_IMPL(0x0052255B, int __cdecl(int), sub_52255B);
 MSG_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
 MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
 MSG_FUNC_NOT_IMPL(0x00421680, signed __int64 __cdecl(), FpsTimerSetupQ);
@@ -2556,6 +2553,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     char *bRestart; // [sp+464h] [bp-8h]@8
     //int i; // [sp+468h] [bp-4h]@70
 
+    SoundCpp_ForceLink();
 
     if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
     {
@@ -2694,10 +2692,10 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     gHInstance = hInstance;
                     if (DoInitAll())
                     {
-                        if (Real_Sound_Init(gHwnd) || AskUserToContinueIfNoSoundCard())
+                        if (Sound_Init(gHwnd) || AskUserToContinueIfNoSoundCard())
                         {
-                            sub_5224C8(dword_651D98);
-                            sub_52255B(dword_716F68);
+                            Sound_Unknown2(dword_651D98);
+                            Sound_Unknown1(dword_716F68);
                             FpsTimerSetupQ();
 
                             /* HACK: Leave cursor showing while developing
