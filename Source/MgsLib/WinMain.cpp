@@ -244,8 +244,8 @@ char*& off_688D40 = *(char**)0x688D40;
 DWORD& gSoftwareRendering = *(DWORD*)0x006FC794;
 HWND& gHwnd = *(HWND*)0x009ADDA0;
 HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
-DWORD& dword_651D98 = *((DWORD*)0x651D98);
-DWORD& dword_716F68 = *((DWORD*)0x716F68);
+DWORD& gSoundFxVol_dword_651D98 = *((DWORD*)0x651D98);
+DWORD& gMusicVol_dword_716F68 = *((DWORD*)0x716F68);
 
 
 VAR(DWORD, dword_77C934, 0x77C934);
@@ -1428,8 +1428,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     sub_43C850();
     if (dword_651CF8)
     {
-        dword_651D98 = 100;
-        dword_716F68 = 100;
+        gSoundFxVol_dword_651D98 = 100;
+        gMusicVol_dword_716F68 = 100;
         mgs_fputs("Executing system profiling sequence.\n", gFile);
         mgs_fflush(gFile);
         mgs_fputs("Choosing default 3D-accelerator\n", gFile);
@@ -2701,8 +2701,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     {
                         if (Sound_Init(gHwnd) || AskUserToContinueIfNoSoundCard())
                         {
-                            Sound_SetSoundFxVolume(dword_651D98);
-                            Sound_SetMusicVolume(dword_716F68);
+                            Sound_SetSoundFxVolume(gSoundFxVol_dword_651D98);
+                            Sound_SetMusicVolume(gMusicVol_dword_716F68);
                             FpsTimerSetupQ();
 
                             /* HACK: Leave cursor showing while developing
