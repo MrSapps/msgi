@@ -119,7 +119,7 @@ MSG_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, int*), sub_51F1E1);
 MSG_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
 MSG_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
 MSG_FUNC_NOT_IMPL(0x00422D40, char *__cdecl(char*, signed int), PrintDDError);
-MSG_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), SetGraphicsBrightness_sub_41C820);
+MSG_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
 MSG_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), sub_41CA80);
 MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), sub_41CC30);
 MSG_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), sub_41CD70);
@@ -1916,7 +1916,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxViewport.dvMaxZ = 1.0f;
                 g_pDirect3DDevice->SetViewport(&dxViewport);
                 v2 = ((float)dword_651D94 - 50.0f) / 100.0f;
-                SetGraphicsBrightness_sub_41C820(v2);
+                Render_SetBrightness_sub_41C820(v2);
             }
             else
             {
