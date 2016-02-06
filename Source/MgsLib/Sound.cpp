@@ -6,11 +6,28 @@
 
 using QWORD = __int64;
 
-static IDirectSoundBuffer* gSndBuffer_dword_77E2D0 = nullptr;
-static IDirectSoundBuffer* g128_Sound_buffers_dword_77DCA0[256] = {};
-static IDirectSoundBuffer* gSndBuffer_dword_77E0A0 = nullptr;
-static DWORD& gSndState_dword_77E2D4 = *(DWORD*)0x77E2D4;
-static DWORD gSoundFxIdx_dword_77D884 = 0;
+#define REDIRECT_SOUND 1
+
+#define MGS_ARY(Redirect, Addr, TypeName, Size, VarName)\
+TypeName LocalArray_##VarName[Size];\
+TypeName* VarName = (Redirect) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
+
+#define MGS_PTR(Redirect, Addr, TypeName, VarName)\
+TypeName LocalPtr_##VarName;\
+TypeName VarName = (Redirect) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
+
+#define MGS_VAR(Redirect, Addr, TypeName, VarName)\
+TypeName LocalVar_##VarName;\
+TypeName& VarName = (Redirect) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
+
+
+MGS_PTR(REDIRECT_SOUND, 0x77E2D0, IDirectSoundBuffer*, gSndBuffer_dword_77E2D0);
+MGS_ARY(REDIRECT_SOUND, 0x77DCA0, IDirectSoundBuffer*, 256, g128_Sound_buffers_dword_77DCA0);
+MGS_VAR(REDIRECT_SOUND, 0x68CE30, DWORD, gMusicWavFile_dword_68CE30);
+MGS_PTR(REDIRECT_SOUND, 0x77E0A0, IDirectSoundBuffer*, gSndBuffer_dword_77E0A0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2D4, DWORD, gSndState_dword_77E2D4);
+MGS_VAR(REDIRECT_SOUND, 0x77D884, DWORD, gSoundFxIdx_dword_77D884);
+
 
 static DWORD* dword_68D058; // part of below array?
 static DWORD* dword_68D05C; // 21 array?
@@ -20,11 +37,13 @@ static DWORD* dword_68D088 = (DWORD*)0x68D088; // 10 array?
 static IDirectSoundBuffer* g64_dword_77D774[64] = {};
 static DWORD dword_77E2DC = 0;
 static DWORD dword_77E2F0 = 0;
-static DWORD& gMusicWavFile_dword_68CE30 = *(DWORD*)0x68CE30;
+
 static DWORD dword_77E2D8;
 static IDirectSound* gDSound_dword_77E2C0 = nullptr;
 static IDirectSoundBuffer* gSoundBuffer_dword_77E1B0 = nullptr;
-static DWORD gFxState_dword_77D8A0[256] = {};
+
+MGS_ARY(REDIRECT_SOUND, 0x77D8A0, DWORD, 256, gFxState_dword_77D8A0);
+
 static DWORD dword_77E1B4 = 0;
 static DWORD dword_77E1C4 = 0;
 static DWORD dword_77D87C = 0;
