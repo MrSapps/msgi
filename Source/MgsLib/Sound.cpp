@@ -428,7 +428,9 @@ bool __cdecl Sound_GetSamp1PosQ()
 // 0x005224BE
 int __cdecl Sound_GetSomeStateQ()
 {
-    return gSndState_dword_77E2D4;
+   // return gSndState_dword_77E2D4;
+    // HACK/ FIX ME
+    return 0;
 }
 
 
