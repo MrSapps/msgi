@@ -8,7 +8,7 @@
 void SoundCpp_ForceLink();
 
 signed int __cdecl Sound_Init(HWND hwnd);
-char __cdecl Sound_CharUpperChangeQ(char value);
+char __cdecl Sound_HexCharToInt(char value);
 signed int __cdecl Sound_CleanUpRelated();
 int __cdecl Sound_CloseWavStopQ();
 signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample, int samplesPerSecond, int a4, int a5);
@@ -21,7 +21,7 @@ int __cdecl Sound_InitFx();
 signed int __cdecl Sound_LoadBufferFromFile(const char *fileName);
 void __cdecl Sound_LoadFxRelatedQ(const char *Str1);
 void __cdecl Sound_LoadFxRelatedQ2(const char *Str1);
-signed int __cdecl Sound_PlayMusic(signed int a1);
+signed int __cdecl Sound_PlayMusic(unsigned int a1);
 int __cdecl Sound_PlaySample();
 void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, int a3, signed int a4);
 void __cdecl Sound_PopulateBufferQ();
@@ -42,7 +42,7 @@ bool __cdecl Sound_Unknown4();
 int __cdecl Sound_Unknown5(int a1, int a2, BYTE*(__cdecl *a3)(DWORD));
 void __cdecl Sound_Unknown6();
 int __cdecl Sound_Play(unsigned int playingFlags);
-int __cdecl Sound_jPlay(int playingFlags);
+int __cdecl Sound_jPlay(unsigned int playingFlags);
 
 // void Sound_music_relatedQ()
 // int __cdecl Sound_music_set()

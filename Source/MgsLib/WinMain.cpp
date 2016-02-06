@@ -88,7 +88,6 @@ MSG_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
 MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
 MSG_FUNC_NOT_IMPL(0x00421680, signed __int64 __cdecl(), FpsTimerSetupQ);
 MSG_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
-MSG_FUNC_NOT_IMPL(0x0043BCF0, int __cdecl(), sub_43BCF0); // Joystick related
 MSG_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
 MSG_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
 MSG_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
@@ -270,7 +269,7 @@ VAR(DWORD, gF10Pressed, 0x009AD8F9);
 VAR(DWORD, dword_734900, 0x734900);
 VAR(DWORD, dword_734904, 0x734904);
 VAR(BYTE, byte_9AD988, 0x9AD988);
-VAR(DWORD, dword_688CDC, 0x688CDC);
+VAR(DWORD, gActive_dword_688CDC, 0x688CDC);
 VAR(DWORD, dword_71D17C, 0x71D17C);
 VAR(DWORD, dword_688CD0, 0x688CD0);
 VAR(DWORD, dword_688CD4, 0x688CD4);
@@ -414,6 +413,7 @@ int __cdecl Actor_DumpActorSystem()
     return result;
 }
 
+void __cdecl Input_AcquireOrUnAcquire();
 
 //MSG_FUNC_NOT_IMPL(0x0051C2D3, signed int __stdcall(HWND, UINT, UINT, LPARAM), MainWindowProc);
 LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
@@ -510,14 +510,14 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
         if ((WORD)wParam)
         {
             printf("$jim - WM_ACTIVATE (active)\n");
-            dword_688CDC = 1;
+            gActive_dword_688CDC = 1;
         }
         else
         {
             printf("$jim - WM_ACTIVATE (inactive)\n");
-            dword_688CDC = 0;
+            gActive_dword_688CDC = 0;
         }
-        sub_43BCF0();
+        Input_AcquireOrUnAcquire();
         FpsTimerSetupQ();
         result = 1;
     }
@@ -2300,7 +2300,7 @@ int __cdecl InitDirectInput(HWND hWnd)
             dword_6571F4[i] = 0xFF;
         }
     }
-
+    
     // 0x43BBEC
     hr = pDirectInput->CreateDevice(GUID_SysMouse_MGS, &pMouseDevice, 0);
     if (hr < 0)
@@ -2337,6 +2337,36 @@ int __cdecl DoDirectInputInit()
         result = printf("$jim failed to init direct input");
     return result;
 }
+
+void __cdecl Input_AcquireOrUnAcquire()
+{
+    if (pMouseDevice)
+    {
+        if (gActive_dword_688CDC)
+        {
+            pMouseDevice->Acquire();
+        }
+        else
+        {
+            pMouseDevice->Unacquire();
+        }
+    }
+    if (pJoystickDevice)
+    {
+        if (gActive_dword_688CDC)
+        {
+            if (pJoystickDevice->Acquire())
+            {
+                printf("$jim - cannot acquire joystick\n");
+            }
+        }
+        else
+        {
+            pJoystickDevice->Unacquire();
+        }
+    }
+}
+MSG_FUNC_IMPL(0x0043BCF0, Input_AcquireOrUnAcquire);
 
 // 0x0044AB30
 int __cdecl SetGraphDebug(int a1)
