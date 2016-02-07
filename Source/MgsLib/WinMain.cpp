@@ -828,7 +828,6 @@ int __cdecl DoDirectInputInit();
 MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
 MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
 MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
-MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(void*, void*, int), File_msgvideocfg_Read);
 
 VAR(DWORD, dword_68C3B8, 0x68C3B8);
 VAR(uint8_t, byte_775F48, 0x775F48);
@@ -836,6 +835,14 @@ VAR(uint8_t, byte_774B48, 0x774B48);
 VAR(uint8_t, byte_776450, 0x776450);
 
 // TODO : make jim_enumerate_devices use this structure too
+struct jimDeviceDDId
+{
+    DDDEVICEIDENTIFIER2 identifier;
+    DWORD field430;
+    DWORD field434;
+};
+static_assert(sizeof(jimDeviceDDId) == 0x438, "jimUnk0x438 should be of size 0x438");
+
 struct jimDeviceIdentifier
 {
     char pDriverDescription[0x28];      // 0x000
@@ -843,28 +850,9 @@ struct jimDeviceIdentifier
     GUID* pOtherGUID;                   // 0x02C
     GUID deviceGUID;                    // 0x030
     GUID otherGUID;                     // 0x040
-    DDDEVICEIDENTIFIER2 ddIdentifier;   // 0x050
-    DWORD field480;                     // 0x480
-    DWORD field484;                     // 0x484
+    jimDeviceDDId ddIdentifier;         // 0x050
 };
 static_assert(sizeof(jimDeviceIdentifier) == 0x488, "jimDeviceIdentifier should be of size 0x488");
-
-struct jimUnk0x488
-{
-    uint8_t field0[0x28];
-    DWORD field28;
-    DWORD field2C;
-    DWORD field30;
-    uint8_t field34[0xC];
-    DWORD field40;
-    uint8_t field44[0xC];
-    uint8_t field50[0x200];
-    char field250[0x200];
-    uint8_t field450[0x30];
-    DWORD field480;
-    DWORD field484;
-};
-static_assert(sizeof(jimUnk0x488) == 0x488, "jimUnk0x488 should be of size 0x488");
 
 struct jimUnk0x204
 {
@@ -873,17 +861,11 @@ struct jimUnk0x204
 };
 static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
 
-struct jimUnk0x438
-{
-    DDDEVICEIDENTIFIER2 identifier;
-    DWORD field430;
-    DWORD field434;
-};
-static_assert(sizeof(jimUnk0x438) == 0x438, "jimUnk0x438 should be of size 0x438");
-
 jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
-jimUnk0x488* array_776B68 = (jimUnk0x488*)0x776B68;
+//jimUnk0x488* array_776B68 = (jimUnk0x488*)0x776B68;
 jimDeviceIdentifier* g_pDeviceIdentifiers = (jimDeviceIdentifier*)0x776B68;
+
+MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
 
 //MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), validateDeviceCaps);
 int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription, LPSTR lpDeviceName, jimDeviceIdentifier* pIdentifier)
@@ -897,7 +879,7 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
     char localString[0x100];
     uint32_t status = 0;
 
-    if (pIdentifier->ddIdentifier.dwVendorId == 0x8086)
+    if (pIdentifier->ddIdentifier.identifier.dwVendorId == 0x8086)
     {
         strcat(pStringError, "Intel device found. Software only.\n");
         status = 1;
@@ -990,23 +972,23 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
         status |= 2;
     }
     
-    uint32_t field480 = pIdentifier->field480;
+    uint32_t field480 = pIdentifier->ddIdentifier.field430;
     if (((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (byte_776450 != 0))
     {
-        sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.szDescription, lpDeviceName);
+        sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.identifier.szDescription, lpDeviceName);
         strcat(pStringError, "\n\tDevice doesn't meet minimum requirements, and will be ignored by the game\n");
         MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", 0);
     }
     else if (((field480 & 2) == 0) && ((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (byte_774B48 != 0))
     {
-        sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.szDescription, lpDeviceName);
+        sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.identifier.szDescription, lpDeviceName);
         strcat(pStringWarning, "\n\tDevice doesn't support everything the game needs\nBut it will be allowed for selection in Option/Advanced Menu\n");
         MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", 0);
     }
 
-    pIdentifier->field480 |= status;
+    pIdentifier->ddIdentifier.field430 |= status;
 
-    return pIdentifier->field480;
+    return pIdentifier->ddIdentifier.field430;
 }
 
 HRESULT CALLBACK EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
@@ -1020,19 +1002,19 @@ HRESULT CALLBACK EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
 
     if (pDesc->dwWidth == 320 && pDesc->dwHeight == 240)
     {
-        pIdentifier->field484 |= 1;
+        pIdentifier->ddIdentifier.field434 |= 1;
     }
     if (pDesc->dwWidth == 640 && pDesc->dwHeight == 480)
     {
-        pIdentifier->field484 |= 2;
+        pIdentifier->ddIdentifier.field434 |= 2;
     }
     if (pDesc->dwWidth == 800 && pDesc->dwHeight == 600)
     {
-        pIdentifier->field484 |= 4;
+        pIdentifier->ddIdentifier.field434 |= 4;
     }
     if (pDesc->dwWidth == 1024 && pDesc->dwHeight == 768)
     {
-        pIdentifier->field484 |= 8;
+        pIdentifier->ddIdentifier.field434 |= 8;
     }
 
     return 1;
@@ -1048,7 +1030,7 @@ HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDevice
     
     if ((pDesc->dwDevCaps & D3DDEVCAPS_HWRASTERIZATION) && !(pDesc->dwDevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) && (pDesc->dwDeviceRenderBitDepth & DDBD_16))
     {
-        if (pIdentifier->field484 == 0)
+        if (pIdentifier->ddIdentifier.field434 == 0)
             return 1;
     }
     else
@@ -1068,8 +1050,8 @@ HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDevice
         strncpy(pGlobalIdentifier->pDriverDescription, pIdentifier->pDriverDescription, 0x28);
     }
     memcpy(&pGlobalIdentifier->ddIdentifier, &pIdentifier->ddIdentifier, sizeof(pGlobalIdentifier->ddIdentifier));
-    pGlobalIdentifier->field480 = pIdentifier->field480;
-    pGlobalIdentifier->field484 = pIdentifier->field484;
+    pGlobalIdentifier->ddIdentifier.field430 = pIdentifier->ddIdentifier.field430;
+    pGlobalIdentifier->ddIdentifier.field434 = pIdentifier->ddIdentifier.field434;
 
     validateDeviceCaps(pDesc, lpDeviceDescription, lpDeviceName, pGlobalIdentifier);
 
@@ -1091,7 +1073,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     DWORD dwTexTotal;
     DWORD dwTexFree;
     jimDeviceIdentifier identifier;
-    jimUnk0x438 Buf2;
+    jimDeviceDDId Buf2;
     
     if (hm != 0)
         return TRUE;
@@ -1144,21 +1126,21 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
 
     memset(&identifier, 0, sizeof(identifier));
     strncpy(identifier.pDriverDescription, lpDriverDescription, 0x27);
-    pDirectDraw->GetDeviceIdentifier(&identifier.ddIdentifier, 0);
+    pDirectDraw->GetDeviceIdentifier(&identifier.ddIdentifier.identifier, 0);
 
-    int result = File_msgvideocfg_Read(&identifier.ddIdentifier, &Buf2, -1);
+    int result = File_msgvideocfg_Read(&identifier.ddIdentifier.identifier, &Buf2, -1);
     if (result != 0)
     {
-        identifier.field480 = Buf2.field430;
+        identifier.ddIdentifier.field430 = Buf2.field430;
     }
     else
     {
         for (int i = 0; i < 4; i++)
         {
-            result = File_msgvideocfg_Read(&identifier.ddIdentifier, &Buf2, i);
+            result = File_msgvideocfg_Read(&identifier.ddIdentifier.identifier, &Buf2, i);
             if (result != 0)
             {
-                identifier.field480 = Buf2.field430;
+                identifier.ddIdentifier.field430 = Buf2.field430;
                 break;
             }
         }
@@ -1166,25 +1148,25 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
 
     if (dwTexTotal < 0x200000)
     {
-        if ((identifier.field480 & 0x40) == 0 && (identifier.field480 & 1) == 0)
+        if ((identifier.ddIdentifier.field430 & 0x40) == 0 && (identifier.ddIdentifier.field430 & 1) == 0)
         {
             MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", 0);
         }
-        identifier.field480 |= 0x40; // Must mean "low vram" ?
+        identifier.ddIdentifier.field430 |= 0x40; // Must mean "low vram" ?
     }
     else
     {
-        identifier.field480 &= 0xBF;
+        identifier.ddIdentifier.field430 &= 0xBF;
     }
 
     pDirectDraw->EnumDisplayModes(0, 0, &identifier, EnumModesCallback);
 
     if (dwMemTotal < 0x300000)
-        identifier.field484 &= 0xF7;
+        identifier.ddIdentifier.field434 &= 0xF7;
     if (dwMemTotal < 0x258000)
-        identifier.field484 &= 0xFB;
+        identifier.ddIdentifier.field434 &= 0xFB;
     if (dwMemTotal < 0x1E0000)
-        identifier.field484 &= 0xFD;
+        identifier.ddIdentifier.field434 &= 0xFD;
 
     pDirect3D->EnumDevices(Enum3DDevicesCallback, &identifier);
 
@@ -1199,8 +1181,8 @@ int __cdecl jim_enumerate_devices()
 {
     int varC;
     int var8 = 0;
-    char Dst[0x438];
-    char Buf1[0x438];
+    jimDeviceDDId Dst;
+    jimDeviceDDId Buf1;
 
     dword_77C608 = 0;
     dword_77C60C = 0;
@@ -1208,7 +1190,7 @@ int __cdecl jim_enumerate_devices()
 
     for (varC = 0; varC < dword_77C608; varC++)
     {
-        array_776B68[varC].field480 |= 0x80;
+        g_pDeviceIdentifiers[varC].ddIdentifier.field430 |= 0x80;
     }
 
     int var4 = 0x41;
@@ -1218,32 +1200,32 @@ int __cdecl jim_enumerate_devices()
         if (varC >= dword_77C608)
             break;
 
-        if ((array_776B68[varC].field480 & var4) != 0)
+        if ((g_pDeviceIdentifiers[varC].ddIdentifier.field430 & var4) != 0)
         {
-            memset(Dst, 0, 0x438);
-            memcpy(Dst, array_776B68[varC].field50, 0x434);    // Copy of var18 is included by memcpying 4 bytes more
-            if (File_msgvideocfg_Write(Dst, -1) == 0)
+            memset(&Dst, 0, 0x438);
+            memcpy(&Dst, &g_pDeviceIdentifiers[varC].ddIdentifier, 0x434);    // Copy of var18 is included by memcpying 4 bytes more
+            if (File_msgvideocfg_Write(&Dst, -1) == 0)
                 var8++;
 
-            memset(&array_776B68[varC], 0, 0x488);
+            memset(&g_pDeviceIdentifiers[varC], 0, 0x488);
 
             if (varC < dword_77C608)
             {
                 int size = (dword_77C608 - (varC + 1)) * 0x488;
-                memmove(&array_776B68[varC], &array_776B68[varC + 1], size);
+                memmove(&g_pDeviceIdentifiers[varC], &g_pDeviceIdentifiers[varC + 1], size);
             }
             dword_77C608--;
             continue;
         }
 
-        if (array_776B68[varC].field2C != 0)
+        if (g_pDeviceIdentifiers[varC].pOtherGUID != 0)
         {
-            array_776B68[varC].field2C = array_776B68[varC].field40;
+            g_pDeviceIdentifiers[varC].pOtherGUID = &g_pDeviceIdentifiers[varC].otherGUID;
         }
 
-        if (array_776B68[varC].field28 != 0)
+        if (g_pDeviceIdentifiers[varC].pDeviceGUID != 0)
         {
-            array_776B68[varC].field28 = array_776B68[varC].field30;
+            g_pDeviceIdentifiers[varC].pDeviceGUID = &g_pDeviceIdentifiers[varC].deviceGUID;
         }
 
         varC++;
@@ -1251,15 +1233,15 @@ int __cdecl jim_enumerate_devices()
 
     for (varC = 0; varC < 4; varC++)
     {
-        memset(Buf1, 0, 0x438);
+        memset(&Buf1, 0, 0x438);
 
         if (varC < dword_77C608)
         {
-            memcpy(Buf1, array_776B68[varC].field50, 0x434);   // Copy of var_450 included same way as earlier
-            if (file_msgvideocfg_Write2(Buf1, -1) == 1)
+            memcpy(&Buf1, &g_pDeviceIdentifiers[varC].ddIdentifier, 0x434);   // Copy of var_450 included same way as earlier
+            if (file_msgvideocfg_Write2(&Buf1, -1) == 1)
                 var8++;
         }
-        if (File_msgvideocfg_Write(Buf1, varC) == 0)
+        if (File_msgvideocfg_Write(&Buf1, varC) == 0)
             var8++;
     }
 
@@ -1270,10 +1252,10 @@ int __cdecl jim_enumerate_devices()
     for (varC = 0; varC < dword_77C608; varC++)
     {
         memset(&array_689B68[dword_68C3B8], 0, 0x204);
-        strncpy(array_689B68[dword_68C3B8].string, array_776B68[varC].field250, 0x200);
-        array_689B68[dword_68C3B8].field200 = array_776B68[varC].field484;
+        strncpy(array_689B68[dword_68C3B8].string, g_pDeviceIdentifiers[varC].ddIdentifier.identifier.szDescription, 0x200);
+        array_689B68[dword_68C3B8].field200 = g_pDeviceIdentifiers[varC].ddIdentifier.field434;
         
-        if (array_776B68[varC].field480 & 2)
+        if (g_pDeviceIdentifiers[varC].ddIdentifier.field430 & 2)
         {
             array_689B68[dword_68C3B8].field200 |= 0x10;
         }
