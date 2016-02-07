@@ -99,40 +99,40 @@ MGS_VAR(1, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
 
 #define SKIP true
 
-MSG_FUNC_IMPLEX(0x0052269C, Sound_Init, SKIP);
-MSG_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, SKIP);
-MSG_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, SKIP);
+MSG_FUNC_IMPLEX(0x0052269C, Sound_Init, false);
+MSG_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, false);
+MSG_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, false);
 MSG_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, SKIP);
-MSG_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, SKIP);
-MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, SKIP);
-MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, SKIP);
-MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, SKIP);
-MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, SKIP);
-MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, SKIP);
-MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, SKIP);
+MSG_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, false);
+MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, false);
+MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, false);
+MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, false);
+MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, false);
+MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, false);
+MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, false);
 MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, SKIP);
 MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP);
 MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP);
 MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
-MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, SKIP);
+MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, false);
 MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SKIP);
 MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP);
-MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, SKIP);
-MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, SKIP);
-MSG_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, SKIP);
-MSG_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);
-MSG_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP);
-MSG_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, SKIP);
-MSG_FUNC_IMPLEX(0x00523232, Sound_Start2SamplesQ, SKIP);
-MSG_FUNC_IMPLEX(0x00523466, Sound_Stop2Samples, SKIP);
+MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, false);
+MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, false);
+MSG_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, false);
+MSG_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);  // causes raspy codec if redirected
+MSG_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP); // causes raspy codec if redirected
+MSG_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, false);
+MSG_FUNC_IMPLEX(0x00523232, Sound_Start2SamplesQ, false);
+MSG_FUNC_IMPLEX(0x00523466, Sound_Stop2Samples, false);
 MSG_FUNC_IMPLEX(0x0052313B, Sound_StopSample, SKIP);
-MSG_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, SKIP);
-MSG_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, SKIP);
-MSG_FUNC_IMPLEX(0x005224C8, Sound_SetSoundFxVolume, SKIP);
+MSG_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, false);
+MSG_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, false);
+MSG_FUNC_IMPLEX(0x005224C8, Sound_SetSoundFxVolume, false);
 MSG_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
-MSG_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, SKIP);
-MSG_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, SKIP);
-MSG_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, SKIP);
+MSG_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, false);
+MSG_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, false);
+MSG_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, false);
 MSG_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP);
 MSG_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP);
 
@@ -429,9 +429,7 @@ bool __cdecl Sound_GetSamp1PosQ()
 // 0x005224BE
 int __cdecl Sound_GetSomeStateQ()
 {
-   // return gSndState_dword_77E2D4;
-    // HACK/ FIX ME
-    return 0;
+   return gSndState_dword_77E2D4;
 }
 
 
@@ -495,7 +493,7 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
                 &sizeToRead,
                 &v9,
                 &v10,
-                0) == 0x88780096)
+                0) == DSERR_BUFFERLOST)
             {
                 g128_Sound_buffers_dword_77DCA0[idx]->Restore();
                 g128_Sound_buffers_dword_77DCA0[idx]->Lock(
@@ -714,7 +712,7 @@ LABEL_74:
             &nNumberOfBytesToRead,
             &v9,
             &v11,
-            0) == 0x88780096)
+            0) == DSERR_BUFFERLOST)
         {
             gSndBuffer_dword_77E2D0->Restore();
             gSndBuffer_dword_77E2D0->Lock(0, 88200, &v10, &nNumberOfBytesToRead, &v9, &v11, 0);
@@ -882,7 +880,7 @@ void __cdecl Sound_PopulateBufferQ()
                         &nNumberOfBytesToRead,
                         &v4,
                         &v6,
-                        0) == 0x88780096)
+                        0) == DSERR_BUFFERLOST)
                     {
                         gSndBuffer_dword_77E2D0->Restore();
                         gSndBuffer_dword_77E2D0->Lock(
@@ -1004,7 +1002,7 @@ signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BY
     pDst = 0;
     if (gSndBuffer_dword_77E0A0)
     {
-        if (gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0) == 0x88780096)
+        if (gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0) == DSERR_BUFFERLOST)
         {
             gSndBuffer_dword_77E0A0->Restore();
             gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0);
@@ -1100,7 +1098,7 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
             {
                 if (Size + dword_77E2F8 <= gSamp1PlayPos_dword_77E1D0)
                 {
-                    if (snd->Lock(dword_77E2F8, Size, (LPVOID*)&Dst, &v16, (LPVOID*)&v12, &v15, 0) == 0x88780096)
+                    if (snd->Lock(dword_77E2F8, Size, (LPVOID*)&Dst, &v16, (LPVOID*)&v12, &v15, 0) == DSERR_BUFFERLOST)
                     {
                         snd->Restore();
                         snd->Lock(dword_77E2F8, Size, (LPVOID*)&Dst, &v16, (LPVOID*)&v12, &v15, 0);
@@ -1658,7 +1656,7 @@ int __cdecl Sound_Unknown5(int a1, int a2, BYTE*(__cdecl* fnRead)(DWORD))
                 &Size,
                 &sndPtr,
                 &sndBufSize,
-                0) == 0x88780096)
+                0) == DSERR_BUFFERLOST)
             {
                 gSndBuffer_dword_77E0A0->Restore();
                 gSndBuffer_dword_77E0A0->Lock(
@@ -1706,19 +1704,18 @@ void __cdecl Sound_Unknown6()
 // 0x00646660
 int __cdecl Sound_Play(unsigned int playingFlags)
 {
-    int result;
     if (playingFlags & 0xFF000000)
     {
         if ((playingFlags & 0xFF000000) == 0x1000000)
+        {
             Sound_PlayMusic(playingFlags & 0xFFFFFF);
-        result = 0;
+        }
     }
     else
     {
         Sound_PlayEffect(playingFlags, (playingFlags >> 16), playingFlags >> 8);
-        result = 0;
     }
-    return result;
+    return 0;
 }
 
 // 0x0044FF6C
