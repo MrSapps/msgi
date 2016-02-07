@@ -22,10 +22,7 @@ TypeName& VarName = (Redirect) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_#
 
 MGS_ARY(REDIRECT_SOUND, 0x77DCA0, IDirectSoundBuffer*, 256, g128_Sound_buffers_dword_77DCA0, {});
 MGS_ARY(REDIRECT_SOUND, 0x77D8A0, DWORD, 256, gFxState_dword_77D8A0, {});
-
-
 MGS_PTR(REDIRECT_SOUND, 0x77E2D0, IDirectSoundBuffer*, gSndBuffer_dword_77E2D0, nullptr);
-
 MGS_VAR(REDIRECT_SOUND, 0x68CE30, DWORD, gMusicWavFile_dword_68CE30, 0);
 MGS_PTR(REDIRECT_SOUND, 0x77E0A0, IDirectSoundBuffer*, gSndBuffer_dword_77E0A0, nullptr);
 MGS_VAR(REDIRECT_SOUND, 0x77E2D4, DWORD, gSndState_dword_77E2D4, 0);
@@ -37,86 +34,70 @@ static DWORD* dword_68D05C; // 21 array?
 static DWORD* dword_68D084 = (DWORD*)0x68D084; // part of below array?
 static DWORD* dword_68D088 = (DWORD*)0x68D088; // 10 array?
 
-static IDirectSoundBuffer* g64_dword_77D774[64] = {};
-static DWORD dword_77E2DC = 0;
-static DWORD dword_77E2F0 = 0;
-
-static DWORD dword_77E2D8;
-static IDirectSound* gDSound_dword_77E2C0 = nullptr;
-static IDirectSoundBuffer* gSoundBuffer_dword_77E1B0 = nullptr;
-
-
-static DWORD dword_77E1B4 = 0;
-static DWORD dword_77E1C4 = 0;
-static DWORD dword_77D87C = 0;
-static DWORD gBlockAlign_dword_77E1DC = 0;
-static LONG gSndVolume_dword_77D88C = 0;
-static QWORD qword_77E1A8 = 0;
-static DWORD dword_77D874 = 0;
-static QWORD qword_77D898 = 0;
-static IDirectSoundBuffer* gSndSamp1_dword_77E2C4 = nullptr;
-static IDirectSoundBuffer* gSndSamp2_dword_77E2C8 = nullptr;
-static DWORD gSamp1PlayPos_dword_77E1D0 = 0;
-static DWORD dword_68E318 = 0;
-static DWORD dword_77E2F8 = 0;
-static DWORD dword_68CE18 = 0;
-DWORD dword_77D894 = 0;
-DWORD dword_77E2F4 = 0;
+MGS_ARY(REDIRECT_SOUND, 0x77D774, IDirectSoundBuffer*, 64, g64_dword_77D774, {});
+MGS_VAR(REDIRECT_SOUND, 0x77E2DC, DWORD, dword_77E2DC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2F0, DWORD, dword_77E2F0, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2D8, DWORD, dword_77E2D8, 0);
+MGS_PTR(REDIRECT_SOUND, 0x77E2C0, IDirectSound*, gDSound_dword_77E2C0, nullptr);
+MGS_PTR(REDIRECT_SOUND, 0x77E1B0, IDirectSoundBuffer*, gSoundBuffer_dword_77E1B0, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77E1B4, DWORD, dword_77E1B4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1C4, DWORD, dword_77E1C4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D87C, DWORD, dword_77D87C, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1DC, DWORD, gBlockAlign_dword_77E1DC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D88C, LONG, gSndVolume_dword_77D88C, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1A8, QWORD, qword_77E1A8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D874, DWORD, dword_77D874, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D898, QWORD, qword_77D898, 0);
+MGS_PTR(REDIRECT_SOUND, 0x77E2C4, IDirectSoundBuffer*, gSndSamp1_dword_77E2C4, nullptr);
+MGS_PTR(REDIRECT_SOUND, 0x77E2C8, IDirectSoundBuffer*, gSndSamp2_dword_77E2C8, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D0, DWORD, gSamp1PlayPos_dword_77E1D0, 0);
+MGS_VAR(REDIRECT_SOUND, 0x68E318, DWORD, dword_68E318, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2F8, DWORD, dword_77E2F8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x68CE18, DWORD, dword_68CE18, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D894, DWORD, dword_77D894, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2F4, DWORD, dword_77E2F4, 0);
 
 // Many unknowns in these
 char** off_68D0B4 = (char**)0x68D0B4;
 char* byte_68D0B1 = (char*)0x68D0B1;
 char* byte_68D0B0 = (char*)0x68D0B0;
-__int16* unk_68D630 = (__int16*)0x68D630;
-//__int16 unk_68D630[1550] = {};
 
-DWORD gSampleSet_dword_68CE34 = 0;
-
-unsigned char* byte_68CE38 = (unsigned char*)0x68CE38;
-unsigned char* byte_68CE39 = (unsigned char*)0x68CE39;
-DWORD dword_77E2E0 = 0;
-DWORD dword_68CE2C = 0;
-DWORD dword_77E2EC = 0;
-DWORD dword_77E2E8 = 0;
-DWORD dword_77E1C0 = 0;
-
-DWORD dword_77E1C8 = 0;
-DWORD dword_77E1BC = 0;
-DWORD dword_77D770 = 0;
-DWORD dword_77D878 = 0;
-DWORD dword_77E1A4 = 0;
-BYTE byte_77D888 = 0;
-
-DWORD* dword_68D02C = (DWORD*)0x68D02C;
-DWORD* dword_68D030 = (DWORD*)0x68D030;
-
-DWORD* dword_68D000 = (DWORD*)0x68D000;
-DWORD* dword_68D004 = (DWORD*)0x68D004;
-
-DWORD* dword_68CEE4 = (DWORD*)0x68CEE4;
-
-DWORD dword_77D880 = 0;
-DWORD dword_77E1B8 = 0;
-DWORD dword_77E1CC = 0;
-DWORD dword_77E1D8 = 0;
-DWORD gSndTime_dword_77D890 = 0;
-
-DWORD dword_77E1D4 = 0;
-
-DWORD dword_77E2E4 = 0;
-
-
-float* byte_68E2D0 = (float*)0x68E2D0; // XA K0
-double& dbl_77E300 = *(double*)0x77E300;
-double& dbl_77E308 = *(double*)0x77E308;
-double& dbl_77E310 = *(double*)0x77E310;
-double& dbl_77E318 = *(double*)0x77E318;
-double* dbl_77E1E0 = (double*)0x77E1E0;
-double* dbl_77E1E8 = (double*)0x77E1E8;
-DWORD* dword_68E2C8 = (DWORD*)0x68E2C8;
-
-// Used outside of sound module
-VAR(DWORD, dword_77E2CC, 0x77E2CC);
+MGS_ARY(REDIRECT_SOUND, 0x68D630, __int16, 1550, unk_68D630, {});
+MGS_VAR(REDIRECT_SOUND, 0x68CE34, DWORD, gSampleSet_dword_68CE34, 0);
+MGS_PTR(REDIRECT_SOUND, 0x68CE38, unsigned char*, byte_68CE38, nullptr); // TODO: Array?
+MGS_PTR(REDIRECT_SOUND, 0x68CE39, unsigned char*, byte_68CE39, nullptr); // TODO: Array?
+MGS_VAR(REDIRECT_SOUND, 0x77E2E0, DWORD, dword_77E2E0, 0);
+MGS_VAR(REDIRECT_SOUND, 0x68CE2C, DWORD, dword_68CE2C, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2EC, DWORD, dword_77E2EC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2E8, DWORD, dword_77E2E8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1C0, DWORD, dword_77E1C0, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1C8, DWORD, dword_77E1C8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1BC, DWORD, dword_77E1BC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D770, DWORD, dword_77D770, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D878, DWORD, dword_77D878, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1A4, DWORD, dword_77E1A4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D888, BYTE, byte_77D888, 0);
+MGS_PTR(REDIRECT_SOUND, 0x68D02C, DWORD*, dword_68D02C, nullptr);
+MGS_PTR(REDIRECT_SOUND, 0x68D030, DWORD*, dword_68D030, nullptr);
+MGS_PTR(REDIRECT_SOUND, 0x68D000, DWORD*, dword_68D000, nullptr);
+MGS_PTR(REDIRECT_SOUND, 0x68D004, DWORD*, dword_68D004, nullptr);
+MGS_PTR(REDIRECT_SOUND, 0x68CEE4, DWORD*, dword_68CEE4, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77D880, DWORD, dword_77D880, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1B8, DWORD, dword_77E1B8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1CC, DWORD, dword_77E1CC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D8, DWORD, dword_77E1D8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D890, DWORD, gSndTime_dword_77D890, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D4, DWORD, dword_77E1D4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2E4, DWORD, dword_77E2E4, 0);
+MGS_PTR(REDIRECT_SOUND, 0x68E2D0, float*, byte_68E2D0, nullptr); // XA K0
+MGS_VAR(REDIRECT_SOUND, 0x77E300, double, dbl_77E300, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E308, double, dbl_77E308, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E310, double, dbl_77E310, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E318, double, dbl_77E318, 0);
+MGS_PTR(REDIRECT_SOUND, 0x77E1E0, double*, dbl_77E1E0, nullptr);
+MGS_PTR(REDIRECT_SOUND, 0x77E1E8, double*, dbl_77E1E8, nullptr);
+MGS_PTR(REDIRECT_SOUND, 0x68E2C8, DWORD*, dword_68E2C8, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
 
 
 MSG_FUNC_IMPL(0x0052269C, Sound_Init);
