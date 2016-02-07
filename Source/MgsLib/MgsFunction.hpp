@@ -127,6 +127,11 @@ public:
 
     ReturnType operator()(Args ... args)
     {
+        if (mPassThrough)
+        {
+            return mRealFuncPtr(args...);
+        }
+
         if (kLogArgs)
         {
             std::cout << mFnName << " (";
@@ -134,7 +139,7 @@ public:
             std::cout << ")" << std::endl;
         }
 
-        if (kNewAddr || mPassThrough)
+        if (kNewAddr)
         {
             // Call "newAddr" since we've replaced the function completely
             return reinterpret_cast<TFuncType>(kNewAddr)(args...);
