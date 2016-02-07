@@ -99,14 +99,14 @@ MGS_VAR(1, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
 
 #define SKIP true
 
-MSG_FUNC_IMPLEX(0x0052269C, Sound_Init, SKIP);
-MSG_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, SKIP);
-MSG_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, SKIP);
+MSG_FUNC_IMPLEX(0x0052269C, Sound_Init, false);
+MSG_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, false);
+MSG_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, false);
 MSG_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, SKIP);
 MSG_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, SKIP);
-MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, SKIP);
-MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, SKIP);
-MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, SKIP);
+MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, false);
+MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, false);
+MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, false);
 MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, SKIP);
 MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, SKIP);
 MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, SKIP);
@@ -429,9 +429,7 @@ bool __cdecl Sound_GetSamp1PosQ()
 // 0x005224BE
 int __cdecl Sound_GetSomeStateQ()
 {
-   // return gSndState_dword_77E2D4;
-    // HACK/ FIX ME
-    return 0;
+   return gSndState_dword_77E2D4;
 }
 
 
