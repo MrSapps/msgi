@@ -6,136 +6,153 @@
 
 using QWORD = __int64;
 
-static IDirectSoundBuffer* gSndBuffer_dword_77E2D0 = nullptr;
-static IDirectSoundBuffer* g128_Sound_buffers_dword_77DCA0[256] = {};
-static IDirectSoundBuffer* gSndBuffer_dword_77E0A0 = nullptr;
-static DWORD gSndState_dword_77E2D4 = 0;
-static DWORD gSoundFxIdx_dword_77D884 = 0;
+#define REDIRECT_SOUND 1
+
+#define MGS_ARY(Redirect, Addr, TypeName, Size, VarName, ...)\
+TypeName LocalArray_##VarName[Size]=__VA_ARGS__;\
+TypeName* VarName = (Redirect) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
+
+#define MGS_PTR(Redirect, Addr, TypeName, VarName, Value)\
+TypeName LocalPtr_##VarName = Value;\
+TypeName VarName = (Redirect) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
+
+#define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)\
+TypeName LocalVar_##VarName = Value;\
+TypeName& VarName = (Redirect) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
+
+MGS_ARY(REDIRECT_SOUND, 0x77DCA0, IDirectSoundBuffer*, 256, g128_Sound_buffers_dword_77DCA0, {});
+MGS_ARY(REDIRECT_SOUND, 0x77D8A0, DWORD, 256, gFxState_dword_77D8A0, {});
+MGS_VAR(REDIRECT_SOUND, 0x77E2D0, IDirectSoundBuffer*, gSndBuffer_dword_77E2D0, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x68CE30, DWORD, gMusicWavFile_dword_68CE30, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E0A0, IDirectSoundBuffer*, gSndBuffer_dword_77E0A0, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77E2D4, DWORD, gSndState_dword_77E2D4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D884, DWORD, gSoundFxIdx_dword_77D884, 0);
+
+// TODO: Use macro
 static DWORD* dword_68D058; // part of below array?
 static DWORD* dword_68D05C; // 21 array?
-static DWORD* dword_68D084; // part of below array?
-static DWORD* dword_68D088; // 10 array?
-static IDirectSoundBuffer* g64_dword_77D774[64] = {};
-static DWORD dword_77E2DC = 0;
-static DWORD dword_77E2F0 = 0;
-static DWORD gWaveFile_dword_68CE30 = 0;
-static DWORD dword_77E2D8;
-static IDirectSound* gDSound_dword_77E2C0 = nullptr;
-static IDirectSoundBuffer* gSoundBuffer_dword_77E1B0 = nullptr;
-static DWORD* gFxState_dword_77D8A0 = 0; // 256 array?
-static DWORD dword_77E1B4 = 0;
-static DWORD dword_77E1C4 = 0;
-static DWORD dword_77D87C = 0;
-static DWORD gBlockAlign_dword_77E1DC = 0;
-static LONG gSndVolume_dword_77D88C = 0;
-static QWORD qword_77E1A8 = 0;
-static DWORD dword_77D874 = 0;
-static QWORD qword_77D898 = 0;
-static IDirectSoundBuffer* gSndSamp1_dword_77E2C4 = nullptr;
-static IDirectSoundBuffer* gSndSamp2_dword_77E2C8 = nullptr;
-static DWORD gSamp1PlayPos_dword_77E1D0 = 0;
-static DWORD dword_68E318 = 0;
-static DWORD dword_77E2F8 = 0;
-static DWORD dword_68CE18 = 0;
-DWORD dword_77D894 = 0;
-DWORD dword_77E2F4 = 0;
+static DWORD* dword_68D084 = (DWORD*)0x68D084; // part of below array?
+static DWORD* dword_68D088 = (DWORD*)0x68D088; // 10 array?
 
-// Many unknowns in these
-char** off_68D0B4 = 0;
-char* byte_68D0B1 = 0;
-char* byte_68D0B0 = 0;
-__int16 unk_68D630[1550] = {};
-DWORD dword_68CE34 = 0;
+MGS_ARY(REDIRECT_SOUND, 0x77D774, IDirectSoundBuffer*, 64, g64_dword_77D774, {});
+MGS_VAR(REDIRECT_SOUND, 0x77E2DC, DWORD, dword_77E2DC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2F0, DWORD, dword_77E2F0, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2D8, DWORD, dword_77E2D8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2C0, IDirectSound*, gDSound_dword_77E2C0, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77E1B0, IDirectSoundBuffer*, gSoundBuffer_dword_77E1B0, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77E1B4, DWORD, dword_77E1B4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1C4, DWORD, dword_77E1C4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D87C, DWORD, dword_77D87C, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1DC, DWORD, gBlockAlign_dword_77E1DC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D88C, LONG, gSndVolume_dword_77D88C, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1A8, QWORD, qword_77E1A8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D874, DWORD, dword_77D874, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D898, QWORD, qword_77D898, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2C4, IDirectSoundBuffer*, gSndSamp1_dword_77E2C4, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77E2C8, IDirectSoundBuffer*, gSndSamp2_dword_77E2C8, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D0, DWORD, gSamp1PlayPos_dword_77E1D0, 0);
+MGS_VAR(REDIRECT_SOUND, 0x68E318, DWORD, dword_68E318, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2F8, DWORD, dword_77E2F8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x68CE18, DWORD, dword_68CE18, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D894, DWORD, dword_77D894, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2F4, DWORD, dword_77E2F4, 0);
 
-unsigned char* byte_68CE38 = nullptr;
-unsigned char* byte_68CE39 = nullptr;
-DWORD dword_77E2E0 = 0;
-DWORD dword_68CE2C = 0;
-DWORD dword_77E2EC = 0;
-DWORD dword_77E2E8 = 0;
-DWORD dword_77E1C0 = 0;
+// TODO: Use macro
+char** off_68D0B4 = (char**)0x68D0B4;
+char* byte_68D0B1 = (char*)0x68D0B1;
+char* byte_68D0B0 = (char*)0x68D0B0;
 
-DWORD dword_77E1C8 = 0;
-DWORD dword_77E1BC = 0;
-DWORD dword_77D770 = 0;
-DWORD dword_77D878 = 0;
-DWORD dword_77E1A4 = 0;
-BYTE byte_77D888 = 0;
+MGS_ARY(REDIRECT_SOUND, 0x68D630, __int16, 1550, unk_68D630, {});
+MGS_VAR(REDIRECT_SOUND, 0x68CE34, DWORD, gSampleSet_dword_68CE34, 0);
+MGS_PTR(1, 0x68CE38, unsigned char*, byte_68CE38, nullptr); // TODO: Figure out array size and dump it
+MGS_PTR(1, 0x68CE39, unsigned char*, byte_68CE39, nullptr); // TODO: Figure out array size and dump it
+MGS_VAR(REDIRECT_SOUND, 0x77E2E0, DWORD, dword_77E2E0, 0);
+MGS_VAR(REDIRECT_SOUND, 0x68CE2C, DWORD, dword_68CE2C, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2EC, DWORD, dword_77E2EC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2E8, DWORD, dword_77E2E8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1C0, DWORD, dword_77E1C0, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1C8, DWORD, dword_77E1C8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1BC, DWORD, dword_77E1BC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D770, DWORD, dword_77D770, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D878, DWORD, dword_77D878, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1A4, DWORD, dword_77E1A4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D888, BYTE, byte_77D888, 0);
+MGS_PTR(1, 0x68D02C, DWORD*, dword_68D02C, nullptr); // TODO: Figure out array size and dump it
+MGS_PTR(1, 0x68D000, DWORD*, dword_68D000, nullptr); // TODO: Figure out array size and dump it
+MGS_PTR(1, 0x68CEE4, DWORD*, dword_68CEE4, nullptr);// TODO: Figure out array size and dump it
+MGS_VAR(REDIRECT_SOUND, 0x77D880, DWORD, dword_77D880, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1B8, DWORD, dword_77E1B8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1CC, DWORD, dword_77E1CC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D8, DWORD, dword_77E1D8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D890, DWORD, gSndTime_dword_77D890, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D4, DWORD, dword_77E1D4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2E4, DWORD, dword_77E2E4, 0);
+MGS_PTR(1, 0x68E2D0, float*, byte_68E2D0, nullptr); // XA K0 TODO: Figure out array size and dump it
+MGS_VAR(REDIRECT_SOUND, 0x77E300, double, dbl_77E300, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E308, double, dbl_77E308, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E310, double, dbl_77E310, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E318, double, dbl_77E318, 0);
+MGS_PTR(1, 0x77E1E0, double*, dbl_77E1E0, nullptr); // array?
+MGS_PTR(1, 0x77E1E8, double*, dbl_77E1E8, nullptr); // array?
+MGS_PTR(1, 0x68E2C8, DWORD*, dword_68E2C8, nullptr); // array?
+MGS_VAR(1, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
 
-DWORD* dword_68D02C = nullptr;
-DWORD* dword_68D030 = nullptr;
+#define SKIP true
 
-DWORD* dword_68D000 = nullptr;
-DWORD* dword_68D004 = nullptr;
+MSG_FUNC_IMPLEX(0x0052269C, Sound_Init, SKIP);
+MSG_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, SKIP);
+MSG_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, SKIP);
+MSG_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, SKIP);
+MSG_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, SKIP);
+MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, SKIP);
+MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, SKIP);
+MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, SKIP);
+MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, SKIP);
+MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, SKIP);
+MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, SKIP);
+MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, SKIP);
+MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP);
+MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP);
+MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
+MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, SKIP);
+MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SKIP);
+MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP);
+MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, SKIP);
+MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, SKIP);
+MSG_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, SKIP);
+MSG_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);
+MSG_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP);
+MSG_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, SKIP);
+MSG_FUNC_IMPLEX(0x00523232, Sound_Start2SamplesQ, SKIP);
+MSG_FUNC_IMPLEX(0x00523466, Sound_Stop2Samples, SKIP);
+MSG_FUNC_IMPLEX(0x0052313B, Sound_StopSample, SKIP);
+MSG_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, SKIP);
+MSG_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, SKIP);
+MSG_FUNC_IMPLEX(0x005224C8, Sound_SetSoundFxVolume, SKIP);
+MSG_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
+MSG_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, SKIP);
+MSG_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, SKIP);
+MSG_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, SKIP);
+MSG_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP);
+MSG_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP);
 
-DWORD* dword_68CEE4 = nullptr;
 
-DWORD dword_77D880 = 0;
-DWORD dword_77E1B8 = 0;
-DWORD dword_77E1CC = 0;
-DWORD dword_77E1D8 = 0;
-DWORD gSndTime_dword_77D890 = 0;
+#pragma comment(lib, "Winmm.lib") // timegettime()
 
-DWORD dword_77E1D4 = 0;
+void SoundCpp_ForceLink()
+{
+    // Make sure the linker won't throw this module away
+}
 
-DWORD dword_77E2E4 = 0;
-
-
-float* byte_68E2D0 = nullptr; // XA K0
-double dbl_77E300;
-double dbl_77E308;
-double dbl_77E310;
-double dbl_77E318;
-double* dbl_77E1E0;
-double* dbl_77E1E8;
-DWORD* dword_68E2C8;
-
-VAR(DWORD, dword_77E2CC, 0x77E2CC);
-
-/*
-MSG_FUNC_IMPL(0x0052269C, Sound_Init);
-MSG_FUNC_IMPL(0x005227AD, Sound_CharUpperChangeQ);
-MSG_FUNC_IMPL(0x00522BCE, Sound_CleanUpRelated);
-MSG_FUNC_IMPL(0x00522466, Sound_CloseWavStopQ);
-MSG_FUNC_IMPL(0x00523A44, Sound_CreateBufferQ);
-MSG_FUNC_IMPL(0x00522601, Sound_CreatePrimarySoundBuffer);
-MSG_FUNC_IMPL(0x00521982, Sound_CreateSecondarySoundBuffer);
-MSG_FUNC_IMPL(0x0052236D, Sound_FadeQ);
-MSG_FUNC_IMPL(0x005234EA, Sound_GetSamp1PosQ);
-MSG_FUNC_IMPL(0x005224BE, Sound_GetSomeStateQ);
-MSG_FUNC_IMPL(0x00522A33, Sound_InitFx);
-MSG_FUNC_IMPL(0x005227FF, Sound_LoadBufferFromFile);
-MSG_FUNC_IMPL(0x00522A9C, Sound_LoadFxRelatedQ);
-MSG_FUNC_IMPL(0x00522B8D, Sound_LoadFxRelatedQ2);
-MSG_FUNC_IMPL(0x00521A54, Sound_MxdWavRelated);
-MSG_FUNC_IMPL(0x005231A9, Sound_PlaySample);
-MSG_FUNC_IMPL(0x0052307F, Sound_PlaySampleRelated);
-MSG_FUNC_IMPL(0x00521F82, Sound_PopulateBufferQ);
-MSG_FUNC_IMPL(0x00523A1F, Sound_ReleaseBufferQ);
-MSG_FUNC_IMPL(0x00521A18, Sound_ReleaseSecondaryBuffer);
-MSG_FUNC_IMPL(0x00523B2C, Sound_RestoreRelatedQ);
-MSG_FUNC_IMPL(0x00523563, Sound_Samp1Related);
-MSG_FUNC_IMPL(0x005239B5, Sound_Samp1Related_2);
-MSG_FUNC_IMPL(0x005226EB, Sound_ShutDown);
-MSG_FUNC_IMPL(0x00523232, Sound_Start2SamplesQ);
-MSG_FUNC_IMPL(0x00523466, Sound_Stop2Samples);
-MSG_FUNC_IMPL(0x0052313B, Sound_StopSample);
-MSG_FUNC_IMPL(0x00521898, Sound_TableUnknown1);
-MSG_FUNC_IMPL(0x0052255B, Sound_Unknown1);
-MSG_FUNC_IMPL(0x005224C8, Sound_Unknown2);
-MSG_FUNC_IMPL(0x00522CB2, Sound_Unknown3);
-MSG_FUNC_IMPL(0x00523E12, Sound_Unknown4);
-MSG_FUNC_IMPL(0x00523CF3, Sound_Unknown5);
-MSG_FUNC_IMPL(0x00523CB9, Sound_Unknown6);
-*/
+MSG_FUNC_NOT_IMPL(0x005530A8, HRESULT __stdcall(LPGUID, LPDIRECTSOUND*, LPUNKNOWN), MgsDirectSoundCreate);
+//MSG_FUNC_NOT_IMPL(0x0053D680, int __cdecl(int), msg_close);
 
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
 {
     signed int result = 0;
 
-    if (true) // TODO: Link fix
-        //  if (DirectSoundCreate(0, &gDSound_dword_77E2C0, 0))
+    if (MgsDirectSoundCreate(0, &gDSound_dword_77E2C0, 0))
     {
         result = 0;
     }
@@ -156,7 +173,7 @@ signed int __cdecl Sound_Init(HWND hwnd)
 }
 
 // 0x005227AD
-char __cdecl Sound_CharUpperChangeQ(char value)
+char __cdecl Sound_HexCharToInt(char value)
 {
     char ret;
     if (value < '0' || value > '9')
@@ -220,13 +237,12 @@ int __cdecl Sound_CloseWavStopQ()
         result = gSndBuffer_dword_77E2D0->Stop();
     }
 
-    if (gWaveFile_dword_68CE30 != -1)
+    if (gMusicWavFile_dword_68CE30 != -1)
     {
-        // TODO: msg_close
-        //result = _close(gWaveFile_dword_68CE30);
+        result = _close(gMusicWavFile_dword_68CE30);
     }
 
-    gWaveFile_dword_68CE30 = -1;
+    gMusicWavFile_dword_68CE30 = -1;
     gSndState_dword_77E2D4 = 0;
     dword_77E2D8 = 0;
     return result;
@@ -413,8 +429,11 @@ bool __cdecl Sound_GetSamp1PosQ()
 // 0x005224BE
 int __cdecl Sound_GetSomeStateQ()
 {
-    return gSndState_dword_77E2D4;
+   // return gSndState_dword_77E2D4;
+    // HACK/ FIX ME
+    return 0;
 }
+
 
 // 0x00522A33
 int __cdecl Sound_InitFx()
@@ -436,7 +455,7 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
 {
     signed int result;
     size_t v3;
-    char v4;
+    char v4[20] = {};
     DWORD sizeToRead;
     DSBUFFERDESC bufferDesc;
     void* v9;
@@ -447,23 +466,23 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
 
     gSoundFxIdx_dword_77D884 = -1;
     fileNameLength = strlen(fileName) - 6;
-    const char v1 = 16 * Sound_CharUpperChangeQ(fileName[fileNameLength]);
-    const unsigned __int8 idx = Sound_CharUpperChangeQ(fileName[fileNameLength + 1]) + v1;
+    const char v1 = 16 * Sound_HexCharToInt(fileName[fileNameLength]);
+    const unsigned __int8 idx = Sound_HexCharToInt(fileName[fileNameLength + 1]) + v1;
     memset(&bufferDesc, 0, 36u);
     bufferDesc.dwSize = 36;
     bufferDesc.dwFlags = 0x100C8;
     bufferDesc.lpwfxFormat = &waveFormat;
     FILE* File = File_LoadDirFileQ(fileName, 0);
     if (File
-        && (File_NormalRead(File, &v4, 20u), File_NormalRead(File, &waveFormat, 18u) == 18)
-        && (File_NormalRead(File, &v4, 2u), File_NormalRead(File, &sizeToRead, 4u) == 4))
+        && (File_NormalRead(File, v4, 20u), File_NormalRead(File, &waveFormat, 18u) == 18)
+        && (File_NormalRead(File, v4, 2u), File_NormalRead(File, &sizeToRead, 4u) == 4))
     {
         bufferDesc.dwBufferBytes = sizeToRead;
         if (gDSound_dword_77E2C0)
         {
             if (gDSound_dword_77E2C0->CreateSoundBuffer(
                 &bufferDesc,
-                (IDirectSoundBuffer **)g128_Sound_buffers_dword_77DCA0[idx],
+                &g128_Sound_buffers_dword_77DCA0[idx],
                 0))
             {
                 return 0;
@@ -540,7 +559,7 @@ void __cdecl Sound_LoadFxRelatedQ(const char *Str1)
             gFxState_dword_77D8A0[soundNum] = 0;
         }
     }
-    dword_68CE34 = sampleSet;
+    gSampleSet_dword_68CE34 = sampleSet;
 }
 
 // 0x00522B8D
@@ -555,13 +574,13 @@ void __cdecl Sound_LoadFxRelatedQ2(const char *Str1)
 }
 
 // 0x00521A54
-signed int __cdecl Sound_MxdWavRelated(signed int a1)
+signed int __cdecl Sound_PlayMusic(unsigned int flags)
 {
     int v2;
     bool v3;
     bool v4;
     LARGE_INTEGER Frequency;
-    char soundFileName;
+    char soundFileName[256] = {};
     __int64 freq;
     unsigned __int8 sndNumber;
     void* v9;
@@ -570,31 +589,31 @@ signed int __cdecl Sound_MxdWavRelated(signed int a1)
     DWORD nNumberOfBytesToRead;
     LARGE_INTEGER PerformanceCount;
 
-    if ((a1 & 0xFFFF00) == 0xFFFF00)
+    if ((flags & 0xFFFF00) == 0xFFFF00)
     {
-        if (a1 >= 6 && a1 <= 13 || a1 == 255)
+        if (flags >= 6 && flags <= 13 || flags == 255)
         {
-            if (a1 == 255)
+            if (flags == 255)
             {
                 Sound_CloseWavStopQ();
             }
             else
             {
-                Sound_FadeQ((a1 - 6) % 4);
-                v4 = a1 >= 6 && a1 <= 9;
+                Sound_FadeQ((flags - 6) % 4);
+                v4 = flags >= 6 && flags <= 9;
                 dword_77E2DC = v4;
             }
             if (!gSndBuffer_dword_77E2D0)
                 Sound_CloseWavStopQ();
             return 1;
         }
-        if (a1 < 3 || a1 > 5)
+        if (flags < 3 || flags > 5)
             return 1;
-        a1 = dword_77E2F0;
+        flags = dword_77E2F0;
     }
-    if (a1 > 8 || a1 < 1)
+    if (flags > 8 || flags < 1)
         return 1;
-    if (a1 == dword_77E2F0)
+    if (flags == dword_77E2F0)
     {
         if (!dword_77E2DC)
             return 1;
@@ -605,10 +624,10 @@ signed int __cdecl Sound_MxdWavRelated(signed int a1)
         Sound_CloseWavStopQ();
     }
     dword_77E2DC = 0;
-    dword_77E2F0 = a1;
+    dword_77E2F0 = flags;
     if (dword_77E2F4 == 59 || dword_77E2F4 >= 62)
     {
-        switch (a1)
+        switch (flags)
         {
         case 1:
             sndNumber = byte_68CE38[2 * dword_77E2F4];
@@ -637,19 +656,19 @@ signed int __cdecl Sound_MxdWavRelated(signed int a1)
         }
         goto LABEL_74;
     }
-    if (a1 == 1)
+    if (flags == 1)
     {
         sndNumber = byte_68CE38[2 * dword_77E2F4];
         goto LABEL_74;
     }
-    if (a1 == 2)
+    if (flags == 2)
     {
         sndNumber = 6;
         goto LABEL_74;
     }
-    if (a1 != 3)
+    if (flags != 3)
     {
-        if (a1 != 4)
+        if (flags != 4)
             return 1;
         if (dword_77E2F4 != 29 && dword_77E2F4 != 45)
             sndNumber = byte_68CE39[2 * dword_77E2F4];
@@ -679,12 +698,12 @@ LABEL_74:
     dword_68CE2C = -1;
     if (!sndNumber)
         return 1;
-    sprintf(&soundFileName, "%s0x%02x.wav", "mdx/", sndNumber);
-    gWaveFile_dword_68CE30 = _open(&soundFileName, 0x8000);
-    if (gWaveFile_dword_68CE30 == -1)
+    sprintf(soundFileName, "%s0x%02x.wav", "mdx/", sndNumber);
+    gMusicWavFile_dword_68CE30 = _open(soundFileName, 0x8000);
+    if (gMusicWavFile_dword_68CE30 == -1)
         return 0;
-    _lseek(gWaveFile_dword_68CE30, 40, 0);
-    if (_read(gWaveFile_dword_68CE30, &dword_77E2EC, 4u) != 4)
+    _lseek(gMusicWavFile_dword_68CE30, 40, 0);
+    if (_read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u) != 4)
         return 0;
     if (gSndBuffer_dword_77E2D0)
     {
@@ -700,10 +719,10 @@ LABEL_74:
             gSndBuffer_dword_77E2D0->Restore();
             gSndBuffer_dword_77E2D0->Lock(0, 88200, &v10, &nNumberOfBytesToRead, &v9, &v11, 0);
         }
-        v2 = _read(gWaveFile_dword_68CE30, v10, nNumberOfBytesToRead);
+        v2 = _read(gMusicWavFile_dword_68CE30, v10, nNumberOfBytesToRead);
         if (v2 != nNumberOfBytesToRead)
         {
-            _close(gWaveFile_dword_68CE30);
+            _close(gMusicWavFile_dword_68CE30);
             gSndBuffer_dword_77E2D0->Unlock(v10, nNumberOfBytesToRead, v9, v11);
             return 0;
         }
@@ -740,7 +759,7 @@ LABEL_74:
 // 0x005231A9
 int __cdecl Sound_PlaySample()
 {
-    int result;
+    int result = 0;
 
     if (gSoundFxIdx_dword_77D884 != -1)
     {
@@ -813,7 +832,7 @@ void __cdecl Sound_PopulateBufferQ()
     DWORD a1;
     int v9;
     LONG lDistanceToMove;
-    BYTE buffer[18];
+    BYTE buffer[18] = {};
     int v12;
     int v13;
 
@@ -876,22 +895,22 @@ void __cdecl Sound_PopulateBufferQ()
                             0);
                     }
                     
-                    v0 = _read(gWaveFile_dword_68CE30, v5, nNumberOfBytesToRead);
+                    v0 = _read(gMusicWavFile_dword_68CE30, v5, nNumberOfBytesToRead);
                     
                     if (v0 != nNumberOfBytesToRead)
                     {
-                        _close(gWaveFile_dword_68CE30);
-                        gWaveFile_dword_68CE30 = -1;
+                        _close(gMusicWavFile_dword_68CE30);
+                        gMusicWavFile_dword_68CE30 = -1;
                         gSndState_dword_77E2D4 = 0;
                     }
 
                     if (nNumberOfBytesToRead < 0x2000)
                     {
-                        v1 = _read(gWaveFile_dword_68CE30, v4, v6);
+                        v1 = _read(gMusicWavFile_dword_68CE30, v4, v6);
                         if (v1 != v6)
                         {
-                            _close(gWaveFile_dword_68CE30);
-                            gWaveFile_dword_68CE30 = -1;
+                            _close(gMusicWavFile_dword_68CE30);
+                            gMusicWavFile_dword_68CE30 = -1;
                             gSndState_dword_77E2D4 = 0;
                         }
                     }
@@ -918,7 +937,7 @@ void __cdecl Sound_PopulateBufferQ()
                     if (v9)
                     {
                         lDistanceToMove = 0;
-                        if (_read(gWaveFile_dword_68CE30, buffer, 68u) == 68 && _read(gWaveFile_dword_68CE30, buffer, 12u) == 12)
+                        if (_read(gMusicWavFile_dword_68CE30, buffer, 68u) == 68 && _read(gMusicWavFile_dword_68CE30, buffer, 12u) == 12)
                         {
                             buffer[11] = 0;
                             lDistanceToMove = 441
@@ -928,9 +947,9 @@ void __cdecl Sound_PopulateBufferQ()
                                 - 48)
                                 / 10;
                         }
-                        _lseek(gWaveFile_dword_68CE30, 40, 0);
-                        _read(gWaveFile_dword_68CE30, &dword_77E2EC, 4u);
-                        _lseek(gWaveFile_dword_68CE30, lDistanceToMove, 1u);
+                        _lseek(gMusicWavFile_dword_68CE30, 40, 0);
+                        _read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u);
+                        _lseek(gMusicWavFile_dword_68CE30, lDistanceToMove, 1u);
                         dword_77E2EC -= lDistanceToMove;
 
                         if (dword_77E2E0)
@@ -1037,9 +1056,9 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
 {
     signed int result;
     signed int v5;
-    double v6;
+    double v6 = 0.0; // hack sometimes used un-inited
     size_t v7;
-    double v8;
+    double v8 = 0.0; // hack sometimes used un-inited
     unsigned int Size;
     signed int i;
     signed int j;
@@ -1272,7 +1291,7 @@ signed int __cdecl Sound_Start2SamplesQ(BYTE *a1)
     DSBUFFERDESC bufferDesc;
     WAVEFORMATEX waveFormat;
     
-    if (gSoundFxIdx_dword_77D884 != -1 && dword_68CE34 == 38)
+    if (gSoundFxIdx_dword_77D884 != -1 && gSampleSet_dword_68CE34 == 38)
     {
         g128_Sound_buffers_dword_77DCA0[gSoundFxIdx_dword_77D884]->Stop();
         gSoundFxIdx_dword_77D884 = -1;
@@ -1412,7 +1431,7 @@ int __cdecl Sound_TableUnknown1(int a1, int rate, int vol)
 }
 
 // 0x0052255B
-int __cdecl Sound_Unknown1(int a1)
+int __cdecl Sound_SetMusicVolume(int a1)
 {
     int result;
     int v2;
@@ -1428,7 +1447,7 @@ int __cdecl Sound_Unknown1(int a1)
     }
     else
     {
-        v3 = 10000 * dword_68D030[v2] / 100 - 10000 - v4;
+        v3 = 10000 * dword_68D02C[v2+1] / 100 - 10000 - v4;
     }
 
     result = (a1 - 100 * (10 * a1 / 100) / 10) * v3 / 10;
@@ -1442,7 +1461,7 @@ int __cdecl Sound_Unknown1(int a1)
 }
 
 // 0x005224C8
-int __cdecl Sound_Unknown2(int a1)
+int __cdecl Sound_SetSoundFxVolume(int a1)
 {
     int result;
     int v2;
@@ -1451,14 +1470,14 @@ int __cdecl Sound_Unknown2(int a1)
 
     v2 = 10 * a1 / 100;
     v4 = 10000 * dword_68D000[v2] / 100 - 10000;
-
+    
     if (v2 == 10)
     {
         v3 = 0;
     }
     else
     {
-        v3 = 10000 * dword_68D004[v2] / 100 - 10000 - v4;
+        v3 = 10000 * dword_68D000[v2 + 1] / 100 - 10000 - v4;
     }
 
     result = (a1 - 100 * (10 * a1 / 100) / 10) * v3 / 10;
@@ -1467,7 +1486,7 @@ int __cdecl Sound_Unknown2(int a1)
 }
 
 // 0x00522CB2
-bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
+bool __cdecl Sound_PlayEffect(unsigned __int8 idx, int a2, int a3)
 {
     bool result; 
     DWORD status;
@@ -1476,9 +1495,9 @@ bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
 
     if (!g128_Sound_buffers_dword_77DCA0[idx])
     {
-        if (dword_68CEE4[dword_68CE34])
+        if (dword_68CEE4[gSampleSet_dword_68CE34])
         {
-            if (dword_68CE34 == 2)
+            if (gSampleSet_dword_68CE34 == 2)
             {
                 switch (idx)
                 {
@@ -1539,21 +1558,21 @@ bool __cdecl Sound_Unknown3(unsigned __int8 idx, int a2, int a3)
             playFlags = 0;
             if (gSoundFxIdx_dword_77D884 == -1)
             {
-                if (dword_68CE34 == 10 && idx == 179
-                    || dword_68CE34 == 43 && idx == 192
-                    || dword_68CE34 == 38 && idx == 128
-                    || dword_68CE34 == 64 && idx == 183
-                    || (!dword_68CE34 || dword_68CE34 == 2 || dword_68CE34 == 16) && idx == 178)
+                if (gSampleSet_dword_68CE34 == 10 && idx == 179
+                    || gSampleSet_dword_68CE34 == 43 && idx == 192
+                    || gSampleSet_dword_68CE34 == 38 && idx == 128
+                    || gSampleSet_dword_68CE34 == 64 && idx == 183
+                    || (!gSampleSet_dword_68CE34 || gSampleSet_dword_68CE34 == 2 || gSampleSet_dword_68CE34 == 16) && idx == 178)
                 {
                     gSoundFxIdx_dword_77D884 = idx;
                     playFlags = DSBPLAY_LOOPING;
                 }
             }
-            else if (dword_68CE34 == 10 && idx == 181
-                || dword_68CE34 == 43 && idx == 182
-                || dword_68CE34 == 38 && idx == 181
-                || dword_68CE34 == 64 && (idx == 15 || idx == 195)
-                || (!dword_68CE34 || dword_68CE34 == 2 || dword_68CE34 == 16) && idx == 179
+            else if (gSampleSet_dword_68CE34 == 10 && idx == 181
+                || gSampleSet_dword_68CE34 == 43 && idx == 182
+                || gSampleSet_dword_68CE34 == 38 && idx == 181
+                || gSampleSet_dword_68CE34 == 64 && (idx == 15 || idx == 195)
+                || (!gSampleSet_dword_68CE34 || gSampleSet_dword_68CE34 == 2 || gSampleSet_dword_68CE34 == 16) && idx == 179
                 || idx == 26
                 || idx == 107)
             {
@@ -1682,4 +1701,28 @@ void __cdecl Sound_Unknown6()
         gSndBuffer_dword_77E0A0->SetVolume(dword_68CE18);
         gSndBuffer_dword_77E0A0->Play(0, 0, DSBPLAY_LOOPING);
     }
+}
+
+// 0x00646660
+int __cdecl Sound_Play(unsigned int playingFlags)
+{
+    int result;
+    if (playingFlags & 0xFF000000)
+    {
+        if ((playingFlags & 0xFF000000) == 0x1000000)
+            Sound_PlayMusic(playingFlags & 0xFFFFFF);
+        result = 0;
+    }
+    else
+    {
+        Sound_PlayEffect(playingFlags, (playingFlags >> 16), playingFlags >> 8);
+        result = 0;
+    }
+    return result;
+}
+
+// 0x0044FF6C
+int __cdecl Sound_jPlay(unsigned int playingFlags)
+{
+    return Sound_Play(playingFlags);
 }

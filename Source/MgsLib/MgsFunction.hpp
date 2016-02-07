@@ -101,8 +101,8 @@ class MgsFunctionImpl : public MgsFunctionBase
 public:
     using TFuncType = Signature*;
 
-    MgsFunctionImpl(const char* fnName)
-        : mFnName(fnName)
+    MgsFunctionImpl(const char* fnName, bool passThrough)
+        : mFnName(fnName), mPassThrough(passThrough)
     {
         auto it = GetMgsFunctionTable().find(kOldAddr);
         if (it != std::end(GetMgsFunctionTable()))
@@ -127,6 +127,11 @@ public:
 
     ReturnType operator()(Args ... args)
     {
+        if (mPassThrough)
+        {
+            return mRealFuncPtr(args...);
+        }
+
         if (kLogArgs)
         {
             std::cout << mFnName << " (";
@@ -213,6 +218,7 @@ protected:
 private:
     TFuncType mRealFuncPtr = nullptr;
     const char* mFnName = nullptr;
+    bool mPassThrough = false;
 };
 
 template<DWORD kOldAddr, void* kNewAddr, bool kLogArgs, class ReturnType>
@@ -224,7 +230,7 @@ class MgsFunction    <kOldAddr, kNewAddr, kLogArgs, ReturnType __cdecl(Args...) 
     MgsFunctionImpl<kOldAddr, kNewAddr, kLogArgs, eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
 {
 public:
-    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
+    MgsFunction(const char* name, bool passThrough = false) : MgsFunctionImpl(name, passThrough) { }
 };
 
 // __stdcall partial specialization
@@ -233,10 +239,13 @@ class MgsFunction    <kOldAddr, kNewAddr, kLogArgs, ReturnType __stdcall(Args...
     MgsFunctionImpl<kOldAddr, kNewAddr, kLogArgs, eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
 {
 public:
-    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
+    MgsFunction(const char* name, bool passThrough = false) : MgsFunctionImpl(name, passThrough) { }
 };
 
 #define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);
 #define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, true, signature> name;
 #define MSG_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, signature> name(#name);
 #define MSG_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, true, decltype(funcName)> funcName##_(#funcName);
+#define MSG_FUNC_IMPLEX(addr, funcName, passThrough) MgsFunction<addr, funcName, true, decltype(funcName)> funcName##_(#funcName, passThrough);
+#define MSG_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, decltype(funcName)> funcName##_(#funcName);
+
