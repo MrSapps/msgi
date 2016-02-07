@@ -2392,6 +2392,40 @@ void DebugLog(const char *Format, ...)
     OutputDebugStringA(Dest);
 }
 
+// The varadic template hook class can't also mixing in varadic C functions, so we have too hook these manually
+// good news is that these kind of functions are rare.
+void InstallVaradicCFunctionHooks()
+{
+    LONG err = DetourTransactionBegin();
+
+    if (err != NO_ERROR)
+    {
+        abort();
+    }
+
+    err = DetourUpdateThread(GetCurrentThread());
+
+    if (err != NO_ERROR)
+    {
+        abort();
+    }
+
+    using DebugLog_Type = decltype(&DebugLog);
+    DebugLog_Type oldPtr = (DebugLog_Type)0x00520157;
+    err = DetourAttach(&(PVOID&)oldPtr, DebugLog);
+    
+    if (err != NO_ERROR)
+    {
+        abort();
+    }
+
+    err = DetourTransactionCommit();
+    if (err != NO_ERROR)
+    {
+        abort();
+    }
+}
+
 int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsigned __int8 b)
 {
     DebugLog(".ClearImage((%d,%d,%d,%d),r=%d,g=%d,b=%d)\n", rect->x1, rect->y1, rect->x2, rect->y2, r, g, b);
@@ -2589,7 +2623,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     //int i; // [sp+468h] [bp-4h]@70
 
     SoundCpp_ForceLink();
-
+    InstallVaradicCFunctionHooks();
+    
     if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
     {
         gCmdLine = lpCmdLine;

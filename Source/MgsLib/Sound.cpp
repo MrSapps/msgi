@@ -6,7 +6,7 @@
 
 using QWORD = __int64;
 
-#define REDIRECT_SOUND 1
+#define REDIRECT_SOUND 0
 
 #define MGS_ARY(Redirect, Addr, TypeName, Size, VarName, ...)\
 TypeName LocalArray_##VarName[Size]=__VA_ARGS__;\
@@ -28,7 +28,7 @@ MGS_PTR(REDIRECT_SOUND, 0x77E0A0, IDirectSoundBuffer*, gSndBuffer_dword_77E0A0, 
 MGS_VAR(REDIRECT_SOUND, 0x77E2D4, DWORD, gSndState_dword_77E2D4, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D884, DWORD, gSoundFxIdx_dword_77D884, 0);
 
-
+// TODO: Use macro
 static DWORD* dword_68D058; // part of below array?
 static DWORD* dword_68D05C; // 21 array?
 static DWORD* dword_68D084 = (DWORD*)0x68D084; // part of below array?
@@ -57,15 +57,15 @@ MGS_VAR(REDIRECT_SOUND, 0x68CE18, DWORD, dword_68CE18, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D894, DWORD, dword_77D894, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2F4, DWORD, dword_77E2F4, 0);
 
-// Many unknowns in these
+// TODO: Use macro
 char** off_68D0B4 = (char**)0x68D0B4;
 char* byte_68D0B1 = (char*)0x68D0B1;
 char* byte_68D0B0 = (char*)0x68D0B0;
 
 MGS_ARY(REDIRECT_SOUND, 0x68D630, __int16, 1550, unk_68D630, {});
 MGS_VAR(REDIRECT_SOUND, 0x68CE34, DWORD, gSampleSet_dword_68CE34, 0);
-MGS_PTR(REDIRECT_SOUND, 0x68CE38, unsigned char*, byte_68CE38, nullptr); // TODO: Array?
-MGS_PTR(REDIRECT_SOUND, 0x68CE39, unsigned char*, byte_68CE39, nullptr); // TODO: Array?
+MGS_PTR(1, 0x68CE38, unsigned char*, byte_68CE38, nullptr); // TODO: Figure out array size and dump it
+MGS_PTR(1, 0x68CE39, unsigned char*, byte_68CE39, nullptr); // TODO: Figure out array size and dump it
 MGS_VAR(REDIRECT_SOUND, 0x77E2E0, DWORD, dword_77E2E0, 0);
 MGS_VAR(REDIRECT_SOUND, 0x68CE2C, DWORD, dword_68CE2C, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2EC, DWORD, dword_77E2EC, 0);
@@ -77,11 +77,9 @@ MGS_VAR(REDIRECT_SOUND, 0x77D770, DWORD, dword_77D770, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D878, DWORD, dword_77D878, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1A4, DWORD, dword_77E1A4, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D888, BYTE, byte_77D888, 0);
-MGS_PTR(REDIRECT_SOUND, 0x68D02C, DWORD*, dword_68D02C, nullptr);
-MGS_PTR(REDIRECT_SOUND, 0x68D030, DWORD*, dword_68D030, nullptr);
-MGS_PTR(REDIRECT_SOUND, 0x68D000, DWORD*, dword_68D000, nullptr);
-MGS_PTR(REDIRECT_SOUND, 0x68D004, DWORD*, dword_68D004, nullptr);
-MGS_PTR(REDIRECT_SOUND, 0x68CEE4, DWORD*, dword_68CEE4, nullptr);
+MGS_PTR(1, 0x68D02C, DWORD*, dword_68D02C, nullptr); // TODO: Figure out array size and dump it
+MGS_PTR(1, 0x68D000, DWORD*, dword_68D000, nullptr); // TODO: Figure out array size and dump it
+MGS_PTR(1, 0x68CEE4, DWORD*, dword_68CEE4, nullptr);// TODO: Figure out array size and dump it
 MGS_VAR(REDIRECT_SOUND, 0x77D880, DWORD, dword_77D880, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1B8, DWORD, dword_77E1B8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1CC, DWORD, dword_77E1CC, 0);
@@ -89,53 +87,54 @@ MGS_VAR(REDIRECT_SOUND, 0x77E1D8, DWORD, dword_77E1D8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D890, DWORD, gSndTime_dword_77D890, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1D4, DWORD, dword_77E1D4, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2E4, DWORD, dword_77E2E4, 0);
-MGS_PTR(REDIRECT_SOUND, 0x68E2D0, float*, byte_68E2D0, nullptr); // XA K0
+MGS_PTR(1, 0x68E2D0, float*, byte_68E2D0, nullptr); // XA K0 TODO: Figure out array size and dump it
 MGS_VAR(REDIRECT_SOUND, 0x77E300, double, dbl_77E300, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E308, double, dbl_77E308, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E310, double, dbl_77E310, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E318, double, dbl_77E318, 0);
-MGS_PTR(REDIRECT_SOUND, 0x77E1E0, double*, dbl_77E1E0, nullptr);
-MGS_PTR(REDIRECT_SOUND, 0x77E1E8, double*, dbl_77E1E8, nullptr);
-MGS_PTR(REDIRECT_SOUND, 0x68E2C8, DWORD*, dword_68E2C8, nullptr);
-MGS_VAR(REDIRECT_SOUND, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
+MGS_PTR(1, 0x77E1E0, double*, dbl_77E1E0, nullptr); // array?
+MGS_PTR(1, 0x77E1E8, double*, dbl_77E1E8, nullptr); // array?
+MGS_PTR(1, 0x68E2C8, DWORD*, dword_68E2C8, nullptr); // array?
+MGS_VAR(1, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
 
+#define SKIP true
 
-MSG_FUNC_IMPL(0x0052269C, Sound_Init);
-MSG_FUNC_IMPL(0x005227AD, Sound_HexCharToInt);
-MSG_FUNC_IMPL(0x00522BCE, Sound_CleanUpRelated);
-MSG_FUNC_IMPL(0x00522466, Sound_CloseWavStopQ);
-MSG_FUNC_IMPL(0x00523A44, Sound_CreateBufferQ);
-MSG_FUNC_IMPL(0x00522601, Sound_CreatePrimarySoundBuffer);
-MSG_FUNC_IMPL(0x00521982, Sound_CreateSecondarySoundBuffer);
-MSG_FUNC_IMPL(0x0052236D, Sound_FadeQ);
-MSG_FUNC_IMPL(0x005234EA, Sound_GetSamp1PosQ);
-MSG_FUNC_IMPL_NOLOG(0x005224BE, Sound_GetSomeStateQ);
-MSG_FUNC_IMPL(0x00522A33, Sound_InitFx);
-MSG_FUNC_IMPL(0x005227FF, Sound_LoadBufferFromFile);
-MSG_FUNC_IMPL(0x00522A9C, Sound_LoadFxRelatedQ);
-MSG_FUNC_IMPL(0x00522B8D, Sound_LoadFxRelatedQ2);
-MSG_FUNC_IMPL(0x00521A54, Sound_PlayMusic);
-MSG_FUNC_IMPL(0x005231A9, Sound_PlaySample);
-MSG_FUNC_IMPL(0x0052307F, Sound_PlaySampleRelated);
-MSG_FUNC_IMPL_NOLOG(0x00521F82, Sound_PopulateBufferQ);
-MSG_FUNC_IMPL(0x00523A1F, Sound_ReleaseBufferQ);
-MSG_FUNC_IMPL(0x00521A18, Sound_ReleaseSecondaryBuffer);
-MSG_FUNC_IMPL(0x00523B2C, Sound_RestoreRelatedQ);
-MSG_FUNC_IMPL(0x00523563, Sound_Samp1Related);
-MSG_FUNC_IMPL(0x005239B5, Sound_Samp1Related_2);
-MSG_FUNC_IMPL(0x005226EB, Sound_ShutDown);
-MSG_FUNC_IMPL(0x00523232, Sound_Start2SamplesQ);
-MSG_FUNC_IMPL(0x00523466, Sound_Stop2Samples);
-MSG_FUNC_IMPL(0x0052313B, Sound_StopSample);
-MSG_FUNC_IMPL(0x00521898, Sound_TableUnknown1);
-MSG_FUNC_IMPL(0x0052255B, Sound_SetMusicVolume);
-MSG_FUNC_IMPL(0x005224C8, Sound_SetSoundFxVolume);
-MSG_FUNC_IMPL(0x00522CB2, Sound_PlayEffect);
-MSG_FUNC_IMPL(0x00523E12, Sound_Unknown4);
-MSG_FUNC_IMPL(0x00523CF3, Sound_Unknown5);
-MSG_FUNC_IMPL(0x00523CB9, Sound_Unknown6);
-MSG_FUNC_IMPL(0x00646660, Sound_Play);
-MSG_FUNC_IMPL(0x0044FF6C, Sound_jPlay);
+MSG_FUNC_IMPLEX(0x0052269C, Sound_Init, SKIP);
+MSG_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, SKIP);
+MSG_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, SKIP);
+MSG_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, SKIP);
+MSG_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, SKIP);
+MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, SKIP);
+MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, SKIP);
+MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, SKIP);
+MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, SKIP);
+MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, SKIP);
+MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, SKIP);
+MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, SKIP);
+MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP);
+MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP);
+MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
+MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, SKIP);
+MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SKIP);
+MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP);
+MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, SKIP);
+MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, SKIP);
+MSG_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, SKIP);
+MSG_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);
+MSG_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP);
+MSG_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, SKIP);
+MSG_FUNC_IMPLEX(0x00523232, Sound_Start2SamplesQ, SKIP);
+MSG_FUNC_IMPLEX(0x00523466, Sound_Stop2Samples, SKIP);
+MSG_FUNC_IMPLEX(0x0052313B, Sound_StopSample, SKIP);
+MSG_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, SKIP);
+MSG_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, SKIP);
+MSG_FUNC_IMPLEX(0x005224C8, Sound_SetSoundFxVolume, SKIP);
+MSG_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
+MSG_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, SKIP);
+MSG_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, SKIP);
+MSG_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, SKIP);
+MSG_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP);
+MSG_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP);
 
 
 #pragma comment(lib, "Winmm.lib") // timegettime()
@@ -1448,7 +1447,7 @@ int __cdecl Sound_SetMusicVolume(int a1)
     }
     else
     {
-        v3 = 10000 * dword_68D030[v2] / 100 - 10000 - v4;
+        v3 = 10000 * dword_68D02C[v2+1] / 100 - 10000 - v4;
     }
 
     result = (a1 - 100 * (10 * a1 / 100) / 10) * v3 / 10;
@@ -1471,14 +1470,14 @@ int __cdecl Sound_SetSoundFxVolume(int a1)
 
     v2 = 10 * a1 / 100;
     v4 = 10000 * dword_68D000[v2] / 100 - 10000;
-
+    
     if (v2 == 10)
     {
         v3 = 0;
     }
     else
     {
-        v3 = 10000 * dword_68D004[v2] / 100 - 10000 - v4;
+        v3 = 10000 * dword_68D000[v2 + 1] / 100 - 10000 - v4;
     }
 
     result = (a1 - 100 * (10 * a1 / 100) / 10) * v3 / 10;
