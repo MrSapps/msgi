@@ -114,7 +114,7 @@ MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, SKIP);
 MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP);
 MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP);
 MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
-MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, SKIP);
+MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, false);
 MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SKIP);
 MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP);
 MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, false);
@@ -493,7 +493,7 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
                 &sizeToRead,
                 &v9,
                 &v10,
-                0) == 0x88780096)
+                0) == DSERR_BUFFERLOST)
             {
                 g128_Sound_buffers_dword_77DCA0[idx]->Restore();
                 g128_Sound_buffers_dword_77DCA0[idx]->Lock(
@@ -712,7 +712,7 @@ LABEL_74:
             &nNumberOfBytesToRead,
             &v9,
             &v11,
-            0) == 0x88780096)
+            0) == DSERR_BUFFERLOST)
         {
             gSndBuffer_dword_77E2D0->Restore();
             gSndBuffer_dword_77E2D0->Lock(0, 88200, &v10, &nNumberOfBytesToRead, &v9, &v11, 0);
@@ -880,7 +880,7 @@ void __cdecl Sound_PopulateBufferQ()
                         &nNumberOfBytesToRead,
                         &v4,
                         &v6,
-                        0) == 0x88780096)
+                        0) == DSERR_BUFFERLOST)
                     {
                         gSndBuffer_dword_77E2D0->Restore();
                         gSndBuffer_dword_77E2D0->Lock(
@@ -1002,7 +1002,7 @@ signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BY
     pDst = 0;
     if (gSndBuffer_dword_77E0A0)
     {
-        if (gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0) == 0x88780096)
+        if (gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0) == DSERR_BUFFERLOST)
         {
             gSndBuffer_dword_77E0A0->Restore();
             gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0);
@@ -1098,7 +1098,7 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
             {
                 if (Size + dword_77E2F8 <= gSamp1PlayPos_dword_77E1D0)
                 {
-                    if (snd->Lock(dword_77E2F8, Size, (LPVOID*)&Dst, &v16, (LPVOID*)&v12, &v15, 0) == 0x88780096)
+                    if (snd->Lock(dword_77E2F8, Size, (LPVOID*)&Dst, &v16, (LPVOID*)&v12, &v15, 0) == DSERR_BUFFERLOST)
                     {
                         snd->Restore();
                         snd->Lock(dword_77E2F8, Size, (LPVOID*)&Dst, &v16, (LPVOID*)&v12, &v15, 0);
@@ -1656,7 +1656,7 @@ int __cdecl Sound_Unknown5(int a1, int a2, BYTE*(__cdecl* fnRead)(DWORD))
                 &Size,
                 &sndPtr,
                 &sndBufSize,
-                0) == 0x88780096)
+                0) == DSERR_BUFFERLOST)
             {
                 gSndBuffer_dword_77E0A0->Restore();
                 gSndBuffer_dword_77E0A0->Lock(
