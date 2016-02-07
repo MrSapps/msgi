@@ -5,6 +5,7 @@
 #include <mmreg.h>
 #include <dsound.h>
 
+void SoundCpp_Debug();
 void SoundCpp_ForceLink();
 
 signed int __cdecl Sound_Init(HWND hwnd);

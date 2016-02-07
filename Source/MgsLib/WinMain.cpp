@@ -2389,7 +2389,8 @@ void DebugLog(const char *Format, ...)
 
     va_start(va, Format);
     vsprintf(Dest, Format, va);
-    OutputDebugStringA(Dest);
+    //OutputDebugStringA(Dest);
+    printf(Dest);
 }
 
 // The varadic template hook class can't also mixing in varadic C functions, so we have too hook these manually
@@ -2623,6 +2624,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     //int i; // [sp+468h] [bp-4h]@70
 
     SoundCpp_ForceLink();
+    SoundCpp_Debug();
+
     InstallVaradicCFunctionHooks();
     
     if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
