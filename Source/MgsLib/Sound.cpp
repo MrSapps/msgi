@@ -108,8 +108,8 @@ MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, false);
 MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, false);
 MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, false);
 MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, SKIP);
-MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, SKIP);
-MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, SKIP);
+MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, false);
+MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, false);
 MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, SKIP);
 MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP);
 MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP);
@@ -117,22 +117,22 @@ MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
 MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, SKIP);
 MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SKIP);
 MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP);
-MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, SKIP);
-MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, SKIP);
-MSG_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, SKIP);
+MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, false);
+MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, false);
+MSG_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, false);
 MSG_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);
 MSG_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP);
-MSG_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, SKIP);
+MSG_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, false);
 MSG_FUNC_IMPLEX(0x00523232, Sound_Start2SamplesQ, SKIP);
 MSG_FUNC_IMPLEX(0x00523466, Sound_Stop2Samples, SKIP);
 MSG_FUNC_IMPLEX(0x0052313B, Sound_StopSample, SKIP);
-MSG_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, SKIP);
-MSG_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, SKIP);
+MSG_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, false);
+MSG_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, false);
 MSG_FUNC_IMPLEX(0x005224C8, Sound_SetSoundFxVolume, SKIP);
 MSG_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
-MSG_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, SKIP);
-MSG_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, SKIP);
-MSG_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, SKIP);
+MSG_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, false);
+MSG_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, false);
+MSG_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, false);
 MSG_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP);
 MSG_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP);
 
@@ -1704,19 +1704,18 @@ void __cdecl Sound_Unknown6()
 // 0x00646660
 int __cdecl Sound_Play(unsigned int playingFlags)
 {
-    int result;
     if (playingFlags & 0xFF000000)
     {
         if ((playingFlags & 0xFF000000) == 0x1000000)
+        {
             Sound_PlayMusic(playingFlags & 0xFFFFFF);
-        result = 0;
+        }
     }
     else
     {
         Sound_PlayEffect(playingFlags, (playingFlags >> 16), playingFlags >> 8);
-        result = 0;
     }
-    return result;
+    return 0;
 }
 
 // 0x0044FF6C
