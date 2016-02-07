@@ -103,7 +103,6 @@ MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), unknown_libname_3); // Note: Not a 
 MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
 MSG_FUNC_NOT_IMPL(0x0044E226, actor_related_struct* __cdecl(), sub_44E226);
-MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
 MSG_FUNC_NOT_IMPL(0x004232B0, void __cdecl(), DoClearAll);
 MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
@@ -159,6 +158,77 @@ int msg_internal_fprintf(FILE *File, const char *Format, ...);
 
 using TMgs_fprintf = decltype(&msg_internal_fprintf);
 TMgs_fprintf mgs_fprintf = (TMgs_fprintf)0x0053C5F0;
+
+MSG_FUNC_NOT_IMPL(0x521F82, void __cdecl(), sub_521F82);
+MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
+MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
+MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), sub_51E1D9);
+
+VAR(BYTE, byte_6FC7E0, 0x6FC7E0);
+VAR(BYTE, byte_9AD89B, 0x9AD89B);
+VAR(DWORD, dword_73491C, 0x73491C);
+VAR(DWORD, dword_71D164, 0x71D164);
+VAR(DWORD, dword_6FC718, 0x6FC718);
+VAR(WORD, word_78E7F8, 0x78E7F8);
+VAR(WORD, word_78E7F6, 0x78E7F6);
+VAR(DWORD, dword_717354, 0x717354);
+VAR(DWORD, dword_717348, 0x717348);
+VAR(DWORD, dword_7348FC, 0x7348FC);
+
+//MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
+int __cdecl MainLoop()
+{
+    char var11C[0xFF];
+    char var21B[0xFF];
+    BYTE var21C = byte_6FC7E0;
+    MSG oMsg;
+    memset(var21B, 0, 0xFF);
+    memset(var11C, 0, 0xFF);
+
+    sub_521F82();
+
+    if (dword_73491C == 1)
+    {
+        dword_73491C = 2;
+
+        while (dword_73491C == 2)
+        {
+            DoSleep(8 + (rand() % 4));
+        }
+        dword_73491C = 0;
+    }
+    if (dword_71D164 == 0 && dword_717354 != 0 && dword_717348 == 0)
+    {
+        dword_717348 = 1;
+        byte_9AD89B = 0;
+
+        if (sub_42BE0A() == 0xFFFFFFEF)
+            return 0;
+
+        dword_6FC718 = 1;
+        dword_717354 = 0;
+        byte_9AD89B = 0;
+        dword_717348 = 0;
+    }
+    if (dword_7348FC != 0)
+    {
+        word_78E7F6 = word_78E7F8 = 0x400;
+    }
+    sub_51E1D9();
+    if (PeekMessageA(&oMsg, 0, 0, 0, 1) == 0)
+        return 1;
+
+    if (oMsg.message == 0x12)
+    {
+        PostQuitMessage(0);
+        return 0;
+    }
+
+    TranslateMessage(&oMsg);
+    DispatchMessageA(&oMsg);
+
+    return 1;
+}
 
 
 // FIX ME - need a way to handle non standard calling conventions
@@ -275,12 +345,9 @@ VAR(DWORD, dword_688CD0, 0x688CD0);
 VAR(DWORD, dword_688CD4, 0x688CD4);
 VAR(DWORD, dword_688CD8, 0x688CD8);
 VAR(DWORD, dword_791DE4, 0x791DE4);
-VAR(DWORD, dword_717354, 0x717354);
-VAR(DWORD, dword_717348, 0x717348);
 VAR(BYTE, byte_9AD888, 0x9AD888);
 VAR(DWORD, dword_733E34, 0x733E34);
 VAR(DWORD, dword_721E78, 0x721E78);
-VAR(DWORD, dword_7348FC, 0x7348FC);
 VAR(DWORD, dword_650D4C, 0x650D4C);
 VAR(char*, gDest, 0x0078E7C0);
 
