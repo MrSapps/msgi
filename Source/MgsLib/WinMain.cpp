@@ -239,7 +239,7 @@ int __cdecl HandleExclusiveMode()
     Sound_PlaySample();
 
     if (dword_732E64 == 1)
-        PostMessageA(gHwnd, 0x100, 0x1B, 0);
+        PostMessageA(gHwnd, WM_KEYDOWN, VK_ESCAPE, 0);
 
     return 0;
 }
