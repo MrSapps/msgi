@@ -24,8 +24,8 @@ MGS_VAR(REDIRECT_SOUND, 0x77E2D4, DWORD, gSndState_dword_77E2D4, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D884, DWORD, gSoundFxIdx_dword_77D884, 0);
 
 // TODO: Use macro
-static DWORD* dword_68D058; // part of below array?
-static DWORD* dword_68D05C; // 21 array?
+static DWORD* dword_68D058 = (DWORD*)0x68D058; // part of below array?
+static DWORD* dword_68D05C = (DWORD*)0x68D05C; // 21 array?
 static DWORD* dword_68D084 = (DWORD*)0x68D084; // part of below array?
 static DWORD* dword_68D088 = (DWORD*)0x68D088; // 10 array?
 
@@ -129,7 +129,7 @@ MGS_ARY(0, 0x68D0B0, StageMusicInfoStruct, 176, gStageInfo_68D0B0,
     { 43, 44, "stage/s19ar" },
     { 43, 44, "stage/s19b" },
     { 43, 44, "stage/s19br" },
-    { 71, 61, "stage/title" },
+    { 71, 59, "stage/title" },
     { 19, 0, "stagevr/camera" },
     { 69, 64, "stagevr/photo_m1" },
     { 69, 64, "stagevr/photo_m2" },
@@ -541,7 +541,7 @@ signed int __cdecl Sound_CreateSecondarySoundBuffer()
 // 0x0052236D
 __int64 __cdecl Sound_FadeQ(int a1)
 {
-    __int64 result;
+    __int64 result = 0; // Hack can sometimes take un-inited path?
     LARGE_INTEGER Frequency;
     __int64 freq;
     LARGE_INTEGER PerformanceCount;
