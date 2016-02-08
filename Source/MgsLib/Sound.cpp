@@ -301,7 +301,7 @@ MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, false);
 MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, false);
 MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, false);
 MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, false);
-MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, SKIP);
+MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, false);
 MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP);
 MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP);
 MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
