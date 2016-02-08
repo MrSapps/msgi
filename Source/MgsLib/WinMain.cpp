@@ -159,7 +159,6 @@ int msg_internal_fprintf(FILE *File, const char *Format, ...);
 using TMgs_fprintf = decltype(&msg_internal_fprintf);
 TMgs_fprintf mgs_fprintf = (TMgs_fprintf)0x0053C5F0;
 
-MSG_FUNC_NOT_IMPL(0x521F82, void __cdecl(), sub_521F82);
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), sub_51E1D9);
@@ -185,7 +184,7 @@ int __cdecl MainLoop()
     memset(var21B, 0, 0xFF);
     memset(var11C, 0, 0xFF);
 
-    sub_521F82();
+    Sound_PopulateBufferQ();
 
     if (dword_73491C == 1)
     {
@@ -214,11 +213,13 @@ int __cdecl MainLoop()
     {
         word_78E7F6 = word_78E7F8 = 0x400;
     }
+    
     sub_51E1D9();
+
     if (PeekMessageA(&oMsg, 0, 0, 0, 1) == 0)
         return 1;
 
-    if (oMsg.message == 0x12)
+    if (oMsg.message == WM_QUIT)
     {
         PostQuitMessage(0);
         return 0;

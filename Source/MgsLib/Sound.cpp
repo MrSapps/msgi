@@ -1027,6 +1027,14 @@ void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, i
 // 0x00521F82
 void __cdecl Sound_PopulateBufferQ()
 {
+    // HACK: Since called directly from MainLoop() call the real since this
+    // function isn't quite right yet
+    using tSound_PopulateBufferQ = decltype(&Sound_PopulateBufferQ);
+    auto fnPtr = (tSound_PopulateBufferQ)0x00521F82;
+    fnPtr();
+    return;
+
+
     DWORD v0;
     DWORD v1;
     LARGE_INTEGER PerformanceCount;
