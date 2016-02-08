@@ -138,27 +138,6 @@ MSG_FUNC_NOT_IMPL(0x0040A2AF, actor_related_struct *__cdecl(int, actor_related_s
 MSG_FUNC_NOT_IMPL(0x0040A3ED, actor_related_struct *__cdecl(actor_related_struct*), Actor_SetFnPtr);
 MSG_FUNC_NOT_IMPL(0x0040A006, int __cdecl(), Actor_Init);
 MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
-
-
-
-// We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
-// stdlib used by MSGI.exe isn't the same as ours, mixing them will lead to a bad time.
-MSG_FUNC_NOT_IMPL(0x0053CB40, FILE* __cdecl(const char*, const char*), mgs_fopen);
-MSG_FUNC_NOT_IMPL(0x0053C970, int __cdecl(const char*, FILE*), mgs_fputs);
-MSG_FUNC_NOT_IMPL(0x0053C6C0, int __cdecl(FILE*), mgs_fflush);
-MSG_FUNC_NOT_IMPL(0x0053C4A0, int __cdecl(FILE *File), mgs_fclose);
-MSG_FUNC_NOT_IMPL(0x00539990, void *__cdecl(size_t), mgs_malloc);
-
-
-// Can't seem to make this work, calling this will crash due to issue mentioned above
-//MSG_FUNC_NOT_IMPL(0x0053C5F0, int __cdecl(FILE*, const char*, ...), mgs_fprintf);
-// So temp HACK - just get a pointer to the MSG func and call directly, remove when all funcs using it
-// are re-impled
-int msg_internal_fprintf(FILE *File, const char *Format, ...);
-
-using TMgs_fprintf = decltype(&msg_internal_fprintf);
-TMgs_fprintf mgs_fprintf = (TMgs_fprintf)0x0053C5F0;
-
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), sub_51E1D9);

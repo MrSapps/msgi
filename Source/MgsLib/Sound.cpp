@@ -2,8 +2,6 @@
 #include "Sound.hpp"
 #include "File.hpp"
 
-#include <io.h> // TODO: Use the games I/O funcs or still will probably explode
-
 using QWORD = __int64;
 
 #define REDIRECT_SOUND 1
@@ -338,7 +336,6 @@ void SoundCpp_ForceLink()
 }
 
 MSG_FUNC_NOT_IMPL(0x005530A8, HRESULT __stdcall(LPGUID, LPDIRECTSOUND*, LPUNKNOWN), MgsDirectSoundCreate);
-//MSG_FUNC_NOT_IMPL(0x0053D680, int __cdecl(int), msg_close);
 
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
@@ -432,7 +429,7 @@ int __cdecl Sound_CloseWavStopQ()
 
     if (gMusicWavFile_dword_68CE30 != -1)
     {
-        result = _close(gMusicWavFile_dword_68CE30);
+        result = mgs_close(gMusicWavFile_dword_68CE30);
     }
 
     gMusicWavFile_dword_68CE30 = -1;
@@ -893,11 +890,11 @@ LABEL_74:
     if (!sndNumber)
         return 1;
     sprintf(soundFileName, "%s0x%02x.wav", "mdx/", sndNumber);
-    gMusicWavFile_dword_68CE30 = _open(soundFileName, 0x8000);
+    gMusicWavFile_dword_68CE30 = mgs_open(soundFileName, 0x8000);
     if (gMusicWavFile_dword_68CE30 == -1)
         return 0;
-    _lseek(gMusicWavFile_dword_68CE30, 40, 0);
-    if (_read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u) != 4)
+    mgs_lseek(gMusicWavFile_dword_68CE30, 40, 0);
+    if (mgs_read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u) != 4)
         return 0;
     if (gSndBuffer_dword_77E2D0)
     {
@@ -913,10 +910,10 @@ LABEL_74:
             gSndBuffer_dword_77E2D0->Restore();
             gSndBuffer_dword_77E2D0->Lock(0, 88200, &v10, &nNumberOfBytesToRead, &v9, &v11, 0);
         }
-        v2 = _read(gMusicWavFile_dword_68CE30, v10, nNumberOfBytesToRead);
+        v2 = mgs_read(gMusicWavFile_dword_68CE30, v10, nNumberOfBytesToRead);
         if (v2 != nNumberOfBytesToRead)
         {
-            _close(gMusicWavFile_dword_68CE30);
+            mgs_close(gMusicWavFile_dword_68CE30);
             gSndBuffer_dword_77E2D0->Unlock(v10, nNumberOfBytesToRead, v9, v11);
             return 0;
         }
@@ -1097,21 +1094,21 @@ void __cdecl Sound_PopulateBufferQ()
                             0);
                     }
                     
-                    v0 = _read(gMusicWavFile_dword_68CE30, v5, nNumberOfBytesToRead);
+                    v0 = mgs_read(gMusicWavFile_dword_68CE30, v5, nNumberOfBytesToRead);
                     
                     if (v0 != nNumberOfBytesToRead)
                     {
-                        _close(gMusicWavFile_dword_68CE30);
+                        mgs_close(gMusicWavFile_dword_68CE30);
                         gMusicWavFile_dword_68CE30 = -1;
                         gSndState_dword_77E2D4 = 0;
                     }
 
                     if (nNumberOfBytesToRead < 0x2000)
                     {
-                        v1 = _read(gMusicWavFile_dword_68CE30, v4, v6);
+                        v1 = mgs_read(gMusicWavFile_dword_68CE30, v4, v6);
                         if (v1 != v6)
                         {
-                            _close(gMusicWavFile_dword_68CE30);
+                            mgs_close(gMusicWavFile_dword_68CE30);
                             gMusicWavFile_dword_68CE30 = -1;
                             gSndState_dword_77E2D4 = 0;
                         }
@@ -1139,7 +1136,7 @@ void __cdecl Sound_PopulateBufferQ()
                     if (v9)
                     {
                         lDistanceToMove = 0;
-                        if (_read(gMusicWavFile_dword_68CE30, buffer, 68u) == 68 && _read(gMusicWavFile_dword_68CE30, buffer, 12u) == 12)
+                        if (mgs_read(gMusicWavFile_dword_68CE30, buffer, 68u) == 68 && mgs_read(gMusicWavFile_dword_68CE30, buffer, 12u) == 12)
                         {
                             buffer[11] = 0;
                             lDistanceToMove = 441
@@ -1149,9 +1146,9 @@ void __cdecl Sound_PopulateBufferQ()
                                 - 48)
                                 / 10;
                         }
-                        _lseek(gMusicWavFile_dword_68CE30, 40, 0);
-                        _read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u);
-                        _lseek(gMusicWavFile_dword_68CE30, lDistanceToMove, 1u);
+                        mgs_lseek(gMusicWavFile_dword_68CE30, 40, 0);
+                        mgs_read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u);
+                        mgs_lseek(gMusicWavFile_dword_68CE30, lDistanceToMove, 1u);
                         dword_77E2EC -= lDistanceToMove;
 
                         if (dword_77E2E0)
