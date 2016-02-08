@@ -8,8 +8,8 @@ using QWORD = __int64;
 
 struct StageMusicInfoStruct
 {
-    unsigned char mMusicSampleSetNumber;
-    unsigned char mUnknown;
+    unsigned char mSampleSetNumber;
+    unsigned char mMusicTrackNumber;
     const char* mStageName;
 };
 static_assert(sizeof(StageMusicInfoStruct) == 0x8, "StageMusicInfoStruct must be 0x8");
@@ -50,7 +50,7 @@ MGS_VAR(REDIRECT_SOUND, 0x68E318, DWORD, dword_68E318, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2F8, DWORD, dword_77E2F8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x68CE18, DWORD, dword_68CE18, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D894, DWORD, dword_77D894, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E2F4, DWORD, dword_77E2F4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E2F4, DWORD, gMusicTrack_dword_77E2F4, 0);
 MGS_ARY(0, 0x68D0B0, StageMusicInfoStruct, 176, gStageInfo_68D0B0, 
 {
     { 19, 0, "stage/abst" },
@@ -239,8 +239,8 @@ void DumpArray()
     StageMusicInfoStruct* ar = (StageMusicInfoStruct*)0x68D0B0;
     for (int i = 0; i < 177; i++)
     {
-        ss << "{ " << static_cast<unsigned int>(ar->mMusicSampleSetNumber) << ", ";
-        ss << static_cast<unsigned int>(ar->mUnknown) << ", ";
+        ss << "{ " << static_cast<unsigned int>(ar->mSampleSetNumber) << ", ";
+        ss << static_cast<unsigned int>(ar->mMusicTrackNumber) << ", ";
         ss << "\"" << ar->mStageName << "\" },\n";
         ar++;
     }
@@ -721,14 +721,14 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
 void __cdecl Sound_LoadFxRelatedQ(const char *Str1)
 {
     int sampleSet = 255;
-    dword_77E2F4 = 0;
+    gMusicTrack_dword_77E2F4 = 0;
     for (int i = 0; i < 176; ++i)
     {
         const StageMusicInfoStruct& ptr = gStageInfo_68D0B0[i];
         if (!strcmp(Str1, ptr.mStageName))
         {
-            dword_77E2F4 = ptr.mUnknown;
-            sampleSet = ptr.mMusicSampleSetNumber;
+            gMusicTrack_dword_77E2F4 = ptr.mMusicTrackNumber;
+            sampleSet = ptr.mSampleSetNumber;
             break;
         }
     }
@@ -811,15 +811,15 @@ signed int __cdecl Sound_PlayMusic(unsigned int flags)
     }
     dword_77E2DC = 0;
     dword_77E2F0 = flags;
-    if (dword_77E2F4 == 59 || dword_77E2F4 >= 62)
+    if (gMusicTrack_dword_77E2F4 == 59 || gMusicTrack_dword_77E2F4 >= 62)
     {
         switch (flags)
         {
         case 1:
-            sndNumber = byte_68CE38[2 * dword_77E2F4];
+            sndNumber = byte_68CE38[2 * gMusicTrack_dword_77E2F4];
             break;
         case 2:
-            sndNumber = byte_68CE39[2 * dword_77E2F4];
+            sndNumber = byte_68CE39[2 * gMusicTrack_dword_77E2F4];
             break;
         case 3:
             sndNumber = 33;
@@ -837,14 +837,14 @@ signed int __cdecl Sound_PlayMusic(unsigned int flags)
             sndNumber = 27;
             break;
         default:
-            sndNumber = byte_68CE38[2 * dword_77E2F4];
+            sndNumber = byte_68CE38[2 * gMusicTrack_dword_77E2F4];
             break;
         }
         goto LABEL_74;
     }
     if (flags == 1)
     {
-        sndNumber = byte_68CE38[2 * dword_77E2F4];
+        sndNumber = byte_68CE38[2 * gMusicTrack_dword_77E2F4];
         goto LABEL_74;
     }
     if (flags == 2)
@@ -856,28 +856,28 @@ signed int __cdecl Sound_PlayMusic(unsigned int flags)
     {
         if (flags != 4)
             return 1;
-        if (dword_77E2F4 != 29 && dword_77E2F4 != 45)
-            sndNumber = byte_68CE39[2 * dword_77E2F4];
+        if (gMusicTrack_dword_77E2F4 != 29 && gMusicTrack_dword_77E2F4 != 45)
+            sndNumber = byte_68CE39[2 * gMusicTrack_dword_77E2F4];
         else
-            sndNumber = byte_68CE38[2 * dword_77E2F4];
+            sndNumber = byte_68CE38[2 * gMusicTrack_dword_77E2F4];
         goto LABEL_74;
     }
-    if (dword_77E2F4 > 36)
+    if (gMusicTrack_dword_77E2F4 > 36)
     {
-        if (dword_77E2F4 != 39 && dword_77E2F4 != 42 && (dword_77E2F4 <= 43 || dword_77E2F4 > 46))
+        if (gMusicTrack_dword_77E2F4 != 39 && gMusicTrack_dword_77E2F4 != 42 && (gMusicTrack_dword_77E2F4 <= 43 || gMusicTrack_dword_77E2F4 > 46))
             return 1;
     }
-    else if (dword_77E2F4 < 35 && dword_77E2F4 != 18)
+    else if (gMusicTrack_dword_77E2F4 < 35 && gMusicTrack_dword_77E2F4 != 18)
     {
-        if (dword_77E2F4 == 19)
+        if (gMusicTrack_dword_77E2F4 == 19)
         {
             sndNumber = 13;
             goto LABEL_74;
         }
-        if (dword_77E2F4 <= 23 || dword_77E2F4 > 25 && (dword_77E2F4 <= 26 || dword_77E2F4 > 32))
+        if (gMusicTrack_dword_77E2F4 <= 23 || gMusicTrack_dword_77E2F4 > 25 && (gMusicTrack_dword_77E2F4 <= 26 || gMusicTrack_dword_77E2F4 > 32))
             return 1;
     }
-    sndNumber = byte_68CE39[2 * dword_77E2F4];
+    sndNumber = byte_68CE39[2 * gMusicTrack_dword_77E2F4];
 LABEL_74:
     v3 = sndNumber == 20 || sndNumber == 32 || sndNumber == 33;
     dword_77E2E0 = v3;
