@@ -307,7 +307,7 @@ MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP);
 MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
 MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, false);
 MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SKIP);
-MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP);
+MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, false);
 MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, false);
 MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, false);
 MSG_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, false);
@@ -1012,14 +1012,6 @@ void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, i
 // 0x00521F82
 void __cdecl Sound_PopulateBufferQ()
 {
-    // HACK: Since called directly from MainLoop() call the real since this
-    // function isn't quite right yet
-    using tSound_PopulateBufferQ = decltype(&Sound_PopulateBufferQ);
-    auto fnPtr = (tSound_PopulateBufferQ)0x00521F82;
-    fnPtr();
-    return;
-
-
     DWORD v0;
     DWORD v1;
     LARGE_INTEGER PerformanceCount;
