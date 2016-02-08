@@ -293,7 +293,7 @@ MGS_VAR(1, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
 MSG_FUNC_IMPLEX(0x0052269C, Sound_Init, false);
 MSG_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, false);
 MSG_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, false);
-MSG_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, SKIP);
+MSG_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, false);
 MSG_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, false);
 MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, false);
 MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, false);
@@ -302,11 +302,11 @@ MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, false);
 MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, false);
 MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, false);
 MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, false);
-MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP);
-MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP);
+MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP); // Breaks knocking on "bomb" wall and trap door sounds
+MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP); // Calls above broken func
 MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
 MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, false);
-MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SKIP);
+MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, false);
 MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, false);
 MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, false);
 MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, false);
@@ -316,7 +316,7 @@ MSG_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP); // causes raspy codec i
 MSG_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, false);
 MSG_FUNC_IMPLEX(0x00523232, Sound_Start2SamplesQ, false);
 MSG_FUNC_IMPLEX(0x00523466, Sound_Stop2Samples, false);
-MSG_FUNC_IMPLEX(0x0052313B, Sound_StopSample, SKIP);
+MSG_FUNC_IMPLEX(0x0052313B, Sound_StopSample, false);
 MSG_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, false);
 MSG_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, false);
 MSG_FUNC_IMPLEX(0x005224C8, Sound_SetSoundFxVolume, false);
@@ -324,8 +324,8 @@ MSG_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
 MSG_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, false);
 MSG_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, false);
 MSG_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, false);
-MSG_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP);
-MSG_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP);
+MSG_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP); // calls to broken funcs
+MSG_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP); // calls to broken funcs
 
 
 #pragma comment(lib, "Winmm.lib") // timegettime()
