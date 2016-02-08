@@ -1018,7 +1018,7 @@ void __cdecl Sound_PopulateBufferQ()
     DWORD a1;
     int v9;
     LONG lDistanceToMove;
-    BYTE buffer[18] = {};
+    BYTE buffer[68] = {};
     int v12;
     int v13;
 
