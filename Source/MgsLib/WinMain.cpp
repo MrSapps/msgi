@@ -138,42 +138,20 @@ MSG_FUNC_NOT_IMPL(0x0040A2AF, actor_related_struct *__cdecl(int, actor_related_s
 MSG_FUNC_NOT_IMPL(0x0040A3ED, actor_related_struct *__cdecl(actor_related_struct*), Actor_SetFnPtr);
 MSG_FUNC_NOT_IMPL(0x0040A006, int __cdecl(), Actor_Init);
 MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
-
-
-
-// We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
-// stdlib used by MSGI.exe isn't the same as ours, mixing them will lead to a bad time.
-MSG_FUNC_NOT_IMPL(0x0053CB40, FILE* __cdecl(const char*, const char*), mgs_fopen);
-MSG_FUNC_NOT_IMPL(0x0053C970, int __cdecl(const char*, FILE*), mgs_fputs);
-MSG_FUNC_NOT_IMPL(0x0053C6C0, int __cdecl(FILE*), mgs_fflush);
-MSG_FUNC_NOT_IMPL(0x0053C4A0, int __cdecl(FILE *File), mgs_fclose);
-MSG_FUNC_NOT_IMPL(0x00539990, void *__cdecl(size_t), mgs_malloc);
-
-
-// Can't seem to make this work, calling this will crash due to issue mentioned above
-//MSG_FUNC_NOT_IMPL(0x0053C5F0, int __cdecl(FILE*, const char*, ...), mgs_fprintf);
-// So temp HACK - just get a pointer to the MSG func and call directly, remove when all funcs using it
-// are re-impled
-int msg_internal_fprintf(FILE *File, const char *Format, ...);
-
-using TMgs_fprintf = decltype(&msg_internal_fprintf);
-TMgs_fprintf mgs_fprintf = (TMgs_fprintf)0x0053C5F0;
-
-MSG_FUNC_NOT_IMPL(0x521F82, void __cdecl(), sub_521F82);
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), sub_51E1D9);
 
-VAR(BYTE, byte_6FC7E0, 0x6FC7E0);
-VAR(BYTE, byte_9AD89B, 0x9AD89B);
-VAR(DWORD, dword_73491C, 0x73491C);
-VAR(DWORD, dword_71D164, 0x71D164);
-VAR(DWORD, dword_6FC718, 0x6FC718);
-VAR(WORD, word_78E7F8, 0x78E7F8);
-VAR(WORD, word_78E7F6, 0x78E7F6);
-VAR(DWORD, dword_717354, 0x717354);
-VAR(DWORD, dword_717348, 0x717348);
-VAR(DWORD, dword_7348FC, 0x7348FC);
+MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
+MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
+MGS_VAR(1, 0x73491C, DWORD, dword_73491C, 0);
+MGS_VAR(1, 0x71D164, DWORD, dword_71D164, 0);
+MGS_VAR(1, 0x6FC718, DWORD, dword_6FC718, 0);
+MGS_VAR(1, 0x78E7F8, WORD, word_78E7F8, 0);
+MGS_VAR(1, 0x78E7F6, WORD, word_78E7F6, 0);
+MGS_VAR(1, 0x717354, DWORD, dword_717354, 0);
+MGS_VAR(1, 0x717348, DWORD, dword_717348, 0);
+MGS_VAR(1, 0x7348FC, DWORD, dword_7348FC, 0);
 
 //MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
 int __cdecl MainLoop()
@@ -185,12 +163,13 @@ int __cdecl MainLoop()
     memset(var21B, 0, 0xFF);
     memset(var11C, 0, 0xFF);
 
-    sub_521F82();
+    Sound_PopulateBufferQ();
 
     if (dword_73491C == 1)
     {
+        // This seems to skip frames when the game is running too "slow".
+        // Disabling it when debug logging causes some frame lag actually improves performance a lot.
         dword_73491C = 2;
-
         while (dword_73491C == 2)
         {
             DoSleep(8 + (rand() % 4));
@@ -214,11 +193,13 @@ int __cdecl MainLoop()
     {
         word_78E7F6 = word_78E7F8 = 0x400;
     }
+    
     sub_51E1D9();
+
     if (PeekMessageA(&oMsg, 0, 0, 0, 1) == 0)
         return 1;
 
-    if (oMsg.message == 0x12)
+    if (oMsg.message == WM_QUIT)
     {
         PostQuitMessage(0);
         return 0;
@@ -317,39 +298,39 @@ DWORD& gSoundFxVol_dword_651D98 = *((DWORD*)0x651D98);
 DWORD& gMusicVol_dword_716F68 = *((DWORD*)0x716F68);
 
 
-VAR(DWORD, dword_77C934, 0x77C934);
-VAR(BYTE, byte_9AD8A5, 0x9AD8A5);
-VAR(BYTE, byte_9AD8A7, 0x9AD8A7);
-VAR(BYTE, byte_9AD8A6, 0x9AD8A6);
-VAR(BYTE, byte_9AD8A8, 0x9AD8A8);
-VAR(BYTE, byte_9AD8DA, 0x9AD8DA);
-VAR(BYTE, byte_9AD8C1, 0x9AD8C1);
-VAR(DWORD, dword_73490C, 0x73490C);
-VAR(DWORD, dword_734908, 0x734908);
+MGS_VAR(1, 0x77C934, DWORD, dword_77C934, 0);
+MGS_VAR(1, 0x9AD8A5, BYTE, byte_9AD8A5, 0);
+MGS_VAR(1, 0x9AD8A7, BYTE, byte_9AD8A7, 0);
+MGS_VAR(1, 0x9AD8A6, BYTE, byte_9AD8A6, 0);
+MGS_VAR(1, 0x9AD8A8, BYTE, byte_9AD8A8, 0);
+MGS_VAR(1, 0x9AD8DA, BYTE, byte_9AD8DA, 0);
+MGS_VAR(1, 0x9AD8C1, BYTE, byte_9AD8C1, 0);
+MGS_VAR(1, 0x73490C, DWORD, dword_73490C, 0);
+MGS_VAR(1, 0x734908, DWORD, dword_734908, 0);
 
 int* gKeys = (int*)0x009AD9A0;
 BYTE* byte_9AD880 = (BYTE*)0x9AD880;
 
-VAR(DWORD, gvirtualKeyRepeatCount, 0x009AD980);
-VAR(DWORD, gVirtualKeyCode, 0x009AD6B0);
+MGS_VAR(1, 0x009AD980, DWORD, gvirtualKeyRepeatCount, 0);
+MGS_VAR(1, 0x009AD6B0, DWORD, gVirtualKeyCode, 0);
 
-VAR(DWORD, gAltPressed, 0x009AD892);
-VAR(DWORD, dword_71D194, 0x71D194);
-VAR(DWORD, gF10Pressed, 0x009AD8F9);
-VAR(DWORD, dword_734900, 0x734900);
-VAR(DWORD, dword_734904, 0x734904);
-VAR(BYTE, byte_9AD988, 0x9AD988);
-VAR(DWORD, gActive_dword_688CDC, 0x688CDC);
-VAR(DWORD, dword_71D17C, 0x71D17C);
-VAR(DWORD, dword_688CD0, 0x688CD0);
-VAR(DWORD, dword_688CD4, 0x688CD4);
-VAR(DWORD, dword_688CD8, 0x688CD8);
-VAR(DWORD, dword_791DE4, 0x791DE4);
-VAR(BYTE, byte_9AD888, 0x9AD888);
-VAR(DWORD, dword_733E34, 0x733E34);
-VAR(DWORD, dword_721E78, 0x721E78);
-VAR(DWORD, dword_650D4C, 0x650D4C);
-VAR(char*, gDest, 0x0078E7C0);
+MGS_VAR(1, 0x009AD892, DWORD, gAltPressed, 0);
+MGS_VAR(1, 0x71D194, DWORD, dword_71D194, 0);
+MGS_VAR(1, 0x009AD8F9, DWORD, gF10Pressed, 0);
+MGS_VAR(1, 0x734900, DWORD, dword_734900, 0);
+MGS_VAR(1, 0x734904, DWORD, dword_734904, 0);
+MGS_VAR(1, 0x9AD988, BYTE, byte_9AD988,0);
+MGS_VAR(1, 0x688CDC, DWORD, gActive_dword_688CDC, 0);
+MGS_VAR(1, 0x71D17C, DWORD, dword_71D17C, 0 );
+MGS_VAR(1, 0x688CD0, DWORD, dword_688CD0, 0);
+MGS_VAR(1, 0x688CD4, DWORD, dword_688CD4, 0);
+MGS_VAR(1, 0x688CD8, DWORD, dword_688CD8, 0);
+MGS_VAR(1, 0x791DE4, DWORD, dword_791DE4, 0);
+MGS_VAR(1, 0x9AD888, BYTE, byte_9AD888, 0);
+MGS_VAR(1, 0x733E34, DWORD, dword_733E34, 0);
+MGS_VAR(1, 0x721E78, DWORD, dword_721E78, 0);
+MGS_VAR(1, 0x650D4C, DWORD, dword_650D4C, 0);
+MGS_VAR(1, 0x0078E7C0, char * , gDest, nullptr);
 
 struct weapon_famas
 {
@@ -364,9 +345,9 @@ struct weapon_famas
 };
 static_assert(sizeof(weapon_famas) == 96, "weapon_famas should be 96");
 
-VAR(WORD, word_995368, 0x995368);
-VAR(WORD, word_995320, 0x995320);
-VAR(WORD, word_78E804, 0x78E804);
+MGS_VAR(1, 0x995368, WORD, word_995368, 0);
+MGS_VAR(1, 0x995320, WORD, word_995320, 0);
+MGS_VAR(1, 0x78E804, WORD, word_78E804, 0);
 
 MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
 MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
@@ -833,49 +814,45 @@ int __cdecl MessageBox_Sometimes(HWND hWnd, int a2, LPCSTR lpCaption, UINT uType
 
 
 
-VAR(IID, IID_IDirectDraw7_MGS, 0x64BDA8);
-VAR(GUID, IID_IDirect3D7_MGS, 0x64BB98);
-VAR(GUID, IID_IDirectDrawGammaControl_MGS, 0x64BCA8);
-VAR(IDirectDraw7*, g_pDirectDraw, 0x6FC730);
-VAR(IDirect3D7*, g_pDirect3D, 0x6FC748);
-VAR(IDirectDrawGammaControl*, g_pGammaControl, 0x6C0EF8);
-VAR(DWORD, g_dwDisplayWidth, 0x6DF214);
-VAR(DWORD, g_dwDisplayHeight, 0x6DF1FC);
-VAR(LPDIRECTDRAWSURFACE7, g_pPrimarySurface, 0x6FC734);
-VAR(LPDIRECTDRAWCLIPPER, g_pClipper, 0x6FC750);
-VAR(LPDIRECTDRAWSURFACE7, g_pBackBuffer, 0x6FC738);
-VAR(LPDIRECT3DDEVICE7, g_pDirect3DDevice, 0x6FC74C);
-VAR(LPDIRECTDRAWSURFACE7, g_pDDSurface, 0x6FC740);
+MGS_VAR(1, 0x64BDA8, IID, IID_IDirectDraw7_MGS, {});
+MGS_VAR(1, 0x64BB98, GUID, IID_IDirect3D7_MGS, {});
+MGS_VAR(1, 0x64BCA8, GUID, IID_IDirectDrawGammaControl_MGS, {});
+MGS_VAR(1, 0x6FC730, IDirectDraw7 * , g_pDirectDraw, nullptr);
+MGS_VAR(1, 0x6FC748, IDirect3D7 * , g_pDirect3D, nullptr);
+MGS_VAR(1, 0x6C0EF8, IDirectDrawGammaControl * , g_pGammaControl, nullptr);
+MGS_VAR(1, 0x6DF214, DWORD, g_dwDisplayWidth, 0);
+MGS_VAR(1, 0x6DF1FC, DWORD, g_dwDisplayHeight, 0);
+MGS_VAR(1, 0x6FC734, LPDIRECTDRAWSURFACE7, g_pPrimarySurface, nullptr);
+MGS_VAR(1, 0x6FC750, LPDIRECTDRAWCLIPPER, g_pClipper, nullptr);
+MGS_VAR(1, 0x6FC738, LPDIRECTDRAWSURFACE7, g_pBackBuffer, nullptr);
+MGS_VAR(1, 0x6FC74C, LPDIRECT3DDEVICE7, g_pDirect3DDevice, nullptr);
+MGS_VAR(1, 0x6FC740, LPDIRECTDRAWSURFACE7, g_pDDSurface, nullptr);
 
-VAR(FILE*, gFile, 0x006DEF78);
-VAR(FILE*, gLogFile, 0x71D414);
+MGS_VAR(1, 0x006DEF78, FILE * , gFile, nullptr);
+MGS_VAR(1, 0x71D414, FILE * , gLogFile, nullptr);
 
-VAR(DWORD, dword_651CF8, 0x651CF8);
-VAR(float, dword_716F5C, 0x716F5C);
-VAR(DWORD, dword_716F78, 0x716F78);
-VAR(DWORD, dword_77C60C, 0x77C60C);
-VAR(DWORD, dword_77C608, 0x77C608);
-VAR(DWORD*, dword_776B94, 0x776B94);
-VAR(DWORD*, dword_776B90, 0x776B90);
-VAR(DWORD, dword_716F74, 0x716F74);
-VAR(DWORD, gXSize_dword_6DF214, 0x6DF214);
-VAR(DWORD, dword_650D2C, 0x650D2C);
-VAR(DWORD*, gImageBufer_dword_6FC728, 0x6FC728);
-VAR(void*, dword_6DEF7C, 0x6DEF7C);
-VAR(void*, dword_6DEF90, 0x6DEF90);
-VAR(void*, gPixelBuffer_dword_6FC72C, 0x6FC72C);
-VAR(DWORD, dword_6FC798, 0x6FC798);
-VAR(DWORD, dword_6FC7C0, 0x6FC7C0);
-VAR(DWORD, dword_716F6C, 0x716F6C);
-VAR(DWORD, dword_6FC7C4, 0x6FC7C4);
-VAR(DWORD, dword_651D94, 0x651D94);
-VAR(DWORD, dword_6FC79C, 0x6FC79C);
-VAR(DWORD, dword_716F60, 0x716F60);
-VAR(char*, unk_776B68, 0x776B68);
-VAR(DWORD, gYSize, 0x006DF1FC);
-VAR(char*, unk_6C0778, 0x6C0778);
-
-
+MGS_VAR(1, 0x651CF8, DWORD, dword_651CF8, 0);
+MGS_VAR(1, 0x716F5C, float, dword_716F5C, 0);
+MGS_VAR(1, 0x716F78, DWORD, dword_716F78, 0);
+MGS_VAR(1, 0x77C60C, DWORD, dword_77C60C, 0);
+MGS_VAR(1, 0x77C608, DWORD, dword_77C608, 0);
+MGS_VAR(1, 0x776B94, DWORD * , dword_776B94, nullptr);
+MGS_VAR(1, 0x776B90, DWORD * , dword_776B90, nullptr);
+MGS_VAR(1, 0x716F74, DWORD, dword_716F74, 0);
+MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
+MGS_VAR(1, 0x6FC728, DWORD * , gImageBufer_dword_6FC728, 0);
+MGS_VAR(1, 0x6DEF7C, void * , dword_6DEF7C, nullptr);
+MGS_VAR(1, 0x6DEF90, void * , dword_6DEF90, nullptr);
+MGS_VAR(1, 0x6FC72C, void * , gPixelBuffer_dword_6FC72C, nullptr);
+MGS_VAR(1, 0x6FC798, DWORD, dword_6FC798, 0);
+MGS_VAR(1, 0x6FC7C0, DWORD, dword_6FC7C0, 0);
+MGS_VAR(1, 0x716F6C, DWORD, dword_716F6C, 0);
+MGS_VAR(1, 0x6FC7C4, DWORD, dword_6FC7C4, 0);
+MGS_VAR(1, 0x651D94, DWORD, dword_651D94, 0);
+MGS_VAR(1, 0x6FC79C, DWORD, dword_6FC79C, 0);
+MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
+MGS_VAR(1, 0x776B68, char * , unk_776B68, nullptr);
+MGS_VAR(1, 0x6C0778, char * , unk_6C0778, nullptr);
 
 HFONT& gFont = *(HFONT*)0x006FC7E8;
 
@@ -898,10 +875,10 @@ MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD),
 MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
 MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
 
-VAR(DWORD, dword_68C3B8, 0x68C3B8);
-VAR(uint8_t, byte_775F48, 0x775F48);
-VAR(uint8_t, byte_774B48, 0x774B48);
-VAR(uint8_t, byte_776450, 0x776450);
+MGS_VAR(1, 0x68C3B8, DWORD, dword_68C3B8, 0);
+MGS_VAR(1, 0x775F48, uint8_t, byte_775F48, 0);
+MGS_VAR(1, 0x774B48, uint8_t, byte_774B48, 0);
+MGS_VAR(1, 0x776450, uint8_t, byte_776450, 0);
 
 // TODO : make jim_enumerate_devices use this structure too
 struct jimDeviceDDId
@@ -1550,8 +1527,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     while (1)
     {
-        gXSize_dword_6DF214 = (signed __int64)(320.0 * gXRes);
-        gYSize = (signed __int64)(240.0 * gXRes);
+        g_dwDisplayWidth = (signed __int64)(320.0 * gXRes);
+        g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
         mgs_fputs("Creating DirectDraw7\n", gFile);
         mgs_fflush(gFile);
         hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
@@ -1574,8 +1551,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 mgs_fflush(gFile);
                 gSoftwareRendering = 1;
                 gXRes = 1.0f;
-                gXSize_dword_6DF214 = (signed __int64)(320.0 * gXRes);
-                gYSize = (signed __int64)(240.0 * gXRes);
+                g_dwDisplayWidth = (signed __int64)(320.0 * gXRes);
+                g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
                 MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
@@ -1643,7 +1620,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         if (!v42)
         {
             hr = g_pDirectDraw->SetDisplayMode(g_dwDisplayWidth, g_dwDisplayHeight, 0x10, 0, 0);
-            mgs_fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", gXSize_dword_6DF214, gYSize);
+            mgs_fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", g_dwDisplayWidth, g_dwDisplayHeight);
             if (hr < 0)
                 return 0;
         }
@@ -1744,8 +1721,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_OFFSCREENPLAIN;
             }
             dxSurfaceDesc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-            dxSurfaceDesc.dwWidth = gXSize_dword_6DF214;
-            dxSurfaceDesc.dwHeight = gYSize;
+            dxSurfaceDesc.dwWidth = g_dwDisplayWidth;
+            dxSurfaceDesc.dwHeight = g_dwDisplayHeight;
 
             mgs_fputs("Creating back buffer for software rendering...\n", gFile);
             mgs_fflush(gFile);
@@ -1769,8 +1746,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             {
                 dxSurfaceDesc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
                 dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_3DDEVICE | DDSCAPS_OFFSCREENPLAIN;
-                dxSurfaceDesc.dwWidth = gXSize_dword_6DF214;
-                dxSurfaceDesc.dwHeight = gYSize;
+                dxSurfaceDesc.dwWidth = g_dwDisplayWidth;
+                dxSurfaceDesc.dwHeight = g_dwDisplayHeight;
                 mgs_fputs("Creating back buffer for windowed mode...\n", gFile);
                 mgs_fflush(gFile);
                 hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc, &g_pBackBuffer, 0);
@@ -1959,8 +1936,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 }
                 dxViewport.dwX = 0;
                 dxViewport.dwY = 0;
-                dxViewport.dwWidth = gXSize_dword_6DF214;
-                dxViewport.dwHeight = gYSize;
+                dxViewport.dwWidth = g_dwDisplayWidth;
+                dxViewport.dwHeight = g_dwDisplayHeight;
                 dxViewport.dvMinZ = 0;
                 dxViewport.dvMaxZ = 1.0f;
                 g_pDirect3DDevice->SetViewport(&dxViewport);
@@ -1978,9 +1955,9 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         mgs_fputs("D3D:CreateDevice() failed, switching to SOFTWARE MODE\n", gFile);
         mgs_fflush(gFile);
-        gXSize_dword_6DF214 = 320;
-        gYSize = 240;
-        mgs_fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", gXSize_dword_6DF214, gYSize);
+        g_dwDisplayWidth = 320;
+        g_dwDisplayHeight = 240;
+        mgs_fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", g_dwDisplayWidth, g_dwDisplayHeight);
         MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
         gSoftwareRendering = 1;
         dword_716F5C = 1.0f;
@@ -2163,17 +2140,17 @@ LPDIENUMDEVICESCALLBACKA EnumDevicesCallback = (LPDIENUMDEVICESCALLBACKA)0x0043B
 LPDIENUMDEVICEOBJECTSCALLBACKA EnumDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0C8;
 LPDIENUMDEVICEOBJECTSCALLBACKA CountDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0B3;
 
-VAR(DWORD, dword_71D670, 0x71D670);
-VAR(DWORD, dword_71D790, 0x71D790);
-VAR(DWORD, dword_71D798, 0x71D798);
-VAR(LPDIRECTINPUT7, pDirectInput, 0x71D664);
-VAR(LPDIRECTINPUTDEVICE7, pJoystickDevice, 0x71D66C);
-VAR(LPDIRECTINPUTDEVICEA, pMouseDevice, 0x71D668);
-VAR(DWORD, dword_71D41C, 0x71D41C);
-VAR(DIDEVICEINSTANCEA, JoystickDeviceInfos, 0x71D420);
-VAR(DIDATAFORMAT, JoystickDataFormat, 0x64DA88);
-VAR(DIDATAFORMAT, MouseDataFormat, 0x64DA70);
-VAR(DIDEVCAPS, JoystickDeviceCaps, 0x71D1D8);
+MGS_VAR(1, 0x71D670, DWORD, dword_71D670, 0);
+MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
+MGS_VAR(1, 0x71D798, DWORD, dword_71D798, 0);
+MGS_VAR(1, 0x71D664, LPDIRECTINPUT7, pDirectInput, nullptr);
+MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE7, pJoystickDevice, nullptr);
+MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICEA, pMouseDevice, nullptr);
+MGS_VAR(1, 0x71D41C, DWORD, dword_71D41C, 0);
+MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
+MGS_VAR(1, 0x64DA88, DIDATAFORMAT, JoystickDataFormat, {});
+MGS_VAR(1, 0x64DA70, DIDATAFORMAT, MouseDataFormat, {});
+MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
 DWORD* dword_65714C = (DWORD*)0x65714C;
 DWORD* dword_657184 = (DWORD*)0x657184;
 DWORD* dword_6571BC = (DWORD*)0x6571BC;
@@ -2184,8 +2161,8 @@ GUID& GUID_SysMouse_MGS = *((GUID*)0x64AEE8);
 DWORD* dword_65726C = (DWORD*)0x65726C;
 char* buttonNames = (char*)0x65510C;
 char* buttonList = (char*)0x654A98;
-VAR(DWORD, nJoystickDeviceObjects, 0x71D68C);
-VAR(DWORD, dword_6FD1DC, 0x6FD1DC);
+MGS_VAR(1, 0x71D68C, DWORD, nJoystickDeviceObjects, 0);
+MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
 
 
 // 0x0043B1D1
@@ -2438,7 +2415,8 @@ void DebugLog(const char *Format, ...)
 
     va_start(va, Format);
     vsprintf(Dest, Format, va);
-    OutputDebugStringA(Dest);
+    //OutputDebugStringA(Dest);
+    printf(Dest);
 }
 
 // The varadic template hook class can't also mixing in varadic C functions, so we have too hook these manually
@@ -2672,6 +2650,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     //int i; // [sp+468h] [bp-4h]@70
 
     SoundCpp_ForceLink();
+    SoundCpp_Debug();
+
     InstallVaradicCFunctionHooks();
     
     if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))

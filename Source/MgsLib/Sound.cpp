@@ -2,23 +2,18 @@
 #include "Sound.hpp"
 #include "File.hpp"
 
-#include <io.h> // TODO: Use the games I/O funcs or still will probably explode
-
 using QWORD = __int64;
 
 #define REDIRECT_SOUND 1
 
-#define MGS_ARY(Redirect, Addr, TypeName, Size, VarName, ...)\
-TypeName LocalArray_##VarName[Size]=__VA_ARGS__;\
-TypeName* VarName = (Redirect) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
+struct StageMusicInfoStruct
+{
+    unsigned char mMusicSampleSetNumber;
+    unsigned char mUnknown;
+    const char* mStageName;
+};
+static_assert(sizeof(StageMusicInfoStruct) == 0x8, "StageMusicInfoStruct must be 0x8");
 
-#define MGS_PTR(Redirect, Addr, TypeName, VarName, Value)\
-TypeName LocalPtr_##VarName = Value;\
-TypeName VarName = (Redirect) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
-
-#define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)\
-TypeName LocalVar_##VarName = Value;\
-TypeName& VarName = (Redirect) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
 
 MGS_ARY(REDIRECT_SOUND, 0x77DCA0, IDirectSoundBuffer*, 256, g128_Sound_buffers_dword_77DCA0, {});
 MGS_ARY(REDIRECT_SOUND, 0x77D8A0, DWORD, 256, gFxState_dword_77D8A0, {});
@@ -56,11 +51,207 @@ MGS_VAR(REDIRECT_SOUND, 0x77E2F8, DWORD, dword_77E2F8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x68CE18, DWORD, dword_68CE18, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D894, DWORD, dword_77D894, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2F4, DWORD, dword_77E2F4, 0);
+MGS_ARY(0, 0x68D0B0, StageMusicInfoStruct, 176, gStageInfo_68D0B0, 
+{
+    { 19, 0, "stage/abst" },
+    { 32, 63, "stage/brf" },
+    { 19, 0, "stage/camera" },
+    { 1, 17, "stage/d01a" },
+    { 33, 24, "stage/d04b" },
+    { 0, 16, "stage/d11c" },
+    { 37, 20, "stage/d12a" },
+    { 16, 42, "stage/d16e" },
+    { 42, 62, "stage/d18a" },
+    { 42, 62, "stage/d18ar" },
+    { 19, 0, "stage/demosel" },
+    { 19, 0, "stage/preope" },
+    { 19, 0, "stage/rank" },
+    { 0, 16, "stage/s00a" },
+    { 1, 17, "stage/s01a" },
+    { 2, 18, "stage/s02a" },
+    { 2, 18, "stage/s02b" },
+    { 2, 18, "stage/s02c" },
+    { 2, 18, "stage/s02d" },
+    { 2, 18, "stage/s02e" },
+    { 3, 19, "stage/s03a" },
+    { 3, 19, "stage/s03ar" },
+    { 38, 60, "stage/s03b" },
+    { 20, 45, "stage/s03c" },
+    { 3, 19, "stage/s03d" },
+    { 3, 19, "stage/s03dr" },
+    { 3, 19, "stage/s03e" },
+    { 3, 19, "stage/s03er" },
+    { 4, 24, "stage/s04a" },
+    { 33, 24, "stage/s04b" },
+    { 33, 24, "stage/s04br" },
+    { 33, 24, "stage/s04c" },
+    { 34, 23, "stage/s05a" },
+    { 6, 26, "stage/s06a" },
+    { 7, 27, "stage/s07a" },
+    { 36, 28, "stage/s07b" },
+    { 36, 28, "stage/s07br" },
+    { 7, 27, "stage/s07c" },
+    { 7, 27, "stage/s07cr" },
+    { 8, 29, "stage/s08a" },
+    { 35, 35, "stage/s08b" },
+    { 35, 35, "stage/s08br" },
+    { 45, 30, "stage/s08c" },
+    { 45, 30, "stage/s08cr" },
+    { 9, 31, "stage/s09a" },
+    { 9, 31, "stage/s09ar" },
+    { 37, 32, "stage/s10a" },
+    { 37, 32, "stage/s10ar" },
+    { 10, 33, "stage/s11a" },
+    { 44, 25, "stage/s11b" },
+    { 10, 33, "stage/s11c" },
+    { 39, 34, "stage/s11d" },
+    { 10, 33, "stage/s11e" },
+    { 44, 25, "stage/s11g" },
+    { 44, 25, "stage/s11h" },
+    { 11, 36, "stage/s11i" },
+    { 12, 37, "stage/s12a" },
+    { 12, 37, "stage/s12b" },
+    { 12, 37, "stage/s12c" },
+    { 13, 38, "stage/s13a" },
+    { 14, 39, "stage/s14e" },
+    { 40, 40, "stage/s15a" },
+    { 15, 41, "stage/s15b" },
+    { 17, 43, "stage/s15c" },
+    { 16, 42, "stage/s16a" },
+    { 16, 42, "stage/s16b" },
+    { 16, 42, "stage/s16c" },
+    { 16, 42, "stage/s16d" },
+    { 41, 46, "stage/s17a" },
+    { 41, 46, "stage/s17ar" },
+    { 42, 21, "stage/s18a" },
+    { 42, 21, "stage/s18ar" },
+    { 43, 44, "stage/s19a" },
+    { 43, 44, "stage/s19ar" },
+    { 43, 44, "stage/s19b" },
+    { 43, 44, "stage/s19br" },
+    { 71, 61, "stage/title" },
+    { 19, 0, "stagevr/camera" },
+    { 69, 64, "stagevr/photo_m1" },
+    { 69, 64, "stagevr/photo_m2" },
+    { 69, 64, "stagevr/photo_n1" },
+    { 69, 64, "stagevr/photo_n2" },
+    { 69, 64, "stagevr/photo_n3" },
+    { 64, 62, "stagevr/selectvr" },
+    { 64, 59, "stagevr/vab_cfr" },
+    { 64, 59, "stagevr/vab_clm" },
+    { 64, 59, "stagevr/vab_fms" },
+    { 64, 59, "stagevr/vab_grn" },
+    { 64, 59, "stagevr/vab_nkt" },
+    { 64, 59, "stagevr/vab_psg" },
+    { 64, 59, "stagevr/vab_scm" },
+    { 64, 59, "stagevr/vab_stg" },
+    { 64, 59, "stagevr/vab_sud" },
+    { 68, 68, "stagevr/vcd_n01" },
+    { 68, 68, "stagevr/vcd_n02" },
+    { 68, 68, "stagevr/vcd_n03" },
+    { 64, 67, "stagevr/vcd_n04" },
+    { 65, 66, "stagevr/vcd_n05" },
+    { 64, 59, "stagevr/vcd_n06" },
+    { 64, 65, "stagevr/vefgh_01" },
+    { 64, 65, "stagevr/vefgh_02" },
+    { 64, 65, "stagevr/vefgh_03" },
+    { 64, 65, "stagevr/vefgh_04" },
+    { 64, 65, "stagevr/vefgh_05" },
+    { 64, 65, "stagevr/vefgh_06" },
+    { 64, 65, "stagevr/vefgh_07" },
+    { 64, 65, "stagevr/vefgh_08" },
+    { 64, 65, "stagevr/vefgh_09" },
+    { 67, 65, "stagevr/vefgh_10" },
+    { 64, 59, "stagevr/vijkl_01" },
+    { 64, 59, "stagevr/vijkl_02" },
+    { 64, 59, "stagevr/vijkl_03" },
+    { 64, 59, "stagevr/vijkl_04" },
+    { 64, 59, "stagevr/vijkl_05" },
+    { 64, 59, "stagevr/vijkl_06" },
+    { 64, 65, "stagevr/vijkl_07" },
+    { 64, 59, "stagevr/vijkl_08" },
+    { 64, 59, "stagevr/vijkl_09" },
+    { 64, 59, "stagevr/vijkl_10" },
+    { 18, 62, "stagevr/vrsave" },
+    { 70, 62, "stagevr/vrtitle" },
+    { 64, 59, "stagevr/vr_cfr01" },
+    { 64, 59, "stagevr/vr_cfr02" },
+    { 64, 59, "stagevr/vr_cfr03" },
+    { 64, 59, "stagevr/vr_cfr04" },
+    { 64, 59, "stagevr/vr_cfr05" },
+    { 64, 59, "stagevr/vr_clm01" },
+    { 64, 59, "stagevr/vr_clm02" },
+    { 64, 59, "stagevr/vr_clm03" },
+    { 64, 59, "stagevr/vr_clm04" },
+    { 64, 59, "stagevr/vr_clm05" },
+    { 64, 59, "stagevr/vr_fms01" },
+    { 64, 59, "stagevr/vr_fms02" },
+    { 64, 59, "stagevr/vr_fms03" },
+    { 64, 59, "stagevr/vr_fms04" },
+    { 64, 59, "stagevr/vr_fms05" },
+    { 64, 59, "stagevr/vr_grn01" },
+    { 64, 59, "stagevr/vr_grn02" },
+    { 64, 59, "stagevr/vr_grn03" },
+    { 64, 59, "stagevr/vr_grn04" },
+    { 64, 59, "stagevr/vr_grn05" },
+    { 64, 59, "stagevr/vr_nkt01" },
+    { 64, 59, "stagevr/vr_nkt02" },
+    { 64, 59, "stagevr/vr_nkt03" },
+    { 64, 59, "stagevr/vr_nkt04" },
+    { 64, 59, "stagevr/vr_nkt05" },
+    { 64, 59, "stagevr/vr_psg01" },
+    { 64, 59, "stagevr/vr_psg02" },
+    { 64, 59, "stagevr/vr_psg03" },
+    { 64, 59, "stagevr/vr_psg04" },
+    { 64, 59, "stagevr/vr_psg05" },
+    { 64, 59, "stagevr/vr_scm01" },
+    { 64, 59, "stagevr/vr_scm02" },
+    { 64, 59, "stagevr/vr_scm03" },
+    { 64, 59, "stagevr/vr_scm04" },
+    { 64, 59, "stagevr/vr_scm05" },
+    { 64, 59, "stagevr/vr_stg01" },
+    { 64, 59, "stagevr/vr_stg02" },
+    { 64, 59, "stagevr/vr_stg03" },
+    { 64, 59, "stagevr/vr_stg04" },
+    { 64, 59, "stagevr/vr_stg05" },
+    { 64, 59, "stagevr/vr_sud01" },
+    { 64, 59, "stagevr/vr_sud02" },
+    { 64, 59, "stagevr/vr_sud03" },
+    { 64, 59, "stagevr/vr_sud04" },
+    { 64, 59, "stagevr/vr_sud05" },
+    { 64, 59, "stagevr/vr_sud06" },
+    { 64, 59, "stagevr/vr_sud07" },
+    { 64, 59, "stagevr/vr_sud08" },
+    { 64, 59, "stagevr/vr_sud09" },
+    { 64, 59, "stagevr/vr_sud10" },
+    { 64, 59, "stagevr/vr_sud11" },
+    { 64, 59, "stagevr/vr_sud12" },
+    { 64, 59, "stagevr/vr_sud13" },
+    { 64, 59, "stagevr/vr_sud14" },
+    { 64, 59, "stagevr/vr_sud15" }
+});
 
-// TODO: Use macro
-char** off_68D0B4 = (char**)0x68D0B4;
-char* byte_68D0B1 = (char*)0x68D0B1;
-char* byte_68D0B0 = (char*)0x68D0B0;
+#include <sstream>
+
+void DumpArray()
+{
+    std::stringstream ss;
+    StageMusicInfoStruct* ar = (StageMusicInfoStruct*)0x68D0B0;
+    for (int i = 0; i < 177; i++)
+    {
+        ss << "{ " << static_cast<unsigned int>(ar->mMusicSampleSetNumber) << ", ";
+        ss << static_cast<unsigned int>(ar->mUnknown) << ", ";
+        ss << "\"" << ar->mStageName << "\" },\n";
+        ar++;
+    }
+    std::string v = ss.str();
+    const char* s = v.c_str();
+}
+
+void SoundCpp_Debug()
+{
+    //DumpArray();
+}
 
 MGS_ARY(REDIRECT_SOUND, 0x68D630, __int16, 1550, unk_68D630, {});
 MGS_VAR(REDIRECT_SOUND, 0x68CE34, DWORD, gSampleSet_dword_68CE34, 0);
@@ -102,7 +293,7 @@ MGS_VAR(1, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
 MSG_FUNC_IMPLEX(0x0052269C, Sound_Init, false);
 MSG_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, false);
 MSG_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, false);
-MSG_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, SKIP);
+MSG_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, false);
 MSG_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, false);
 MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, false);
 MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, false);
@@ -110,13 +301,13 @@ MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, false);
 MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, false);
 MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, false);
 MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, false);
-MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, SKIP);
-MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP);
-MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP);
+MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, false);
+MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP); // Breaks knocking on "bomb" wall and trap door sounds
+MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP); // Calls above broken func
 MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
 MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, false);
-MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SKIP);
-MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP);
+MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, false);
+MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, false);
 MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, false);
 MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, false);
 MSG_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, false);
@@ -125,7 +316,7 @@ MSG_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP); // causes raspy codec i
 MSG_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, false);
 MSG_FUNC_IMPLEX(0x00523232, Sound_Start2SamplesQ, false);
 MSG_FUNC_IMPLEX(0x00523466, Sound_Stop2Samples, false);
-MSG_FUNC_IMPLEX(0x0052313B, Sound_StopSample, SKIP);
+MSG_FUNC_IMPLEX(0x0052313B, Sound_StopSample, false);
 MSG_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, false);
 MSG_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, false);
 MSG_FUNC_IMPLEX(0x005224C8, Sound_SetSoundFxVolume, false);
@@ -133,8 +324,8 @@ MSG_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
 MSG_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, false);
 MSG_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, false);
 MSG_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, false);
-MSG_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP);
-MSG_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP);
+MSG_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP); // calls to broken funcs
+MSG_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP); // calls to broken funcs
 
 
 #pragma comment(lib, "Winmm.lib") // timegettime()
@@ -145,7 +336,6 @@ void SoundCpp_ForceLink()
 }
 
 MSG_FUNC_NOT_IMPL(0x005530A8, HRESULT __stdcall(LPGUID, LPDIRECTSOUND*, LPUNKNOWN), MgsDirectSoundCreate);
-//MSG_FUNC_NOT_IMPL(0x0053D680, int __cdecl(int), msg_close);
 
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
@@ -239,7 +429,7 @@ int __cdecl Sound_CloseWavStopQ()
 
     if (gMusicWavFile_dword_68CE30 != -1)
     {
-        result = _close(gMusicWavFile_dword_68CE30);
+        result = mgs_close(gMusicWavFile_dword_68CE30);
     }
 
     gMusicWavFile_dword_68CE30 = -1;
@@ -537,16 +727,19 @@ void __cdecl Sound_LoadFxRelatedQ(const char *Str1)
 
     v5 = 0;
     sampleSet = 0xFF;
+
     for (int i = 0; i < 176; ++i)
     {
-        if (!strcmp(Str1, off_68D0B4[2 * i]))
+        if (!strcmp(Str1, gStageInfo_68D0B0[i].mStageName))
         {
-            v5 = byte_68D0B1[8 * i];
-            sampleSet = byte_68D0B0[8 * i];
+            v5 = gStageInfo_68D0B0[i].mUnknown;
+            sampleSet = gStageInfo_68D0B0[i].mMusicSampleSetNumber;
             break;
         }
     }
+
     dword_77E2F4 = v5;
+
     for (int i = 0; i < 1550; ++i) // 82 is biggest samples in a set, 1550 is total number of sample set samples, excluding main/ones in root dir
     {
         soundNum = unk_68D630[i];
@@ -697,11 +890,11 @@ LABEL_74:
     if (!sndNumber)
         return 1;
     sprintf(soundFileName, "%s0x%02x.wav", "mdx/", sndNumber);
-    gMusicWavFile_dword_68CE30 = _open(soundFileName, 0x8000);
+    gMusicWavFile_dword_68CE30 = mgs_open(soundFileName, 0x8000);
     if (gMusicWavFile_dword_68CE30 == -1)
         return 0;
-    _lseek(gMusicWavFile_dword_68CE30, 40, 0);
-    if (_read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u) != 4)
+    mgs_lseek(gMusicWavFile_dword_68CE30, 40, 0);
+    if (mgs_read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u) != 4)
         return 0;
     if (gSndBuffer_dword_77E2D0)
     {
@@ -717,10 +910,10 @@ LABEL_74:
             gSndBuffer_dword_77E2D0->Restore();
             gSndBuffer_dword_77E2D0->Lock(0, 88200, &v10, &nNumberOfBytesToRead, &v9, &v11, 0);
         }
-        v2 = _read(gMusicWavFile_dword_68CE30, v10, nNumberOfBytesToRead);
+        v2 = mgs_read(gMusicWavFile_dword_68CE30, v10, nNumberOfBytesToRead);
         if (v2 != nNumberOfBytesToRead)
         {
-            _close(gMusicWavFile_dword_68CE30);
+            mgs_close(gMusicWavFile_dword_68CE30);
             gSndBuffer_dword_77E2D0->Unlock(v10, nNumberOfBytesToRead, v9, v11);
             return 0;
         }
@@ -893,21 +1086,21 @@ void __cdecl Sound_PopulateBufferQ()
                             0);
                     }
                     
-                    v0 = _read(gMusicWavFile_dword_68CE30, v5, nNumberOfBytesToRead);
+                    v0 = mgs_read(gMusicWavFile_dword_68CE30, v5, nNumberOfBytesToRead);
                     
                     if (v0 != nNumberOfBytesToRead)
                     {
-                        _close(gMusicWavFile_dword_68CE30);
+                        mgs_close(gMusicWavFile_dword_68CE30);
                         gMusicWavFile_dword_68CE30 = -1;
                         gSndState_dword_77E2D4 = 0;
                     }
 
                     if (nNumberOfBytesToRead < 0x2000)
                     {
-                        v1 = _read(gMusicWavFile_dword_68CE30, v4, v6);
+                        v1 = mgs_read(gMusicWavFile_dword_68CE30, v4, v6);
                         if (v1 != v6)
                         {
-                            _close(gMusicWavFile_dword_68CE30);
+                            mgs_close(gMusicWavFile_dword_68CE30);
                             gMusicWavFile_dword_68CE30 = -1;
                             gSndState_dword_77E2D4 = 0;
                         }
@@ -935,7 +1128,7 @@ void __cdecl Sound_PopulateBufferQ()
                     if (v9)
                     {
                         lDistanceToMove = 0;
-                        if (_read(gMusicWavFile_dword_68CE30, buffer, 68u) == 68 && _read(gMusicWavFile_dword_68CE30, buffer, 12u) == 12)
+                        if (mgs_read(gMusicWavFile_dword_68CE30, buffer, 68u) == 68 && mgs_read(gMusicWavFile_dword_68CE30, buffer, 12u) == 12)
                         {
                             buffer[11] = 0;
                             lDistanceToMove = 441
@@ -945,9 +1138,9 @@ void __cdecl Sound_PopulateBufferQ()
                                 - 48)
                                 / 10;
                         }
-                        _lseek(gMusicWavFile_dword_68CE30, 40, 0);
-                        _read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u);
-                        _lseek(gMusicWavFile_dword_68CE30, lDistanceToMove, 1u);
+                        mgs_lseek(gMusicWavFile_dword_68CE30, 40, 0);
+                        mgs_read(gMusicWavFile_dword_68CE30, &dword_77E2EC, 4u);
+                        mgs_lseek(gMusicWavFile_dword_68CE30, lDistanceToMove, 1u);
                         dword_77E2EC -= lDistanceToMove;
 
                         if (dword_77E2E0)
@@ -1103,6 +1296,7 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
                         snd->Restore();
                         snd->Lock(dword_77E2F8, Size, (LPVOID*)&Dst, &v16, (LPVOID*)&v12, &v15, 0);
                     }
+
                     if (a1)
                     {
                         if (a4)
