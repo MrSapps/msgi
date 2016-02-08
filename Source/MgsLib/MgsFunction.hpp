@@ -245,7 +245,6 @@ public:
 class MgsVar
 {
 public:
-    MgsVar(DWORD addr);
     MgsVar(DWORD addr, DWORD sizeInBytes);
 };
 

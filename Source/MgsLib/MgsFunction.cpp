@@ -13,13 +13,33 @@ bool gbIsDll;
 
 
 // TODO: Check for multiply defined vars or overlapping vars
-MgsVar::MgsVar(DWORD addr)
+struct TVarInfo
 {
+    DWORD mAddr;
+    DWORD mSize;
+};
 
+bool operator < (const TVarInfo& lhs, const TVarInfo& rhs)
+{
+    return lhs.mAddr < rhs.mAddr;
 }
+
+std::set<TVarInfo> gVars;
 
 MgsVar::MgsVar(DWORD addr, DWORD sizeInBytes)
 {
-
+    for (const auto& var : gVars)
+    {
+        if (var.mAddr == addr)
+        {
+            // Var has been defined twice
+            abort();
+        }
+        else if (var.mAddr >= addr && var.mAddr + var.mSize <= addr)
+        {
+            // Var overlaps
+            abort();
+        }
+    }
+    gVars.insert({ addr, sizeInBytes });
 }
-
