@@ -140,7 +140,10 @@ MSG_FUNC_NOT_IMPL(0x0040A006, int __cdecl(), Actor_Init);
 MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
-MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), sub_51E1D9);
+MSG_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
+MSG_FUNC_NOT_IMPL(0x51FEBC, int __cdecl(), Task_Pause);
+MSG_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
+MSG_FUNC_NOT_IMPL(0x51FEDC, int __cdecl(), Task_ResumeQ);
 
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
 MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
@@ -152,6 +155,94 @@ MGS_VAR(1, 0x78E7F6, WORD, word_78E7F6, 0);
 MGS_VAR(1, 0x717354, DWORD, dword_717354, 0);
 MGS_VAR(1, 0x717348, DWORD, dword_717348, 0);
 MGS_VAR(1, 0x7348FC, DWORD, dword_7348FC, 0);
+MGS_VAR(1, 0x732E64, DWORD, dword_732E64, 0);
+
+MGS_VAR(1, 0x64BDA8, IID, IID_IDirectDraw7_MGS, {});
+MGS_VAR(1, 0x64BB98, GUID, IID_IDirect3D7_MGS, {});
+MGS_VAR(1, 0x64BCA8, GUID, IID_IDirectDrawGammaControl_MGS, {});
+MGS_VAR(1, 0x6FC730, IDirectDraw7 *, g_pDirectDraw, nullptr);
+MGS_VAR(1, 0x6FC748, IDirect3D7 *, g_pDirect3D, nullptr);
+MGS_VAR(1, 0x6C0EF8, IDirectDrawGammaControl *, g_pGammaControl, nullptr);
+MGS_VAR(1, 0x6DF214, DWORD, g_dwDisplayWidth, 0);
+MGS_VAR(1, 0x6DF1FC, DWORD, g_dwDisplayHeight, 0);
+MGS_VAR(1, 0x6FC734, LPDIRECTDRAWSURFACE7, g_pPrimarySurface, nullptr);
+MGS_VAR(1, 0x6FC750, LPDIRECTDRAWCLIPPER, g_pClipper, nullptr);
+MGS_VAR(1, 0x6FC738, LPDIRECTDRAWSURFACE7, g_pBackBuffer, nullptr);
+MGS_VAR(1, 0x6FC74C, LPDIRECT3DDEVICE7, g_pDirect3DDevice, nullptr);
+MGS_VAR(1, 0x6FC740, LPDIRECTDRAWSURFACE7, g_pDDSurface, nullptr);
+
+MGS_VAR(1, 0x006DEF78, FILE *, gFile, nullptr);
+MGS_VAR(1, 0x71D414, FILE *, gLogFile, nullptr);
+
+MGS_VAR(1, 0x651CF8, DWORD, dword_651CF8, 0);
+MGS_VAR(1, 0x716F5C, float, dword_716F5C, 0);
+MGS_VAR(1, 0x716F78, DWORD, dword_716F78, 0);
+MGS_VAR(1, 0x77C60C, DWORD, dword_77C60C, 0);
+MGS_VAR(1, 0x77C608, DWORD, dword_77C608, 0);
+MGS_VAR(1, 0x776B94, DWORD *, dword_776B94, nullptr);
+MGS_VAR(1, 0x776B90, DWORD *, dword_776B90, nullptr);
+MGS_VAR(1, 0x716F74, DWORD, dword_716F74, 0);
+MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
+MGS_VAR(1, 0x6FC728, DWORD *, gImageBufer_dword_6FC728, 0);
+MGS_VAR(1, 0x6DEF7C, void *, dword_6DEF7C, nullptr);
+MGS_VAR(1, 0x6DEF90, void *, dword_6DEF90, nullptr);
+MGS_VAR(1, 0x6FC72C, void *, gPixelBuffer_dword_6FC72C, nullptr);
+MGS_VAR(1, 0x6FC798, DWORD, dword_6FC798, 0);
+MGS_VAR(1, 0x6FC7C0, DWORD, dword_6FC7C0, 0);
+MGS_VAR(1, 0x716F6C, DWORD, dword_716F6C, 0);
+MGS_VAR(1, 0x6FC7C4, DWORD, dword_6FC7C4, 0);
+MGS_VAR(1, 0x651D94, DWORD, dword_651D94, 0);
+MGS_VAR(1, 0x6FC79C, DWORD, dword_6FC79C, 0);
+MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
+MGS_VAR(1, 0x776B68, char *, unk_776B68, nullptr);
+MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
+
+HFONT& gFont = *(HFONT*)0x006FC7E8;
+HWND& gHwnd = *(HWND*)0x009ADDA0;
+
+//MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
+int __cdecl HandleExclusiveMode()
+{
+    MSG oMsg;
+
+    if (!g_pDirectDraw)
+        return 0;
+
+    if (g_pDirectDraw->TestCooperativeLevel() != DDERR_NOEXCLUSIVEMODE)
+        return 0;
+
+    Sound_StopSample();
+    sub_4583BB();
+    Task_Pause();
+
+    do
+    {
+        if (PeekMessageA(&oMsg, 0, 0, 0, 1) != 0)
+        {
+            if (oMsg.message == WM_QUIT)
+            {
+                PostQuitMessage(0);
+                return 1;
+            }
+
+            TranslateMessage(&oMsg);
+            DispatchMessageA(&oMsg);
+        }
+
+        Sleep(1000);
+    }
+    while (g_pDirectDraw->TestCooperativeLevel() != 0);
+
+    sub_51E086();
+    FpsTimerSetupQ();
+    Task_ResumeQ();
+    Sound_PlaySample();
+
+    if (dword_732E64 == 1)
+        PostMessageA(gHwnd, 0x100, 0x1B, 0);
+
+    return 0;
+}
 
 //MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
 int __cdecl MainLoop()
@@ -194,7 +285,7 @@ int __cdecl MainLoop()
         word_78E7F6 = word_78E7F8 = 0x400;
     }
     
-    sub_51E1D9();
+    HandleExclusiveMode();
 
     if (PeekMessageA(&oMsg, 0, 0, 0, 1) == 0)
         return 1;
@@ -292,7 +383,6 @@ DWORD& gBlendMode = *(DWORD*)0x00650D38;
 DWORD& gLowRes = *(DWORD*)0x00650D20;
 char*& off_688D40 = *(char**)0x688D40;
 DWORD& gSoftwareRendering = *(DWORD*)0x006FC794;
-HWND& gHwnd = *(HWND*)0x009ADDA0;
 HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
 DWORD& gSoundFxVol_dword_651D98 = *((DWORD*)0x651D98);
 DWORD& gMusicVol_dword_716F68 = *((DWORD*)0x716F68);
@@ -811,50 +901,6 @@ int __cdecl MessageBox_Sometimes(HWND hWnd, int a2, LPCSTR lpCaption, UINT uType
     }
     return result;
 }
-
-
-
-MGS_VAR(1, 0x64BDA8, IID, IID_IDirectDraw7_MGS, {});
-MGS_VAR(1, 0x64BB98, GUID, IID_IDirect3D7_MGS, {});
-MGS_VAR(1, 0x64BCA8, GUID, IID_IDirectDrawGammaControl_MGS, {});
-MGS_VAR(1, 0x6FC730, IDirectDraw7 * , g_pDirectDraw, nullptr);
-MGS_VAR(1, 0x6FC748, IDirect3D7 * , g_pDirect3D, nullptr);
-MGS_VAR(1, 0x6C0EF8, IDirectDrawGammaControl * , g_pGammaControl, nullptr);
-MGS_VAR(1, 0x6DF214, DWORD, g_dwDisplayWidth, 0);
-MGS_VAR(1, 0x6DF1FC, DWORD, g_dwDisplayHeight, 0);
-MGS_VAR(1, 0x6FC734, LPDIRECTDRAWSURFACE7, g_pPrimarySurface, nullptr);
-MGS_VAR(1, 0x6FC750, LPDIRECTDRAWCLIPPER, g_pClipper, nullptr);
-MGS_VAR(1, 0x6FC738, LPDIRECTDRAWSURFACE7, g_pBackBuffer, nullptr);
-MGS_VAR(1, 0x6FC74C, LPDIRECT3DDEVICE7, g_pDirect3DDevice, nullptr);
-MGS_VAR(1, 0x6FC740, LPDIRECTDRAWSURFACE7, g_pDDSurface, nullptr);
-
-MGS_VAR(1, 0x006DEF78, FILE * , gFile, nullptr);
-MGS_VAR(1, 0x71D414, FILE * , gLogFile, nullptr);
-
-MGS_VAR(1, 0x651CF8, DWORD, dword_651CF8, 0);
-MGS_VAR(1, 0x716F5C, float, dword_716F5C, 0);
-MGS_VAR(1, 0x716F78, DWORD, dword_716F78, 0);
-MGS_VAR(1, 0x77C60C, DWORD, dword_77C60C, 0);
-MGS_VAR(1, 0x77C608, DWORD, dword_77C608, 0);
-MGS_VAR(1, 0x776B94, DWORD * , dword_776B94, nullptr);
-MGS_VAR(1, 0x776B90, DWORD * , dword_776B90, nullptr);
-MGS_VAR(1, 0x716F74, DWORD, dword_716F74, 0);
-MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
-MGS_VAR(1, 0x6FC728, DWORD * , gImageBufer_dword_6FC728, 0);
-MGS_VAR(1, 0x6DEF7C, void * , dword_6DEF7C, nullptr);
-MGS_VAR(1, 0x6DEF90, void * , dword_6DEF90, nullptr);
-MGS_VAR(1, 0x6FC72C, void * , gPixelBuffer_dword_6FC72C, nullptr);
-MGS_VAR(1, 0x6FC798, DWORD, dword_6FC798, 0);
-MGS_VAR(1, 0x6FC7C0, DWORD, dword_6FC7C0, 0);
-MGS_VAR(1, 0x716F6C, DWORD, dword_716F6C, 0);
-MGS_VAR(1, 0x6FC7C4, DWORD, dword_6FC7C4, 0);
-MGS_VAR(1, 0x651D94, DWORD, dword_651D94, 0);
-MGS_VAR(1, 0x6FC79C, DWORD, dword_6FC79C, 0);
-MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
-MGS_VAR(1, 0x776B68, char * , unk_776B68, nullptr);
-MGS_VAR(1, 0x6C0778, char * , unk_6C0778, nullptr);
-
-HFONT& gFont = *(HFONT*)0x006FC7E8;
 
 // 0x423F1B
 HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
