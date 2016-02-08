@@ -24,11 +24,15 @@ bool operator < (const TVarInfo& lhs, const TVarInfo& rhs)
     return lhs.mAddr < rhs.mAddr;
 }
 
-std::set<TVarInfo> gVars;
+std::set<TVarInfo>& Vars()
+{
+    static std::set<TVarInfo> v;
+    return v;
+}
 
 MgsVar::MgsVar(DWORD addr, DWORD sizeInBytes)
 {
-    for (const auto& var : gVars)
+    for (const auto& var : Vars())
     {
         if (var.mAddr == addr)
         {
@@ -41,5 +45,5 @@ MgsVar::MgsVar(DWORD addr, DWORD sizeInBytes)
             abort();
         }
     }
-    gVars.insert({ addr, sizeInBytes });
+    Vars().insert({ addr, sizeInBytes });
 }

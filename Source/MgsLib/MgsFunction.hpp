@@ -7,8 +7,6 @@
 #include "logger.hpp"
 #include "detours.h"
 
-#define VAR(type,name,addr) type& name = *(type*)addr;
-
 inline std::ostream& operator<<(std::ostream& out, IID id)
 {
     // TODO: Print GUIDS properly
@@ -247,6 +245,23 @@ class MgsVar
 public:
     MgsVar(DWORD addr, DWORD sizeInBytes);
 };
+
+#define MGS_ARY(Redirect, Addr, TypeName, Size, VarName, ...)\
+TypeName LocalArray_##VarName[Size]=__VA_ARGS__;\
+MgsVar Var_##VarName(Addr, sizeof(LocalArray_##VarName));\
+TypeName* VarName = (Redirect) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
+
+// TODO: MGS_VAR should handle this case?
+#define MGS_PTR(Redirect, Addr, TypeName, VarName, Value)\
+TypeName LocalPtr_##VarName = Value;\
+MgsVar Var_##VarName(Addr, sizeof(LocalPtr_##VarName));\
+TypeName VarName = (Redirect) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
+
+#define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)\
+TypeName LocalVar_##VarName = Value;\
+MgsVar Var_##VarName(Addr, sizeof(LocalVar_##VarName));\
+TypeName& VarName = (Redirect) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
+
 
 #define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);
 #define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, true, signature> name;

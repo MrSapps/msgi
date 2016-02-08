@@ -8,22 +8,6 @@ using QWORD = __int64;
 
 #define REDIRECT_SOUND 1
 
-#define MGS_ARY(Redirect, Addr, TypeName, Size, VarName, ...)\
-TypeName LocalArray_##VarName[Size]=__VA_ARGS__;\
-MgsVar Var_##VarName(Addr, sizeof(LocalArray_##VarName));\
-TypeName* VarName = (Redirect) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
-
-// TODO: MGS_VAR should handle this case?
-#define MGS_PTR(Redirect, Addr, TypeName, VarName, Value)\
-TypeName LocalPtr_##VarName = Value;\
-MgsVar Var_##VarName(Addr, sizeof(LocalPtr_##VarName));\
-TypeName VarName = (Redirect) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
-
-#define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)\
-TypeName LocalVar_##VarName = Value;\
-MgsVar Var_##VarName(Addr, sizeof(LocalVar_##VarName));\
-TypeName& VarName = (Redirect) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
-
 struct StageMusicInfoStruct
 {
     unsigned char mMusicSampleSetNumber;
