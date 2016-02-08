@@ -302,8 +302,8 @@ MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, false);
 MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, false);
 MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, false);
 MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, false);
-MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SKIP); // Breaks knocking on "bomb" wall and trap door sounds
-MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SKIP); // Calls above broken func
+MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, false);
+MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, false);
 MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
 MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, false);
 MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, false);
@@ -720,34 +720,29 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
 // 0x00522A9C
 void __cdecl Sound_LoadFxRelatedQ(const char *Str1)
 {
-    char soundFileName[256];
-    unsigned __int16 soundNum;
-    int sampleSet;
-    int v5;
-
-    v5 = 0;
-    sampleSet = 0xFF;
-
+    int sampleSet = 255;
+    dword_77E2F4 = 0;
     for (int i = 0; i < 176; ++i)
     {
-        if (!strcmp(Str1, gStageInfo_68D0B0[i].mStageName))
+        const StageMusicInfoStruct& ptr = gStageInfo_68D0B0[i];
+        if (!strcmp(Str1, ptr.mStageName))
         {
-            v5 = gStageInfo_68D0B0[i].mUnknown;
-            sampleSet = gStageInfo_68D0B0[i].mMusicSampleSetNumber;
+            dword_77E2F4 = ptr.mUnknown;
+            sampleSet = ptr.mMusicSampleSetNumber;
             break;
         }
     }
-
-    dword_77E2F4 = v5;
-
-    for (int i = 0; i < 1550; ++i) // 82 is biggest samples in a set, 1550 is total number of sample set samples, excluding main/ones in root dir
+ 
+    // 82 is biggest samples in a set, 1550 is total number of sample set samples, excluding main/ones in root dir
+    for (int i = 0; i < 1550; ++i) 
     {
-        soundNum = unk_68D630[i];
-        if ((((signed int)soundNum >> 8) & 127) == sampleSet)
+        const unsigned __int16 soundNum = unk_68D630[i]; // used as 2 bytes, casts are important!
+        if (((soundNum >> 8) & 127) == sampleSet)
         {
-            sprintf(soundFileName, "%ssample%02x/0x%02x.wav", "efx/", sampleSet, soundNum);
+            char soundFileName[512] = {};
+            sprintf(soundFileName, "%ssample%02x/0x%02x.wav", "efx/", sampleSet, (unsigned char)soundNum);
             Sound_LoadBufferFromFile(soundFileName);
-            gFxState_dword_77D8A0[soundNum] = 0;
+            gFxState_dword_77D8A0[(unsigned char)soundNum] = 0; // Seems to be a dead array?
         }
     }
     gSampleSet_dword_68CE34 = sampleSet;
