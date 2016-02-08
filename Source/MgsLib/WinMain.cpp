@@ -188,8 +188,9 @@ int __cdecl MainLoop()
 
     if (dword_73491C == 1)
     {
+        // This seems to skip frames when the game is running too "slow".
+        // Disabling it when debug logging causes some frame lag actually improves performance a lot.
         dword_73491C = 2;
-
         while (dword_73491C == 2)
         {
             DoSleep(8 + (rand() % 4));

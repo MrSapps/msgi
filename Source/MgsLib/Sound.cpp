@@ -9,14 +9,18 @@ using QWORD = __int64;
 #define REDIRECT_SOUND 1
 
 #define MGS_ARY(Redirect, Addr, TypeName, Size, VarName, ...)\
+MgsVar Var_##VarName(Addr);\
 TypeName LocalArray_##VarName[Size]=__VA_ARGS__;\
 TypeName* VarName = (Redirect) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
 
+// TODO: MGS_VAR should handle this case?
 #define MGS_PTR(Redirect, Addr, TypeName, VarName, Value)\
+MgsVar Var_##VarName(Addr);\
 TypeName LocalPtr_##VarName = Value;\
 TypeName VarName = (Redirect) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
 
 #define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)\
+MgsVar Var_##VarName(Addr);\
 TypeName LocalVar_##VarName = Value;\
 TypeName& VarName = (Redirect) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
 

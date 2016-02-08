@@ -242,6 +242,13 @@ public:
     MgsFunction(const char* name, bool passThrough = false) : MgsFunctionImpl(name, passThrough) { }
 };
 
+class MgsVar
+{
+public:
+    MgsVar(DWORD addr);
+    MgsVar(DWORD addr, DWORD sizeInBytes);
+};
+
 #define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);
 #define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, true, signature> name;
 #define MSG_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, signature> name(#name);
