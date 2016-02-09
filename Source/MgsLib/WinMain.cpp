@@ -22,6 +22,10 @@
 #include "Sound.hpp"
 #include "File.hpp"
 
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "ddraw.lib")
+#pragma comment(lib, "dsound.lib")
 
 struct texture_struct
 {
@@ -52,7 +56,7 @@ struct texture_struct
 };
 static_assert(sizeof(texture_struct) == 0x50, "texture_struct should be 0x50");
 
-texture_struct* gTextures_dword_6C0F00 = (texture_struct*)0x6C0F00; // Array of 1500 items?
+MGS_ARY(1, 0x6C0F00, texture_struct, 1500, gTextures_dword_6C0F00, {}); // Array of 1500 items
 
 struct prim_struct
 {
@@ -64,7 +68,7 @@ struct prim_struct
     DWORD dwVertexCount;
 };
 static_assert(sizeof(prim_struct) == 0x14, "prim_struct should be 0x14");
-prim_struct* gPrimBuffer_dword_6C0EFC = (prim_struct*)0x6C0EFC; // Array of 15000 items?
+MGS_VAR(1, 0x6C0EFC, prim_struct*, gPrimBuffer_dword_6C0EFC, nullptr); // Dynamically allocated array of 15000 items
 
 struct rend_struct
 {
@@ -347,8 +351,10 @@ MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
 MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 
-actor_related_struct& stru_722760 = *(actor_related_struct*)0x722760;
-actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
+MGS_VAR(1, 0x722760, actor_related_struct, stru_722760, {});
+
+//actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
+MGS_ARY(1, 0x006BFC78, actor_related_struct, 9, gActors, {});
 
 MGS_VAR(1, 0x78E7FC, WORD, word_78E7FC, 0);
 MGS_VAR(1, 0x78E7FE, WORD, word_78E7FE, 0);
@@ -368,9 +374,7 @@ MGS_VAR(1, 0x006DEF94, DWORD, gNoCrashCheck, 0);
 MGS_VAR(1, 0x0071687C, DWORD, gCheatsEnabled, 0);
 MGS_VAR(1, 0x006FD1F8, DWORD, gNoCdEnabled, 0);
 MGS_VAR(1, 0x00650D14, DWORD, gWindowedMode, 0);
-
-char*& off_688DB8 = *(char**)0x688DB8;
-
+MGS_VAR(1, 0x00688DB8, char*, off_688DB8, "");
 MGS_VAR(1, 0x6FC7A0, DWORD, dword_6FC7A0, 0);
 MGS_VAR(1, 0x00650D24, DWORD, gNoEffects, 0);
 MGS_VAR(1, 0x00650D28, float, gXRes, 0.0f);
@@ -381,9 +385,7 @@ MGS_VAR(1, 0x006FC76C, DWORD, gFps, 0);
 MGS_VAR(1, 0x006FC7A4, DWORD, gColourKey, 0);
 MGS_VAR(1, 0x00650D38, DWORD, gBlendMode, 0);
 MGS_VAR(1, 0x00650D20, DWORD, gLowRes, 0);
-
-char*& off_688D40 = *(char**)0x688D40;
-
+MGS_VAR(1, 0x688D40, char*, off_688D40, "");
 MGS_VAR(1, 0x006FC794, DWORD, gSoftwareRendering, 0);
 MGS_VAR(1, 0x0071D1D0, HINSTANCE, gHInstance, 0);
 MGS_VAR(1, 0x651D98, DWORD, gSoundFxVol_dword_651D98, 0);
@@ -1869,7 +1871,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dword_6FC7C4 = 0;
         }
         dword_6FC79C = sub_41D1D0();
-        mgs_fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
+        //mgs_fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
         if (gSoftwareRendering)
             break;
         dxSurfaceDesc.dwSize = 124;
@@ -2187,15 +2189,14 @@ signed int __cdecl Resetgraph(int a1)
 MSG_FUNC_IMPL(0x0044A7B0, Resetgraph);
 
 
-LPDIENUMDEVICESCALLBACKA EnumDevicesCallback = (LPDIENUMDEVICESCALLBACKA)0x0043B078;
 LPDIENUMDEVICEOBJECTSCALLBACKA EnumDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0C8;
 LPDIENUMDEVICEOBJECTSCALLBACKA CountDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0B3;
 
 MGS_VAR(1, 0x71D670, DWORD, dword_71D670, 0);
 MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
 MGS_VAR(1, 0x71D798, DWORD, dword_71D798, 0);
-MGS_VAR(1, 0x71D664, LPDIRECTINPUT7, pDirectInput, nullptr);
-MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE7, pJoystickDevice, nullptr);
+MGS_VAR(1, 0x71D664, LPDIRECTINPUTA, pDirectInput, nullptr);
+MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE, pJoystickDevice, nullptr);
 MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICEA, pMouseDevice, nullptr);
 MGS_VAR(1, 0x71D41C, DWORD, dword_71D41C, 0);
 MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
@@ -2216,6 +2217,14 @@ char* buttonList = (char*)0x654A98; // TODO: Dump array
 MGS_VAR(1, 0x71D68C, DWORD, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
 
+
+// 0x0043B078
+BOOL __stdcall EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID pvRef)
+{
+    // Stop when worked
+    HRESULT hr = pDirectInput->CreateDevice(lpddi->guidInstance, &pJoystickDevice, NULL);
+    return !SUCCEEDED(hr);
+}
 
 // 0x0043B1D1
 //MSG_FUNC_NOT_IMPL(0x0043B1D1, int __cdecl(HWND), InitDirectInput);
@@ -2380,7 +2389,7 @@ int __cdecl InitDirectInput(HWND hWnd)
     }
     
     // 0x43BBEC
-    hr = pDirectInput->CreateDevice(GUID_SysMouse_MGS, &pMouseDevice, 0);
+    hr = pDirectInput->CreateDevice(GUID_SysMouse, &pMouseDevice, 0);
     if (hr < 0)
         return hr;
 
@@ -2774,7 +2783,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             {
                 gWindowedMode = 0;
                 if (strstr(lpCmdLine, off_688DB8))
-                    dword_6FC7A0 = 58;
+                    dword_6FC7A0 = 58; // "Normal" path, in real game setting this to zero seems to be impossible
                 else
                     dword_6FC7A0 = 0;
                 if (strstr(lpCmdLine, "-noeffects"))

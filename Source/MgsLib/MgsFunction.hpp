@@ -124,7 +124,7 @@ public:
 
     ReturnType operator()(Args ... args)
     {
-        if (mPassThrough)
+        if (mPassThrough && IsMgsi())
         {
             return mRealFuncPtr(args...);
         }

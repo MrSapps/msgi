@@ -342,7 +342,7 @@ signed int __cdecl Sound_Init(HWND hwnd)
 {
     signed int result = 0;
 
-    if (MgsDirectSoundCreate(0, &gDSound_dword_77E2C0, 0))
+    if (DirectSoundCreate(0, &gDSound_dword_77E2C0, 0))
     {
         result = 0;
     }
