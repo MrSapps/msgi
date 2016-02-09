@@ -10,6 +10,7 @@
 #include <map>
 #include <detours.h>
 
+
 #define DIRECTINPUT_VERSION 0x700
 #include <dinput.h>
 #define DIRECTDRAW_VERSION 0x700
@@ -21,7 +22,12 @@
 #include "MgsFunction.hpp"
 #include "Sound.hpp"
 #include "File.hpp"
+#include "Input.hpp"
 
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "ddraw.lib")
+#pragma comment(lib, "dsound.lib")
 
 struct texture_struct
 {
@@ -52,7 +58,7 @@ struct texture_struct
 };
 static_assert(sizeof(texture_struct) == 0x50, "texture_struct should be 0x50");
 
-texture_struct* gTextures_dword_6C0F00 = (texture_struct*)0x6C0F00; // Array of 1500 items?
+MGS_ARY(1, 0x6C0F00, texture_struct, 1500, gTextures_dword_6C0F00, {}); // Array of 1500 items
 
 struct prim_struct
 {
@@ -64,7 +70,7 @@ struct prim_struct
     DWORD dwVertexCount;
 };
 static_assert(sizeof(prim_struct) == 0x14, "prim_struct should be 0x14");
-prim_struct* gPrimBuffer_dword_6C0EFC = (prim_struct*)0x6C0EFC; // Array of 15000 items?
+MGS_VAR(1, 0x6C0EFC, prim_struct*, gPrimBuffer_dword_6C0EFC, nullptr); // Dynamically allocated array of 15000 items
 
 struct rend_struct
 {
@@ -85,7 +91,6 @@ struct actor_related_struct;
 
 MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
 MSG_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
-MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
 MSG_FUNC_NOT_IMPL(0x00421680, signed __int64 __cdecl(), FpsTimerSetupQ);
 MSG_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
 MSG_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
@@ -196,9 +201,8 @@ MGS_VAR(1, 0x6FC79C, DWORD, dword_6FC79C, 0);
 MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
 MGS_VAR(1, 0x776B68, char *, unk_776B68, nullptr);
 MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
-
-HFONT& gFont = *(HFONT*)0x006FC7E8;
-HWND& gHwnd = *(HWND*)0x009ADDA0;
+MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
+MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 
 //MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
 int __cdecl HandleExclusiveMode()
@@ -239,7 +243,7 @@ int __cdecl HandleExclusiveMode()
     Sound_PlaySample();
 
     if (dword_732E64 == 1)
-        PostMessageA(gHwnd, 0x100, 0x1B, 0);
+        PostMessageA(gHwnd, WM_KEYDOWN, VK_ESCAPE, 0);
 
     return 0;
 }
@@ -340,54 +344,53 @@ struct Rect16
 };
 static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
 
-DWORD& dword_995344 = *(DWORD*)0x995344;
-DWORD& dword_7227A4 = *(DWORD*)0x7227A4;
-DWORD& dword_9942B8 = *(DWORD*)0x9942B8;
-DWORD& dword_78D7B0 = *(DWORD*)0x78D7B0;
-WORD& word_78E7E8 = *(WORD*)0x78E7E8;
-DWORD& dword_995324 = *(DWORD*)0x995324;
-DWORD& dword_7919C0 = *(DWORD*)0x7919C0;
+MGS_VAR(1, 0x995344, DWORD, dword_995344, 0);
+MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
+MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
+MGS_VAR(1, 0x78D7B0, DWORD, dword_78D7B0, 0);
+MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
+MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
+MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 
-actor_related_struct& stru_722760 = *(actor_related_struct*)0x722760;
-actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
+MGS_VAR(1, 0x722760, actor_related_struct, stru_722760, {});
 
-WORD& word_78E7FC = *(WORD*)0x78E7FC;
-WORD& word_78E7FE = *(WORD*)0x78E7FE;
-DWORD& gResidentTop_dword_78E960 = *(DWORD*)0x78E960;
-DWORD& dword_78E964 = *(DWORD*)0x78E964;
-DWORD& dword_791A0C = *(DWORD*)0x791A0C;
-DWORD& dword_9942A0 = *(DWORD*)0x9942A0;
-DWORD& gExitMainGameLoop = *(DWORD*)0x0073492C;
-WORD& word_994320 = *(WORD*)0x994320;
-WORD& word_669AE0 = *(WORD*)0x669AE0;
-DWORD& dword_993F44 = *(DWORD*)0x993F44;
+//actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
+MGS_ARY(1, 0x006BFC78, actor_related_struct, 9, gActors, {});
 
-char*& gCmdLine = *((char**)0x0071D16C);
-DWORD& dword_787774 = *((DWORD*)0x787774);
-DWORD& dword_787778 = *((DWORD*)0x787778);
-WORD& dword_78E7E4 = *(WORD*)0x78E7E4;
-DWORD& gNoCrashCheck = *((DWORD*)0x006DEF94);
-DWORD& gCheatsEnabled = *(DWORD*)0x0071687C;
-DWORD& gNoCdEnabled = *(DWORD*)0x006FD1F8;
-DWORD& gWindowedMode = *(DWORD*)0x00650D14;
-char*& off_688DB8 = *(char**)0x688DB8;
-DWORD& dword_6FC7A0 = *((DWORD*)0x6FC7A0);
-DWORD& gNoEffects = *(DWORD*)0x00650D24;
-float& gXRes = *(float*)0x00650D28;
-DWORD& gNoFilter = *(DWORD*)0x00650D34;
-DWORD& gModX2 = *(DWORD*)0x00650D30;
-DWORD& gNoTrueType = *(DWORD*)0x00650D40;
-DWORD& gFps = *(DWORD*)0x006FC76C;
-DWORD& gColourKey = *(DWORD*)0x006FC7A4;
-DWORD& gBlendMode = *(DWORD*)0x00650D38;
-DWORD& gLowRes = *(DWORD*)0x00650D20;
-char*& off_688D40 = *(char**)0x688D40;
-DWORD& gSoftwareRendering = *(DWORD*)0x006FC794;
-HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
-DWORD& gSoundFxVol_dword_651D98 = *((DWORD*)0x651D98);
-DWORD& gMusicVol_dword_716F68 = *((DWORD*)0x716F68);
-
-
+MGS_VAR(1, 0x78E7FC, WORD, word_78E7FC, 0);
+MGS_VAR(1, 0x78E7FE, WORD, word_78E7FE, 0);
+MGS_VAR(1, 0x78E960, DWORD, gResidentTop_dword_78E960, 0);
+MGS_VAR(1, 0x78E964, DWORD, dword_78E964, 0);
+MGS_VAR(1, 0x791A0C, DWORD, dword_791A0C, 0);
+MGS_VAR(1, 0x9942A0, DWORD, dword_9942A0, 0);
+MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
+MGS_VAR(1, 0x994320, WORD, word_994320, 0);
+MGS_VAR(1, 0x669AE0, WORD, word_669AE0, 0);
+MGS_VAR(1, 0x993F44, DWORD, dword_993F44, 0);
+MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
+MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
+MGS_VAR(1, 0x787778, DWORD, dword_787778, 0);
+MGS_VAR(1, 0x78E7E4, WORD, dword_78E7E4, 0);
+MGS_VAR(1, 0x006DEF94, DWORD, gNoCrashCheck, 0);
+MGS_VAR(1, 0x0071687C, DWORD, gCheatsEnabled, 0);
+MGS_VAR(1, 0x006FD1F8, DWORD, gNoCdEnabled, 0);
+MGS_VAR(1, 0x00650D14, DWORD, gWindowedMode, 0);
+MGS_VAR(1, 0x00688DB8, char*, off_688DB8, "");
+MGS_VAR(1, 0x6FC7A0, DWORD, dword_6FC7A0, 0);
+MGS_VAR(1, 0x00650D24, DWORD, gNoEffects, 0);
+MGS_VAR(1, 0x00650D28, float, gXRes, 0.0f);
+MGS_VAR(1, 0x00650D34, DWORD, gNoFilter, 0);
+MGS_VAR(1, 0x00650D30, DWORD, gModX2, 0);
+MGS_VAR(1, 0x00650D40, DWORD, gNoTrueType, 0);
+MGS_VAR(1, 0x006FC76C, DWORD, gFps, 0);
+MGS_VAR(1, 0x006FC7A4, DWORD, gColourKey, 0);
+MGS_VAR(1, 0x00650D38, DWORD, gBlendMode, 0);
+MGS_VAR(1, 0x00650D20, DWORD, gLowRes, 0);
+MGS_VAR(1, 0x688D40, char*, off_688D40, "");
+MGS_VAR(1, 0x006FC794, DWORD, gSoftwareRendering, 0);
+MGS_VAR(1, 0x0071D1D0, HINSTANCE, gHInstance, 0);
+MGS_VAR(1, 0x651D98, DWORD, gSoundFxVol_dword_651D98, 0);
+MGS_VAR(1, 0x716F68, DWORD, gMusicVol_dword_716F68, 0);
 MGS_VAR(1, 0x77C934, DWORD, dword_77C934, 0);
 MGS_VAR(1, 0x9AD8A5, BYTE, byte_9AD8A5, 0);
 MGS_VAR(1, 0x9AD8A7, BYTE, byte_9AD8A7, 0);
@@ -398,12 +401,10 @@ MGS_VAR(1, 0x9AD8C1, BYTE, byte_9AD8C1, 0);
 MGS_VAR(1, 0x73490C, DWORD, dword_73490C, 0);
 MGS_VAR(1, 0x734908, DWORD, dword_734908, 0);
 
-int* gKeys = (int*)0x009AD9A0;
-BYTE* byte_9AD880 = (BYTE*)0x9AD880;
-
+int* gKeys = (int*)0x009AD9A0; // TODO: Array?
+MGS_ARY(1, 0x9AD880, BYTE, 256, byte_9AD880, {});
 MGS_VAR(1, 0x009AD980, DWORD, gvirtualKeyRepeatCount, 0);
 MGS_VAR(1, 0x009AD6B0, DWORD, gVirtualKeyCode, 0);
-
 MGS_VAR(1, 0x009AD892, DWORD, gAltPressed, 0);
 MGS_VAR(1, 0x71D194, DWORD, dword_71D194, 0);
 MGS_VAR(1, 0x009AD8F9, DWORD, gF10Pressed, 0);
@@ -844,60 +845,67 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
     return result;
 }
 
+struct MessageBoxStruct
+{
+    DWORD mShowErrCount;
+    DWORD mDisplayThisErrCode;
+};
 
-DWORD* dword_664EC4 = (DWORD*)0x664EC4;
-DWORD* dword_664EC0 = (DWORD*)0x664EC0;
-char* aHoldDownTheInv = (char*)0x00662EC0;
+MGS_ARY(1, 0x664EC0, MessageBoxStruct, 8, stru_664EC0, {});
+MGS_ARY(1, 0x00662EC0, char, 8*1024, gStrErrStrings, {}); // 2d array of [8][1024]
 
 // 0x0043CBD9
-int __cdecl MessageBox_Sometimes(HWND hWnd, int a2, LPCSTR lpCaption, UINT uType)
+int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uType)
 {
-    int result; // eax@2
-    signed int i; // [sp+0h] [bp-8h]@5
-    signed int j; // [sp+0h] [bp-8h]@11
-    signed int v7; // [sp+4h] [bp-4h]@5
-
-    if (a2 <= 0 || (result = a2, dword_664EC4[2 * a2]))
+    int result;
+    if (errCode <= 0 || (result = errCode, stru_664EC0[errCode].mDisplayThisErrCode))
     {
-        if (a2 == -1)
+        if (errCode == -1)
         {
-            v7 = -1;
-            for (i = 0; i < 8; ++i)
+            signed int msgIdx = -1;
+
+            for (int i = 0; i < 8; ++i)
             {
-                if (dword_664EC4[2 * i])
+                if (stru_664EC0[i].mDisplayThisErrCode)
                 {
-                    if (dword_664EC0[2 * i])
-                        v7 = i;
+                    if (stru_664EC0[i].mShowErrCount)
+                    {
+                        msgIdx = i;
+                    }
                 }
                 result = i + 1;
             }
-            for (j = 0; j < 8; ++j)
+
+            for (int j = 0; j < 8; ++j)
             {
-                if (dword_664EC4[2 * j])
+                if (stru_664EC0[j].mDisplayThisErrCode)
                 {
-                    if (dword_664EC0[2 * j])
+                    if (stru_664EC0[j].mShowErrCount)
                     {
-                        if (dword_664EC4[2 * j] < (unsigned int)dword_664EC4[2 * v7])
+                        if (stru_664EC0[j].mDisplayThisErrCode < stru_664EC0[msgIdx].mDisplayThisErrCode)
                         {
-                            v7 = j;
-                            dword_664EC0[2 * j] = 0;
+                            msgIdx = j;
+                            stru_664EC0[j].mShowErrCount = 0;
                         }
                     }
                 }
                 result = j + 1;
             }
-            if (v7 >= 0)
-                result = MessageBoxA(hWnd, &aHoldDownTheInv[1024 * v7], lpCaption, uType); // Hold down the Inventory and Weapon item buttons
+
+            if (msgIdx >= 0)
+            {
+                result = MessageBoxA(hWnd, &gStrErrStrings[msgIdx * 1024], lpCaption, uType);
+            }
         }
         else
         {
-            ++dword_664EC0[2 * a2];
+            ++stru_664EC0[errCode].mShowErrCount;
             result = 2;
         }
     }
     else
     {
-        result = MessageBoxA(hWnd, &aHoldDownTheInv[1024 * a2], lpCaption, uType);
+        result = MessageBoxA(hWnd, &gStrErrStrings[errCode * 1024], lpCaption, uType);
     }
     return result;
 }
@@ -913,9 +921,6 @@ HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
     gFont = result;
     return result;
 }
-
-// 0x0042D69E
-int __cdecl DoDirectInputInit();
 
 MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
 MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
@@ -1069,13 +1074,13 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
     {
         sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.identifier.szDescription, lpDeviceName);
         strcat(pStringError, "\n\tDevice doesn't meet minimum requirements, and will be ignored by the game\n");
-        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
+        MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
     }
     else if (((field480 & 2) == 0) && ((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (byte_774B48 != 0))
     {
         sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.identifier.szDescription, lpDeviceName);
         strcat(pStringWarning, "\n\tDevice doesn't support everything the game needs\nBut it will be allowed for selection in Option/Advanced Menu\n");
-        MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
+        MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
     }
 
     pIdentifier->ddIdentifier.field430 |= status;
@@ -1242,7 +1247,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     {
         if ((identifier.ddIdentifier.field430 & 0x40) == 0 && (identifier.ddIdentifier.field430 & 1) == 0)
         {
-            MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", MB_OK);
+            MessageBox_Error(0, 6, "Metal Gear Solid PC", MB_OK);
         }
         identifier.ddIdentifier.field430 |= 0x40; // Must mean "low vram" ?
     }
@@ -1486,7 +1491,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 lpGuid = 0;
                 gXRes = 1.0f;
                 dword_716F5C = 1.0f;
-                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
+                MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
             }
             gWindowedMode = 0;
             sub_433801();
@@ -1526,7 +1531,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             dword_716F5C = 1.0f;
             gXRes = 1.0f;
             lpGuid = 0;
-            MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
+            MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
         }
         sub_431C63();
     }
@@ -1599,7 +1604,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 gXRes = 1.0f;
                 g_dwDisplayWidth = (signed __int64)(320.0 * gXRes);
                 g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
-                MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
+                MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
@@ -1864,7 +1869,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dword_6FC7C4 = 0;
         }
         dword_6FC79C = sub_41D1D0();
-        mgs_fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
+        //mgs_fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
         if (gSoftwareRendering)
             break;
         dxSurfaceDesc.dwSize = 124;
@@ -1994,7 +1999,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             {
                 g_pDirect3DDevice->Release();
                 g_pDirect3DDevice = 0;
-                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
+                MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
                 gSoftwareRendering = 1;
             }
             break;
@@ -2004,7 +2009,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         g_dwDisplayWidth = 320;
         g_dwDisplayHeight = 240;
         mgs_fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", g_dwDisplayWidth, g_dwDisplayHeight);
-        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
+        MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
         gSoftwareRendering = 1;
         dword_716F5C = 1.0f;
         gXRes = dword_716F5C; // TODO: Float
@@ -2122,7 +2127,7 @@ signed int __cdecl DoInitAll()
 
     //v1 = InitD3d_ProfileGfxHardwareQ_Test();
     v1 = InitD3d_ProfileGfxHardwareQ();
-    MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
+    MessageBox_Error(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
     return v1;
 }
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
@@ -2181,264 +2186,6 @@ signed int __cdecl Resetgraph(int a1)
 }
 MSG_FUNC_IMPL(0x0044A7B0, Resetgraph);
 
-
-LPDIENUMDEVICESCALLBACKA EnumDevicesCallback = (LPDIENUMDEVICESCALLBACKA)0x0043B078;
-LPDIENUMDEVICEOBJECTSCALLBACKA EnumDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0C8;
-LPDIENUMDEVICEOBJECTSCALLBACKA CountDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0B3;
-
-MGS_VAR(1, 0x71D670, DWORD, dword_71D670, 0);
-MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
-MGS_VAR(1, 0x71D798, DWORD, dword_71D798, 0);
-MGS_VAR(1, 0x71D664, LPDIRECTINPUT7, pDirectInput, nullptr);
-MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE7, pJoystickDevice, nullptr);
-MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICEA, pMouseDevice, nullptr);
-MGS_VAR(1, 0x71D41C, DWORD, dword_71D41C, 0);
-MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
-MGS_VAR(1, 0x64DA88, DIDATAFORMAT, JoystickDataFormat, {});
-MGS_VAR(1, 0x64DA70, DIDATAFORMAT, MouseDataFormat, {});
-MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
-DWORD* dword_65714C = (DWORD*)0x65714C;
-DWORD* dword_657184 = (DWORD*)0x657184;
-DWORD* dword_6571BC = (DWORD*)0x6571BC;
-DWORD* dword_6571F4 = (DWORD*)0x6571F4;
-char* sidewinderEtc = (char*)0x657298;
-GUID& IID_IDirectInput7A_MGS = *((GUID*)0x64B028);
-GUID& GUID_SysMouse_MGS = *((GUID*)0x64AEE8);
-DWORD* dword_65726C = (DWORD*)0x65726C;
-char* buttonNames = (char*)0x65510C;
-char* buttonList = (char*)0x654A98;
-MGS_VAR(1, 0x71D68C, DWORD, nJoystickDeviceObjects, 0);
-MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
-
-
-// 0x0043B1D1
-//MSG_FUNC_NOT_IMPL(0x0043B1D1, int __cdecl(HWND), InitDirectInput);
-int __cdecl InitDirectInput(HWND hWnd)
-{
-    char productName[0x80];
-    char instanceName[0x80];
-    dword_71D670 = 0;
-    //fputs("InitDirectInput {\n", gLogFile);
-    // I'll do log prints later
-    HRESULT hr = DirectInputCreateExMGS(gHInstance, DIRECTINPUT_VERSION, IID_IDirectInput7A_MGS, (LPVOID*)&pDirectInput, 0);
-    if (hr < 0)
-        return hr;
-
-    hr = pDirectInput->EnumDevices(DIDEVTYPE_JOYSTICK, EnumDevicesCallback, 0, DIEDFL_ATTACHEDONLY);
-    if (hr >= 0)
-    {
-        if (pJoystickDevice != 0)
-        {
-            memset(&JoystickDeviceInfos, 0, sizeof(DIDEVICEINSTANCEA));
-            assert(sizeof(DIDEVICEINSTANCEA) == 0x244);
-            JoystickDeviceInfos.dwSize = sizeof(DIDEVICEINSTANCEA);
-            HRESULT hGetInfosRes = pJoystickDevice->GetDeviceInfo(&JoystickDeviceInfos);
-            hr = pJoystickDevice->SetDataFormat(&JoystickDataFormat);
-            if (hr >= 0)
-            {
-                hr = pJoystickDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
-                if (hr >= 0)
-                {
-                    memset(&JoystickDeviceCaps, 0, 0x2Cu);
-                    JoystickDeviceCaps.dwSize = 0x2C;
-                    hr = pJoystickDevice->GetCapabilities(&JoystickDeviceCaps);
-                    if (hr >= 0)
-                    {
-                        pJoystickDevice->EnumObjects(EnumDeviceObjectsCallback, hWnd, DIDFT_AXIS);
-                        pJoystickDevice->EnumObjects(CountDeviceObjectsCallback, hWnd, DIDFT_BUTTON);
-                        hr = pJoystickDevice->Acquire();
-                        if (hr >= 0)
-                        {
-                            if (hGetInfosRes >= 0)
-                            {
-                                strcpy((char*)0x71D690, JoystickDeviceInfos.tszInstanceName);
-
-                                for (int i = 0; i < 6; i++)
-                                {
-                                    int var14 = 1;
-                                    strcpy(productName, JoystickDeviceInfos.tszProductName);
-                                    _strlwr(productName);
-                                    strcpy(instanceName, JoystickDeviceInfos.tszInstanceName);
-                                    _strlwr(instanceName);
-
-                                    for (int j = 0; j < 5; j++)
-                                    {
-                                        size_t offset = i * 0x140 + j * 0x40;
-                                        if (strstr(productName, &sidewinderEtc[offset]) == 0 && strstr(instanceName, &sidewinderEtc[offset]) == 0)
-                                        {
-                                            var14 = 0;
-                                        }
-                                    }
-
-                                    if (var14 != 0)
-                                    {
-                                        if (i == 5)
-                                            i = 4;
-
-                                        dword_71D790 = 1;
-                                        dword_71D41C = dword_65726C[i * 2];
-                                        dword_71D798 = i + 1;
-
-                                        for (int nButton = 0; nButton < 0x38; nButton++)
-                                        {
-                                            size_t offset = i * 0x672 + nButton * 0x19;
-                                            strcpy(&buttonList[nButton * 0x19], &buttonNames[offset]);
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                dword_71D790 = 0;
-                                for (int i = 0; i < 14; i++)
-                                {
-                                    dword_65714C[i] = 0;
-                                    dword_657184[i] = 0;
-                                }
-                            }
-                            if (dword_71D798 == 5)
-                            {
-                                for (int i = 0; i < 14; i++)
-                                {
-                                    dword_6571BC[i] = 0xFF;
-                                    dword_6571F4[i] = 0xFF;
-                                }
-                                dword_6571BC[ 0] = dword_6571F4[ 0] = 0;
-                                dword_6571BC[ 1] = dword_6571F4[ 1] = 1;
-                                dword_6571BC[ 2] = dword_6571F4[ 2] = 2;
-                                dword_6571BC[ 3] = dword_6571F4[ 3] = 3;
-                                dword_6571BC[ 4] = dword_6571F4[ 4] = 6;
-                                dword_6571BC[ 5] = dword_6571F4[ 5] = 6;
-                                dword_6571BC[ 6] = dword_6571F4[ 6] = 7;
-                                dword_6571BC[ 7] = dword_6571F4[ 7] = 7;
-                                dword_6571BC[ 8] = dword_6571F4[ 8] = 4;
-                                dword_6571BC[ 9] = dword_6571F4[ 9] = 0x21;
-                                dword_6571BC[10] = dword_6571F4[10] = 0x20;
-                                dword_6571BC[11] = dword_6571F4[11] = 0x23;
-                                dword_6571BC[12] = dword_6571F4[12] = 0x22;
-                                dword_6571BC[13] = dword_6571F4[13] = 5;
-                                for (int i = 0; i < 14; i++)
-                                {
-                                    dword_65714C[i] = dword_657184[i];
-                                }
-                            }
-                            else if (dword_71D798 != 1 && dword_71D798 != 4)
-                            {
-                                for (int i = 0; i < 14; i++)
-                                {
-                                    dword_6571BC[i] = 0xFF;
-                                    dword_6571F4[i] = 0xFF;
-                                }
-                                int var124 = 0;
-                                for (int i = 0; i < 14; i++)
-                                {
-                                    if (dword_71D790 != 0 && var124 == dword_71D41C)
-                                    {
-                                        var124++;
-                                    }
-                                    if (var124 == nJoystickDeviceObjects)
-                                        break;
-
-                                    if (i == 9)
-                                        i = 13;
-
-                                    dword_6571BC[i] = var124;
-                                    dword_6571F4[i] = var124;
-
-                                    var124++;
-                                }
-                                dword_6571BC[ 9] = dword_6571F4[ 9] = 0x21;
-                                dword_6571BC[10] = dword_6571F4[10] = 0x20;
-                                dword_6571BC[11] = dword_6571F4[11] = 0x23;
-                                dword_6571BC[12] = dword_6571F4[12] = 0x22;
-                                for (int i = 0; i < 14; i++)
-                                {
-                                    dword_65714C[i] = 0;
-                                    dword_657184[i] = 0;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if (hr < 0 || pJoystickDevice == 0)
-    {
-        for (unsigned int i = 0; i < dword_6FD1DC; i++)
-        {
-            dword_6571F4[i] = 0xFF;
-        }
-    }
-    
-    // 0x43BBEC
-    hr = pDirectInput->CreateDevice(GUID_SysMouse_MGS, &pMouseDevice, 0);
-    if (hr < 0)
-        return hr;
-
-    hr = pMouseDevice->SetDataFormat(&MouseDataFormat);
-    if (hr < 0)
-        return hr;
-
-    if (gWindowedMode != 0)
-    {
-        hr = pMouseDevice->SetCooperativeLevel(hWnd, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
-    }
-    else
-    {
-        hr = pMouseDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
-    }
-    if (hr < 0)
-        return hr;
-
-    hr = pMouseDevice->Acquire();
-
-    return 0;
-}
-
-// 0x0042D69E
-int __cdecl DoDirectInputInit()
-{
-    int result; // eax@1
-
-    dword_717348 = 0;
-    result = InitDirectInput(gHwnd);
-    if (result < 0)
-        result = printf("$jim failed to init direct input");
-    return result;
-}
-
-void __cdecl Input_AcquireOrUnAcquire()
-{
-    if (pMouseDevice)
-    {
-        if (gActive_dword_688CDC)
-        {
-            pMouseDevice->Acquire();
-        }
-        else
-        {
-            pMouseDevice->Unacquire();
-        }
-    }
-    if (pJoystickDevice)
-    {
-        if (gActive_dword_688CDC)
-        {
-            if (pJoystickDevice->Acquire())
-            {
-                printf("$jim - cannot acquire joystick\n");
-            }
-        }
-        else
-        {
-            pJoystickDevice->Unacquire();
-        }
-    }
-}
-MSG_FUNC_IMPL(0x0043BCF0, Input_AcquireOrUnAcquire);
 
 // 0x0044AB30
 int __cdecl SetGraphDebug(int a1)
@@ -2505,7 +2252,7 @@ int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsig
     return 0;
 }
 
-WORD& word_7227C8 = *(WORD*)0x7227C8;
+MGS_VAR(1, 0x7227C8, WORD, word_7227C8, 0);
 
 // 0x44EAED
 void *__cdecl sub_44EAED()
@@ -2698,8 +2445,11 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     SoundCpp_ForceLink();
     SoundCpp_Debug();
 
-    InstallVaradicCFunctionHooks();
-    
+    if (IsMgsi())
+    {
+        InstallVaradicCFunctionHooks();
+    }
+
     if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
     {
         gCmdLine = lpCmdLine;
@@ -2765,7 +2515,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             {
                 gWindowedMode = 0;
                 if (strstr(lpCmdLine, off_688DB8))
-                    dword_6FC7A0 = 58;
+                    dword_6FC7A0 = 58; // "Normal" path, in real game setting this to zero seems to be impossible
                 else
                     dword_6FC7A0 = 0;
                 if (strstr(lpCmdLine, "-noeffects"))

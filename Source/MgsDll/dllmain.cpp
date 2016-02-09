@@ -4,6 +4,11 @@
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
 
+bool IsMgsi()
+{
+    return true;
+}
+
 extern "C"
 {
     __declspec(dllexport) signed int __cdecl EBUEula(LPCSTR phkResult, LPARAM a2, int a3, int a4)

@@ -7,6 +7,8 @@
 #include "logger.hpp"
 #include "detours.h"
 
+bool IsMgsi();
+
 inline std::ostream& operator<<(std::ostream& out, IID id)
 {
     // TODO: Print GUIDS properly
@@ -45,9 +47,6 @@ void doPrint(std::ostream& out, T t, U u, Args... args)
     out << t << ',';
     doPrint(out, u, args...);
 }
-
-extern bool gbIsDll;
-
 
 class MgsFunctionBase
 {
@@ -125,13 +124,17 @@ public:
 
     ReturnType operator()(Args ... args)
     {
-        if (mPassThrough)
+        if (mPassThrough && IsMgsi())
         {
             return mRealFuncPtr(args...);
         }
 
         if (kLogArgs)
         {
+            if (!IsMgsi() && !mRealFuncPtr)
+            {
+                std::cout << "WARNING: Unimpl call: " << mFnName << std::endl;
+            }
             std::cout << mFnName << " (";
             doPrint(std::cout, args...);
             std::cout << ")" << std::endl;
@@ -144,6 +147,12 @@ public:
         }
         else
         {
+            if (!IsMgsi())
+            {
+                // Cast handles "return void;" this case is a stub for when
+                // calling a real game function outside of the game exe
+                return (ReturnType)0;
+            }
             // Call "mRealFuncPtr" here so that we are calling the "real" function
 
             // If not running within the game then we can't call real so just return
@@ -154,6 +163,21 @@ public:
 
     Signature* Ptr() const
     {
+        if (!IsMgsi())
+        {
+            if (convention == eCDecl)
+            {
+                return Cdecl_Static_Hook_Impl;
+            }
+            else if (convention == eStdCall)
+            {
+                return reinterpret_cast<Signature*>(StdCall_Static_Hook_Impl);
+            }
+            else
+            {
+                abort();
+            }
+        }
         return mRealFuncPtr;
     }
 
@@ -249,19 +273,18 @@ public:
 #define MGS_ARY(Redirect, Addr, TypeName, Size, VarName, ...)\
 TypeName LocalArray_##VarName[Size]=__VA_ARGS__;\
 MgsVar Var_##VarName(Addr, sizeof(LocalArray_##VarName));\
-TypeName* VarName = (Redirect) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
+TypeName* VarName = (Redirect && IsMgsi()) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
 
 // TODO: MGS_VAR should handle this case?
 #define MGS_PTR(Redirect, Addr, TypeName, VarName, Value)\
 TypeName LocalPtr_##VarName = Value;\
 MgsVar Var_##VarName(Addr, sizeof(LocalPtr_##VarName));\
-TypeName VarName = (Redirect) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
+TypeName VarName = (Redirect && IsMgsi()) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
 
 #define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)\
 TypeName LocalVar_##VarName = Value;\
 MgsVar Var_##VarName(Addr, sizeof(LocalVar_##VarName));\
-TypeName& VarName = (Redirect) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
-
+TypeName& VarName = (Redirect && IsMgsi()) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
 
 #define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);
 #define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, true, signature> name;
