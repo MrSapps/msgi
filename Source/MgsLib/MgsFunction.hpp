@@ -131,6 +131,10 @@ public:
 
         if (kLogArgs)
         {
+            if (!IsMgsi() && !mRealFuncPtr)
+            {
+                std::cout << "WARNING: Unimpl call: " << mFnName << std::endl;
+            }
             std::cout << mFnName << " (";
             doPrint(std::cout, args...);
             std::cout << ")" << std::endl;
@@ -159,6 +163,21 @@ public:
 
     Signature* Ptr() const
     {
+        if (!IsMgsi())
+        {
+            if (convention == eCDecl)
+            {
+                return Cdecl_Static_Hook_Impl;
+            }
+            else if (convention == eStdCall)
+            {
+                return reinterpret_cast<Signature*>(StdCall_Static_Hook_Impl);
+            }
+            else
+            {
+                abort();
+            }
+        }
         return mRealFuncPtr;
     }
 

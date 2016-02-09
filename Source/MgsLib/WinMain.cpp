@@ -196,9 +196,8 @@ MGS_VAR(1, 0x6FC79C, DWORD, dword_6FC79C, 0);
 MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
 MGS_VAR(1, 0x776B68, char *, unk_776B68, nullptr);
 MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
-
-HFONT& gFont = *(HFONT*)0x006FC7E8;
-HWND& gHwnd = *(HWND*)0x009ADDA0;
+MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
+MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 
 //MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
 int __cdecl HandleExclusiveMode()
@@ -340,55 +339,55 @@ struct Rect16
 };
 static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
 
-DWORD& dword_995344 = *(DWORD*)0x995344;
-DWORD& dword_7227A4 = *(DWORD*)0x7227A4;
-DWORD& dword_9942B8 = *(DWORD*)0x9942B8;
-DWORD& dword_78D7B0 = *(DWORD*)0x78D7B0;
-WORD& word_78E7E8 = *(WORD*)0x78E7E8;
-DWORD& dword_995324 = *(DWORD*)0x995324;
-DWORD& dword_7919C0 = *(DWORD*)0x7919C0;
+MGS_VAR(1, 0x995344, DWORD, dword_995344, 0);
+MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
+MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
+MGS_VAR(1, 0x78D7B0, DWORD, dword_78D7B0, 0);
+MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
+MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
+MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 
 actor_related_struct& stru_722760 = *(actor_related_struct*)0x722760;
 actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
 
-WORD& word_78E7FC = *(WORD*)0x78E7FC;
-WORD& word_78E7FE = *(WORD*)0x78E7FE;
-DWORD& gResidentTop_dword_78E960 = *(DWORD*)0x78E960;
-DWORD& dword_78E964 = *(DWORD*)0x78E964;
-DWORD& dword_791A0C = *(DWORD*)0x791A0C;
-DWORD& dword_9942A0 = *(DWORD*)0x9942A0;
-DWORD& gExitMainGameLoop = *(DWORD*)0x0073492C;
-WORD& word_994320 = *(WORD*)0x994320;
-WORD& word_669AE0 = *(WORD*)0x669AE0;
-DWORD& dword_993F44 = *(DWORD*)0x993F44;
-
+MGS_VAR(1, 0x78E7FC, WORD, word_78E7FC, 0);
+MGS_VAR(1, 0x78E7FE, WORD, word_78E7FE, 0);
+MGS_VAR(1, 0x78E960, DWORD, gResidentTop_dword_78E960, 0);
+MGS_VAR(1, 0x78E964, DWORD, dword_78E964, 0);
+MGS_VAR(1, 0x791A0C, DWORD, dword_791A0C, 0);
+MGS_VAR(1, 0x9942A0, DWORD, dword_9942A0, 0);
+MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
+MGS_VAR(1, 0x994320, WORD, word_994320, 0);
+MGS_VAR(1, 0x669AE0, WORD, word_669AE0, 0);
+MGS_VAR(1, 0x993F44, DWORD, dword_993F44, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
 MGS_VAR(1, 0x787778, DWORD, dword_787778, 0);
+MGS_VAR(1, 0x78E7E4, WORD, dword_78E7E4, 0);
+MGS_VAR(1, 0x006DEF94, DWORD, gNoCrashCheck, 0);
+MGS_VAR(1, 0x0071687C, DWORD, gCheatsEnabled, 0);
+MGS_VAR(1, 0x006FD1F8, DWORD, gNoCdEnabled, 0);
+MGS_VAR(1, 0x00650D14, DWORD, gWindowedMode, 0);
 
-WORD& dword_78E7E4 = *(WORD*)0x78E7E4;
-DWORD& gNoCrashCheck = *((DWORD*)0x006DEF94);
-DWORD& gCheatsEnabled = *(DWORD*)0x0071687C;
-DWORD& gNoCdEnabled = *(DWORD*)0x006FD1F8;
-DWORD& gWindowedMode = *(DWORD*)0x00650D14;
 char*& off_688DB8 = *(char**)0x688DB8;
-DWORD& dword_6FC7A0 = *((DWORD*)0x6FC7A0);
-DWORD& gNoEffects = *(DWORD*)0x00650D24;
-float& gXRes = *(float*)0x00650D28;
-DWORD& gNoFilter = *(DWORD*)0x00650D34;
-DWORD& gModX2 = *(DWORD*)0x00650D30;
-DWORD& gNoTrueType = *(DWORD*)0x00650D40;
-DWORD& gFps = *(DWORD*)0x006FC76C;
-DWORD& gColourKey = *(DWORD*)0x006FC7A4;
-DWORD& gBlendMode = *(DWORD*)0x00650D38;
-DWORD& gLowRes = *(DWORD*)0x00650D20;
+
+MGS_VAR(1, 0x6FC7A0, DWORD, dword_6FC7A0, 0);
+MGS_VAR(1, 0x00650D24, DWORD, gNoEffects, 0);
+MGS_VAR(1, 0x00650D28, float, gXRes, 0.0f);
+MGS_VAR(1, 0x00650D34, DWORD, gNoFilter, 0);
+MGS_VAR(1, 0x00650D30, DWORD, gModX2, 0);
+MGS_VAR(1, 0x00650D40, DWORD, gNoTrueType, 0);
+MGS_VAR(1, 0x006FC76C, DWORD, gFps, 0);
+MGS_VAR(1, 0x006FC7A4, DWORD, gColourKey, 0);
+MGS_VAR(1, 0x00650D38, DWORD, gBlendMode, 0);
+MGS_VAR(1, 0x00650D20, DWORD, gLowRes, 0);
+
 char*& off_688D40 = *(char**)0x688D40;
-DWORD& gSoftwareRendering = *(DWORD*)0x006FC794;
-HINSTANCE& gHInstance = *(HINSTANCE*)0x0071D1D0;
-DWORD& gSoundFxVol_dword_651D98 = *((DWORD*)0x651D98);
-DWORD& gMusicVol_dword_716F68 = *((DWORD*)0x716F68);
 
-
+MGS_VAR(1, 0x006FC794, DWORD, gSoftwareRendering, 0);
+MGS_VAR(1, 0x0071D1D0, HINSTANCE, gHInstance, 0);
+MGS_VAR(1, 0x651D98, DWORD, gSoundFxVol_dword_651D98, 0);
+MGS_VAR(1, 0x716F68, DWORD, gMusicVol_dword_716F68, 0);
 MGS_VAR(1, 0x77C934, DWORD, dword_77C934, 0);
 MGS_VAR(1, 0x9AD8A5, BYTE, byte_9AD8A5, 0);
 MGS_VAR(1, 0x9AD8A7, BYTE, byte_9AD8A7, 0);
@@ -399,12 +398,11 @@ MGS_VAR(1, 0x9AD8C1, BYTE, byte_9AD8C1, 0);
 MGS_VAR(1, 0x73490C, DWORD, dword_73490C, 0);
 MGS_VAR(1, 0x734908, DWORD, dword_734908, 0);
 
-int* gKeys = (int*)0x009AD9A0;
-BYTE* byte_9AD880 = (BYTE*)0x9AD880;
+int* gKeys = (int*)0x009AD9A0; // TODO: Array?
+MGS_VAR(1, 0x9AD880, BYTE*, byte_9AD880, 0); // TODO: Array?
 
 MGS_VAR(1, 0x009AD980, DWORD, gvirtualKeyRepeatCount, 0);
 MGS_VAR(1, 0x009AD6B0, DWORD, gVirtualKeyCode, 0);
-
 MGS_VAR(1, 0x009AD892, DWORD, gAltPressed, 0);
 MGS_VAR(1, 0x71D194, DWORD, dword_71D194, 0);
 MGS_VAR(1, 0x009AD8F9, DWORD, gF10Pressed, 0);
@@ -845,10 +843,9 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
     return result;
 }
 
-
-DWORD* dword_664EC4 = (DWORD*)0x664EC4;
-DWORD* dword_664EC0 = (DWORD*)0x664EC0;
-char* aHoldDownTheInv = (char*)0x00662EC0;
+MGS_VAR(1, 0x664EC4, DWORD*, dword_664EC4, 0); // TODO: Array?
+MGS_VAR(1, 0x664EC0, DWORD*, dword_664EC0, 0); // TODO: Array?
+char* aHoldDownTheInv = (char*)0x00662EC0; // TODO: Array?
 
 // 0x0043CBD9
 int __cdecl MessageBox_Sometimes(HWND hWnd, int a2, LPCSTR lpCaption, UINT uType)
@@ -2198,16 +2195,17 @@ MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
 MGS_VAR(1, 0x64DA88, DIDATAFORMAT, JoystickDataFormat, {});
 MGS_VAR(1, 0x64DA70, DIDATAFORMAT, MouseDataFormat, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
-DWORD* dword_65714C = (DWORD*)0x65714C;
-DWORD* dword_657184 = (DWORD*)0x657184;
+MGS_VAR(1, 0x65714C, DWORD*, dword_65714C, nullptr);
+MGS_VAR(1, 0x657184, DWORD*, dword_657184, nullptr);
+
 DWORD* dword_6571BC = (DWORD*)0x6571BC;
 DWORD* dword_6571F4 = (DWORD*)0x6571F4;
-char* sidewinderEtc = (char*)0x657298;
-GUID& IID_IDirectInput7A_MGS = *((GUID*)0x64B028);
-GUID& GUID_SysMouse_MGS = *((GUID*)0x64AEE8);
+char* sidewinderEtc = (char*)0x657298; // TODO: Dump array
+GUID& IID_IDirectInput7A_MGS = *((GUID*)0x64B028); // TODO: Use DxGuid
+GUID& GUID_SysMouse_MGS = *((GUID*)0x64AEE8); // TODO: Use DxGuid
 DWORD* dword_65726C = (DWORD*)0x65726C;
-char* buttonNames = (char*)0x65510C;
-char* buttonList = (char*)0x654A98;
+char* buttonNames = (char*)0x65510C; // TODO: Dump array
+char* buttonList = (char*)0x654A98; // TODO: Dump array
 MGS_VAR(1, 0x71D68C, DWORD, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
 
@@ -2506,7 +2504,7 @@ int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsig
     return 0;
 }
 
-WORD& word_7227C8 = *(WORD*)0x7227C8;
+MGS_VAR(1, 0x7227C8, WORD, word_7227C8, 0);
 
 // 0x44EAED
 void *__cdecl sub_44EAED()
