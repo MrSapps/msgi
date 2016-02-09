@@ -362,9 +362,10 @@ WORD& word_994320 = *(WORD*)0x994320;
 WORD& word_669AE0 = *(WORD*)0x669AE0;
 DWORD& dword_993F44 = *(DWORD*)0x993F44;
 
-char*& gCmdLine = *((char**)0x0071D16C);
-DWORD& dword_787774 = *((DWORD*)0x787774);
-DWORD& dword_787778 = *((DWORD*)0x787778);
+MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
+MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
+MGS_VAR(1, 0x787778, DWORD, dword_787778, 0);
+
 WORD& dword_78E7E4 = *(WORD*)0x78E7E4;
 DWORD& gNoCrashCheck = *((DWORD*)0x006DEF94);
 DWORD& gCheatsEnabled = *(DWORD*)0x0071687C;
@@ -2698,8 +2699,11 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     SoundCpp_ForceLink();
     SoundCpp_Debug();
 
-    InstallVaradicCFunctionHooks();
-    
+    if (IsMgsi())
+    {
+        InstallVaradicCFunctionHooks();
+    }
+
     if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
     {
         gCmdLine = lpCmdLine;
