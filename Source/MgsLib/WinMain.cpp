@@ -399,8 +399,7 @@ MGS_VAR(1, 0x73490C, DWORD, dword_73490C, 0);
 MGS_VAR(1, 0x734908, DWORD, dword_734908, 0);
 
 int* gKeys = (int*)0x009AD9A0; // TODO: Array?
-MGS_VAR(1, 0x9AD880, BYTE*, byte_9AD880, 0); // TODO: Array?
-
+MGS_ARY(1, 0x9AD880, BYTE, 256, byte_9AD880, {});
 MGS_VAR(1, 0x009AD980, DWORD, gvirtualKeyRepeatCount, 0);
 MGS_VAR(1, 0x009AD6B0, DWORD, gVirtualKeyCode, 0);
 MGS_VAR(1, 0x009AD892, DWORD, gAltPressed, 0);
@@ -843,59 +842,67 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
     return result;
 }
 
-MGS_VAR(1, 0x664EC4, DWORD*, dword_664EC4, 0); // TODO: Array?
-MGS_VAR(1, 0x664EC0, DWORD*, dword_664EC0, 0); // TODO: Array?
-char* aHoldDownTheInv = (char*)0x00662EC0; // TODO: Array?
+struct MessageBoxStruct
+{
+    DWORD mShowErrCount;
+    DWORD mDisplayThisErrCode;
+};
+
+MGS_ARY(1, 0x664EC0, MessageBoxStruct, 8, stru_664EC0, {});
+MGS_ARY(1, 0x00662EC0, char, 8*1024, gStrErrStrings, {}); // 2d array of [8][1024]
 
 // 0x0043CBD9
-int __cdecl MessageBox_Sometimes(HWND hWnd, int a2, LPCSTR lpCaption, UINT uType)
+int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uType)
 {
-    int result; // eax@2
-    signed int i; // [sp+0h] [bp-8h]@5
-    signed int j; // [sp+0h] [bp-8h]@11
-    signed int v7; // [sp+4h] [bp-4h]@5
-
-    if (a2 <= 0 || (result = a2, dword_664EC4[2 * a2]))
+    int result;
+    if (errCode <= 0 || (result = errCode, stru_664EC0[errCode].mDisplayThisErrCode))
     {
-        if (a2 == -1)
+        if (errCode == -1)
         {
-            v7 = -1;
-            for (i = 0; i < 8; ++i)
+            signed int msgIdx = -1;
+
+            for (int i = 0; i < 8; ++i)
             {
-                if (dword_664EC4[2 * i])
+                if (stru_664EC0[i].mDisplayThisErrCode)
                 {
-                    if (dword_664EC0[2 * i])
-                        v7 = i;
+                    if (stru_664EC0[i].mShowErrCount)
+                    {
+                        msgIdx = i;
+                    }
                 }
                 result = i + 1;
             }
-            for (j = 0; j < 8; ++j)
+
+            for (int j = 0; j < 8; ++j)
             {
-                if (dword_664EC4[2 * j])
+                if (stru_664EC0[j].mDisplayThisErrCode)
                 {
-                    if (dword_664EC0[2 * j])
+                    if (stru_664EC0[j].mShowErrCount)
                     {
-                        if (dword_664EC4[2 * j] < (unsigned int)dword_664EC4[2 * v7])
+                        if (stru_664EC0[j].mDisplayThisErrCode < stru_664EC0[msgIdx].mDisplayThisErrCode)
                         {
-                            v7 = j;
-                            dword_664EC0[2 * j] = 0;
+                            msgIdx = j;
+                            stru_664EC0[j].mShowErrCount = 0;
                         }
                     }
                 }
                 result = j + 1;
             }
-            if (v7 >= 0)
-                result = MessageBoxA(hWnd, &aHoldDownTheInv[1024 * v7], lpCaption, uType); // Hold down the Inventory and Weapon item buttons
+
+            if (msgIdx >= 0)
+            {
+                result = MessageBoxA(hWnd, &gStrErrStrings[msgIdx * 1024], lpCaption, uType);
+            }
         }
         else
         {
-            ++dword_664EC0[2 * a2];
+            ++stru_664EC0[errCode].mShowErrCount;
             result = 2;
         }
     }
     else
     {
-        result = MessageBoxA(hWnd, &aHoldDownTheInv[1024 * a2], lpCaption, uType);
+        result = MessageBoxA(hWnd, &gStrErrStrings[errCode * 1024], lpCaption, uType);
     }
     return result;
 }
@@ -1067,13 +1074,13 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
     {
         sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.identifier.szDescription, lpDeviceName);
         strcat(pStringError, "\n\tDevice doesn't meet minimum requirements, and will be ignored by the game\n");
-        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
+        MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
     }
     else if (((field480 & 2) == 0) && ((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (byte_774B48 != 0))
     {
         sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.identifier.szDescription, lpDeviceName);
         strcat(pStringWarning, "\n\tDevice doesn't support everything the game needs\nBut it will be allowed for selection in Option/Advanced Menu\n");
-        MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
+        MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
     }
 
     pIdentifier->ddIdentifier.field430 |= status;
@@ -1240,7 +1247,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     {
         if ((identifier.ddIdentifier.field430 & 0x40) == 0 && (identifier.ddIdentifier.field430 & 1) == 0)
         {
-            MessageBox_Sometimes(0, 6, "Metal Gear Solid PC", MB_OK);
+            MessageBox_Error(0, 6, "Metal Gear Solid PC", MB_OK);
         }
         identifier.ddIdentifier.field430 |= 0x40; // Must mean "low vram" ?
     }
@@ -1484,7 +1491,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 lpGuid = 0;
                 gXRes = 1.0f;
                 dword_716F5C = 1.0f;
-                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
+                MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
             }
             gWindowedMode = 0;
             sub_433801();
@@ -1524,7 +1531,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             dword_716F5C = 1.0f;
             gXRes = 1.0f;
             lpGuid = 0;
-            MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
+            MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
         }
         sub_431C63();
     }
@@ -1597,7 +1604,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 gXRes = 1.0f;
                 g_dwDisplayWidth = (signed __int64)(320.0 * gXRes);
                 g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
-                MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
+                MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
@@ -1992,7 +1999,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             {
                 g_pDirect3DDevice->Release();
                 g_pDirect3DDevice = 0;
-                MessageBox_Sometimes(0, 5, "Metal Gear Solid PC", MB_OK);
+                MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
                 gSoftwareRendering = 1;
             }
             break;
@@ -2002,7 +2009,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         g_dwDisplayWidth = 320;
         g_dwDisplayHeight = 240;
         mgs_fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", g_dwDisplayWidth, g_dwDisplayHeight);
-        MessageBox_Sometimes(0, 4, "Metal Gear Solid PC", MB_OK);
+        MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
         gSoftwareRendering = 1;
         dword_716F5C = 1.0f;
         gXRes = dword_716F5C; // TODO: Float
@@ -2120,7 +2127,7 @@ signed int __cdecl DoInitAll()
 
     //v1 = InitD3d_ProfileGfxHardwareQ_Test();
     v1 = InitD3d_ProfileGfxHardwareQ();
-    MessageBox_Sometimes(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
+    MessageBox_Error(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
     return v1;
 }
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
@@ -2195,8 +2202,8 @@ MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
 MGS_VAR(1, 0x64DA88, DIDATAFORMAT, JoystickDataFormat, {});
 MGS_VAR(1, 0x64DA70, DIDATAFORMAT, MouseDataFormat, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
-MGS_VAR(1, 0x65714C, DWORD*, dword_65714C, nullptr);
-MGS_VAR(1, 0x657184, DWORD*, dword_657184, nullptr);
+MGS_ARY(1, 0x65714C, DWORD, 14, dword_65714C, {});
+MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, {});
 
 DWORD* dword_6571BC = (DWORD*)0x6571BC;
 DWORD* dword_6571F4 = (DWORD*)0x6571F4;
