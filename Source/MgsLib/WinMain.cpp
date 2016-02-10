@@ -87,7 +87,8 @@ static_assert(sizeof(rend_struct) == 0x20, "rend_struct should be 0x20");
 
 rend_struct* gRenderRelated_dword_6FC780 = (rend_struct*)0x6FC780; // Array of 15000 items?
 
-struct actor_related_struct;
+struct Actor;
+struct ActorList;
 
 MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
 MSG_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
@@ -107,7 +108,7 @@ MSG_FUNC_NOT_IMPL(0x0044E381, void* __cdecl(int), sub_44E381);
 MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), unknown_libname_3); // Note: Not a CRT func!!
 MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
-MSG_FUNC_NOT_IMPL(0x0044E226, actor_related_struct* __cdecl(), sub_44E226);
+MSG_FUNC_NOT_IMPL(0x0044E226, Actor* __cdecl(), sub_44E226);
 MSG_FUNC_NOT_IMPL(0x004232B0, void __cdecl(), DoClearAll);
 MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
@@ -137,9 +138,9 @@ MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), sub_4
 MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
-MSG_FUNC_NOT_IMPL(0x0040A3FC, int __cdecl (actor_related_struct*), Actor_Unknown3);
-MSG_FUNC_NOT_IMPL(0x0040A2AF, actor_related_struct *__cdecl(int, actor_related_struct *, void(__cdecl *)(actor_related_struct*)), Actor_Unknown4);
-MSG_FUNC_NOT_IMPL(0x0040A3ED, actor_related_struct *__cdecl(actor_related_struct*), Actor_SetFnPtr);
+//MSG_FUNC_NOT_IMPL(0x0040A3FC, int __cdecl (actor_related_struct*), Actor_Unknown3);
+MSG_FUNC_NOT_IMPL(0x0040A2AF, Actor* __cdecl(int, Actor*, void(__cdecl *)(Actor*)), Actor_Unknown4);
+MSG_FUNC_NOT_IMPL(0x0040A3ED, Actor* __cdecl(Actor*), Actor_SetRemoveFnPtr);
 MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
@@ -201,6 +202,7 @@ MGS_VAR(1, 0x776B68, char *, unk_776B68, nullptr);
 MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
 MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
+MGS_VAR(1, 0x72279C, DWORD, dword_72279C, 0);
 
 //MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
 int __cdecl HandleExclusiveMode()
@@ -313,28 +315,27 @@ int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
     return ((fn)(0x452E6E))();
 }
 
-struct actor_related_struct
+struct Actor
 {
-    actor_related_struct* pPrevious;
-    actor_related_struct* pNext;
-    void(__cdecl *fn_unknown)(actor_related_struct *);
-    void(__cdecl *fnUnknown3)(actor_related_struct *);
-    void(__cdecl *fnUnknown2)(actor_related_struct *);
+    Actor* pPrevious;
+    Actor* pNext;
+    void(__cdecl *fn_unknown)(Actor*);
+    void(__cdecl *fnUnknown3)(Actor*);
+    void(__cdecl *fnUnknown2)(Actor*);
     char* mNamePtr;
     DWORD field_18;
     DWORD field_1C;
-    actor_related_struct* actor_struct_ptr2;
-    DWORD field_24;
-    DWORD field_28;
-    DWORD field_2C;
-    DWORD field_30;
-    DWORD field_34;
-    DWORD field_38;
-    DWORD field_3C;
+};
+static_assert(sizeof(Actor) == 0x20, "Actor should be 0x20");
+
+struct ActorList
+{
+    Actor first;
+    Actor last;
     WORD mPause;
     WORD mKill;
 };
-static_assert(sizeof(actor_related_struct) == 0x44, "actor_related_struct should be 0x44");
+static_assert(sizeof(ActorList) == 0x44, "ActorList should be 0x44");
 
 struct Rect16
 {
@@ -343,6 +344,9 @@ struct Rect16
 static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
 
 MGS_VAR(1, 0x995344, DWORD, dword_995344, 0);
+MGS_VAR(1, 0x722780, DWORD, dword_722780, 0);
+MGS_VAR(1, 0x722784, DWORD, dword_722784, 0);
+MGS_VAR(1, 0x7227A0, DWORD, dword_7227A0, 0);
 MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
 MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
 MGS_VAR(1, 0x78D7B0, DWORD, dword_78D7B0, 0);
@@ -350,10 +354,10 @@ MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
 MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 
-MGS_VAR(1, 0x722760, actor_related_struct, stru_722760, {});
+MGS_VAR(1, 0x722760, Actor, stru_722760, {});
 
 //actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
-MGS_ARY(1, 0x006BFC78, actor_related_struct, 9, gActors, {});
+MGS_ARY(1, 0x006BFC78, ActorList, 9, gActors, {});
 
 MGS_VAR(1, 0x78E7FC, WORD, word_78E7FC, 0);
 MGS_VAR(1, 0x78E7FE, WORD, word_78E7FE, 0);
@@ -423,7 +427,7 @@ MGS_VAR(1, 0x0078E7C0, char * , gDest, nullptr);
 
 struct weapon_famas
 {
-    actor_related_struct mActor;
+    ActorList mActor;
     DWORD field_44_a1;
     DWORD field_48_a2;
     DWORD field_4C_a3;
@@ -441,7 +445,7 @@ MGS_VAR(1, 0x78E804, WORD, word_78E804, 0);
 MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
 MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
 
-actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, int fn2, char *srcFileName);
+Actor*__cdecl Actor_Unknown6(Actor* a1, int fn1, int fn2, char *srcFileName);
 
 MSG_FUNC_NOT_IMPL(0x0040B38E, int __cdecl(char*), ResourceRequestQ);
 MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
@@ -454,7 +458,7 @@ signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, in
     int res; // eax@2
     signed int result; // eax@5
 
-    v4 = (int)&a1->mActor.actor_struct_ptr2;
+    v4 = (int)&a1->mActor.last;
     if (bMp5)
         res = ResourceRequestQ("mpfive");
     else
@@ -472,7 +476,8 @@ signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, in
     return result;
 }
 
-weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(actor_related_struct *a1, actor_related_struct *a2, void(__cdecl *a3)(actor_related_struct *), void(__cdecl *a4)(DWORD), int bMp5)
+// TODO : check if ActorList or Actor
+weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
 {
     weapon_famas *pFamas; // eax@1 MAPDST
     int v8; // eax@5
@@ -481,10 +486,10 @@ weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(actor_related_struct *a1, a
     pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
     if (pFamas)
     {
-        Actor_Unknown6(&pFamas->mActor, (int)Res_famas_sub_640CDC.Ptr(), (int)sub_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
+        Actor_Unknown6(&pFamas->mActor.first, (int)Res_famas_sub_640CDC.Ptr(), (int)sub_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
         if (Res_Weapon_famas_init_sub_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
         {
-            Actor_SetFnPtr(&pFamas->mActor);
+            Actor_SetRemoveFnPtr(&pFamas->mActor.first);
             return 0;
         }
         pFamas->field_58 = 0;
@@ -518,17 +523,17 @@ int __cdecl Actor_DumpActorSystem()
 {
     int result; // eax@1
     int v1; // [sp+0h] [bp-18h]@6
-    actor_related_struct *pNextActor; // [sp+4h] [bp-14h]@4
-    actor_related_struct *pActorCopy; // [sp+8h] [bp-10h]@3
+    Actor* pNextActor; // [sp+4h] [bp-14h]@4
+    Actor* pActorCopy; // [sp+8h] [bp-10h]@3
     signed int i; // [sp+10h] [bp-8h]@1
-    actor_related_struct *pActor; // [sp+14h] [bp-4h]@1
+    ActorList* pActor; // [sp+14h] [bp-4h]@1
 
     pActor = gActors;
     result = printf("--DumpActorSystem--\n");
     for (i = 0; i < 9; ++i)
     {
         printf("Lv %d Pause %d Kill %d\n", i, pActor->mPause, pActor->mKill);
-        pActorCopy = pActor;
+        pActorCopy = &pActor->first;
         do
         {
             pNextActor = pActorCopy->pNext;
@@ -550,8 +555,8 @@ int __cdecl Actor_DumpActorSystem()
     return result;
 }
 
-//MSG_FUNC_NOT_IMPL(0x0040A37C, void __cdecl (actor_related_struct*), RemoveActor);
-void __cdecl RemoveActor(actor_related_struct* pActor)
+//MSG_FUNC_NOT_IMPL(0x0040A37C, void __cdecl (Actor*), RemoveActor);
+void __cdecl RemoveActor(Actor* pActor)
 {
     if (!pActor)
         return;
@@ -767,7 +772,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 if (gCheatsEnabled)
                 {
-                    stru_722760.field_3C = 0;
+                    dword_72279C = 0;
                     sub_521210();
                     sub_452E6E();
                     result = 0;
@@ -782,7 +787,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                 if (wParam == VK_ESCAPE)
                 {
                     dword_791DE4 = 1;
-                    if (stru_722760.field_3C != 0x20000000 || !strstr(gDest, "s19a"))
+                    if (dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
                     {
                         if (!dword_717354)
                         {
@@ -2280,11 +2285,8 @@ void *__cdecl sub_44EAED()
 //MSG_FUNC_NOT_IMPL(0x40A68D, int __cdecl(int, int), sub_40A68D);
 int __cdecl sub_40A68D(int number, int fn)
 {
-    int result; // eax@1
-
-    result = fn;
-    *((DWORD *)&gActors[4].pPrevious + number) = fn;
-    return result;
+    *((DWORD *)&gActors[4].first.pPrevious + number) = fn;
+    return fn;
 }
 
 //MSG_FUNC_NOT_IMPL(0x44E1E0, __int16 __cdecl(), sub_44E1E0);
@@ -2299,17 +2301,14 @@ __int16 __cdecl sub_44E1E0()
 }
 
 //MSG_FUNC_NOT_IMPL(0x0040A347, actor_related_struct *__cdecl (actor_related_struct*, int, int, char *), Actor_Unknown6);
-actor_related_struct *__cdecl Actor_Unknown6(actor_related_struct *a1, int fn1, int fn2, char *srcFileName)
+Actor* __cdecl Actor_Unknown6(Actor* a1, int fn1, int fn2, char *srcFileName)
 {
-    actor_related_struct *result; // eax@1
-
-    a1->fn_unknown = (void(__cdecl *)(actor_related_struct*))fn1;
-    a1->fnUnknown3 = (void(__cdecl *)(actor_related_struct*))fn2;
+    a1->fn_unknown = (void(__cdecl *)(Actor*))fn1;
+    a1->fnUnknown3 = (void(__cdecl *)(Actor*))fn2;
     a1->mNamePtr = srcFileName;
     a1->field_1C = 0;
-    result = a1;
     a1->field_18 = 0;
-    return result;
+    return a1;
 }
 MSG_FUNC_IMPL(0x0040A347, Actor_Unknown6);
 
@@ -2328,7 +2327,7 @@ void *__cdecl sub_44E12B()
 {
     dword_995344 = 0;
     dword_7227A4 = 0;
-    *(DWORD *)&stru_722760.mPause = 0;
+    dword_7227A0 = 0;
     dword_9942B8 = 0;
     Menu_Related1();
     sub_44EAED();
@@ -2345,8 +2344,8 @@ void *__cdecl sub_44E12B()
     word_78E7E8 = (WORD)(dword_78D7B0 + 1);
     dword_995324 = (int)&dword_7919C0;
     GetResidentTop();
-    stru_722760.actor_struct_ptr2 = 0;
-    stru_722760.field_24 = 0;
+    dword_722780 = 0;
+    dword_722784 = 0;
     return sub_44E226();
 }
 
@@ -2354,20 +2353,19 @@ void *__cdecl sub_44E12B()
 int __cdecl Actor_Unknown()
 {
     int result; // eax@8
-    actor_related_struct *v1; // [sp+0h] [bp-18h]@5
-    actor_related_struct *v2; // [sp+4h] [bp-14h]@4
-    void(__cdecl *fn)(actor_related_struct *); // [sp+8h] [bp-10h]@5
+    Actor* v1; // [sp+0h] [bp-18h]@5
+    Actor* v2; // [sp+4h] [bp-14h]@4
+    void(__cdecl *fn)(Actor*); // [sp+8h] [bp-10h]@5
     signed int i; // [sp+10h] [bp-8h]@1
-    actor_related_struct *pActor; // [sp+14h] [bp-4h]@1
+    ActorList *pActor; // [sp+14h] [bp-4h]@1
 
     pActor = gActors;
-
 
     for (i = 9; i > 0; --i)
     {
         if (!(dword_791A0C & pActor->mPause))
         {
-            v2 = pActor;
+            v2 = &pActor->first;
             do
             {
                 v1 = v2->pNext;
@@ -2400,19 +2398,19 @@ MGS_ARY(1, 0x6507EC, PauseKill, 9, gPauseKills, { { 0, 7 }, { 0, 7 }, { 9, 4 }, 
 //MSG_FUNC_NOT_IMPL(0x0040A006, void __cdecl(), Actor_Init);
 void __cdecl Actor_Init()
 {
-    actor_related_struct* pActor = gActors;
+    ActorList* pActor = gActors;
 
     for (int i = 0; i < 9; i++)
     {
-        pActor->pPrevious = 0;
-        pActor->pNext = (actor_related_struct*)&pActor->actor_struct_ptr2;
-        pActor->actor_struct_ptr2 = pActor;
-        pActor->field_24 = 0;
+        pActor->first.pPrevious = 0;
+        pActor->first.pNext = &pActor->last;
+        pActor->last.pPrevious = &pActor->first;
+        pActor->last.pNext = 0;
 
-        pActor->fnUnknown2 = 0;
-        pActor->fnUnknown3 = 0;
-        pActor->field_2C = 0; // fnUnknown2
-        pActor->field_28 = 0; // fnUnknown3
+        pActor->first.fnUnknown2 = 0;
+        pActor->first.fnUnknown3 = 0;
+        pActor->last.fnUnknown2 = 0;
+        pActor->last.fnUnknown3 = 0;
 
         pActor->mPause = gPauseKills[i].mPause;
         pActor->mKill = gPauseKills[i].mKill;
