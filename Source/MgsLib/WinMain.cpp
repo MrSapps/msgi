@@ -139,7 +139,6 @@ MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
 //MSG_FUNC_NOT_IMPL(0x0040A3FC, int __cdecl (actor_related_struct*), Actor_Unknown3);
-MSG_FUNC_NOT_IMPL(0x0040A2AF, Actor* __cdecl(int, Actor*, void(__cdecl *)(Actor*)), Actor_Unknown4);
 MSG_FUNC_NOT_IMPL(0x0040A3ED, Actor* __cdecl(Actor*), Actor_SetRemoveFnPtr);
 MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
@@ -2322,6 +2321,8 @@ int __cdecl GetResidentTop()
     return result;
 }
 
+Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Actor*));
+
 //MSG_FUNC_NOT_IMPL(0x44E12B, void *__cdecl(), sub_44E12B);
 void *__cdecl sub_44E12B()
 {
@@ -2335,7 +2336,7 @@ void *__cdecl sub_44E12B()
     sub_452610();
     sub_40A68D(98, (int)sub_44E9D2.Ptr());
     sub_44E1E0();
-    Actor_Unknown4(1, &stru_722760, 0);
+    Actor_PushBack(1, &stru_722760, 0);
     Actor_Unknown6(&stru_722760, (int)sub_44E381.Ptr(), 0, "C:\\mgs\\source\\Game\\gamed.c");
 
     unknown_libname_3();
@@ -2419,6 +2420,22 @@ void __cdecl Actor_Init()
     }
 
     dword_791A0C = 0;
+}
+
+//MSG_FUNC_NOT_IMPL(0x0040A2AF, Actor* __cdecl(int, Actor*, void(__cdecl *)(Actor*)), Actor_PushBack);
+Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Actor*))
+{
+    Actor* pLast = &gActors[a_nLvl].last;
+    Actor* pLastPrevious = pLast->pPrevious;
+    pLast->pPrevious = a_pActor;
+    pLastPrevious->pNext = a_pActor;
+    a_pActor->pNext = pLast;
+    a_pActor->pPrevious = pLastPrevious;
+    a_pActor->fnUnknown3 = 0;
+    a_pActor->fn_unknown = 0;
+    a_pActor->fnUnknown2 = fn;
+
+    return a_pActor;
 }
 
 
