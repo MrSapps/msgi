@@ -54,10 +54,34 @@ BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID pvRef
     return !SUCCEEDED(hr);
 }
 
+// 0x43C716
+int __cdecl Input_Shutdown_sub_43C716()
+{
+    if (pJoystickDevice)
+    {
+        pJoystickDevice->Unacquire();
+        pJoystickDevice->Release();
+        pJoystickDevice = 0;
+    }
+
+    if (pMouseDevice)
+    {
+        pMouseDevice->Unacquire();
+        pMouseDevice->Release();
+        pMouseDevice = 0;
+    }
+
+    if (pDirectInput)
+    {
+        pDirectInput->Release();
+        pDirectInput = 0;
+    }
+    return 0;
+}
 
 // 0x0043B1D1
 //MSG_FUNC_NOT_IMPL(0x0043B1D1, int __cdecl(HWND), InitDirectInput);
-int __cdecl InitDirectInput(HWND hWnd)
+int __cdecl Input_Init(HWND hWnd)
 {
     char productName[0x80];
     char instanceName[0x80];
@@ -243,12 +267,12 @@ int __cdecl InitDirectInput(HWND hWnd)
 }
 
 // 0x0042D69E
-int __cdecl DoDirectInputInit()
+int __cdecl Input_Start()
 {
     int result; // eax@1
 
     dword_717348 = 0;
-    result = InitDirectInput(gHwnd);
+    result = Input_Init(gHwnd);
     if (result < 0)
         result = printf("$jim failed to init direct input");
     return result;

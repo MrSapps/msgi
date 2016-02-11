@@ -112,7 +112,6 @@ MSG_FUNC_NOT_IMPL(0x0044E226, Actor* __cdecl(), sub_44E226);
 MSG_FUNC_NOT_IMPL(0x004232B0, void __cdecl(), DoClearAll);
 MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
-MSG_FUNC_NOT_IMPL(0x0051D180, void __cdecl(), ShutdownEngine);
 MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
 MSG_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
 MSG_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
@@ -147,6 +146,8 @@ MSG_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
 MSG_FUNC_NOT_IMPL(0x51FEBC, int __cdecl(), Task_Pause);
 MSG_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
 MSG_FUNC_NOT_IMPL(0x51FEDC, int __cdecl(), Task_ResumeQ);
+MSG_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
+MSG_FUNC_NOT_IMPL(0x51FFC3, void *__cdecl(), Task_TerminateQ);
 
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
 MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
@@ -1439,7 +1440,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     mgs_fputs("InitAll {\n", gFile);
     mgs_fflush(gFile);
     gLogFile = gFile;
-    DoDirectInputInit();
+    Input_Start();
     mgs_fputs("jim_enumerate_devices()\n", gFile);
     mgs_fflush(gFile);
     v55 = jim_enumerate_devices();
@@ -2483,6 +2484,19 @@ int __cdecl DoMain()
 }
 
 
+// 0x0051D180
+void ShutdownEngine()
+{
+    if (gHwnd)
+    {
+        Fonts_Release_sub_4317B3();
+        Input_Shutdown_sub_43C716();
+        Sound_ShutDown(); // FIXME: Execution always ends at DSound::IUnknown::Release (if its not null)
+        DoClearAll();
+        Task_TerminateQ();
+        DestroyWindow(gHwnd);
+    }
+}
 
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
@@ -2638,7 +2652,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     0);
                 if (gHwnd)
                 {
-                    atexit(ShutdownEngine.Ptr());
+                    atexit(ShutdownEngine);
                     SetWindowSize(gHwnd, 640, 480);
                     ShowWindow(gHwnd, 5);
                     UpdateWindow(gHwnd);
