@@ -2350,39 +2350,30 @@ void *__cdecl sub_44E12B()
     return sub_44E226();
 }
 
-//MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_Unknown);
-int __cdecl Actor_Unknown()
+//MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_RunActors);
+int __cdecl Actor_RunActors()
 {
-    int result; // eax@8
-    Actor* v1; // [sp+0h] [bp-18h]@5
-    Actor* v2; // [sp+4h] [bp-14h]@4
-    void(__cdecl *fn)(Actor*); // [sp+8h] [bp-10h]@5
-    signed int i; // [sp+10h] [bp-8h]@1
-    ActorList *pActor; // [sp+14h] [bp-4h]@1
+    int result = 0;
 
-    pActor = gActors;
-
-    for (i = 9; i > 0; --i)
+    ActorList* pActorList = gActors;
+    for (int i = 9; i > 0; --i)
     {
-        if (!(dword_791A0C & pActor->mPause))
+        if (!(dword_791A0C & pActorList->mPause))
         {
-            v2 = &pActor->first;
+            // Loop through each actor at this level and call its
+            // run function if set
+            Actor* pActor = &pActorList->first;
             do
             {
-                v1 = v2->pNext;
-                fn = v2->fn_unknown;
-
-               // bool isFamasFunc = fn == (void*)0x640CDC;
-
-                if (fn)
+                if (pActor->fn_unknown)
                 {
-                    fn(v2);
+                    pActor->fn_unknown(pActor);
                 }
                 dword_9942A0 = 0;
-                v2 = v1;
-            } while (v1);
+                pActor = pActor->pNext;
+            } while (pActor);
         }
-        ++pActor;
+        ++pActorList;
         result = i - 1;
     }
     return result;
@@ -2479,7 +2470,7 @@ signed int __cdecl Main()
         // HACK: Somtimes the game crashes somewhere deep in here, not calling this seems to prevent the game
         // state from progressing.
         // In software rendering mode when gameover it will crash, but this is an existing bug of the game.
-        Actor_Unknown();
+        Actor_RunActors();
     }
     return result;
 }
