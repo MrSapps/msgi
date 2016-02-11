@@ -13,7 +13,8 @@ MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
 MGS_VAR(1, 0x64DA88, DIDATAFORMAT, JoystickDataFormat, {});
 MGS_VAR(1, 0x64DA70, DIDATAFORMAT, MouseDataFormat, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
-DWORD* dword_6571F4 = (DWORD*)0x6571F4; // TODO: Array?
+MGS_ARY(1, 0x6571F4, DWORD, 14, dword_6571F4, {});// TODO: Check 14 is big enough
+
 char* sidewinderEtc = (char*)0x657298; // TODO: Dump array
 GUID& IID_IDirectInput7A_MGS = *((GUID*)0x64B028); // TODO: Use DxGuid
 GUID& GUID_SysMouse_MGS = *((GUID*)0x64AEE8); // TODO: Use DxGuid
@@ -24,7 +25,7 @@ MGS_VAR(1, 0x71D68C, DWORD, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
 MGS_VAR(1, 0x71D670, DWORD, dword_71D670, 0);
 MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
-MGS_VAR(1, 0x71D798, DWORD, dword_71D798, 0);
+MGS_VAR(1, 0x71D798, DWORD, gJoyStickId_dword_71D798, 0);
 MGS_VAR(1, 0x71D41C, DWORD, dword_71D41C, 0);
 MGS_ARY(1, 0x65714C, DWORD, 14, dword_65714C, {});
 MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, {});
@@ -223,7 +224,7 @@ int __cdecl Input_Init(HWND hWnd)
 
                                         dword_71D790 = 1;
                                         dword_71D41C = dword_65726C[i * 2];
-                                        dword_71D798 = i + 1;
+                                        gJoyStickId_dword_71D798 = i + 1;
 
                                         for (int nButton = 0; nButton < 0x38; nButton++)
                                         {
@@ -243,7 +244,7 @@ int __cdecl Input_Init(HWND hWnd)
                                     dword_657184[i] = 0;
                                 }
                             }
-                            if (dword_71D798 == 5)
+                            if (gJoyStickId_dword_71D798 == 5)
                             {
                                 for (int i = 0; i < 14; i++)
                                 {
@@ -269,7 +270,7 @@ int __cdecl Input_Init(HWND hWnd)
                                     dword_65714C[i] = dword_657184[i];
                                 }
                             }
-                            else if (dword_71D798 != 1 && dword_71D798 != 4)
+                            else if (gJoyStickId_dword_71D798 != 1 && gJoyStickId_dword_71D798 != 4)
                             {
                                 for (int i = 0; i < 14; i++)
                                 {
