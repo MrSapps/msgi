@@ -9,13 +9,11 @@
 MGS_VAR(1, 0x71D664, LPDIRECTINPUTA, pDirectInput, nullptr);
 MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE, pJoystickDevice, nullptr);
 MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICEA, pMouseDevice, nullptr);
-
 MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
 MGS_VAR(1, 0x64DA88, DIDATAFORMAT, JoystickDataFormat, {});
 MGS_VAR(1, 0x64DA70, DIDATAFORMAT, MouseDataFormat, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
-
-DWORD* dword_6571F4 = (DWORD*)0x6571F4;
+DWORD* dword_6571F4 = (DWORD*)0x6571F4; // TODO: Array?
 char* sidewinderEtc = (char*)0x657298; // TODO: Dump array
 GUID& IID_IDirectInput7A_MGS = *((GUID*)0x64B028); // TODO: Use DxGuid
 GUID& GUID_SysMouse_MGS = *((GUID*)0x64AEE8); // TODO: Use DxGuid
@@ -24,18 +22,17 @@ char* buttonNames = (char*)0x65510C; // TODO: Dump array
 char* buttonList = (char*)0x654A98; // TODO: Dump array
 MGS_VAR(1, 0x71D68C, DWORD, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
-
 MGS_VAR(1, 0x71D670, DWORD, dword_71D670, 0);
 MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
 MGS_VAR(1, 0x71D798, DWORD, dword_71D798, 0);
 MGS_VAR(1, 0x71D41C, DWORD, dword_71D41C, 0);
-
 MGS_ARY(1, 0x65714C, DWORD, 14, dword_65714C, {});
 MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, {});
+MGS_VAR(1, 0x71D79C, DWORD, dword_71D79C, 0);
+MGS_ARY(1, 0x6571BC, DWORD, 14, dword_6571BC, {});// TODO: Check 14 is big enough
 
-DWORD* dword_6571BC = (DWORD*)0x6571BC;
-
-extern DWORD& dword_717348; // WinMain.cpp
+// WinMain.cpp
+extern DWORD& dword_717348; 
 extern HINSTANCE& gHInstance;
 extern DWORD& gWindowedMode;
 extern HWND& gHwnd;
@@ -43,8 +40,89 @@ extern DWORD& gActive_dword_688CDC;
 
 MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
 
-LPDIENUMDEVICEOBJECTSCALLBACKA EnumDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0C8;
-LPDIENUMDEVICEOBJECTSCALLBACKA CountDeviceObjectsCallback = (LPDIENUMDEVICEOBJECTSCALLBACKA)0x0043B0B3;
+// 0x0043B0B3
+BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef)
+{
+    ++nJoystickDeviceObjects;
+    return 1;
+}
+
+// 0x0043B0C8
+BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef)
+{
+    BOOL result;
+    unsigned int dwOfs;
+
+    struct Prop
+    {
+        DIPROPHEADER hdr;
+        DWORD field1;
+        DWORD field2;
+    };
+    static_assert(sizeof(DIPROPHEADER) == 16, "Wrong DIPROPHEADER size");
+    static_assert(sizeof(Prop) == 24, "Wrong Prop size");
+
+    Prop p;
+    p.hdr.dwHeaderSize = sizeof(DIPROPHEADER);
+
+    p.hdr.dwSize = 24;
+    p.hdr.dwHeaderSize = 16;
+    p.hdr.dwHow = 1;
+    p.hdr.dwObj = lpddoi->dwOfs; // 20?
+    p.field1 = -1000;
+    p.field2  = 1000;
+
+    if (pJoystickDevice->SetProperty(DIPROP_RANGE, &p.hdr) >= 0)
+    {
+        dwOfs = lpddoi->dwOfs;
+
+        // TODO: Should be possible to combine back into 1 switch case
+        if (dwOfs > 16)
+        {
+            switch (dwOfs)
+            {
+            case 20u:
+                ++dword_71D79C;
+                break;
+            case 24u:
+                ++dword_71D79C;
+                break;
+            case 28u:
+                ++dword_71D79C;
+                break;
+            }
+        }
+        else if (dwOfs == 16)
+        {
+            ++dword_71D79C;
+        }
+        else if (dwOfs)
+        {
+            switch (dwOfs)
+            {
+            case 4u:
+                ++dword_71D79C;
+                break;
+            case 8u:
+                ++dword_71D79C;
+                break;
+            case 12u:
+                ++dword_71D79C;
+                break;
+            }
+        }
+        else
+        {
+            ++dword_71D79C;
+        }
+        result = 1;
+    }
+    else
+    {
+        result = 0;
+    }
+    return result;
+}
 
 // 0x0043B078
 BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID pvRef)
@@ -112,8 +190,8 @@ int __cdecl Input_Init(HWND hWnd)
                     hr = pJoystickDevice->GetCapabilities(&JoystickDeviceCaps);
                     if (hr >= 0)
                     {
-                        pJoystickDevice->EnumObjects(EnumDeviceObjectsCallback, hWnd, DIDFT_AXIS);
-                        pJoystickDevice->EnumObjects(CountDeviceObjectsCallback, hWnd, DIDFT_BUTTON);
+                        pJoystickDevice->EnumObjects(Input_Enum_Axis_43B0C8, hWnd, DIDFT_AXIS);
+                        pJoystickDevice->EnumObjects(Input_Enum_Buttons_sub_43B0B3, hWnd, DIDFT_BUTTON);
                         hr = pJoystickDevice->Acquire();
                         if (hr >= 0)
                         {
