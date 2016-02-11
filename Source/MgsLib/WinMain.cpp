@@ -555,8 +555,8 @@ int __cdecl Actor_DumpActorSystem()
     return result;
 }
 
-//MSG_FUNC_NOT_IMPL(0x0040A37C, void __cdecl (Actor*), RemoveActor);
-void __cdecl RemoveActor(Actor* pActor)
+//MSG_FUNC_NOT_IMPL(0x0040A37C, void __cdecl (Actor*), Actor_Remove);
+void __cdecl Actor_Remove(Actor* pActor)
 {
     if (!pActor)
         return;
