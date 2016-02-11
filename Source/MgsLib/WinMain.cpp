@@ -354,7 +354,7 @@ MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
 MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 
-MGS_VAR(1, 0x722760, Actor, stru_722760, {});
+MGS_VAR(1, 0x722760, Actor, g_Actor_722760, {});
 
 //actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
 MGS_ARY(1, 0x006BFC78, ActorList, 9, gActors, {});
@@ -445,7 +445,7 @@ MGS_VAR(1, 0x78E804, WORD, word_78E804, 0);
 MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
 MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
 
-Actor*__cdecl Actor_Unknown6(Actor* a1, int fn1, int fn2, char *srcFileName);
+Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *fn1)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName);
 
 MSG_FUNC_NOT_IMPL(0x0040B38E, int __cdecl(char*), ResourceRequestQ);
 MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
@@ -486,7 +486,7 @@ weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a
     pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
     if (pFamas)
     {
-        Actor_Unknown6(&pFamas->mActor.first, (int)Res_famas_sub_640CDC.Ptr(), (int)sub_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
+        Actor_Init(&pFamas->mActor.first, (void(__cdecl *)(Actor*))Res_famas_sub_640CDC.Ptr(), (void(__cdecl *)(Actor*))sub_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
         if (Res_Weapon_famas_init_sub_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
         {
             Actor_SetRemoveFnPtr(&pFamas->mActor.first);
@@ -952,7 +952,6 @@ MGS_VAR(1, 0x775F48, uint8_t, byte_775F48, 0);
 MGS_VAR(1, 0x774B48, uint8_t, byte_774B48, 0);
 MGS_VAR(1, 0x776450, uint8_t, byte_776450, 0);
 
-// TODO : make jim_enumerate_devices use this structure too
 struct jimDeviceDDId
 {
     DDDEVICEIDENTIFIER2 identifier;
@@ -980,7 +979,6 @@ struct jimUnk0x204
 static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
 
 jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
-//jimUnk0x488* array_776B68 = (jimUnk0x488*)0x776B68;
 jimDeviceIdentifier* g_pDeviceIdentifiers = (jimDeviceIdentifier*)0x776B68;
 
 MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
@@ -2300,17 +2298,17 @@ __int16 __cdecl sub_44E1E0()
     return result;
 }
 
-//MSG_FUNC_NOT_IMPL(0x0040A347, actor_related_struct *__cdecl (actor_related_struct*, int, int, char *), Actor_Unknown6);
-Actor* __cdecl Actor_Unknown6(Actor* a1, int fn1, int fn2, char *srcFileName)
+//MSG_FUNC_NOT_IMPL(0x0040A347, Actor* __cdecl (Actor*, (void(__cdecl *)(Actor*)), (void(__cdecl *)(Actor*)), char*), Actor_Init);
+Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *fn1)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName)
 {
-    a1->fn_unknown = (void(__cdecl *)(Actor*))fn1;
-    a1->fnUnknown3 = (void(__cdecl *)(Actor*))fn2;
+    a1->fn_unknown = fn1;
+    a1->fnUnknown3 = fn2;
     a1->mNamePtr = srcFileName;
     a1->field_1C = 0;
     a1->field_18 = 0;
     return a1;
 }
-MSG_FUNC_IMPL(0x0040A347, Actor_Unknown6);
+MSG_FUNC_IMPL(0x0040A347, Actor_Init);
 
 //MSG_FUNC_NOT_IMPL(0x0040B36E, int __cdecl(), GetResidentTop);
 int __cdecl GetResidentTop()
@@ -2337,8 +2335,8 @@ void *__cdecl sub_44E12B()
     sub_452610();
     sub_40A68D(98, (int)sub_44E9D2.Ptr());
     sub_44E1E0();
-    Actor_PushBack(1, &stru_722760, 0);
-    Actor_Unknown6(&stru_722760, (int)sub_44E381.Ptr(), 0, "C:\\mgs\\source\\Game\\gamed.c");
+    Actor_PushBack(1, &g_Actor_722760, 0);
+    Actor_Init(&g_Actor_722760, (void(__cdecl*)(Actor*))sub_44E381.Ptr(), 0, "C:\\mgs\\source\\Game\\gamed.c");
 
     unknown_libname_3();
     sub_44E287();
@@ -2389,7 +2387,7 @@ struct PauseKill
 MGS_ARY(1, 0x6507EC, PauseKill, 9, gPauseKills, { { 0, 7 }, { 0, 7 }, { 9, 4 }, { 9, 4 }, { 0xF, 4 }, { 0xF, 4 }, { 0xF, 4 }, { 9, 4 }, { 0, 7 } });
 
 //MSG_FUNC_NOT_IMPL(0x0040A006, void __cdecl(), Actor_Init);
-void __cdecl Actor_Init()
+void __cdecl ActorList_Init()
 {
     ActorList* pActor = gActors;
 
