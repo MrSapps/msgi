@@ -45,84 +45,65 @@ MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVers
 BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef)
 {
     ++nJoystickDeviceObjects;
-    return 1;
+    return DIENUM_CONTINUE;
 }
 
 // 0x0043B0C8
 BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef)
 {
-    BOOL result;
-    unsigned int dwOfs;
-
-    struct Prop
-    {
-        DIPROPHEADER hdr;
-        DWORD field1;
-        DWORD field2;
-    };
     static_assert(sizeof(DIPROPHEADER) == 16, "Wrong DIPROPHEADER size");
-    static_assert(sizeof(Prop) == 24, "Wrong Prop size");
+    static_assert(sizeof(DIPROPRANGE) == 24, "Wrong DIPROPRANGE size");
 
-    Prop p;
-    p.hdr.dwHeaderSize = sizeof(DIPROPHEADER);
+    DIPROPRANGE p = {};
+    p.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    p.diph.dwSize = sizeof(DIPROPRANGE);
+    p.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    p.diph.dwHow = DIPH_BYOFFSET;
+    p.diph.dwObj = lpddoi->dwOfs;
+    p.lMin = -1000;
+    p.lMax  = 1000;
 
-    p.hdr.dwSize = 24;
-    p.hdr.dwHeaderSize = 16;
-    p.hdr.dwHow = 1;
-    p.hdr.dwObj = lpddoi->dwOfs; // 20?
-    p.field1 = -1000;
-    p.field2  = 1000;
-
-    if (pJoystickDevice->SetProperty(DIPROP_RANGE, &p.hdr) >= 0)
+    if (SUCCEEDED(pJoystickDevice->SetProperty(DIPROP_RANGE, &p.diph)))
     {
-        dwOfs = lpddoi->dwOfs;
+        switch (lpddoi->dwOfs)
+        {
+        case 0u:
+            ++dword_71D79C;
+            break;
 
-        // TODO: Should be possible to combine back into 1 switch case
-        if (dwOfs > 16)
-        {
-            switch (dwOfs)
-            {
-            case 20u:
-                ++dword_71D79C;
-                break;
-            case 24u:
-                ++dword_71D79C;
-                break;
-            case 28u:
-                ++dword_71D79C;
-                break;
-            }
-        }
-        else if (dwOfs == 16)
-        {
+        case 4u:
             ++dword_71D79C;
-        }
-        else if (dwOfs)
-        {
-            switch (dwOfs)
-            {
-            case 4u:
-                ++dword_71D79C;
-                break;
-            case 8u:
-                ++dword_71D79C;
-                break;
-            case 12u:
-                ++dword_71D79C;
-                break;
-            }
-        }
-        else
-        {
+            break;
+
+        case 8u:
             ++dword_71D79C;
+            break;
+
+        case 12u:
+            ++dword_71D79C;
+            break;
+
+        case 16u:
+            ++dword_71D79C;
+            break;
+
+        case 20u:
+            ++dword_71D79C;
+            break;
+
+        case 24u:
+            ++dword_71D79C;
+            break;
+
+        case 28u:
+            ++dword_71D79C;
+            break;
         }
-        result = 1;
+
+        return DIENUM_CONTINUE;
     }
-    else
-    {
-        result = 0;
-    }
-    return result;
+    
+    return DIENUM_STOP;
 }
 
 // 0x0043B078
