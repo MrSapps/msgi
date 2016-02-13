@@ -7,6 +7,11 @@
 #include "logger.hpp"
 #include "detours.h"
 
+// Turn off logging unless required, while using a Console Window its much too
+// slow. Need to use something like ImGui and log the output in to the game 
+// rendering itself to be fast enough.
+#define ENABLE_LOGGING 0
+
 bool IsMgsi();
 
 inline std::ostream& operator<<(std::ostream& out, IID id)
@@ -129,6 +134,7 @@ public:
             return mRealFuncPtr(args...);
         }
 
+#if ENABLE_LOGGING
         if (kLogArgs)
         {
             if (!IsMgsi() && !mRealFuncPtr)
@@ -139,6 +145,7 @@ public:
             doPrint(std::cout, args...);
             std::cout << ")" << std::endl;
         }
+#endif
 
         if (kNewAddr)
         {
