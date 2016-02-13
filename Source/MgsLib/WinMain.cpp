@@ -946,7 +946,6 @@ HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
 MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
 MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
 MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
-MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), sub_41E9E0);
 
 MGS_VAR(1, 0x68C3B8, DWORD, dword_68C3B8, 0);
 MGS_VAR(1, 0x775F48, uint8_t, byte_775F48, 0);
@@ -2154,6 +2153,28 @@ struct MGSVertex
 };
 static_assert(sizeof(MGSVertex) == 0x20, "MGSVertex must be of size 0x20");
 
+//MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), SetDDSurfaceTexture);
+HRESULT __cdecl SetDDSurfaceTexture()
+{
+    HRESULT hr;
+
+    if (g_pDDSurface != 0)
+    {
+        if (g_pDDSurface->IsLost() == DDERR_SURFACELOST)
+        {
+            g_pDDSurface->Restore();
+            sub_41E990();
+        }
+        hr = g_pDirect3DDevice->SetTexture(0, g_pDDSurface);
+    }
+    else
+    {
+        hr = g_pDirect3DDevice->SetTexture(0, NULL);
+    }
+
+    return hr;
+}
+
 //MSG_FUNC_NOT_IMPL(0x41E130, int __cdecl(uint32_t, uint32_t, uint32_t*, MGSVertex*), ClearBackBuffer);
 int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
 {
@@ -2185,7 +2206,7 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
 
     // result stored but not used
     // happens a few times in this function, I keep it
-    hr = sub_41E9E0();
+    hr = SetDDSurfaceTexture();
 
     hr = g_pDirect3DDevice->BeginScene();
     if (hr != 0)
