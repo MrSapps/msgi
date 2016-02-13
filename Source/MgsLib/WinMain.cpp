@@ -318,7 +318,7 @@ struct Actor
 {
     Actor* pPrevious;
     Actor* pNext;
-    void(__cdecl *fn_unknown)(Actor*);
+    void(__cdecl *update)(Actor*);
     void(__cdecl *fnUnknown3)(Actor*);
     void(__cdecl *fnUnknown2)(Actor*);
     char* mNamePtr;
@@ -536,13 +536,13 @@ int __cdecl Actor_DumpActorSystem()
         do
         {
             pNextActor = pActorCopy->pNext;
-            if (pActorCopy->fn_unknown)
+            if (pActorCopy->update)
             {
                 if (pActorCopy->field_1C <= 0)
                     v1 = 0;
                 else
                     v1 = 100 * pActorCopy->field_18 / pActorCopy->field_1C;
-                printf("Lv%d %04d.%02d %08X %s\n", i, v1 / 100, v1 % 100, pActorCopy->fn_unknown, pActorCopy->mNamePtr);
+                printf("Lv%d %04d.%02d %08X %s\n", i, v1 / 100, v1 % 100, pActorCopy->update, pActorCopy->mNamePtr);
                 pActorCopy->field_1C = 0;
                 pActorCopy->field_18 = 0;
             }
@@ -2420,9 +2420,9 @@ __int16 __cdecl sub_44E1E0()
 }
 
 //MSG_FUNC_NOT_IMPL(0x0040A347, Actor* __cdecl (Actor*, (void(__cdecl *)(Actor*)), (void(__cdecl *)(Actor*)), char*), Actor_Init);
-Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *fn1)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName)
+Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *update)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName)
 {
-    a1->fn_unknown = fn1;
+    a1->update = update;
     a1->fnUnknown3 = fn2;
     a1->mNamePtr = srcFileName;
     a1->field_1C = 0;
@@ -2470,8 +2470,8 @@ void *__cdecl sub_44E12B()
     return sub_44E226();
 }
 
-//MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_RunActors);
-int __cdecl Actor_RunActors()
+//MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_UpdateActors);
+int __cdecl Actor_UpdateActors()
 {
     int result = 0;
 
@@ -2485,9 +2485,9 @@ int __cdecl Actor_RunActors()
             Actor* pActor = &pActorList->first;
             do
             {
-                if (pActor->fn_unknown)
+                if (pActor->update)
                 {
-                    pActor->fn_unknown(pActor);
+                    pActor->update(pActor);
                 }
                 dword_9942A0 = 0;
                 pActor = pActor->pNext;
@@ -2543,7 +2543,7 @@ Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Act
     a_pActor->pNext = pLast;
     a_pActor->pPrevious = pLastPrevious;
     a_pActor->fnUnknown3 = 0;
-    a_pActor->fn_unknown = 0;
+    a_pActor->update = 0;
     a_pActor->fnUnknown2 = fn;
 
     return a_pActor;
@@ -2590,7 +2590,7 @@ signed int __cdecl Main()
         // HACK: Somtimes the game crashes somewhere deep in here, not calling this seems to prevent the game
         // state from progressing.
         // In software rendering mode when gameover it will crash, but this is an existing bug of the game.
-        Actor_RunActors();
+        Actor_UpdateActors();
     }
     return result;
 }
