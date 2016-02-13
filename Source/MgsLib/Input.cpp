@@ -39,23 +39,22 @@ extern HINSTANCE& gHInstance;
 extern DWORD& gWindowedMode;
 extern HWND& gHwnd;
 extern DWORD& gActive_dword_688CDC;
+extern DWORD& dword_73490C;
+extern DWORD& dword_734908;
 
 MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
 
-DWORD gButtonStates_dword_71D30C[65];
-DWORD gKeyBoardButtonStates_dword_71D204[55];
-
-DWORD dword_721E44;
-DWORD dword_73490C;
-DWORD dword_734908;
-DWORD dword_734910;
-DWORD dword_734914;
-DWORD dword_71D680;
-DWORD dword_71D688;
-DWORD dword_71D684;
-DWORD dword_71D418;
-DWORD dword_71D1EC;
-DWORD dword_657148;
+MGS_ARY(1, 0x71D30C, DWORD, 65, gButtonStates_dword_71D30C, {});
+MGS_ARY(1, 0x71D204, DWORD, 55, gKeyBoardButtonStates_dword_71D204, {});
+MGS_VAR(1, 0x721E44, DWORD, dword_721E44, 0);
+MGS_VAR(1, 0x734910, DWORD, dword_734910, 0);
+MGS_VAR(1, 0x734914, DWORD, dword_734914, 0);
+MGS_VAR(1, 0x71D680, DWORD, dword_71D680, 0);
+MGS_VAR(1, 0x71D688, DWORD, dword_71D688, 0);
+MGS_VAR(1, 0x71D684, DWORD, dword_71D684, 0);
+MGS_VAR(1, 0x71D418, DWORD, dword_71D418, 0);
+MGS_VAR(1, 0x71D1EC, DWORD, dword_71D1EC, 0);
+MGS_VAR(1, 0x657148, DWORD, dword_657148, 0);
 
 // 0x43BD6E
 HRESULT __cdecl Input_Read_43BD6E()
@@ -414,9 +413,7 @@ HRESULT __cdecl Input_Read_43BD6E()
     }
     return 0;
 }
-//MSG_FUNC_IMPL(0x43BD6E, Input_Read_43BD6E);
-// function not yet working..
-MSG_FUNC_NOT_IMPL(0x43BD6E, decltype(Input_Read_43BD6E), Input_Read_43BD6E_)
+MSG_FUNC_IMPL(0x43BD6E, Input_Read_43BD6E);
 
 // 0x0043B0B3
 BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef)
