@@ -196,7 +196,7 @@ MGS_VAR(1, 0x6FC7C0, DWORD, dword_6FC7C0, 0);
 MGS_VAR(1, 0x716F6C, DWORD, dword_716F6C, 0);
 MGS_VAR(1, 0x6FC7C4, DWORD, dword_6FC7C4, 0);
 MGS_VAR(1, 0x651D94, DWORD, dword_651D94, 0);
-MGS_VAR(1, 0x6FC79C, DWORD, dword_6FC79C, 0);
+MGS_VAR(1, 0x6FC79C, DWORD, g_surface565Mode, 0);
 MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
 MGS_VAR(1, 0x776B68, char *, unk_776B68, nullptr);
 MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
@@ -946,6 +946,7 @@ HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
 MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
 MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
 MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
+MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), sub_41E9E0);
 
 MGS_VAR(1, 0x68C3B8, DWORD, dword_68C3B8, 0);
 MGS_VAR(1, 0x775F48, uint8_t, byte_775F48, 0);
@@ -1887,8 +1888,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             if (hr || (v1 = dxCaps.dwCaps2, !(v1 & 0x20000)))
                 dword_6FC7C4 = 0;
         }
-        dword_6FC79C = sub_41D1D0();
-        //mgs_fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
+        g_surface565Mode = sub_41D1D0();
+        //mgs_fprintf(gFile, "565 mode = %i\n", g_surface565Mode);
         if (gSoftwareRendering)
             break;
         dxSurfaceDesc.dwSize = 124;
@@ -2139,6 +2140,91 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 }
 //MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
+#define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
+struct MGSVertex
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    DWORD diffuse;
+    DWORD specular;
+    float u;
+    float v;
+};
+static_assert(sizeof(MGSVertex) == 0x20, "MGSVertex must be of size 0x20");
+
+//MSG_FUNC_NOT_IMPL(0x41E130, int __cdecl(uint32_t, uint32_t, uint32_t*, MGSVertex*), ClearBackBuffer);
+int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
+{
+    HRESULT hr;
+    Sleep(500);
+
+    if (g_surface565Mode != 0)
+    {
+        a_ClearColor = ((a_ClearColor & 0xF8) >> 3) | ((a_ClearColor & 0xFC00) >> 5) | ((a_ClearColor & 0xF80000) >> 8);
+    }
+    else
+    {
+        a_ClearColor = ((a_ClearColor & 0xF8) >> 3) | ((a_ClearColor & 0xF800) >> 6) | ((a_ClearColor & 0xF80000) >> 9) | ((a_ClearColor & 0x80000000) >> 16);
+    }
+
+    DDBLTFX bltFX;
+    bltFX.dwSize = sizeof(DDBLTFX);
+    bltFX.dwFillColor = a_ClearColor;
+    
+    do {
+        hr = g_pBackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
+    } while (hr == DDERR_WASSTILLDRAWING);
+    if (hr != 0)
+        return 0;
+
+    a_pVertices[2].diffuse = a_DiffuseColor;
+    a_pVertices[1].diffuse = a_DiffuseColor;
+    a_pVertices[0].diffuse = a_DiffuseColor;
+
+    // result stored but not used
+    // happens a few times in this function, I keep it
+    hr = sub_41E9E0();
+
+    hr = g_pDirect3DDevice->BeginScene();
+    if (hr != 0)
+        return 0;
+
+    hr = g_pDirect3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, MGSVERTEX_DEF, a_pVertices, 3, 0);
+    hr = g_pDirect3DDevice->SetTexture(0, NULL);
+    if (hr != 0)
+        return 0;
+
+    hr = g_pDirect3DDevice->EndScene();
+    if (hr != 0)
+        return 0;
+
+    DDSURFACEDESC2 ddDesc;
+    memset(&ddDesc, 0, sizeof(DDSURFACEDESC2));
+    ddDesc.dwSize = sizeof(DDSURFACEDESC2);
+
+    do {
+        hr = g_pBackBuffer->Lock(NULL, &ddDesc, 0, 0);
+    } while (hr == DDERR_WASSTILLDRAWING);
+    if (hr != 0)
+        return 0;
+
+    WORD wFirstPixel = ((WORD*)ddDesc.lpSurface)[0];
+    g_pBackBuffer->Unlock(NULL);
+
+    *pFirstPixel = 0;
+    if (g_surface565Mode != 0)
+    {
+        *pFirstPixel = ((wFirstPixel & 0xF800) << 8) | ((wFirstPixel & 0x07E0) << 5) | ((wFirstPixel & 0x001F) << 3);
+    }
+    else
+    {
+        *pFirstPixel = ((wFirstPixel & 0x7C00) << 9) | ((wFirstPixel & 0x03E0) << 6) | ((wFirstPixel & 0x001F) << 3);
+    }
+    return 1;
+}
+
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
@@ -2290,12 +2376,8 @@ int __cdecl sub_40A68D(int number, int fn)
 //MSG_FUNC_NOT_IMPL(0x44E1E0, __int16 __cdecl(), sub_44E1E0);
 __int16 __cdecl sub_44E1E0()
 {
-    __int16 result; // ax@1
-
-    word_78E7FC = -1;
-    result = word_78E7FC;
-    word_78E7FE = word_78E7FC;
-    return result;
+    word_78E7FE = word_78E7FC = -1;
+    return -1;
 }
 
 //MSG_FUNC_NOT_IMPL(0x0040A347, Actor* __cdecl (Actor*, (void(__cdecl *)(Actor*)), (void(__cdecl *)(Actor*)), char*), Actor_Init);
@@ -2386,7 +2468,7 @@ struct PauseKill
 
 MGS_ARY(1, 0x6507EC, PauseKill, 9, gPauseKills, { { 0, 7 }, { 0, 7 }, { 9, 4 }, { 9, 4 }, { 0xF, 4 }, { 0xF, 4 }, { 0xF, 4 }, { 9, 4 }, { 0, 7 } });
 
-//MSG_FUNC_NOT_IMPL(0x0040A006, void __cdecl(), Actor_Init);
+//MSG_FUNC_NOT_IMPL(0x0040A006, void __cdecl(), ActorList_Init);
 void __cdecl ActorList_Init()
 {
     ActorList* pActor = gActors;
