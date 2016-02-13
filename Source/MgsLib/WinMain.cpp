@@ -131,7 +131,6 @@ MSG_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), sub_41D1D0);
 MSG_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), sub_41D420);
 MSG_FUNC_NOT_IMPL(0x0041E3C0, int __cdecl(), sub_41E3C0);
 MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), sub_41E730);
-MSG_FUNC_NOT_IMPL(0x0041E990, bool __cdecl(), sub_41E990);
 MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_Unknown1);
 MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), sub_422BC0);
 MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
@@ -1394,6 +1393,25 @@ int __cdecl jim_enumerate_devices()
     return 0;
 }
 
+//MSG_FUNC_NOT_IMPL(0x41E990, int __cdecl(), ClearDDSurfaceWhite);
+int __cdecl ClearDDSurfaceWhite()
+{
+    HRESULT hr;
+
+    DDBLTFX bltFX;
+    bltFX.dwSize = sizeof(DDBLTFX);
+    bltFX.dwFillColor = 0xFFFF;
+
+    do {
+        hr = g_pBackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
+    } while (hr == DDERR_WASSTILLDRAWING);
+
+    if (hr != 0)
+        return 0;
+
+    return 1;
+}
+
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -1939,7 +1957,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 }
                 else
                 {
-                    if (!sub_41E990())
+                    if (!ClearDDSurfaceWhite())
                     {
                         g_pDDSurface->Release();
                         g_pDDSurface = 0;
@@ -2163,7 +2181,7 @@ HRESULT __cdecl SetDDSurfaceTexture()
         if (g_pDDSurface->IsLost() == DDERR_SURFACELOST)
         {
             g_pDDSurface->Restore();
-            sub_41E990();
+            ClearDDSurfaceWhite();
         }
         hr = g_pDirect3DDevice->SetTexture(0, g_pDDSurface);
     }
