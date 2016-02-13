@@ -13,7 +13,8 @@ MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
 MGS_VAR(1, 0x64DA88, DIDATAFORMAT, JoystickDataFormat, {});
 MGS_VAR(1, 0x64DA70, DIDATAFORMAT, MouseDataFormat, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
-DWORD* dword_6571F4 = (DWORD*)0x6571F4; // TODO: Array?
+MGS_ARY(1, 0x6571F4, DWORD, 14, dword_6571F4, {});// TODO: Check 14 is big enough
+
 char* sidewinderEtc = (char*)0x657298; // TODO: Dump array
 GUID& IID_IDirectInput7A_MGS = *((GUID*)0x64B028); // TODO: Use DxGuid
 GUID& GUID_SysMouse_MGS = *((GUID*)0x64AEE8); // TODO: Use DxGuid
@@ -24,7 +25,7 @@ MGS_VAR(1, 0x71D68C, DWORD, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
 MGS_VAR(1, 0x71D670, DWORD, dword_71D670, 0);
 MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
-MGS_VAR(1, 0x71D798, DWORD, dword_71D798, 0);
+MGS_VAR(1, 0x71D798, DWORD, gJoyStickId_dword_71D798, 0);
 MGS_VAR(1, 0x71D41C, DWORD, dword_71D41C, 0);
 MGS_ARY(1, 0x65714C, DWORD, 14, dword_65714C, {});
 MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, {});
@@ -44,84 +45,65 @@ MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVers
 BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef)
 {
     ++nJoystickDeviceObjects;
-    return 1;
+    return DIENUM_CONTINUE;
 }
 
 // 0x0043B0C8
 BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef)
 {
-    BOOL result;
-    unsigned int dwOfs;
-
-    struct Prop
-    {
-        DIPROPHEADER hdr;
-        DWORD field1;
-        DWORD field2;
-    };
     static_assert(sizeof(DIPROPHEADER) == 16, "Wrong DIPROPHEADER size");
-    static_assert(sizeof(Prop) == 24, "Wrong Prop size");
+    static_assert(sizeof(DIPROPRANGE) == 24, "Wrong DIPROPRANGE size");
 
-    Prop p;
-    p.hdr.dwHeaderSize = sizeof(DIPROPHEADER);
+    DIPROPRANGE p = {};
+    p.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    p.diph.dwSize = sizeof(DIPROPRANGE);
+    p.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+    p.diph.dwHow = DIPH_BYOFFSET;
+    p.diph.dwObj = lpddoi->dwOfs;
+    p.lMin = -1000;
+    p.lMax  = 1000;
 
-    p.hdr.dwSize = 24;
-    p.hdr.dwHeaderSize = 16;
-    p.hdr.dwHow = 1;
-    p.hdr.dwObj = lpddoi->dwOfs; // 20?
-    p.field1 = -1000;
-    p.field2  = 1000;
-
-    if (pJoystickDevice->SetProperty(DIPROP_RANGE, &p.hdr) >= 0)
+    if (SUCCEEDED(pJoystickDevice->SetProperty(DIPROP_RANGE, &p.diph)))
     {
-        dwOfs = lpddoi->dwOfs;
+        switch (lpddoi->dwOfs)
+        {
+        case 0u:
+            ++dword_71D79C;
+            break;
 
-        // TODO: Should be possible to combine back into 1 switch case
-        if (dwOfs > 16)
-        {
-            switch (dwOfs)
-            {
-            case 20u:
-                ++dword_71D79C;
-                break;
-            case 24u:
-                ++dword_71D79C;
-                break;
-            case 28u:
-                ++dword_71D79C;
-                break;
-            }
-        }
-        else if (dwOfs == 16)
-        {
+        case 4u:
             ++dword_71D79C;
-        }
-        else if (dwOfs)
-        {
-            switch (dwOfs)
-            {
-            case 4u:
-                ++dword_71D79C;
-                break;
-            case 8u:
-                ++dword_71D79C;
-                break;
-            case 12u:
-                ++dword_71D79C;
-                break;
-            }
-        }
-        else
-        {
+            break;
+
+        case 8u:
             ++dword_71D79C;
+            break;
+
+        case 12u:
+            ++dword_71D79C;
+            break;
+
+        case 16u:
+            ++dword_71D79C;
+            break;
+
+        case 20u:
+            ++dword_71D79C;
+            break;
+
+        case 24u:
+            ++dword_71D79C;
+            break;
+
+        case 28u:
+            ++dword_71D79C;
+            break;
         }
-        result = 1;
+
+        return DIENUM_CONTINUE;
     }
-    else
-    {
-        result = 0;
-    }
-    return result;
+    
+    return DIENUM_STOP;
 }
 
 // 0x0043B078
@@ -223,7 +205,7 @@ int __cdecl Input_Init(HWND hWnd)
 
                                         dword_71D790 = 1;
                                         dword_71D41C = dword_65726C[i * 2];
-                                        dword_71D798 = i + 1;
+                                        gJoyStickId_dword_71D798 = i + 1;
 
                                         for (int nButton = 0; nButton < 0x38; nButton++)
                                         {
@@ -243,7 +225,7 @@ int __cdecl Input_Init(HWND hWnd)
                                     dword_657184[i] = 0;
                                 }
                             }
-                            if (dword_71D798 == 5)
+                            if (gJoyStickId_dword_71D798 == 5)
                             {
                                 for (int i = 0; i < 14; i++)
                                 {
@@ -269,7 +251,7 @@ int __cdecl Input_Init(HWND hWnd)
                                     dword_65714C[i] = dword_657184[i];
                                 }
                             }
-                            else if (dword_71D798 != 1 && dword_71D798 != 4)
+                            else if (gJoyStickId_dword_71D798 != 1 && gJoyStickId_dword_71D798 != 4)
                             {
                                 for (int i = 0; i < 14; i++)
                                 {
