@@ -234,7 +234,6 @@ __int16 __cdecl Render_RestoreAll()
                 const HRESULT hr = gTextures_dword_6C0F00[i].mSurface->Restore();
                 if (hr)
                 {
-                    // TODO: Bug, i will be treated as DD HR err
                     PrintDDError("tex #%i restore caput", i);
                 }
             }
