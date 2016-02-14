@@ -409,24 +409,24 @@ struct Actor
 static_assert(sizeof(Actor) == 0x20, "Actor should be 0x20");
 
 // TODO: Could be linked list header?
-struct struct8
+struct struct_8
 {
     DWORD field_0;
     DWORD field_4;
 };
-static_assert(sizeof(struct8) == 0x8, "struct8 should be 0x8");
+static_assert(sizeof(struct_8) == 0x8, "struct_8 should be 0x8");
 
 struct struct_lib_gvd
 {
     Actor mActor;
     DWORD field_6BFF00;
     DWORD field_6BFF04;
-    struct8* struct_8_ptr_6BFF08;
+    struct_8* struct_8_ptr_6BFF08;
     DWORD field_6BFF0C[26];
-    struct8* struct_8_ptr_6BFF74;
-    struct8* struct_8_ptr_6BFF78;
+    struct_8* struct_8_ptr_6BFF74;
+    struct_8* struct_8_ptr_6BFF78;
     DWORD pad_field_6BFF7C;
-    struct8 mStruct8_128Array_06BFF80[128];
+    struct_8 mStruct8_128Array_06BFF80[128];
     DWORD field_6C0380;
     DWORD field_6C0384;
     DWORD field_6C0388[6];
@@ -444,6 +444,15 @@ void __cdecl LibGvd_sub_40A69D()
     memset(g_lib_gvd_stru_6BFEE0.field_6BFF0C, 0, sizeof(g_lib_gvd_stru_6BFEE0.field_6BFF0C));
 }
 MSG_FUNC_IMPL(0x40A69D, LibGvd_sub_40A69D);
+
+// Other likely LibGvd funcs
+MSG_FUNC_NOT_IMPL(0x40A77F, int __cdecl(int, signed int, int), LibGvd_sub_40A77F);
+MSG_FUNC_NOT_IMPL(0x40A72A, struct_8 *__cdecl(), LibGvd_sub_40A72A);
+MSG_FUNC_NOT_IMPL(0x40A6CD, char* __cdecl(), LibGvd_sub_40A6CD);
+MSG_FUNC_NOT_IMPL(0x40A6AC, struct_8 *__cdecl(), LibGvd_128_inits_sub_40A6AC);
+MSG_FUNC_NOT_IMPL(0x40A662, signed int __cdecl(int, int), LibGvd_sub_40A662);
+MSG_FUNC_NOT_IMPL(0x40A618, struct_8 *__cdecl(int), LibGvd_sub_40A618);
+MSG_FUNC_NOT_IMPL(0x40A603, int __cdecl(int), LibGvd_sub_40A603);
 
 
 struct ActorList
