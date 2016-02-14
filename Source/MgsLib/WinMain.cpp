@@ -123,16 +123,15 @@ MSG_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
 MSG_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
 MSG_FUNC_NOT_IMPL(0x00422D40, char *__cdecl(char*, signed int), PrintDDError);
 MSG_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
-MSG_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), sub_41CA80);
-MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), sub_41CC30);
-MSG_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), sub_41CD70);
-MSG_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), sub_41CE20);
-MSG_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), sub_41D1D0);
-MSG_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), sub_41D420);
-MSG_FUNC_NOT_IMPL(0x0041E3C0, int __cdecl(), sub_41E3C0);
-MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), sub_41E730);
-MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_Unknown1);
-MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), sub_422BC0);
+MSG_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), Render_TextureScratchAlloc);
+MSG_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
+MSG_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
+MSG_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
+MSG_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
+MSG_FUNC_NOT_IMPL(0x0041E3C0, int __cdecl(), Render_sub_41E3C0);
+MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
+MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_SetRenderState);
+MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Render_InitTextureStages);
 MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
@@ -202,6 +201,49 @@ MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
 MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 MGS_VAR(1, 0x72279C, DWORD, dword_72279C, 0);
+MGS_VAR(1, 0x6FC78C, WORD, gNumTextures_word_6FC78C, 0);
+
+
+//MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), Render_RestoreAll);
+__int16 __cdecl Render_RestoreAll()
+{
+    if (g_pPrimarySurface->IsLost() == DDERR_SURFACELOST)
+    {
+        const HRESULT hr = g_pPrimarySurface->Restore();
+        if (FAILED(hr))
+        {
+            PrintDDError("Prim restore caput", hr);
+        }
+    }
+
+    if (g_pBackBuffer->IsLost() == DDERR_SURFACELOST)
+    {
+        const HRESULT hr = g_pBackBuffer->Restore();
+        if (FAILED(hr))
+        {
+            PrintDDError("Ren restore caput", hr);
+        }
+    }
+
+    for (int i = 0; i < gNumTextures_word_6FC78C; i++)
+    {
+        if (gTextures_dword_6C0F00[i].mSurface)
+        {
+            if (gTextures_dword_6C0F00[i].mSurface->IsLost() == DDERR_SURFACELOST)
+            {
+                const HRESULT hr = gTextures_dword_6C0F00[i].mSurface->Restore();
+                if (hr)
+                {
+                    // TODO: Bug, i will be treated as DD HR err
+                    PrintDDError("tex #%i restore caput", i);
+                }
+            }
+        }
+    }
+
+    return gNumTextures_word_6FC78C;
+}
+MSG_FUNC_IMPL(0x0041CC30, Render_RestoreAll);
 
 //MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
 int __cdecl HandleExclusiveMode()
@@ -1743,7 +1785,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         MakeFonts();
         if (dword_651CF8)
         {
-            sub_41CD70();
+            Render_sub_41CD70();
             Sleep(0x7D0u);
         }
         if (gWindowedMode)
@@ -1786,7 +1828,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             {
                 mgs_fputs("Testing software render speed to system and to video surface\n", gFile);
                 mgs_fflush(gFile);
-                if (sub_41CE20())
+                if (Render_sub_41CE20())
                 {
                     mgs_fputs(" . rendering to video surface is faster\n", gFile);
                     mgs_fflush(gFile);
@@ -1869,7 +1911,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         mgs_fputs("Restoring surfaces...\n", gFile);
         mgs_fflush(gFile);
-        sub_41CC30();
+        Render_RestoreAll();
         if (hr)
         {
             mgs_fputs(" . fail\n", gFile);
@@ -1905,7 +1947,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             if (hr || (v1 = dxCaps.dwCaps2, !(v1 & 0x20000)))
                 dword_6FC7C4 = 0;
         }
-        g_surface565Mode = sub_41D1D0();
+        g_surface565Mode = Render_sub_41D1D0();
         //mgs_fprintf(gFile, "565 mode = %i\n", g_surface565Mode);
         if (gSoftwareRendering)
             break;
@@ -1927,8 +1969,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
-            Render_Unknown1(22, 1);
-            Render_Unknown1(26, 0);
+            Render_SetRenderState(22, 1);
+            Render_SetRenderState(26, 0);
             if (!gSoftwareRendering)
             {
 
@@ -1964,33 +2006,33 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     }
                 }
             }
-            sub_422BC0(0, 2, 2);
-            sub_422BC0(0, 1, 4);
-            sub_422BC0(0, 3, 0);
-            sub_422BC0(0, 5, 2);
-            sub_422BC0(0, 4, 4);
-            sub_422BC0(0, 6, 0);
-            if (sub_41E3C0())
+            Render_InitTextureStages(0, 2, 2);
+            Render_InitTextureStages(0, 1, 4);
+            Render_InitTextureStages(0, 3, 0);
+            Render_InitTextureStages(0, 5, 2);
+            Render_InitTextureStages(0, 4, 4);
+            Render_InitTextureStages(0, 6, 0);
+            if (Render_sub_41E3C0())
             {
                 mgs_fprintf(gFile, "Blend modes = %i \n", gBlendMode);
                 mgs_fprintf(gFile, "Alpha modulate = %i \n", dword_6FC798);
-                gColourKey = sub_41E730();
+                gColourKey = Render_sub_41E730();
                 mgs_fprintf(gFile, "ColorKey = %i\n", gColourKey);
-                sub_422BC0(0, 12, 3);
+                Render_InitTextureStages(0, 12, 3);
                 if (gModX2 == 2)
-                    gModX2 = sub_41D420();
+                    gModX2 =  Render_sub_41D420();
                 mgs_fprintf(gFile, "MODULATE2X = %i \n", gModX2);
                 if (gColourKey)
                 {
-                    Render_Unknown1(41, 1);
+                    Render_SetRenderState(41, 1);
                 }
                 else
                 {
-                    Render_Unknown1(15, 1);
-                    Render_Unknown1(24, 127);
-                    Render_Unknown1(25, 7);
+                    Render_SetRenderState(15, 1);
+                    Render_SetRenderState(24, 127);
+                    Render_SetRenderState(25, 7);
                 }
-                Render_Unknown1(26, 1);
+                Render_SetRenderState(26, 1);
                 if (dword_651CF8)
                 {
                     if (gLowRes != gLowRes)
@@ -2102,7 +2144,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gTextures_dword_6C0F00[i].field_24 = 0;
     }
     
-    dword_6FC7C0 = sub_41CA80() == 0;
+    dword_6FC7C0 = Render_TextureScratchAlloc() == 0;
     if (dword_6FC7C0)
     {
         gNoEffects = 0;
