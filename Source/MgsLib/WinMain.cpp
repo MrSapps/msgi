@@ -450,7 +450,6 @@ MSG_FUNC_NOT_IMPL(0x40A77F, int __cdecl(int, signed int, int), LibGvd_sub_40A77F
 MSG_FUNC_NOT_IMPL(0x40A72A, struct_8 *__cdecl(), LibGvd_sub_40A72A);
 MSG_FUNC_NOT_IMPL(0x40A6CD, char* __cdecl(), LibGvd_sub_40A6CD);
 MSG_FUNC_NOT_IMPL(0x40A6AC, struct_8 *__cdecl(), LibGvd_128_inits_sub_40A6AC);
-MSG_FUNC_NOT_IMPL(0x40A662, signed int __cdecl(int, int), LibGvd_sub_40A662);
 MSG_FUNC_NOT_IMPL(0x40A618, struct_8 *__cdecl(int), LibGvd_sub_40A618);
 MSG_FUNC_NOT_IMPL(0x40A603, int __cdecl(int), LibGvd_sub_40A603);
 
@@ -2542,6 +2541,19 @@ int __cdecl LibGvd_SetFnPtr_sub_40A68D(int number, int fn)
     return fn;
 }
 MSG_FUNC_IMPL(0x40A68D, LibGvd_SetFnPtr_sub_40A68D);
+
+signed int __cdecl LibGvd_sub_40A662(int a1, int a2)
+{
+    if (!LibGvd_sub_40A618(a1) && g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08 != 0)
+    {
+        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->field_0 = a1;
+        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->field_4 = a2;
+        return 0;
+    }
+    return -1;
+}
+MSG_FUNC_IMPL(0x40A662, LibGvd_sub_40A662);
+
 
 //MSG_FUNC_NOT_IMPL(0x44E1E0, __int16 __cdecl(), sub_44E1E0);
 __int16 __cdecl sub_44E1E0()
