@@ -131,7 +131,6 @@ MSG_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), sub_41D1D0);
 MSG_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), sub_41D420);
 MSG_FUNC_NOT_IMPL(0x0041E3C0, int __cdecl(), sub_41E3C0);
 MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), sub_41E730);
-MSG_FUNC_NOT_IMPL(0x0041E990, bool __cdecl(), sub_41E990);
 MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_Unknown1);
 MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), sub_422BC0);
 MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
@@ -196,7 +195,7 @@ MGS_VAR(1, 0x6FC7C0, DWORD, dword_6FC7C0, 0);
 MGS_VAR(1, 0x716F6C, DWORD, dword_716F6C, 0);
 MGS_VAR(1, 0x6FC7C4, DWORD, dword_6FC7C4, 0);
 MGS_VAR(1, 0x651D94, DWORD, dword_651D94, 0);
-MGS_VAR(1, 0x6FC79C, DWORD, dword_6FC79C, 0);
+MGS_VAR(1, 0x6FC79C, DWORD, g_surface565Mode, 0);
 MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
 MGS_VAR(1, 0x776B68, char *, unk_776B68, nullptr);
 MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
@@ -319,7 +318,7 @@ struct Actor
 {
     Actor* pPrevious;
     Actor* pNext;
-    void(__cdecl *fn_unknown)(Actor*);
+    void(__cdecl *update)(Actor*);
     void(__cdecl *fnUnknown3)(Actor*);
     void(__cdecl *fnUnknown2)(Actor*);
     char* mNamePtr;
@@ -537,13 +536,13 @@ int __cdecl Actor_DumpActorSystem()
         do
         {
             pNextActor = pActorCopy->pNext;
-            if (pActorCopy->fn_unknown)
+            if (pActorCopy->update)
             {
                 if (pActorCopy->field_1C <= 0)
                     v1 = 0;
                 else
                     v1 = 100 * pActorCopy->field_18 / pActorCopy->field_1C;
-                printf("Lv%d %04d.%02d %08X %s\n", i, v1 / 100, v1 % 100, pActorCopy->fn_unknown, pActorCopy->mNamePtr);
+                printf("Lv%d %04d.%02d %08X %s\n", i, v1 / 100, v1 % 100, pActorCopy->update, pActorCopy->mNamePtr);
                 pActorCopy->field_1C = 0;
                 pActorCopy->field_18 = 0;
             }
@@ -1394,6 +1393,25 @@ int __cdecl jim_enumerate_devices()
     return 0;
 }
 
+//MSG_FUNC_NOT_IMPL(0x41E990, int __cdecl(), ClearDDSurfaceWhite);
+int __cdecl ClearDDSurfaceWhite()
+{
+    HRESULT hr;
+
+    DDBLTFX bltFX;
+    bltFX.dwSize = sizeof(DDBLTFX);
+    bltFX.dwFillColor = 0xFFFF;
+
+    do {
+        hr = g_pBackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
+    } while (hr == DDERR_WASSTILLDRAWING);
+
+    if (hr != 0)
+        return 0;
+
+    return 1;
+}
+
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -1887,8 +1905,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             if (hr || (v1 = dxCaps.dwCaps2, !(v1 & 0x20000)))
                 dword_6FC7C4 = 0;
         }
-        dword_6FC79C = sub_41D1D0();
-        //mgs_fprintf(gFile, "565 mode = %i\n", dword_6FC79C);
+        g_surface565Mode = sub_41D1D0();
+        //mgs_fprintf(gFile, "565 mode = %i\n", g_surface565Mode);
         if (gSoftwareRendering)
             break;
         dxSurfaceDesc.dwSize = 124;
@@ -1939,7 +1957,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 }
                 else
                 {
-                    if (!sub_41E990())
+                    if (!ClearDDSurfaceWhite())
                     {
                         g_pDDSurface->Release();
                         g_pDDSurface = 0;
@@ -2139,6 +2157,113 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 }
 //MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
+#define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
+struct MGSVertex
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    DWORD diffuse;
+    DWORD specular;
+    float u;
+    float v;
+};
+static_assert(sizeof(MGSVertex) == 0x20, "MGSVertex must be of size 0x20");
+
+//MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), SetDDSurfaceTexture);
+HRESULT __cdecl SetDDSurfaceTexture()
+{
+    HRESULT hr;
+
+    if (g_pDDSurface != 0)
+    {
+        if (g_pDDSurface->IsLost() == DDERR_SURFACELOST)
+        {
+            g_pDDSurface->Restore();
+            ClearDDSurfaceWhite();
+        }
+        hr = g_pDirect3DDevice->SetTexture(0, g_pDDSurface);
+    }
+    else
+    {
+        hr = g_pDirect3DDevice->SetTexture(0, NULL);
+    }
+
+    return hr;
+}
+
+//MSG_FUNC_NOT_IMPL(0x41E130, int __cdecl(uint32_t, uint32_t, uint32_t*, MGSVertex*), ClearBackBuffer);
+int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
+{
+    HRESULT hr;
+    Sleep(500);
+
+    if (g_surface565Mode != 0)
+    {
+        a_ClearColor = ((a_ClearColor & 0xF8) >> 3) | ((a_ClearColor & 0xFC00) >> 5) | ((a_ClearColor & 0xF80000) >> 8);
+    }
+    else
+    {
+        a_ClearColor = ((a_ClearColor & 0xF8) >> 3) | ((a_ClearColor & 0xF800) >> 6) | ((a_ClearColor & 0xF80000) >> 9) | ((a_ClearColor & 0x80000000) >> 16);
+    }
+
+    DDBLTFX bltFX;
+    bltFX.dwSize = sizeof(DDBLTFX);
+    bltFX.dwFillColor = a_ClearColor;
+    
+    do {
+        hr = g_pBackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
+    } while (hr == DDERR_WASSTILLDRAWING);
+    if (hr != 0)
+        return 0;
+
+    a_pVertices[2].diffuse = a_DiffuseColor;
+    a_pVertices[1].diffuse = a_DiffuseColor;
+    a_pVertices[0].diffuse = a_DiffuseColor;
+
+    // result stored but not used
+    // happens a few times in this function, I keep it
+    hr = SetDDSurfaceTexture();
+
+    hr = g_pDirect3DDevice->BeginScene();
+    if (hr != 0)
+        return 0;
+
+    hr = g_pDirect3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, MGSVERTEX_DEF, a_pVertices, 3, 0);
+    hr = g_pDirect3DDevice->SetTexture(0, NULL);
+    if (hr != 0)
+        return 0;
+
+    hr = g_pDirect3DDevice->EndScene();
+    if (hr != 0)
+        return 0;
+
+    DDSURFACEDESC2 ddDesc;
+    memset(&ddDesc, 0, sizeof(DDSURFACEDESC2));
+    ddDesc.dwSize = sizeof(DDSURFACEDESC2);
+
+    do {
+        hr = g_pBackBuffer->Lock(NULL, &ddDesc, 0, 0);
+    } while (hr == DDERR_WASSTILLDRAWING);
+    if (hr != 0)
+        return 0;
+
+    WORD wFirstPixel = ((WORD*)ddDesc.lpSurface)[0];
+    g_pBackBuffer->Unlock(NULL);
+
+    *pFirstPixel = 0;
+    if (g_surface565Mode != 0)
+    {
+        *pFirstPixel = ((wFirstPixel & 0xF800) << 8) | ((wFirstPixel & 0x07E0) << 5) | ((wFirstPixel & 0x001F) << 3);
+    }
+    else
+    {
+        *pFirstPixel = ((wFirstPixel & 0x7C00) << 9) | ((wFirstPixel & 0x03E0) << 6) | ((wFirstPixel & 0x001F) << 3);
+    }
+    return 1;
+}
+
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
@@ -2290,18 +2415,14 @@ int __cdecl sub_40A68D(int number, int fn)
 //MSG_FUNC_NOT_IMPL(0x44E1E0, __int16 __cdecl(), sub_44E1E0);
 __int16 __cdecl sub_44E1E0()
 {
-    __int16 result; // ax@1
-
-    word_78E7FC = -1;
-    result = word_78E7FC;
-    word_78E7FE = word_78E7FC;
-    return result;
+    word_78E7FE = word_78E7FC = -1;
+    return -1;
 }
 
 //MSG_FUNC_NOT_IMPL(0x0040A347, Actor* __cdecl (Actor*, (void(__cdecl *)(Actor*)), (void(__cdecl *)(Actor*)), char*), Actor_Init);
-Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *fn1)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName)
+Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *update)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName)
 {
-    a1->fn_unknown = fn1;
+    a1->update = update;
     a1->fnUnknown3 = fn2;
     a1->mNamePtr = srcFileName;
     a1->field_1C = 0;
@@ -2349,8 +2470,8 @@ void *__cdecl sub_44E12B()
     return sub_44E226();
 }
 
-//MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_RunActors);
-int __cdecl Actor_RunActors()
+//MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_UpdateActors);
+int __cdecl Actor_UpdateActors()
 {
     int result = 0;
 
@@ -2364,9 +2485,9 @@ int __cdecl Actor_RunActors()
             Actor* pActor = &pActorList->first;
             do
             {
-                if (pActor->fn_unknown)
+                if (pActor->update)
                 {
-                    pActor->fn_unknown(pActor);
+                    pActor->update(pActor);
                 }
                 dword_9942A0 = 0;
                 pActor = pActor->pNext;
@@ -2386,7 +2507,7 @@ struct PauseKill
 
 MGS_ARY(1, 0x6507EC, PauseKill, 9, gPauseKills, { { 0, 7 }, { 0, 7 }, { 9, 4 }, { 9, 4 }, { 0xF, 4 }, { 0xF, 4 }, { 0xF, 4 }, { 9, 4 }, { 0, 7 } });
 
-//MSG_FUNC_NOT_IMPL(0x0040A006, void __cdecl(), Actor_Init);
+//MSG_FUNC_NOT_IMPL(0x0040A006, void __cdecl(), ActorList_Init);
 void __cdecl ActorList_Init()
 {
     ActorList* pActor = gActors;
@@ -2422,7 +2543,7 @@ Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Act
     a_pActor->pNext = pLast;
     a_pActor->pPrevious = pLastPrevious;
     a_pActor->fnUnknown3 = 0;
-    a_pActor->fn_unknown = 0;
+    a_pActor->update = 0;
     a_pActor->fnUnknown2 = fn;
 
     return a_pActor;
@@ -2469,7 +2590,7 @@ signed int __cdecl Main()
         // HACK: Somtimes the game crashes somewhere deep in here, not calling this seems to prevent the game
         // state from progressing.
         // In software rendering mode when gameover it will crash, but this is an existing bug of the game.
-        Actor_RunActors();
+        Actor_UpdateActors();
     }
     return result;
 }
