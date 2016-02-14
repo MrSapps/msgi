@@ -2698,13 +2698,6 @@ void ShutdownEngine()
     }
 }
 
-void Test()
-{
-    PrintDDError("blah ", 2);
-    PrintDDError("Prim restore caput", DDERR_SURFACELOST);
-    PrintDDError("tex #%i restore caput", DDERR_SURFACELOST);
-    abort();
-}
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
@@ -2721,8 +2714,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
 
     SoundCpp_ForceLink();
     SoundCpp_Debug();
-    Test();
-
+ 
     if (IsMgsi())
     {
         InstallVaradicCFunctionHooks();
