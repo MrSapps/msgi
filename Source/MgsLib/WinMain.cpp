@@ -408,6 +408,44 @@ struct Actor
 };
 static_assert(sizeof(Actor) == 0x20, "Actor should be 0x20");
 
+// TODO: Could be linked list header?
+struct struct8
+{
+    DWORD field_0;
+    DWORD field_4;
+};
+static_assert(sizeof(struct8) == 0x8, "struct8 should be 0x8");
+
+struct struct_lib_gvd
+{
+    Actor mActor;
+    DWORD field_6BFF00;
+    DWORD field_6BFF04;
+    struct8* struct_8_ptr_6BFF08;
+    DWORD field_6BFF0C[26];
+    struct8* struct_8_ptr_6BFF74;
+    struct8* struct_8_ptr_6BFF78;
+    DWORD pad_field_6BFF7C;
+    struct8 mStruct8_128Array_06BFF80[128];
+    DWORD field_6C0380;
+    DWORD field_6C0384;
+    DWORD field_6C0388[6];
+    DWORD field_6C03A0;
+    DWORD field_6C03A4;
+    DWORD field_6C03B0[81];
+};
+// TODO: This is actually probably bigger!
+static_assert(sizeof(struct_lib_gvd) == 0x60C, "struct_lib_gvd should be 0x60C");
+
+MGS_VAR(1, 0x6BFEE0, struct_lib_gvd, g_lib_gvd_stru_6BFEE0, {});
+
+void __cdecl LibGvd_sub_40A69D()
+{
+    memset(g_lib_gvd_stru_6BFEE0.field_6BFF0C, 0, sizeof(g_lib_gvd_stru_6BFEE0.field_6BFF0C));
+}
+MSG_FUNC_IMPL(0x40A69D, LibGvd_sub_40A69D);
+
+
 struct ActorList
 {
     Actor first;
@@ -434,7 +472,7 @@ MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
 MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 
-MGS_VAR(1, 0x722760, Actor, g_Actor_722760, {});
+MGS_VAR(1, 0x722760, Actor, g_gamed_722760, {}); // TODO: Will actually big an Actor + other data
 
 //actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
 MGS_ARY(1, 0x006BFC78, ActorList, 9, gActors, {});
@@ -2487,11 +2525,14 @@ void *__cdecl sub_44EAED()
 
 // 0x40A68D
 //MSG_FUNC_NOT_IMPL(0x40A68D, int __cdecl(int, int), sub_40A68D);
-int __cdecl sub_40A68D(int number, int fn)
+int __cdecl LibGvd_SetFnPtr_sub_40A68D(int number, int fn)
 {
-    *((DWORD *)&gActors[4].first.pPrevious + number) = fn;
+    const int idx = number - 0x61; // Some compiler optimization, just adds this onto g_lib_gvd_stru_6BFEE0 to index the array
+    assert(idx < _countof(g_lib_gvd_stru_6BFEE0.field_6BFF0C));
+    g_lib_gvd_stru_6BFEE0.field_6BFF0C[idx] = fn;
     return fn;
 }
+MSG_FUNC_IMPL(0x40A68D, LibGvd_SetFnPtr_sub_40A68D);
 
 //MSG_FUNC_NOT_IMPL(0x44E1E0, __int16 __cdecl(), sub_44E1E0);
 __int16 __cdecl sub_44E1E0()
@@ -2535,10 +2576,10 @@ void *__cdecl sub_44E12B()
     sub_44EAED();
     sub_457B5B();
     sub_452610();
-    sub_40A68D(98, (int)sub_44E9D2.Ptr());
+    LibGvd_SetFnPtr_sub_40A68D(98, (int)sub_44E9D2.Ptr());
     sub_44E1E0();
-    Actor_PushBack(1, &g_Actor_722760, 0);
-    Actor_Init(&g_Actor_722760, (void(__cdecl*)(Actor*))sub_44E381.Ptr(), 0, "C:\\mgs\\source\\Game\\gamed.c");
+    Actor_PushBack(1, &g_gamed_722760, 0);
+    Actor_Init(&g_gamed_722760, (void(__cdecl*)(Actor*))sub_44E381.Ptr(), 0, "C:\\mgs\\source\\Game\\gamed.c");
 
     unknown_libname_3();
     sub_44E287();
