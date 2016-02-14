@@ -121,7 +121,6 @@ MSG_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
 MSG_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, int*), sub_51F1E1);
 MSG_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
 MSG_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
-MSG_FUNC_NOT_IMPL(0x00422D40, char *__cdecl(char*, signed int), PrintDDError);
 MSG_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
 MSG_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), Render_TextureScratchAlloc);
 MSG_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
@@ -203,6 +202,47 @@ MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 MGS_VAR(1, 0x72279C, DWORD, dword_72279C, 0);
 MGS_VAR(1, 0x6FC78C, WORD, gNumTextures_word_6FC78C, 0);
 
+//MSG_FUNC_NOT_IMPL(0x00422D40, char *__cdecl(char*, HRESULT), PrintDDError);
+void __cdecl PrintDDError(const char* errMsg, HRESULT hrErr)
+{
+    char* pStrErr = nullptr;
+    switch (hrErr)
+    {
+    case DDERR_NOBLTHW:                 pStrErr = "DD - NOBLTHW";                   break;
+    case DDERR_WRONGMODE:               pStrErr = "DD - WRONGMODE";                 break;
+    case DDERR_IMPLICITLYCREATED:       pStrErr = "DD - IMPLICITLYCREATED";         break;
+    case DDERR_CLIPPERISUSINGHWND:      pStrErr = "DD - CLIPPERISUSINGHWND";        break;
+    case DDERR_WASSTILLDRAWING:         pStrErr = "DD - WASSTILLDRAWING";           break;
+    case DDERR_SURFACELOST:             pStrErr = "DD - SURFACELOST";               break;
+    case DDERR_NOEXCLUSIVEMODE:         pStrErr = "DD - NOEXCLUSIVEMODE";           break;
+    case DDERR_SURFACEBUSY:             pStrErr = "DD - DSURFACEBUSY";              break;
+    case DDERR_INVALIDRECT:             pStrErr = "DD - INVALIDRECT";               break;
+    case DDERR_INCOMPATIBLEPRIMARY:     pStrErr = "DD - DDERR_INCOMPATIBLEPRIMARY"; break;
+    case DDERR_INVALIDCLIPLIST:         pStrErr = "DD - INVALIDCLIPLIST";           break;
+    case DDERR_INVALIDOBJECT:           pStrErr = "DD - INVALIDOBJECT";             break;
+    case DDERR_EXCEPTION:               pStrErr = "DD - EXCEPTION";                 break;
+    case DDERR_INVALIDPARAMS:           pStrErr = "DD - INVALIDPARAMS";             break;
+    case DDERR_OUTOFMEMORY:             pStrErr = "DD - DDERR_OUTOFMEMORY";         break;
+    case DDERR_UNSUPPORTED:             pStrErr = "DD - UNSUPPORTED";               break;
+    case DDERR_GENERIC:                 pStrErr = "DD - GENERIC";                   break;
+    }
+
+    char Dest[224] = {};
+    if (!pStrErr)
+    {
+        sprintf(Dest, "Code Err=%i", hrErr);
+        pStrErr = Dest;
+    }
+
+    if (hrErr)
+    {
+        for (int i = 0; i < 5; ++i)
+        {
+            printf("!edq %s !  %s\n", errMsg, pStrErr);
+        }
+    }
+}
+MSG_FUNC_IMPL(0x00422D40, PrintDDError);
 
 //MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), Render_RestoreAll);
 __int16 __cdecl Render_RestoreAll()
@@ -2658,6 +2698,13 @@ void ShutdownEngine()
     }
 }
 
+void Test()
+{
+    PrintDDError("blah ", 2);
+    PrintDDError("Prim restore caput", DDERR_SURFACELOST);
+    PrintDDError("tex #%i restore caput", DDERR_SURFACELOST);
+    abort();
+}
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
@@ -2674,6 +2721,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
 
     SoundCpp_ForceLink();
     SoundCpp_Debug();
+    Test();
 
     if (IsMgsi())
     {
