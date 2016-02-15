@@ -17,8 +17,6 @@ MGS_VAR(1, 0x71D664, LPDIRECTINPUTA, pDirectInput, nullptr);
 MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE2A, pJoystickDevice, nullptr);
 MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICE2A, pMouseDevice, nullptr);
 MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
-MGS_VAR(1, 0x64DA88, DIDATAFORMAT, JoystickDataFormat, {});
-MGS_VAR(1, 0x64DA70, DIDATAFORMAT, MouseDataFormat, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
 MGS_ARY(1, 0x6571F4, DWORD, 14, dword_6571F4, {});// TODO: Check 14 is big enough
 
@@ -557,7 +555,7 @@ int __cdecl Input_Init(HWND hWnd)
             assert(sizeof(DIDEVICEINSTANCEA) == 0x244);
             JoystickDeviceInfos.dwSize = sizeof(DIDEVICEINSTANCEA);
             HRESULT hGetInfosRes = pJoystickDevice->GetDeviceInfo(&JoystickDeviceInfos);
-            hr = pJoystickDevice->SetDataFormat(&JoystickDataFormat);
+            hr = pJoystickDevice->SetDataFormat(&c_dfDIJoystick);
             if (hr >= 0)
             {
                 hr = pJoystickDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
@@ -710,7 +708,7 @@ int __cdecl Input_Init(HWND hWnd)
     if (hr < 0)
         return hr;
 
-    hr = pMouseDevice->SetDataFormat(&MouseDataFormat);
+    hr = pMouseDevice->SetDataFormat(&c_dfDIMouse);
     if (hr < 0)
         return hr;
 
