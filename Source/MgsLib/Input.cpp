@@ -3,7 +3,14 @@
 #include "MgsFunction.hpp"
 #include <assert.h>
 
+#define USE_DINPUT8 1
+
+#if USE_DINPUT8
+#define DIRECTINPUT_VERSION 0x800
+#else
 #define DIRECTINPUT_VERSION 0x700
+#endif
+
 #include <dinput.h>
 
 MGS_VAR(1, 0x71D664, LPDIRECTINPUTA, pDirectInput, nullptr);
@@ -527,11 +534,21 @@ int __cdecl Input_Init(HWND hWnd)
     dword_71D670 = 0;
     //fputs("InitDirectInput {\n", gLogFile);
     // I'll do log prints later
+#if USE_DINPUT8
+    HRESULT hr = DirectInput8Create(gHInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&pDirectInput, 0);
+#else
     HRESULT hr = DirectInputCreateExMGS(gHInstance, DIRECTINPUT_VERSION, IID_IDirectInput7A_MGS, (LPVOID*)&pDirectInput, 0);
+#endif
+
     if (hr < 0)
         return hr;
 
+#if USE_DINPUT8
+    hr = pDirectInput->EnumDevices(DI8DEVCLASS_GAMECTRL, Input_EnumDevicesCallback, 0, DIEDFL_ATTACHEDONLY);
+#else
     hr = pDirectInput->EnumDevices(DIDEVTYPE_JOYSTICK, Input_EnumDevicesCallback, 0, DIEDFL_ATTACHEDONLY);
+#endif
+
     if (hr >= 0)
     {
         if (pJoystickDevice != 0)
@@ -553,7 +570,15 @@ int __cdecl Input_Init(HWND hWnd)
                     {
                         pJoystickDevice->EnumObjects(Input_Enum_Axis_43B0C8, hWnd, DIDFT_AXIS);
                         pJoystickDevice->EnumObjects(Input_Enum_Buttons_sub_43B0B3, hWnd, DIDFT_BUTTON);
-                        hr = pJoystickDevice->Acquire();
+#if USE_DINPUT8
+                        do
+#endif
+                        {
+                            hr = pJoystickDevice->Acquire();
+#if USE_DINPUT8
+                        } while (hr == E_ACCESSDENIED);
+#endif
+
                         if (hr >= 0)
                         {
                             if (hGetInfosRes >= 0)
