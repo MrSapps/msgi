@@ -3,22 +3,25 @@
 #include "MgsFunction.hpp"
 #include <assert.h>
 
+#define USE_DINPUT8 1
+
+#if USE_DINPUT8
+#define DIRECTINPUT_VERSION 0x800
+#else
 #define DIRECTINPUT_VERSION 0x700
+#endif
+
 #include <dinput.h>
 
-MGS_VAR(1, 0x71D664, LPDIRECTINPUTA, pDirectInput, nullptr);
-MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE2A, pJoystickDevice, nullptr);
-MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICE2A, pMouseDevice, nullptr);
+MGS_VAR(1, 0x71D664, LPDIRECTINPUT8, pDirectInput, nullptr);
+MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE8, pJoystickDevice, nullptr);
+MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICE8, pMouseDevice, nullptr);
 MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
-MGS_VAR(1, 0x64DA88, DIDATAFORMAT, JoystickDataFormat, {});
-MGS_VAR(1, 0x64DA70, DIDATAFORMAT, MouseDataFormat, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
 MGS_ARY(1, 0x6571F4, DWORD, 14, dword_6571F4, {});// TODO: Check 14 is big enough
 
 
 char* sidewinderEtc = (char*)0x657298; // TODO: Dump array
-GUID& IID_IDirectInput7A_MGS = *((GUID*)0x64B028); // TODO: Use DxGuid
-GUID& GUID_SysMouse_MGS = *((GUID*)0x64AEE8); // TODO: Use DxGuid
 DWORD* dword_65726C = (DWORD*)0x65726C;
 char* buttonNames = (char*)0x65510C; // TODO: Dump array
 char* buttonList = (char*)0x654A98; // TODO: Dump array
@@ -486,7 +489,7 @@ MSG_FUNC_IMPL(0x0043B0C8, Input_Enum_Axis_43B0C8);
 BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID pvRef)
 {
     // Stop when worked
-    HRESULT hr = pDirectInput->CreateDevice(lpddi->guidInstance, (LPDIRECTINPUTDEVICEA*)&pJoystickDevice, NULL);
+    HRESULT hr = pDirectInput->CreateDevice(lpddi->guidInstance, &pJoystickDevice, NULL);
     return !SUCCEEDED(hr);
 }
 MSG_FUNC_IMPL(0x0043B078, Input_EnumDevicesCallback);
@@ -527,11 +530,21 @@ int __cdecl Input_Init(HWND hWnd)
     dword_71D670 = 0;
     //fputs("InitDirectInput {\n", gLogFile);
     // I'll do log prints later
+#if USE_DINPUT8
+    HRESULT hr = DirectInput8Create(gHInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&pDirectInput, 0);
+#else
     HRESULT hr = DirectInputCreateExMGS(gHInstance, DIRECTINPUT_VERSION, IID_IDirectInput7A_MGS, (LPVOID*)&pDirectInput, 0);
+#endif
+
     if (hr < 0)
         return hr;
 
+#if USE_DINPUT8
+    hr = pDirectInput->EnumDevices(DI8DEVCLASS_GAMECTRL, Input_EnumDevicesCallback, 0, DIEDFL_ATTACHEDONLY);
+#else
     hr = pDirectInput->EnumDevices(DIDEVTYPE_JOYSTICK, Input_EnumDevicesCallback, 0, DIEDFL_ATTACHEDONLY);
+#endif
+
     if (hr >= 0)
     {
         if (pJoystickDevice != 0)
@@ -540,7 +553,7 @@ int __cdecl Input_Init(HWND hWnd)
             assert(sizeof(DIDEVICEINSTANCEA) == 0x244);
             JoystickDeviceInfos.dwSize = sizeof(DIDEVICEINSTANCEA);
             HRESULT hGetInfosRes = pJoystickDevice->GetDeviceInfo(&JoystickDeviceInfos);
-            hr = pJoystickDevice->SetDataFormat(&JoystickDataFormat);
+            hr = pJoystickDevice->SetDataFormat(&c_dfDIJoystick);
             if (hr >= 0)
             {
                 hr = pJoystickDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
@@ -553,11 +566,20 @@ int __cdecl Input_Init(HWND hWnd)
                     {
                         pJoystickDevice->EnumObjects(Input_Enum_Axis_43B0C8, hWnd, DIDFT_AXIS);
                         pJoystickDevice->EnumObjects(Input_Enum_Buttons_sub_43B0B3, hWnd, DIDFT_BUTTON);
-                        hr = pJoystickDevice->Acquire();
+#if USE_DINPUT8
+                        do
+#endif
+                        {
+                            hr = pJoystickDevice->Acquire();
+#if USE_DINPUT8
+                        } while (hr == E_ACCESSDENIED);
+#endif
+
                         if (hr >= 0)
                         {
                             if (hGetInfosRes >= 0)
                             {
+                                // TODO: Make 0x71D690 a var
                                 strcpy((char*)0x71D690, JoystickDeviceInfos.tszInstanceName);
 
                                 for (int i = 0; i < 6; i++)
@@ -570,6 +592,7 @@ int __cdecl Input_Init(HWND hWnd)
 
                                     for (int j = 0; j < 5; j++)
                                     {
+                                        // TODO: Figure out the size of sidewinderEtc
                                         size_t offset = i * 0x140 + j * 0x40;
                                         if (strstr(productName, &sidewinderEtc[offset]) == 0 && strstr(instanceName, &sidewinderEtc[offset]) == 0)
                                         {
@@ -681,11 +704,11 @@ int __cdecl Input_Init(HWND hWnd)
     }
 
     // 0x43BBEC
-    hr = pDirectInput->CreateDevice(GUID_SysMouse, (LPDIRECTINPUTDEVICEA*)&pMouseDevice, 0);
+    hr = pDirectInput->CreateDevice(GUID_SysMouse, &pMouseDevice, 0);
     if (hr < 0)
         return hr;
 
-    hr = pMouseDevice->SetDataFormat(&MouseDataFormat);
+    hr = pMouseDevice->SetDataFormat(&c_dfDIMouse);
     if (hr < 0)
         return hr;
 
