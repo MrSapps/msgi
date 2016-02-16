@@ -63,14 +63,14 @@ MGS_ARY(1, 0x6C0F00, texture_struct, 1500, gTextures_dword_6C0F00, {}); // Array
 struct prim_struct
 {
     DWORD field_0;
-    WORD field_4;
-    WORD field_6;
+    WORD nTextureIndex;
+    WORD nBlendMode;
     DWORD mShadeMode;
     DWORD mPrimTypeQ;
     DWORD dwVertexCount;
 };
 static_assert(sizeof(prim_struct) == 0x14, "prim_struct should be 0x14");
-MGS_VAR(1, 0x6C0EFC, prim_struct*, gPrimBuffer_dword_6C0EFC, nullptr); // Dynamically allocated array of 15000 items
+MGS_VAR(1, 0x6C0EFC, prim_struct*, gPrimStructArray, nullptr); // Dynamically allocated array of 15000 items
 
 struct rend_struct
 {
@@ -187,7 +187,7 @@ MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
 MGS_VAR(1, 0x6FC728, DWORD *, gImageBufer_dword_6FC728, 0);
 MGS_VAR(1, 0x6DEF7C, void *, dword_6DEF7C, nullptr);
 MGS_VAR(1, 0x6DEF90, void *, dword_6DEF90, nullptr);
-MGS_VAR(1, 0x6FC72C, void *, gPixelBuffer_dword_6FC72C, nullptr);
+MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices, 0);
 MGS_VAR(1, 0x6FC798, DWORD, dword_6FC798, 0);
 MGS_VAR(1, 0x6FC7C0, DWORD, dword_6FC7C0, 0);
 MGS_VAR(1, 0x716F6C, DWORD, dword_716F6C, 0);
@@ -200,7 +200,8 @@ MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
 MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 MGS_VAR(1, 0x72279C, DWORD, dword_72279C, 0);
-MGS_VAR(1, 0x6FC78C, WORD, gNumTextures_word_6FC78C, 0);
+MGS_VAR(1, 0x6FC78C, WORD, g_NumTextures, 0);
+
 
 //MSG_FUNC_NOT_IMPL(0x00422D40, char *__cdecl(char*, HRESULT), PrintDDError);
 void __cdecl PrintDDError(const char* errMsg, HRESULT hrErr)
@@ -265,7 +266,7 @@ __int16 __cdecl Render_RestoreAll()
         }
     }
 
-    for (int i = 0; i < gNumTextures_word_6FC78C; i++)
+    for (int i = 0; i < g_NumTextures; i++)
     {
         if (gTextures_dword_6C0F00[i].mSurface)
         {
@@ -280,7 +281,7 @@ __int16 __cdecl Render_RestoreAll()
         }
     }
 
-    return gNumTextures_word_6FC78C;
+    return g_NumTextures;
 }
 MSG_FUNC_IMPL(0x0041CC30, Render_RestoreAll);
 
@@ -2237,10 +2238,10 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
-        gPrimBuffer_dword_6C0EFC = (prim_struct*)mgs_malloc(0x493E0u);
+        gPrimStructArray = (prim_struct*)mgs_malloc(15000 * sizeof(prim_struct));
         for (i = 0; i < 15000; ++i)
         {
-            gPrimBuffer_dword_6C0EFC[i].field_0 = 0;
+            gPrimStructArray[i].field_0 = 0;
         }
         gRenderRelated_dword_6FC780 = (rend_struct*)mgs_malloc(0x75300u); // 15000 items
     }
@@ -2248,7 +2249,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     if (gImageBufer_dword_6FC728)
     {
         memset(gImageBufer_dword_6FC728, 0, 0x100000u);
-        gPixelBuffer_dword_6FC72C = mgs_malloc(0x100000u);
+        g_pwTextureIndices = (WORD*)mgs_malloc(0x100000u);
         if (gImageBufer_dword_6FC728)
         {
             memset(gImageBufer_dword_6FC728, -1, 0x100000u);
@@ -2387,6 +2388,1079 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
         *pFirstPixel = ((wFirstPixel & 0x7C00) << 9) | ((wFirstPixel & 0x03E0) << 6) | ((wFirstPixel & 0x001F) << 3);
     }
     return 1;
+}
+
+struct MGSSmallVert
+{
+    WORD x; // 11.1 bits
+    WORD y; // 11.1 bits
+};
+
+struct MGSFloatVert
+{
+    float x;
+    float y;
+};
+
+struct StructVert
+{
+    uint8_t diffuseR;
+    uint8_t diffuseG;
+    uint8_t diffuseB;
+    uint8_t structType;
+};
+
+struct StructVertType0
+{
+    uint8_t diffuseR;
+    uint8_t diffuseG;
+    uint8_t diffuseB;
+    uint8_t structType;
+    MGSSmallVert Vtxs[4];
+};
+
+struct MGSLargeVert
+{
+    MGSSmallVert Vtx;
+    uint8_t u;
+    uint8_t v;
+    uint16_t textureIdx;
+};
+
+struct StructVertType1
+{
+    uint8_t diffuseR;
+    uint8_t diffuseG;
+    uint8_t diffuseB;
+    uint8_t structType;
+    MGSLargeVert TexVtx[4];
+};
+
+struct MGSDiffuseVert
+{
+    uint8_t diffuseR;
+    uint8_t diffuseG;
+    uint8_t diffuseB;
+    uint8_t padding;
+    MGSSmallVert Vtx;
+};
+
+struct StructVertType2
+{
+    MGSDiffuseVert DifVtx[4];
+};
+
+struct MGSLargeVertDif
+{
+    uint8_t diffuseR;
+    uint8_t diffuseG;
+    uint8_t diffuseB;
+    uint8_t padding;
+    MGSSmallVert Vtx;
+    uint8_t u;
+    uint8_t v;
+    uint16_t textureIdx;
+};
+
+struct StructVertType3
+{
+    MGSLargeVertDif DifVtx[3];
+};
+
+struct MGSVertType4
+{
+    MGSFloatVert Vtx;
+    uint8_t u;
+    uint8_t v;
+    uint16_t textureIdx;
+};
+
+struct StructVertType4
+{
+    uint8_t diffuseR;
+    uint8_t diffuseG;
+    uint8_t diffuseB;
+    uint8_t padding;
+    MGSVertType4 Vtx[4];
+};
+
+struct StructVertType5
+{
+    uint32_t field0;
+};
+
+MGS_VAR(1, 0x791C54, DWORD, dword_791C54, 0);
+MGS_VAR(1, 0x791C58, DWORD, dword_791C58, 0);
+MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
+MGS_VAR(1, 0x791C5C, float, g_fV3, 0);
+MGS_VAR(1, 0x791C60, float, g_fV2, 0);
+MGS_VAR(1, 0x791C64, float, g_fV1, 0);
+MGS_VAR(1, 0x791C68, float, g_fV0, 0);
+MGS_VAR(1, 0x791C6C, float, g_fU3, 0);
+MGS_VAR(1, 0x791C70, float, g_fU2, 0);
+MGS_VAR(1, 0x791C74, float, g_fU1, 0);
+MGS_VAR(1, 0x791C78, float, g_fU0, 0);
+MGS_VAR(1, 0x6FC788, DWORD, g_nPrimitiveIndex, 0);
+MGS_VAR(1, 0x6FC784, DWORD, g_nVertexOffset, 0);
+MGS_VAR(1, 0x6C0EA0, WORD, g_wXOffset, 0);
+MGS_VAR(1, 0x6C0EA2, WORD, g_wYOffset, 0);
+MGS_VAR(1, 0x791C80, float, g_fXOffset, 0);
+MGS_VAR(1, 0x791C84, float, g_fYOffset, 0);
+MGS_VAR(1, 0x791C7C, DWORD, g_nTextureIndex, 0);
+MGS_VAR(1, 0x6C0EAC, WORD, word_6C0EAC, 0);
+MGS_VAR(1, 0x6C0EAE, WORD, word_6C0EAE, 0);
+MGS_VAR(1, 0x6C0E98, WORD, word_6C0E98, 0);
+MGS_VAR(1, 0x6C0E9A, WORD, word_6C0E9A, 0);
+MGS_VAR(1, 0x6C0E9C, WORD, word_6C0E9C, 0);
+MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
+
+MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
+
+MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
+MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
+MSG_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
+MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t), sub_40FF20);
+MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
+
+
+void convertVertexType0(StructVertType0* pStructVert, uint32_t nIndex)
+{
+    int32_t signedX, signedY;
+    signedX = pStructVert->Vtxs[nIndex].x << 20;
+    signedX >>= 20;
+    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
+
+    signedY = pStructVert->Vtxs[nIndex].y << 20;
+    signedY >>= 20;
+    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
+    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+
+    uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
+    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
+    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
+    g_nVertexOffset++;
+}
+
+void convertColorWZType0(StructVertType0* pStructVert)
+{
+    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+
+    uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
+    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
+    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
+    g_nVertexOffset++;
+}
+
+void convertVertexType1(StructVertType1* pStructVert, uint32_t nIndex, float u, float v)
+{
+    int32_t signedX, signedY;
+    signedX = pStructVert->TexVtx[nIndex].Vtx.x << 20;
+    signedX >>= 20;
+    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
+
+    signedY = pStructVert->TexVtx[nIndex].Vtx.y << 20;
+    signedY >>= 20;
+    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
+    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+    g_pMGSVertices[g_nVertexOffset].u = u;
+    g_pMGSVertices[g_nVertexOffset].v = v;
+
+    uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
+    if (gModX2 == 0)
+    {
+        uint32_t R = (pStructVert->diffuseR * 0x19A) >> 8;
+        uint32_t G = (pStructVert->diffuseG * 0x19A) >> 8;
+        uint32_t B = (pStructVert->diffuseB * 0x19A) >> 8;
+        R = min(R, 0xFF);
+        G = min(G, 0xFF);
+        B = min(B, 0xFF);
+        diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
+    }
+    
+    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
+    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
+    g_nVertexOffset++;
+}
+
+void convertExceptPosType1(StructVertType1* pStructVert, float u, float v)
+{
+    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+    g_pMGSVertices[g_nVertexOffset].u = u;
+    g_pMGSVertices[g_nVertexOffset].v = v;
+
+    uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
+    if (gModX2 == 0)
+    {
+        uint32_t R = (pStructVert->diffuseR * 0x19A) >> 8;
+        uint32_t G = (pStructVert->diffuseG * 0x19A) >> 8;
+        uint32_t B = (pStructVert->diffuseB * 0x19A) >> 8;
+        R = min(R, 0xFF);
+        G = min(G, 0xFF);
+        B = min(B, 0xFF);
+        diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
+    }
+
+    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
+    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
+    g_nVertexOffset++;
+}
+
+void convertVertexType2(StructVertType2* pStructVert, uint32_t nIndex)
+{
+    int32_t signedX, signedY;
+    signedX = pStructVert->DifVtx[nIndex].Vtx.x << 20;
+    signedX >>= 20;
+    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
+
+    signedY = pStructVert->DifVtx[nIndex].Vtx.y << 20;
+    signedY >>= 20;
+    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
+    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+
+    uint32_t diffuseColor = 0xFF000000 | (pStructVert->DifVtx[nIndex].diffuseR << 16) | (pStructVert->DifVtx[nIndex].diffuseG << 8) | (pStructVert->DifVtx[nIndex].diffuseB);
+    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
+    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
+    g_nVertexOffset++;
+}
+
+void convertVertexType3(StructVertType3* pStructVert, uint32_t nIndex, float u, float v)
+{
+    int32_t signedX, signedY;
+    signedX = pStructVert->DifVtx[nIndex].Vtx.x << 20;
+    signedX >>= 20;
+    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
+
+    signedY = pStructVert->DifVtx[nIndex].Vtx.y << 20;
+    signedY >>= 20;
+    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
+    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+    g_pMGSVertices[g_nVertexOffset].u = u;
+    g_pMGSVertices[g_nVertexOffset].v = v;
+
+    uint32_t diffuseColor = 0xFF000000 | (pStructVert->DifVtx[nIndex].diffuseR << 16) | (pStructVert->DifVtx[nIndex].diffuseG << 8) | (pStructVert->DifVtx[nIndex].diffuseB);
+    if (gModX2 == 0)
+    {
+        uint32_t R = (pStructVert->DifVtx[nIndex].diffuseR * 0x19A) >> 8;
+        uint32_t G = (pStructVert->DifVtx[nIndex].diffuseG * 0x19A) >> 8;
+        uint32_t B = (pStructVert->DifVtx[nIndex].diffuseB * 0x19A) >> 8;
+        R = min(R, 0xFF);
+        G = min(G, 0xFF);
+        B = min(B, 0xFF);
+        diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
+    }
+
+    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
+    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
+    g_nVertexOffset++;
+}
+
+float convertPositionFloat(WORD n)
+{
+    int32_t signedN;
+    signedN = n << 20;
+    signedN >>= 20;
+    return (float)signedN;
+}
+
+uint32_t calculateModX2Diffuse(uint32_t diffuseR, uint32_t diffuseG, uint32_t diffuseB)
+{
+    uint32_t diffuseColor = 0xFF000000 | (diffuseR << 16) | (diffuseG << 8) | (diffuseB);
+    if (gModX2 == 0)
+    {
+        uint32_t R = (diffuseR * 0x19A) >> 8;
+        uint32_t G = (diffuseG * 0x19A) >> 8;
+        uint32_t B = (diffuseB * 0x19A) >> 8;
+        R = min(R, 0xFF);
+        G = min(G, 0xFF);
+        B = min(B, 0xFF);
+        diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
+    }
+
+    return diffuseColor;
+}
+
+void handleBlendMode(uint16_t nBlend)
+{
+    if ((dword_791C54 & 2) != 0)
+        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 1 + ((nBlend >> 5) & 3);
+    else
+        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 0;
+}
+
+void handleBlendMode(uint16_t nBlend, uint32_t offset)
+{
+    if ((dword_791C54 & 2) != 0)
+        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 1 + offset + ((nBlend >> 5) & 3);
+    else
+        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = offset;
+}
+
+void convertVertexType4(StructVertType4* pStructVert, uint32_t nIndex, float u, float v)
+{
+    g_pMGSVertices[g_nVertexOffset].x = pStructVert->Vtx[nIndex].Vtx.x + g_fXOffset;
+    g_pMGSVertices[g_nVertexOffset].y = pStructVert->Vtx[nIndex].Vtx.y + g_fYOffset;
+    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+    g_pMGSVertices[g_nVertexOffset].u = u;
+    g_pMGSVertices[g_nVertexOffset].v = v;
+    g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->diffuseR, pStructVert->diffuseG, pStructVert->diffuseB);
+    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
+    g_nVertexOffset++;
+}
+
+// Untested for the moment
+//MSG_FUNC_NOT_IMPL(0x410560, int __cdecl(), Render_Hardware);
+int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
+{
+    uint32_t varC = sub_44EAE5();
+    uint32_t var14 = dword_688CD4;
+    uint32_t var1C = dword_688CD0;
+
+    while (true)
+    {
+        if (a_nSize <= 0)
+            return 1;
+
+        dword_791C54 = a_pStructVert->structType;
+        dword_791C58 = 0;
+        g_fV3 = g_fV2 = g_fV1 = g_fV0 = 0;
+        g_fU3 = g_fU2 = g_fU1 = g_fU0 = 0;
+
+        gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 0;
+        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 0;
+
+        switch (dword_791C54)
+        {
+        case 0:
+            return 1;
+
+        case 32:
+        case 33:
+        case 34:
+        case 35:
+        {
+            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC);
+
+            convertVertexType0(pStructVert, 0);
+            convertVertexType0(pStructVert, 1);
+            convertVertexType0(pStructVert, 2);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 3;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLELIST;
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+
+            dword_791C58 = 4;
+            break;
+        }
+
+        case 40:
+        case 41:
+        case 42:
+        case 43:
+        {
+            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC);
+
+            convertVertexType0(pStructVert, 0);
+            convertVertexType0(pStructVert, 1);
+            convertVertexType0(pStructVert, 2);
+            convertVertexType0(pStructVert, 3);
+
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+
+            dword_791C58 = 5;
+            break;
+        }
+
+        case 44:
+        case 45:
+        case 46:
+        case 47:
+        {
+            StructVertType1* pStructVert = (StructVertType1*)a_pStructVert;
+            uint32_t TextureIdx0, TextureIdx1;
+            Render_ComputeTextureIdx(pStructVert->TexVtx[1].textureIdx, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
+            TextureIdx0 &= 0xFFFF;
+            TextureIdx1 &= 0xFFFF;
+
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+            g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
+
+            if (g_nTextureIndex >= g_NumTextures)
+            {
+                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
+            }
+            else
+            {
+                uint32_t var7C = (pStructVert->TexVtx[1].textureIdx & 0x180) >> 7;
+                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
+                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[1].u, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
+                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v, &g_fU2, &g_fV2);
+                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[3].u, pStructVert->TexVtx[3].v, &g_fU3, &g_fV3);
+            }
+
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(pStructVert->TexVtx[1].textureIdx);
+
+            convertVertexType1(pStructVert, 0, g_fU0, g_fV0);
+            convertVertexType1(pStructVert, 1, g_fU1, g_fV1);
+            convertVertexType1(pStructVert, 2, g_fU2, g_fV2);
+            convertVertexType1(pStructVert, 3, g_fU3, g_fV3);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+
+            dword_791C58 = 9;
+            break;
+        }
+
+        case 48:
+        case 49:
+        case 50:
+        case 51:
+        {
+            StructVertType2* pStructVert = (StructVertType2*)a_pStructVert;
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC);
+
+            convertVertexType2(pStructVert, 0);
+            convertVertexType2(pStructVert, 1);
+            convertVertexType2(pStructVert, 2);
+
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 3;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLELIST;
+
+            dword_791C58 = 6;
+            break;
+        }
+
+        case 52:
+        case 53:
+        case 54:
+        case 55:
+        {
+            StructVertType3* pStructVert = (StructVertType3*)a_pStructVert;
+
+            uint32_t TextureIdx0, TextureIdx1;
+            Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1);
+            TextureIdx0 &= 0xFFFF;
+            TextureIdx1 &= 0xFFFF;
+
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+            g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
+
+            if (g_nTextureIndex >= g_NumTextures)
+            {
+                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
+            }
+            else
+            {
+                uint32_t var110 = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
+                Render_ComputeUVs(g_nTextureIndex, var110, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
+                Render_ComputeUVs(g_nTextureIndex, var110, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
+                Render_ComputeUVs(g_nTextureIndex, var110, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
+            }
+
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(pStructVert->DifVtx[1].textureIdx);
+
+            convertVertexType3(pStructVert, 0, g_fU0, g_fV0);
+            convertVertexType3(pStructVert, 1, g_fU1, g_fV1);
+            convertVertexType3(pStructVert, 2, g_fU2, g_fV2);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 3;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLELIST;
+
+            dword_791C58 = 9;
+        }
+
+        case 56:
+        case 57:
+        case 58:
+        case 59:
+        {
+            StructVertType2* pStructVert = (StructVertType2*)a_pStructVert;
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC);
+
+            if (gPrimStructArray[g_nPrimitiveIndex].nBlendMode == 3)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    pStructVert->DifVtx[i].diffuseB = (uint8_t)min(pStructVert->DifVtx[i].diffuseB << 2, 0xFF);
+                    pStructVert->DifVtx[i].diffuseG = (uint8_t)min(pStructVert->DifVtx[i].diffuseG << 2, 0xFF);
+                    pStructVert->DifVtx[i].diffuseR = (uint8_t)min(pStructVert->DifVtx[i].diffuseR << 2, 0xFF);
+                }
+            }
+            
+            convertVertexType2(pStructVert, 0);
+            convertVertexType2(pStructVert, 1);
+            convertVertexType2(pStructVert, 2);
+            convertVertexType2(pStructVert, 3);
+
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+
+            if (gPrimStructArray[g_nPrimitiveIndex].nBlendMode == 3 && dword_6FC774 != 0)
+            {
+                convertVertexType2(pStructVert, 0);
+                convertVertexType2(pStructVert, 1);
+                convertVertexType2(pStructVert, 2);
+                convertVertexType2(pStructVert, 3);
+
+                gPrimStructArray[g_nPrimitiveIndex].dwVertexCount += 4;
+            }
+
+            dword_791C58 = 8;
+            break;
+        }
+
+        case 60:
+        case 61:
+        case 62:
+        case 63:
+        {
+            StructVertType3* pStructVert = (StructVertType3*)a_pStructVert;
+            float position[16];
+            position[11] = 0.5f;
+            position[10] = 0.5f;
+            position[ 9] = 0.5f;
+            position[ 8] = 0.5f;
+            position[15] = 1.0f;
+            position[14] = 0.999999f;
+            position[13] = 0.999999f;
+            position[12] = 0.999999;
+
+            position[3] = convertPositionFloat(pStructVert->DifVtx[0].Vtx.x);
+            position[2] = convertPositionFloat(pStructVert->DifVtx[1].Vtx.x);
+            position[1] = convertPositionFloat(pStructVert->DifVtx[2].Vtx.x);
+            position[0] = convertPositionFloat(pStructVert->DifVtx[3].Vtx.x);
+
+            position[7] = convertPositionFloat(pStructVert->DifVtx[0].Vtx.y);
+            position[6] = convertPositionFloat(pStructVert->DifVtx[1].Vtx.y);
+            position[5] = convertPositionFloat(pStructVert->DifVtx[2].Vtx.y);
+            position[4] = convertPositionFloat(pStructVert->DifVtx[3].Vtx.y);
+
+            if ((pStructVert->DifVtx[3].textureIdx & 0x8000) != 0 && var1C != 0)
+            {
+                float* var68 = (float*)(0x734A40 + ((pStructVert->DifVtx[3].textureIdx & 0xFFF) << 6)); // TODO : Var this struct (sizeof = 0x40)
+                if (var68[8] > 0.0005f)
+                    position[15] = 1.0f / var68[8];
+                if (var68[9] > 0.0005f)
+                    position[14] = 1.0f / var68[9];
+                if (var68[10] > 0.0005f)
+                    position[13] = 1.0f / var68[10];
+                if (var68[11] > 0.0005f)
+                    position[12] = 1.0f / var68[11];
+
+                if (var14 != 0)
+                {
+                    position[3] = var68[0];
+                    position[2] = var68[1];
+                    position[1] = var68[2];
+                    position[0] = var68[3];
+
+                    position[7] = var68[4];
+                    position[6] = var68[5];
+                    position[5] = var68[6];
+                    position[4] = var68[7];
+                }
+            }
+
+            uint32_t TextureIdx0, TextureIdx1;
+            if (Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
+            {
+                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFE;
+                g_fU0 = (float)(TextureIdx0 & 0xFFFF);
+                g_fV0 = (float)(TextureIdx1 & 0xFFFF);
+
+                Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &TextureIdx0, &TextureIdx1);
+                g_fU1 = (float)(TextureIdx0 & 0xFFFF);
+                g_fV1 = (float)(TextureIdx1 & 0xFFFF);
+
+                Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &TextureIdx0, &TextureIdx1);
+                g_fU2 = (float)(TextureIdx0 & 0xFFFF);
+                g_fV2 = (float)(TextureIdx1 & 0xFFFF);
+
+                Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &TextureIdx0, &TextureIdx1);
+                g_fU3 = (float)(TextureIdx0 & 0xFFFF);
+                g_fV3 = (float)(TextureIdx1 & 0xFFFF);
+            }
+            else
+            {
+                TextureIdx0 &= 0xFFFF;
+                TextureIdx1 &= 0xFFFF;
+
+                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+                g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
+
+                if (g_nTextureIndex >= g_NumTextures)
+                {
+                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
+                }
+                else
+                {
+                    uint32_t var6C = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
+                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &g_fU3, &g_fV3);
+
+                    uint16_t* pIndex = (uint16_t*)(0x6FC728 + ((pStructVert->DifVtx[0].textureIdx >> 6) << 11) + ((pStructVert->DifVtx[0].textureIdx & 0x3F) << 5));
+                    if (*pIndex == 0xEDED)
+                    {
+                        gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFF0;
+                        dword_791C54 &= 0xFFFFFFFD;
+                    }
+                }
+            }
+            
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(pStructVert->DifVtx[1].textureIdx);
+
+            g_pMGSVertices[g_nVertexOffset].x = position[ 3] + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = position[ 7] + g_fYOffset;
+            g_pMGSVertices[g_nVertexOffset].z = position[11];
+            g_pMGSVertices[g_nVertexOffset].w = position[15];
+            g_pMGSVertices[g_nVertexOffset].u = g_fU0;
+            g_pMGSVertices[g_nVertexOffset].v = g_fV0;
+            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[0].diffuseR, pStructVert->DifVtx[0].diffuseG, pStructVert->DifVtx[0].diffuseB);
+            g_nVertexOffset++;
+
+            g_pMGSVertices[g_nVertexOffset].x = position[ 2] + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = position[ 6] + g_fYOffset;
+            g_pMGSVertices[g_nVertexOffset].z = position[10];
+            g_pMGSVertices[g_nVertexOffset].w = position[14];
+            g_pMGSVertices[g_nVertexOffset].u = g_fU1;
+            g_pMGSVertices[g_nVertexOffset].v = g_fV1;
+            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[1].diffuseR, pStructVert->DifVtx[1].diffuseG, pStructVert->DifVtx[1].diffuseB);
+            g_nVertexOffset++;
+
+            g_pMGSVertices[g_nVertexOffset].x = position[ 1] + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = position[ 5] + g_fYOffset;
+            g_pMGSVertices[g_nVertexOffset].z = position[ 9];
+            g_pMGSVertices[g_nVertexOffset].w = position[13];
+            g_pMGSVertices[g_nVertexOffset].u = g_fU2;
+            g_pMGSVertices[g_nVertexOffset].v = g_fV2;
+            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[2].diffuseR, pStructVert->DifVtx[2].diffuseG, pStructVert->DifVtx[2].diffuseB);
+            g_nVertexOffset++;
+
+            g_pMGSVertices[g_nVertexOffset].x = position[ 0] + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = position[ 4] + g_fYOffset;
+            g_pMGSVertices[g_nVertexOffset].z = position[ 8];
+            g_pMGSVertices[g_nVertexOffset].w = position[12];
+            g_pMGSVertices[g_nVertexOffset].u = g_fU3;
+            g_pMGSVertices[g_nVertexOffset].v = g_fV3;
+            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[3].diffuseR, pStructVert->DifVtx[3].diffuseG, pStructVert->DifVtx[3].diffuseB);
+            g_nVertexOffset++;
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+
+            dword_791C58 = 0xC;
+            break;
+        }
+
+        case 64:
+        case 65:
+        case 66:
+        case 67:
+        {
+            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            sub_40FF20(pStructVert->Vtxs[0].x, pStructVert->Vtxs[0].y, pStructVert->Vtxs[1].x, pStructVert->Vtxs[1].y);
+            handleBlendMode(word_6C0EAC);
+
+            convertVertexType0(pStructVert, 0);
+            convertVertexType0(pStructVert, 0);
+            convertVertexType0(pStructVert, 1);
+            convertVertexType0(pStructVert, 1);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+
+            dword_791C58 = 3;
+            break;
+        }
+
+        case 72:
+        case 73:
+        case 74:
+        case 75:
+        {
+            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC);
+
+            convertVertexType0(pStructVert, 0);
+            convertVertexType0(pStructVert, 1);
+            convertVertexType0(pStructVert, 2);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 3;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_LINESTRIP;
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+
+            dword_791C58 = 5;
+            break;
+        }
+
+        case 76:
+        case 77:
+        case 78:
+        case 79:
+        {
+            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC);
+
+            convertVertexType0(pStructVert, 0);
+            convertVertexType0(pStructVert, 1);
+            convertVertexType0(pStructVert, 2);
+            convertVertexType0(pStructVert, 3);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_LINESTRIP;
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+
+            dword_791C58 = 6;
+            break;
+        }
+
+        case 96:
+        case 97:
+        case 98:
+        case 99:
+        {
+            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+
+            float fSecondX = convertPositionFloat(pStructVert->Vtxs[0].x) + (float)((int16_t)pStructVert->Vtxs[1].x);
+            float fSecondY = convertPositionFloat(pStructVert->Vtxs[0].y) + (float)((int16_t)pStructVert->Vtxs[1].y);
+
+            handleBlendMode(word_6C0EAC);
+            convertVertexType0(pStructVert, 0);
+            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = convertPositionFloat(pStructVert->Vtxs[0].y) + g_fYOffset;
+            convertColorWZType0(pStructVert);
+            g_pMGSVertices[g_nVertexOffset].x = convertPositionFloat(pStructVert->Vtxs[0].x) + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
+            convertColorWZType0(pStructVert);
+            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
+            convertColorWZType0(pStructVert);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+
+            dword_791C58 = 3;
+            break;
+        }
+
+        case 100:
+        case 101:
+        case 102:
+        case 103:
+        {
+            StructVertType1* pStructVert = (StructVertType1*)a_pStructVert;
+            float fInverseRes = 1.0f / gXRes;
+
+            int16_t diffX = (int16_t)pStructVert->TexVtx[1].Vtx.x;
+            int16_t diffY = (int16_t)pStructVert->TexVtx[1].Vtx.y;
+            float fSecondX = convertPositionFloat(pStructVert->TexVtx[0].Vtx.x) + (float)diffX;
+            float fSecondY = convertPositionFloat(pStructVert->TexVtx[0].Vtx.y) + (float)diffY;
+
+            uint32_t TextureIdx0, TextureIdx1;
+            if (Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
+            {
+                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFD;
+                g_fU0 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
+                g_fV0 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
+
+                Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
+                g_fU1 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
+                g_fV1 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
+
+                Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
+                g_fU2 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
+                g_fV2 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
+
+                Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
+                g_fU3 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
+                g_fV3 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
+            }
+            else
+            {
+                if (pStructVert->TexVtx[0].textureIdx & 0x8000)
+                {
+                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 1 + (pStructVert->TexVtx[0].textureIdx & 0xF);
+                    g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
+                    pStructVert->TexVtx[0].u = 0;
+                    pStructVert->TexVtx[0].v = 0;
+                }
+                else
+                {
+                    TextureIdx0 &= 0xFFFF;
+                    TextureIdx1 &= 0xFFFF;
+                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+                    g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
+                }
+                if (g_nTextureIndex >= g_NumTextures)
+                {
+                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
+                }
+                else
+                {
+                    uint32_t var9C = (word_6C0EAC & 0x180) >> 7;
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[1].u + diffX, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v + diffY, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[3].u + diffX, pStructVert->TexVtx[3].v + diffY, &g_fU3, &g_fV3);
+                }
+            }
+
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC, 0x8000);
+
+            convertVertexType1(pStructVert, 0, g_fU0, g_fV0);
+            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = convertPositionFloat(pStructVert->TexVtx[0].Vtx.y) + g_fYOffset;
+            convertExceptPosType1(pStructVert, g_fU1, g_fV1);
+            g_pMGSVertices[g_nVertexOffset].x = convertPositionFloat(pStructVert->TexVtx[0].Vtx.x) + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
+            convertExceptPosType1(pStructVert, g_fU2, g_fV2);
+            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
+            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
+            convertExceptPosType1(pStructVert, g_fU3, g_fV3);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+
+            dword_791C58 = 4;
+            break;
+        }
+
+        case 104:
+        case 105:
+        case 106:
+        case 107:
+        {
+            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            float fHalfOffset = (((gXRes - 1.0f) / 2.0f) + 1.0f) / gXRes;
+
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC);
+
+            float centerX = convertPositionFloat(pStructVert->Vtxs[0].x);
+            float centerY = convertPositionFloat(pStructVert->Vtxs[0].y);
+            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset - fHalfOffset;
+            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset - fHalfOffset;
+            convertColorWZType0(pStructVert);
+            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset + fHalfOffset;
+            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset - fHalfOffset;
+            convertColorWZType0(pStructVert);
+            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset - fHalfOffset;
+            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset + fHalfOffset;
+            convertColorWZType0(pStructVert);
+            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset + fHalfOffset;
+            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset + fHalfOffset;
+            convertColorWZType0(pStructVert);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+
+            dword_791C58 = 2;
+            break;
+        }
+
+        case 128:
+        {
+            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            int16_t rawPos[4];
+            rawPos[1] = pStructVert->Vtxs[0].y;
+            rawPos[0] = pStructVert->Vtxs[0].x;
+
+            int16_t varDC = pStructVert->Vtxs[1].y;
+            int16_t varD8 = pStructVert->Vtxs[1].x;
+
+            rawPos[3] = pStructVert->Vtxs[2].y;
+            rawPos[2] = pStructVert->Vtxs[2].x;
+
+            sub_40D540(rawPos, varD8, varDC);
+
+            dword_791C58 = 4;
+            break;
+        }
+
+        case 144:
+        case 145:
+        case 146:
+        case 147:
+        {
+            StructVertType4* pStructVert = (StructVertType4*)a_pStructVert;
+            if ((pStructVert->Vtx[0].textureIdx & 0x8000) != 0)
+            {
+                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFF0;
+            }
+            else
+            {
+                uint32_t TextureIdx0, TextureIdx1;
+                Render_ComputeTextureIdx(pStructVert->Vtx[1].textureIdx, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &TextureIdx0, &TextureIdx1);
+                TextureIdx0 &= 0xFFFF;
+                TextureIdx1 &= 0xFFFF;
+                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+                g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
+
+                if (g_nTextureIndex >= g_NumTextures)
+                {
+                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
+                }
+                else
+                {
+                    uint32_t var124 = (pStructVert->Vtx[1].textureIdx & 0x180) >> 7;
+                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[1].u, pStructVert->Vtx[1].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[2].u, pStructVert->Vtx[2].v, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[3].u, pStructVert->Vtx[3].v, &g_fU3, &g_fV3);
+                }
+            }
+            
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC);
+
+            convertVertexType4(pStructVert, 0, g_fU0, g_fV0);
+            convertVertexType4(pStructVert, 1, g_fU1, g_fV1);
+            convertVertexType4(pStructVert, 2, g_fU2, g_fV2);
+            convertVertexType4(pStructVert, 3, g_fU3, g_fV3);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+
+            dword_791C58 = 0xD;
+            break;
+        }
+
+        case 225:
+        {
+            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
+
+            word_6C0EAC = pStructVert->field0 & 0x1FF;
+            word_6C0EAE = (((pStructVert->field0 >> 10) & 1) << 8) | ((pStructVert->field0 >> 9) & 1);
+
+            dword_791C58 = 1;
+            break;
+        }
+
+        case 226:
+        {
+            dword_791C58 = 1;
+            break;
+        }
+
+        case 227:
+        {
+            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
+
+            word_6C0E98 = pStructVert->field0 & 0x3FF;
+            word_6C0E9A = (pStructVert->field0 >> 10) & 0x3FF;
+
+            dword_791C58 = 1;
+            break;
+        }
+
+        case 228:
+        {
+            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
+
+            word_6C0E9C = (pStructVert->field0 & 0x3FF) - word_6C0E98 + 1;
+            word_6C0E9E = ((pStructVert->field0 >> 10) & 0x3FF) - word_6C0E9A + 1;
+
+            g_pMGSVertices[g_nVertexOffset].x = (float)word_6C0E98;
+            g_pMGSVertices[g_nVertexOffset].y = (float)word_6C0E9A;
+            g_pMGSVertices[g_nVertexOffset].u = (float)word_6C0E9C;
+            g_pMGSVertices[g_nVertexOffset].v = (float)word_6C0E9E;
+            g_nVertexOffset++;
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 1;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = 0x7D0; // ?
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+
+            dword_791C58 = 1;
+            break;
+        }
+
+        case 229:
+        {
+            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
+
+            g_wXOffset = pStructVert->field0 & 0x7FF;
+            g_wYOffset = (pStructVert->field0 >> 11) & 0x3FF;
+
+            dword_791C58 = 1;
+            break;
+        }
+
+        case 255:
+        {
+            dword_791C58 = 1;
+            break;
+        }
+
+        default:
+            break;
+        }
+
+        if (gPrimStructArray[g_nPrimitiveIndex].dwVertexCount != 0)
+            g_nPrimitiveIndex++;
+
+        if (dword_791C58 == 0)
+        {
+            uint8_t* pValue = (uint8_t*)(0x650A5C + dword_791C54);
+            dword_791C58 = *pValue;
+        }
+        if (dword_791C58 == 0)
+            dword_791C58 = 1;
+
+        a_nSize -= dword_791C58;
+        a_pStructVert = (StructVert*)((intptr_t)a_pStructVert + dword_791C58 * 4);
+    }
 }
 
 // 0x00420810
@@ -2774,7 +3848,6 @@ Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Act
 
     return a_pActor;
 }
-
 
 // 0x00401005
 //MSG_FUNC_NOT_IMPL(0x00401005, signed int __cdecl(), Main);
