@@ -23,6 +23,7 @@
 #include "Sound.hpp"
 #include "File.hpp"
 #include "Input.hpp"
+#include "Task.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -140,11 +141,8 @@ MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 MSG_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
-MSG_FUNC_NOT_IMPL(0x51FEBC, int __cdecl(), Task_Pause);
 MSG_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
-MSG_FUNC_NOT_IMPL(0x51FEDC, int __cdecl(), Task_ResumeQ);
 MSG_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
-MSG_FUNC_NOT_IMPL(0x51FFC3, void *__cdecl(), Task_TerminateQ);
 
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
 MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
@@ -3930,6 +3928,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     char *bRestart; // [sp+464h] [bp-8h]@8
     //int i; // [sp+468h] [bp-4h]@70
 
+    TaskCpp_ForceLink();
     SoundCpp_ForceLink();
     SoundCpp_Debug();
  
