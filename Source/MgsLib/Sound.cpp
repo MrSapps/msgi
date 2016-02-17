@@ -340,26 +340,25 @@ MSG_FUNC_NOT_IMPL(0x005530A8, HRESULT __stdcall(LPGUID, LPDIRECTSOUND*, LPUNKNOW
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
 {
-    signed int result = 0;
+    HRESULT hr = DirectSoundCreate(0, &gDSound_dword_77E2C0, 0);
+    if (FAILED(hr))
+    {
+        return 0;
+    }
 
-    if (DirectSoundCreate(0, &gDSound_dword_77E2C0, 0))
+    hr = gDSound_dword_77E2C0->SetCooperativeLevel(hwnd, DSSCL_EXCLUSIVE);
+    if (FAILED(hr))
     {
-        result = 0;
+        return 0;
     }
-    else if (gDSound_dword_77E2C0->SetCooperativeLevel(hwnd, 3))
+
+    if (!Sound_CreatePrimarySoundBuffer())
     {
-        result = 0;
+        return 0;
     }
-    else if (Sound_CreatePrimarySoundBuffer())
-    {
-        Sound_InitFx();
-        result = Sound_CreateSecondarySoundBuffer();
-    }
-    else
-    {
-        result = 0;
-    }
-    return result;
+   
+    Sound_InitFx();
+    return Sound_CreateSecondarySoundBuffer();
 }
 
 // 0x005227AD
