@@ -3916,7 +3916,7 @@ void ShutdownEngine()
     {
         Fonts_Release_sub_4317B3();
         Input_Shutdown_sub_43C716();
-        Sound_ShutDown(); // FIXME: Execution always ends at DSound::IUnknown::Release (if its not null)
+        Sound_ShutDown();
         DoClearAll();
         Task_TerminateQ();
         DestroyWindow(gHwnd);
@@ -4078,7 +4078,6 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     0);
                 if (gHwnd)
                 {
-                    atexit(ShutdownEngine);
                     SetWindowSize(gHwnd, 640, 480);
                     ShowWindow(gHwnd, 5);
                     UpdateWindow(gHwnd);
@@ -4142,6 +4141,10 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             MB_OK);
         result = 0;
     }
+
+    // Real game uses atexit() to call this, we don't because we don't want it calling
+    // during DllMain as this can cause a crash.
+    ShutdownEngine();
 
     return result;
 }
