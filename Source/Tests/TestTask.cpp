@@ -2,18 +2,24 @@
 #include <gmock/gmock.h>
 #include "Task.hpp"
 #include "Sound.hpp"
+#include <atomic>
 
 #pragma comment(lib, "dsound.lib")
 
-unsigned int __stdcall TaskThreadProc(void *)
+std::atomic<int> gThreadProcCalls;
+
+unsigned int __stdcall TaskThreadProc(void(*fn)(void))
 {
+    gThreadProcCalls++;
     return 7;
 }
 
 // TODO: Need to rip the thread proc array
-TEST(Task, DISABLED_Init)
+TEST(Task, Init)
 {
+    gThreadProcCalls = 0;
     Task_Init(30, TaskThreadProc);
+    while (gThreadProcCalls != 1) {}
 }
 
 // TODO: Fails on AppVeyor - probably need to mock the IDirectSound obj

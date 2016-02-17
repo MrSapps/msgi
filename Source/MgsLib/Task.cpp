@@ -10,10 +10,54 @@ struct Task
     HANDLE mEventHandle;
 };
 static_assert(sizeof(Task) == 0x10, "Task size must be 0x10");
-using ThreadProc = unsigned int(__stdcall *)(void *);
+using ThreadProc = unsigned int(__stdcall *)(void(*fn)(void));
+
+void __cdecl __Task_EndSelf();
+
+unsigned int __stdcall TaskThreadProcEndSelf(void(*fn)(void))
+{
+    fn();
+    __Task_EndSelf();
+    return 0;
+}
 
 MGS_ARY(1, 0x77C710, Task, 32, gTasks_77C710, {});
-MGS_ARY(1, 0x68C4C0, ThreadProc, 32, gFnTbl_off_68C4C0, {}); // TODO: Populate
+MGS_ARY(1, 0x68C4C0, ThreadProc, 32, gFnTbl_off_68C4C0, 
+{
+    // The real game has many duplicated functions here, but they all do the same thing
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf,
+    TaskThreadProcEndSelf
+}); // TODO: Populate
 MGS_VAR(1, 0x7346FC, DWORD, gTaskRequest_dword_7346FC, 0);
 MGS_VAR(1, 0x7346F8, DWORD, gTaskResult_dword_7346F8, 0);
 
@@ -62,7 +106,7 @@ void __cdecl Task_Init(int taskId, void* fnThreadProc)
         gTasks_77C710[freeTaskIdx].mThreadHandle = (HANDLE)_beginthreadex(
             0,
             0x10000u,
-            gFnTbl_off_68C4C0[freeTaskIdx],
+            (unsigned(__stdcall *) (void *))gFnTbl_off_68C4C0[freeTaskIdx],
             fnThreadProc,
             0,
             &gTasks_77C710[freeTaskIdx].mThreadId);
