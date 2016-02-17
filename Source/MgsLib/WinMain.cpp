@@ -10,6 +10,8 @@
 #include <map>
 #include <detours.h>
 
+// When changing this, delete the cfg files the game creates else it will get into a bad state and probably crash
+#define HARDWARE_RENDERING_FORCE 1
 
 #define DIRECTINPUT_VERSION 0x700
 #include <dinput.h>
@@ -85,8 +87,6 @@ struct rend_struct
     DWORD field_1C;
 };
 static_assert(sizeof(rend_struct) == 0x20, "rend_struct should be 0x20");
-
-rend_struct* gRenderRelated_dword_6FC780 = (rend_struct*)0x6FC780; // Array of 15000 items?
 
 struct Actor;
 struct ActorList;
@@ -496,7 +496,7 @@ MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
 MGS_VAR(1, 0x787778, DWORD, dword_787778, 0);
 MGS_VAR(1, 0x78E7E4, WORD, dword_78E7E4, 0);
-MGS_VAR(1, 0x006DEF94, DWORD, gNoCrashCheck, 0);
+MGS_VAR(1, 0x006DEF94, DWORD, gCrashCheck, 0);
 MGS_VAR(1, 0x0071687C, DWORD, gCheatsEnabled, 0);
 MGS_VAR(1, 0x006FD1F8, DWORD, gNoCdEnabled, 0);
 MGS_VAR(1, 0x00650D14, DWORD, gWindowedMode, 0);
@@ -525,8 +525,7 @@ MGS_VAR(1, 0x9AD8DA, BYTE, byte_9AD8DA, 0);
 MGS_VAR(1, 0x9AD8C1, BYTE, byte_9AD8C1, 0);
 MGS_VAR(1, 0x73490C, DWORD, dword_73490C, 0);
 MGS_VAR(1, 0x734908, DWORD, dword_734908, 0);
-
-int* gKeys = (int*)0x009AD9A0; // TODO: Array?
+MGS_VAR(1, 0x009AD9A0, int*, gKeys, nullptr); // TODO: Array? FIX ME, crashes when defined this way
 MGS_ARY(1, 0x9AD880, BYTE, 256, byte_9AD880, {});
 MGS_VAR(1, 0x009AD980, DWORD, gvirtualKeyRepeatCount, 0);
 MGS_VAR(1, 0x009AD6B0, DWORD, gVirtualKeyCode, 0);
@@ -1101,6 +1100,7 @@ struct jimUnk0x204
 };
 static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
 
+// FIXME: Use var macro
 jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
 jimDeviceIdentifier* g_pDeviceIdentifiers = (jimDeviceIdentifier*)0x776B68;
 
@@ -1134,11 +1134,16 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
         strcat(pStringError, "E2b:\tNo Texture Alpha Channel support\n");
         status = 1;
     }
+
+    // For a GTX770 either this check is wrong or somehow it supports less features than antique cards
+    // disable this check so the card isn't marked as unsupported.
+#ifndef HARDWARE_RENDERING_FORCE
     if (!(pDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_POW2))
     {
         strcat(pStringError, "E2e:\tBilinear filtering not supported\n");
         status = 1;
     }
+#endif
     if (!(pDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_TRANSPARENCY) || !(pDesc->dpcTriCaps.dwAlphaCmpCaps & D3DPCMPCAPS_GREATEREQUAL))
     {
         strcat(pStringError, "E3a:\tNo Texture Transparency or Alpha Test (GREATEROREQUAL) support\n");
@@ -1536,6 +1541,23 @@ int __cdecl ClearDDSurfaceWhite()
     return 1;
 }
 
+#define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
+struct MGSVertex
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    DWORD diffuse;
+    DWORD specular;
+    float u;
+    float v;
+};
+static_assert(sizeof(MGSVertex) == 0x20, "MGSVertex must be of size 0x20");
+
+MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
+
+
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -1606,7 +1628,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fflush(gFile);
         if (dword_716F78 == 1)
         {
-            if (gNoCrashCheck)
+            if (gCrashCheck)
             {
                 MessageBoxA(
                     0,
@@ -1626,7 +1648,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs(" . fail\n", gFile);
         mgs_fflush(gFile);
     }
-    if (gNoCrashCheck)
+    if (gCrashCheck)
     {
         dword_716F78 = 1;
         sub_433801();
@@ -1724,8 +1746,11 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     mgs_fflush(gFile);
     for (i = 0; i < dword_77C608; ++i)
     {
+        // TODO: Hack/fixme accessing the dword_776B94 crashes
+#ifndef HARDWARE_RENDERING_FORCE
         mgs_fprintf(gFile, "pDriverGUID %x, pDeviceGUID %x\n", dword_776B94[290 * i], dword_776B90[290 * i]);
         mgs_fprintf(gFile, "D3DDevice description : %s", (char *)&unk_776B68 + 1160 * i);
+#endif
         if (dword_77C60C == i)
         {
             mgs_fputs("   /selected/\n", gFile);
@@ -2046,7 +2071,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs("Creating device...\n", gFile);
         mgs_fflush(gFile);
 
+        // TODO: FIX ME the GUID is wrong here so this fails with invalid argument
+#ifdef HARDWARE_RENDERING_FORCE
+        hr = g_pDirect3D->CreateDevice(IID_IDirect3DHALDevice, g_pBackBuffer, &g_pDirect3DDevice);
+#else
         hr = g_pDirect3D->CreateDevice(*((GUID*)(&v33)), g_pBackBuffer, &g_pDirect3DDevice);
+#endif
         if (hr >= 0)
         {
             mgs_fputs(" . done\n", gFile);
@@ -2241,7 +2271,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             gPrimStructArray[i].field_0 = 0;
         }
-        gRenderRelated_dword_6FC780 = (rend_struct*)mgs_malloc(0x75300u); // 15000 items
+        g_pMGSVertices = (MGSVertex*)mgs_malloc(sizeof(MGSVertex) * 15000);
     }
     gImageBufer_dword_6FC728 = (DWORD*)mgs_malloc(0x100000u);
     if (gImageBufer_dword_6FC728)
@@ -2281,19 +2311,6 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 }
 //MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
-#define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
-struct MGSVertex
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    DWORD diffuse;
-    DWORD specular;
-    float u;
-    float v;
-};
-static_assert(sizeof(MGSVertex) == 0x20, "MGSVertex must be of size 0x20");
 
 //MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), SetDDSurfaceTexture);
 HRESULT __cdecl SetDDSurfaceTexture()
@@ -2512,12 +2529,20 @@ MGS_VAR(1, 0x6C0E9A, WORD, word_6C0E9A, 0);
 MGS_VAR(1, 0x6C0E9C, WORD, word_6C0E9C, 0);
 MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
 
-MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 
 MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
 MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
 MSG_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
-MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t), sub_40FF20);
+
+// TODO: FIX ME in hardware rendering mode even when ConvertPolys_Hardware is left as the original
+// function, sub_40FF20 will de-ref null and crash. Stubbing this function prevents crash but corrupts
+// 2D hud graphics.
+uint32_t __cdecl sub_40FF20(uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4)
+{
+    return 0;
+}
+//MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t), sub_40FF20);
+
 MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 
 
@@ -3461,6 +3486,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
     }
 }
 
+MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
@@ -3986,9 +4012,9 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             _chdir(".");
             dword_78D7B0 = -1;
             if (strstr(lpCmdLine, "-nocrashcheck"))
-                gNoCrashCheck = 0;
+                gCrashCheck = 0;
             else
-                gNoCrashCheck = 1;
+                gCrashCheck = 1;
             if (strstr(lpCmdLine, "-cheatenable"))
                 gCheatsEnabled = 1;
             else
@@ -4053,8 +4079,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
 
                 // HACK: Set some options that allow the game to actually start for now
                 gCheatsEnabled = 1;
-                gNoCrashCheck = 1;
-                gSoftwareRendering = 1;
+                gCrashCheck = 0;
+                gSoftwareRendering = 0;
                 gNoCdEnabled = 1;
                 gFps = 1;
                 
