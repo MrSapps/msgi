@@ -10,14 +10,12 @@ struct Task
     HANDLE mEventHandle;
 };
 static_assert(sizeof(Task) == 0x10, "Task size must be 0x10");
-using ThreadProc = unsigned int(__stdcall *)(void(*fn)(void));
+using ThreadProc = unsigned int(__stdcall *)(void(__stdcall *fn)(void));
 
-void __cdecl __Task_EndSelf();
-
-unsigned int __stdcall TaskThreadProcEndSelf(void(*fn)(void))
+unsigned int __stdcall TaskThreadProcEndSelf(void(__stdcall  *fn)(void))
 {
     fn();
-    __Task_EndSelf();
+    Task_EndSelf();
     return 0;
 }
 
@@ -57,25 +55,23 @@ MGS_ARY(1, 0x68C4C0, ThreadProc, 32, gFnTbl_off_68C4C0,
     TaskThreadProcEndSelf,
     TaskThreadProcEndSelf,
     TaskThreadProcEndSelf
-}); // TODO: Populate
+});
 MGS_VAR(1, 0x7346FC, DWORD, gTaskRequest_dword_7346FC, 0);
 MGS_VAR(1, 0x7346F8, DWORD, gTaskResult_dword_7346F8, 0);
 
-// TODO: Enable when bug that breaks 2nd codec convo is fixed
-/*
 MSG_FUNC_IMPL(0x0051FEFC, Task_Init);
 MSG_FUNC_IMPL(0x004605AE, Task_Pause);
 MSG_FUNC_IMPL(0x0051FEDC, Task_ResumeQ);
 MSG_FUNC_IMPL(0x0051FFC3, Task_TerminateQ);
 MSG_FUNC_IMPL(0x00520001, Task_SignalQ);
 MSG_FUNC_IMPL(0x00520095, Task_WaitForSignalQ);
-MSG_FUNC_IMPL(0x00445490, j_Task_WaitForSignalQ);
+// TODO: After a 2nd codec call this function causes it to break, perhaps a detouring issue since 
+// this function is merely a jmp!
+//MSG_FUNC_IMPL(0x00445490, j_Task_WaitForSignalQ);
 MSG_FUNC_IMPL(0x00508115, Task_SyncCall);
 MSG_FUNC_IMPL(0x0051FF6A, Task_GetExitCodeQ);
 
-//MSG_FUNC_IMPL(0x00520032, Task_EndSelf);
-MSG_FUNC_NOT_IMPL(0x00520032, decltype(Task_EndSelf), _Task_EndSelf);
-*/
+
 
 void TaskCpp_ForceLink()
 {
@@ -241,8 +237,7 @@ int __cdecl Task_GetExitCodeQ(DWORD taskId)
 }
 
 // Seems to be called at the end of the thread proc, ends *this* thread
-// FIX ME: Ending codec convo calls this and then it breaks
-void __cdecl __Task_EndSelf()
+void __cdecl Task_EndSelf()
 {
     const DWORD currentThreadId = GetCurrentThreadId();
     int taskIdx = 0;
