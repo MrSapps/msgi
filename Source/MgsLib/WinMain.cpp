@@ -3771,27 +3771,36 @@ void *__cdecl sub_44E12B()
 //MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_UpdateActors);
 int __cdecl Actor_UpdateActors()
 {
-    int result = 0;
+    int result; // eax@8
+    Actor *v1; // [sp+0h] [bp-18h]@5
+    Actor *v2; // [sp+4h] [bp-14h]@4
+    signed int i; // [sp+10h] [bp-8h]@1
+    ActorList *pActor; // [sp+14h] [bp-4h]@1
 
-    ActorList* pActorList = gActors;
-    for (int i = 9; i > 0; --i)
+    pActor = gActors;
+
+
+    for (i = 9; i > 0; --i)
     {
-        if (!(dword_791A0C & pActorList->mPause))
+        if (!(dword_791A0C & pActor->mPause))
         {
-            // Loop through each actor at this level and call its
-            // run function if set
-            Actor* pActor = &pActorList->first;
+            v2 = &pActor->first;
             do
             {
-                if (pActor->update)
+                v1 = v2->pNext;
+                auto fn = v2->update;
+
+                // bool isFamasFunc = fn == (void*)0x640CDC;
+
+                if (fn)
                 {
-                    pActor->update(pActor);
+                    fn(v2);
                 }
                 dword_9942A0 = 0;
-                pActor = pActor->pNext;
-            } while (pActor);
+                v2 = v1;
+            } while (v1);
         }
-        ++pActorList;
+        ++pActor;
         result = i - 1;
     }
     return result;
