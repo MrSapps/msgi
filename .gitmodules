@@ -1,3 +1,6 @@
 [submodule "3rdParty/Detours"]
 	path = 3rdParty/Detours
 	url = https://github.com/paulsapps/Detours.git
+[submodule "3rdParty/gmock-1.7.0"]
+	path = 3rdParty/gmock-1.7.0
+	url = https://github.com/paulsapps/gmock-1.7.0.git
