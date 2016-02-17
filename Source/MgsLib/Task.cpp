@@ -65,9 +65,7 @@ MSG_FUNC_IMPL(0x0051FEDC, Task_ResumeQ);
 MSG_FUNC_IMPL(0x0051FFC3, Task_TerminateQ);
 MSG_FUNC_IMPL(0x00520001, Task_SignalQ);
 MSG_FUNC_IMPL(0x00520095, Task_WaitForSignalQ);
-// TODO: After a 2nd codec call this function causes it to break, perhaps a detouring issue since 
-// this function is merely a jmp!
-//MSG_FUNC_IMPL(0x00445490, j_Task_WaitForSignalQ);
+MSG_FUNC_IMPL(0x00445470, j_Task_WaitForSignalQ);
 MSG_FUNC_IMPL(0x00508115, Task_SyncCall);
 MSG_FUNC_IMPL(0x0051FF6A, Task_GetExitCodeQ);
 
