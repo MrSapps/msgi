@@ -10,6 +10,8 @@
 #include <map>
 #include <detours.h>
 
+// When changing this, delete the cfg files the game creates else it will get into a bad state and probably crash
+#define HARDWARE_RENDERING_FORCE 1
 
 #define DIRECTINPUT_VERSION 0x700
 #include <dinput.h>
@@ -23,6 +25,7 @@
 #include "Sound.hpp"
 #include "File.hpp"
 #include "Input.hpp"
+#include "Task.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -85,8 +88,6 @@ struct rend_struct
 };
 static_assert(sizeof(rend_struct) == 0x20, "rend_struct should be 0x20");
 
-rend_struct* gRenderRelated_dword_6FC780 = (rend_struct*)0x6FC780; // Array of 15000 items?
-
 struct Actor;
 struct ActorList;
 
@@ -140,11 +141,8 @@ MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 MSG_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
-MSG_FUNC_NOT_IMPL(0x51FEBC, int __cdecl(), Task_Pause);
 MSG_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
-MSG_FUNC_NOT_IMPL(0x51FEDC, int __cdecl(), Task_ResumeQ);
 MSG_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
-MSG_FUNC_NOT_IMPL(0x51FFC3, void *__cdecl(), Task_TerminateQ);
 
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
 MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
@@ -500,7 +498,7 @@ MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
 MGS_VAR(1, 0x787778, DWORD, dword_787778, 0);
 MGS_VAR(1, 0x78E7E4, WORD, dword_78E7E4, 0);
-MGS_VAR(1, 0x006DEF94, DWORD, gNoCrashCheck, 0);
+MGS_VAR(1, 0x006DEF94, DWORD, gCrashCheck, 0);
 MGS_VAR(1, 0x0071687C, DWORD, gCheatsEnabled, 0);
 MGS_VAR(1, 0x006FD1F8, DWORD, gNoCdEnabled, 0);
 MGS_VAR(1, 0x00650D14, DWORD, gWindowedMode, 0);
@@ -529,8 +527,7 @@ MGS_VAR(1, 0x9AD8DA, BYTE, byte_9AD8DA, 0);
 MGS_VAR(1, 0x9AD8C1, BYTE, byte_9AD8C1, 0);
 MGS_VAR(1, 0x73490C, DWORD, dword_73490C, 0);
 MGS_VAR(1, 0x734908, DWORD, dword_734908, 0);
-
-int* gKeys = (int*)0x009AD9A0; // TODO: Array?
+MGS_PTR(1, 0x009AD9A0, int*, gKeys, nullptr); // TODO: Array - defined as "plain" ptr so array access won't crash
 MGS_ARY(1, 0x9AD880, BYTE, 256, byte_9AD880, {});
 MGS_VAR(1, 0x009AD980, DWORD, gvirtualKeyRepeatCount, 0);
 MGS_VAR(1, 0x009AD6B0, DWORD, gVirtualKeyCode, 0);
@@ -1105,6 +1102,7 @@ struct jimUnk0x204
 };
 static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
 
+// FIXME: Use var macro
 jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
 jimDeviceIdentifier* g_pDeviceIdentifiers = (jimDeviceIdentifier*)0x776B68;
 
@@ -1138,11 +1136,16 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
         strcat(pStringError, "E2b:\tNo Texture Alpha Channel support\n");
         status = 1;
     }
+
+    // For a GTX770 either this check is wrong or somehow it supports less features than antique cards
+    // disable this check so the card isn't marked as unsupported.
+#ifndef HARDWARE_RENDERING_FORCE
     if (!(pDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_POW2))
     {
         strcat(pStringError, "E2e:\tBilinear filtering not supported\n");
         status = 1;
     }
+#endif
     if (!(pDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_TRANSPARENCY) || !(pDesc->dpcTriCaps.dwAlphaCmpCaps & D3DPCMPCAPS_GREATEREQUAL))
     {
         strcat(pStringError, "E3a:\tNo Texture Transparency or Alpha Test (GREATEROREQUAL) support\n");
@@ -1540,6 +1543,23 @@ int __cdecl ClearDDSurfaceWhite()
     return 1;
 }
 
+#define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
+struct MGSVertex
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    DWORD diffuse;
+    DWORD specular;
+    float u;
+    float v;
+};
+static_assert(sizeof(MGSVertex) == 0x20, "MGSVertex must be of size 0x20");
+
+MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
+
+
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -1610,7 +1630,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fflush(gFile);
         if (dword_716F78 == 1)
         {
-            if (gNoCrashCheck)
+            if (gCrashCheck)
             {
                 MessageBoxA(
                     0,
@@ -1630,7 +1650,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs(" . fail\n", gFile);
         mgs_fflush(gFile);
     }
-    if (gNoCrashCheck)
+    if (gCrashCheck)
     {
         dword_716F78 = 1;
         sub_433801();
@@ -1728,8 +1748,11 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     mgs_fflush(gFile);
     for (i = 0; i < dword_77C608; ++i)
     {
+        // TODO: Hack/fixme accessing the dword_776B94 crashes
+#ifndef HARDWARE_RENDERING_FORCE
         mgs_fprintf(gFile, "pDriverGUID %x, pDeviceGUID %x\n", dword_776B94[290 * i], dword_776B90[290 * i]);
         mgs_fprintf(gFile, "D3DDevice description : %s", (char *)&unk_776B68 + 1160 * i);
+#endif
         if (dword_77C60C == i)
         {
             mgs_fputs("   /selected/\n", gFile);
@@ -2050,7 +2073,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs("Creating device...\n", gFile);
         mgs_fflush(gFile);
 
+        // TODO: FIX ME the GUID is wrong here so this fails with invalid argument
+#ifdef HARDWARE_RENDERING_FORCE
+        hr = g_pDirect3D->CreateDevice(IID_IDirect3DHALDevice, g_pBackBuffer, &g_pDirect3DDevice);
+#else
         hr = g_pDirect3D->CreateDevice(*((GUID*)(&v33)), g_pBackBuffer, &g_pDirect3DDevice);
+#endif
         if (hr >= 0)
         {
             mgs_fputs(" . done\n", gFile);
@@ -2245,7 +2273,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             gPrimStructArray[i].field_0 = 0;
         }
-        gRenderRelated_dword_6FC780 = (rend_struct*)mgs_malloc(0x75300u); // 15000 items
+        g_pMGSVertices = (MGSVertex*)mgs_malloc(sizeof(MGSVertex) * 15000);
     }
     gImageBufer_dword_6FC728 = (DWORD*)mgs_malloc(0x100000u);
     if (gImageBufer_dword_6FC728)
@@ -2285,19 +2313,6 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 }
 //MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
-#define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
-struct MGSVertex
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    DWORD diffuse;
-    DWORD specular;
-    float u;
-    float v;
-};
-static_assert(sizeof(MGSVertex) == 0x20, "MGSVertex must be of size 0x20");
 
 //MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), SetDDSurfaceTexture);
 HRESULT __cdecl SetDDSurfaceTexture()
@@ -2516,7 +2531,6 @@ MGS_VAR(1, 0x6C0E9A, WORD, word_6C0E9A, 0);
 MGS_VAR(1, 0x6C0E9C, WORD, word_6C0E9C, 0);
 MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
 
-MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 
 MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
 MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
@@ -3471,6 +3485,8 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
     }
 }
 
+MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
+
 MGS_VAR(1, 0x6FC868, void*, g_pBackBufferSurface, 0);
 MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
 
@@ -3841,27 +3857,36 @@ void *__cdecl sub_44E12B()
 //MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_UpdateActors);
 int __cdecl Actor_UpdateActors()
 {
-    int result = 0;
+    int result; // eax@8
+    Actor *v1; // [sp+0h] [bp-18h]@5
+    Actor *v2; // [sp+4h] [bp-14h]@4
+    signed int i; // [sp+10h] [bp-8h]@1
+    ActorList *pActor; // [sp+14h] [bp-4h]@1
 
-    ActorList* pActorList = gActors;
-    for (int i = 9; i > 0; --i)
+    pActor = gActors;
+
+
+    for (i = 9; i > 0; --i)
     {
-        if (!(dword_791A0C & pActorList->mPause))
+        if (!(dword_791A0C & pActor->mPause))
         {
-            // Loop through each actor at this level and call its
-            // run function if set
-            Actor* pActor = &pActorList->first;
+            v2 = &pActor->first;
             do
             {
-                if (pActor->update)
+                v1 = v2->pNext;
+                auto fn = v2->update;
+
+                // bool isFamasFunc = fn == (void*)0x640CDC;
+
+                if (fn)
                 {
-                    pActor->update(pActor);
+                    fn(v2);
                 }
                 dword_9942A0 = 0;
-                pActor = pActor->pNext;
-            } while (pActor);
+                v2 = v1;
+            } while (v1);
         }
-        ++pActorList;
+        ++pActor;
         result = i - 1;
     }
     return result;
@@ -3977,7 +4002,7 @@ void ShutdownEngine()
     {
         Fonts_Release_sub_4317B3();
         Input_Shutdown_sub_43C716();
-        Sound_ShutDown(); // FIXME: Execution always ends at DSound::IUnknown::Release (if its not null)
+        Sound_ShutDown();
         DoClearAll();
         Task_TerminateQ();
         DestroyWindow(gHwnd);
@@ -3998,6 +4023,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     char *bRestart; // [sp+464h] [bp-8h]@8
     //int i; // [sp+468h] [bp-4h]@70
 
+    TaskCpp_ForceLink();
     SoundCpp_ForceLink();
     SoundCpp_Debug();
  
@@ -4046,9 +4072,9 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             _chdir(".");
             dword_78D7B0 = -1;
             if (strstr(lpCmdLine, "-nocrashcheck"))
-                gNoCrashCheck = 0;
+                gCrashCheck = 0;
             else
-                gNoCrashCheck = 1;
+                gCrashCheck = 1;
             if (strstr(lpCmdLine, "-cheatenable"))
                 gCheatsEnabled = 1;
             else
@@ -4113,8 +4139,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
 
                 // HACK: Set some options that allow the game to actually start for now
                 gCheatsEnabled = 1;
-                gNoCrashCheck = 1;
-                gSoftwareRendering = 1;
+                gCrashCheck = 0;
+                gSoftwareRendering = 0;
                 gNoCdEnabled = 1;
                 gFps = 1;
                 
@@ -4138,7 +4164,6 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
                     0);
                 if (gHwnd)
                 {
-                    atexit(ShutdownEngine);
                     SetWindowSize(gHwnd, 640, 480);
                     ShowWindow(gHwnd, 5);
                     UpdateWindow(gHwnd);
@@ -4202,6 +4227,10 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
             MB_OK);
         result = 0;
     }
+
+    // Real game uses atexit() to call this, we don't because we don't want it calling
+    // during DllMain as this can cause a crash.
+    ShutdownEngine();
 
     return result;
 }
