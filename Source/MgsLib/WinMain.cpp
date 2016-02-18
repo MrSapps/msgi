@@ -525,7 +525,7 @@ MGS_VAR(1, 0x9AD8DA, BYTE, byte_9AD8DA, 0);
 MGS_VAR(1, 0x9AD8C1, BYTE, byte_9AD8C1, 0);
 MGS_VAR(1, 0x73490C, DWORD, dword_73490C, 0);
 MGS_VAR(1, 0x734908, DWORD, dword_734908, 0);
-MGS_VAR(1, 0x009AD9A0, int*, gKeys, nullptr); // TODO: Array? FIX ME, crashes when defined this way
+MGS_PTR(1, 0x009AD9A0, int*, gKeys, nullptr); // TODO: Array - defined as "plain" ptr so array access won't crash
 MGS_ARY(1, 0x9AD880, BYTE, 256, byte_9AD880, {});
 MGS_VAR(1, 0x009AD980, DWORD, gvirtualKeyRepeatCount, 0);
 MGS_VAR(1, 0x009AD6B0, DWORD, gVirtualKeyCode, 0);
