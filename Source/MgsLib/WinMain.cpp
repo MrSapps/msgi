@@ -2521,7 +2521,7 @@ MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
 MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
 MSG_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
-MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t), sub_40FF20);
+MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
 MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 
 
@@ -3092,13 +3092,18 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
-            sub_40FF20(pStructVert->Vtxs[0].x, pStructVert->Vtxs[0].y, pStructVert->Vtxs[1].x, pStructVert->Vtxs[1].y);
+            float fXSize, fYSize;
+            sub_40FF20(pStructVert->Vtxs[0].x, pStructVert->Vtxs[0].y, pStructVert->Vtxs[1].x, pStructVert->Vtxs[1].y, &fXSize, &fYSize);
             handleBlendMode(word_6C0EAC);
 
             convertVertexType0(pStructVert, 0);
             convertVertexType0(pStructVert, 0);
+            g_pMGSVertices[g_nVertexOffset - 1].x += fXSize;
+            g_pMGSVertices[g_nVertexOffset - 1].y += fYSize;
             convertVertexType0(pStructVert, 1);
             convertVertexType0(pStructVert, 1);
+            g_pMGSVertices[g_nVertexOffset - 1].x += fXSize;
+            g_pMGSVertices[g_nVertexOffset - 1].y += fYSize;
 
             gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
             gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
