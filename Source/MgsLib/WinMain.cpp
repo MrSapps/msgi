@@ -149,6 +149,8 @@ MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
 MGS_VAR(1, 0x73491C, DWORD, dword_73491C, 0);
 MGS_VAR(1, 0x71D164, DWORD, dword_71D164, 0);
 MGS_VAR(1, 0x6FC718, DWORD, dword_6FC718, 0);
+MGS_VAR(1, 0x6FC720, DWORD, dword_6FC720, 0);
+MGS_VAR(1, 0x6FC768, DWORD, dword_6FC768, 0);
 MGS_VAR(1, 0x78E7F8, WORD, word_78E7F8, 0);
 MGS_VAR(1, 0x78E7F6, WORD, word_78E7F6, 0);
 MGS_VAR(1, 0x717354, DWORD, dword_717354, 0);
@@ -2419,9 +2421,9 @@ struct MGSFloatVert
 
 struct StructVert
 {
-    uint8_t diffuseR;
-    uint8_t diffuseG;
-    uint8_t diffuseB;
+    uint8_t pad0;
+    uint8_t pad1;
+    uint8_t pad2;
     uint8_t structType;
 };
 
@@ -2533,16 +2535,7 @@ MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
 MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
 MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
 MSG_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
-
-// TODO: FIX ME in hardware rendering mode even when ConvertPolys_Hardware is left as the original
-// function, sub_40FF20 will de-ref null and crash. Stubbing this function prevents crash but corrupts
-// 2D hud graphics.
-uint32_t __cdecl sub_40FF20(uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4)
-{
-    return 0;
-}
-//MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t), sub_40FF20);
-
+MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
 MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 
 
@@ -2730,11 +2723,12 @@ void convertVertexType4(StructVertType4* pStructVert, uint32_t nIndex, float u, 
     g_nVertexOffset++;
 }
 
+MSG_FUNC_NOT_IMPL(0x418A70, int __cdecl(StructVert* a_pStructVert, int a_nSize), Render_Software);
+
 // Untested for the moment
-//MSG_FUNC_NOT_IMPL(0x410560, int __cdecl(), Render_Hardware);
+//MSG_FUNC_NOT_IMPL(0x410560, int __cdecl(StructVert* a_pStructVert, int a_nSize), ConvertPolys_Hardware);
 int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
 {
-    uint32_t varC = sub_44EAE5();
     uint32_t var14 = dword_688CD4;
     uint32_t var1C = dword_688CD0;
 
@@ -3112,13 +3106,18 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
-            sub_40FF20(pStructVert->Vtxs[0].x, pStructVert->Vtxs[0].y, pStructVert->Vtxs[1].x, pStructVert->Vtxs[1].y);
+            float fXSize, fYSize;
+            sub_40FF20(pStructVert->Vtxs[0].x, pStructVert->Vtxs[0].y, pStructVert->Vtxs[1].x, pStructVert->Vtxs[1].y, &fXSize, &fYSize);
             handleBlendMode(word_6C0EAC);
 
             convertVertexType0(pStructVert, 0);
             convertVertexType0(pStructVert, 0);
+            g_pMGSVertices[g_nVertexOffset - 1].x += fXSize;
+            g_pMGSVertices[g_nVertexOffset - 1].y += fYSize;
             convertVertexType0(pStructVert, 1);
             convertVertexType0(pStructVert, 1);
+            g_pMGSVertices[g_nVertexOffset - 1].x += fXSize;
+            g_pMGSVertices[g_nVertexOffset - 1].y += fYSize;
 
             gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
             gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
@@ -3487,6 +3486,67 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
 }
 
 MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
+
+MGS_VAR(1, 0x6FC868, void*, g_pBackBufferSurface, 0);
+MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
+
+MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
+MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
+
+//MSG_FUNC_NOT_IMPL(0x410560, int __cdecl(), Render_DrawGeneric);
+void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
+{
+    if (dword_6FC718 == 1)
+    {
+        dword_6FC718 = 0;
+        dword_6FC720 = 1;
+        return;
+    }
+
+    dword_6FC718 = 0;
+    if (dword_6FC720 == 0)
+    {
+        if (gSoftwareRendering != 0)
+        {
+            DDSURFACEDESC2 desc;
+            memset(&desc, 0, sizeof(DDSURFACEDESC2));
+            g_pBackBuffer->Lock(NULL, &desc, 0, 0);
+            g_pBackBufferSurface = desc.lpSurface;
+            g_BackBufferPitch = desc.lPitch;
+        }
+        do
+        {
+            if (a_pStructVert->structType != 0 && dword_6FC768 == 0)
+            {
+                if (gSoftwareRendering != 0)
+                {
+                    Render_Software(&a_pStructVert[1], a_pStructVert->structType);
+                }
+                else
+                {
+                    ConvertPolys_Hardware(&a_pStructVert[1], a_pStructVert->structType);
+                }
+            }
+            uint32_t nextStructVert = ((uint32_t*)a_pStructVert)[0] & 0x00FFFFFF;
+            a_pStructVert = (StructVert*)nextStructVert;
+        }
+        while ((uint32_t)a_pStructVert != 0xFFFFFF);
+
+        if (gSoftwareRendering != 0)
+        {
+            g_pBackBuffer->Unlock(0);
+        }
+        if (gSoftwareRendering == 0)
+        {
+            Render_DrawHardware();
+        }
+    }
+    if (gSoftwareRendering == 0)
+    {
+        sub_51DE0A();
+    }
+}
+
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
