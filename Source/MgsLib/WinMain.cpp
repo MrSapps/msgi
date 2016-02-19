@@ -1770,7 +1770,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
         mgs_fputs("Creating DirectDraw7\n", gFile);
         mgs_fflush(gFile);
-        hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
+        hr = CoCreateInstance(CLSID_DirectDraw, NULL, CLSCTX_ALL, IID_IDirectDraw7, (void**)&g_pDirectDraw);
+        if (!FAILED(hr))
+        {
+            hr = g_pDirectDraw->Initialize(NULL);
+        }
+        //hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
         if (hr < 0)
         {
             mgs_fputs(" . fail\n", gFile);
