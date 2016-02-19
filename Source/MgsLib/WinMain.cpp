@@ -1664,29 +1664,29 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         sub_433801();
     }
     if (!dword_651CF8 && (v55 == -1))
-    {
-        MessageBoxA(
-            0,
-            "Your video configuration has been updated - your system will be re-profiled\n",
-            "Metal Gear Solid (PC)",
-            MB_OK);
-        v55 = 0;
-        if (sub_41EC40())
         {
-            gSoftwareRendering = 0;
-            gXRes = 2.0f;
-        }
-        else
-        {
-            gSoftwareRendering = 1;
-            lpGuid = 0;
-            gXRes = 1.0f;
-            dword_716F5C = 1.0f;
-            MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
-        }
-        gWindowedMode = 0;
-        sub_433801();
-        v34 = gWindowedMode;
+            MessageBoxA(
+                0,
+                "Your video configuration has been updated - your system will be re-profiled\n",
+                "Metal Gear Solid (PC)",
+                MB_OK);
+            v55 = 0;
+            if (sub_41EC40())
+            {
+                gSoftwareRendering = 0;
+                gXRes = 2.0f;
+            }
+            else
+            {
+                gSoftwareRendering = 1;
+                lpGuid = 0;
+                gXRes = 1.0f;
+                dword_716F5C = 1.0f;
+                MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
+            }
+            gWindowedMode = 0;
+            sub_433801();
+            v34 = gWindowedMode;
         dword_651CF8 = ParseMsgCfg() == 0;
     }
     sub_43C850();
@@ -1770,7 +1770,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
         mgs_fputs("Creating DirectDraw7\n", gFile);
         mgs_fflush(gFile);
-        hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
+        hr = CoCreateInstance(CLSID_DirectDraw, NULL, CLSCTX_ALL, IID_IDirectDraw7, (void**)&g_pDirectDraw);
+        if (!FAILED(hr))
+        {
+            hr = g_pDirectDraw->Initialize(NULL);
+        }
+        //hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
         if (hr < 0)
         {
             mgs_fputs(" . fail\n", gFile);
@@ -2108,12 +2113,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     g_pDDSurface = 0;
                 }
                 else if (!ClearDDSurfaceWhite())
-                {
+                    {
 
-                    g_pDDSurface->Release();
-                    g_pDDSurface = 0;
+                        g_pDDSurface->Release();
+                        g_pDDSurface = 0;
+                    }
                 }
-            }
 
 
             Render_InitTextureStages(0, 2, 2);
