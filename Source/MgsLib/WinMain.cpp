@@ -1531,23 +1531,19 @@ int __cdecl jim_enumerate_devices_z()
 }
 
 //MSG_FUNC_NOT_IMPL(0x41E990, int __cdecl(), ClearDDSurfaceWhite);
-int __cdecl ClearDDSurfaceWhite()
+bool __cdecl ClearDDSurfaceWhite()
 {
-    HRESULT hr;
-
-    DDBLTFX bltFX;
+    DDBLTFX bltFX = {};
     bltFX.dwSize = sizeof(DDBLTFX);
     bltFX.dwFillColor = 0xFFFF;
-
-    do {
-        hr = g_pBackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
+    HRESULT hr;
+    do 
+    {
+        hr = g_pDDSurface->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
     } while (hr == DDERR_WASSTILLDRAWING);
-
-    if (hr != 0)
-        return 0;
-
-    return 1;
+    return hr == S_OK;
 }
+MSG_FUNC_IMPL(0x41E990, ClearDDSurfaceWhite);
 
 #define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
 struct MGSVertex
@@ -3697,15 +3693,9 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
-    signed int v1; // ST10_4@1
-
-    // TODO: Call reimpl and call reimpl with jmp
-    // then compare memory to see whats gone wrong?
-
-    //v1 = InitD3d_ProfileGfxHardwareQ_Test();
-    v1 = InitD3d_ProfileGfxHardwareQ();
+    const auto ret = InitD3d_ProfileGfxHardwareQ();
     MessageBox_Error(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
-    return v1;
+    return ret;
 }
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
 
