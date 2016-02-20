@@ -2888,6 +2888,9 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 0;
         gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 0;
 
+        // 100-103 case has an issue, causes corrupted text
+        //LOG_INFO("VTX type: " << dword_791C54);
+
         switch (dword_791C54)
         {
         case 0:
@@ -3628,7 +3631,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
     }
 }
 
-//MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
+MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
 
 MGS_VAR(1, 0x6FC868, void*, g_pBackBufferSurface, 0);
 MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
@@ -3636,7 +3639,7 @@ MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
 MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
 MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
 
-//MSG_FUNC_NOT_IMPL(0x410560, int __cdecl(), Render_DrawGeneric);
+//MSG_FUNC_NOT_IMPL(0x4103B0, int __cdecl(), Render_DrawGeneric);
 void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
 {
     if (dword_6FC718 == 1)
@@ -3689,6 +3692,7 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
         sub_51DE0A();
     }
 }
+MSG_FUNC_IMPL(0x4103B0, Render_DrawGeneric);
 
 // 0x00420810
 signed int __cdecl DoInitAll()
