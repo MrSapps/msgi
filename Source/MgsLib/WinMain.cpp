@@ -3498,7 +3498,7 @@ MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
 MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
 MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
 
-//MSG_FUNC_NOT_IMPL(0x4103B0, int __cdecl(), Render_DrawGeneric);
+//MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
 void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
 {
     if (dword_6FC718 == 1)
@@ -3551,7 +3551,13 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
         sub_51DE0A();
     }
 }
-signed int __cdecl argh();
+
+//MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
+void __cdecl Render_DrawIndex(uint32_t a_nIndex)
+{
+    StructVert* pStructVert = (StructVert*)(0x6BC1EC + a_nIndex * 0x40);
+    Render_DrawGeneric(pStructVert);
+}
 
 // 0x00420810
 signed int __cdecl DoInitAll()
