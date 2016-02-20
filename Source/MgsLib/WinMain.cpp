@@ -3498,7 +3498,7 @@ MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
 MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
 MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
 
-//MSG_FUNC_NOT_IMPL(0x410560, int __cdecl(), Render_DrawGeneric);
+//MSG_FUNC_NOT_IMPL(0x4103B0, int __cdecl(), Render_DrawGeneric);
 void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
 {
     if (dword_6FC718 == 1)
