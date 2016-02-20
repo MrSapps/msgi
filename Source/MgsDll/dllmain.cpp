@@ -9,6 +9,8 @@ bool IsMgsi()
     return true;
 }
 
+// real addr of new func is 0x4103B0
+
 extern "C"
 {
     __declspec(dllexport) signed int __cdecl EBUEula(LPCSTR phkResult, LPARAM a2, int a3, int a4)

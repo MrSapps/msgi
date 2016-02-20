@@ -13,6 +13,7 @@
 // When changing this, delete the cfg files the game creates else it will get into a bad state and probably crash
 #define HARDWARE_RENDERING_FORCE 1
 
+
 #define DIRECTINPUT_VERSION 0x700
 #include <dinput.h>
 #define DIRECTDRAW_VERSION 0x700
@@ -119,7 +120,7 @@ MSG_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
 MSG_FUNC_NOT_IMPL(0x0041EC40, signed int __cdecl(), sub_41EC40);
 MSG_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), sub_43C850);
 MSG_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
-MSG_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, int*), sub_51F1E1);
+MSG_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, GUID**), sub_51F1E1);
 MSG_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
 MSG_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
 MSG_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
@@ -178,10 +179,10 @@ MGS_VAR(1, 0x71D414, FILE *, gLogFile, nullptr);
 MGS_VAR(1, 0x651CF8, DWORD, dword_651CF8, 0);
 MGS_VAR(1, 0x716F5C, float, dword_716F5C, 0);
 MGS_VAR(1, 0x716F78, DWORD, dword_716F78, 0);
-MGS_VAR(1, 0x77C60C, DWORD, dword_77C60C, 0);
-MGS_VAR(1, 0x77C608, DWORD, dword_77C608, 0);
-MGS_VAR(1, 0x776B94, DWORD *, dword_776B94, nullptr);
-MGS_VAR(1, 0x776B90, DWORD *, dword_776B90, nullptr);
+MGS_VAR(1, 0x77C60C, DWORD, gDriverNum_dword_77C60C, 0);
+MGS_VAR(1, 0x77C608, DWORD, gNumDrivers_dword_77C608, 0);
+MGS_PTR(1, 0x776B94, DWORD *, dword_776B94, nullptr);
+MGS_PTR(1, 0x776B90, DWORD *, dword_776B90, nullptr);
 MGS_VAR(1, 0x716F74, DWORD, dword_716F74, 0);
 MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
 MGS_VAR(1, 0x6FC728, DWORD *, gImageBufer_dword_6FC728, 0);
@@ -195,7 +196,10 @@ MGS_VAR(1, 0x6FC7C4, DWORD, dword_6FC7C4, 0);
 MGS_VAR(1, 0x651D94, DWORD, dword_651D94, 0);
 MGS_VAR(1, 0x6FC79C, DWORD, g_surface565Mode, 0);
 MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
-MGS_VAR(1, 0x776B68, char *, unk_776B68, nullptr);
+
+MGS_PTR(1, 0x776B68, struct jimDeviceIdentifier *, g_pDeviceIdentifiers, nullptr); // TODO: Array?
+MGS_PTR(1, 0x689B68, struct jimUnk0x204 *, array_689B68, nullptr); // TODO: Array?
+
 MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
 MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
@@ -1102,9 +1106,7 @@ struct jimUnk0x204
 };
 static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
 
-// FIXME: Use var macro
-jimUnk0x204* array_689B68 = (jimUnk0x204*)0x689B68;
-jimDeviceIdentifier* g_pDeviceIdentifiers = (jimDeviceIdentifier*)0x776B68;
+
 
 MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
 
@@ -1139,6 +1141,7 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
 
     // For a GTX770 either this check is wrong or somehow it supports less features than antique cards
     // disable this check so the card isn't marked as unsupported.
+    //pDesc->dpcTriCaps.dwTextureCaps |= D3DPTEXTURECAPS_POW2;
 #ifndef HARDWARE_RENDERING_FORCE
     if (!(pDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_POW2))
     {
@@ -1237,6 +1240,8 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
     return pIdentifier->ddIdentifier.field430;
 }
 
+MSG_FUNC_IMPL(0x51E7FC, validateDeviceCaps);
+
 HRESULT CALLBACK EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
 {
     jimDeviceIdentifier* pIdentifier = (jimDeviceIdentifier*)pUser;
@@ -1270,7 +1275,7 @@ HRESULT CALLBACK EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
 HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDeviceName, LPD3DDEVICEDESC7 pDesc, LPVOID pUser)
 {
     jimDeviceIdentifier* pIdentifier = (jimDeviceIdentifier*)pUser;
-    jimDeviceIdentifier* pGlobalIdentifier = &g_pDeviceIdentifiers[dword_77C608];
+    jimDeviceIdentifier* pGlobalIdentifier = g_pDeviceIdentifiers +gNumDrivers_dword_77C608;
 
     memset(pGlobalIdentifier, 0, sizeof(jimDeviceIdentifier));
     
@@ -1301,7 +1306,7 @@ HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDevice
 
     validateDeviceCaps(pDesc, lpDeviceDescription, lpDeviceName, pGlobalIdentifier);
 
-    dword_77C608++;
+    gNumDrivers_dword_77C608++;
 
     return 1;
 }
@@ -1422,56 +1427,58 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     return TRUE;
 }
 
-//MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices);
-int __cdecl jim_enumerate_devices()
+MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices_);
+int __cdecl jim_enumerate_devices_z()
 {
+    abort();
+
     int varC;
     int var8 = 0;
     jimDeviceDDId Dst;
     jimDeviceDDId Buf1;
 
-    dword_77C608 = 0;
-    dword_77C60C = 0;
+    gNumDrivers_dword_77C608 = 0;
+    gDriverNum_dword_77C60C = 0;
     DirectDrawEnumerateExA_MGS(DDEnumCallbackEx, 0, DDENUM_NONDISPLAYDEVICES);
 
-    for (varC = 0; varC < dword_77C608; varC++)
+    for (varC = 0; varC < gNumDrivers_dword_77C608; varC++)
     {
-        g_pDeviceIdentifiers[varC].ddIdentifier.field430 |= 0x80;
+        (g_pDeviceIdentifiers+varC)->ddIdentifier.field430 |= 0x80;
     }
 
     int var4 = 0x41;
     varC = 0;
     while (true)
     {
-        if (varC >= dword_77C608)
+        if (varC >= gNumDrivers_dword_77C608)
             break;
 
-        if ((g_pDeviceIdentifiers[varC].ddIdentifier.field430 & var4) != 0)
+        if (((g_pDeviceIdentifiers+varC)->ddIdentifier.field430 & var4) != 0)
         {
             memset(&Dst, 0, 0x438);
-            memcpy(&Dst, &g_pDeviceIdentifiers[varC].ddIdentifier, 0x434);    // Copy of var18 is included by memcpying 4 bytes more
+            memcpy(&Dst, &(g_pDeviceIdentifiers+varC)->ddIdentifier, 0x434);    // Copy of var18 is included by memcpying 4 bytes more
             if (File_msgvideocfg_Write(&Dst, -1) == 0)
                 var8++;
 
-            memset(&g_pDeviceIdentifiers[varC], 0, 0x488);
+            memset(g_pDeviceIdentifiers+varC, 0, 0x488);
 
-            if (varC < dword_77C608)
+            if (varC < gNumDrivers_dword_77C608)
             {
-                int size = (dword_77C608 - (varC + 1)) * 0x488;
-                memmove(&g_pDeviceIdentifiers[varC], &g_pDeviceIdentifiers[varC + 1], size);
+                int size = (gNumDrivers_dword_77C608 - (varC + 1)) * 0x488;
+                memmove(g_pDeviceIdentifiers+varC, g_pDeviceIdentifiers + varC + 1, size);
             }
-            dword_77C608--;
+            gNumDrivers_dword_77C608--;
             continue;
         }
 
-        if (g_pDeviceIdentifiers[varC].pOtherGUID != 0)
+        if ((g_pDeviceIdentifiers+varC)->pOtherGUID != 0)
         {
-            g_pDeviceIdentifiers[varC].pOtherGUID = &g_pDeviceIdentifiers[varC].otherGUID;
+            (g_pDeviceIdentifiers + varC)->pOtherGUID = &(g_pDeviceIdentifiers + varC)->otherGUID;
         }
 
-        if (g_pDeviceIdentifiers[varC].pDeviceGUID != 0)
+        if ((g_pDeviceIdentifiers + varC)->pDeviceGUID != 0)
         {
-            g_pDeviceIdentifiers[varC].pDeviceGUID = &g_pDeviceIdentifiers[varC].deviceGUID;
+            (g_pDeviceIdentifiers + varC)->pDeviceGUID = &(g_pDeviceIdentifiers + varC)->deviceGUID;
         }
 
         varC++;
@@ -1481,9 +1488,9 @@ int __cdecl jim_enumerate_devices()
     {
         memset(&Buf1, 0, 0x438);
 
-        if (varC < dword_77C608)
+        if (varC < gNumDrivers_dword_77C608)
         {
-            memcpy(&Buf1, &g_pDeviceIdentifiers[varC].ddIdentifier, 0x434);   // Copy of var_450 included same way as earlier
+            memcpy(&Buf1, &(g_pDeviceIdentifiers + varC)->ddIdentifier, 0x434);   // Copy of var_450 included same way as earlier
             if (file_msgvideocfg_Write2(&Buf1, -1) == 1)
                 var8++;
         }
@@ -1491,17 +1498,17 @@ int __cdecl jim_enumerate_devices()
             var8++;
     }
 
-    if (dword_77C608 > 2)
-        dword_77C608 = 2;
+    if (gNumDrivers_dword_77C608 > 2)
+        gNumDrivers_dword_77C608 = 2;
 
     dword_68C3B8 = 1;
-    for (varC = 0; varC < dword_77C608; varC++)
+    for (varC = 0; varC < gNumDrivers_dword_77C608; varC++)
     {
         memset(&array_689B68[dword_68C3B8], 0, 0x204);
-        strncpy(array_689B68[dword_68C3B8].string, g_pDeviceIdentifiers[varC].ddIdentifier.identifier.szDescription, 0x200);
-        array_689B68[dword_68C3B8].field200 = g_pDeviceIdentifiers[varC].ddIdentifier.field434;
+        strncpy(array_689B68[dword_68C3B8].string, (g_pDeviceIdentifiers + varC)->ddIdentifier.identifier.szDescription, 0x200);
+        array_689B68[dword_68C3B8].field200 = (g_pDeviceIdentifiers + varC)->ddIdentifier.field434;
         
-        if (g_pDeviceIdentifiers[varC].ddIdentifier.field430 & 2)
+        if ((g_pDeviceIdentifiers + varC)->ddIdentifier.field430 & 2)
         {
             array_689B68[dword_68C3B8].field200 |= 0x10;
         }
@@ -1509,7 +1516,7 @@ int __cdecl jim_enumerate_devices()
         dword_68C3B8++;
     }
 
-    if (dword_77C608 != 0)
+    if (gNumDrivers_dword_77C608 != 0)
     {
         if (var8 != 0)
         {
@@ -1561,6 +1568,7 @@ MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 
 
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
+
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
     signed int result; // eax@41
@@ -1571,7 +1579,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     DDSCAPS2 dxCaps1; // [sp+164h] [bp-2ECh]@104
 
     DDCAPS_DX7 dxCaps; // [sp+198h] [bp-2B8h]@114  sizeof = 0x17C
-    int v33; // [sp+314h] [bp-13Ch]@1
+    GUID* v33; // [sp+314h] [bp-13Ch]@1
     int v34; // [sp+318h] [bp-138h]@3
     unsigned int i; // [sp+320h] [bp-130h]@34
     DDSURFACEDESC2 dxSurfaceDesc; // [sp+328h] [bp-128h]@86
@@ -1607,7 +1615,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     Input_Start();
     mgs_fputs("jim_enumerate_devices()\n", gFile);
     mgs_fflush(gFile);
-    v55 = jim_enumerate_devices();
+    v55 = jim_enumerate_devices_();
     if (!v55)
     {
         gSoftwareRendering = 1;
@@ -1655,9 +1663,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         dword_716F78 = 1;
         sub_433801();
     }
-    if (!dword_651CF8)
-    {
-        if (v55 == -1)
+    if (!dword_651CF8 && (v55 == -1))
         {
             MessageBoxA(
                 0,
@@ -1681,11 +1687,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             gWindowedMode = 0;
             sub_433801();
             v34 = gWindowedMode;
-            if (ParseMsgCfg())
-                dword_651CF8 = 0;
-            else
-                dword_651CF8 = 1;
-        }
+        dword_651CF8 = ParseMsgCfg() == 0;
     }
     sub_43C850();
     if (dword_651CF8)
@@ -1700,7 +1702,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
-            mgs_fprintf(gFile, " getting selected driver No %d from %d available\n", dword_77C60C + 1, dword_77C608);
+            mgs_fprintf(gFile, " getting selected driver No %d from %d available\n", gDriverNum_dword_77C60C + 1, gNumDrivers_dword_77C608);
             gXRes = 2.0f;
             gWindowedMode = 0;
             gSoftwareRendering = 0;
@@ -1722,11 +1724,11 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     else
     {
-        dword_77C60C = dword_716F74;
+        gDriverNum_dword_77C60C = dword_716F74;
     }
     if (v34)
     {
-        dword_77C60C = 0;
+        gDriverNum_dword_77C60C = 0;
         gXRes = 2.0f;
     }
     if (gSoftwareRendering)
@@ -1746,14 +1748,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     mgs_fputs("\n(i) List of enumerated devices:\n", gFile);
     mgs_fflush(gFile);
-    for (i = 0; i < dword_77C608; ++i)
+    for (i = 0; i < gNumDrivers_dword_77C608; ++i)
     {
-        // TODO: Hack/fixme accessing the dword_776B94 crashes
-#ifndef HARDWARE_RENDERING_FORCE
         mgs_fprintf(gFile, "pDriverGUID %x, pDeviceGUID %x\n", dword_776B94[290 * i], dword_776B90[290 * i]);
-        mgs_fprintf(gFile, "D3DDevice description : %s", (char *)&unk_776B68 + 1160 * i);
-#endif
-        if (dword_77C60C == i)
+        mgs_fprintf(gFile, "D3DDevice description : %s", (g_pDeviceIdentifiers + i)->ddIdentifier.identifier.szDescription);
+
+        if (gDriverNum_dword_77C60C == i)
         {
             mgs_fputs("   /selected/\n", gFile);
             mgs_fflush(gFile);
@@ -1770,7 +1770,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
         mgs_fputs("Creating DirectDraw7\n", gFile);
         mgs_fflush(gFile);
-        hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
+        hr = CoCreateInstance(CLSID_DirectDraw, NULL, CLSCTX_ALL, IID_IDirectDraw7, (void**)&g_pDirectDraw);
+        if (!FAILED(hr))
+        {
+            hr = g_pDirectDraw->Initialize(NULL);
+        }
+        //hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
         if (hr < 0)
         {
             mgs_fputs(" . fail\n", gFile);
@@ -1790,8 +1795,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 mgs_fflush(gFile);
                 gSoftwareRendering = 1;
                 gXRes = 1.0f;
-                g_dwDisplayWidth = (signed __int64)(320.0 * gXRes);
-                g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
+                g_dwDisplayWidth = (signed __int64)(320.0 * 1.0f);
+                g_dwDisplayHeight = (signed __int64)(240.0 * 1.0f);
                 MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
@@ -2073,12 +2078,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs("Creating device...\n", gFile);
         mgs_fflush(gFile);
 
-        // TODO: FIX ME the GUID is wrong here so this fails with invalid argument
-#ifdef HARDWARE_RENDERING_FORCE
-        hr = g_pDirect3D->CreateDevice(IID_IDirect3DHALDevice, g_pBackBuffer, &g_pDirect3DDevice);
-#else
-        hr = g_pDirect3D->CreateDevice(*((GUID*)(&v33)), g_pBackBuffer, &g_pDirect3DDevice);
-#endif
+        hr = g_pDirect3D->CreateDevice(*v33, g_pBackBuffer, &g_pDirect3DDevice);
+
         if (hr >= 0)
         {
             mgs_fputs(" . done\n", gFile);
@@ -2099,7 +2100,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
                 memset(&dxSurfaceDesc3, 0, 124);
                 dxSurfaceDesc3.dwSize = 124;
-                dxSurfaceDesc3.dwFlags = DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
+                dxSurfaceDesc3.dwFlags = 4103;// DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
                 memcpy(&dxSurfaceDesc3.ddpfPixelFormat, &pixelFormat, sizeof(DDPIXELFORMAT));
                 dxSurfaceDesc3.dwWidth = 16;
                 dxSurfaceDesc3.dwHeight = 16;
@@ -2111,21 +2112,22 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 {
                     g_pDDSurface = 0;
                 }
-                else
-                {
-                    if (!ClearDDSurfaceWhite())
+                else if (!ClearDDSurfaceWhite())
                     {
+
                         g_pDDSurface->Release();
                         g_pDDSurface = 0;
                     }
                 }
-            }
+
+
             Render_InitTextureStages(0, 2, 2);
             Render_InitTextureStages(0, 1, 4);
             Render_InitTextureStages(0, 3, 0);
             Render_InitTextureStages(0, 5, 2);
             Render_InitTextureStages(0, 4, 4);
             Render_InitTextureStages(0, 6, 0);
+
             if (Render_sub_41E3C0())
             {
                 mgs_fprintf(gFile, "Blend modes = %i \n", gBlendMode);
@@ -2248,6 +2250,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
     }
     mgs_fputs("other inits\n", gFile);
+
+
     mgs_fflush(gFile);
 
 
@@ -2268,12 +2272,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
-        gPrimStructArray = (prim_struct*)mgs_malloc(15000 * sizeof(prim_struct));
+        gPrimStructArray = (prim_struct*)mgs_malloc(150000 * sizeof(prim_struct));
         for (i = 0; i < 15000; ++i)
         {
             gPrimStructArray[i].field_0 = 0;
         }
-        g_pMGSVertices = (MGSVertex*)mgs_malloc(sizeof(MGSVertex) * 15000);
+        g_pMGSVertices = (MGSVertex*)mgs_malloc(sizeof(MGSVertex) * 150000);
     }
     gImageBufer_dword_6FC728 = (DWORD*)mgs_malloc(0x100000u);
     if (gImageBufer_dword_6FC728)
@@ -2311,6 +2315,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     return result;
 }
+
 //MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
 
@@ -3485,7 +3490,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
     }
 }
 
-MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
+//MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
 
 MGS_VAR(1, 0x6FC868, void*, g_pBackBufferSurface, 0);
 MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
@@ -3546,6 +3551,7 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
         sub_51DE0A();
     }
 }
+signed int __cdecl argh();
 
 // 0x00420810
 signed int __cdecl DoInitAll()
