@@ -129,7 +129,6 @@ MSG_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
 MSG_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
 MSG_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
 MSG_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
-MSG_FUNC_NOT_IMPL(0x0041E3C0, int __cdecl(), Render_sub_41E3C0);
 MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
 MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_SetRenderState);
 MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Render_InitTextureStages);
@@ -1568,6 +1567,7 @@ MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 
 
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
+signed int Render_sub_41E3C0();
 
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -2111,7 +2111,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
                 memset(&dxSurfaceDesc3, 0, 124);
                 dxSurfaceDesc3.dwSize = 124;
-                dxSurfaceDesc3.dwFlags = 4103;// DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
+                dxSurfaceDesc3.dwFlags = DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
                 memcpy(&dxSurfaceDesc3.ddpfPixelFormat, &pixelFormat, sizeof(DDPIXELFORMAT));
                 dxSurfaceDesc3.dwWidth = 16;
                 dxSurfaceDesc3.dwHeight = 16;
@@ -2351,6 +2351,138 @@ HRESULT __cdecl SetDDSurfaceTexture()
     return hr;
 }
 
+int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices);
+
+MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
+
+signed int Render_sub_41E3C0()
+{
+    signed int result;
+    
+    D3DDEVICEDESC7 caps;
+    MGSVertex pPrim[3];
+    uint32_t firstPixel;
+
+    DWORD dwNumPasses = 1;
+    pPrim[0].x = 1.0f;
+    pPrim[1].x = (double)(g_dwDisplayWidth - 1);
+    pPrim[2].x = 1.0f;
+
+    pPrim[0].y = 1.0f;
+    pPrim[1].y = 1.0f;
+    pPrim[2].y = (double)(g_dwDisplayHeight - 1);
+
+    pPrim[0].z = 1.0f;
+    pPrim[1].z = 1.0f;
+    pPrim[2].z = 1.0f;
+
+    pPrim[0].u = 1.0f;
+    pPrim[1].u = 1.0f;
+    pPrim[2].u = 1.0f;
+
+    pPrim[0].v = 1.0f;
+    pPrim[1].v = 1.0f;
+    pPrim[2].v = 1.0f;
+
+    pPrim[0].w = 0.99999899f;
+    pPrim[1].w = 0.99999899f;
+    pPrim[2].w = 0.99999899f;
+
+    g_pDirect3DDevice->GetCaps(&caps);
+    const DWORD srcBlendCaps = caps.dpcTriCaps.dwSrcBlendCaps;
+    const DWORD dstBlendCaps = caps.dpcTriCaps.dwDestBlendCaps;
+    Render_SetRenderState(9, 1);
+    Render_SetRenderState(27, 1);
+
+    if (g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+    {
+        gAlphaModulate_dword_6FC798 = 0;
+        Render_InitTextureStages(0, 4, 2);
+    }
+    else
+    {
+        gAlphaModulate_dword_6FC798 = 1;
+    }
+
+    if (gBlendMode < 0)
+    {
+        gBlendMode = 0;
+        if (srcBlendCaps & 0x10)
+        {
+            if (dstBlendCaps & 0x10)
+            {
+                Render_SetRenderState(19, 5);
+                Render_SetRenderState(20, 5);
+                if (!g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+                {
+                    if (gAlphaModulate_dword_6FC798)
+                    {
+                        ClearBackBuffer(0xFF707070, 0x7F404040u, &firstPixel, pPrim);
+                        if ((unsigned __int8)firstPixel < 0x5Bu && (unsigned __int8)firstPixel > 0x55u)
+                        {
+                            gBlendMode |= 1u;
+                        }
+                    }
+                }
+            }
+        }
+        if (srcBlendCaps & 0x10)
+        {
+            if (dstBlendCaps & 2)
+            {
+                Render_SetRenderState(19, 5);
+                Render_SetRenderState(20, 2);
+                if (!g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+                {
+                    if (gAlphaModulate_dword_6FC798)
+                    {
+                        ClearBackBuffer(0xFF101010, 0x3F404040u, &firstPixel, pPrim);
+                        if ((unsigned __int8)firstPixel < 0x25u && (unsigned __int8)firstPixel > 0x1Bu)
+                        {
+                            gBlendMode |= 8u;
+                        }
+                    }
+                }
+            }
+        }
+        if (srcBlendCaps & 2 && dstBlendCaps & 2)
+        {
+            gBlendMode |= 2u;
+            if (srcBlendCaps & 1)
+            {
+                if (dstBlendCaps & 8)
+                {
+                    Render_SetRenderState(19, 1);
+                    Render_SetRenderState(20, 4);
+                    ClearBackBuffer(0xFFA0FFA0, 0xFF400040, &firstPixel, pPrim);
+
+                    if ((unsigned __int8)firstPixel < 0x79u && (unsigned __int8)firstPixel > 0x6Fu)
+                    {
+                        gBlendMode |= 4u;
+                    }
+
+                    if ((firstPixel & 0xFF00) <= 0xFF00 && (firstPixel & 0xFF00) > 0xFB00)
+                    {
+                        dword_6FC774 = 1;
+                    }
+                }
+            }
+            result = 1;
+        }
+        else
+        {
+            result = 0;
+        }
+    }
+    else
+    {
+        result = 1;
+    }
+    return result;
+}
+
+MSG_FUNC_IMPL(0x41E3C0, Render_sub_41E3C0);
+
 //MSG_FUNC_NOT_IMPL(0x41E130, int __cdecl(uint32_t, uint32_t, uint32_t*, MGSVertex*), ClearBackBuffer);
 int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
 {
@@ -2524,7 +2656,6 @@ struct StructVertType5
 
 MGS_VAR(1, 0x791C54, DWORD, dword_791C54, 0);
 MGS_VAR(1, 0x791C58, DWORD, dword_791C58, 0);
-MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
 MGS_VAR(1, 0x791C5C, float, g_fV3, 0);
 MGS_VAR(1, 0x791C60, float, g_fV2, 0);
 MGS_VAR(1, 0x791C64, float, g_fV1, 0);
