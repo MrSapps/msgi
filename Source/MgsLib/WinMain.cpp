@@ -189,7 +189,7 @@ MGS_VAR(1, 0x6FC728, DWORD *, gImageBufer_dword_6FC728, 0);
 MGS_VAR(1, 0x6DEF7C, void *, dword_6DEF7C, nullptr);
 MGS_VAR(1, 0x6DEF90, void *, dword_6DEF90, nullptr);
 MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices, 0);
-MGS_VAR(1, 0x6FC798, DWORD, dword_6FC798, 0);
+MGS_VAR(1, 0x6FC798, DWORD, gAlphaModulate_dword_6FC798, 0);
 MGS_VAR(1, 0x6FC7C0, DWORD, dword_6FC7C0, 0);
 MGS_VAR(1, 0x716F6C, DWORD, dword_716F6C, 0);
 MGS_VAR(1, 0x6FC7C4, DWORD, dword_6FC7C4, 0);
@@ -1766,16 +1766,26 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     while (1)
     {
-        g_dwDisplayWidth = (signed __int64)(320.0 * gXRes);
-        g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
+        g_dwDisplayWidth = (320.0 * gXRes);
+        g_dwDisplayHeight = (240.0 * gXRes);
         mgs_fputs("Creating DirectDraw7\n", gFile);
         mgs_fflush(gFile);
-        hr = CoCreateInstance(CLSID_DirectDraw, NULL, CLSCTX_ALL, IID_IDirectDraw7, (void**)&g_pDirectDraw);
-        if (!FAILED(hr))
+
+        if (IsMgsi())
         {
-            hr = g_pDirectDraw->Initialize(NULL);
+            // Call the games DD create
+            hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
         }
-        //hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
+        else
+        {
+            // Since we're not hosted in the game call the winapi to get a dd7 instance
+            hr = CoCreateInstance(CLSID_DirectDraw, NULL, CLSCTX_ALL, IID_IDirectDraw7, (void**)&g_pDirectDraw);
+            if (!FAILED(hr))
+            {
+                hr = g_pDirectDraw->Initialize(NULL);
+            }
+        }
+    
         if (hr < 0)
         {
             mgs_fputs(" . fail\n", gFile);
@@ -1795,8 +1805,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 mgs_fflush(gFile);
                 gSoftwareRendering = 1;
                 gXRes = 1.0f;
-                g_dwDisplayWidth = (signed __int64)(320.0 * 1.0f);
-                g_dwDisplayHeight = (signed __int64)(240.0 * 1.0f);
+                g_dwDisplayWidth = (320.0 * 1.0f);
+                g_dwDisplayHeight = (240.0 * 1.0f);
                 MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
@@ -2062,7 +2072,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dword_6FC7C4 = 0;
         }
         g_surface565Mode = Render_sub_41D1D0();
-        //mgs_fprintf(gFile, "565 mode = %i\n", g_surface565Mode);
+        mgs_fprintf(gFile, "565 mode = %i\n", g_surface565Mode);
+        
         if (gSoftwareRendering)
             break;
         dxSurfaceDesc.dwSize = 124;
@@ -2113,13 +2124,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     g_pDDSurface = 0;
                 }
                 else if (!ClearDDSurfaceWhite())
-                    {
+                {
 
-                        g_pDDSurface->Release();
-                        g_pDDSurface = 0;
-                    }
+                    g_pDDSurface->Release();
+                    g_pDDSurface = 0;
                 }
-
+            }
 
             Render_InitTextureStages(0, 2, 2);
             Render_InitTextureStages(0, 1, 4);
@@ -2131,7 +2141,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             if (Render_sub_41E3C0())
             {
                 mgs_fprintf(gFile, "Blend modes = %i \n", gBlendMode);
-                mgs_fprintf(gFile, "Alpha modulate = %i \n", dword_6FC798);
+                mgs_fprintf(gFile, "Alpha modulate = %i \n", gAlphaModulate_dword_6FC798);
                 gColourKey = Render_sub_41E730();
                 mgs_fprintf(gFile, "ColorKey = %i\n", gColourKey);
                 Render_InitTextureStages(0, 12, 3);
@@ -2411,6 +2421,7 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
     }
     return 1;
 }
+MSG_FUNC_IMPL(0x41E130, ClearBackBuffer);
 
 struct MGSSmallVert
 {
@@ -3551,12 +3562,14 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
         sub_51DE0A();
     }
 }
-signed int __cdecl argh();
 
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
     signed int v1; // ST10_4@1
+
+    // TODO: Call reimpl and call reimpl with jmp
+    // then compare memory to see whats gone wrong?
 
     //v1 = InitD3d_ProfileGfxHardwareQ_Test();
     v1 = InitD3d_ProfileGfxHardwareQ();
