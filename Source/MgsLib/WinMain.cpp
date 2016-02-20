@@ -514,7 +514,7 @@ MGS_VAR(1, 0x00650D30, DWORD, gModX2, 0);
 MGS_VAR(1, 0x00650D40, DWORD, gNoTrueType, 0);
 MGS_VAR(1, 0x006FC76C, DWORD, gFps, 0);
 MGS_VAR(1, 0x006FC7A4, DWORD, gColourKey, 0);
-MGS_VAR(1, 0x00650D38, DWORD, gBlendMode, 0);
+MGS_VAR(1, 0x00650D38, int, gBlendMode, 0);
 MGS_VAR(1, 0x00650D20, DWORD, gLowRes, 0);
 MGS_VAR(1, 0x688D40, char*, off_688D40, "");
 MGS_VAR(1, 0x006FC794, DWORD, gSoftwareRendering, 0);
@@ -2359,7 +2359,7 @@ signed int Render_sub_41E3C0()
 {
     signed int result;
     
-    D3DDEVICEDESC7 caps;
+    D3DDEVICEDESC7 caps = {};
     MGSVertex pPrim[3];
     uint32_t firstPixel;
 
