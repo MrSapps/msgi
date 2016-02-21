@@ -158,9 +158,9 @@ MGS_VAR(1, 0x717348, DWORD, dword_717348, 0);
 MGS_VAR(1, 0x7348FC, DWORD, dword_7348FC, 0);
 MGS_VAR(1, 0x732E64, DWORD, dword_732E64, 0);
 
-MGS_VAR(1, 0x64BDA8, IID, IID_IDirectDraw7_MGS, {});
-MGS_VAR(1, 0x64BB98, GUID, IID_IDirect3D7_MGS, {});
-MGS_VAR(1, 0x64BCA8, GUID, IID_IDirectDrawGammaControl_MGS, {});
+MGS_VAR(1, 0x64BDA8, const IID, IID_IDirectDraw7_MGS, {});
+MGS_VAR(1, 0x64BB98, const GUID, IID_IDirect3D7_MGS, {});
+MGS_VAR(1, 0x64BCA8, const GUID, IID_IDirectDrawGammaControl_MGS, {});
 MGS_VAR(1, 0x6FC730, IDirectDraw7 *, g_pDirectDraw, nullptr);
 MGS_VAR(1, 0x6FC748, IDirect3D7 *, g_pDirect3D, nullptr);
 MGS_VAR(1, 0x6C0EF8, IDirectDrawGammaControl *, g_pGammaControl, nullptr);
@@ -2068,7 +2068,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dword_6FC7C4 = 0;
         }
         g_surface565Mode = Render_sub_41D1D0();
-        mgs_fprintf(gFile, "565 mode = %i\n", g_surface565Mode);
+       // mgs_fprintf(gFile, "565 mode = %i\n", g_surface565Mode);
         
         if (gSoftwareRendering)
             break;
@@ -2677,7 +2677,22 @@ MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
 
 MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
 MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
+
+
+uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV);
+MSG_FUNC_IMPL(0x40CD80, Render_ComputeUVs)
+
+/* TODO: Implement me
+uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV)
+{
+    uint32_t ret = Render_ComputeUVs_.Ptr()(textureIdx, a1, u, v, outU, outV);
+    //LOG_INFO("t: " << textureIdx << " a: " << a1 << " u " << u << " v " << v << " ou " << *outU << " ov " << *outV);
+    return ret;
+}
+*/
+
 MSG_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
+
 MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
 MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 
@@ -3410,9 +3425,9 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                 {
                     uint32_t var9C = (word_6C0EAC & 0x180) >> 7;
                     Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[1].u + diffX, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v + diffY, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[3].u + diffX, pStructVert->TexVtx[3].v + diffY, &g_fU3, &g_fV3);
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v + diffY, &g_fU3, &g_fV3);
                 }
             }
 
