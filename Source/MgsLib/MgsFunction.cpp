@@ -173,14 +173,15 @@ bool StaticVarSnapShot::operator == (const StaticVarSnapShot& other)
 
 void DynamicVarSnapShot::Restore()
 {
-    void* pointerValue = ((DWORD*)mAddr);
+    void* pointerValue = (*(DWORD**)mAddr);
+
     if (DWORD(pointerValue) != mPtrValue)
     {
         LOG_WARNING("Pointer value changed, can't restore as original might have been freed!");
     }
     else
     {
-        void* pointerValue = ((DWORD*)mAddr);
+        void* pointerValue = (*(DWORD**)mAddr);
         memcpy(pointerValue, mBufferCopy.data(), mBufferCopy.size());
     }
 }
@@ -189,7 +190,7 @@ void DynamicVarSnapShot::SnapShot()
 {
     // Get the address
     void* pointerValue = (*(DWORD**)mAddr);
-    
+
     // See if its in the alloc map
     auto it = MgsVar::mAllocs.find(pointerValue);
 
