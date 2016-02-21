@@ -3180,6 +3180,28 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             break;
         }
 
+        case 80:
+        case 81:
+        case 82:
+        case 83:
+        {
+            StructVertType2* pStructVert = (StructVertType2*)a_pStructVert;
+            g_fXOffset = g_wXOffset;
+            g_fYOffset = g_wYOffset;
+            handleBlendMode(word_6C0EAC);
+
+            convertVertexType2(pStructVert, 0);
+            convertVertexType2(pStructVert, 1);
+
+            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 2;
+            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_LINELIST;
+            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
+
+            dword_791C58 = 4;
+            break;
+        }
+
         case 96:
         case 97:
         case 98:
@@ -3269,9 +3291,9 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                 {
                     uint32_t var9C = (word_6C0EAC & 0x180) >> 7;
                     Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[1].u + diffX, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v + diffY, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[3].u + diffX, pStructVert->TexVtx[3].v + diffY, &g_fU3, &g_fV3);
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v + diffY, &g_fU3, &g_fV3);
                 }
             }
 
