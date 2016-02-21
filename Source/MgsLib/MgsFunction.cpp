@@ -188,8 +188,8 @@ void DynamicVarSnapShot::Restore()
 void DynamicVarSnapShot::SnapShot()
 {
     // Get the address
-    void* pointerValue = ((DWORD*)mAddr);
-
+    void* pointerValue = (*(DWORD**)mAddr);
+    
     // See if its in the alloc map
     auto it = MgsVar::mAllocs.find(pointerValue);
 
