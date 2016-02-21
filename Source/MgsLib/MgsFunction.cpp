@@ -220,7 +220,8 @@ bool DynamicVarSnapShot::operator == (const DynamicVarSnapShot& other)
 
     if (mBufferCopy != other.mBufferCopy)
     {
-        abort();
+        LOG_WARNING("Var diff: " << other.mAddr << " name " << other.mName);
+        //abort();
     }
 
     return true;
