@@ -129,7 +129,6 @@ MSG_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
 MSG_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
 MSG_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
 MSG_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
-MSG_FUNC_NOT_IMPL(0x0041E3C0, int __cdecl(), Render_sub_41E3C0);
 MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
 MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_SetRenderState);
 MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Render_InitTextureStages);
@@ -159,9 +158,9 @@ MGS_VAR(1, 0x717348, DWORD, dword_717348, 0);
 MGS_VAR(1, 0x7348FC, DWORD, dword_7348FC, 0);
 MGS_VAR(1, 0x732E64, DWORD, dword_732E64, 0);
 
-MGS_VAR(1, 0x64BDA8, IID, IID_IDirectDraw7_MGS, {});
-MGS_VAR(1, 0x64BB98, GUID, IID_IDirect3D7_MGS, {});
-MGS_VAR(1, 0x64BCA8, GUID, IID_IDirectDrawGammaControl_MGS, {});
+MGS_VAR(1, 0x64BDA8, const IID, IID_IDirectDraw7_MGS, {});
+MGS_VAR(1, 0x64BB98, const GUID, IID_IDirect3D7_MGS, {});
+MGS_VAR(1, 0x64BCA8, const GUID, IID_IDirectDrawGammaControl_MGS, {});
 MGS_VAR(1, 0x6FC730, IDirectDraw7 *, g_pDirectDraw, nullptr);
 MGS_VAR(1, 0x6FC748, IDirect3D7 *, g_pDirect3D, nullptr);
 MGS_VAR(1, 0x6C0EF8, IDirectDrawGammaControl *, g_pGammaControl, nullptr);
@@ -189,7 +188,7 @@ MGS_VAR(1, 0x6FC728, DWORD *, gImageBufer_dword_6FC728, 0);
 MGS_VAR(1, 0x6DEF7C, void *, dword_6DEF7C, nullptr);
 MGS_VAR(1, 0x6DEF90, void *, dword_6DEF90, nullptr);
 MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices, 0);
-MGS_VAR(1, 0x6FC798, DWORD, dword_6FC798, 0);
+MGS_VAR(1, 0x6FC798, DWORD, gAlphaModulate_dword_6FC798, 0);
 MGS_VAR(1, 0x6FC7C0, DWORD, dword_6FC7C0, 0);
 MGS_VAR(1, 0x716F6C, DWORD, dword_716F6C, 0);
 MGS_VAR(1, 0x6FC7C4, DWORD, dword_6FC7C4, 0);
@@ -515,7 +514,7 @@ MGS_VAR(1, 0x00650D30, DWORD, gModX2, 0);
 MGS_VAR(1, 0x00650D40, DWORD, gNoTrueType, 0);
 MGS_VAR(1, 0x006FC76C, DWORD, gFps, 0);
 MGS_VAR(1, 0x006FC7A4, DWORD, gColourKey, 0);
-MGS_VAR(1, 0x00650D38, DWORD, gBlendMode, 0);
+MGS_VAR(1, 0x00650D38, int, gBlendMode, 0);
 MGS_VAR(1, 0x00650D20, DWORD, gLowRes, 0);
 MGS_VAR(1, 0x688D40, char*, off_688D40, "");
 MGS_VAR(1, 0x006FC794, DWORD, gSoftwareRendering, 0);
@@ -1532,23 +1531,19 @@ int __cdecl jim_enumerate_devices_z()
 }
 
 //MSG_FUNC_NOT_IMPL(0x41E990, int __cdecl(), ClearDDSurfaceWhite);
-int __cdecl ClearDDSurfaceWhite()
+bool __cdecl ClearDDSurfaceWhite()
 {
-    HRESULT hr;
-
-    DDBLTFX bltFX;
+    DDBLTFX bltFX = {};
     bltFX.dwSize = sizeof(DDBLTFX);
     bltFX.dwFillColor = 0xFFFF;
-
-    do {
-        hr = g_pBackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
+    HRESULT hr;
+    do 
+    {
+        hr = g_pDDSurface->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
     } while (hr == DDERR_WASSTILLDRAWING);
-
-    if (hr != 0)
-        return 0;
-
-    return 1;
+    return hr == S_OK;
 }
+MSG_FUNC_IMPL(0x41E990, ClearDDSurfaceWhite);
 
 #define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
 struct MGSVertex
@@ -1568,6 +1563,7 @@ MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 
 
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
+signed int Render_sub_41E3C0();
 
 signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 {
@@ -1766,16 +1762,26 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     while (1)
     {
-        g_dwDisplayWidth = (signed __int64)(320.0 * gXRes);
-        g_dwDisplayHeight = (signed __int64)(240.0 * gXRes);
+        g_dwDisplayWidth = (320.0 * gXRes);
+        g_dwDisplayHeight = (240.0 * gXRes);
         mgs_fputs("Creating DirectDraw7\n", gFile);
         mgs_fflush(gFile);
-        hr = CoCreateInstance(CLSID_DirectDraw, NULL, CLSCTX_ALL, IID_IDirectDraw7, (void**)&g_pDirectDraw);
-        if (!FAILED(hr))
+
+        if (IsMgsi())
         {
-            hr = g_pDirectDraw->Initialize(NULL);
+            // Call the games DD create
+            hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
         }
-        //hr = DirectDrawCreateExMGS(lpGuid, (LPVOID*)&g_pDirectDraw, &IID_IDirectDraw7_MGS, 0);
+        else
+        {
+            // Since we're not hosted in the game call the winapi to get a dd7 instance
+            hr = CoCreateInstance(CLSID_DirectDraw, NULL, CLSCTX_ALL, IID_IDirectDraw7, (void**)&g_pDirectDraw);
+            if (!FAILED(hr))
+            {
+                hr = g_pDirectDraw->Initialize(NULL);
+            }
+        }
+    
         if (hr < 0)
         {
             mgs_fputs(" . fail\n", gFile);
@@ -1795,8 +1801,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 mgs_fflush(gFile);
                 gSoftwareRendering = 1;
                 gXRes = 1.0f;
-                g_dwDisplayWidth = (signed __int64)(320.0 * 1.0f);
-                g_dwDisplayHeight = (signed __int64)(240.0 * 1.0f);
+                g_dwDisplayWidth = (320.0 * 1.0f);
+                g_dwDisplayHeight = (240.0 * 1.0f);
                 MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
@@ -2062,7 +2068,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dword_6FC7C4 = 0;
         }
         g_surface565Mode = Render_sub_41D1D0();
-        //mgs_fprintf(gFile, "565 mode = %i\n", g_surface565Mode);
+       // mgs_fprintf(gFile, "565 mode = %i\n", g_surface565Mode);
+        
         if (gSoftwareRendering)
             break;
         dxSurfaceDesc.dwSize = 124;
@@ -2100,7 +2107,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
                 memset(&dxSurfaceDesc3, 0, 124);
                 dxSurfaceDesc3.dwSize = 124;
-                dxSurfaceDesc3.dwFlags = 4103;// DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
+                dxSurfaceDesc3.dwFlags = DDSD_PIXELFORMAT | DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
                 memcpy(&dxSurfaceDesc3.ddpfPixelFormat, &pixelFormat, sizeof(DDPIXELFORMAT));
                 dxSurfaceDesc3.dwWidth = 16;
                 dxSurfaceDesc3.dwHeight = 16;
@@ -2113,13 +2120,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     g_pDDSurface = 0;
                 }
                 else if (!ClearDDSurfaceWhite())
-                    {
+                {
 
-                        g_pDDSurface->Release();
-                        g_pDDSurface = 0;
-                    }
+                    g_pDDSurface->Release();
+                    g_pDDSurface = 0;
                 }
-
+            }
 
             Render_InitTextureStages(0, 2, 2);
             Render_InitTextureStages(0, 1, 4);
@@ -2131,7 +2137,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             if (Render_sub_41E3C0())
             {
                 mgs_fprintf(gFile, "Blend modes = %i \n", gBlendMode);
-                mgs_fprintf(gFile, "Alpha modulate = %i \n", dword_6FC798);
+                mgs_fprintf(gFile, "Alpha modulate = %i \n", gAlphaModulate_dword_6FC798);
                 gColourKey = Render_sub_41E730();
                 mgs_fprintf(gFile, "ColorKey = %i\n", gColourKey);
                 Render_InitTextureStages(0, 12, 3);
@@ -2341,6 +2347,138 @@ HRESULT __cdecl SetDDSurfaceTexture()
     return hr;
 }
 
+int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices);
+
+MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
+
+signed int Render_sub_41E3C0()
+{
+    signed int result;
+    
+    D3DDEVICEDESC7 caps = {};
+    MGSVertex pPrim[3];
+    uint32_t firstPixel;
+
+    DWORD dwNumPasses = 1;
+    pPrim[0].x = 1.0f;
+    pPrim[1].x = (double)(g_dwDisplayWidth - 1);
+    pPrim[2].x = 1.0f;
+
+    pPrim[0].y = 1.0f;
+    pPrim[1].y = 1.0f;
+    pPrim[2].y = (double)(g_dwDisplayHeight - 1);
+
+    pPrim[0].z = 1.0f;
+    pPrim[1].z = 1.0f;
+    pPrim[2].z = 1.0f;
+
+    pPrim[0].u = 1.0f;
+    pPrim[1].u = 1.0f;
+    pPrim[2].u = 1.0f;
+
+    pPrim[0].v = 1.0f;
+    pPrim[1].v = 1.0f;
+    pPrim[2].v = 1.0f;
+
+    pPrim[0].w = 0.99999899f;
+    pPrim[1].w = 0.99999899f;
+    pPrim[2].w = 0.99999899f;
+
+    g_pDirect3DDevice->GetCaps(&caps);
+    const DWORD srcBlendCaps = caps.dpcTriCaps.dwSrcBlendCaps;
+    const DWORD dstBlendCaps = caps.dpcTriCaps.dwDestBlendCaps;
+    Render_SetRenderState(9, 1);
+    Render_SetRenderState(27, 1);
+
+    if (g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+    {
+        gAlphaModulate_dword_6FC798 = 0;
+        Render_InitTextureStages(0, 4, 2);
+    }
+    else
+    {
+        gAlphaModulate_dword_6FC798 = 1;
+    }
+
+    if (gBlendMode < 0)
+    {
+        gBlendMode = 0;
+        if (srcBlendCaps & 0x10)
+        {
+            if (dstBlendCaps & 0x10)
+            {
+                Render_SetRenderState(19, 5);
+                Render_SetRenderState(20, 5);
+                if (!g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+                {
+                    if (gAlphaModulate_dword_6FC798)
+                    {
+                        ClearBackBuffer(0xFF707070, 0x7F404040u, &firstPixel, pPrim);
+                        if ((unsigned __int8)firstPixel < 0x5Bu && (unsigned __int8)firstPixel > 0x55u)
+                        {
+                            gBlendMode |= 1u;
+                        }
+                    }
+                }
+            }
+        }
+        if (srcBlendCaps & 0x10)
+        {
+            if (dstBlendCaps & 2)
+            {
+                Render_SetRenderState(19, 5);
+                Render_SetRenderState(20, 2);
+                if (!g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+                {
+                    if (gAlphaModulate_dword_6FC798)
+                    {
+                        ClearBackBuffer(0xFF101010, 0x3F404040u, &firstPixel, pPrim);
+                        if ((unsigned __int8)firstPixel < 0x25u && (unsigned __int8)firstPixel > 0x1Bu)
+                        {
+                            gBlendMode |= 8u;
+                        }
+                    }
+                }
+            }
+        }
+        if (srcBlendCaps & 2 && dstBlendCaps & 2)
+        {
+            gBlendMode |= 2u;
+            if (srcBlendCaps & 1)
+            {
+                if (dstBlendCaps & 8)
+                {
+                    Render_SetRenderState(19, 1);
+                    Render_SetRenderState(20, 4);
+                    ClearBackBuffer(0xFFA0FFA0, 0xFF400040, &firstPixel, pPrim);
+
+                    if ((unsigned __int8)firstPixel < 0x79u && (unsigned __int8)firstPixel > 0x6Fu)
+                    {
+                        gBlendMode |= 4u;
+                    }
+
+                    if ((firstPixel & 0xFF00) <= 0xFF00 && (firstPixel & 0xFF00) > 0xFB00)
+                    {
+                        dword_6FC774 = 1;
+                    }
+                }
+            }
+            result = 1;
+        }
+        else
+        {
+            result = 0;
+        }
+    }
+    else
+    {
+        result = 1;
+    }
+    return result;
+}
+
+MSG_FUNC_IMPL(0x41E3C0, Render_sub_41E3C0);
+
 //MSG_FUNC_NOT_IMPL(0x41E130, int __cdecl(uint32_t, uint32_t, uint32_t*, MGSVertex*), ClearBackBuffer);
 int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
 {
@@ -2411,6 +2549,7 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
     }
     return 1;
 }
+MSG_FUNC_IMPL(0x41E130, ClearBackBuffer);
 
 struct MGSSmallVert
 {
@@ -2513,7 +2652,6 @@ struct StructVertType5
 
 MGS_VAR(1, 0x791C54, DWORD, dword_791C54, 0);
 MGS_VAR(1, 0x791C58, DWORD, dword_791C58, 0);
-MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
 MGS_VAR(1, 0x791C5C, float, g_fV3, 0);
 MGS_VAR(1, 0x791C60, float, g_fV2, 0);
 MGS_VAR(1, 0x791C64, float, g_fV1, 0);
@@ -2539,7 +2677,22 @@ MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
 
 MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
 MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
+
+
+/* TODO: Implement me
+uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV);
+MSG_FUNC_IMPL(0x40CD80, Render_ComputeUVs)
+
+uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV)
+{
+    uint32_t ret = Render_ComputeUVs_.Ptr()(textureIdx, a1, u, v, outU, outV);
+    //LOG_INFO("t: " << textureIdx << " a: " << a1 << " u " << u << " v " << v << " ou " << *outU << " ov " << *outV);
+    return ret;
+}
+*/
+
 MSG_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
+
 MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
 MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 
@@ -2749,6 +2902,9 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
 
         gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 0;
         gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 0;
+
+        // 100-103 case has an issue, causes corrupted text
+        //LOG_INFO("VTX type: " << dword_791C54);
 
         switch (dword_791C54)
         {
@@ -3512,7 +3668,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
     }
 }
 
-//MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
+MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
 
 MGS_VAR(1, 0x6FC868, void*, g_pBackBufferSurface, 0);
 MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
@@ -3573,6 +3729,7 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
         sub_51DE0A();
     }
 }
+MSG_FUNC_IMPL(0x4103B0, Render_DrawGeneric);
 
 //MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
 void __cdecl Render_DrawIndex(uint32_t a_nIndex)
@@ -3584,12 +3741,9 @@ void __cdecl Render_DrawIndex(uint32_t a_nIndex)
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
-    signed int v1; // ST10_4@1
-
-    //v1 = InitD3d_ProfileGfxHardwareQ_Test();
-    v1 = InitD3d_ProfileGfxHardwareQ();
+    const auto ret = InitD3d_ProfileGfxHardwareQ();
     MessageBox_Error(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
-    return v1;
+    return ret;
 }
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
 

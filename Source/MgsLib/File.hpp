@@ -9,7 +9,13 @@ EXTERN_MSG_FUNC_NOT_IMPL(0x0053CB40, FILE* __cdecl(const char*, const char*), mg
 EXTERN_MSG_FUNC_NOT_IMPL(0x0053C970, int __cdecl(const char*, FILE*), mgs_fputs);
 EXTERN_MSG_FUNC_NOT_IMPL(0x0053C6C0, int __cdecl(FILE*), mgs_fflush);
 EXTERN_MSG_FUNC_NOT_IMPL(0x0053C4A0, int __cdecl(FILE *File), mgs_fclose);
-EXTERN_MSG_FUNC_NOT_IMPL(0x00539990, void *__cdecl(size_t), mgs_malloc);
+
+// Memory allocation
+void *__cdecl mgs_malloc(size_t Size);
+void __cdecl mgs_free(void *Memory);
+void *__cdecl mgs_realloc(void *Memory, size_t NewSize);
+void *__cdecl mgs_calloc(size_t NumOfElements, size_t SizeOfElements);
+
 
 // Special case varadics..
 int msg_internal_fprintf(FILE *File, const char *Format, ...);

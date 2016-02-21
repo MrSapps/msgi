@@ -7,7 +7,71 @@ MSG_FUNC_NOT_IMPL(0x0053CB40, FILE* __cdecl(const char*, const char*), mgs_fopen
 MSG_FUNC_NOT_IMPL(0x0053C970, int __cdecl(const char*, FILE*), mgs_fputs);
 MSG_FUNC_NOT_IMPL(0x0053C6C0, int __cdecl(FILE*), mgs_fflush);
 MSG_FUNC_NOT_IMPL(0x0053C4A0, int __cdecl(FILE *File), mgs_fclose);
-MSG_FUNC_NOT_IMPL(0x00539990, void *__cdecl(size_t), mgs_malloc);
+
+
+// Memory allocation
+MSG_FUNC_IMPL(0x00539990, mgs_malloc);
+MSG_FUNC_IMPL(0x0053A400, mgs_free);
+MSG_FUNC_IMPL(0x00539E20, mgs_realloc);
+MSG_FUNC_IMPL(0x00539DA0, mgs_calloc);
+
+void *__cdecl mgs_malloc(size_t Size)
+{
+    if (IsMgsi())
+    {
+        void* ptr = mgs_malloc_.Ptr()(Size);
+        if (ptr)
+        {
+            MgsVar::TrackAlloc(ptr, Size);
+        }
+        return ptr;
+    }
+    return malloc(Size);
+}
+
+void __cdecl mgs_free(void *Memory)
+{
+    if (IsMgsi())
+    {
+        if (Memory)
+        {
+            MgsVar::TrackFree(Memory);
+        }
+        mgs_free_.Ptr()(Memory);
+    }
+    else
+    {
+        free(Memory);
+    }
+}
+
+void *__cdecl mgs_realloc(void *Memory, size_t NewSize)
+{
+    if (IsMgsi())
+    {
+        // TODO: Track
+        LOG_WARNING("realloc() not tracked");
+        return mgs_realloc_.Ptr()(Memory, NewSize);
+    }
+    else
+    {
+        return realloc(Memory, NewSize);
+    }
+}
+
+void *__cdecl mgs_calloc(size_t NumOfElements, size_t SizeOfElements)
+{
+    if (IsMgsi())
+    {
+        // TODO: Track
+        LOG_WARNING("calloc() not tracked");
+        return mgs_calloc_.Ptr()(NumOfElements, SizeOfElements);
+    }
+    else
+    {
+        return calloc(NumOfElements, SizeOfElements);
+    }
+}
 
 
 // Can't seem to make this work, calling this will crash due to issue mentioned above

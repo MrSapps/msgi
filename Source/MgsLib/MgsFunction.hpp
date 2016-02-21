@@ -4,6 +4,8 @@
 #include <ostream>
 #include <map>
 #include <memory>
+#include <set>
+#include <vector>
 #include <type_traits>
 #include "logger.hpp"
 #include "detours.h"
@@ -272,26 +274,144 @@ public:
     MgsFunction(const char* name, bool passThrough = false) : MgsFunctionImpl(name, passThrough) { }
 };
 
+class AutoCs
+{
+public:
+    AutoCs(const AutoCs&) = delete;
+    AutoCs& operator = (const AutoCs&) = delete;
+    AutoCs()
+    {
+        ::InitializeCriticalSection(&mCs);
+    }
+
+    ~AutoCs()
+    {
+        ::DeleteCriticalSection(&mCs);
+    }
+
+    void Lock()
+    {
+        ::EnterCriticalSection(&mCs);
+    }
+
+    void UnLock()
+    {
+        ::LeaveCriticalSection(&mCs);
+    }
+private:
+    CRITICAL_SECTION mCs;
+};
+
+class AutoCsLock
+{
+public:
+    AutoCsLock(const AutoCsLock&) = delete;
+    AutoCsLock& operator = (const AutoCsLock&) = delete;
+    explicit AutoCsLock(AutoCs& cs)
+        : mCs(cs)
+    {
+        mCs.Lock();
+    }
+
+    ~AutoCsLock()
+    {
+        mCs.UnLock();
+    }
+private:
+    AutoCs& mCs;
+};
+
+class BaseVarSnapShot
+{
+public:
+    BaseVarSnapShot(const char* name, DWORD addr) : mName(name), mAddr(addr) { }
+    virtual ~BaseVarSnapShot() = default;
+    virtual void Restore() = 0;
+    DWORD Address() const { return mAddr; }
+protected:
+    const char* mName = nullptr;
+    DWORD mAddr = 0;
+};
+
+class StaticVarSnapShot : public BaseVarSnapShot
+{
+public:
+    StaticVarSnapShot(const char* name, DWORD addr, DWORD size) : BaseVarSnapShot(name, addr), mSize(size) { SnapShot(); }
+    virtual void Restore() override;
+    bool operator == (const StaticVarSnapShot& other);
+    bool operator != (const StaticVarSnapShot& other)
+    {
+        return !(*this == other);
+    }
+private:
+    void SnapShot();
+    DWORD mSize = 0;
+    std::vector<BYTE> mValue;
+};
+
+// TODO: Could be improved to "delay" free()'s while a snapshot exists
+// this way the old pointer could be safely restored if it was free()'ed since the
+// snapshot was taken. This can be added if/when its needed.
+class DynamicVarSnapShot : public BaseVarSnapShot
+{
+public:
+    DynamicVarSnapShot(const char* name, DWORD addr) : BaseVarSnapShot(name, addr) { SnapShot(); }
+    virtual void Restore() override;
+    bool operator == (const DynamicVarSnapShot& other);
+    bool operator != (const DynamicVarSnapShot& other)
+    {
+        return !(*this == other);
+    }
+private:
+    void SnapShot();
+    DWORD mPtrValue = 0;
+    std::vector<BYTE> mBufferCopy;
+};
+
 class MgsVar
 {
 public:
-    MgsVar(DWORD addr, DWORD sizeInBytes);
+    // Debugging aid to check real game function VS re-implementation does the same thing
+    // won't always work since if the function deleted a file then this can't restore it.
+    // Or if the global state of a direct3D device was changed then again it won't be restored.
+    // Memory allocation can be a problem too since things will take copies of pointers in locals or currently
+    // untracked vars.
+    // But in a lot of cases this is can be useful.
+    class SnapShot
+    {
+    public:
+        SnapShot();
+        SnapShot(const SnapShot&) = delete;
+        void AssertEqual(const SnapShot& other);
+        void Restore();
+    private:
+        std::map<DWORD, std::unique_ptr<BaseVarSnapShot>> mVars;
+    };
+    MgsVar(const char* name, DWORD addr, DWORD sizeInBytes, bool isDynamicallyAllocated, bool isConstData);
+    static std::unique_ptr<SnapShot> MakeSnapShot();
+    static void TrackAlloc(void* ptr, size_t size);
+    static void TrackFree(void* ptr);
+private:
+    static AutoCs mCs;
+    static std::map<void*, size_t> mAllocs;
+    friend class DynamicVarSnapShot;
+    friend class StaticVarSnapShot;
 };
 
 #define MGS_ARY(Redirect, Addr, TypeName, Size, VarName, ...)\
 TypeName LocalArray_##VarName[Size]=__VA_ARGS__;\
-MgsVar Var_##VarName(Addr, sizeof(LocalArray_##VarName));\
+MgsVar Var_##VarName(#VarName, Addr, sizeof(LocalArray_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
 TypeName* VarName = (Redirect && IsMgsi()) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
 
 // Only use this for pointers to arrays until it can be changed to MGS_ARY (so this is only used when the array size is not yet known)
 #define MGS_PTR(Redirect, Addr, TypeName, VarName, Value)\
 TypeName LocalPtr_##VarName = Value;\
-MgsVar Var_##VarName(Addr, sizeof(LocalPtr_##VarName));\
+MgsVar Var_##VarName(#VarName, Addr, sizeof(LocalPtr_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
 std::remove_pointer<TypeName>::type * const VarName = (Redirect && IsMgsi()) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
 
 #define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)\
 TypeName LocalVar_##VarName = Value;\
-MgsVar Var_##VarName(Addr, sizeof(LocalVar_##VarName));\
+MgsVar Var_##VarName(#VarName, Addr, sizeof(LocalVar_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
 TypeName& VarName = (Redirect && IsMgsi()) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
 
 #define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);
