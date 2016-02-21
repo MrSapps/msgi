@@ -2978,11 +2978,11 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             }
             else
             {
-                uint32_t var7C = (pStructVert->TexVtx[1].textureIdx & 0x180) >> 7;
-                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[1].u, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
-                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v, &g_fU2, &g_fV2);
-                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[3].u, pStructVert->TexVtx[3].v, &g_fU3, &g_fV3);
+                const uint32_t texturePage = (pStructVert->TexVtx[1].textureIdx & 0x180) >> 7;
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[1].u, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v, &g_fU2, &g_fV2);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[3].u, pStructVert->TexVtx[3].v, &g_fU3, &g_fV3);
             }
 
             g_fXOffset = g_wXOffset;
@@ -3046,10 +3046,10 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             }
             else
             {
-                uint32_t var110 = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
-                Render_ComputeUVs(g_nTextureIndex, var110, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
-                Render_ComputeUVs(g_nTextureIndex, var110, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
-                Render_ComputeUVs(g_nTextureIndex, var110, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
+                const uint32_t texturePage = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
             }
 
             g_fXOffset = g_wXOffset;
@@ -3196,11 +3196,11 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                 }
                 else
                 {
-                    uint32_t var6C = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &g_fU3, &g_fV3);
+                    const uint32_t texturePage = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &g_fU3, &g_fV3);
 
                     uint16_t* pIndex = (uint16_t*)(0x6FC728 + ((pStructVert->DifVtx[0].textureIdx >> 6) << 11) + ((pStructVert->DifVtx[0].textureIdx & 0x3F) << 5));
                     if (*pIndex == 0xEDED)
@@ -3445,11 +3445,11 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                 }
                 else
                 {
-                    uint32_t var9C = (word_6C0EAC & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v + diffY, &g_fU3, &g_fV3);
+                    const uint32_t texturePage = (word_6C0EAC & 0x180) >> 7;
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v + diffY, &g_fU3, &g_fV3);
                 }
             }
 
@@ -3556,11 +3556,11 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                 }
                 else
                 {
-                    uint32_t var124 = (pStructVert->Vtx[1].textureIdx & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[1].u, pStructVert->Vtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[2].u, pStructVert->Vtx[2].v, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[3].u, pStructVert->Vtx[3].v, &g_fU3, &g_fV3);
+                    const uint32_t texturePage = (pStructVert->Vtx[1].textureIdx & 0x180) >> 7;
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[1].u, pStructVert->Vtx[1].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[2].u, pStructVert->Vtx[2].v, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[3].u, pStructVert->Vtx[3].v, &g_fU3, &g_fV3);
                 }
             }
             
