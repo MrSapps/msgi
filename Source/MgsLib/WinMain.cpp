@@ -2679,10 +2679,10 @@ MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
 MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
 
 
+/* TODO: Implement me
 uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV);
 MSG_FUNC_IMPL(0x40CD80, Render_ComputeUVs)
 
-/* TODO: Implement me
 uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV)
 {
     uint32_t ret = Render_ComputeUVs_.Ptr()(textureIdx, a1, u, v, outU, outV);
