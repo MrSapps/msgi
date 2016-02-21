@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MgsFunction.hpp"
 #include <set>
+#include <fstream>
 
 struct TVarInfo
 {
@@ -206,6 +207,16 @@ void DynamicVarSnapShot::SnapShot()
     mPtrValue = (DWORD)pointerValue;
 }
 
+
+static void WriteVec(const char* fileName, const std::vector<BYTE>& vec)
+{
+    using namespace std;
+
+    ofstream fout(fileName, ios::out | ios::binary);
+    fout.write((char*)vec.data(), vec.size());
+    fout.close();
+}
+
 bool DynamicVarSnapShot::operator == (const DynamicVarSnapShot& other)
 {
     if (mAddr != other.mAddr)
@@ -221,6 +232,10 @@ bool DynamicVarSnapShot::operator == (const DynamicVarSnapShot& other)
     if (mBufferCopy != other.mBufferCopy)
     {
         LOG_WARNING("Var diff: " << other.mAddr << " name " << other.mName);
+
+       // WriteVec("new.dat", mBufferCopy);
+        //WriteVec("old.dat", other.mBufferCopy);
+
         //abort();
     }
 
