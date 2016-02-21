@@ -324,18 +324,19 @@ private:
 class BaseVarSnapShot
 {
 public:
-    explicit BaseVarSnapShot(DWORD addr) : mAddr(addr) { }
+    BaseVarSnapShot(const char* name, DWORD addr) : mName(name), mAddr(addr) { }
     virtual ~BaseVarSnapShot() = default;
     virtual void Restore() = 0;
     DWORD Address() const { return mAddr; }
 protected:
+    const char* mName = nullptr;
     DWORD mAddr = 0;
 };
 
 class StaticVarSnapShot : public BaseVarSnapShot
 {
 public:
-    explicit StaticVarSnapShot(DWORD addr, DWORD size) : BaseVarSnapShot(addr), mSize(size) { SnapShot();  }
+    StaticVarSnapShot(const char* name, DWORD addr, DWORD size) : BaseVarSnapShot(name, addr), mSize(size) { SnapShot(); }
     virtual void Restore() override;
     bool operator == (const StaticVarSnapShot& other);
     bool operator != (const StaticVarSnapShot& other)
@@ -354,7 +355,7 @@ private:
 class DynamicVarSnapShot : public BaseVarSnapShot
 {
 public:
-    explicit DynamicVarSnapShot(DWORD addr) : BaseVarSnapShot(addr) { SnapShot(); }
+    DynamicVarSnapShot(const char* name, DWORD addr) : BaseVarSnapShot(name, addr) { SnapShot(); }
     virtual void Restore() override;
     bool operator == (const DynamicVarSnapShot& other);
     bool operator != (const DynamicVarSnapShot& other)
@@ -386,7 +387,7 @@ public:
     private:
         std::map<DWORD, std::unique_ptr<BaseVarSnapShot>> mVars;
     };
-    MgsVar(DWORD addr, DWORD sizeInBytes, bool isDynamicallyAllocated, bool isConstData);
+    MgsVar(const char* name, DWORD addr, DWORD sizeInBytes, bool isDynamicallyAllocated, bool isConstData);
     static std::unique_ptr<SnapShot> MakeSnapShot();
     static void TrackAlloc(void* ptr, size_t size);
     static void TrackFree(void* ptr);
@@ -399,18 +400,18 @@ private:
 
 #define MGS_ARY(Redirect, Addr, TypeName, Size, VarName, ...)\
 TypeName LocalArray_##VarName[Size]=__VA_ARGS__;\
-MgsVar Var_##VarName(Addr, sizeof(LocalArray_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
+MgsVar Var_##VarName(#VarName, Addr, sizeof(LocalArray_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
 TypeName* VarName = (Redirect && IsMgsi()) ? reinterpret_cast<TypeName*>(Addr) : reinterpret_cast<TypeName*>(&LocalArray_##VarName[0]);
 
 // Only use this for pointers to arrays until it can be changed to MGS_ARY (so this is only used when the array size is not yet known)
 #define MGS_PTR(Redirect, Addr, TypeName, VarName, Value)\
 TypeName LocalPtr_##VarName = Value;\
-MgsVar Var_##VarName(Addr, sizeof(LocalPtr_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
+MgsVar Var_##VarName(#VarName, Addr, sizeof(LocalPtr_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
 std::remove_pointer<TypeName>::type * const VarName = (Redirect && IsMgsi()) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
 
 #define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)\
 TypeName LocalVar_##VarName = Value;\
-MgsVar Var_##VarName(Addr, sizeof(LocalVar_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
+MgsVar Var_##VarName(#VarName, Addr, sizeof(LocalVar_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
 TypeName& VarName = (Redirect && IsMgsi()) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
 
 #define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);

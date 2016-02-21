@@ -8,6 +8,7 @@ struct TVarInfo
     DWORD mSize;
     bool mIsPointerType;
     bool mIsConstData;
+    const char* mName;
 };
 
 // Since the MgsFunctionBase instances are global we have to do this to avoid global static init ordering issues
@@ -28,7 +29,7 @@ std::set<TVarInfo>& Vars()
     return v;
 }
 
-MgsVar::MgsVar(DWORD addr, DWORD sizeInBytes, bool isPointerType, bool isConstData)
+MgsVar::MgsVar(const char* name, DWORD addr, DWORD sizeInBytes, bool isPointerType, bool isConstData)
 {
     for (const auto& var : Vars())
     {
@@ -45,7 +46,7 @@ MgsVar::MgsVar(DWORD addr, DWORD sizeInBytes, bool isPointerType, bool isConstDa
             abort();
         }
     }
-    Vars().insert({ addr, sizeInBytes, isPointerType, isConstData });
+    Vars().insert({ addr, sizeInBytes, isPointerType, isConstData, name });
 }
 
 /*static*/ void  MgsVar::TrackAlloc(void* ptr, size_t size)
@@ -85,11 +86,11 @@ MgsVar::SnapShot::SnapShot()
         {
             if (v.mIsPointerType)
             {
-                mVars[v.mAddr] = std::make_unique<DynamicVarSnapShot>(v.mAddr);
+                mVars[v.mAddr] = std::make_unique<DynamicVarSnapShot>(v.mName, v.mAddr);
             }
             else
             {
-                mVars[v.mAddr] = std::make_unique<StaticVarSnapShot>(v.mAddr, v.mSize);
+                mVars[v.mAddr] = std::make_unique<StaticVarSnapShot>(v.mName, v.mAddr, v.mSize);
             }
         }
     }
@@ -161,7 +162,10 @@ bool StaticVarSnapShot::operator == (const StaticVarSnapShot& other)
 
     if (other.mValue != mValue)
     {
-        abort();
+        
+
+        LOG_WARNING("Var diff: " << other.mAddr << " name " << other.mName);
+        //abort();
     }
 
     return true;
