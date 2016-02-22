@@ -1426,11 +1426,8 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     return TRUE;
 }
 
-MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices_);
-int __cdecl jim_enumerate_devices_z()
+int __cdecl jim_enumerate_devices()
 {
-    abort();
-
     int varC;
     int var8 = 0;
     jimDeviceDDId Dst;
@@ -1611,7 +1608,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     Input_Start();
     mgs_fputs("jim_enumerate_devices()\n", gFile);
     mgs_fflush(gFile);
-    v55 = jim_enumerate_devices_();
+    v55 = jim_enumerate_devices();
     if (!v55)
     {
         gSoftwareRendering = 1;
