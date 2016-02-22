@@ -3924,10 +3924,7 @@ DRAWENV *__cdecl Renderer_DRAWENV_Init_401888(DRAWENV *ptr, __int16 clipX1, __in
 }
 MSG_FUNC_IMPL(0x401888, Renderer_DRAWENV_Init_401888);
 
-MGS_VAR(1, 0x6BECF0, WORD, gClipX1_word_6BECF0, 0x0);
-MGS_VAR(1, 0x6BECF2, WORD, gClipY1_word_6BECF2, 0x0);
-MGS_VAR(1, 0x6BECF4, WORD, gClipX2_word_6BECF4, 0x0);
-MGS_VAR(1, 0x6BECF6, WORD, gClipY2_word_6BECF6, 0x0);
+MGS_VAR(1, 0x6BECF0, Rect16, gClipRect_6BECF0, {});
 
 MGS_VAR(1, 0x6C0EAA, WORD, word_6C0EAA, 0x0);
 MGS_VAR(1, 0x6C0EA8, WORD, word_6C0EA8, 0x0);
@@ -3949,10 +3946,10 @@ DRAWENV *Renderer_Init_DRAWENV_40200D()
     DRAWENV drawEnv;
     Renderer_DRAWENV_Init_401888(
         &drawEnv,
-        gClipX1_word_6BECF0,
-        gClipY1_word_6BECF2,
-        gClipX2_word_6BECF4,
-        gClipY2_word_6BECF6);
+        gClipRect_6BECF0.x1,
+        gClipRect_6BECF0.y1,
+        gClipRect_6BECF0.x2,
+        gClipRect_6BECF0.y2);
     return Renderer_Set_DRAWENV_40DD90(&drawEnv);
 }
 MSG_FUNC_IMPL(0x40200D, Renderer_Init_DRAWENV_40200D);
