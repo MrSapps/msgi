@@ -2622,7 +2622,7 @@ struct MGSLargeVertDif
 
 struct StructVertType3
 {
-    MGSLargeVertDif DifVtx[3];
+    MGSLargeVertDif DifVtx[4];
 };
 
 struct MGSVertType4
