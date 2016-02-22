@@ -3875,6 +3875,54 @@ void *__cdecl sub_44EAED()
     return memset(&word_7227C8, 0, 0x10u);
 }
 
+struct DR_ENV
+{
+    DWORD tag;
+    DWORD code[15];
+};
+static_assert(sizeof(DR_ENV) == 0x40, "DR_ENV size must be 0x40");
+
+struct DRAWENV
+{
+    Rect16 clip;
+    WORD offx;
+    WORD offy;
+    Rect16 textureWindow;
+    BYTE texturePage;
+    BYTE dtd;
+    BYTE dfe;
+    BYTE isbg;
+    BYTE r0;
+    BYTE g0;
+    BYTE b0;
+    DR_ENV dr_env;
+};
+static_assert(sizeof(DRAWENV) == 0x5C, "DRAWENV size must be 0x5C");
+
+
+DRAWENV *__cdecl Renderer_DRAWENV_Init_401888(DRAWENV *ptr, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2)
+{
+    ptr->clip.x1 = clipX1;
+    ptr->clip.x2 = clipX2;
+    ptr->offx = clipX1;
+    ptr->clip.y2 = clipY2;
+    ptr->clip.y1 = clipY1;
+    ptr->offy = clipY1;
+    ptr->dtd = 1;
+    ptr->dfe = 0;
+    ptr->textureWindow.x1 = 0;
+    ptr->textureWindow.y1 = 0;
+    ptr->textureWindow.x2 = 0;
+    ptr->textureWindow.y2 = 0;
+    ptr->r0 = 0;
+    ptr->g0 = 0;
+    ptr->b0 = 0;
+    ptr->texturePage = 0;
+    ptr->isbg = 0;
+    return ptr;
+}
+MSG_FUNC_IMPL(0x401888, Renderer_DRAWENV_Init_401888);
+
 // 0x40A68D
 //MSG_FUNC_NOT_IMPL(0x40A68D, int __cdecl(int, int), sub_40A68D);
 void __cdecl LibGvd_SetFnPtr_sub_40A68D(int number, int(__cdecl* fn)(DWORD*))
