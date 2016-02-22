@@ -337,7 +337,7 @@ int __cdecl MainLoop()
 {
     char var11C[0xFF];
     char var21B[0xFF];
-    BYTE var21C = byte_6FC7E0;
+    //BYTE var21C = byte_6FC7E0;
     MSG oMsg;
     memset(var21B, 0, 0xFF);
     memset(var11C, 0, 0xFF);
@@ -477,7 +477,7 @@ MGS_VAR(1, 0x722784, DWORD, dword_722784, 0);
 MGS_VAR(1, 0x7227A0, DWORD, dword_7227A0, 0);
 MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
 MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
-MGS_VAR(1, 0x78D7B0, DWORD, dword_78D7B0, 0);
+MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
 MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
 MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
@@ -487,7 +487,7 @@ MGS_VAR(1, 0x722760, Actor, g_gamed_722760, {}); // TODO: Will actually big an A
 //actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
 MGS_ARY(1, 0x006BFC78, ActorList, 9, gActors, {});
 
-MGS_VAR(1, 0x78E7FC, WORD, word_78E7FC, 0);
+MGS_VAR(1, 0x78E7FC, signed short int, word_78E7FC, 0);
 MGS_VAR(1, 0x78E7FE, WORD, word_78E7FE, 0);
 MGS_VAR(1, 0x78E960, DWORD, gResidentTop_dword_78E960, 0);
 MGS_VAR(1, 0x78E964, DWORD, dword_78E964, 0);
@@ -607,7 +607,7 @@ signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, in
 weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
 {
     weapon_famas *pFamas; // eax@1 MAPDST
-    int v8; // eax@5
+    WORD v8; // eax@5
     __int16 v9; // cx@6
 
     pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
@@ -789,7 +789,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
     }
     if (Msg == WM_CHAR)
     {
-        byte_9AD988 = wParam;
+        byte_9AD988 = static_cast<BYTE>(wParam);
         return DefWindowProcA(hWnd, Msg, wParam, lParam);
     }
     if (Msg == WM_ACTIVATE)
@@ -1110,7 +1110,7 @@ static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204
 MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
 
 //MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), validateDeviceCaps);
-int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription, LPSTR lpDeviceName, jimDeviceIdentifier* pIdentifier)
+int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescription*/, LPSTR lpDeviceName, jimDeviceIdentifier* pIdentifier)
 {
     byte_775F48 = 0;
     byte_774B48 = 0;
@@ -1311,7 +1311,7 @@ HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDevice
 }
 
 // 0x51F5B8
-BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDriverName, LPVOID lpContext, HMONITOR hm)
+BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR /*lpDriverName*/, LPVOID /*lpContext*/, HMONITOR hm)
 {
     HRESULT hr;
     IDirectDraw7* pDirectDraw;
@@ -1428,7 +1428,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
 
 int __cdecl jim_enumerate_devices()
 {
-    int varC;
+    DWORD varC;
     int var8 = 0;
     jimDeviceDDId Dst;
     jimDeviceDDId Buf1;
@@ -1444,7 +1444,7 @@ int __cdecl jim_enumerate_devices()
 
     int var4 = 0x41;
     varC = 0;
-    while (true)
+    for (;;)
     {
         if (varC >= gNumDrivers_dword_77C608)
             break;
@@ -1757,10 +1757,10 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             mgs_fflush(gFile);
         }
     }
-    while (1)
+    for (;;)
     {
-        g_dwDisplayWidth = (320.0 * gXRes);
-        g_dwDisplayHeight = (240.0 * gXRes);
+        g_dwDisplayWidth = static_cast<DWORD>(320.0 * gXRes);
+        g_dwDisplayHeight = static_cast<DWORD>(240.0 * gXRes);
         mgs_fputs("Creating DirectDraw7\n", gFile);
         mgs_fflush(gFile);
 
@@ -1798,8 +1798,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 mgs_fflush(gFile);
                 gSoftwareRendering = 1;
                 gXRes = 1.0f;
-                g_dwDisplayWidth = (320.0 * 1.0f);
-                g_dwDisplayHeight = (240.0 * 1.0f);
+                g_dwDisplayWidth = static_cast<DWORD>(320.0 * 1.0f);
+                g_dwDisplayHeight = static_cast<DWORD>(240.0 * 1.0f);
                 MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
@@ -2271,7 +2271,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gNoEffects = 0;
         dword_716F60 = 0;
     }
-    sub_423F1B(0, (signed __int64)(14.0 * gXRes));
+    sub_423F1B(0, static_cast<int>(14.0 * gXRes));
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
@@ -2358,12 +2358,12 @@ signed int Render_sub_41E3C0()
 
     DWORD dwNumPasses = 1;
     pPrim[0].x = 1.0f;
-    pPrim[1].x = (double)(g_dwDisplayWidth - 1);
+    pPrim[1].x = static_cast<float>(g_dwDisplayWidth - 1);
     pPrim[2].x = 1.0f;
 
     pPrim[0].y = 1.0f;
     pPrim[1].y = 1.0f;
-    pPrim[2].y = (double)(g_dwDisplayHeight - 1);
+    pPrim[2].y = static_cast<float>(g_dwDisplayHeight - 1);
 
     pPrim[0].z = 1.0f;
     pPrim[1].z = 1.0f;
@@ -2858,7 +2858,7 @@ void handleBlendMode(uint16_t nBlend)
         gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 0;
 }
 
-void handleBlendMode(uint16_t nBlend, uint32_t offset)
+void handleBlendMode(uint16_t nBlend, uint16_t offset)
 {
     if ((dword_791C54 & 2) != 0)
         gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 1 + offset + ((nBlend >> 5) & 3);
@@ -2887,7 +2887,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
     uint32_t var14 = dword_688CD4;
     uint32_t var1C = dword_688CD0;
 
-    while (true)
+    for (;;)
     {
         if (a_nSize <= 0)
             return 1;
@@ -3122,7 +3122,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             position[15] = 1.0f;
             position[14] = 0.999999f;
             position[13] = 0.999999f;
-            position[12] = 0.999999;
+            position[12] = 0.999999f;
 
             position[3] = convertPositionFloat(pStructVert->DifVtx[0].Vtx.x);
             position[2] = convertPositionFloat(pStructVert->DifVtx[1].Vtx.x);
@@ -3885,7 +3885,7 @@ void __cdecl LibGvd_SetFnPtr_sub_40A68D(int number, int(__cdecl* fn)(DWORD*))
 }
 MSG_FUNC_IMPL(0x40A68D, LibGvd_SetFnPtr_sub_40A68D);
 
-struct_8 *__cdecl LibGvd_sub_40A618(int id)
+struct_8 *__cdecl LibGvd_sub_40A618(DWORD id)
 {
     signed int cnt;
     int v4;
@@ -4159,7 +4159,7 @@ signed int __cdecl Main()
     sub_4090A7();
     sub_40B725();
     sub_44E12B();
-    while (1)
+    for (;;)
     {
         result = MainLoop();
         if (!result)
@@ -4198,7 +4198,7 @@ void ShutdownEngine()
 }
 
 
-int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
     int result; // eax@2
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13

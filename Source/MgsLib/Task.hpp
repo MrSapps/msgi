@@ -17,7 +17,7 @@ DWORD __cdecl Task_ResumeQ();
 void* __cdecl Task_TerminateQ();
 
 // 00520001
-void __cdecl Task_SignalQ(int taskId);
+void __cdecl Task_SignalQ(DWORD taskId);
 
 // 00520095
 DWORD __cdecl Task_WaitForSignalQ();

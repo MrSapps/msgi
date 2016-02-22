@@ -152,7 +152,7 @@ void* __cdecl Task_TerminateQ()
     return memset(gTasks_77C710, 0, 512);
 }
 
-void __cdecl Task_SignalQ(int taskId)
+void __cdecl Task_SignalQ(DWORD taskId)
 {
     int idx = 0;
     Task* result = &gTasks_77C710[0];
