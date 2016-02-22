@@ -2647,6 +2647,32 @@ struct StructVertType5
     uint32_t field0;
 };
 
+
+struct DR_ENV
+{
+    DWORD tag;
+    DWORD code[15];
+};
+static_assert(sizeof(DR_ENV) == 0x40, "DR_ENV size must be 0x40");
+
+struct DRAWENV
+{
+    Rect16 clip;
+    WORD offx;
+    WORD offy;
+    Rect16 textureWindow;
+    BYTE texturePage;
+    BYTE dtd;
+    BYTE dfe;
+    BYTE isbg;
+    BYTE r0;
+    BYTE g0;
+    BYTE b0;
+    DR_ENV dr_env;
+};
+static_assert(sizeof(DRAWENV) == 0x5C, "DRAWENV size must be 0x5C");
+
+
 MGS_VAR(1, 0x791C54, DWORD, dword_791C54, 0);
 MGS_VAR(1, 0x791C58, DWORD, dword_791C58, 0);
 MGS_VAR(1, 0x791C5C, float, g_fV3, 0);
@@ -2666,7 +2692,7 @@ MGS_VAR(1, 0x791C84, float, g_fYOffset, 0);
 MGS_VAR(1, 0x791C7C, DWORD, g_nTextureIndex, 0);
 MGS_VAR(1, 0x6C0EAC, WORD, word_6C0EAC, 0);
 MGS_VAR(1, 0x6C0EAE, WORD, word_6C0EAE, 0);
-MGS_VAR(1, 0x6C0E98, WORD, word_6C0E98, 0);
+MGS_VAR(1, 0x6C0E98, DRAWENV, gDrawEnv_6C0E98, {});
 MGS_VAR(1, 0x6C0E9A, WORD, word_6C0E9A, 0);
 MGS_VAR(1, 0x6C0E9C, WORD, word_6C0E9C, 0);
 MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
@@ -3600,7 +3626,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         {
             StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
 
-            word_6C0E98 = pStructVert->field0 & 0x3FF;
+            gDrawEnv_6C0E98.clip.x1 = pStructVert->field0 & 0x3FF;
             word_6C0E9A = (pStructVert->field0 >> 10) & 0x3FF;
 
             dword_791C58 = 1;
@@ -3611,10 +3637,10 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         {
             StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
 
-            word_6C0E9C = (pStructVert->field0 & 0x3FF) - word_6C0E98 + 1;
+            word_6C0E9C = (pStructVert->field0 & 0x3FF) - gDrawEnv_6C0E98.clip.x1 + 1;
             word_6C0E9E = ((pStructVert->field0 >> 10) & 0x3FF) - word_6C0E9A + 1;
 
-            g_pMGSVertices[g_nVertexOffset].x = (float)word_6C0E98;
+            g_pMGSVertices[g_nVertexOffset].x = (float)gDrawEnv_6C0E98.clip.x1;
             g_pMGSVertices[g_nVertexOffset].y = (float)word_6C0E9A;
             g_pMGSVertices[g_nVertexOffset].u = (float)word_6C0E9C;
             g_pMGSVertices[g_nVertexOffset].v = (float)word_6C0E9E;
@@ -3875,31 +3901,6 @@ void *__cdecl sub_44EAED()
     return memset(&word_7227C8, 0, 0x10u);
 }
 
-struct DR_ENV
-{
-    DWORD tag;
-    DWORD code[15];
-};
-static_assert(sizeof(DR_ENV) == 0x40, "DR_ENV size must be 0x40");
-
-struct DRAWENV
-{
-    Rect16 clip;
-    WORD offx;
-    WORD offy;
-    Rect16 textureWindow;
-    BYTE texturePage;
-    BYTE dtd;
-    BYTE dfe;
-    BYTE isbg;
-    BYTE r0;
-    BYTE g0;
-    BYTE b0;
-    DR_ENV dr_env;
-};
-static_assert(sizeof(DRAWENV) == 0x5C, "DRAWENV size must be 0x5C");
-
-
 DRAWENV *__cdecl Renderer_DRAWENV_Init_401888(DRAWENV *ptr, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2)
 {
     ptr->clip.x1 = clipX1;
@@ -3922,6 +3923,40 @@ DRAWENV *__cdecl Renderer_DRAWENV_Init_401888(DRAWENV *ptr, __int16 clipX1, __in
     return ptr;
 }
 MSG_FUNC_IMPL(0x401888, Renderer_DRAWENV_Init_401888);
+
+MGS_VAR(1, 0x6BECF0, WORD, gClipX1_word_6BECF0, 0x0);
+MGS_VAR(1, 0x6BECF2, WORD, gClipY1_word_6BECF2, 0x0);
+MGS_VAR(1, 0x6BECF4, WORD, gClipX2_word_6BECF4, 0x0);
+MGS_VAR(1, 0x6BECF6, WORD, gClipY2_word_6BECF6, 0x0);
+
+MGS_VAR(1, 0x6C0EAA, WORD, word_6C0EAA, 0x0);
+MGS_VAR(1, 0x6C0EA8, WORD, word_6C0EA8, 0x0);
+
+
+DRAWENV *__cdecl Renderer_Set_DRAWENV_40DD90(DRAWENV *pDrawEnv)
+{
+    memcpy(&gDrawEnv_6C0E98, pDrawEnv, sizeof(gDrawEnv_6C0E98));
+    if (!word_6C0EAA)
+        word_6C0EAA = 255;
+    if (!word_6C0EA8)
+        word_6C0EA8 = 255;
+    return &gDrawEnv_6C0E98;
+}
+MSG_FUNC_IMPL(0x40DD90, Renderer_Set_DRAWENV_40DD90);
+
+DRAWENV *Renderer_Init_DRAWENV_40200D()
+{
+    DRAWENV drawEnv;
+    Renderer_DRAWENV_Init_401888(
+        &drawEnv,
+        gClipX1_word_6BECF0,
+        gClipY1_word_6BECF2,
+        gClipX2_word_6BECF4,
+        gClipY2_word_6BECF6);
+    return Renderer_Set_DRAWENV_40DD90(&drawEnv);
+}
+MSG_FUNC_IMPL(0x40200D, Renderer_Init_DRAWENV_40200D);
+
 
 // 0x40A68D
 //MSG_FUNC_NOT_IMPL(0x40A68D, int __cdecl(int, int), sub_40A68D);
