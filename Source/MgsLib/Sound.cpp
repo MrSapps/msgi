@@ -1271,7 +1271,7 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
     }
     else
     {
-        Size = 7 * a2 >> 1;
+        Size = (7 * a2) >> 1;
         if (snd)
         {
             snd->GetCurrentPosition(&gSamp1PlayPos_dword_77E1D0, 0);

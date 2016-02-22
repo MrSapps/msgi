@@ -2157,7 +2157,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 Render_SetRenderState(26, 1);
                 if (dword_651CF8)
                 {
-                    if (gLowRes != gLowRes)
+                    if (gLowRes != gLowRes) // FIX ME: This can't be right
                     {
                         if (!gLowRes)
                         {
@@ -3130,6 +3130,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             position[3] = convertPositionFloat(pStructVert->DifVtx[0].Vtx.x);
             position[2] = convertPositionFloat(pStructVert->DifVtx[1].Vtx.x);
             position[1] = convertPositionFloat(pStructVert->DifVtx[2].Vtx.x);
+            // TODO: FIX ME 3 is out of bounds
             position[0] = convertPositionFloat(pStructVert->DifVtx[3].Vtx.x);
 
             position[7] = convertPositionFloat(pStructVert->DifVtx[0].Vtx.y);
@@ -3752,6 +3753,7 @@ void *__cdecl sub_457B5B()
 {
     void *result; // eax@1
 
+    // TODO: FIX ME make pointer/array
     result = memcpy(&word_994320, &word_669AE0, 0x1000u);
     dword_993F44 = (int)&word_994320;
     return result;
@@ -3867,6 +3869,7 @@ int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsig
     return 0;
 }
 
+// TODO: Make array/pointer
 MGS_VAR(1, 0x7227C8, WORD, word_7227C8, 0);
 
 // 0x44EAED
@@ -4205,7 +4208,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
     void(__stdcall *pSetThreadExecutionState)(unsigned int); // [sp+Ch] [bp-460h]@13
     HMODULE hKernel32; // [sp+10h] [bp-45Ch]@12
     char Dest[256]; // [sp+14h] [bp-458h]@11
-    struct _MEMORYSTATUS Buffer; // [sp+414h] [bp-58h]@10
+    _MEMORYSTATUS Buffer = {};
     char *v11; // [sp+434h] [bp-38h]@52
     WNDCLASSA WndClass; // [sp+438h] [bp-34h]@27
     char *bRestart; // [sp+464h] [bp-8h]@8
@@ -4227,7 +4230,6 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
         if (bRestart)
             *bRestart = 0;
         Buffer.dwLength = 32;
-        memset(&Buffer.dwMemoryLoad, 0, 0x1Cu);
         GlobalMemoryStatus(&Buffer);
         if (Buffer.dwAvailPageFile >= 0x4000000)// 50mb hard disk space check
         {
