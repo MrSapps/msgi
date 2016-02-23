@@ -3700,12 +3700,14 @@ MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
 MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
 MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
 
+#define OT_END_TAG 0xFFFFFF
+
 int __cdecl Renderer_ClearOTag(DWORD* ot, int otSize)
 {
     if (otSize - 1 <= 0)
     {
         // As we only have 1 item, set the start of the table to be the end marker
-        *ot = 0xFFFFFF; 
+        *ot = OT_END_TAG;
     }
     else
     {
@@ -3731,7 +3733,7 @@ int __cdecl Renderer_ClearOTag(DWORD* ot, int otSize)
         } while (count);
 
         // Set the first item to the end marker
-        *ot = 0xFFFFFF;
+        *ot = OT_END_TAG;
     }
     return 0;
 }
@@ -3772,11 +3774,11 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
                 }
             }
 
-            // Ordering table linked list? See Renderer_ClearOTag
+            // Get the pointer bytes of the OT, the remainder byte is the type.. TODO - how does the vertex info fit into the OT?
             uint32_t nextStructVert = ((uint32_t*)a_pStructVert)[0] & 0x00FFFFFF;
             a_pStructVert = (StructVert*)nextStructVert;
         }
-        while ((uint32_t)a_pStructVert != 0xFFFFFF);
+        while ((uint32_t)a_pStructVert != OT_END_TAG);
 
         if (gSoftwareRendering != 0)
         {
