@@ -3700,6 +3700,43 @@ MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
 MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
 MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
 
+int __cdecl Renderer_ClearOTag(DWORD* ot, int otSize)
+{
+    if (otSize - 1 <= 0)
+    {
+        // As we only have 1 item, set the start of the table to be the end marker
+        *ot = 0xFFFFFF; 
+    }
+    else
+    {
+        // Get a pointer to the last item
+        DWORD* pOTItem = &ot[otSize - 1];
+        int count = otSize - 1;
+        do
+        {
+            // Set the current item to point to the previous item
+            *pOTItem = reinterpret_cast<DWORD>(pOTItem - 1);
+            if (reinterpret_cast<DWORD>(pOTItem) & 0xFF000000)
+            {
+                printf(
+                    "\n"
+                    "\n"
+                    "***** ERROR: ClearOTag() found a pointer which uses more than 24 bit *****\n"
+                    " Invalid pointer value caused overflow [%x]\n"
+                    "\n",
+                    *pOTItem);
+            }
+            --pOTItem;
+            --count;
+        } while (count);
+
+        // Set the first item to the end marker
+        *ot = 0xFFFFFF;
+    }
+    return 0;
+}
+MSG_FUNC_IMPL(0x0044AB80, Renderer_ClearOTag);
+
 //MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
 void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
 {
@@ -3734,6 +3771,8 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
                     ConvertPolys_Hardware(&a_pStructVert[1], a_pStructVert->structType);
                 }
             }
+
+            // Ordering table linked list? See Renderer_ClearOTag
             uint32_t nextStructVert = ((uint32_t*)a_pStructVert)[0] & 0x00FFFFFF;
             a_pStructVert = (StructVert*)nextStructVert;
         }
@@ -3754,6 +3793,7 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
     }
 }
 MSG_FUNC_IMPL(0x4103B0, Render_DrawGeneric);
+
 
 //MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
 void __cdecl Render_DrawIndex(uint32_t a_nIndex)
