@@ -2934,7 +2934,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 0:
             return 1;
 
-        case 32:
+        case 32: // monochrome 3 point polygon
         case 33:
         case 34:
         case 35:
@@ -2957,7 +2957,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             break;
         }
 
-        case 40:
+        case 40: // monchrome 4 point polygon
         case 41:
         case 42:
         case 43:
@@ -3536,19 +3536,24 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             break;
         }
 
-        case 128:
+        case 128: // $80     move image in frame buffer
         {
             StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
             int16_t rawPos[4];
+
+            // source coord
             rawPos[1] = pStructVert->Vtxs[0].y;
             rawPos[0] = pStructVert->Vtxs[0].x;
 
+            // dest coord
             int16_t varDC = pStructVert->Vtxs[1].y;
             int16_t varD8 = pStructVert->Vtxs[1].x;
 
+            // w/h to xfer
             rawPos[3] = pStructVert->Vtxs[2].y;
             rawPos[2] = pStructVert->Vtxs[2].x;
 
+            // move image
             sub_40D540(rawPos, varD8, varDC);
 
             dword_791C58 = 4;
