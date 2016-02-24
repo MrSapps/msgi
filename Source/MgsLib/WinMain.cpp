@@ -111,7 +111,6 @@ MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), unknown_libname_3); // Note: Not a 
 MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
 MSG_FUNC_NOT_IMPL(0x0044E226, Actor* __cdecl(), sub_44E226);
-MSG_FUNC_NOT_IMPL(0x004232B0, void __cdecl(), DoClearAll);
 MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
 MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
@@ -4262,6 +4261,114 @@ int __cdecl DoMain()
     return Main();
 }
 
+MGS_VAR(1, 0x6FC73C, IUnknown*, dword_6FC73C, nullptr); // TODO: Check what this is
+
+MSG_FUNC_NOT_IMPL(0x4241A4, void* __cdecl(void *), sub_4241A4);
+
+// 00423020
+void __cdecl ClearAll()
+{
+    puts(" *************************** CLEAR ALL START *************************");
+    if (g_NumTextures)
+    {
+        for (int i = 0; i < g_NumTextures; ++i)
+        {
+            if (gTextures_dword_6C0F00[i].mSurfaceType == 5)
+            {
+                sub_4241A4(gTextures_dword_6C0F00[i].mSurface);
+            }
+            else if (!gSoftwareRendering)
+            {
+                if (gTextures_dword_6C0F00[i].mSurface)
+                {
+                    gTextures_dword_6C0F00[i].mSurface->Release();
+                    gTextures_dword_6C0F00[i].mSurface = 0;
+                }
+            }
+        }
+    }
+
+    if (dword_6FC73C)
+    {
+        dword_6FC73C->Release();
+        dword_6FC73C = 0;
+    }
+
+    if (g_pDirect3DDevice)
+    {
+        g_pDirect3DDevice->Release();
+        g_pDirect3DDevice = 0;
+    }
+
+    if (g_pBackBuffer)
+    {
+        g_pBackBuffer->Release();
+        g_pBackBuffer = 0;
+    }
+
+    if (g_pClipper)
+    {
+        g_pClipper->Release();
+        g_pClipper = 0;
+    }
+
+    if (g_pPrimarySurface)
+    {
+        g_pPrimarySurface->Release();
+        g_pPrimarySurface = 0;
+    }
+
+    if (g_pDirect3D)
+    {
+        g_pDirect3D->Release();
+        g_pDirect3D = 0;
+    }
+
+    if (g_pDirectDraw)
+    {
+        g_pDirectDraw->Release();
+        g_pDirectDraw = 0;
+    }
+
+    if (g_pDDSurface)
+    {
+        g_pDDSurface->Release();
+        g_pDDSurface = 0;
+    }
+
+    if (g_pMGSVertices)
+    {
+        mgs_free(g_pMGSVertices);
+        g_pMGSVertices = 0;
+    }
+
+    if (gPrimStructArray)
+    {
+        mgs_free(gPrimStructArray);
+        gPrimStructArray = 0;
+    }
+
+    if (dword_6DEF7C)
+    {
+        mgs_free(dword_6DEF7C);
+        dword_6DEF7C = 0;
+    }
+
+    if (dword_6DEF90)
+    {
+        mgs_free(dword_6DEF90);
+        dword_6DEF90 = 0;
+    }
+
+    mgs_free(gImageBufer_dword_6FC728);
+    mgs_free(g_pwTextureIndices);
+}
+
+void __cdecl DoClearAll()
+{
+    ClearAll();
+}
+MSG_FUNC_IMPL(0x004232B0, DoClearAll);
 
 // 0x0051D180
 void ShutdownEngine()
