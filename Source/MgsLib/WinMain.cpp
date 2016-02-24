@@ -3813,7 +3813,6 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
 }
 MSG_FUNC_IMPL(0x4103B0, Render_DrawGeneric);
 
-
 //MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
 void __cdecl Render_DrawIndex(uint32_t a_nIndex)
 {
@@ -4012,6 +4011,56 @@ DRAWENV *Renderer_Init_DRAWENV_40200D()
     return Renderer_Set_DRAWENV_40DD90(&drawEnv);
 }
 MSG_FUNC_IMPL(0x40200D, Renderer_Init_DRAWENV_40200D);
+
+MGS_VAR(1, 0x791A08, int, gActiveBuffer_dword_791A08, 0);
+MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
+MGS_VAR(1, 0x6BED20, DWORD, dword_6BED20, 0);
+MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {}); // TODO: Check 2 is correct
+
+MSG_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(Rect16 *pRect), sub_40DD00);
+MSG_FUNC_NOT_IMPL(0x40ACB2, int __cdecl(int idx), System_sub_40ACB2);
+MSG_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), sub_459ACE);
+MSG_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), sub_40162D);
+MSG_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
+
+int __cdecl Main_sub_401C02()
+{
+    int result = 0;
+    if (gSoftwareRendering)
+    {
+        // SW rendering path not implemented
+        abort();
+    }
+    else
+    {
+        const int activeBufferHW = gActiveBuffer_dword_791A08;
+        if (dword_6BED20 <= 0)
+        {
+            if (gLastActiveBuffer_dword_650110 < 0 || gActiveBuffer_dword_791A08 != gLastActiveBuffer_dword_650110)
+            {
+                gClipRect_6BECF0.x1 = static_cast<WORD>(dword_6BED18[gActiveBuffer_dword_791A08]);
+                sub_40DD00(&gClipRect_6BECF0);
+                Render_DrawIndex(1 - activeBufferHW);
+                gLastActiveBuffer_dword_650110 = -1;
+            }
+        }
+        else
+        {
+            if (gLastActiveBuffer_dword_650110 < 0)
+            {
+                gLastActiveBuffer_dword_650110 = gActiveBuffer_dword_791A08;
+            }
+            --dword_6BED20;
+        }
+        System_sub_40ACB2(activeBufferHW);
+        System_sub_40ACB2(2);
+        sub_459ACE();
+        sub_40162D(activeBufferHW);                 // calls ClearOTag
+        result = sub_4021F2();
+    }
+    return result;
+}
+MSG_FUNC_IMPL(0x401C02, Main_sub_401C02);
 
 
 // 0x40A68D
