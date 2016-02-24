@@ -2933,7 +2933,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 0:
             return 1;
 
-        case 32:
+        case 32: // monochrome 3 point polygon
         case 33:
         case 34:
         case 35:
@@ -2956,7 +2956,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             break;
         }
 
-        case 40:
+        case 40: // monchrome 4 point polygon
         case 41:
         case 42:
         case 43:
@@ -3535,19 +3535,24 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             break;
         }
 
-        case 128:
+        case 128: // $80     move image in frame buffer
         {
             StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
             int16_t rawPos[4];
+
+            // source coord
             rawPos[1] = pStructVert->Vtxs[0].y;
             rawPos[0] = pStructVert->Vtxs[0].x;
 
+            // dest coord
             int16_t varDC = pStructVert->Vtxs[1].y;
             int16_t varD8 = pStructVert->Vtxs[1].x;
 
+            // w/h to xfer
             rawPos[3] = pStructVert->Vtxs[2].y;
             rawPos[2] = pStructVert->Vtxs[2].x;
 
+            // move image
             sub_40D540(rawPos, varD8, varDC);
 
             dword_791C58 = 4;
@@ -3699,6 +3704,45 @@ MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
 MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
 MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
 
+#define OT_END_TAG 0xFFFFFF
+
+int __cdecl Renderer_ClearOTag(DWORD* ot, int otSize)
+{
+    if (otSize - 1 <= 0)
+    {
+        // As we only have 1 item, set the start of the table to be the end marker
+        *ot = OT_END_TAG;
+    }
+    else
+    {
+        // Get a pointer to the last item
+        DWORD* pOTItem = &ot[otSize - 1];
+        int count = otSize - 1;
+        do
+        {
+            // Set the current item to point to the previous item
+            *pOTItem = reinterpret_cast<DWORD>(pOTItem - 1);
+            if (reinterpret_cast<DWORD>(pOTItem) & 0xFF000000)
+            {
+                printf(
+                    "\n"
+                    "\n"
+                    "***** ERROR: ClearOTag() found a pointer which uses more than 24 bit *****\n"
+                    " Invalid pointer value caused overflow [%x]\n"
+                    "\n",
+                    *pOTItem);
+            }
+            --pOTItem;
+            --count;
+        } while (count);
+
+        // Set the first item to the end marker
+        *ot = OT_END_TAG;
+    }
+    return 0;
+}
+MSG_FUNC_IMPL(0x0044AB80, Renderer_ClearOTag);
+
 //MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
 void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
 {
@@ -3733,10 +3777,12 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
                     ConvertPolys_Hardware(&a_pStructVert[1], a_pStructVert->structType);
                 }
             }
+
+            // Get the pointer bytes of the OT, the remainder byte is the type.. TODO - how does the vertex info fit into the OT?
             uint32_t nextStructVert = ((uint32_t*)a_pStructVert)[0] & 0x00FFFFFF;
             a_pStructVert = (StructVert*)nextStructVert;
         }
-        while ((uint32_t)a_pStructVert != 0xFFFFFF);
+        while ((uint32_t)a_pStructVert != OT_END_TAG);
 
         if (gSoftwareRendering != 0)
         {
@@ -3753,6 +3799,7 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
     }
 }
 MSG_FUNC_IMPL(0x4103B0, Render_DrawGeneric);
+
 
 //MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
 void __cdecl Render_DrawIndex(uint32_t a_nIndex)
