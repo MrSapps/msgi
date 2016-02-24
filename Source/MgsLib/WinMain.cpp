@@ -265,7 +265,7 @@ void __cdecl PrintDDError(const char* errMsg, HRESULT hrErr)
         pStrErr = Dest;
     }
 
-    if (hrErr)
+    if (hrErr != S_OK)
     {
         for (int i = 0; i < 5; ++i)
         {
@@ -303,7 +303,7 @@ __int16 __cdecl Render_RestoreAll()
             if (gTextures_dword_6C0F00[i].mSurface->IsLost() == DDERR_SURFACELOST)
             {
                 const HRESULT hr = gTextures_dword_6C0F00[i].mSurface->Restore();
-                if (hr)
+                if (FAILED(hr))
                 {
                     PrintDDError("tex #%i restore caput", i);
                 }
@@ -362,12 +362,10 @@ int __cdecl HandleExclusiveMode()
 //MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
 int __cdecl MainLoop()
 {
-    char var11C[0xFF];
-    char var21B[0xFF];
+    //char var11C[0xFF] = { 0xFF };
+    //char var21B[0xFF] = { 0xFF };
     //BYTE var21C = byte_6FC7E0;
-    MSG oMsg;
-    memset(var21B, 0, 0xFF);
-    memset(var11C, 0, 0xFF);
+    MSG oMsg = {};
 
     Sound_PopulateBufferQ();
 
@@ -697,7 +695,7 @@ int __cdecl Actor_DumpActorSystem()
                     v1 = 0;
                 else
                     v1 = 100 * pActorCopy->field_18 / pActorCopy->field_1C;
-                printf("Lv%d %04d.%02d %08X %s\n", i, v1 / 100, v1 % 100, pActorCopy->update, pActorCopy->mNamePtr);
+                printf("Lv%d %04d.%02d %p %s\n", i, v1 / 100, v1 % 100, pActorCopy->update, pActorCopy->mNamePtr);
                 pActorCopy->field_1C = 0;
                 pActorCopy->field_18 = 0;
             }
@@ -1158,7 +1156,7 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescripti
         strcat(pStringError, "E5a:\tDevice is PoverVR like, which is not supported\n");
         status = 1;
     }
-    if (!(pDesc->dpcTriCaps.dwShadeCaps & (D3DPSHADECAPS_ALPHAFLATBLEND || D3DPSHADECAPS_ALPHAGOURAUDBLEND)))
+    if (!(pDesc->dpcTriCaps.dwShadeCaps & (D3DPSHADECAPS_ALPHAFLATBLEND | D3DPSHADECAPS_ALPHAGOURAUDBLEND)))
     {
         strcat(pStringError, "E6a:\tFlat or Gourad Alpha Flat Blending required\n");
         status = 1;
@@ -1821,22 +1819,28 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         if (g_pPrimarySurface)
         {
             hr = g_pPrimarySurface->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release primary surf", hr);
+            }
             g_pPrimarySurface = 0;
         }
         if (g_pBackBuffer)
         {
             hr = g_pBackBuffer->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release render surf", hr);
+            }
             g_pBackBuffer = 0;
         }
         if (g_pClipper)
         {
             hr = g_pClipper->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release clipper", hr);
+            }
             g_pClipper = 0;
         }
         g_pPrimarySurface = 0;
@@ -1856,7 +1860,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             mgs_fflush(gFile);
             hr = g_pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
         }
-        if (hr < 0)
+        if (FAILED(hr))
         {
             mgs_fputs(" . fail\n", gFile);
             mgs_fflush(gFile);
@@ -1910,7 +1914,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             mgs_fputs("Creating clipper...\n", gFile);
             mgs_fflush(gFile);
             hr = g_pDirectDraw->CreateClipper(0, &g_pClipper, 0);
-            if (hr)
+            if (FAILED(hr))
             {
                 mgs_fputs(" . fail\n", gFile);
                 mgs_fflush(gFile);
@@ -1918,7 +1922,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 return 0;
             }
             hr = g_pClipper->SetHWnd(0, gHwnd);
-            if (hr)
+            if (FAILED(hr))
             {
                 mgs_fputs(" . fail\n", gFile);
                 mgs_fflush(gFile);
@@ -1926,7 +1930,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 return 0;
             }
             hr = g_pPrimarySurface->SetClipper(g_pClipper);
-            if (hr)
+            if (FAILED(hr))
             {
                 mgs_fputs(" . fail\n", gFile);
                 mgs_fflush(gFile);
@@ -1941,7 +1945,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         dxSurfaceDesc.dwSize = 124;
         if (gSoftwareRendering)
         {
-            if (dword_651CF8 || dword_716F6C && dword_716F6C != 1)
+            if (dword_651CF8 || (dword_716F6C && dword_716F6C != 1))
             {
                 mgs_fputs("Testing software render speed to system and to video surface\n", gFile);
                 mgs_fflush(gFile);
@@ -2029,7 +2033,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs("Restoring surfaces...\n", gFile);
         mgs_fflush(gFile);
         Render_RestoreAll();
-        if (hr)
+        if (FAILED(hr))
         {
             mgs_fputs(" . fail\n", gFile);
             mgs_fflush(gFile);
@@ -2043,7 +2047,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs("Querying gamma interface...\n", gFile);
         mgs_fflush(gFile);
         g_pPrimarySurface->QueryInterface(IID_IDirectDrawGammaControl_MGS, (LPVOID*)&g_pGammaControl);
-        if (hr)
+        if (FAILED(hr))
         {
             mgs_fputs(" . fail\n", gFile);
             mgs_fflush(gFile);
@@ -2084,7 +2088,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
         hr = g_pDirect3D->CreateDevice(*v33, g_pBackBuffer, &g_pDirect3DDevice);
 
-        if (hr >= 0)
+        if (SUCCEEDED(hr))
         {
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
@@ -2112,15 +2116,17 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxSurfaceDesc3.ddsCaps.dwCaps2 = DDSCAPS2_TEXTUREMANAGE;
 
                 hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc3, &g_pDDSurface, 0);
-                if (hr)
+                if (FAILED(hr))
                 {
                     g_pDDSurface = 0;
                 }
-                else if (!ClearDDSurfaceWhite())
+                else 
                 {
-
-                    g_pDDSurface->Release();
-                    g_pDDSurface = 0;
+                    if (!ClearDDSurfaceWhite())
+                    {
+                        g_pDDSurface->Release();
+                        g_pDDSurface = 0;
+                    }
                 }
             }
 
@@ -2220,22 +2226,28 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         if (g_pBackBuffer)
         {
             hr = g_pBackBuffer->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release render surf", hr);
+            }
             g_pBackBuffer = 0;
         }
         if (g_pPrimarySurface)
         {
             hr = g_pPrimarySurface->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't relaese primary surf", hr);
+            }
             g_pPrimarySurface = 0;
         }
         if (g_pClipper)
         {
             hr = g_pClipper->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release clipper", hr);
+            }
             g_pClipper = 0;
         }
         g_pPrimarySurface = 0;
@@ -2387,7 +2399,7 @@ signed int Render_sub_41E3C0()
     Render_SetRenderState(9, 1);
     Render_SetRenderState(27, 1);
 
-    if (g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+    if (SUCCEEDED(g_pDirect3DDevice->ValidateDevice(&dwNumPasses)))
     {
         gAlphaModulate_dword_6FC798 = 0;
         Render_InitTextureStages(0, 4, 2);
@@ -2406,7 +2418,7 @@ signed int Render_sub_41E3C0()
             {
                 Render_SetRenderState(19, 5);
                 Render_SetRenderState(20, 5);
-                if (!g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+                if (FAILED(g_pDirect3DDevice->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
                     {
@@ -2425,7 +2437,7 @@ signed int Render_sub_41E3C0()
             {
                 Render_SetRenderState(19, 5);
                 Render_SetRenderState(20, 2);
-                if (!g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+                if (FAILED(g_pDirect3DDevice->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
                     {
@@ -3896,7 +3908,7 @@ void DebugLog(const char *Format, ...)
     va_start(va, Format);
     vsprintf(Dest, Format, va);
     //OutputDebugStringA(Dest);
-    printf(Dest);
+    printf("%s", Dest);
 }
 
 // The varadic template hook class can't also mixing in varadic C functions, so we have too hook these manually
