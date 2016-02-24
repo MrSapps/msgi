@@ -3910,6 +3910,21 @@ void DebugLog(const char *Format, ...)
     printf("%s", Dest);
 }
 
+int mgs_printf(const char *fmt, ...)
+{
+
+    va_list myargs;
+    va_start(myargs, fmt);
+
+
+    int ret = vprintf(fmt, myargs);
+
+    va_end(myargs);
+    
+
+    return ret;
+}
+
 // The varadic template hook class can't also mixing in varadic C functions, so we have too hook these manually
 // good news is that these kind of functions are rare.
 void InstallVaradicCFunctionHooks()
@@ -3932,10 +3947,21 @@ void InstallVaradicCFunctionHooks()
     DebugLog_Type oldPtr = (DebugLog_Type)0x00520157;
     err = DetourAttach(&(PVOID&)oldPtr, DebugLog);
     
+
     if (err != NO_ERROR)
     {
         abort();
     }
+    
+    using mgs_printf_Type = decltype(&mgs_printf);
+    mgs_printf_Type old_mgs_printf = (mgs_printf_Type)0x005398F0;
+
+    err = DetourAttach(&(PVOID&)old_mgs_printf, mgs_printf);
+    if (err != NO_ERROR)
+    {
+        abort();
+    }
+    
 
     err = DetourTransactionCommit();
     if (err != NO_ERROR)

@@ -50,7 +50,7 @@ void *__cdecl mgs_realloc(void *Memory, size_t NewSize)
     if (IsMgsi())
     {
         // TODO: Track
-        LOG_WARNING("realloc() not tracked");
+        //LOG_WARNING("realloc() not tracked");
         return mgs_realloc_.Ptr()(Memory, NewSize);
     }
     else
@@ -64,7 +64,7 @@ void *__cdecl mgs_calloc(size_t NumOfElements, size_t SizeOfElements)
     if (IsMgsi())
     {
         // TODO: Track
-        LOG_WARNING("calloc() not tracked");
+        //LOG_WARNING("calloc() not tracked");
         return mgs_calloc_.Ptr()(NumOfElements, SizeOfElements);
     }
     else
