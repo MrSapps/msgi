@@ -179,7 +179,7 @@ MGS_VAR(1, 0x716F5C, float, dword_716F5C, 0);
 MGS_VAR(1, 0x716F78, DWORD, dword_716F78, 0);
 MGS_VAR(1, 0x77C60C, DWORD, gDriverNum_dword_77C60C, 0);
 MGS_VAR(1, 0x77C608, DWORD, gNumDrivers_dword_77C608, 0);
-MGS_PTR(1, 0x776B94, DWORD *, dword_776B94, nullptr);
+MGS_PTR(1, 0x776B94, DWORD *, dword_776B94, nullptr); // TODO: Array?
 MGS_PTR(1, 0x776B90, DWORD *, dword_776B90, nullptr);
 MGS_VAR(1, 0x716F74, DWORD, dword_716F74, 0);
 MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
@@ -195,10 +195,38 @@ MGS_VAR(1, 0x651D94, DWORD, dword_651D94, 0);
 MGS_VAR(1, 0x6FC79C, DWORD, g_surface565Mode, 0);
 MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
 
-MGS_PTR(1, 0x776B68, struct jimDeviceIdentifier *, g_pDeviceIdentifiers, nullptr); // TODO: Array?
-MGS_PTR(1, 0x689B68, struct jimUnk0x204 *, array_689B68, nullptr); // TODO: Array?
+struct jimDeviceDDId
+{
+    DDDEVICEIDENTIFIER2 identifier;
+    DWORD field430;
+    DWORD field434;
+};
+static_assert(sizeof(jimDeviceDDId) == 0x438, "jimUnk0x438 should be of size 0x438");
 
-MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
+struct jimDeviceIdentifier
+{
+    char pDriverDescription[0x28];      // 0x000
+    GUID* pDeviceGUID;                  // 0x028
+    GUID* pOtherGUID;                   // 0x02C
+    GUID deviceGUID;                    // 0x030
+    GUID otherGUID;                     // 0x040
+    jimDeviceDDId ddIdentifier;         // 0x050
+};
+static_assert(sizeof(jimDeviceIdentifier) == 0x488, "jimDeviceIdentifier should be of size 0x488");
+
+struct jimUnk0x204
+{
+    char    string[512];
+    DWORD   field200;
+};
+static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
+
+
+
+MGS_ARY(1, 0x776B68, struct jimDeviceIdentifier, 2, g_pDeviceIdentifiers, {}); // TODO: Check size, code seems to clamp it to 2
+MGS_ARY(1, 0x689B68, struct jimUnk0x204, 2, array_689B68, {}); // TODO: Also 2?
+
+MGS_ARY(1, 0x6C0778, char, 0x400, unk_6C0778, {}); // TODO: Struct?
 MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 MGS_VAR(1, 0x72279C, DWORD, dword_72279C, 0);
@@ -493,8 +521,8 @@ MGS_VAR(1, 0x78E964, DWORD, dword_78E964, 0);
 MGS_VAR(1, 0x791A0C, DWORD, dword_791A0C, 0);
 MGS_VAR(1, 0x9942A0, DWORD, dword_9942A0, 0);
 MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
-MGS_VAR(1, 0x994320, WORD, word_994320, 0);
-MGS_VAR(1, 0x669AE0, WORD, word_669AE0, 0);
+MGS_ARY(1, 0x994320, WORD, 2048, word_994320, {}); // todo: struct?
+MGS_ARY(1, 0x669AE0, WORD, 2048, word_669AE0, {}); // todo: struct?
 MGS_VAR(1, 0x993F44, DWORD, dword_993F44, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
@@ -1078,33 +1106,6 @@ MGS_VAR(1, 0x775F48, uint8_t, byte_775F48, 0);
 MGS_VAR(1, 0x774B48, uint8_t, byte_774B48, 0);
 MGS_VAR(1, 0x776450, uint8_t, byte_776450, 0);
 
-struct jimDeviceDDId
-{
-    DDDEVICEIDENTIFIER2 identifier;
-    DWORD field430;
-    DWORD field434;
-};
-static_assert(sizeof(jimDeviceDDId) == 0x438, "jimUnk0x438 should be of size 0x438");
-
-struct jimDeviceIdentifier
-{
-    char pDriverDescription[0x28];      // 0x000
-    GUID* pDeviceGUID;                  // 0x028
-    GUID* pOtherGUID;                   // 0x02C
-    GUID deviceGUID;                    // 0x030
-    GUID otherGUID;                     // 0x040
-    jimDeviceDDId ddIdentifier;         // 0x050
-};
-static_assert(sizeof(jimDeviceIdentifier) == 0x488, "jimDeviceIdentifier should be of size 0x488");
-
-struct jimUnk0x204
-{
-    char    string[512];
-    DWORD   field200;
-};
-static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
-
-
 
 MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
 
@@ -1500,10 +1501,10 @@ int __cdecl jim_enumerate_devices()
     for (varC = 0; varC < gNumDrivers_dword_77C608; varC++)
     {
         memset(&array_689B68[dword_68C3B8], 0, 0x204);
-        strncpy(array_689B68[dword_68C3B8].string, (g_pDeviceIdentifiers + varC)->ddIdentifier.identifier.szDescription, 0x200);
-        array_689B68[dword_68C3B8].field200 = (g_pDeviceIdentifiers + varC)->ddIdentifier.field434;
+        strncpy(array_689B68[dword_68C3B8].string, g_pDeviceIdentifiers[varC].ddIdentifier.identifier.szDescription, 0x200);
+        array_689B68[dword_68C3B8].field200 = g_pDeviceIdentifiers[varC].ddIdentifier.field434;
         
-        if ((g_pDeviceIdentifiers + varC)->ddIdentifier.field430 & 2)
+        if (g_pDeviceIdentifiers[varC].ddIdentifier.field430 & 2)
         {
             array_689B68[dword_68C3B8].field200 |= 0x10;
         }
@@ -2290,7 +2291,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             memset(gImageBufer_dword_6FC728, -1, 0x100000u);
             _cfltcvt_init();
-            memset(&unk_6C0778, 0, 0x400u);
+            memset(unk_6C0778, 0, 0x400u);
             dword_6DEF7C = mgs_malloc(0x200u);
             dword_6DEF90 = mgs_malloc(0x200u);
             memset(dword_6DEF7C, 0, 0x100u);
@@ -3823,8 +3824,8 @@ void *__cdecl sub_457B5B()
     void *result; // eax@1
 
     // TODO: FIX ME make pointer/array
-    result = memcpy(&word_994320, &word_669AE0, 0x1000u);
-    dword_993F44 = (int)&word_994320;
+    result = memcpy(word_994320, word_669AE0, 0x1000u);
+    dword_993F44 = (int)&word_994320[0];
     return result;
 }
 
@@ -3938,13 +3939,13 @@ int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsig
     return 0;
 }
 
-// TODO: Make array/pointer
-MGS_VAR(1, 0x7227C8, WORD, word_7227C8, 0);
+
+MGS_ARY(1, 0x7227C8, WORD, 5, word_7227C8, {}); // TODO: Struct?
 
 // 0x44EAED
 void *__cdecl sub_44EAED()
 {
-    return memset(&word_7227C8, 0, 0x10u);
+    return memset(word_7227C8, 0, 0x10u);
 }
 
 DRAWENV *__cdecl Renderer_DRAWENV_Init_401888(DRAWENV *ptr, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2)
