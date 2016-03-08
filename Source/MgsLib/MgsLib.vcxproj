@@ -84,6 +84,7 @@
     <ClCompile Include="File.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="MgsFunction.cpp" />
+    <ClCompile Include="Script.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
