@@ -27,6 +27,7 @@
 #include "File.hpp"
 #include "Input.hpp"
 #include "Task.hpp"
+#include "Script.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -4533,6 +4534,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     char *bRestart; // [sp+464h] [bp-8h]@8
     //int i; // [sp+468h] [bp-4h]@70
 
+    ScriptCpp_ForceLink();
     TaskCpp_ForceLink();
     SoundCpp_ForceLink();
     SoundCpp_Debug();

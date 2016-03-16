@@ -75,6 +75,7 @@
     <ClInclude Include="Input.hpp" />
     <ClInclude Include="logger.hpp" />
     <ClInclude Include="MgsFunction.hpp" />
+    <ClInclude Include="Script.hpp" />
     <ClInclude Include="Sound.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
