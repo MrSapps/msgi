@@ -112,7 +112,6 @@ MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), unknown_libname_3); // Note: Not a 
 MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
 MSG_FUNC_NOT_IMPL(0x0044E226, Actor* __cdecl(), sub_44E226);
-MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
 MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
 MSG_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
@@ -4230,6 +4229,17 @@ int __cdecl GetResidentTop()
 
 Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Actor*));
 
+// TODO: Is a global that inherits from Actor
+MGS_VAR(1, 0x725FC0, Actor, gMenuMan_stru_725FC0, {});
+
+Actor *__cdecl Menu_Related1()
+{
+    Actor_PushBack(1, &gMenuMan_stru_725FC0, 0);
+    return Actor_Init(&gMenuMan_stru_725FC0, 0, 0, "C:\\mgs\\source\\Menu\\menuman.c");
+}
+MSG_FUNC_IMPL(0x00459A9A, Menu_Related1);
+
+
 //MSG_FUNC_NOT_IMPL(0x44E12B, void *__cdecl(), sub_44E12B);
 void *__cdecl sub_44E12B()
 {
@@ -4256,6 +4266,7 @@ void *__cdecl sub_44E12B()
     dword_722784 = 0;
     return sub_44E226();
 }
+MSG_FUNC_IMPL(0x44E12B, sub_44E12B);
 
 //MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_UpdateActors);
 int __cdecl Actor_UpdateActors()
