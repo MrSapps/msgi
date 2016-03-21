@@ -35,6 +35,8 @@ MGS_ARY(1, 0x65714C, DWORD, 14, dword_65714C, {});
 MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, {});
 MGS_VAR(1, 0x71D79C, DWORD, dword_71D79C, 0);
 MGS_ARY(1, 0x6571BC, DWORD, 14, dword_6571BC, {});// TODO: Check 14 is big enough
+MGS_ARY(1, 0x71D690, char, 256, char_71D69, {});
+
 
 // WinMain.cpp
 extern DWORD& dword_717348; 
@@ -580,7 +582,7 @@ int __cdecl Input_Init(HWND hWnd)
                             if (hGetInfosRes >= 0)
                             {
                                 // TODO: Make 0x71D690 a var
-                                strcpy((char*)0x71D690, JoystickDeviceInfos.tszInstanceName);
+                                strcpy(char_71D69, JoystickDeviceInfos.tszInstanceName);
 
                                 for (int i = 0; i < 6; i++)
                                 {
