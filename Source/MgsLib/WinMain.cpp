@@ -3693,6 +3693,7 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
         {
             DDSURFACEDESC2 desc;
             memset(&desc, 0, sizeof(DDSURFACEDESC2));
+            desc.dwSize = sizeof(DDSURFACEDESC2);
             g_pBackBuffer->Lock(NULL, &desc, 0, 0);
             g_pBackBufferSurface = desc.lpSurface;
             g_BackBufferPitch = desc.lPitch;
@@ -3730,6 +3731,33 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
     }
 }
 MSG_FUNC_IMPL(0x4103B0, Render_DrawGeneric);
+
+struct VertsBlock
+{
+    StructVert header;
+    uint8_t padding[0x3C];
+};
+static_assert(sizeof(VertsBlock) == 0x40, "VertsBlock must be of size 0x40");
+
+struct PrimitivesChain
+{
+    StructVert* pStructVerts0[2];
+    uint8_t nNumStructs;
+    uint8_t padding0;
+    uint8_t padding1;
+    uint8_t padding2;
+    uint16_t fieldC;
+    uint8_t fieldE[0x4E];
+    uint32_t field5C;
+    uint32_t field60;
+    uint32_t field64;
+    uint32_t field68;
+    VertsBlock vertBlock0[2];
+    VertsBlock vertBlock1[2];
+    VertsBlock vertBlock2[2];
+};
+static_assert(sizeof(PrimitivesChain) == 0x1EC, "PrimitivesChain must be of size 0x1EC");
+
 
 //MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
 void __cdecl Render_DrawIndex(uint32_t a_nIndex)
