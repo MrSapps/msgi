@@ -8,7 +8,7 @@
 
 std::atomic<int> gThreadProcCalls;
 
-unsigned int __stdcall TaskThreadProc(void(*fn)(void))
+unsigned int __stdcall TaskThreadProc(void(*)(void))
 {
     gThreadProcCalls++;
     return 7;

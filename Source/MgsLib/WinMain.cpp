@@ -27,6 +27,7 @@
 #include "File.hpp"
 #include "Input.hpp"
 #include "Task.hpp"
+#include "Script.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -111,8 +112,6 @@ MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), unknown_libname_3); // Note: Not a 
 MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
 MSG_FUNC_NOT_IMPL(0x0044E226, Actor* __cdecl(), sub_44E226);
-MSG_FUNC_NOT_IMPL(0x004232B0, void __cdecl(), DoClearAll);
-MSG_FUNC_NOT_IMPL(0x00459A9A, int __cdecl(), Menu_Related1);
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
 MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
 MSG_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
@@ -180,7 +179,7 @@ MGS_VAR(1, 0x716F5C, float, dword_716F5C, 0);
 MGS_VAR(1, 0x716F78, DWORD, dword_716F78, 0);
 MGS_VAR(1, 0x77C60C, DWORD, gDriverNum_dword_77C60C, 0);
 MGS_VAR(1, 0x77C608, DWORD, gNumDrivers_dword_77C608, 0);
-MGS_PTR(1, 0x776B94, DWORD *, dword_776B94, nullptr);
+MGS_PTR(1, 0x776B94, DWORD *, dword_776B94, nullptr); // TODO: Array?
 MGS_PTR(1, 0x776B90, DWORD *, dword_776B90, nullptr);
 MGS_VAR(1, 0x716F74, DWORD, dword_716F74, 0);
 MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
@@ -196,10 +195,38 @@ MGS_VAR(1, 0x651D94, DWORD, dword_651D94, 0);
 MGS_VAR(1, 0x6FC79C, DWORD, g_surface565Mode, 0);
 MGS_VAR(1, 0x716F60, DWORD, dword_716F60, 0);
 
-MGS_PTR(1, 0x776B68, struct jimDeviceIdentifier *, g_pDeviceIdentifiers, nullptr); // TODO: Array?
-MGS_PTR(1, 0x689B68, struct jimUnk0x204 *, array_689B68, nullptr); // TODO: Array?
+struct jimDeviceDDId
+{
+    DDDEVICEIDENTIFIER2 identifier;
+    DWORD field430;
+    DWORD field434;
+};
+static_assert(sizeof(jimDeviceDDId) == 0x438, "jimUnk0x438 should be of size 0x438");
 
-MGS_VAR(1, 0x6C0778, char *, unk_6C0778, nullptr);
+struct jimDeviceIdentifier
+{
+    char pDriverDescription[0x28];      // 0x000
+    GUID* pDeviceGUID;                  // 0x028
+    GUID* pOtherGUID;                   // 0x02C
+    GUID deviceGUID;                    // 0x030
+    GUID otherGUID;                     // 0x040
+    jimDeviceDDId ddIdentifier;         // 0x050
+};
+static_assert(sizeof(jimDeviceIdentifier) == 0x488, "jimDeviceIdentifier should be of size 0x488");
+
+struct jimUnk0x204
+{
+    char    string[512];
+    DWORD   field200;
+};
+static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
+
+
+
+MGS_ARY(1, 0x776B68, struct jimDeviceIdentifier, 2, g_pDeviceIdentifiers, {}); // TODO: Check size, code seems to clamp it to 2
+MGS_ARY(1, 0x689B68, struct jimUnk0x204, 2, array_689B68, {}); // TODO: Also 2?
+
+MGS_ARY(1, 0x6C0778, char, 0x400, unk_6C0778, {}); // TODO: Struct?
 MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 MGS_VAR(1, 0x72279C, DWORD, dword_72279C, 0);
@@ -238,7 +265,7 @@ void __cdecl PrintDDError(const char* errMsg, HRESULT hrErr)
         pStrErr = Dest;
     }
 
-    if (hrErr)
+    if (hrErr != S_OK)
     {
         for (int i = 0; i < 5; ++i)
         {
@@ -276,7 +303,7 @@ __int16 __cdecl Render_RestoreAll()
             if (gTextures_dword_6C0F00[i].mSurface->IsLost() == DDERR_SURFACELOST)
             {
                 const HRESULT hr = gTextures_dword_6C0F00[i].mSurface->Restore();
-                if (hr)
+                if (FAILED(hr))
                 {
                     PrintDDError("tex #%i restore caput", i);
                 }
@@ -335,12 +362,10 @@ int __cdecl HandleExclusiveMode()
 //MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
 int __cdecl MainLoop()
 {
-    char var11C[0xFF];
-    char var21B[0xFF];
-    BYTE var21C = byte_6FC7E0;
-    MSG oMsg;
-    memset(var21B, 0, 0xFF);
-    memset(var11C, 0, 0xFF);
+    //char var11C[0xFF] = { 0xFF };
+    //char var21B[0xFF] = { 0xFF };
+    //BYTE var21C = byte_6FC7E0;
+    MSG oMsg = {};
 
     Sound_PopulateBufferQ();
 
@@ -477,7 +502,7 @@ MGS_VAR(1, 0x722784, DWORD, dword_722784, 0);
 MGS_VAR(1, 0x7227A0, DWORD, dword_7227A0, 0);
 MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
 MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
-MGS_VAR(1, 0x78D7B0, DWORD, dword_78D7B0, 0);
+MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
 MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
 MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
@@ -487,15 +512,15 @@ MGS_VAR(1, 0x722760, Actor, g_gamed_722760, {}); // TODO: Will actually big an A
 //actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
 MGS_ARY(1, 0x006BFC78, ActorList, 9, gActors, {});
 
-MGS_VAR(1, 0x78E7FC, WORD, word_78E7FC, 0);
+MGS_VAR(1, 0x78E7FC, signed short int, word_78E7FC, 0);
 MGS_VAR(1, 0x78E7FE, WORD, word_78E7FE, 0);
 MGS_VAR(1, 0x78E960, DWORD, gResidentTop_dword_78E960, 0);
 MGS_VAR(1, 0x78E964, DWORD, dword_78E964, 0);
 MGS_VAR(1, 0x791A0C, DWORD, dword_791A0C, 0);
 MGS_VAR(1, 0x9942A0, DWORD, dword_9942A0, 0);
 MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
-MGS_VAR(1, 0x994320, WORD, word_994320, 0);
-MGS_VAR(1, 0x669AE0, WORD, word_669AE0, 0);
+MGS_ARY(1, 0x994320, WORD, 2048, word_994320, {}); // todo: struct?
+MGS_ARY(1, 0x669AE0, WORD, 2048, word_669AE0, {}); // todo: struct?
 MGS_VAR(1, 0x993F44, DWORD, dword_993F44, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
@@ -607,7 +632,7 @@ signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, in
 weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
 {
     weapon_famas *pFamas; // eax@1 MAPDST
-    int v8; // eax@5
+    WORD v8; // eax@5
     __int16 v9; // cx@6
 
     pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
@@ -670,7 +695,7 @@ int __cdecl Actor_DumpActorSystem()
                     v1 = 0;
                 else
                     v1 = 100 * pActorCopy->field_18 / pActorCopy->field_1C;
-                printf("Lv%d %04d.%02d %08X %s\n", i, v1 / 100, v1 % 100, pActorCopy->update, pActorCopy->mNamePtr);
+                printf("Lv%d %04d.%02d %p %s\n", i, v1 / 100, v1 % 100, pActorCopy->update, pActorCopy->mNamePtr);
                 pActorCopy->field_1C = 0;
                 pActorCopy->field_18 = 0;
             }
@@ -789,7 +814,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
     }
     if (Msg == WM_CHAR)
     {
-        byte_9AD988 = wParam;
+        byte_9AD988 = static_cast<BYTE>(wParam);
         return DefWindowProcA(hWnd, Msg, wParam, lParam);
     }
     if (Msg == WM_ACTIVATE)
@@ -1079,38 +1104,11 @@ MGS_VAR(1, 0x775F48, uint8_t, byte_775F48, 0);
 MGS_VAR(1, 0x774B48, uint8_t, byte_774B48, 0);
 MGS_VAR(1, 0x776450, uint8_t, byte_776450, 0);
 
-struct jimDeviceDDId
-{
-    DDDEVICEIDENTIFIER2 identifier;
-    DWORD field430;
-    DWORD field434;
-};
-static_assert(sizeof(jimDeviceDDId) == 0x438, "jimUnk0x438 should be of size 0x438");
-
-struct jimDeviceIdentifier
-{
-    char pDriverDescription[0x28];      // 0x000
-    GUID* pDeviceGUID;                  // 0x028
-    GUID* pOtherGUID;                   // 0x02C
-    GUID deviceGUID;                    // 0x030
-    GUID otherGUID;                     // 0x040
-    jimDeviceDDId ddIdentifier;         // 0x050
-};
-static_assert(sizeof(jimDeviceIdentifier) == 0x488, "jimDeviceIdentifier should be of size 0x488");
-
-struct jimUnk0x204
-{
-    char    string[512];
-    DWORD   field200;
-};
-static_assert(sizeof(jimUnk0x204) == 0x204, "jimUnk0x204 should be of size 0x204");
-
-
 
 MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
 
 //MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), validateDeviceCaps);
-int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription, LPSTR lpDeviceName, jimDeviceIdentifier* pIdentifier)
+int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescription*/, LPSTR lpDeviceName, jimDeviceIdentifier* pIdentifier)
 {
     byte_775F48 = 0;
     byte_774B48 = 0;
@@ -1158,7 +1156,7 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR lpDeviceDescription
         strcat(pStringError, "E5a:\tDevice is PoverVR like, which is not supported\n");
         status = 1;
     }
-    if (!(pDesc->dpcTriCaps.dwShadeCaps & (D3DPSHADECAPS_ALPHAFLATBLEND || D3DPSHADECAPS_ALPHAGOURAUDBLEND)))
+    if (!(pDesc->dpcTriCaps.dwShadeCaps & (D3DPSHADECAPS_ALPHAFLATBLEND | D3DPSHADECAPS_ALPHAGOURAUDBLEND)))
     {
         strcat(pStringError, "E6a:\tFlat or Gourad Alpha Flat Blending required\n");
         status = 1;
@@ -1311,7 +1309,7 @@ HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDevice
 }
 
 // 0x51F5B8
-BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDriverName, LPVOID lpContext, HMONITOR hm)
+BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR /*lpDriverName*/, LPVOID /*lpContext*/, HMONITOR hm)
 {
     HRESULT hr;
     IDirectDraw7* pDirectDraw;
@@ -1426,12 +1424,9 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR lpDr
     return TRUE;
 }
 
-MSG_FUNC_NOT_IMPL(0x0051F22F, int __cdecl(), jim_enumerate_devices_);
-int __cdecl jim_enumerate_devices_z()
+int __cdecl jim_enumerate_devices()
 {
-    abort();
-
-    int varC;
+    DWORD varC;
     int var8 = 0;
     jimDeviceDDId Dst;
     jimDeviceDDId Buf1;
@@ -1447,7 +1442,7 @@ int __cdecl jim_enumerate_devices_z()
 
     int var4 = 0x41;
     varC = 0;
-    while (true)
+    for (;;)
     {
         if (varC >= gNumDrivers_dword_77C608)
             break;
@@ -1504,10 +1499,10 @@ int __cdecl jim_enumerate_devices_z()
     for (varC = 0; varC < gNumDrivers_dword_77C608; varC++)
     {
         memset(&array_689B68[dword_68C3B8], 0, 0x204);
-        strncpy(array_689B68[dword_68C3B8].string, (g_pDeviceIdentifiers + varC)->ddIdentifier.identifier.szDescription, 0x200);
-        array_689B68[dword_68C3B8].field200 = (g_pDeviceIdentifiers + varC)->ddIdentifier.field434;
+        strncpy(array_689B68[dword_68C3B8].string, g_pDeviceIdentifiers[varC].ddIdentifier.identifier.szDescription, 0x200);
+        array_689B68[dword_68C3B8].field200 = g_pDeviceIdentifiers[varC].ddIdentifier.field434;
         
-        if ((g_pDeviceIdentifiers + varC)->ddIdentifier.field430 & 2)
+        if (g_pDeviceIdentifiers[varC].ddIdentifier.field430 & 2)
         {
             array_689B68[dword_68C3B8].field200 |= 0x10;
         }
@@ -1611,7 +1606,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     Input_Start();
     mgs_fputs("jim_enumerate_devices()\n", gFile);
     mgs_fflush(gFile);
-    v55 = jim_enumerate_devices_();
+    v55 = jim_enumerate_devices();
     if (!v55)
     {
         gSoftwareRendering = 1;
@@ -1760,10 +1755,10 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             mgs_fflush(gFile);
         }
     }
-    while (1)
+    for (;;)
     {
-        g_dwDisplayWidth = (320.0 * gXRes);
-        g_dwDisplayHeight = (240.0 * gXRes);
+        g_dwDisplayWidth = static_cast<DWORD>(320.0 * gXRes);
+        g_dwDisplayHeight = static_cast<DWORD>(240.0 * gXRes);
         mgs_fputs("Creating DirectDraw7\n", gFile);
         mgs_fflush(gFile);
 
@@ -1801,8 +1796,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 mgs_fflush(gFile);
                 gSoftwareRendering = 1;
                 gXRes = 1.0f;
-                g_dwDisplayWidth = (320.0 * 1.0f);
-                g_dwDisplayHeight = (240.0 * 1.0f);
+                g_dwDisplayWidth = static_cast<DWORD>(320.0 * 1.0f);
+                g_dwDisplayHeight = static_cast<DWORD>(240.0 * 1.0f);
                 MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
             }
             mgs_fputs(" . done\n", gFile);
@@ -1824,22 +1819,28 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         if (g_pPrimarySurface)
         {
             hr = g_pPrimarySurface->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release primary surf", hr);
+            }
             g_pPrimarySurface = 0;
         }
         if (g_pBackBuffer)
         {
             hr = g_pBackBuffer->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release render surf", hr);
+            }
             g_pBackBuffer = 0;
         }
         if (g_pClipper)
         {
             hr = g_pClipper->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release clipper", hr);
+            }
             g_pClipper = 0;
         }
         g_pPrimarySurface = 0;
@@ -1859,7 +1860,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             mgs_fflush(gFile);
             hr = g_pDirectDraw->SetCooperativeLevel(gHwnd, DDSCL_FPUPRESERVE | DDSCL_MULTITHREADED | DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
         }
-        if (hr < 0)
+        if (FAILED(hr))
         {
             mgs_fputs(" . fail\n", gFile);
             mgs_fflush(gFile);
@@ -1913,7 +1914,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             mgs_fputs("Creating clipper...\n", gFile);
             mgs_fflush(gFile);
             hr = g_pDirectDraw->CreateClipper(0, &g_pClipper, 0);
-            if (hr)
+            if (FAILED(hr))
             {
                 mgs_fputs(" . fail\n", gFile);
                 mgs_fflush(gFile);
@@ -1921,7 +1922,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 return 0;
             }
             hr = g_pClipper->SetHWnd(0, gHwnd);
-            if (hr)
+            if (FAILED(hr))
             {
                 mgs_fputs(" . fail\n", gFile);
                 mgs_fflush(gFile);
@@ -1929,7 +1930,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 return 0;
             }
             hr = g_pPrimarySurface->SetClipper(g_pClipper);
-            if (hr)
+            if (FAILED(hr))
             {
                 mgs_fputs(" . fail\n", gFile);
                 mgs_fflush(gFile);
@@ -1944,7 +1945,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         dxSurfaceDesc.dwSize = 124;
         if (gSoftwareRendering)
         {
-            if (dword_651CF8 || dword_716F6C && dword_716F6C != 1)
+            if (dword_651CF8 || (dword_716F6C && dword_716F6C != 1))
             {
                 mgs_fputs("Testing software render speed to system and to video surface\n", gFile);
                 mgs_fflush(gFile);
@@ -2032,7 +2033,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs("Restoring surfaces...\n", gFile);
         mgs_fflush(gFile);
         Render_RestoreAll();
-        if (hr)
+        if (FAILED(hr))
         {
             mgs_fputs(" . fail\n", gFile);
             mgs_fflush(gFile);
@@ -2046,7 +2047,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs("Querying gamma interface...\n", gFile);
         mgs_fflush(gFile);
         g_pPrimarySurface->QueryInterface(IID_IDirectDrawGammaControl_MGS, (LPVOID*)&g_pGammaControl);
-        if (hr)
+        if (FAILED(hr))
         {
             mgs_fputs(" . fail\n", gFile);
             mgs_fflush(gFile);
@@ -2087,7 +2088,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
         hr = g_pDirect3D->CreateDevice(*v33, g_pBackBuffer, &g_pDirect3DDevice);
 
-        if (hr >= 0)
+        if (SUCCEEDED(hr))
         {
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
@@ -2115,15 +2116,17 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxSurfaceDesc3.ddsCaps.dwCaps2 = DDSCAPS2_TEXTUREMANAGE;
 
                 hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc3, &g_pDDSurface, 0);
-                if (hr)
+                if (FAILED(hr))
                 {
                     g_pDDSurface = 0;
                 }
-                else if (!ClearDDSurfaceWhite())
+                else 
                 {
-
-                    g_pDDSurface->Release();
-                    g_pDDSurface = 0;
+                    if (!ClearDDSurfaceWhite())
+                    {
+                        g_pDDSurface->Release();
+                        g_pDDSurface = 0;
+                    }
                 }
             }
 
@@ -2157,7 +2160,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 Render_SetRenderState(26, 1);
                 if (dword_651CF8)
                 {
-                    if (gLowRes != gLowRes)
+                    if (gLowRes != gLowRes) // FIX ME: This can't be right
                     {
                         if (!gLowRes)
                         {
@@ -2223,22 +2226,28 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         if (g_pBackBuffer)
         {
             hr = g_pBackBuffer->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release render surf", hr);
+            }
             g_pBackBuffer = 0;
         }
         if (g_pPrimarySurface)
         {
             hr = g_pPrimarySurface->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't relaese primary surf", hr);
+            }
             g_pPrimarySurface = 0;
         }
         if (g_pClipper)
         {
             hr = g_pClipper->Release();
-            if (hr)
+            if (FAILED(hr))
+            {
                 PrintDDError("Can't release clipper", hr);
+            }
             g_pClipper = 0;
         }
         g_pPrimarySurface = 0;
@@ -2274,7 +2283,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gNoEffects = 0;
         dword_716F60 = 0;
     }
-    sub_423F1B(0, (signed __int64)(14.0 * gXRes));
+    sub_423F1B(0, static_cast<int>(14.0 * gXRes));
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
@@ -2294,7 +2303,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             memset(gImageBufer_dword_6FC728, -1, 0x100000u);
             _cfltcvt_init();
-            memset(&unk_6C0778, 0, 0x400u);
+            memset(unk_6C0778, 0, 0x400u);
             dword_6DEF7C = mgs_malloc(0x200u);
             dword_6DEF90 = mgs_malloc(0x200u);
             memset(dword_6DEF7C, 0, 0x100u);
@@ -2361,12 +2370,12 @@ signed int Render_sub_41E3C0()
 
     DWORD dwNumPasses = 1;
     pPrim[0].x = 1.0f;
-    pPrim[1].x = (double)(g_dwDisplayWidth - 1);
+    pPrim[1].x = static_cast<float>(g_dwDisplayWidth - 1);
     pPrim[2].x = 1.0f;
 
     pPrim[0].y = 1.0f;
     pPrim[1].y = 1.0f;
-    pPrim[2].y = (double)(g_dwDisplayHeight - 1);
+    pPrim[2].y = static_cast<float>(g_dwDisplayHeight - 1);
 
     pPrim[0].z = 1.0f;
     pPrim[1].z = 1.0f;
@@ -2390,7 +2399,7 @@ signed int Render_sub_41E3C0()
     Render_SetRenderState(9, 1);
     Render_SetRenderState(27, 1);
 
-    if (g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+    if (SUCCEEDED(g_pDirect3DDevice->ValidateDevice(&dwNumPasses)))
     {
         gAlphaModulate_dword_6FC798 = 0;
         Render_InitTextureStages(0, 4, 2);
@@ -2409,7 +2418,7 @@ signed int Render_sub_41E3C0()
             {
                 Render_SetRenderState(19, 5);
                 Render_SetRenderState(20, 5);
-                if (!g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+                if (FAILED(g_pDirect3DDevice->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
                     {
@@ -2428,7 +2437,7 @@ signed int Render_sub_41E3C0()
             {
                 Render_SetRenderState(19, 5);
                 Render_SetRenderState(20, 2);
-                if (!g_pDirect3DDevice->ValidateDevice(&dwNumPasses))
+                if (FAILED(g_pDirect3DDevice->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
                     {
@@ -2625,7 +2634,7 @@ struct MGSLargeVertDif
 
 struct StructVertType3
 {
-    MGSLargeVertDif DifVtx[3];
+    MGSLargeVertDif DifVtx[4];
 };
 
 struct MGSVertType4
@@ -2650,6 +2659,32 @@ struct StructVertType5
     uint32_t field0;
 };
 
+
+struct DR_ENV
+{
+    DWORD tag;
+    DWORD code[15];
+};
+static_assert(sizeof(DR_ENV) == 0x40, "DR_ENV size must be 0x40");
+
+struct DRAWENV
+{
+    Rect16 clip;
+    WORD offx;
+    WORD offy;
+    Rect16 textureWindow;
+    BYTE texturePage;
+    BYTE dtd;
+    BYTE dfe;
+    BYTE isbg;
+    BYTE r0;
+    BYTE g0;
+    BYTE b0;
+    DR_ENV dr_env;
+};
+static_assert(sizeof(DRAWENV) == 0x5C, "DRAWENV size must be 0x5C");
+
+
 MGS_VAR(1, 0x791C54, DWORD, dword_791C54, 0);
 MGS_VAR(1, 0x791C58, DWORD, dword_791C58, 0);
 MGS_VAR(1, 0x791C5C, float, g_fV3, 0);
@@ -2669,7 +2704,7 @@ MGS_VAR(1, 0x791C84, float, g_fYOffset, 0);
 MGS_VAR(1, 0x791C7C, DWORD, g_nTextureIndex, 0);
 MGS_VAR(1, 0x6C0EAC, WORD, word_6C0EAC, 0);
 MGS_VAR(1, 0x6C0EAE, WORD, word_6C0EAE, 0);
-MGS_VAR(1, 0x6C0E98, WORD, word_6C0E98, 0);
+MGS_VAR(1, 0x6C0E98, DRAWENV, gDrawEnv_6C0E98, {});
 MGS_VAR(1, 0x6C0E9A, WORD, word_6C0E9A, 0);
 MGS_VAR(1, 0x6C0E9C, WORD, word_6C0E9C, 0);
 MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
@@ -2861,7 +2896,7 @@ void handleBlendMode(uint16_t nBlend)
         gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 0;
 }
 
-void handleBlendMode(uint16_t nBlend, uint32_t offset)
+void handleBlendMode(uint16_t nBlend, uint16_t offset)
 {
     if ((dword_791C54 & 2) != 0)
         gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 1 + offset + ((nBlend >> 5) & 3);
@@ -2890,7 +2925,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
     uint32_t var14 = dword_688CD4;
     uint32_t var1C = dword_688CD0;
 
-    while (true)
+    for (;;)
     {
         if (a_nSize <= 0)
             return 1;
@@ -2911,7 +2946,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 0:
             return 1;
 
-        case 32:
+        case 32: // monochrome 3 point polygon
         case 33:
         case 34:
         case 35:
@@ -2934,7 +2969,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             break;
         }
 
-        case 40:
+        case 40: // monchrome 4 point polygon
         case 41:
         case 42:
         case 43:
@@ -2978,11 +3013,11 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             }
             else
             {
-                uint32_t var7C = (pStructVert->TexVtx[1].textureIdx & 0x180) >> 7;
-                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[1].u, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
-                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v, &g_fU2, &g_fV2);
-                Render_ComputeUVs(g_nTextureIndex, var7C, pStructVert->TexVtx[3].u, pStructVert->TexVtx[3].v, &g_fU3, &g_fV3);
+                const uint32_t texturePage = (pStructVert->TexVtx[1].textureIdx & 0x180) >> 7;
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[1].u, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v, &g_fU2, &g_fV2);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[3].u, pStructVert->TexVtx[3].v, &g_fU3, &g_fV3);
             }
 
             g_fXOffset = g_wXOffset;
@@ -3046,10 +3081,10 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             }
             else
             {
-                uint32_t var110 = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
-                Render_ComputeUVs(g_nTextureIndex, var110, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
-                Render_ComputeUVs(g_nTextureIndex, var110, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
-                Render_ComputeUVs(g_nTextureIndex, var110, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
+                const uint32_t texturePage = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
+                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
             }
 
             g_fXOffset = g_wXOffset;
@@ -3125,11 +3160,12 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             position[15] = 1.0f;
             position[14] = 0.999999f;
             position[13] = 0.999999f;
-            position[12] = 0.999999;
+            position[12] = 0.999999f;
 
             position[3] = convertPositionFloat(pStructVert->DifVtx[0].Vtx.x);
             position[2] = convertPositionFloat(pStructVert->DifVtx[1].Vtx.x);
             position[1] = convertPositionFloat(pStructVert->DifVtx[2].Vtx.x);
+            // TODO: FIX ME 3 is out of bounds
             position[0] = convertPositionFloat(pStructVert->DifVtx[3].Vtx.x);
 
             position[7] = convertPositionFloat(pStructVert->DifVtx[0].Vtx.y);
@@ -3196,11 +3232,11 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                 }
                 else
                 {
-                    uint32_t var6C = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, var6C, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &g_fU3, &g_fV3);
+                    const uint32_t texturePage = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &g_fU3, &g_fV3);
 
                     uint16_t* pIndex = (uint16_t*)(0x6FC728 + ((pStructVert->DifVtx[0].textureIdx >> 6) << 11) + ((pStructVert->DifVtx[0].textureIdx & 0x3F) << 5));
                     if (*pIndex == 0xEDED)
@@ -3445,11 +3481,11 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                 }
                 else
                 {
-                    uint32_t var9C = (word_6C0EAC & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, var9C, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v + diffY, &g_fU3, &g_fV3);
+                    const uint32_t texturePage = (word_6C0EAC & 0x180) >> 7;
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v + diffY, &g_fU3, &g_fV3);
                 }
             }
 
@@ -3512,19 +3548,24 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             break;
         }
 
-        case 128:
+        case 128: // $80     move image in frame buffer
         {
             StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
             int16_t rawPos[4];
+
+            // source coord
             rawPos[1] = pStructVert->Vtxs[0].y;
             rawPos[0] = pStructVert->Vtxs[0].x;
 
+            // dest coord
             int16_t varDC = pStructVert->Vtxs[1].y;
             int16_t varD8 = pStructVert->Vtxs[1].x;
 
+            // w/h to xfer
             rawPos[3] = pStructVert->Vtxs[2].y;
             rawPos[2] = pStructVert->Vtxs[2].x;
 
+            // move image
             sub_40D540(rawPos, varD8, varDC);
 
             dword_791C58 = 4;
@@ -3556,11 +3597,11 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                 }
                 else
                 {
-                    uint32_t var124 = (pStructVert->Vtx[1].textureIdx & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[1].u, pStructVert->Vtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[2].u, pStructVert->Vtx[2].v, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, var124, pStructVert->Vtx[3].u, pStructVert->Vtx[3].v, &g_fU3, &g_fV3);
+                    const uint32_t texturePage = (pStructVert->Vtx[1].textureIdx & 0x180) >> 7;
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[1].u, pStructVert->Vtx[1].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[2].u, pStructVert->Vtx[2].v, &g_fU2, &g_fV2);
+                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[3].u, pStructVert->Vtx[3].v, &g_fU3, &g_fV3);
                 }
             }
             
@@ -3602,7 +3643,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         {
             StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
 
-            word_6C0E98 = pStructVert->field0 & 0x3FF;
+            gDrawEnv_6C0E98.clip.x1 = pStructVert->field0 & 0x3FF;
             word_6C0E9A = (pStructVert->field0 >> 10) & 0x3FF;
 
             dword_791C58 = 1;
@@ -3613,10 +3654,10 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         {
             StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
 
-            word_6C0E9C = (pStructVert->field0 & 0x3FF) - word_6C0E98 + 1;
+            word_6C0E9C = (pStructVert->field0 & 0x3FF) - gDrawEnv_6C0E98.clip.x1 + 1;
             word_6C0E9E = ((pStructVert->field0 >> 10) & 0x3FF) - word_6C0E9A + 1;
 
-            g_pMGSVertices[g_nVertexOffset].x = (float)word_6C0E98;
+            g_pMGSVertices[g_nVertexOffset].x = (float)gDrawEnv_6C0E98.clip.x1;
             g_pMGSVertices[g_nVertexOffset].y = (float)word_6C0E9A;
             g_pMGSVertices[g_nVertexOffset].u = (float)word_6C0E9C;
             g_pMGSVertices[g_nVertexOffset].v = (float)word_6C0E9E;
@@ -3676,6 +3717,45 @@ MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
 MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
 MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
 
+#define OT_END_TAG 0xFFFFFF
+
+int __cdecl Renderer_ClearOTag(DWORD* ot, int otSize)
+{
+    if (otSize - 1 <= 0)
+    {
+        // As we only have 1 item, set the start of the table to be the end marker
+        *ot = OT_END_TAG;
+    }
+    else
+    {
+        // Get a pointer to the last item
+        DWORD* pOTItem = &ot[otSize - 1];
+        int count = otSize - 1;
+        do
+        {
+            // Set the current item to point to the previous item
+            *pOTItem = reinterpret_cast<DWORD>(pOTItem - 1);
+            if (reinterpret_cast<DWORD>(pOTItem) & 0xFF000000)
+            {
+                printf(
+                    "\n"
+                    "\n"
+                    "***** ERROR: ClearOTag() found a pointer which uses more than 24 bit *****\n"
+                    " Invalid pointer value caused overflow [%x]\n"
+                    "\n",
+                    *pOTItem);
+            }
+            --pOTItem;
+            --count;
+        } while (count);
+
+        // Set the first item to the end marker
+        *ot = OT_END_TAG;
+    }
+    return 0;
+}
+MSG_FUNC_IMPL(0x0044AB80, Renderer_ClearOTag);
+
 //MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
 void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
 {
@@ -3711,10 +3791,12 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
                     ConvertPolys_Hardware(&a_pStructVert[1], a_pStructVert->structType);
                 }
             }
+
+            // Get the pointer bytes of the OT, the remainder byte is the type.. TODO - how does the vertex info fit into the OT?
             uint32_t nextStructVert = ((uint32_t*)a_pStructVert)[0] & 0x00FFFFFF;
             a_pStructVert = (StructVert*)nextStructVert;
         }
-        while ((uint32_t)a_pStructVert != 0xFFFFFF);
+        while ((uint32_t)a_pStructVert != OT_END_TAG);
 
         if (gSoftwareRendering != 0)
         {
@@ -3780,8 +3862,9 @@ void *__cdecl sub_457B5B()
 {
     void *result; // eax@1
 
-    result = memcpy(&word_994320, &word_669AE0, 0x1000u);
-    dword_993F44 = (int)&word_994320;
+    // TODO: FIX ME make pointer/array
+    result = memcpy(word_994320, word_669AE0, 0x1000u);
+    dword_993F44 = (int)&word_994320[0];
     return result;
 }
 
@@ -3852,7 +3935,22 @@ void DebugLog(const char *Format, ...)
     va_start(va, Format);
     vsprintf(Dest, Format, va);
     //OutputDebugStringA(Dest);
-    printf(Dest);
+    printf("%s", Dest);
+}
+
+int mgs_printf(const char *fmt, ...)
+{
+
+    va_list myargs;
+    va_start(myargs, fmt);
+
+
+    int ret = vprintf(fmt, myargs);
+
+    va_end(myargs);
+    
+
+    return ret;
 }
 
 // The varadic template hook class can't also mixing in varadic C functions, so we have too hook these manually
@@ -3877,10 +3975,21 @@ void InstallVaradicCFunctionHooks()
     DebugLog_Type oldPtr = (DebugLog_Type)0x00520157;
     err = DetourAttach(&(PVOID&)oldPtr, DebugLog);
     
+
     if (err != NO_ERROR)
     {
         abort();
     }
+    
+    using mgs_printf_Type = decltype(&mgs_printf);
+    mgs_printf_Type old_mgs_printf = (mgs_printf_Type)0x005398F0;
+
+    err = DetourAttach(&(PVOID&)old_mgs_printf, mgs_printf);
+    if (err != NO_ERROR)
+    {
+        abort();
+    }
+    
 
     err = DetourTransactionCommit();
     if (err != NO_ERROR)
@@ -3895,13 +4004,118 @@ int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsig
     return 0;
 }
 
-MGS_VAR(1, 0x7227C8, WORD, word_7227C8, 0);
+
+MGS_ARY(1, 0x7227C8, WORD, 5, word_7227C8, {}); // TODO: Struct?
 
 // 0x44EAED
 void *__cdecl sub_44EAED()
 {
-    return memset(&word_7227C8, 0, 0x10u);
+    return memset(word_7227C8, 0, 0x10u);
 }
+
+DRAWENV *__cdecl Renderer_DRAWENV_Init_401888(DRAWENV *ptr, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2)
+{
+    ptr->clip.x1 = clipX1;
+    ptr->clip.x2 = clipX2;
+    ptr->offx = clipX1;
+    ptr->clip.y2 = clipY2;
+    ptr->clip.y1 = clipY1;
+    ptr->offy = clipY1;
+    ptr->dtd = 1;
+    ptr->dfe = 0;
+    ptr->textureWindow.x1 = 0;
+    ptr->textureWindow.y1 = 0;
+    ptr->textureWindow.x2 = 0;
+    ptr->textureWindow.y2 = 0;
+    ptr->r0 = 0;
+    ptr->g0 = 0;
+    ptr->b0 = 0;
+    ptr->texturePage = 0;
+    ptr->isbg = 0;
+    return ptr;
+}
+MSG_FUNC_IMPL(0x401888, Renderer_DRAWENV_Init_401888);
+
+MGS_VAR(1, 0x6BECF0, Rect16, gClipRect_6BECF0, {});
+
+MGS_VAR(1, 0x6C0EAA, WORD, word_6C0EAA, 0x0);
+MGS_VAR(1, 0x6C0EA8, WORD, word_6C0EA8, 0x0);
+
+
+DRAWENV *__cdecl Renderer_Set_DRAWENV_40DD90(DRAWENV *pDrawEnv)
+{
+    memcpy(&gDrawEnv_6C0E98, pDrawEnv, sizeof(gDrawEnv_6C0E98));
+    if (!word_6C0EAA)
+        word_6C0EAA = 255;
+    if (!word_6C0EA8)
+        word_6C0EA8 = 255;
+    return &gDrawEnv_6C0E98;
+}
+MSG_FUNC_IMPL(0x40DD90, Renderer_Set_DRAWENV_40DD90);
+
+DRAWENV *Renderer_Init_DRAWENV_40200D()
+{
+    DRAWENV drawEnv;
+    Renderer_DRAWENV_Init_401888(
+        &drawEnv,
+        gClipRect_6BECF0.x1,
+        gClipRect_6BECF0.y1,
+        gClipRect_6BECF0.x2,
+        gClipRect_6BECF0.y2);
+    return Renderer_Set_DRAWENV_40DD90(&drawEnv);
+}
+MSG_FUNC_IMPL(0x40200D, Renderer_Init_DRAWENV_40200D);
+
+MGS_VAR(1, 0x791A08, int, gActiveBuffer_dword_791A08, 0);
+MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
+MGS_VAR(1, 0x6BED20, DWORD, dword_6BED20, 0);
+MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {}); // TODO: Check 2 is correct
+
+MSG_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(Rect16 *pRect), sub_40DD00);
+MSG_FUNC_NOT_IMPL(0x40ACB2, int __cdecl(int idx), System_sub_40ACB2);
+MSG_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), sub_459ACE);
+MSG_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), sub_40162D);
+MSG_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
+
+int __cdecl Main_sub_401C02()
+{
+    int result = 0;
+    if (gSoftwareRendering)
+    {
+        // SW rendering path not implemented
+        abort();
+    }
+    else
+    {
+        const int activeBufferHW = gActiveBuffer_dword_791A08;
+        if (dword_6BED20 <= 0)
+        {
+            if (gLastActiveBuffer_dword_650110 < 0 || gActiveBuffer_dword_791A08 != gLastActiveBuffer_dword_650110)
+            {
+                gClipRect_6BECF0.x1 = static_cast<WORD>(dword_6BED18[gActiveBuffer_dword_791A08]);
+                sub_40DD00(&gClipRect_6BECF0);
+                Render_DrawIndex(1 - activeBufferHW);
+                gLastActiveBuffer_dword_650110 = -1;
+            }
+        }
+        else
+        {
+            if (gLastActiveBuffer_dword_650110 < 0)
+            {
+                gLastActiveBuffer_dword_650110 = gActiveBuffer_dword_791A08;
+            }
+            --dword_6BED20;
+        }
+        System_sub_40ACB2(activeBufferHW);
+        System_sub_40ACB2(2);
+        sub_459ACE();
+        sub_40162D(activeBufferHW);                 // calls ClearOTag
+        result = sub_4021F2();
+    }
+    return result;
+}
+MSG_FUNC_IMPL(0x401C02, Main_sub_401C02);
+
 
 // 0x40A68D
 //MSG_FUNC_NOT_IMPL(0x40A68D, int __cdecl(int, int), sub_40A68D);
@@ -3913,7 +4127,7 @@ void __cdecl LibGvd_SetFnPtr_sub_40A68D(int number, int(__cdecl* fn)(DWORD*))
 }
 MSG_FUNC_IMPL(0x40A68D, LibGvd_SetFnPtr_sub_40A68D);
 
-struct_8 *__cdecl LibGvd_sub_40A618(int id)
+struct_8 *__cdecl LibGvd_sub_40A618(DWORD id)
 {
     signed int cnt;
     int v4;
@@ -4043,6 +4257,17 @@ int __cdecl GetResidentTop()
 
 Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Actor*));
 
+// TODO: Is a global that inherits from Actor
+MGS_VAR(1, 0x725FC0, Actor, gMenuMan_stru_725FC0, {});
+
+Actor *__cdecl Menu_Related1()
+{
+    Actor_PushBack(1, &gMenuMan_stru_725FC0, 0);
+    return Actor_Init(&gMenuMan_stru_725FC0, 0, 0, "C:\\mgs\\source\\Menu\\menuman.c");
+}
+MSG_FUNC_IMPL(0x00459A9A, Menu_Related1);
+
+
 //MSG_FUNC_NOT_IMPL(0x44E12B, void *__cdecl(), sub_44E12B);
 void *__cdecl sub_44E12B()
 {
@@ -4069,6 +4294,7 @@ void *__cdecl sub_44E12B()
     dword_722784 = 0;
     return sub_44E226();
 }
+MSG_FUNC_IMPL(0x44E12B, sub_44E12B);
 
 //MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_UpdateActors);
 int __cdecl Actor_UpdateActors()
@@ -4187,7 +4413,7 @@ signed int __cdecl Main()
     sub_4090A7();
     sub_40B725();
     sub_44E12B();
-    while (1)
+    for (;;)
     {
         result = MainLoop();
         if (!result)
@@ -4210,6 +4436,114 @@ int __cdecl DoMain()
     return Main();
 }
 
+MGS_VAR(1, 0x6FC73C, IUnknown*, dword_6FC73C, nullptr); // TODO: Check what this is
+
+MSG_FUNC_NOT_IMPL(0x4241A4, void* __cdecl(void *), sub_4241A4);
+
+// 00423020
+void __cdecl ClearAll()
+{
+    puts(" *************************** CLEAR ALL START *************************");
+    if (g_NumTextures)
+    {
+        for (int i = 0; i < g_NumTextures; ++i)
+        {
+            if (gTextures_dword_6C0F00[i].mSurfaceType == 5)
+            {
+                sub_4241A4(gTextures_dword_6C0F00[i].mSurface);
+            }
+            else if (!gSoftwareRendering)
+            {
+                if (gTextures_dword_6C0F00[i].mSurface)
+                {
+                    gTextures_dword_6C0F00[i].mSurface->Release();
+                    gTextures_dword_6C0F00[i].mSurface = 0;
+                }
+            }
+        }
+    }
+
+    if (dword_6FC73C)
+    {
+        dword_6FC73C->Release();
+        dword_6FC73C = 0;
+    }
+
+    if (g_pDirect3DDevice)
+    {
+        g_pDirect3DDevice->Release();
+        g_pDirect3DDevice = 0;
+    }
+
+    if (g_pBackBuffer)
+    {
+        g_pBackBuffer->Release();
+        g_pBackBuffer = 0;
+    }
+
+    if (g_pClipper)
+    {
+        g_pClipper->Release();
+        g_pClipper = 0;
+    }
+
+    if (g_pPrimarySurface)
+    {
+        g_pPrimarySurface->Release();
+        g_pPrimarySurface = 0;
+    }
+
+    if (g_pDirect3D)
+    {
+        g_pDirect3D->Release();
+        g_pDirect3D = 0;
+    }
+
+    if (g_pDirectDraw)
+    {
+        g_pDirectDraw->Release();
+        g_pDirectDraw = 0;
+    }
+
+    if (g_pDDSurface)
+    {
+        g_pDDSurface->Release();
+        g_pDDSurface = 0;
+    }
+
+    if (g_pMGSVertices)
+    {
+        mgs_free(g_pMGSVertices);
+        g_pMGSVertices = 0;
+    }
+
+    if (gPrimStructArray)
+    {
+        mgs_free(gPrimStructArray);
+        gPrimStructArray = 0;
+    }
+
+    if (dword_6DEF7C)
+    {
+        mgs_free(dword_6DEF7C);
+        dword_6DEF7C = 0;
+    }
+
+    if (dword_6DEF90)
+    {
+        mgs_free(dword_6DEF90);
+        dword_6DEF90 = 0;
+    }
+
+    mgs_free(gImageBufer_dword_6FC728);
+    mgs_free(g_pwTextureIndices);
+}
+
+void __cdecl DoClearAll()
+{
+    ClearAll();
+}
+MSG_FUNC_IMPL(0x004232B0, DoClearAll);
 
 // 0x0051D180
 void ShutdownEngine()
@@ -4226,19 +4560,20 @@ void ShutdownEngine()
 }
 
 
-int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
     int result; // eax@2
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
     void(__stdcall *pSetThreadExecutionState)(unsigned int); // [sp+Ch] [bp-460h]@13
     HMODULE hKernel32; // [sp+10h] [bp-45Ch]@12
     char Dest[256]; // [sp+14h] [bp-458h]@11
-    struct _MEMORYSTATUS Buffer; // [sp+414h] [bp-58h]@10
+    _MEMORYSTATUS Buffer = {};
     char *v11; // [sp+434h] [bp-38h]@52
     WNDCLASSA WndClass; // [sp+438h] [bp-34h]@27
     char *bRestart; // [sp+464h] [bp-8h]@8
     //int i; // [sp+468h] [bp-4h]@70
 
+    ScriptCpp_ForceLink();
     TaskCpp_ForceLink();
     SoundCpp_ForceLink();
     SoundCpp_Debug();
@@ -4255,7 +4590,6 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, i
         if (bRestart)
             *bRestart = 0;
         Buffer.dwLength = 32;
-        memset(&Buffer.dwMemoryLoad, 0, 0x1Cu);
         GlobalMemoryStatus(&Buffer);
         if (Buffer.dwAvailPageFile >= 0x4000000)// 50mb hard disk space check
         {

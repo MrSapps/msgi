@@ -25,16 +25,18 @@ char* sidewinderEtc = (char*)0x657298; // TODO: Dump array
 DWORD* dword_65726C = (DWORD*)0x65726C;
 char* buttonNames = (char*)0x65510C; // TODO: Dump array
 char* buttonList = (char*)0x654A98; // TODO: Dump array
-MGS_VAR(1, 0x71D68C, DWORD, nJoystickDeviceObjects, 0);
+MGS_VAR(1, 0x71D68C, int, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
 MGS_VAR(1, 0x71D670, DWORD, dword_71D670, 0);
 MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
 MGS_VAR(1, 0x71D798, DWORD, gJoyStickId_dword_71D798, 0);
-MGS_VAR(1, 0x71D41C, DWORD, dword_71D41C, 0);
+MGS_VAR(1, 0x71D41C, int, dword_71D41C, 0);
 MGS_ARY(1, 0x65714C, DWORD, 14, dword_65714C, {});
 MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, {});
 MGS_VAR(1, 0x71D79C, DWORD, dword_71D79C, 0);
 MGS_ARY(1, 0x6571BC, DWORD, 14, dword_6571BC, {});// TODO: Check 14 is big enough
+MGS_ARY(1, 0x71D690, char, 256, char_71D69, {});
+
 
 // WinMain.cpp
 extern DWORD& dword_717348; 
@@ -419,7 +421,7 @@ HRESULT __cdecl Input_Read_43BD6E()
 MSG_FUNC_IMPL(0x43BD6E, Input_Read_43BD6E);
 
 // 0x0043B0B3
-BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef)
+BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE /*lpddoi*/, LPVOID /*pvRef*/)
 {
     ++nJoystickDeviceObjects;
     return DIENUM_CONTINUE;
@@ -427,7 +429,7 @@ BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVO
 MSG_FUNC_IMPL(0x0043B0B3, Input_Enum_Buttons_sub_43B0B3);
 
 // 0x0043B0C8
-BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef)
+BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID /*pvRef*/)
 {
     static_assert(sizeof(DIPROPHEADER) == 16, "Wrong DIPROPHEADER size");
     static_assert(sizeof(DIPROPRANGE) == 24, "Wrong DIPROPRANGE size");
@@ -486,7 +488,7 @@ BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRe
 MSG_FUNC_IMPL(0x0043B0C8, Input_Enum_Axis_43B0C8);
 
 // 0x0043B078
-BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID pvRef)
+BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID /*pvRef*/)
 {
     // Stop when worked
     HRESULT hr = pDirectInput->CreateDevice(lpddi->guidInstance, &pJoystickDevice, NULL);
@@ -580,7 +582,7 @@ int __cdecl Input_Init(HWND hWnd)
                             if (hGetInfosRes >= 0)
                             {
                                 // TODO: Make 0x71D690 a var
-                                strcpy((char*)0x71D690, JoystickDeviceInfos.tszInstanceName);
+                                strcpy(char_71D69, JoystickDeviceInfos.tszInstanceName);
 
                                 for (int i = 0; i < 6; i++)
                                 {

@@ -18,10 +18,10 @@ static_assert(sizeof(StageMusicInfoStruct) == 0x8, "StageMusicInfoStruct must be
 MGS_ARY(REDIRECT_SOUND, 0x77DCA0, IDirectSoundBuffer*, 256, g128_Sound_buffers_dword_77DCA0, {});
 MGS_ARY(REDIRECT_SOUND, 0x77D8A0, DWORD, 256, gFxState_dword_77D8A0, {});
 MGS_VAR(REDIRECT_SOUND, 0x77E2D0, IDirectSoundBuffer*, gSndBuffer_dword_77E2D0, nullptr);
-MGS_VAR(REDIRECT_SOUND, 0x68CE30, DWORD, gMusicWavFile_dword_68CE30, 0);
+MGS_VAR(REDIRECT_SOUND, 0x68CE30, int, gMusicWavFile_dword_68CE30, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E0A0, IDirectSoundBuffer*, gSndBuffer_dword_77E0A0, nullptr);
 MGS_VAR(REDIRECT_SOUND, 0x77E2D4, DWORD, gSndState_dword_77E2D4, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77D884, DWORD, gSoundFxIdx_dword_77D884, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D884, int, gSoundFxIdx_dword_77D884, 0);
 
 // TODO: Use macro
 static DWORD* dword_68D058 = (DWORD*)0x68D058; // part of below array?
@@ -41,7 +41,7 @@ MGS_VAR(REDIRECT_SOUND, 0x77D87C, DWORD, dword_77D87C, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1DC, DWORD, gBlockAlign_dword_77E1DC, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D88C, LONG, gSndVolume_dword_77D88C, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1A8, QWORD, qword_77E1A8, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77D874, DWORD, dword_77D874, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D874, int, dword_77D874, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D898, QWORD, qword_77D898, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2C4, IDirectSoundBuffer*, gSndSamp1_dword_77E2C4, nullptr);
 MGS_VAR(REDIRECT_SOUND, 0x77E2C8, IDirectSoundBuffer*, gSndSamp2_dword_77E2C8, nullptr);
@@ -246,6 +246,7 @@ void DumpArray()
     }
     std::string v = ss.str();
     const char* s = v.c_str();
+    std::cout << s << std::endl;
 }
 
 void SoundCpp_Debug()
@@ -373,7 +374,7 @@ char __cdecl Sound_HexCharToInt(char value)
         }
         else
         {
-            ret = toupper(value) - '7';
+            ret = static_cast<char>(toupper(value)) - '7';
         }
     }
     else
@@ -449,11 +450,11 @@ signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample
     if (gDSound_dword_77E2C0)
     {
         waveFormat.wFormatTag = 1;
-        waveFormat.nChannels = numChannels;
+        waveFormat.nChannels = static_cast<WORD>(numChannels);
         waveFormat.nSamplesPerSec = samplesPerSecond;
         waveFormat.nAvgBytesPerSec = blockAlign * samplesPerSecond;
-        waveFormat.nBlockAlign = blockAlign;
-        waveFormat.wBitsPerSample = bitsPerSample;
+        waveFormat.nBlockAlign = static_cast<WORD>(blockAlign);
+        waveFormat.wBitsPerSample = static_cast<WORD>(bitsPerSample);
         waveFormat.cbSize = 0;
         memset(&bufferDesc, 0, 36u);
         bufferDesc.dwSize = 36;
@@ -544,7 +545,7 @@ __int64 __cdecl Sound_FadeQ(int a1)
     LARGE_INTEGER Frequency;
     __int64 freq;
     LARGE_INTEGER PerformanceCount;
-    __int64 v5;
+    __int64 v5 = 0;
 
     if (gSndBuffer_dword_77E2D0)
     {
@@ -761,7 +762,7 @@ void __cdecl Sound_LoadFxRelatedQ2(const char *Str1)
 // 0x00521A54
 signed int __cdecl Sound_PlayMusic(unsigned int flags)
 {
-    int v2;
+    DWORD v2;
     bool v3;
     bool v4;
     LARGE_INTEGER Frequency;
@@ -880,7 +881,7 @@ signed int __cdecl Sound_PlayMusic(unsigned int flags)
 LABEL_74:
     v3 = sndNumber == 20 || sndNumber == 32 || sndNumber == 33;
     dword_77E2E0 = v3;
-    dword_68CE2C = -1;
+    dword_68CE2C = static_cast<DWORD>(-1);
     if (!sndNumber)
         return 1;
     sprintf(soundFileName, "%s0x%02x.wav", "mdx/", sndNumber);
@@ -1018,7 +1019,7 @@ void __cdecl Sound_PopulateBufferQ()
     int v9;
     LONG lDistanceToMove;
     BYTE buffer[68] = {};
-    int v12;
+    DWORD v12;
     int v13;
 
     if (gSndBuffer_dword_77E2D0)
@@ -1178,10 +1179,10 @@ void __cdecl Sound_ReleaseSecondaryBuffer()
 signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BYTE*(__cdecl *a3)(DWORD))
 {
     BYTE* v4;
-    void* v6;
-    BYTE* v7;
-    DWORD v8;
-    DWORD v9;
+    void* v6 = nullptr; // TODO: Some of these vars could be used without being assigned, is this correct?
+    BYTE* v7 = nullptr; 
+    DWORD v8 = 0;
+    DWORD v9 = 0;
     BYTE *pDst;
     size_t Size;
 
@@ -1271,7 +1272,7 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
     }
     else
     {
-        Size = 7 * a2 >> 1;
+        Size = (7 * a2) >> 1;
         if (snd)
         {
             snd->GetCurrentPosition(&gSamp1PlayPos_dword_77E1D0, 0);
@@ -1410,7 +1411,7 @@ signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuf
                 if (gSamp1PlayPos_dword_77E1D0 >= dword_77E2F8 && gSamp1PlayPos_dword_77E1D0 < dword_68E318)
                 {
                     dword_77E2CC = 1;
-                    dword_68E318 = -1;
+                    dword_68E318 = static_cast<DWORD>(-1);
                 }
                 result = 1;
             }
@@ -1533,7 +1534,7 @@ signed int __cdecl Sound_Start2SamplesQ(BYTE *a1)
         gSndSamp2_dword_77E2C8->SetPan(10000);
     }
     dword_77E2F8 = 0;
-    dword_68E318 = -1;
+    dword_68E318 = static_cast<DWORD>(-1);
     dword_77E2CC = 0;
     byte_77D888 = 0;
     return 1;
@@ -1565,7 +1566,7 @@ signed int __cdecl Sound_Stop2Samples()
 // 0x0052313B
 int __cdecl Sound_StopSample()
 {
-    int result;
+    int result = 0; // TODO: Should default to error?
 
     if (gSoundFxIdx_dword_77D884 != -1)
     {
@@ -1822,8 +1823,9 @@ bool __cdecl Sound_Unknown4()
 }
 
 // 0x00523CF3
-int __cdecl Sound_Unknown5(int a1, int a2, BYTE*(__cdecl* fnRead)(DWORD))
+int __cdecl Sound_Unknown5(int a1, int /*a2*/, BYTE*(__cdecl* fnRead)(DWORD))
 {
+    // TODO: Why a2 isn't used?
     void *sndPtr;
     DWORD sndBufSize;
     void *Dst;
@@ -1901,7 +1903,7 @@ int __cdecl Sound_Play(unsigned int playingFlags)
     }
     else
     {
-        Sound_PlayEffect(playingFlags, (playingFlags >> 16), playingFlags >> 8);
+        Sound_PlayEffect(static_cast<unsigned char>(playingFlags), (playingFlags >> 16), playingFlags >> 8);
     }
     return 0;
 }

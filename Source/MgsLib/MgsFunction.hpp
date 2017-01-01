@@ -4,6 +4,7 @@
 #include <ostream>
 #include <map>
 #include <memory>
+#include <fstream>
 #include <set>
 #include <vector>
 #include <type_traits>
@@ -38,7 +39,7 @@ inline std::ostream& operator<<(std::ostream& out, const char* ptr)
 }
 
 // No arguments case
-inline void doPrint(std::ostream& out)
+inline void doPrint(std::ostream& /*out*/)
 {
 
 }
@@ -130,6 +131,7 @@ public:
         }
     }
 
+
     ReturnType operator()(Args ... args)
     {
         if (mPassThrough && IsMgsi())
@@ -150,6 +152,8 @@ public:
         }
 #endif
 
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant
         if (kNewAddr)
         {
             // Call "newAddr" since we've replaced the function completely
@@ -169,10 +173,15 @@ public:
             // a default R and log params
             return mRealFuncPtr(args...);
         }
-    }
+#pragma warning(pop)
 
+
+    }
+    
     Signature* Ptr() const
     {
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant
         if (!IsMgsi())
         {
             if (convention == eCDecl)
@@ -188,6 +197,7 @@ public:
                 abort();
             }
         }
+#pragma warning(pop)
         return mRealFuncPtr;
     }
 
@@ -227,7 +237,8 @@ protected:
         mRealFuncPtr = (TFuncType)kOldAddr;
 
         LONG err = 0;
-
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant
         if (convention == eCDecl)
         {
             err = DetourAttach(&(PVOID&)mRealFuncPtr, Cdecl_Static_Hook_Impl);
@@ -240,7 +251,7 @@ protected:
         {
             abort();
         }
-
+#pragma warning(pop)
         if (err != NO_ERROR)
         {
             abort();
@@ -329,6 +340,13 @@ public:
     virtual void Restore() = 0;
     DWORD Address() const { return mAddr; }
 protected:
+    static void WriteVec(const char* fileName, const std::vector<BYTE>& vec)
+    {
+        std::ofstream fout(fileName, std::ios::out | std::ios::binary);
+        fout.write((char*)vec.data(), vec.size());
+        fout.close();
+    }
+
     const char* mName = nullptr;
     DWORD mAddr = 0;
 };
