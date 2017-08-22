@@ -11,46 +11,59 @@ MGS_PTR(1, 0x995468, DWORD*, dword_995468, 0);
 MGS_PTR(1, 0x99546C, DWORD*, dword_99546C, 0);
 MGS_PTR(1, 0x995462, WORD*, word_995462, 0);
 
+MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
+
+MGS_VAR_EXTERN(DWORD, script_cancel_non_zero_dword_7227A0);
+
 void ScriptCpp_ForceLink()
 {
 
 }
 
-/*
-int __cdecl Script_AnimQ(int a1, BYTE* pScript)
+MSG_FUNC_NOT_IMPL(0x00409CAF, signed int __cdecl(char *pScriptBytes, int numberOfArguments), Script_Run);
+
+struct GCL_ProcInfo
 {
-    int char_num = MAKEWORD(pScript[0], pScript[1]); // TODO: Check ordering
-    int code_num = MAKEWORD(pScript[2], pScript[3]); // TODO: Check ordering
+    WORD mId;
+    WORD mOffset;
+};
 
-    int v4 = MAKEWORD(pScript[4], pScript[5]); // TODO: Check ordering
+MGS_PTR(1, 0x006BFC60, GCL_ProcInfo**, gProcInfos, nullptr);
+MGS_PTR(1, 0x006BFC64, char**, dword_6BFC64, 0);
 
 
-    signed int v6 = 1;
-
-    if (v4 > 256)
+char* __cdecl Script_FindProc(WORD procId)
+{
+    for (GCL_ProcInfo* pProcInfo = *gProcInfos; pProcInfo->mId; ++pProcInfo)
     {
-        v6 = 0;
-        v4 -= 256;
+        if (pProcInfo->mId == procId)
+        {
+            return (*dword_6BFC64) + pProcInfo->mOffset;
+        }
     }
-
-    const unsigned int idx = 20 * (char_num == 8650);
-    word_995460[idx / 2] = 1;
-    dword_995470[idx / 4] = a1; // off 16
-    dword_995464[idx / 4] = char_num; // off 4
-    dword_995468[idx / 4] = code_num; // off 8
-    dword_99546C[idx / 4] = v4; // off 12
-    word_995462[idx / 2] = v6; // off 2
-    
-    if (v6)
-    {
-        // Seems to get stuck here as whatever other thread is supposed to set the event never does..
-        j_Task_WaitForSignalQ();
-    }
-
-    return printf("ANIME CHARA %d CODE %d\n", char_num, code_num);
+    printf("PROC %X NOT FOUND\n");
+    return nullptr;
 }
-MSG_FUNC_IMPL(0x0045CEC2, Script_AnimQ);
-*/
+MSG_FUNC_IMPL(0x00409B1D, Script_FindProc);
+
+signed int __cdecl Script_ProcCancelOrRun(WORD id, int numArgs)
+{
+    if (script_cancel_non_zero_dword_7227A0 || BYTE1(byte1_flags_word_9942A8) & 0x20)
+    {
+        printf("proc %d cancel\n");
+        return 0;
+    }
+    else
+    {
+        // stage\init\scenerio.gcx @ 0x5FA
+        // 40 00 08 70 04 21 51 00 00 40 08 
+        // 24 70 04 C8 CF 00 60 00 12 64 C0
+        char* scriptProc = Script_FindProc(id); // For id = 26069 / 0x000065d5
+        return Script_Run(scriptProc + 3, numArgs);
+    }
+}
+MSG_FUNC_IMPL(0x00409B53, Script_ProcCancelOrRun);
+
 
 int __cdecl Script_Operator_Evaluate(int operation, int v1, int v2)
 {

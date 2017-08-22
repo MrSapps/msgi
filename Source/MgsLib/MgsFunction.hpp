@@ -432,6 +432,10 @@ TypeName LocalVar_##VarName = Value;\
 MgsVar Var_##VarName(#VarName, Addr, sizeof(LocalVar_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
 TypeName& VarName = (Redirect && IsMgsi()) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
 
+#define MGS_VAR_EXTERN(TypeName, VarName)\
+extern TypeName LocalVar_##VarName;\
+extern TypeName& VarName;
+
 #define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);
 #define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, true, signature> name;
 #define MSG_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, signature> name(#name);
@@ -439,3 +443,7 @@ TypeName& VarName = (Redirect && IsMgsi()) ? *reinterpret_cast<TypeName*>(Addr) 
 #define MSG_FUNC_IMPLEX(addr, funcName, passThrough) MgsFunction<addr, funcName, true, decltype(funcName)> funcName##_(#funcName, passThrough);
 #define MSG_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, decltype(funcName)> funcName##_(#funcName);
 
+#define BYTEn(x, n)   (*((BYTE*)&(x)+n))
+#define BYTE1(x)   BYTEn(x,  1)
+#define BYTE2(x)   BYTEn(x,  2)
+#define BYTE3(x)   BYTEn(x,  3)

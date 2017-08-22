@@ -499,7 +499,7 @@ static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
 MGS_VAR(1, 0x995344, DWORD, dword_995344, 0);
 MGS_VAR(1, 0x722780, DWORD, dword_722780, 0);
 MGS_VAR(1, 0x722784, DWORD, dword_722784, 0);
-MGS_VAR(1, 0x7227A0, DWORD, dword_7227A0, 0);
+MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
 MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
 MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
 MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
@@ -4245,7 +4245,7 @@ void *__cdecl sub_44E12B()
 {
     dword_995344 = 0;
     dword_7227A4 = 0;
-    dword_7227A0 = 0;
+    script_cancel_non_zero_dword_7227A0 = 0;
     dword_9942B8 = 0;
     Menu_Related1();
     sub_44EAED();
