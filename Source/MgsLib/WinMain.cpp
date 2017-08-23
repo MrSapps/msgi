@@ -599,7 +599,18 @@ MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
 
 Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *fn1)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName);
 
-MSG_FUNC_NOT_IMPL(0x0040B38E, int __cdecl(char*), ResourceRequestQ);
+int __cdecl ResourceNameHash(const char* string)
+{
+    // hash = ( (hash << 0x05) | (hash >> 0x0b) ) + str[i].unpack("H*")[0].hex.to_i & 0xffff
+    unsigned int i, len = strlen(string), hash = 0;
+    uint16_t rethash;
+    for (i = 0; i < len; i++) hash = (((hash << 0x05) | (hash >> 0x0B)) + string[i]) & 0xFFFF;
+    rethash = hash & 0xFFFF;
+    return rethash;
+}
+MSG_FUNC_IMPL(0x0040B38E, ResourceNameHash);
+
+
 MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
 MSG_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
 
@@ -612,9 +623,9 @@ signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, in
 
     v4 = (int)&a1->mActor.last;
     if (bMp5)
-        res = ResourceRequestQ("mpfive");
+        res = ResourceNameHash("mpfive");
     else
-        res = ResourceRequestQ("famas");
+        res = ResourceNameHash("famas");
     sub_44FF7C(v4, res, 109);
     if (*(DWORD *)v4)
     {
