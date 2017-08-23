@@ -55,7 +55,6 @@ BYTE* __cdecl Script_InitProcTables_sub_409C87(BYTE* pScript)
 
     return pScript + 4;
 }
-
 MSG_FUNC_IMPL(0x00409C87, Script_InitProcTables_sub_409C87);
 
 MGS_PTR(1, 0x6BFC68, BYTE**, gScriptMainProc_dword_6BFC68, 0);
@@ -93,6 +92,13 @@ BYTE* __cdecl Script_FindProc(WORD procId)
     return nullptr;
 }
 MSG_FUNC_IMPL(0x00409B1D, Script_FindProc);
+
+signed int __cdecl Script_Run_Proc_sub_409B03(WORD procId, int numArgs)
+{
+    BYTE* pScriptProc = Script_FindProc(procId);
+    return Script_Run(pScriptProc + 3, numArgs);
+}
+MSG_FUNC_IMPL(0x409B03, Script_Run_Proc_sub_409B03);
 
 signed int __cdecl Script_ProcCancelOrRun(WORD id, int numArgs)
 {
