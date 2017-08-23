@@ -20,6 +20,66 @@ void ScriptCpp_ForceLink()
 
 }
 
+struct proc_struct_sub;
+
+struct proc_struct
+{
+    proc_struct* pNext;
+    DWORD mNumCommands;
+    proc_struct_sub* pCommandsArray;
+};
+
+using proc_sub_ptr = int(__cdecl*)(char *);
+
+struct proc_struct_sub
+{
+    WORD mId;
+    WORD mUnknown;
+    proc_sub_ptr mCommandFunction;
+};
+
+MGS_PTR(1, 0x6BFC6C, proc_struct**, gScriptCmdTable_dword_6BFC6C, 0);
+
+proc_struct_sub *__cdecl Script_GetCommand(WORD cmdToFind)
+{
+    proc_struct* i = *gScriptCmdTable_dword_6BFC6C;
+    while (i)
+    {
+        for (DWORD j = 0; j<i->mNumCommands; j++) // WARN: Real game does it backwards but can't see why
+        {
+            if (i->pCommandsArray[j].mId == cmdToFind)
+            {
+                return &i->pCommandsArray[j];
+            }
+        }
+        i = i->pNext;
+    }
+    printf("command not found\n");
+    return 0;
+}
+MSG_FUNC_IMPL(0x00409ACC, Script_GetCommand);
+
+
+int __cdecl Script_InitCommandTable(proc_struct *pCmdTbl)
+{
+    pCmdTbl->pNext = *gScriptCmdTable_dword_6BFC6C;
+    *gScriptCmdTable_dword_6BFC6C = pCmdTbl;
+    proc_struct_sub* pItem = pCmdTbl->pCommandsArray;
+    if (pCmdTbl->mNumCommands > 0)
+    {
+        DWORD cmdNum = pCmdTbl->mNumCommands;
+        do
+        {
+            printf("COM %d ADR %X\n", pItem->mId, pItem->mCommandFunction);
+            ++pItem;
+            --cmdNum;
+        } while (cmdNum);
+    }
+    return 0;
+}
+MSG_FUNC_IMPL(0x00409A4F, Script_InitCommandTable);
+
+
 MSG_FUNC_NOT_IMPL(0x00409CAF, signed int __cdecl(BYTE* pScriptBytes, int numberOfArguments), Script_Run);
 
 struct GCL_ProcInfo
