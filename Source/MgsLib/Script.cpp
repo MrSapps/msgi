@@ -41,7 +41,7 @@ char* __cdecl Script_FindProc(WORD procId)
             return (*dword_6BFC64) + pProcInfo->mOffset;
         }
     }
-    printf("PROC %X NOT FOUND\n");
+    printf("PROC %X NOT FOUND\n", procId);
     return nullptr;
 }
 MSG_FUNC_IMPL(0x00409B1D, Script_FindProc);
@@ -50,7 +50,7 @@ signed int __cdecl Script_ProcCancelOrRun(WORD id, int numArgs)
 {
     if (script_cancel_non_zero_dword_7227A0 || BYTE1(byte1_flags_word_9942A8) & 0x20)
     {
-        printf("proc %d cancel\n");
+        printf("proc %d cancel\n", id);
         return 0;
     }
     else
