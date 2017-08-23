@@ -20,7 +20,7 @@ void ScriptCpp_ForceLink()
 
 }
 
-MSG_FUNC_NOT_IMPL(0x00409CAF, signed int __cdecl(char *pScriptBytes, int numberOfArguments), Script_Run);
+MSG_FUNC_NOT_IMPL(0x00409CAF, signed int __cdecl(BYTE* pScriptBytes, int numberOfArguments), Script_Run);
 
 struct GCL_ProcInfo
 {
@@ -29,10 +29,58 @@ struct GCL_ProcInfo
 };
 
 MGS_PTR(1, 0x006BFC60, GCL_ProcInfo**, gProcInfos, nullptr);
-MGS_PTR(1, 0x006BFC64, char**, dword_6BFC64, 0);
+MGS_PTR(1, 0x006BFC64, BYTE**, dword_6BFC64, 0);
+
+static DWORD ToDWORD(const BYTE* ptr)
+{
+    return (ptr[3]) | (ptr[2] << 8) | (ptr[1] << 16) | (ptr[0] << 24);
+}
+
+BYTE* __cdecl Script_InitProcTables_sub_409C87(BYTE* pScript)
+{
+    // pScript skips the first 4 bytes of the script
+    for (;;)
+    {
+        // Reverse the GCL_ProcInfo data
+        std::swap(pScript[0], pScript[1]);
+        std::swap(pScript[2], pScript[3]);
+        pScript += 4;
+
+        // 4 NULL bytes is the end of the table
+        if (pScript[0] == 0 && pScript[1] == 0 && pScript[2] == 0 && pScript[3] == 0)
+        {
+            break;
+        }
+    }
+
+    return pScript + 4;
+}
+
+MSG_FUNC_IMPL(0x00409C87, Script_InitProcTables_sub_409C87);
+
+MGS_PTR(1, 0x6BFC68, BYTE**, gScriptMainProc_dword_6BFC68, 0);
+
+MSG_FUNC_NOT_IMPL(0x45A6F6, int __cdecl(int a1, void* a2), sub_45A6F6);
+
+int __cdecl Script_Init_sub_409C19(BYTE* pScript)
+{
+    DWORD offset = ToDWORD(pScript);
+    *gProcInfos = reinterpret_cast<GCL_ProcInfo*>(pScript + 4);
+    *dword_6BFC64 = Script_InitProcTables_sub_409C87(pScript + 4);
+
+    *gScriptMainProc_dword_6BFC68 = (pScript + 4 + offset + 4);
+
+    DWORD mainScriptLen = ToDWORD((*gScriptMainProc_dword_6BFC68)-4);
+    BYTE* pEndOfScriptData = (*gScriptMainProc_dword_6BFC68) + mainScriptLen + 4;
+
+    sub_45A6F6(2, pEndOfScriptData);
+
+    return 0;
+}
+MSG_FUNC_IMPL(0x00409C19, Script_Init_sub_409C19);
 
 
-char* __cdecl Script_FindProc(WORD procId)
+BYTE* __cdecl Script_FindProc(WORD procId)
 {
     for (GCL_ProcInfo* pProcInfo = *gProcInfos; pProcInfo->mId; ++pProcInfo)
     {
@@ -58,7 +106,7 @@ signed int __cdecl Script_ProcCancelOrRun(WORD id, int numArgs)
         // stage\init\scenerio.gcx @ 0x5FA
         // 40 00 08 70 04 21 51 00 00 40 08 
         // 24 70 04 C8 CF 00 60 00 12 64 C0
-        char* scriptProc = Script_FindProc(id); // For id = 26069 / 0x000065d5
+        BYTE* scriptProc = Script_FindProc(id); // For id = 26069 / 0x000065d5
         return Script_Run(scriptProc + 3, numArgs);
     }
 }
