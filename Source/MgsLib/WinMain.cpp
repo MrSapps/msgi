@@ -29,6 +29,7 @@
 #include "Task.hpp"
 #include "Script.hpp"
 #include "Actor.hpp"
+#include "System.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -4002,7 +4003,6 @@ MGS_VAR(1, 0x6BED20, DWORD, dword_6BED20, 0);
 MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {}); // TODO: Check 2 is correct
 
 MSG_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(Rect16 *pRect), sub_40DD00);
-MSG_FUNC_NOT_IMPL(0x40ACB2, int __cdecl(int idx), System_sub_40ACB2);
 MSG_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), sub_459ACE);
 MSG_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), sub_40162D);
 MSG_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);

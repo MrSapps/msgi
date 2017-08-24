@@ -79,6 +79,7 @@
     <ClInclude Include="Script.hpp" />
     <ClInclude Include="Sound.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="System.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Task.hpp" />
   </ItemGroup>
@@ -93,6 +94,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="System.cpp" />
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
