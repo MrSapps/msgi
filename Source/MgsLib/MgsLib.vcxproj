@@ -71,6 +71,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Actor.hpp" />
     <ClInclude Include="File.hpp" />
     <ClInclude Include="Input.hpp" />
     <ClInclude Include="logger.hpp" />
@@ -82,6 +83,7 @@
     <ClInclude Include="Task.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Actor.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="MgsFunction.cpp" />
