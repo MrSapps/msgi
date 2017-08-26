@@ -443,6 +443,9 @@ extern TypeName& VarName;
 #define MSG_FUNC_IMPLEX(addr, funcName, passThrough) MgsFunction<addr, funcName, true, decltype(funcName)> funcName##_(#funcName, passThrough);
 #define MSG_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, decltype(funcName)> funcName##_(#funcName);
 
+#define MSG_ASSERT_SIZEOF(structureName, expectedSize) static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize)
+
+
 #define BYTEn(x, n)   (*((BYTE*)&(x)+n))
 #define BYTE1(x)   BYTEn(x,  1)
 #define BYTE2(x)   BYTEn(x,  2)

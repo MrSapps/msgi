@@ -6,7 +6,7 @@ struct LibGV_MemoryAllocation
     BYTE* mPDataStart;
     DWORD mAllocType;
 };
-static_assert(sizeof(LibGV_MemoryAllocation) == 8, "size must be 8");
+MSG_ASSERT_SIZEOF(LibGV_MemoryAllocation, 8);
 
 struct system_struct
 {
@@ -17,11 +17,8 @@ struct system_struct
     BYTE* mMemoryPool;
     DWORD field_14;
     LibGV_MemoryAllocation mAllocs[511];
-
-    //DWORD pUnknownStruct2; // This and below is the allocs memory data?
-    //DWORD mArray[1021]; 
 };
-static_assert(sizeof(system_struct) == 0x1010, "size must be 0x1010");
+MSG_ASSERT_SIZEOF(system_struct, 0x1010);
 
 MSG_FUNC_NOT_IMPL(0x40ACB2, int __cdecl(int idx), System_sub_40ACB2);
 
