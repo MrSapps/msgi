@@ -36,3 +36,5 @@ void CC Actor_Destroy(Actor* pActor);
 void CC Actor_UpdateActors();
 void CC ActorList_Init();
 void CC Actor_DumpActorSystem();
+ActorList* CC ActorList_Set_KillPause(int index, __int16 pause, __int16 kill);
+void CC Actor_Remove(Actor* pActorToRemove);

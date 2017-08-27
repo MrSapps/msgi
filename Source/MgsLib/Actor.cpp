@@ -22,7 +22,7 @@ MGS_ARY(1, 0x6507EC, PauseKill, 9, gPauseKills,
     { 0,  7 } 
 });
 MGS_ARY(1, 0x006BFC78, ActorList, 9, gActorsList, {});
-MGS_VAR(1, 0x791A0C, DWORD, flags_dword_791A0C, 0);
+MGS_VAR(1, 0x791A0C, DWORD, gActorPauseFlags_dword_791A0C, 0);
 MGS_VAR(1, 0x9942A0, DWORD, dword_9942A0, 0);
 
 void CC Actor_DumpActorSystem()
@@ -152,7 +152,7 @@ void CC Actor_UpdateActors()
     ActorList* pActorList = gActorsList;
     for (int i = 9; i > 0; --i)
     {
-        if (!(flags_dword_791A0C & pActorList->mPause))
+        if (!(gActorPauseFlags_dword_791A0C & pActorList->mPause))
         {
             Actor* pActor = &pActorList->first;
             while (pActor)
@@ -192,6 +192,35 @@ void CC ActorList_Init()
         pActorList++;
     }
 
-    flags_dword_791A0C = 0;
+    gActorPauseFlags_dword_791A0C = 0;
 }
 MSG_FUNC_IMPL(0x0040A006, ActorList_Init);
+
+ActorList* CC ActorList_Set_KillPause(int index, __int16 pause, __int16 kill)
+{
+    gActorsList[index].mPause = pause;
+    gActorsList[index].mKill = kill;
+    return &gActorsList[index];
+}
+MSG_FUNC_IMPL(0x0040A0AA, ActorList_Set_KillPause);
+
+void CC Actor_Remove(Actor* pActorToRemove)
+{
+    ActorList* pActorList = gActorsList;
+    for (int i = 9; i > 0; --i)
+    {
+        Actor* pActor = &pActorList->first;
+        while (pActor)
+        {
+            if (pActor == pActorToRemove)
+            {
+                Actor_DestroyOnNextUpdate(pActor);
+                return;
+            }
+            pActor = pActor->pNext;
+        }
+        pActorList++;
+    }
+    printf("#");
+}
+MSG_FUNC_IMPL(0x0040A3FC, Actor_Remove);
