@@ -445,6 +445,8 @@ extern TypeName& VarName;
 
 #define MSG_ASSERT_SIZEOF(structureName, expectedSize) static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize)
 
+#define CC __cdecl
+#define MSG_COUNTOF(x) _countof(x)
 
 #define BYTEn(x, n)   (*((BYTE*)&(x)+n))
 #define BYTE1(x)   BYTEn(x,  1)

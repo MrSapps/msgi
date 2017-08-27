@@ -1,19 +1,23 @@
 #pragma once
 
 #include <windows.h>
+#include "MgsFunction.hpp"
+
+struct Actor;
+using TActorFunction = void(CC*)(Actor*);
 
 struct Actor
 {
     Actor* pPrevious;
     Actor* pNext;
-    void(__cdecl *update)(Actor*);
-    void(__cdecl *fnUnknown3)(Actor*);
-    void(__cdecl *fnUnknown2)(Actor*);
-    char* mNamePtr;
+    TActorFunction mFnUpdate;
+    TActorFunction mFnShutdown;
+    TActorFunction mFreeFunc;   // Used to free(pActor)?
+    const char* mName;
     DWORD field_18;
     DWORD field_1C;
 };
-static_assert(sizeof(Actor) == 0x20, "Actor should be 0x20");
+MSG_ASSERT_SIZEOF(Actor, 0x20);
 
 struct ActorList
 {
@@ -22,11 +26,13 @@ struct ActorList
     WORD mPause;
     WORD mKill;
 };
-static_assert(sizeof(ActorList) == 0x44, "ActorList should be 0x44");
+MSG_ASSERT_SIZEOF(ActorList, 0x44);
 
-Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *update)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName);
-Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Actor*));
-void __cdecl Actor_Remove(Actor* pActor);
-int __cdecl Actor_UpdateActors();
-void __cdecl ActorList_Init();
-int __cdecl Actor_DumpActorSystem();
+Actor* CC Actor_Init(Actor* pActor, TActorFunction fnUpdate, TActorFunction fnShutDown, const char *srcFileName);
+Actor* CC Actor_PushBack(int level, Actor* pActor, TActorFunction fnFree);
+void CC Actor_KillActorsAtLevel(signed int killLevel);
+void CC Actor_DestroyOnNextUpdate(Actor* pActor);
+void CC Actor_Destroy(Actor* pActor);
+void CC Actor_UpdateActors();
+void CC ActorList_Init();
+void CC Actor_DumpActorSystem();

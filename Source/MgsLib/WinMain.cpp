@@ -136,8 +136,6 @@ MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Rende
 MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
-//MSG_FUNC_NOT_IMPL(0x0040A3FC, int __cdecl (actor_related_struct*), Actor_Unknown3);
-MSG_FUNC_NOT_IMPL(0x0040A3ED, Actor* __cdecl(Actor*), Actor_SetRemoveFnPtr);
 MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
@@ -617,17 +615,13 @@ signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, in
 // TODO : check if ActorList or Actor
 weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
 {
-    weapon_famas *pFamas; // eax@1 MAPDST
-    WORD v8; // eax@5
-    __int16 v9; // cx@6
-
-    pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
+    weapon_famas* pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
     if (pFamas)
     {
         Actor_Init(&pFamas->mActor.first, (void(__cdecl *)(Actor*))Res_famas_sub_640CDC.Ptr(), (void(__cdecl *)(Actor*))sub_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
         if (Res_Weapon_famas_init_sub_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
         {
-            Actor_SetRemoveFnPtr(&pFamas->mActor.first);
+            Actor_DestroyOnNextUpdate(&pFamas->mActor.first);
             return 0;
         }
         pFamas->field_58 = 0;
@@ -638,19 +632,22 @@ weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a
         pFamas->field_54 = 1;
         pFamas->mbIsMp5 = bMp5;
     }
-    v8 = (word_995368 != 0) + 25;                 // 25 is the ammo clip size
+
+    const WORD mp5ClipSize = (word_995368 != 0) + 25;                 // 25 is the ammo clip size
     if (bMp5)
     {
-        word_995368 = (word_995368 != 0) + 25; // Remainder in clip
-        word_995320 = v8; // clip size?
+        word_995320 = mp5ClipSize;
+        word_995368 = mp5ClipSize;
     }
     else
     {
-        v9 = word_78E804;
-        if (v8 > 0 && word_78E804 > v8)
-            v9 = (word_995368 != 0) + 25;
-        word_995320 = (word_995368 != 0) + 25;
-        word_995368 = v9;
+        __int16 famasClipSize = word_78E804;
+        if (mp5ClipSize > 0 && word_78E804 > mp5ClipSize)
+        {
+            famasClipSize = mp5ClipSize;
+        }
+        word_995320 = mp5ClipSize;
+        word_995368 = famasClipSize;
     }
     return pFamas;
 }
