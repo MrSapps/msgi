@@ -48,6 +48,12 @@
     <ClInclude Include="System.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LibDG.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGV.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -78,6 +84,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="System.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibDG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGV.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

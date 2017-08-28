@@ -30,6 +30,8 @@
 #include "Script.hpp"
 #include "Actor.hpp"
 #include "System.hpp"
+#include "LibDG.hpp"
+#include "LibGV.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -108,7 +110,6 @@ MSG_FUNC_NOT_IMPL(0x0040111A, int __cdecl(), sub_40111A);
 MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
 MSG_FUNC_NOT_IMPL(0x0040B725, int __cdecl(), sub_40B725);
 MSG_FUNC_NOT_IMPL(0x00452610, int __cdecl(), Script_452610);
-MSG_FUNC_NOT_IMPL(0x0044E9D2, int __cdecl(DWORD*), LibDG_CHARA_44E9D2);
 MSG_FUNC_NOT_IMPL(0x0044E381, void* __cdecl(int), GameD_Update_44E381);
 MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
 MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
@@ -424,49 +425,6 @@ int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
     return ((fn)(0x452E6E))();
 }
 
-// TODO: Could be linked list header?
-struct struct_8
-{
-    DWORD mId;
-    DWORD* field_4;
-};
-static_assert(sizeof(struct_8) == 0x8, "struct_8 should be 0x8");
-
-struct struct_lib_gvd
-{
-    Actor mActor;
-    DWORD field_6BFF00;
-    DWORD field_6BFF04;
-    struct_8* struct_8_ptr_6BFF08; // Seems to point to one of mStruct8_128Array_06BFF80
-    int(__cdecl* field_6BFF0C[26])(DWORD*);
-    struct_8* struct_8_ptr_6BFF74;
-    struct_8* struct_8_ptr_6BFF78;
-    DWORD pad_field_6BFF7C;
-    struct_8 mStruct8_128Array_06BFF80[128];
-    DWORD field_6C0380;
-    DWORD field_6C0384;
-    DWORD field_6C0388[6];
-    DWORD field_6C03A0;
-    DWORD field_6C03A4;
-    DWORD field_6C03B0[81];
-};
-// TODO: This is actually probably bigger!
-static_assert(sizeof(struct_lib_gvd) == 0x60C, "struct_lib_gvd should be 0x60C");
-
-MGS_VAR(1, 0x6BFEE0, struct_lib_gvd, g_lib_gvd_stru_6BFEE0, {});
-
-void __cdecl LibGvd_sub_40A69D()
-{
-    memset(g_lib_gvd_stru_6BFEE0.field_6BFF0C, 0, sizeof(g_lib_gvd_stru_6BFEE0.field_6BFF0C));
-}
-MSG_FUNC_IMPL(0x40A69D, LibGvd_sub_40A69D);
-
-// Other likely LibGvd funcs
-MSG_FUNC_NOT_IMPL(0x40A72A, struct_8 *__cdecl(), LibGvd_sub_40A72A);
-MSG_FUNC_NOT_IMPL(0x40A6CD, char* __cdecl(), LibGvd_sub_40A6CD);
-MSG_FUNC_NOT_IMPL(0x40A6AC, struct_8 *__cdecl(), LibGvd_128_inits_sub_40A6AC);
-MSG_FUNC_NOT_IMPL(0x40A603, int __cdecl(int), LibGvd_sub_40A603);
-
 
 struct Rect16
 {
@@ -494,9 +452,6 @@ MGS_VAR(1, 0x78E7FE, WORD, word_78E7FE, 0);
 MGS_VAR(1, 0x78E960, DWORD, gResidentTop_dword_78E960, 0);
 MGS_VAR(1, 0x78E964, DWORD, dword_78E964, 0);
 MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
-MGS_ARY(1, 0x994320, WORD, 2048, word_994320, {}); // todo: struct?
-MGS_ARY(1, 0x669AE0, WORD, 2048, word_669AE0, {}); // todo: struct?
-MGS_VAR(1, 0x993F44, DWORD, dword_993F44, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
 MGS_VAR(1, 0x787778, DWORD, dword_787778, 0);
@@ -3785,17 +3740,6 @@ signed int __cdecl DoInitAll()
 }
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
 
-// 0x457B5B
-void *__cdecl SetActiveResourceInitFuncPtrs_457B5B()
-{
-    void *result; // eax@1
-
-    // TODO: FIX ME make pointer/array
-    result = memcpy(word_994320, word_669AE0, 0x1000u);
-    dword_993F44 = (int)&word_994320[0];
-    return result;
-}
-
 struct POLY_F4
 {
     DWORD *tag;      // Pointer to the next primitive
@@ -4056,114 +4000,6 @@ int __cdecl Main_sub_401C02()
 MSG_FUNC_IMPL(0x401C02, Main_sub_401C02);
 
 
-// 0x40A68D
-//MSG_FUNC_NOT_IMPL(0x40A68D, int __cdecl(int, int), sub_40A68D);
-void __cdecl LibDG_SetFnPtr_sub_40A68D(int number, int(__cdecl* fn)(DWORD*))
-{
-    const int idx = number - 0x61; // Some compiler optimization, just adds this onto g_lib_gvd_stru_6BFEE0 to index the array
-    assert(idx < _countof(g_lib_gvd_stru_6BFEE0.field_6BFF0C));
-    g_lib_gvd_stru_6BFEE0.field_6BFF0C[idx] = fn;
-}
-MSG_FUNC_IMPL(0x40A68D, LibDG_SetFnPtr_sub_40A68D);
-
-struct_8 *__cdecl LibGvd_sub_40A618(DWORD id)
-{
-    signed int cnt;
-    int v4;
-
-    cnt = 128;
-    v4 = 128 - id % 128;
-    struct_8* result = &g_lib_gvd_stru_6BFEE0.mStruct8_128Array_06BFF80[id % 128];
-
-    while (result->mId & 0xFFFFFF)
-    {
-        if ((result->mId & 0xFFFFFF) == id) // 3 bytes are id
-        {
-            return result;
-        }
-        
-        ++result;
-        
-        if (!--v4)
-        {
-            result = &g_lib_gvd_stru_6BFEE0.mStruct8_128Array_06BFF80[0];
-        }
-
-        if (--cnt <= 0)
-        {
-            g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08 = 0;
-            return 0;
-        }
-    }
-    g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08 = result;
-    return 0;
-}
-MSG_FUNC_IMPL(0x40A618, LibGvd_sub_40A618);
-
-signed int __cdecl LibGvd_sub_40A662(int a1, DWORD* a2)
-{
-    if (!LibGvd_sub_40A618(a1) && g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08 != 0)
-    {
-        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->mId = a1;
-        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->field_4 = a2;
-        return 0;
-    }
-    return -1;
-}
-MSG_FUNC_IMPL(0x40A662, LibGvd_sub_40A662);
-
-/* TODO FIX ME - this seems to halt the game states, can't see why..
-int __cdecl LibGvd_sub_40A77F(DWORD* a1, signed int a2, int a3);
-MSG_FUNC_IMPL(0x40A77F, LibGvd_sub_40A77F);
-int __cdecl LibGvd_sub_40A77F(DWORD* a1, signed int a2, int a3)
-{
-    int result = 0;
-    if (a3)
-    {
-        if (LibGvd_sub_40A618(a2) || g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08 == 0)
-        {
-            printf("id conflict\n");
-            return -1;
-        }
-
-        signed int v6 = a2;
-        if (a3 != 1)
-        {
-            v6 = a2 | 0x1000000;
-        }
-
-        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->mId = v6;
-        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->field_4 = a1;
-        const auto v7 = g_lib_gvd_stru_6BFEE0.field_6BFF0C[a2 / 0x10000];
-        if (v7)
-        {
-            result = v7(a1);
-            if (result <= 0)
-            {
-                g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->mId = 0;
-                return result;
-            }
-        }
-        return 1;
-    }
-
-    auto v3 = g_lib_gvd_stru_6BFEE0.field_6BFF0C[a2 / 0x10000];
-
-    if (!v3)
-    {
-        return 1;
-    }
-
-    result = v3(a1);
-
-    if (result > 0)
-    {
-        return 1;
-    }
-
-    return result;
-}
-*/
 
 //MSG_FUNC_NOT_IMPL(0x44E1E0, __int16 __cdecl(), sub_44E1E0);
 __int16 __cdecl sub_44E1E0()
@@ -4202,9 +4038,9 @@ void __cdecl Init_Gamed_sub_44E12B()
     dword_9942B8 = 0;
     Menu_Related1();
     Stage_GetNameHashStack_44EAED();
-    SetActiveResourceInitFuncPtrs_457B5B();
+    LibDG_SetActiveResourceInitFuncPtrs_457B5B();
     Script_452610();
-    LibDG_SetFnPtr_sub_40A68D('b', LibDG_CHARA_44E9D2.Ptr());
+    LibGV_SetFnPtr_sub_40A68D('b', (GV_FnPtr)LibDG_CHARA_44E9D2);
     sub_44E1E0();
     Actor_PushBack(1, &g_gamed_722760, nullptr);
     Actor_Init(&g_gamed_722760, (void(__cdecl*)(Actor*))GameD_Update_44E381.Ptr(), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
@@ -4419,7 +4255,9 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     TaskCpp_ForceLink();
     SoundCpp_ForceLink();
     SoundCpp_Debug();
- 
+    LibDGCppForceLink();
+    LibGVCppForceLink();
+
     if (IsMgsi())
     {
         InstallVaradicCFunctionHooks();

@@ -74,6 +74,8 @@
     <ClInclude Include="Actor.hpp" />
     <ClInclude Include="File.hpp" />
     <ClInclude Include="Input.hpp" />
+    <ClInclude Include="LibDG.hpp" />
+    <ClInclude Include="LibGV.hpp" />
     <ClInclude Include="logger.hpp" />
     <ClInclude Include="MgsFunction.hpp" />
     <ClInclude Include="Script.hpp" />
@@ -87,6 +89,8 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="LibDG.cpp" />
+    <ClCompile Include="LibGV.cpp" />
     <ClCompile Include="MgsFunction.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Sound.cpp" />
