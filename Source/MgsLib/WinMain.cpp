@@ -107,10 +107,10 @@ MSG_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
 MSG_FUNC_NOT_IMPL(0x0040111A, int __cdecl(), sub_40111A);
 MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
 MSG_FUNC_NOT_IMPL(0x0040B725, int __cdecl(), sub_40B725);
-MSG_FUNC_NOT_IMPL(0x00452610, int __cdecl(), sub_452610);
-MSG_FUNC_NOT_IMPL(0x0044E9D2, int __cdecl(DWORD*), sub_44E9D2);
-MSG_FUNC_NOT_IMPL(0x0044E381, void* __cdecl(int), sub_44E381);
-MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), unknown_libname_3); // Note: Not a CRT func!!
+MSG_FUNC_NOT_IMPL(0x00452610, int __cdecl(), Script_452610);
+MSG_FUNC_NOT_IMPL(0x0044E9D2, int __cdecl(DWORD*), LibDG_CHARA_44E9D2);
+MSG_FUNC_NOT_IMPL(0x0044E381, void* __cdecl(int), GameD_Update_44E381);
+MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
 MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
 MSG_FUNC_NOT_IMPL(0x0044E226, Actor* __cdecl(), sub_44E226);
@@ -474,7 +474,7 @@ struct Rect16
 };
 static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
 
-MGS_VAR(1, 0x995344, DWORD, dword_995344, 0);
+MGS_VAR(1, 0x995344, DWORD, gFrameCounter_dword_995344, 0);
 MGS_VAR(1, 0x722780, DWORD, dword_722780, 0);
 MGS_VAR(1, 0x722784, DWORD, dword_722784, 0);
 MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
@@ -572,14 +572,14 @@ MGS_VAR(1, 0x78E804, WORD, word_78E804, 0);
 MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
 MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
 
-int __cdecl ResourceNameHash(const char* string)
+WORD CC ResourceNameHash(const char* string)
 {
     // hash = ( (hash << 0x05) | (hash >> 0x0b) ) + str[i].unpack("H*")[0].hex.to_i & 0xffff
     unsigned int i, len = strlen(string), hash = 0;
     uint16_t rethash;
     for (i = 0; i < len; i++) hash = (((hash << 0x05) | (hash >> 0x0B)) + string[i]) & 0xFFFF;
     rethash = hash & 0xFFFF;
-    return rethash;
+    return static_cast<WORD>(rethash);
 }
 MSG_FUNC_IMPL(0x0040B38E, ResourceNameHash);
 
@@ -2593,7 +2593,7 @@ struct DR_ENV
     DWORD tag;
     DWORD code[15];
 };
-static_assert(sizeof(DR_ENV) == 0x40, "DR_ENV size must be 0x40");
+static_assert(sizeof(DR_ENV) == 64, "DR_ENV size must be 0x40");
 
 struct DRAWENV
 {
@@ -3786,7 +3786,7 @@ signed int __cdecl DoInitAll()
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
 
 // 0x457B5B
-void *__cdecl sub_457B5B()
+void *__cdecl SetActiveResourceInitFuncPtrs_457B5B()
 {
     void *result; // eax@1
 
@@ -3796,10 +3796,22 @@ void *__cdecl sub_457B5B()
     return result;
 }
 
-// 0x0044A7B0
-signed int __cdecl Resetgraph(int a1)
+struct POLY_F4
 {
-    printf(".Resetgraph(%d)\n", a1);
+    DWORD *tag;      // Pointer to the next primitive
+    BYTE r0, g0, b0; // RGB color values
+    BYTE code;       // Primitive ID(reserved)
+    WORD x0, y0;     // Vertex coordinates 
+    WORD x1, y1;     // Vertex coordinates 
+    WORD x2, y2;     // Vertex coordinates 
+    WORD x3, y3;     // Vertex coordinates
+};
+MSG_ASSERT_SIZEOF(POLY_F4, 24);
+
+// 0x0044A7B0
+signed int __cdecl Resetgraph_AndPrintPsxStructureSizes(int mode)
+{
+    printf(".Resetgraph(%d)\n", mode);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT", 8, 8, 2, 2);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT32", 16, 16, 4, 4);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_ENV", 64, 64, 16, 16);
@@ -3808,7 +3820,7 @@ signed int __cdecl Resetgraph(int a1)
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_TAG", 8, 8, 2, 2);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_CODE", 4, 4, 1, 1);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F3", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F4", 24, 24, 6, 6);
+    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F4", sizeof(POLY_F4), sizeof(POLY_F4), sizeof(POLY_F4) / sizeof(DWORD), sizeof(POLY_F4) / sizeof(DWORD));
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT3", 32, 32, 8, 8);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT4", 40, 40, 10, 10);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_G3", 28, 28, 7, 7);
@@ -3838,7 +3850,7 @@ signed int __cdecl Resetgraph(int a1)
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_STP", 12, 12, 3, 3);
     return 1;
 }
-MSG_FUNC_IMPL(0x0044A7B0, Resetgraph);
+MSG_FUNC_IMPL(0x0044A7B0, Resetgraph_AndPrintPsxStructureSizes);
 
 
 // 0x0044AB30
@@ -3936,7 +3948,7 @@ int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsig
 MGS_ARY(1, 0x7227C8, WORD, 5, word_7227C8, {}); // TODO: Struct?
 
 // 0x44EAED
-void *__cdecl sub_44EAED()
+void *__cdecl Stage_GetNameHashStack_44EAED()
 {
     return memset(word_7227C8, 0, 0x10u);
 }
@@ -4046,13 +4058,13 @@ MSG_FUNC_IMPL(0x401C02, Main_sub_401C02);
 
 // 0x40A68D
 //MSG_FUNC_NOT_IMPL(0x40A68D, int __cdecl(int, int), sub_40A68D);
-void __cdecl LibGvd_SetFnPtr_sub_40A68D(int number, int(__cdecl* fn)(DWORD*))
+void __cdecl LibDG_SetFnPtr_sub_40A68D(int number, int(__cdecl* fn)(DWORD*))
 {
     const int idx = number - 0x61; // Some compiler optimization, just adds this onto g_lib_gvd_stru_6BFEE0 to index the array
     assert(idx < _countof(g_lib_gvd_stru_6BFEE0.field_6BFF0C));
     g_lib_gvd_stru_6BFEE0.field_6BFF0C[idx] = fn;
 }
-MSG_FUNC_IMPL(0x40A68D, LibGvd_SetFnPtr_sub_40A68D);
+MSG_FUNC_IMPL(0x40A68D, LibDG_SetFnPtr_sub_40A68D);
 
 struct_8 *__cdecl LibGvd_sub_40A618(DWORD id)
 {
@@ -4182,24 +4194,22 @@ Actor *__cdecl Menu_Related1()
 }
 MSG_FUNC_IMPL(0x00459A9A, Menu_Related1);
 
-
-//MSG_FUNC_NOT_IMPL(0x44E12B, void *__cdecl(), sub_44E12B);
-void *__cdecl sub_44E12B()
+void __cdecl Init_Gamed_sub_44E12B()
 {
-    dword_995344 = 0;
+    gFrameCounter_dword_995344 = 0;
     dword_7227A4 = 0;
     script_cancel_non_zero_dword_7227A0 = 0;
     dword_9942B8 = 0;
     Menu_Related1();
-    sub_44EAED();
-    sub_457B5B();
-    sub_452610();
-    LibGvd_SetFnPtr_sub_40A68D(98, sub_44E9D2.Ptr());
+    Stage_GetNameHashStack_44EAED();
+    SetActiveResourceInitFuncPtrs_457B5B();
+    Script_452610();
+    LibDG_SetFnPtr_sub_40A68D('b', LibDG_CHARA_44E9D2.Ptr());
     sub_44E1E0();
-    Actor_PushBack(1, &g_gamed_722760, 0);
-    Actor_Init(&g_gamed_722760, (void(__cdecl*)(Actor*))sub_44E381.Ptr(), 0, "C:\\mgs\\source\\Game\\gamed.c");
+    Actor_PushBack(1, &g_gamed_722760, nullptr);
+    Actor_Init(&g_gamed_722760, (void(__cdecl*)(Actor*))GameD_Update_44E381.Ptr(), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
 
-    unknown_libname_3();
+    sub_44E1F9();
     sub_44E287();
     sub_44E212();
     word_78E7E8 = (WORD)(dword_78D7B0 + 1);
@@ -4207,10 +4217,12 @@ void *__cdecl sub_44E12B()
     GetResidentTop();
     dword_722780 = 0;
     dword_722784 = 0;
-    return sub_44E226();
+    
+  
+    // Creates res_loader which loads the init map ?
+    sub_44E226();
 }
-MSG_FUNC_IMPL(0x44E12B, sub_44E12B);
-
+MSG_FUNC_IMPL(0x44E12B, Init_Gamed_sub_44E12B);
 
 // 0x00401005
 //MSG_FUNC_NOT_IMPL(0x00401005, signed int __cdecl(), Main);
@@ -4219,7 +4231,7 @@ signed int __cdecl Main()
     signed int result; // eax@2
     Rect16 clearRect; // [sp+4h] [bp-8h]@1
 
-    Resetgraph(0);
+    Resetgraph_AndPrintPsxStructureSizes(0);
     SetGraphDebug(0);
     //null_44AC80();
     SetDispMask(0);
@@ -4240,7 +4252,8 @@ signed int __cdecl Main()
     sub_40111A();
     sub_4090A7();
     sub_40B725();
-    sub_44E12B();
+    Init_Gamed_sub_44E12B();
+
     for (;;)
     {
         result = MainLoop();
