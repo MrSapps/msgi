@@ -25,36 +25,68 @@ MGS_ARY(1, 0x006BFC78, ActorList, 9, gActorsList, {});
 MGS_VAR(1, 0x791A0C, DWORD, gActorPauseFlags_dword_791A0C, 0);
 MGS_VAR(1, 0x9942A0, DWORD, dword_9942A0, 0);
 
-void CC Actor_DumpActorSystem()
+template<class bShouldEnterList, class bShouldContinue>
+static bool IterateActors(bShouldEnterList fnEnterList, bShouldContinue fnShouldContinue)
 {
-    printf("--DumpActorSystem--\n");
     ActorList* pActorList = gActorsList;
     for (int i = 9; i > 0; --i)
     {
-        printf("Lv %d Pause %d Kill %d\n", i, pActorList->mPause, pActorList->mKill);
-        Actor* pActor = &pActorList->first;
-        while (pActor)
+        if (fnEnterList(pActorList))
         {
-            if (pActor->mFnUpdate)
+            Actor* pNext = nullptr;
+            Actor* pActor = &pActorList->first;
+            do
             {
-                int unknown = 0;
-                if (pActor->field_1C <= 0)
+                pNext = pActor->pNext;
+                if (!fnShouldContinue(pActor))
                 {
-                    unknown = 0;
+                    return true;
                 }
-                else
-                {
-                    // TODO: I've yet to see this condition be hit - perhaps an unused feature of the actor system?
-                    unknown = 100 * pActor->field_18 / pActor->field_1C;
-                }
-                printf("Lv%d %04d.%02d %p %s\n", i, unknown / 100, unknown % 100, pActor->mFnUpdate, pActor->mName);
-                pActor->field_1C = 0;
-                pActor->field_18 = 0;
-            }
-            pActor = pActor->pNext;
+                dword_9942A0 = 0;
+                pActor = pNext;
+            } while (pNext);
         }
-        pActorList++;
+        ++pActorList;
     }
+    return false;
+}
+
+
+void CC Actor_DumpActorSystem()
+{
+    printf("--DumpActorSystem--\n");
+
+    int i = 0;
+    auto fnEnterActorList = [&](ActorList* pActorList)
+    {
+        i++;
+        printf("Lv %d Pause %d Kill %d\n", i, pActorList->mPause, pActorList->mKill);
+        return true;
+    };
+
+    auto fnUpdateActor = [&](Actor* pActor)
+    {
+        if (pActor->mFnUpdate)
+        {
+            int unknown = 0;
+            if (pActor->field_1C <= 0)
+            {
+                unknown = 0;
+            }
+            else
+            {
+                // TODO: I've yet to see this condition be hit - perhaps an unused feature of the actor system?
+                unknown = 100 * pActor->field_18 / pActor->field_1C;
+            }
+            printf("Lv%d %04d.%02d %p %s\n", i, unknown / 100, unknown % 100, pActor->mFnUpdate, pActor->mName);
+            pActor->field_1C = 0;
+            pActor->field_18 = 0;
+        }
+        pActor = pActor->pNext;
+        return true;
+    };
+
+    IterateActors(fnEnterActorList, fnUpdateActor);
 }
 MSG_FUNC_IMPL(0x0040A0D4, Actor_DumpActorSystem);
 
@@ -95,23 +127,21 @@ MSG_FUNC_IMPL(0x0040A2AF, Actor_PushBack);
 
 void CC Actor_KillActorsAtLevel(signed int killLevel)
 {
-    ActorList* pActorList = gActorsList;
-    for (int i = 9; i > 0; --i)
+    auto fnEnterActorList = [&](ActorList* pActorList)
     {
-        if (pActorList->mKill <= killLevel)       // only known to be called at level 4
+        return pActorList->mKill <= killLevel;
+    };
+
+    auto fnUpdateActor = [](Actor* pActor)
+    {
+        if (pActor->mFnUpdate || pActor->mFnShutdown)
         {
-            Actor* pActor = &pActorList->first;
-            while (pActor)
-            {
-                if (pActor->mFnUpdate || pActor->mFnShutdown)
-                {
-                    Actor_DestroyOnNextUpdate(pActor);
-                }
-                pActor = pActor->pNext;
-            } 
+            Actor_DestroyOnNextUpdate(pActor);
         }
-        pActorList++;
-    }
+        return true;
+    };
+
+    IterateActors(fnEnterActorList, fnUpdateActor);
 }
 MSG_FUNC_IMPL(0x0040A23D, Actor_KillActorsAtLevel);
 
@@ -149,26 +179,23 @@ MSG_FUNC_IMPL(0x0040A37C, Actor_Destroy);
 
 void CC Actor_UpdateActors()
 {
-    ActorList* pActorList = gActorsList;
-    for (int i = 9; i > 0; --i)
+    auto fnEnterActorList = [](ActorList* pActorList)
     {
-        if (!(gActorPauseFlags_dword_791A0C & pActorList->mPause))
+        return !(gActorPauseFlags_dword_791A0C & pActorList->mPause);
+    };
+
+    auto fnUpdateActor = [](Actor* pActor)
+    {
+        if (pActor->mFnUpdate)
         {
-            Actor* pActor = &pActorList->first;
-            while (pActor)
-            {
-                if (pActor->mFnUpdate)
-                {
-                    pActor->mFnUpdate(pActor);
-                }
-                dword_9942A0 = 0;
-                pActor = pActor->pNext;
-            }
+            pActor->mFnUpdate(pActor);
         }
-        pActorList++;
-    }
+        return true;
+    };
+
+    IterateActors(fnEnterActorList, fnUpdateActor);
 }
-MSG_FUNC_IMPL(0x0040A1BF, Actor_UpdateActors);
+MSG_FUNC_IMPL(0x0040A1BF, Actor_UpdateActors); 
 
 void CC ActorList_Init()
 {
@@ -206,21 +233,24 @@ MSG_FUNC_IMPL(0x0040A0AA, ActorList_Set_KillPause);
 
 void CC Actor_Remove(Actor* pActorToRemove)
 {
-    ActorList* pActorList = gActorsList;
-    for (int i = 9; i > 0; --i)
+    auto fnEnterActorList = [](ActorList*)
     {
-        Actor* pActor = &pActorList->first;
-        while (pActor)
+        return true;
+    };
+
+    auto fnUpdateActor = [&](Actor* pActor)
+    {
+        if (pActor == pActorToRemove)
         {
-            if (pActor == pActorToRemove)
-            {
-                Actor_DestroyOnNextUpdate(pActor);
-                return;
-            }
-            pActor = pActor->pNext;
+            Actor_DestroyOnNextUpdate(pActor);
+            return false;
         }
-        pActorList++;
+        return true;
+    };
+
+    if (!IterateActors(fnEnterActorList, fnUpdateActor))
+    {
+        printf("#");
     }
-    printf("#");
 }
 MSG_FUNC_IMPL(0x0040A3FC, Actor_Remove);
