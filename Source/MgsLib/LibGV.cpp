@@ -20,7 +20,7 @@ struct struct_lib_gv
     GV_FnPtr field_6BFF0C_fn_ptrs[26];
     struct_8* struct_8_ptr_6BFF74;
     struct_8* struct_8_ptr_6BFF78;
-    DWORD pad_field_6BFF7C; // TODO: This isn't in ida, how can the rest of this struct be correct????
+    //DWORD pad_field_6BFF7C; // TODO: This isn't in ida, how can the rest of this struct be correct????
     struct_8 mStruct8_128Array_06BFF80[128];
     DWORD mDWORD_Pad1;
     DWORD gGv_dword_6C0380;
@@ -30,11 +30,11 @@ struct struct_lib_gv
     DWORD gGv_dword_6C03A4;
     DWORD gGv_dword_6C03A8;
     DWORD mDWORD_Pad2;
-    DWORD gGv_dword_6C03B0[81];
-    DWORD gGv_dword_6C04F4[81];
-    DWORD gGv_dword_6C0638;
+    DWORD gGv_dword_6C03B0_array1[81];
+    DWORD gGv_dword_6C04F4_array2[81];
+    DWORD gGv_dword_6C0638_active_array_idx;
 };
-MSG_ASSERT_SIZEOF(struct_lib_gv, 0x75C+4);
+MSG_ASSERT_SIZEOF(struct_lib_gv, 0x75C);
 
 MGS_VAR(1, 0x6BFEE0, struct_lib_gv, g_lib_gv_stru_6BFEE0, {});
 
@@ -51,23 +51,21 @@ MSG_FUNC_NOT_IMPL(0x40A4B1, void __cdecl(), sub_40A4B1);
 
 MSG_FUNC_NOT_IMPL(0x4455A0, __int64 __cdecl(), TimingRelated_4455A0);
 
-// #define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)
-
 MGS_VAR(1, 0x791A04, DWORD, dword_791A04, 0);
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
-void __cdecl LibGV_Update_40A54E(Actor* pActor);
-MSG_FUNC_IMPL(0x40A54E, LibGV_Update_40A54E);
+void __cdecl LibGV_40B3BC()
+{
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_array1[0] = 0;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_array2[0] = 0;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx = 0;
+}
 
 void __cdecl LibGV_Update_40A54E(Actor* pActor)
 {
-    LibGV_Update_40A54E_.Ptr()(pActor);
-
-    /*
     ++g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00;
 
- 
-    int currentTime = TimingRelated_4455A0();
+    int currentTime = TimingRelated_4455A0(); // TODO: Truncation?
     int timeDiff = currentTime - g_lib_gv_stru_6BFEE0.dword_6BFF04_time_related;
     g_lib_gv_stru_6BFEE0.dword_6BFF04_time_related = currentTime;
     dword_791A04 = timeDiff;
@@ -80,11 +78,21 @@ void __cdecl LibGV_Update_40A54E(Actor* pActor)
 
     if (!gActorPauseFlags_dword_791A0C)
     {
-        g_lib_gv_stru_6BFEE0.gGv_dword_6C0638 = 1 - g_lib_gv_stru_6BFEE0.gGv_dword_6C0638;
-        g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4[-81 * g_lib_gv_stru_6BFEE0.gGv_dword_6C0638] = 0;
-    }
-    */
+        assert(g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx >=0 && g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx <= 1);
+        g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx = 1 - g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx;
+
+        if (g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx != 0)
+        {
+            g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_array1[0] = 0;
+        }
+        else
+        {
+            g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_array2[0] = 0;
+        }
+    } 
 }
+MSG_FUNC_IMPL(0x40A54E, LibGV_Update_40A54E);
+
 
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
@@ -103,6 +111,7 @@ void LibGv_Init_sub_40A4F6()
 }
 MSG_FUNC_IMPL(0x40A4F6, LibGv_Init_sub_40A4F6);
 
+
 void CC LibGv_ClearFunctionPointers_40A69D()
 {
     memset(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs, 0, sizeof(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs));
@@ -119,49 +128,3 @@ void __cdecl LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
     g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs[idx] = fn;
 }
 MSG_FUNC_IMPL(0x40A68D, LibGV_SetFnPtr_sub_40A68D);
-
-struct_8 *__cdecl LibGvd_sub_40A618(DWORD id)
-{
-    signed int cnt;
-    int v4;
-
-    cnt = 128;
-    v4 = 128 - id % 128;
-    struct_8* result = &g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[id % 128];
-
-    while (result->mId & 0xFFFFFF)
-    {
-        if ((result->mId & 0xFFFFFF) == id) // 3 bytes are id
-        {
-            return result;
-        }
-
-        ++result;
-
-        if (!--v4)
-        {
-            result = &g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[0];
-        }
-
-        if (--cnt <= 0)
-        {
-            g_lib_gv_stru_6BFEE0.struct_8_ptr_6BFF08 = 0;
-            return 0;
-        }
-    }
-    g_lib_gv_stru_6BFEE0.struct_8_ptr_6BFF08 = result;
-    return 0;
-}
-MSG_FUNC_IMPL(0x40A618, LibGvd_sub_40A618);
-
-signed int __cdecl LibGvd_sub_40A662(int a1, DWORD* a2)
-{
-    if (!LibGvd_sub_40A618(a1) && g_lib_gv_stru_6BFEE0.struct_8_ptr_6BFF08 != 0)
-    {
-        g_lib_gv_stru_6BFEE0.struct_8_ptr_6BFF08->mId = a1;
-        g_lib_gv_stru_6BFEE0.struct_8_ptr_6BFF08->field_4 = a2;
-        return 0;
-    }
-    return -1;
-}
-MSG_FUNC_IMPL(0x40A662, LibGvd_sub_40A662);
