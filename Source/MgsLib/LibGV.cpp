@@ -53,7 +53,7 @@ MSG_FUNC_NOT_IMPL(0x40B35E, void __cdecl(), LibGV_Reset_System2_Memory_40B35E);
 MSG_FUNC_NOT_IMPL(0x40A6AC, void __cdecl(), LibGV_Init_Allocs_40A6AC);
 MSG_FUNC_NOT_IMPL(0x40A4B1, void __cdecl(), sub_40A4B1);
 
-MSG_FUNC_NOT_IMPL(0x4455A0, __int64 __cdecl(), TimingRelated_4455A0);
+//MSG_FUNC_NOT_IMPL(0x4455A0, __int64 __cdecl(), TimingRelated_4455A0);
 
 MGS_VAR(REDIRECT_LIBGV_DATA, 0x791A04, DWORD, dword_791A04, 0);
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
@@ -66,11 +66,62 @@ void __cdecl LibGV_40B3BC()
 }
 MSG_FUNC_IMPLEX(0x40B3BC, LibGV_40B3BC, HOOK_LIBGV_FUNCS);
 
-void __cdecl LibGV_Update_40A54E(Actor* pActor)
+struct PerformanceFreqStruct
+{
+    LONGLONG mFreq60;
+    LONGLONG mFreq30;
+    LONGLONG mFreq24;
+    LONGLONG mFreq23;
+    LONGLONG mFreq22;
+    LONGLONG mFreq21;
+    LONGLONG mFreq20;
+    LONGLONG mFreq25;
+    LONGLONG mFreq15;
+};
+PerformanceFreqStruct gPerformanceFreq_995648;
+
+LARGE_INTEGER CC TimerInitBaseLineAndGetCurrentTime_5201A6()
+{
+    LARGE_INTEGER currentCounter = {};
+    static bool sDoneQuery_dword_77C920 = false;
+    static LARGE_INTEGER sLargeInteger_stru_995690 = {};
+
+    if (!sDoneQuery_dword_77C920)
+    {
+        QueryPerformanceFrequency(&sLargeInteger_stru_995690);
+        gPerformanceFreq_995648.mFreq60 = sLargeInteger_stru_995690.QuadPart / 60;
+        gPerformanceFreq_995648.mFreq30 = sLargeInteger_stru_995690.QuadPart / 30;
+        gPerformanceFreq_995648.mFreq24 = sLargeInteger_stru_995690.QuadPart / 24;
+        gPerformanceFreq_995648.mFreq23 = sLargeInteger_stru_995690.QuadPart / 23;
+        gPerformanceFreq_995648.mFreq22 = sLargeInteger_stru_995690.QuadPart / 22;
+        gPerformanceFreq_995648.mFreq21 = sLargeInteger_stru_995690.QuadPart / 21;
+        gPerformanceFreq_995648.mFreq20 = sLargeInteger_stru_995690.QuadPart / 20;
+        gPerformanceFreq_995648.mFreq25 = sLargeInteger_stru_995690.QuadPart / 25;
+        gPerformanceFreq_995648.mFreq15 = sLargeInteger_stru_995690.QuadPart / 15;
+        sDoneQuery_dword_77C920 = true;
+    }
+    QueryPerformanceCounter(&currentCounter);
+    return currentCounter;
+}
+
+__int64 CC TimeGetElapsed_4455A0()
+{
+    static LARGE_INTEGER sCurrentPeftCounter_qword_665508 = {};
+
+    if ((sCurrentPeftCounter_qword_665508.HighPart &  sCurrentPeftCounter_qword_665508.LowPart) == -1)
+    {
+        sCurrentPeftCounter_qword_665508.QuadPart = TimerInitBaseLineAndGetCurrentTime_5201A6().QuadPart;
+    }
+
+    return (TimerInitBaseLineAndGetCurrentTime_5201A6().QuadPart - sCurrentPeftCounter_qword_665508.QuadPart) / gPerformanceFreq_995648.mFreq60;
+}
+MSG_FUNC_IMPLEX(0x4455A0, TimeGetElapsed_4455A0, HOOK_LIBGV_FUNCS);
+
+void CC LibGV_Update_40A54E(Actor* pActor)
 {
     ++g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00;
 
-    int currentTime = TimingRelated_4455A0(); // TODO: Truncation?
+    int currentTime = TimeGetElapsed_4455A0(); // TODO: Truncation?
     int timeDiff = currentTime - g_lib_gv_stru_6BFEE0.dword_6BFF04_time_related;
     g_lib_gv_stru_6BFEE0.dword_6BFF04_time_related = currentTime;
     dword_791A04 = timeDiff;
