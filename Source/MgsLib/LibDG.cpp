@@ -3,15 +3,19 @@
 
 void LibDGCppForceLink() { }
 
-MGS_ARY(1, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0, {});      // TODO: Rip array from exe
-MGS_ARY(1, 0x994320, Res_Init_Record, 512, gDynamicResFuncs_word_994320, {});   // TODO: Rip array from exe
-MGS_ARY(1, 0x650040, Res_Init_Record, 3, gStaticResInitFuncs_stru_650040, {});  // TODO: Rip array from exe
-MGS_PTR(1, 0x993F44, Res_Init_Record**, gpToDynamicResInitFuncs_dword_993F44, nullptr);
+#define REDIRECT_LIBDG_DATA 1
+#define HOOK_LIBDG_FUNCS false
 
-MGS_VAR(1, 0x994304, DWORD, gSleep5000_after_res_funcs_1_dword_994304, 0);
-MGS_VAR(1, 0x99430C, DWORD, gSleep5000_after_res_funcs_2_dword_99430C, 0);
 
-MGS_VAR(1, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
+MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0, {});      // TODO: Rip array from exe
+MGS_ARY(REDIRECT_LIBDG_DATA, 0x994320, Res_Init_Record, 512, gDynamicResFuncs_word_994320, {});   // TODO: Rip array from exe
+MGS_ARY(REDIRECT_LIBDG_DATA, 0x650040, Res_Init_Record, 3, gStaticResInitFuncs_stru_650040, {});  // TODO: Rip array from exe
+MGS_PTR(REDIRECT_LIBDG_DATA, 0x993F44, Res_Init_Record**, gpToDynamicResInitFuncs_dword_993F44, nullptr);
+
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x994304, DWORD, gSleep5000_after_res_funcs_1_dword_994304, 0);
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x99430C, DWORD, gSleep5000_after_res_funcs_2_dword_99430C, 0);
+
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
 
 
 // TODO: sub_457B9A - call GCL script to get res fn func ptr, then caller creates the resource
@@ -57,21 +61,21 @@ signed int CC LibDG_CHARA_44E9D2(Res_Init_Record* pStartingRecord)
 
     return 1;
 }
-MSG_FUNC_IMPL(0x0044E9D2, LibDG_CHARA_44E9D2);
+MSG_FUNC_IMPLEX(0x0044E9D2, LibDG_CHARA_44E9D2, HOOK_LIBDG_FUNCS);
 
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B()
 {
     memcpy(gDynamicResFuncs_word_994320, gKnownResInitFuncs_669AE0, 4096u); // 4096u = sizeof(gResInitFuncs_669AE0)
     *gpToDynamicResInitFuncs_dword_993F44 = gDynamicResFuncs_word_994320;
 }
-MSG_FUNC_IMPL(0x457B5B, LibDG_SetActiveResourceInitFuncPtrs_457B5B);
+MSG_FUNC_IMPLEX(0x457B5B, LibDG_SetActiveResourceInitFuncPtrs_457B5B, HOOK_LIBDG_FUNCS);
 
 void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C()
 {
     memset(gDynamicResFuncs_word_994320, 0, 4096u); // 4096u = sizeof(gResInitFuncs_669AE0)
     *gpToDynamicResInitFuncs_dword_993F44 = gDynamicResFuncs_word_994320;
 }
-MSG_FUNC_IMPL(0x457B7C, LibDG_ClearActiveResourceFunctionPointerList_457B7C);
+MSG_FUNC_IMPLEX(0x457B7C, LibDG_ClearActiveResourceFunctionPointerList_457B7C, HOOK_LIBDG_FUNCS);
 
 static ResInitFn FindFnPtrByHash(Res_Init_Record* arrayToSearch, WORD hashName)
 {
@@ -100,4 +104,4 @@ ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName)
     result = FindFnPtrByHash(*gpToDynamicResInitFuncs_dword_993F44, hashedName);
     return result;
 }
-MSG_FUNC_IMPL(0x457BAC, LibDG_GetResourceInitFuncPtr_457BAC);
+MSG_FUNC_IMPLEX(0x457BAC, LibDG_GetResourceInitFuncPtr_457BAC, HOOK_LIBDG_FUNCS);

@@ -4,13 +4,17 @@
 #include <assert.h>
 #include "LibDG.hpp"
 
+#define REDIRECT_LIBGV_DATA 1
+#define HOOK_LIBGV_FUNCS false
+
 // TODO: Actually a SYSTEM alloc from lib DG
 struct struct_8
 {
     DWORD mId;
     DWORD* field_4;
 };
-static_assert(sizeof(struct_8) == 0x8, "struct_8 should be 0x8");
+MSG_ASSERT_SIZEOF(struct_8, 0x8);
+
 struct struct_lib_gv
 {
     Actor mBase;
@@ -36,7 +40,7 @@ struct struct_lib_gv
 };
 MSG_ASSERT_SIZEOF(struct_lib_gv, 0x75C);
 
-MGS_VAR(1, 0x6BFEE0, struct_lib_gv, g_lib_gv_stru_6BFEE0, {});
+MGS_VAR(REDIRECT_LIBGV_DATA, 0x6BFEE0, struct_lib_gv, g_lib_gv_stru_6BFEE0, {});
 
 // Other likely LibGvd funcs
 MSG_FUNC_NOT_IMPL(0x40A72A, struct_8 *__cdecl(), LibGvd_sub_40A72A);
@@ -51,7 +55,7 @@ MSG_FUNC_NOT_IMPL(0x40A4B1, void __cdecl(), sub_40A4B1);
 
 MSG_FUNC_NOT_IMPL(0x4455A0, __int64 __cdecl(), TimingRelated_4455A0);
 
-MGS_VAR(1, 0x791A04, DWORD, dword_791A04, 0);
+MGS_VAR(REDIRECT_LIBGV_DATA, 0x791A04, DWORD, dword_791A04, 0);
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
 void __cdecl LibGV_40B3BC()
@@ -60,6 +64,7 @@ void __cdecl LibGV_40B3BC()
     g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_array2[0] = 0;
     g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx = 0;
 }
+MSG_FUNC_IMPLEX(0x40B3BC, LibGV_40B3BC, HOOK_LIBGV_FUNCS);
 
 void __cdecl LibGV_Update_40A54E(Actor* pActor)
 {
@@ -91,7 +96,7 @@ void __cdecl LibGV_Update_40A54E(Actor* pActor)
         }
     } 
 }
-MSG_FUNC_IMPL(0x40A54E, LibGV_Update_40A54E);
+MSG_FUNC_IMPLEX(0x40A54E, LibGV_Update_40A54E, HOOK_LIBGV_FUNCS);
 
 
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
@@ -109,14 +114,14 @@ void LibGv_Init_sub_40A4F6()
     g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00 = 0;
     //nullsub_6(nullsub_4);
 }
-MSG_FUNC_IMPL(0x40A4F6, LibGv_Init_sub_40A4F6);
+MSG_FUNC_IMPLEX(0x40A4F6, LibGv_Init_sub_40A4F6, HOOK_LIBGV_FUNCS);
 
 
 void CC LibGv_ClearFunctionPointers_40A69D()
 {
     memset(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs, 0, sizeof(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs));
 }
-MSG_FUNC_IMPL(0x40A69D, LibGv_ClearFunctionPointers_40A69D);
+MSG_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, HOOK_LIBGV_FUNCS);
 
 
 void __cdecl LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
@@ -127,4 +132,4 @@ void __cdecl LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
     assert(idx < _countof(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs));
     g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs[idx] = fn;
 }
-MSG_FUNC_IMPL(0x40A68D, LibGV_SetFnPtr_sub_40A68D);
+MSG_FUNC_IMPLEX(0x40A68D, LibGV_SetFnPtr_sub_40A68D, HOOK_LIBGV_FUNCS);
