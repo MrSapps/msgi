@@ -430,7 +430,7 @@ struct Rect16
 };
 static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
 
-MGS_VAR(1, 0x995344, DWORD, gFrameCounter_dword_995344, 0);
+MGS_VAR(1, 0x995344, DWORD, gFrameTime_dword_995344, 0);
 MGS_VAR(1, 0x722780, DWORD, dword_722780, 0);
 MGS_VAR(1, 0x722784, DWORD, dword_722784, 0);
 MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
@@ -4030,7 +4030,7 @@ MSG_FUNC_IMPL(0x00459A9A, Menu_Related1);
 
 void __cdecl Init_Gamed_sub_44E12B()
 {
-    gFrameCounter_dword_995344 = 0;
+    gFrameTime_dword_995344 = 0;
     dword_7227A4 = 0;
     script_cancel_non_zero_dword_7227A0 = 0;
     dword_9942B8 = 0;
