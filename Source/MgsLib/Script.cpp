@@ -4,12 +4,6 @@
 #include "Task.hpp"
 #include "Script.hpp"
 
-MGS_PTR(1, 0x995460, WORD*, word_995460, 0);
-MGS_PTR(1, 0x995470, DWORD*, dword_995470, 0);
-MGS_PTR(1, 0x995464, DWORD*, dword_995464, 0);
-MGS_PTR(1, 0x995468, DWORD*, dword_995468, 0);
-MGS_PTR(1, 0x99546C, DWORD*, dword_99546C, 0);
-MGS_PTR(1, 0x995462, WORD*, word_995462, 0);
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
 
@@ -60,7 +54,7 @@ proc_struct_sub *__cdecl Script_GetCommand(WORD cmdToFind)
 MSG_FUNC_IMPL(0x00409ACC, Script_GetCommand);
 
 
-int __cdecl Script_InitCommandTable(proc_struct *pCmdTbl)
+int __cdecl Script_InitCommandTable(proc_struct* pCmdTbl)
 {
     pCmdTbl->pNext = *gScriptCmdTable_dword_6BFC6C;
     *gScriptCmdTable_dword_6BFC6C = pCmdTbl;
@@ -79,6 +73,91 @@ int __cdecl Script_InitCommandTable(proc_struct *pCmdTbl)
 }
 MSG_FUNC_IMPL(0x00409A4F, Script_InitCommandTable);
 
+MSG_FUNC_NOT_IMPL(0x00451A5E, int __cdecl(char*), Script_tbl_mesg_sub_451A5E);
+MSG_FUNC_NOT_IMPL(0x00451688, int __cdecl(char*), Script_tbl_ntrap_removeQ_451688);
+MSG_FUNC_NOT_IMPL(0x00451AC3, int __cdecl(char*), Script_tbl_chara_sub_451AC3);
+MSG_FUNC_NOT_IMPL(0x0045151D, int __cdecl(char*), Script_tbl_map_sub_45151D);
+MSG_FUNC_NOT_IMPL(0x00451673, int __cdecl(char*), Script_tbl_hzd_related_sub_451673);
+MSG_FUNC_NOT_IMPL(0x004512E5, int __cdecl(char*), script_tbl_camera_sub_4512E5);
+MSG_FUNC_NOT_IMPL(0x00451239, int __cdecl(char*), Script_tbl_light_sub_451239);
+MSG_FUNC_NOT_IMPL(0x00451B0E, int __cdecl(char*), Script_tbl_start_sub_451B0E);
+MSG_FUNC_NOT_IMPL(0x00451BBF, int __cdecl(char*), Script_tbl_load_451BBF);
+MSG_FUNC_NOT_IMPL(0x00451D5C, int __cdecl(char*), Script_tbl_radio_sub_451D5C);
+MSG_FUNC_NOT_IMPL(0x00451F22, int __cdecl(char*), Script_tbl_str_status_sub_451F22);
+MSG_FUNC_NOT_IMPL(0x00452064, int __cdecl(char*), Script_tbl_demo_sub_452064);
+MSG_FUNC_NOT_IMPL(0x00451778, int __cdecl(char*), Script_tbl_ntrap_451778);
+MSG_FUNC_NOT_IMPL(0x004519C7, int __cdecl(char*), Script_tbl_Delay_sub_4519C7);
+MSG_FUNC_NOT_IMPL(0x00452132, int __cdecl(char*), Script_tbl_pad_452132);
+MSG_FUNC_NOT_IMPL(0x00451F89, int __cdecl(char*), Script_tbl_varsave_sub_451F89);
+MSG_FUNC_NOT_IMPL(0x00451FE3, int __cdecl(char*), Script_tbl_system_sub_451FE3);
+MSG_FUNC_NOT_IMPL(0x0045219B, int __cdecl(char*), Script_tbl_sound_45219B);
+MSG_FUNC_NOT_IMPL(0x004521A7, int __cdecl(char*), Script_tbl_menu_sub_4521A7);
+MSG_FUNC_NOT_IMPL(0x004523C7, int __cdecl(char*), Script_Tbl_rand_4523C7);
+MSG_FUNC_NOT_IMPL(0x004523E7, int __cdecl(char*), Script_tbl_sub_4523E7);
+MSG_FUNC_NOT_IMPL(0x0045256B, int __cdecl(char*), Script_tbl_print_sub_45256B);
+MSG_FUNC_NOT_IMPL(0x004525D6, int __cdecl(char*), Script_tbl_jimaku_4525D6);
+MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
+{
+    { 0x22FF, 0x0, Script_tbl_mesg_sub_451A5E.Ptr() },
+    { 0xD4CB, 0x0, Script_tbl_ntrap_removeQ_451688.Ptr() },
+    { 0x9906, 0x0, Script_tbl_chara_sub_451AC3.Ptr() },
+    { 0xC091, 0x0, Script_tbl_map_sub_45151D.Ptr() },
+    { 0x7D50, 0x0, Script_tbl_hzd_related_sub_451673.Ptr() },
+    { 0xEEE9, 0x0, script_tbl_camera_sub_4512E5.Ptr() },
+    { 0x306A, 0x0, Script_tbl_light_sub_451239.Ptr() },
+    { 0x9A1F, 0x0, Script_tbl_start_sub_451B0E.Ptr() },
+    { 0xC8BB, 0x0, Script_tbl_load_451BBF.Ptr() },
+    { 0x24E1, 0x0, Script_tbl_radio_sub_451D5C.Ptr() },
+    { 0xE43C, 0x0, Script_tbl_str_status_sub_451F22.Ptr() },
+    { 0xA242, 0x0, Script_tbl_demo_sub_452064.Ptr() },
+    { 0xDBAB, 0x0, Script_tbl_ntrap_451778.Ptr() },
+    { 0x430D, 0x0, Script_tbl_Delay_sub_4519C7.Ptr() },
+    { 0xCC85, 0x0, Script_tbl_pad_452132.Ptr() },
+    { 0x5C9E, 0x0, Script_tbl_varsave_sub_451F89.Ptr() },
+    { 0x4AD9, 0x0, Script_tbl_system_sub_451FE3.Ptr() },
+    { 0x698D, 0x0, Script_tbl_sound_45219B.Ptr() },
+    { 0x226D, 0x0, Script_tbl_menu_sub_4521A7.Ptr() },
+    { 0x925E, 0x0, Script_Tbl_rand_4523C7.Ptr() },
+    { 0xE257, 0x0, Script_tbl_sub_4523E7.Ptr() },
+    { 0xB96E, 0x0, Script_tbl_print_sub_45256B.Ptr() },
+    { 0xEC9D, 0x0, Script_tbl_jimaku_4525D6.Ptr() }
+});
+MGS_ARY(1, 0x66B0B8, proc_struct, 1, gScriptBindFns_66B0B8, { nullptr, 23, script_funcs_tbl_66B000 }); // TODO: Not an array, only done this way so it compiles
+
+MSG_FUNC_NOT_IMPL(0x004525E6, int __cdecl(), Script_binds_init_4525E6);
+
+void CC Script_BindInits_452610()
+{
+    Script_binds_init_4525E6();
+    Script_InitCommandTable(gScriptBindFns_66B0B8);
+}
+MSG_FUNC_IMPL(0x00452610, Script_BindInits_452610);
+
+MSG_FUNC_NOT_IMPL(0x004090EA, int __cdecl(char*), Script_tbl_if_sub_4090EA);
+MSG_FUNC_NOT_IMPL(0x0040915D, int __cdecl(char*), Script_tbl_eval_sub_40915D);
+MSG_FUNC_NOT_IMPL(0x00409178, int __cdecl(char*), Script_tbl_unknown_loop_sub_409178);
+
+signed int script_tbl_nop_sub_4091F6(char*)
+{
+    return 1;
+}
+//MSG_FUNC_IMPL(0x004091F6, script_tbl_nop_sub_4091F6); // Can't hook because func is too small
+
+
+MGS_ARY(1, 0x6506E0, proc_struct_sub, 4, gEarlyScriptBinds_Tbl_6506E0,
+{
+    { 0x000D, 0x0, Script_tbl_if_sub_4090EA.Ptr() },
+    { 0x64C0, 0x0, Script_tbl_eval_sub_40915D.Ptr() },
+    { 0xCD3A, 0x0, script_tbl_nop_sub_4091F6 },
+    { 0x7636, 0x0, Script_tbl_unknown_loop_sub_409178.Ptr() }
+});
+MGS_ARY(1, 0x650700, proc_struct, 1, gEarlyScriptBinds_650700, { nullptr, 4, gEarlyScriptBinds_Tbl_6506E0 }); // TODO: Not an array, only done this way so it compiles
+
+void __cdecl Script_sub_4091FA()
+{
+    Script_InitCommandTable(gEarlyScriptBinds_650700);
+}
+MSG_FUNC_IMPL(0x004091FA, Script_sub_4091FA);
 
 MSG_FUNC_NOT_IMPL(0x00409CAF, signed int __cdecl(BYTE* pScriptBytes, int numberOfArguments), Script_Run);
 

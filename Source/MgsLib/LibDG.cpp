@@ -3,13 +3,15 @@
 
 void LibDGCppForceLink() { }
 
-MGS_ARY(1, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0, {});
-MGS_ARY(1, 0x994320, Res_Init_Record, 512, gDynamicResFuncs_word_994320, {});
-MGS_ARY(1, 0x650040, Res_Init_Record, 3, gStaticResInitFuncs_stru_650040, {});
+MGS_ARY(1, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0, {});      // TODO: Rip array from exe
+MGS_ARY(1, 0x994320, Res_Init_Record, 512, gDynamicResFuncs_word_994320, {});   // TODO: Rip array from exe
+MGS_ARY(1, 0x650040, Res_Init_Record, 3, gStaticResInitFuncs_stru_650040, {});  // TODO: Rip array from exe
 MGS_PTR(1, 0x993F44, Res_Init_Record**, gpToDynamicResInitFuncs_dword_993F44, nullptr);
 
 MGS_VAR(1, 0x994304, DWORD, gSleep5000_after_res_funcs_1_dword_994304, 0);
 MGS_VAR(1, 0x99430C, DWORD, gSleep5000_after_res_funcs_2_dword_99430C, 0);
+
+// TODO: sub_457B9A - call GCL script to get res fn func ptr, then caller creates the resource
 
 signed int CC LibDG_CHARA_44E9D2(Res_Init_Record* pStartingRecord)
 {
