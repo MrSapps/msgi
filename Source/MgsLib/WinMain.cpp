@@ -104,7 +104,6 @@ MSG_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_520
 MSG_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
 MSG_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
 MSG_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
-MSG_FUNC_NOT_IMPL(0x0040A4F6, void __cdecl(), sub_40A4F6);
 MSG_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
 MSG_FUNC_NOT_IMPL(0x0040111A, int __cdecl(), sub_40111A);
 MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
@@ -4059,17 +4058,15 @@ void __cdecl Init_Gamed_sub_44E12B()
 }
 MSG_FUNC_IMPL(0x44E12B, Init_Gamed_sub_44E12B);
 
-// 0x00401005
-//MSG_FUNC_NOT_IMPL(0x00401005, signed int __cdecl(), Main);
 signed int __cdecl Main()
 {
-    signed int result; // eax@2
-    Rect16 clearRect; // [sp+4h] [bp-8h]@1
+    signed int result = 0;
 
     Resetgraph_AndPrintPsxStructureSizes(0);
     SetGraphDebug(0);
     //null_44AC80();
     SetDispMask(0);
+    Rect16 clearRect;
     clearRect.x1 = 0;
     clearRect.y1 = 0;
     clearRect.x2 = 1024;
@@ -4082,7 +4079,7 @@ signed int __cdecl Main()
     //nullsub_8();
     MemCardsInit();
     //nullsub_9();
-    sub_40A4F6();
+    LibGv_Init_sub_40A4F6();
     sub_408086();
     sub_40111A();
     sub_4090A7();
@@ -4093,17 +4090,23 @@ signed int __cdecl Main()
     {
         result = MainLoop();
         if (!result)
+        {
             break;
-        if (gExitMainGameLoop)
-            break;
+        }
 
-        // HACK: Somtimes the game crashes somewhere deep in here, not calling this seems to prevent the game
+        if (gExitMainGameLoop)
+        {
+            break;
+        }
+
+        // HACK: Sometimes the game crashes somewhere deep in here, not calling this seems to prevent the game
         // state from progressing.
-        // In software rendering mode when gameover it will crash, but this is an existing bug of the game.
+        // In software rendering mode when game over it will crash, but this is an existing bug of the game.
         Actor_UpdateActors();
     }
     return result;
 }
+MSG_FUNC_IMPL(0x00401005, Main);
 
 // 0x00401000
 //MSG_FUNC_NOT_IMPL(0x00401000, int __cdecl(), DoMain);
