@@ -11,6 +11,9 @@ MGS_PTR(1, 0x993F44, Res_Init_Record**, gpToDynamicResInitFuncs_dword_993F44, nu
 MGS_VAR(1, 0x994304, DWORD, gSleep5000_after_res_funcs_1_dword_994304, 0);
 MGS_VAR(1, 0x99430C, DWORD, gSleep5000_after_res_funcs_2_dword_99430C, 0);
 
+MGS_VAR(1, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
+
+
 // TODO: sub_457B9A - call GCL script to get res fn func ptr, then caller creates the resource
 
 signed int CC LibDG_CHARA_44E9D2(Res_Init_Record* pStartingRecord)

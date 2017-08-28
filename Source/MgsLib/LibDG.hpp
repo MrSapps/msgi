@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MgsFunction.hpp"
+#include "Actor.hpp"
 
 void LibDGCppForceLink();
 
@@ -13,6 +14,19 @@ struct Res_Init_Record
     ResInitFn mInitFunctionPointer;
 };
 MSG_ASSERT_SIZEOF(Res_Init_Record, 0x8);
+
+struct LibDG_Struct
+{
+    Actor mBase;
+    DWORD dword_6BB950_do_not_flip_buffers;
+    DWORD dword_6BB954;
+    BYTE gG_byte_6BB958;
+    BYTE gB_byte_6BB959;
+    BYTE gR_byte_6BB95A;
+    BYTE mPadding;
+};
+MSG_ASSERT_SIZEOF(LibDG_Struct, 0x2C);
+MGS_VAR_EXTERN(LibDG_Struct, gLibDG_2_stru_6BB930);
 
 signed int CC LibDG_CHARA_44E9D2(Res_Init_Record *pStartingRecord);
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B();

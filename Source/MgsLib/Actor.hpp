@@ -28,6 +28,8 @@ struct ActorList
 };
 MSG_ASSERT_SIZEOF(ActorList, 0x44);
 
+MGS_VAR_EXTERN(DWORD, gActorPauseFlags_dword_791A0C);
+
 Actor* CC Actor_Init(Actor* pActor, TActorFunction fnUpdate, TActorFunction fnShutDown, const char *srcFileName);
 Actor* CC Actor_PushBack(int level, Actor* pActor, TActorFunction fnFree);
 void CC Actor_KillActorsAtLevel(signed int killLevel);
