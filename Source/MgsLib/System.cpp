@@ -194,6 +194,36 @@ void __cdecl System_Debug_sub_40AEC0(int idx)
 }
 MSG_FUNC_IMPL(0x40AEC0, System_Debug_sub_40AEC0);
 
+LibGV_MemoryAllocation *__cdecl System_sub_40B05B(system_struct* pSystem, LibGV_MemoryAllocation* pAlloc)
+{
+    int temp = pSystem->mUnitsCount;
+   // LibGV_MemoryAllocation* result = &pSystem->mAllocs[pSystem->mUnitsCount];
+
+    const int allocIndex = pAlloc - pSystem->mAllocs;
+    const int numAllocsBeforeThisOne = pSystem->mUnitsCount - allocIndex;
+
+    if (numAllocsBeforeThisOne >= 0)
+    {
+       // LibGV_MemoryAllocation* pNextAlloc = result + 1;
+        int counter = numAllocsBeforeThisOne + 1;
+        do
+        {
+            pSystem->mAllocs[temp + 1].mPDataStart = pSystem->mAllocs[temp].mPDataStart;
+            pSystem->mAllocs[temp + 1].mAllocType = pSystem->mAllocs[temp].mAllocType;
+            temp--;
+
+            //pNextAlloc->mPDataStart = result->mPDataStart;
+            //pNextAlloc->mAllocType = result->mAllocType;
+            //--result;
+            //--pNextAlloc;
+            --counter;
+        } while (counter);
+    }
+    ++pSystem->mUnitsCount;
+    return &pSystem->mAllocs[temp];
+}
+MSG_FUNC_IMPL(0x40B05B, System_sub_40B05B);
+
 /*
 void* __cdecl System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
 {
