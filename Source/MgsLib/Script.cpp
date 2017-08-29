@@ -315,7 +315,7 @@ int __cdecl Script_Operator_Evaluate(int operation, int v1, int v2)
         result = v2 ^ v1;
         break;
     case 18:
-        result = v1 >= 0 && v2 >= 0; // TODO Check this is correct __PAIR__(v2, v1) != 0;
+        result = v1 || v2; // TODO: Write a test case for real function, this might be wrong
         printf("Check me\n");
         break;
     case 19:
