@@ -133,6 +133,67 @@ void __cdecl System_Debug_sub_40ADEC(int index)
 }
 MSG_FUNC_IMPL(0x40ADEC, System_Debug_sub_40ADEC);
 
+void __cdecl System_Debug_sub_40AEC0(int idx)
+{
+    system_struct* pSystem = &gSystems_dword_78E980[idx];
+    printf("system %d ( ", idx);
+    if (pSystem->mFlags & 1)
+    {
+        printf("dynamic ");
+    }
+    else
+    {
+        printf("static ");
+    }
+
+    if (pSystem->mFlags & 2)
+    {
+        printf("voided ");
+    }
+
+    if (pSystem->mFlags & 4)
+    {
+        printf("failed ");
+    }
+    printf(")\n");
+
+    if (pSystem->mUnitsCount > 0)
+    {
+        LibGV_MemoryAllocation* pAlloc = pSystem->mAllocs;
+        LibGV_MemoryAllocation* pNextAlloc = nullptr;
+        int unitCounter = pSystem->mUnitsCount;
+        do
+        {
+            BYTE* ptr = pAlloc->mPDataStart;
+            const int alloc_type = pAlloc->mAllocType;
+            pNextAlloc = pAlloc + 1;
+            const int allocSizeBytes = pAlloc[1].mPDataStart - pAlloc->mPDataStart;
+            switch (alloc_type)
+            {
+            case 0:
+                printf("---- %8d bytes ( from %08x free )\n", allocSizeBytes, ptr);
+                break;
+
+            case 1:
+                printf("==== %8d bytes ( from %08x void )\n", allocSizeBytes, ptr);
+                break;
+
+            case 2:
+                printf("++++ %8d bytes ( from %08x used )\n", allocSizeBytes, ptr);
+                break;
+
+            default:
+                printf("**** %8d bytes ( from %08x user %08x )\n", allocSizeBytes, ptr, alloc_type);
+            }
+
+            --unitCounter;
+            pAlloc = pNextAlloc;
+        } while (unitCounter);
+    }
+    printf("\n");
+}
+MSG_FUNC_IMPL(0x40AEC0, System_Debug_sub_40AEC0);
+
 /*
 void* __cdecl System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
 {
