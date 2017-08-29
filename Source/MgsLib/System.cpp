@@ -66,6 +66,14 @@ system_struct* CC System_init_40AC6C(int index, int bIsDynamic, void* pMemory, i
 }
 MSG_FUNC_IMPL(0x40AC6C, System_init_40AC6C);
 
+void __cdecl System_DeInit_Systems_0_to_2_sub_40AC52()
+{
+    for (int i = 0; i < 3; i++)
+    {
+        System_init_40AC6C(i, 0, nullptr, 0);
+    }
+}
+MSG_FUNC_IMPL(0x40AC52, System_DeInit_Systems_0_to_2_sub_40AC52);
 
 /*
 void* __cdecl System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
