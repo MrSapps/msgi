@@ -15,8 +15,7 @@ struct system_struct
     BYTE* mStartAddr;
     BYTE* mEndAddr;
     DWORD mUnitsCount;
-    LibGV_MemoryAllocation mMemoryPool;
-    LibGV_MemoryAllocation mAllocs[511];
+    LibGV_MemoryAllocation mAllocs[512];
 };
 MSG_ASSERT_SIZEOF(system_struct, 0x1010);
 
@@ -57,11 +56,11 @@ system_struct* CC System_init_40AC6C(int index, int bIsDynamic, void* pMemory, i
     gSystems_dword_78E980[index].mUnitsCount = 1;
     gSystems_dword_78E980[index].mEndAddr = alignedEndPtr;
     
-    gSystems_dword_78E980[index].mMemoryPool.mAllocType = 0;
-    gSystems_dword_78E980[index].mMemoryPool.mPDataStart = (BYTE *)pMemory;
+    gSystems_dword_78E980[index].mAllocs[0].mAllocType = 0;
+    gSystems_dword_78E980[index].mAllocs[0].mPDataStart = (BYTE *)pMemory;
 
-    gSystems_dword_78E980[index].mAllocs[0].mPDataStart = alignedEndPtr;
-    gSystems_dword_78E980[index].mAllocs[0].mAllocType = 2;
+    gSystems_dword_78E980[index].mAllocs[1].mPDataStart = alignedEndPtr;
+    gSystems_dword_78E980[index].mAllocs[1].mAllocType = 2;
     return &gSystems_dword_78E980[index];
 }
 MSG_FUNC_IMPL(0x40AC6C, System_init_40AC6C);
@@ -74,6 +73,65 @@ void __cdecl System_DeInit_Systems_0_to_2_sub_40AC52()
     }
 }
 MSG_FUNC_IMPL(0x40AC52, System_DeInit_Systems_0_to_2_sub_40AC52);
+
+void __cdecl System_Debug_sub_40ADEC(int index)
+{
+    system_struct* pSystem = &gSystems_dword_78E980[index];
+
+    printf("system %d ( ", index);
+    if (pSystem->mFlags & 1)
+    {
+        printf("dynamic ");
+    }
+    if (pSystem->mFlags & 2)
+    {
+        printf("voided ");
+    }
+    if (pSystem->mFlags & 4)
+    {
+        printf("failed ");
+    }
+    printf(")\n");
+    printf("  addr = %08x - %08x, units = %d\n", pSystem->mStartAddr, pSystem->mEndAddr, pSystem->mUnitsCount);
+
+    int biggestFreeBlockSizeBytes = 0;
+    int numFreeBytes = 0;
+    int numVoidedBytes = 0;
+
+    if (pSystem->mUnitsCount > 0)
+    {
+        LibGV_MemoryAllocation* ptr = pSystem->mAllocs;
+        bool bEnd = false;
+        int counter = pSystem->mUnitsCount;
+        do
+        {
+            const int allocType = ptr->mAllocType;
+            const int sizeBytes = ptr[1].mPDataStart - ptr->mPDataStart;
+            if (allocType && allocType == 1)
+            {
+                numVoidedBytes += sizeBytes;
+            }
+            else
+            {
+                numFreeBytes += sizeBytes;
+                if (sizeBytes > biggestFreeBlockSizeBytes)
+                {
+                    biggestFreeBlockSizeBytes = sizeBytes;
+                }
+            }
+            bEnd = counter-- == 1;
+            ++ptr;
+        } while (!bEnd);
+    }
+
+    const int numTotalBytes = pSystem->mEndAddr - pSystem->mStartAddr;
+    printf("  free = %d / %d, voided = %d, max_free = %d\n",
+        numFreeBytes,
+        numTotalBytes,
+        numVoidedBytes,
+        biggestFreeBlockSizeBytes);
+}
+MSG_FUNC_IMPL(0x40ADEC, System_Debug_sub_40ADEC);
 
 /*
 void* __cdecl System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
