@@ -196,33 +196,51 @@ MSG_FUNC_IMPL(0x40AEC0, System_Debug_sub_40AEC0);
 
 LibGV_MemoryAllocation *__cdecl System_sub_40B05B(system_struct* pSystem, LibGV_MemoryAllocation* pAlloc)
 {
-    int temp = pSystem->mUnitsCount;
-   // LibGV_MemoryAllocation* result = &pSystem->mAllocs[pSystem->mUnitsCount];
+    // pAlloc is an alloc that matches a size, its not yet marked as allocated
+    // and the remaining total data is still bigger than size
 
+    int idx = pSystem->mUnitsCount;
     const int allocIndex = pAlloc - pSystem->mAllocs;
     const int numAllocsBeforeThisOne = pSystem->mUnitsCount - allocIndex;
 
     if (numAllocsBeforeThisOne >= 0)
     {
-       // LibGV_MemoryAllocation* pNextAlloc = result + 1;
         int counter = numAllocsBeforeThisOne + 1;
         do
         {
-            pSystem->mAllocs[temp + 1].mPDataStart = pSystem->mAllocs[temp].mPDataStart;
-            pSystem->mAllocs[temp + 1].mAllocType = pSystem->mAllocs[temp].mAllocType;
-            temp--;
-
-            //pNextAlloc->mPDataStart = result->mPDataStart;
-            //pNextAlloc->mAllocType = result->mAllocType;
-            //--result;
-            //--pNextAlloc;
+            pSystem->mAllocs[idx + 1].mPDataStart = pSystem->mAllocs[idx].mPDataStart;
+            pSystem->mAllocs[idx + 1].mAllocType = pSystem->mAllocs[idx].mAllocType;
+            --idx;
             --counter;
         } while (counter);
     }
     ++pSystem->mUnitsCount;
-    return &pSystem->mAllocs[temp];
+    return &pSystem->mAllocs[idx];
 }
 MSG_FUNC_IMPL(0x40B05B, System_sub_40B05B);
+
+LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struct *pSystem, unsigned int requestedSize)
+{
+    BYTE* pStart = pSystem->mAllocs[0].mPDataStart;
+    int unitCounter = pSystem->mUnitsCount;
+    LibGV_MemoryAllocation* pAlloc = pSystem->mAllocs;
+    while (unitCounter > 0)
+    {
+        DWORD allocSize = pAlloc[1].mPDataStart - pStart; // Next alloc - this alloc
+        if (allocSize >= requestedSize && !pAlloc->mAllocType)
+        {
+            return pAlloc;
+        }
+       
+        ++pAlloc;
+        pStart = pAlloc->mPDataStart;
+
+        --unitCounter;
+    }
+    return 0;
+}
+MSG_FUNC_IMPL(0x40B024, System_FindMatchingFreeAllocation_40B024);
+
 
 /*
 void* __cdecl System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
