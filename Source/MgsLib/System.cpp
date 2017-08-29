@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "System.hpp"
+#include <assert.h>
 
 struct LibGV_MemoryAllocation
 {
@@ -14,8 +15,7 @@ struct system_struct
     BYTE* mStartAddr;
     BYTE* mEndAddr;
     DWORD mUnitsCount;
-    BYTE* mMemoryPool;
-    DWORD field_14;
+    LibGV_MemoryAllocation mMemoryPool;
     LibGV_MemoryAllocation mAllocs[511];
 };
 MSG_ASSERT_SIZEOF(system_struct, 0x1010);
@@ -30,20 +30,43 @@ MGS_ARY(1, 0x78E980, system_struct, 3, gSystems_dword_78E980, {});
 
 void SystemCpp_ForceLink() { }
 
+static bool IsPowerOf2(int i)
+{
+    return !(i & (i - 1));
+}
+
+static DWORD RoundUpPowerOf2(DWORD numToRound, int multiple)
+{
+    assert(multiple && IsPowerOf2(multiple));
+    return (numToRound + multiple - 1) & -multiple;
+}
+
+static DWORD RoundDownPowerOf2(DWORD numToRound, int multiple)
+{
+    assert(multiple && IsPowerOf2(multiple));
+    return numToRound & -multiple;
+}
+
 system_struct* CC System_init_40AC6C(int index, int bIsDynamic, void* pMemory, int size)
 {
     gSystems_dword_78E980[index].mFlags = bIsDynamic != 0;
-    gSystems_dword_78E980[index].mStartAddr = (BYTE*)pMemory;
-    BYTE* endPtr = ((BYTE*)pMemory + (size & 0xFFFFFFF0));
+    gSystems_dword_78E980[index].mStartAddr = (BYTE *)pMemory;
+    
+    BYTE* alignedEndPtr = (BYTE *)(pMemory) + RoundDownPowerOf2(size, 16);
+    
     gSystems_dword_78E980[index].mUnitsCount = 1;
-    gSystems_dword_78E980[index].mEndAddr = endPtr;
-    gSystems_dword_78E980[index].field_14 = 0;
-    gSystems_dword_78E980[index].mMemoryPool = (BYTE*)pMemory;
-    gSystems_dword_78E980[index].mAllocs[0].mPDataStart = endPtr;
+    gSystems_dword_78E980[index].mEndAddr = alignedEndPtr;
+    
+    gSystems_dword_78E980[index].mMemoryPool.mAllocType = 0;
+    gSystems_dword_78E980[index].mMemoryPool.mPDataStart = (BYTE *)pMemory;
+
+    gSystems_dword_78E980[index].mAllocs[0].mPDataStart = alignedEndPtr;
     gSystems_dword_78E980[index].mAllocs[0].mAllocType = 2;
     return &gSystems_dword_78E980[index];
 }
 MSG_FUNC_IMPL(0x40AC6C, System_init_40AC6C);
+
+
 /*
 void* __cdecl System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
 {
@@ -58,7 +81,7 @@ void* __cdecl System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type
         return 0;
     }
 
-    alignedSize = (size + 15) & 0xFFFFFFF0;
+    alignedSize = RoundUpPowerOf2(size, 16);
     
     pAlloc = System_FindMatchingAllocation_40B024(pSystem, alignedSize);
     if (!pAlloc)
