@@ -2,22 +2,6 @@
 #include "System.hpp"
 #include <assert.h>
 
-struct LibGV_MemoryAllocation
-{
-    BYTE* mPDataStart;
-    DWORD mAllocType;
-};
-MSG_ASSERT_SIZEOF(LibGV_MemoryAllocation, 8);
-
-struct system_struct
-{
-    DWORD mFlags;
-    BYTE* mStartAddr;
-    BYTE* mEndAddr;
-    DWORD mUnitsCount;
-    LibGV_MemoryAllocation mAllocs[512];
-};
-MSG_ASSERT_SIZEOF(system_struct, 0x1010);
 
 MSG_FUNC_NOT_IMPL(0x40ACB2, int __cdecl(int idx), System_sub_40ACB2);
 
@@ -56,16 +40,16 @@ system_struct* CC System_init_40AC6C(int index, int bIsDynamic, void* pMemory, i
     gSystems_dword_78E980[index].mUnitsCount = 1;
     gSystems_dword_78E980[index].mEndAddr = alignedEndPtr;
     
-    gSystems_dword_78E980[index].mAllocs[0].mAllocType = 0;
+    gSystems_dword_78E980[index].mAllocs[0].mAllocType = LibGV_MemoryAllocation::eFree;
     gSystems_dword_78E980[index].mAllocs[0].mPDataStart = (BYTE *)pMemory;
 
     gSystems_dword_78E980[index].mAllocs[1].mPDataStart = alignedEndPtr;
-    gSystems_dword_78E980[index].mAllocs[1].mAllocType = 2;
+    gSystems_dword_78E980[index].mAllocs[1].mAllocType = LibGV_MemoryAllocation::eUsed;
     return &gSystems_dword_78E980[index];
 }
 MSG_FUNC_IMPL(0x40AC6C, System_init_40AC6C);
 
-void __cdecl System_DeInit_Systems_0_to_2_sub_40AC52()
+void CC System_DeInit_Systems_0_to_2_sub_40AC52()
 {
     for (int i = 0; i < 3; i++)
     {
@@ -74,20 +58,25 @@ void __cdecl System_DeInit_Systems_0_to_2_sub_40AC52()
 }
 MSG_FUNC_IMPL(0x40AC52, System_DeInit_Systems_0_to_2_sub_40AC52);
 
-void __cdecl System_Debug_sub_40ADEC(int index)
+void CC System_Debug_sub_40ADEC(int index)
 {
     system_struct* pSystem = &gSystems_dword_78E980[index];
 
     printf("system %d ( ", index);
-    if (pSystem->mFlags & 1)
+    if (pSystem->mFlags & system_struct::eDynamic)
     {
         printf("dynamic ");
     }
-    if (pSystem->mFlags & 2)
+    else
+    {
+        printf("static ");
+    }
+
+    if (pSystem->mFlags & system_struct::eVoided)
     {
         printf("voided ");
     }
-    if (pSystem->mFlags & 4)
+    if (pSystem->mFlags & system_struct::eFailed)
     {
         printf("failed ");
     }
@@ -107,7 +96,7 @@ void __cdecl System_Debug_sub_40ADEC(int index)
         {
             const int allocType = ptr->mAllocType;
             const int sizeBytes = ptr[1].mPDataStart - ptr->mPDataStart;
-            if (allocType && allocType == 1)
+            if (allocType && allocType == LibGV_MemoryAllocation::eVoid)
             {
                 numVoidedBytes += sizeBytes;
             }
@@ -133,11 +122,11 @@ void __cdecl System_Debug_sub_40ADEC(int index)
 }
 MSG_FUNC_IMPL(0x40ADEC, System_Debug_sub_40ADEC);
 
-void __cdecl System_Debug_sub_40AEC0(int idx)
+void CC System_Debug_sub_40AEC0(int idx)
 {
     system_struct* pSystem = &gSystems_dword_78E980[idx];
     printf("system %d ( ", idx);
-    if (pSystem->mFlags & 1)
+    if (pSystem->mFlags & system_struct::eDynamic)
     {
         printf("dynamic ");
     }
@@ -146,12 +135,12 @@ void __cdecl System_Debug_sub_40AEC0(int idx)
         printf("static ");
     }
 
-    if (pSystem->mFlags & 2)
+    if (pSystem->mFlags & system_struct::eVoided)
     {
         printf("voided ");
     }
 
-    if (pSystem->mFlags & 4)
+    if (pSystem->mFlags & system_struct::eFailed)
     {
         printf("failed ");
     }
@@ -170,15 +159,15 @@ void __cdecl System_Debug_sub_40AEC0(int idx)
             const int allocSizeBytes = pAlloc[1].mPDataStart - pAlloc->mPDataStart;
             switch (alloc_type)
             {
-            case 0:
+            case LibGV_MemoryAllocation::eFree:
                 printf("---- %8d bytes ( from %08x free )\n", allocSizeBytes, ptr);
                 break;
 
-            case 1:
+            case LibGV_MemoryAllocation::eVoid:
                 printf("==== %8d bytes ( from %08x void )\n", allocSizeBytes, ptr);
                 break;
 
-            case 2:
+            case LibGV_MemoryAllocation::eUsed:
                 printf("++++ %8d bytes ( from %08x used )\n", allocSizeBytes, ptr);
                 break;
 
@@ -194,7 +183,7 @@ void __cdecl System_Debug_sub_40AEC0(int idx)
 }
 MSG_FUNC_IMPL(0x40AEC0, System_Debug_sub_40AEC0);
 
-LibGV_MemoryAllocation *__cdecl System_sub_40B05B(system_struct* pSystem, LibGV_MemoryAllocation* pAlloc)
+LibGV_MemoryAllocation* CC System_sub_40B05B(system_struct* pSystem, LibGV_MemoryAllocation* pAlloc)
 {
     // pAlloc is an alloc that matches a size, its not yet marked as allocated
     // and the remaining total data is still bigger than size
@@ -227,7 +216,7 @@ LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struc
     while (unitCounter > 0)
     {
         DWORD allocSize = pAlloc[1].mPDataStart - pStart; // Next alloc - this alloc
-        if (allocSize >= requestedSize && !pAlloc->mAllocType)
+        if (allocSize >= requestedSize && pAlloc->mAllocType == LibGV_MemoryAllocation::eFree)
         {
             return pAlloc;
         }
