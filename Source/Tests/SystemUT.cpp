@@ -26,7 +26,13 @@ TEST(System, System_init_40AC6C)
     pSystem->mAllocs[1].mAllocType = LibGV_MemoryAllocation::eUsed;
     pSystem->mAllocs[1].mAllocType = 0;
 
+    void* ptr1 = System_mem_zerod_alloc_40AFA4(0, 123, (void**)LibGV_MemoryAllocation::eUsed);
+    void* ptr2 = System_mem_zerod_alloc_40AFA4(0, 55, (void**)LibGV_MemoryAllocation::eUsed);
+    void* ptr3 = System_mem_zerod_alloc_40AFA4(0, 7, (void**)LibGV_MemoryAllocation::eUsed);
+    void* ptr4 = System_mem_zerod_alloc_40AFA4(0, 700, (void**)LibGV_MemoryAllocation::eUsed);
+    void* ptr5 = System_mem_zerod_alloc_40AFA4(0, 4477, (void**)LibGV_MemoryAllocation::eUsed);
 
+    ASSERT_NE(nullptr, ptr1);
 
     System_Debug_sub_40ADEC(0);
     System_Debug_sub_40AEC0(0);

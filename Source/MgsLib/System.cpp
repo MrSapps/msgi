@@ -96,9 +96,12 @@ void CC System_Debug_sub_40ADEC(int index)
         {
             const int allocType = ptr->mAllocType;
             const int sizeBytes = ptr[1].mPDataStart - ptr->mPDataStart;
-            if (allocType && allocType == LibGV_MemoryAllocation::eVoid)
+            if (allocType)
             {
-                numVoidedBytes += sizeBytes;
+                if (allocType == LibGV_MemoryAllocation::eVoid)
+                {
+                    numVoidedBytes += sizeBytes;
+                }
             }
             else
             {
@@ -208,14 +211,14 @@ LibGV_MemoryAllocation* CC System_sub_40B05B(system_struct* pSystem, LibGV_Memor
 }
 MSG_FUNC_IMPL(0x40B05B, System_sub_40B05B);
 
-LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struct *pSystem, unsigned int requestedSize)
+LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struct* pSystem, unsigned int requestedSize)
 {
     BYTE* pStart = pSystem->mAllocs[0].mPDataStart;
     int unitCounter = pSystem->mUnitsCount;
     LibGV_MemoryAllocation* pAlloc = pSystem->mAllocs;
     while (unitCounter > 0)
     {
-        DWORD allocSize = pAlloc[1].mPDataStart - pStart; // Next alloc - this alloc
+        const DWORD allocSize = pAlloc[1].mPDataStart - pStart; // Next alloc - this alloc
         if (allocSize >= requestedSize && pAlloc->mAllocType == LibGV_MemoryAllocation::eFree)
         {
             return pAlloc;
@@ -230,54 +233,46 @@ LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struc
 }
 MSG_FUNC_IMPL(0x40B024, System_FindMatchingFreeAllocation_40B024);
 
-
-/*
-void* __cdecl System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
+void* CC System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
 {
-    system_struct *pSystem;
-    unsigned int alignedSize;
-    LibGV_MemoryAllocation *pAlloc;
-    LibGV_MemoryAllocation *ptr;
-
-    pSystem = &gSystems_dword_78E980[idx];
+    system_struct* pSystem = &gSystems_dword_78E980[idx];
     if (pSystem->mUnitsCount >= 511)
     {
         return 0;
     }
 
-    alignedSize = RoundUpPowerOf2(size, 16);
-    
-    pAlloc = System_FindMatchingAllocation_40B024(pSystem, alignedSize);
+    const unsigned int alignedSize = RoundUpPowerOf2(size, 16);
+    LibGV_MemoryAllocation* pAlloc = System_FindMatchingFreeAllocation_40B024(pSystem, alignedSize);
     if (!pAlloc)
     {
-        pSystem->mFlags |= 4u; // mark as failed
-        return 0;
+        pSystem->mFlags |= system_struct::eFailed;
+        return nullptr;
     }
-
-    ptr = reinterpret_cast<LibGV_MemoryAllocation*>(pAlloc->mPDataStart);
 
     const unsigned int allocSize = pAlloc[1].mPDataStart - pAlloc->mPDataStart;
     if (allocSize > alignedSize)
     {
-        //System_sub_40B05B(pSystem, pAlloc);
-        pAlloc[1].mAllocType = 0;
-        pAlloc[1].mPDataStart = reinterpret_cast<BYTE*>(ptr + alignedSize);
+        System_sub_40B05B(pSystem, pAlloc); // TODO: Figure out this part
+        pAlloc[1].mAllocType = LibGV_MemoryAllocation::eFree;
+        pAlloc[1].mPDataStart = pAlloc->mPDataStart + alignedSize;
     }
+
+    // Set the alloc type
     pAlloc->mAllocType = (DWORD)alloc_type_or_ptr;
 
-    if (alloc_type_or_ptr != (void**)2)
+    if (alloc_type_or_ptr != (void**)LibGV_MemoryAllocation::eUsed)
     {
-        *alloc_type_or_ptr = ptr;
+        *alloc_type_or_ptr = pAlloc->mPDataStart;
     }
 
-    memset(ptr, 0, alignedSize);
-    return ptr;
+    memset(pAlloc->mPDataStart, 0, alignedSize);
+    return pAlloc->mPDataStart;
 }
 MSG_FUNC_IMPL(0x40AFA4, System_mem_zerod_alloc_40AFA4);
 
 void* CC System_2_zerod_allocate_memory_40B296(int size)
 {
-    return System_mem_zerod_alloc_40AFA4(2, size, (void**)2);
+    return System_mem_zerod_alloc_40AFA4(2, size, (void**)LibGV_MemoryAllocation::eUsed);
 }
 MSG_FUNC_IMPL(0x40B296, System_2_zerod_allocate_memory_40B296);
-*/
+
