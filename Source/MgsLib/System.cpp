@@ -277,29 +277,23 @@ void* CC System_2_zerod_allocate_memory_40B296(int size)
 MSG_FUNC_IMPL(0x40B296, System_2_zerod_allocate_memory_40B296);
 
 // Compacts free blocks
-int CC System_sub_40B147(system_struct* pSystem, LibGV_MemoryAllocation* alloc, int numUnitsToMerge)
+int CC System_EraseContiguousBlocks_40B147(system_struct* pSystem, LibGV_MemoryAllocation* alloc, int numBlocksToErase)
 {
-    LibGV_MemoryAllocation* pStartAlloc = alloc;
-    LibGV_MemoryAllocation* pEndAlloc = alloc + numUnitsToMerge;
-
-    const int allocIndex = alloc - pSystem->mAllocs;
-    int numUnitsBeforeStartAlloc = pSystem->mUnitsCount - allocIndex;
-    if (numUnitsBeforeStartAlloc >= 0)
+    const int startAllocIndex = alloc - pSystem->mAllocs;
+    int numMovesCount = pSystem->mUnitsCount - startAllocIndex - numBlocksToErase;
+    if (numMovesCount >= 0)
     {
-        ++numUnitsBeforeStartAlloc;
-        do
+        ++numMovesCount;
+        for (int i = 0; i < numMovesCount; i++)
         {
-            pStartAlloc->mPDataStart = pEndAlloc->mPDataStart;
-            pStartAlloc->mAllocType = pEndAlloc->mAllocType;
-            ++pEndAlloc;
-            ++pStartAlloc;
-            --numUnitsBeforeStartAlloc;
-        } while (numUnitsBeforeStartAlloc);
+            pSystem->mAllocs[startAllocIndex + i].mPDataStart = pSystem->mAllocs[startAllocIndex + numBlocksToErase + i].mPDataStart;
+            pSystem->mAllocs[startAllocIndex + i].mAllocType = pSystem->mAllocs[startAllocIndex + numBlocksToErase + i].mAllocType;
+        }
     }
-    pSystem->mUnitsCount -= numUnitsToMerge;
-    return numUnitsBeforeStartAlloc;
+    pSystem->mUnitsCount -= numBlocksToErase;
+    return numMovesCount;
 }
-MSG_FUNC_IMPL(0x40B147, System_sub_40B147);
+MSG_FUNC_IMPL(0x40B147, System_EraseContiguousBlocks_40B147);
 
 
 MSG_FUNC_NOT_IMPL(0x40B0F7, LibGV_MemoryAllocation *__cdecl (system_struct *, void *), System_FindAlloc_40B0F7);
@@ -338,7 +332,7 @@ void CC System_Free_40B099(int idx, void *ptr)
 
         if (numAllocsToMerge)
         {
-            System_sub_40B147(&gSystems_dword_78E980[idx], allocPtr, numAllocsToMerge);
+            System_EraseContiguousBlocks_40B147(&gSystems_dword_78E980[idx], allocPtr, numAllocsToMerge);
         }
     }
 }
