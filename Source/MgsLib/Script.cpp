@@ -407,6 +407,15 @@ DWORD* CC Script_PushArgs_409845(GCL_Proc_Arguments* pArgs)
 }
 MSG_FUNC_IMPLEX(0x00409845, Script_PushArgs_409845, true);
 
+void CC ScriptSetArgs_409893(DWORD* pArgs)
+{
+    if (pArgs)
+    {
+        script_args_dword_6BFBB8 = pArgs;
+    }
+}
+MSG_FUNC_IMPLEX(0x00409893, ScriptSetArgs_409893, true);
+
 static void Test_Script_Operator_Evaluate()
 {
     ASSERT_EQ(-50, Script_Operator_Evaluate(eNegate, 0, 50));
