@@ -23,7 +23,7 @@ struct proc_struct
     proc_struct_sub* pCommandsArray;
 };
 
-using proc_sub_ptr = int(__cdecl*)(char *);
+using proc_sub_ptr = int(__cdecl*)(BYTE *);
 
 struct proc_struct_sub
 {
@@ -73,29 +73,29 @@ int CC Script_InitCommandTable(proc_struct* pCmdTbl)
 }
 MSG_FUNC_IMPL(0x00409A4F, Script_InitCommandTable);
 
-MSG_FUNC_NOT_IMPL(0x00451A5E, int __cdecl(char*), Script_tbl_mesg_sub_451A5E);
-MSG_FUNC_NOT_IMPL(0x00451688, int __cdecl(char*), Script_tbl_ntrap_removeQ_451688);
-MSG_FUNC_NOT_IMPL(0x00451AC3, int __cdecl(char*), Script_tbl_chara_sub_451AC3);
-MSG_FUNC_NOT_IMPL(0x0045151D, int __cdecl(char*), Script_tbl_map_sub_45151D);
-MSG_FUNC_NOT_IMPL(0x00451673, int __cdecl(char*), Script_tbl_hzd_related_sub_451673);
-MSG_FUNC_NOT_IMPL(0x004512E5, int __cdecl(char*), script_tbl_camera_sub_4512E5);
-MSG_FUNC_NOT_IMPL(0x00451239, int __cdecl(char*), Script_tbl_light_sub_451239);
-MSG_FUNC_NOT_IMPL(0x00451B0E, int __cdecl(char*), Script_tbl_start_sub_451B0E);
-MSG_FUNC_NOT_IMPL(0x00451BBF, int __cdecl(char*), Script_tbl_load_451BBF);
-MSG_FUNC_NOT_IMPL(0x00451D5C, int __cdecl(char*), Script_tbl_radio_sub_451D5C);
-MSG_FUNC_NOT_IMPL(0x00451F22, int __cdecl(char*), Script_tbl_str_status_sub_451F22);
-MSG_FUNC_NOT_IMPL(0x00452064, int __cdecl(char*), Script_tbl_demo_sub_452064);
-MSG_FUNC_NOT_IMPL(0x00451778, int __cdecl(char*), Script_tbl_ntrap_451778);
-MSG_FUNC_NOT_IMPL(0x004519C7, int __cdecl(char*), Script_tbl_Delay_sub_4519C7);
-MSG_FUNC_NOT_IMPL(0x00452132, int __cdecl(char*), Script_tbl_pad_452132);
-MSG_FUNC_NOT_IMPL(0x00451F89, int __cdecl(char*), Script_tbl_varsave_sub_451F89);
-MSG_FUNC_NOT_IMPL(0x00451FE3, int __cdecl(char*), Script_tbl_system_sub_451FE3);
-MSG_FUNC_NOT_IMPL(0x0045219B, int __cdecl(char*), Script_tbl_sound_45219B);
-MSG_FUNC_NOT_IMPL(0x004521A7, int __cdecl(char*), Script_tbl_menu_sub_4521A7);
-MSG_FUNC_NOT_IMPL(0x004523C7, int __cdecl(char*), Script_Tbl_rand_4523C7);
-MSG_FUNC_NOT_IMPL(0x004523E7, int __cdecl(char*), Script_tbl_sub_4523E7);
-MSG_FUNC_NOT_IMPL(0x0045256B, int __cdecl(char*), Script_tbl_print_sub_45256B);
-MSG_FUNC_NOT_IMPL(0x004525D6, int __cdecl(char*), Script_tbl_jimaku_4525D6);
+MSG_FUNC_NOT_IMPL(0x00451A5E, int __cdecl(BYTE*), Script_tbl_mesg_sub_451A5E);
+MSG_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
+MSG_FUNC_NOT_IMPL(0x00451AC3, int __cdecl(BYTE*), Script_tbl_chara_sub_451AC3);
+MSG_FUNC_NOT_IMPL(0x0045151D, int __cdecl(BYTE*), Script_tbl_map_sub_45151D);
+MSG_FUNC_NOT_IMPL(0x00451673, int __cdecl(BYTE*), Script_tbl_hzd_related_sub_451673);
+MSG_FUNC_NOT_IMPL(0x004512E5, int __cdecl(BYTE*), script_tbl_camera_sub_4512E5);
+MSG_FUNC_NOT_IMPL(0x00451239, int __cdecl(BYTE*), Script_tbl_light_sub_451239);
+MSG_FUNC_NOT_IMPL(0x00451B0E, int __cdecl(BYTE*), Script_tbl_start_sub_451B0E);
+MSG_FUNC_NOT_IMPL(0x00451BBF, int __cdecl(BYTE*), Script_tbl_load_451BBF);
+MSG_FUNC_NOT_IMPL(0x00451D5C, int __cdecl(BYTE*), Script_tbl_radio_sub_451D5C);
+MSG_FUNC_NOT_IMPL(0x00451F22, int __cdecl(BYTE*), Script_tbl_str_status_sub_451F22);
+MSG_FUNC_NOT_IMPL(0x00452064, int __cdecl(BYTE*), Script_tbl_demo_sub_452064);
+MSG_FUNC_NOT_IMPL(0x00451778, int __cdecl(BYTE*), Script_tbl_ntrap_451778);
+MSG_FUNC_NOT_IMPL(0x004519C7, int __cdecl(BYTE*), Script_tbl_Delay_sub_4519C7);
+MSG_FUNC_NOT_IMPL(0x00452132, int __cdecl(BYTE*), Script_tbl_pad_452132);
+MSG_FUNC_NOT_IMPL(0x00451F89, int __cdecl(BYTE*), Script_tbl_varsave_sub_451F89);
+MSG_FUNC_NOT_IMPL(0x00451FE3, int __cdecl(BYTE*), Script_tbl_system_sub_451FE3);
+MSG_FUNC_NOT_IMPL(0x0045219B, int __cdecl(BYTE*), Script_tbl_sound_45219B);
+MSG_FUNC_NOT_IMPL(0x004521A7, int __cdecl(BYTE*), Script_tbl_menu_sub_4521A7);
+MSG_FUNC_NOT_IMPL(0x004523C7, int __cdecl(BYTE*), Script_Tbl_rand_4523C7);
+MSG_FUNC_NOT_IMPL(0x004523E7, int __cdecl(BYTE*), Script_tbl_sub_4523E7);
+MSG_FUNC_NOT_IMPL(0x0045256B, int __cdecl(BYTE*), Script_tbl_print_sub_45256B);
+MSG_FUNC_NOT_IMPL(0x004525D6, int __cdecl(BYTE*), Script_tbl_jimaku_4525D6);
 MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
 {
     { 0x22FF, 0x0, Script_tbl_mesg_sub_451A5E.Ptr() },
@@ -133,11 +133,11 @@ void CC Script_BindInits_452610()
 }
 MSG_FUNC_IMPL(0x00452610, Script_BindInits_452610);
 
-MSG_FUNC_NOT_IMPL(0x004090EA, int __cdecl(char*), Script_tbl_if_sub_4090EA);
-MSG_FUNC_NOT_IMPL(0x0040915D, int __cdecl(char*), Script_tbl_eval_sub_40915D);
-MSG_FUNC_NOT_IMPL(0x00409178, int __cdecl(char*), Script_tbl_unknown_loop_sub_409178);
+MSG_FUNC_NOT_IMPL(0x004090EA, int __cdecl(BYTE*), Script_tbl_if_sub_4090EA);
+MSG_FUNC_NOT_IMPL(0x0040915D, int __cdecl(BYTE*), Script_tbl_eval_sub_40915D);
+MSG_FUNC_NOT_IMPL(0x00409178, int __cdecl(BYTE*), Script_tbl_unknown_loop_sub_409178);
 
-signed int script_tbl_nop_sub_4091F6(char*)
+signed int script_tbl_nop_sub_4091F6(BYTE*)
 {
     return 1;
 }
@@ -175,6 +175,11 @@ static DWORD ToDWORD(const BYTE* ptr)
     return (ptr[3]) | (ptr[2] << 8) | (ptr[1] << 16) | (ptr[0] << 24);
 }
 
+static WORD ToWORD(const BYTE* ptr)
+{
+    return (ptr[1]) | (ptr[0] << 8);
+}
+
 BYTE* CC Script_InitProcTables_sub_409C87(BYTE* pScript)
 {
     // pScript skips the first 4 bytes of the script
@@ -204,8 +209,11 @@ int CC Script_Init_sub_409C19(BYTE* pScript)
 {
     DWORD offset = ToDWORD(pScript);
     *gProcInfos = reinterpret_cast<GCL_ProcInfo*>(pScript + 4);
+    
+    // Swap bytes in the table of script functions so they are the correct ordering
     *dword_6BFC64 = Script_InitProcTables_sub_409C87(pScript + 4);
 
+    // Get pointer to main script function start
     *gScriptMainProc_dword_6BFC68 = (pScript + 4 + offset + 4);
 
     DWORD mainScriptLen = ToDWORD((*gScriptMainProc_dword_6BFC68)-4);
@@ -326,6 +334,43 @@ int CC Script_Operator_Evaluate(int operation, int v1, int v2)
     return result;
 }
 MSG_FUNC_IMPLEX(0x00409E7C, Script_Operator_Evaluate, true);
+
+MGS_VAR(1, 0x06BFC3C, BYTE**, gScriptStackPos_dword_6BFC3C, 0); // Pointer to an array of 32 BYTE*'s
+MGS_VAR(1, 0x078D7B4, BYTE*, gScriptExecuteRet_dword_78D7B4, 0);
+
+
+void CC Script_Push(BYTE *arg)
+{
+    *gScriptStackPos_dword_6BFC3C = arg;
+    ++(gScriptStackPos_dword_6BFC3C);
+}
+MSG_FUNC_IMPLEX(0x004098B7, Script_Push, true);
+
+void CC Script_Pop()
+{
+    --(gScriptStackPos_dword_6BFC3C);
+}
+MSG_FUNC_IMPLEX(0x004098CA, Script_Pop, true);
+
+void CC Script_SetReturnAddress(BYTE* pScript)
+{
+    (gScriptExecuteRet_dword_78D7B4) = pScript;
+}
+MSG_FUNC_IMPLEX(0x004096C4, Script_SetReturnAddress, true);
+
+
+int CC Script_CommandExecute(BYTE* pScript)
+{
+    const WORD cmdId = ToWORD(pScript);
+    proc_struct_sub* pScriptCmd = Script_GetCommand(cmdId);
+    Script_Push(&pScript[pScript[2] + 2]);
+    Script_SetReturnAddress(pScript + 3);
+    const int cmdRet = pScriptCmd->mCommandFunction(pScript + 3);
+    Script_Pop();
+    return cmdRet;
+}
+MSG_FUNC_IMPLEX(0x00409A8D, Script_CommandExecute, true);
+
 
 static void Test_Script_Operator_Evaluate()
 {
