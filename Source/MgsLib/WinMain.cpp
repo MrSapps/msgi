@@ -108,7 +108,7 @@ MSG_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
 MSG_FUNC_NOT_IMPL(0x0040111A, int __cdecl(), sub_40111A);
 MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
 MSG_FUNC_NOT_IMPL(0x0040B725, int __cdecl(), sub_40B725);
-MSG_FUNC_NOT_IMPL(0x0044E381, void* __cdecl(int), GameD_Update_44E381);
+MSG_FUNC_NOT_IMPL(0x0044E381, void __cdecl(Actor*), GameD_Update_44E381);
 MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
 MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
@@ -4041,7 +4041,7 @@ void __cdecl Init_Gamed_sub_44E12B()
     LibGV_SetFnPtr_sub_40A68D('b', (GV_FnPtr)LibDG_CHARA_44E9D2);
     sub_44E1E0();
     Actor_PushBack(1, &g_gamed_722760, nullptr);
-    Actor_Init(&g_gamed_722760, (void(__cdecl*)(Actor*))GameD_Update_44E381.Ptr(), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
+    Actor_Init(&g_gamed_722760, GameD_Update_44E381.Ptr(), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
 
     sub_44E1F9();
     sub_44E287();
