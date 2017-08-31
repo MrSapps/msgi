@@ -4247,6 +4247,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     int argCount = 0;
     ::testing::InitGoogleMock(&argCount, &lpCmdLine);
     DoScriptTests();
+    DoTestSystem();
 
     int result; // eax@2
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
