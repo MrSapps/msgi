@@ -231,17 +231,16 @@ LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struc
 MSG_FUNC_IMPL(0x40B024, System_FindMatchingFreeAllocation_40B024);
 
 
-LibGV_MemoryAllocation* CC System_VoidAllocation_40B187(int idx, void *pMem)
+void CC System_VoidAllocation_40B187(int idx, void **pMem)
 {
-    LibGV_MemoryAllocation* pFound = System_FindAlloc_40B0F7(&gSystems_dword_78E980[idx], pMem);
+    LibGV_MemoryAllocation* pFound = System_FindAlloc_40B0F7(&gSystems_dword_78E980[idx], *pMem);
     if (pFound)
     {
         pFound->mAllocType = LibGV_MemoryAllocation::eVoid;
         gSystems_dword_78E980[idx].mFlags |= system_struct::eVoided;
     }
-    return pFound;
 }
-MSG_FUNC_IMPL(0x40B187, System_VoidAllocation_40B187);
+MSG_FUNC_IMPLEX(0x40B187, System_VoidAllocation_40B187, true);
 
 void CC System_2_VoidAllocation_40B2B5(void *ptr)
 {
@@ -355,7 +354,7 @@ void CC System_HouseKeeping_40ACB2(int idx)
     }
     pSystem->mFlags &= ~(system_struct::eVoided | system_struct::eFailed);
 }
-MSG_FUNC_IMPL(0x40ACB2, System_HouseKeeping_40ACB2);
+MSG_FUNC_IMPLEX(0x40ACB2, System_HouseKeeping_40ACB2, true);
 
 // Finds a block by doing a binary search
 LibGV_MemoryAllocation* CC System_FindAlloc_40B0F7(system_struct* pSystem, void* pFindMe)
