@@ -279,63 +279,28 @@ MSG_FUNC_IMPL(0x40B296, System_2_zerod_allocate_memory_40B296);
 // Compacts free blocks
 int CC System_sub_40B147(system_struct* pSystem, LibGV_MemoryAllocation* alloc, int numUnitsToMerge)
 {
-    LibGV_MemoryAllocation* pAllocCopy = alloc;
-    LibGV_MemoryAllocation* pAllocIterator = &alloc[numUnitsToMerge];
+    LibGV_MemoryAllocation* pStartAlloc = alloc;
+    LibGV_MemoryAllocation* pEndAlloc = alloc + numUnitsToMerge;
 
     const int allocIndex = alloc - pSystem->mAllocs;
-    int numAllocsBeforeThisOne = pSystem->mUnitsCount - allocIndex;
-    if (numAllocsBeforeThisOne >= 0)
+    int numUnitsBeforeStartAlloc = pSystem->mUnitsCount - allocIndex;
+    if (numUnitsBeforeStartAlloc >= 0)
     {
-        ++numAllocsBeforeThisOne;
+        ++numUnitsBeforeStartAlloc;
         do
         {
-            BYTE* previousAllocStart = pAllocIterator->mPDataStart;
-            ++pAllocIterator;
-            pAllocCopy->mPDataStart = previousAllocStart;
-            pAllocCopy->mAllocType = pAllocIterator[-1].mAllocType;
-            ++pAllocCopy;
-            --numAllocsBeforeThisOne;
-        } while (numAllocsBeforeThisOne);
+            pStartAlloc->mPDataStart = pEndAlloc->mPDataStart;
+            pStartAlloc->mAllocType = pEndAlloc->mAllocType;
+            ++pEndAlloc;
+            ++pStartAlloc;
+            --numUnitsBeforeStartAlloc;
+        } while (numUnitsBeforeStartAlloc);
     }
     pSystem->mUnitsCount -= numUnitsToMerge;
-    return numAllocsBeforeThisOne;
+    return numUnitsBeforeStartAlloc;
 }
 MSG_FUNC_IMPL(0x40B147, System_sub_40B147);
 
-/*
-// Finds a block
-LibGV_MemoryAllocation *__cdecl System_FindAlloc_40B0F7(system_struct *pSystem, void *allocPtr)
-{
-    int unitCount; // esi@3
-    LibGV_MemoryAllocation *pFound; // ecx@3
-    BYTE *pIteratedAlloc; // edx@5
-    LibGV_MemoryAllocation *result; // eax@5
-
-    if ((unsigned int)allocPtr < pSystem->mStartAddr || (unsigned int)allocPtr >= pSystem->mEndAddr)
-        goto out_of_bounds;
-    unitCount = pSystem->mUnitsCount;
-    pFound = pSystem->mAllocs;
-    while (unitCount > 1)
-    {
-        pIteratedAlloc = pFound[unitCount / 2].mPDataStart;
-        result = &pFound[unitCount / 2];
-        if (allocPtr == pIteratedAlloc)
-            return result;
-        if (allocPtr > pIteratedAlloc)
-        {
-            --unitCount;
-            pFound = result + 1;
-        }
-        unitCount /= 2;
-    }
-    if (unitCount < 1 || pFound->mPDataStart != allocPtr)
-        out_of_bounds:
-    result = 0;
-    else
-        result = pFound;
-    return result;
-}
-*/
 
 MSG_FUNC_NOT_IMPL(0x40B0F7, LibGV_MemoryAllocation *__cdecl (system_struct *, void *), System_FindAlloc_40B0F7);
 
