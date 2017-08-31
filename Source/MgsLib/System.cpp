@@ -276,6 +276,113 @@ void* CC System_2_zerod_allocate_memory_40B296(int size)
 }
 MSG_FUNC_IMPL(0x40B296, System_2_zerod_allocate_memory_40B296);
 
+// Compacts free blocks
+int CC System_sub_40B147(system_struct* pSystem, LibGV_MemoryAllocation* alloc, int numUnitsToMerge)
+{
+    LibGV_MemoryAllocation* pAllocCopy = alloc;
+    LibGV_MemoryAllocation* pAllocIterator = &alloc[numUnitsToMerge];
+
+    const int allocIndex = alloc - pSystem->mAllocs;
+    int numAllocsBeforeThisOne = pSystem->mUnitsCount - allocIndex;
+    if (numAllocsBeforeThisOne >= 0)
+    {
+        ++numAllocsBeforeThisOne;
+        do
+        {
+            BYTE* previousAllocStart = pAllocIterator->mPDataStart;
+            ++pAllocIterator;
+            pAllocCopy->mPDataStart = previousAllocStart;
+            pAllocCopy->mAllocType = pAllocIterator[-1].mAllocType;
+            ++pAllocCopy;
+            --numAllocsBeforeThisOne;
+        } while (numAllocsBeforeThisOne);
+    }
+    pSystem->mUnitsCount -= numUnitsToMerge;
+    return numAllocsBeforeThisOne;
+}
+MSG_FUNC_IMPL(0x40B147, System_sub_40B147);
+
+/*
+// Finds a block
+LibGV_MemoryAllocation *__cdecl System_FindAlloc_40B0F7(system_struct *pSystem, void *allocPtr)
+{
+    int unitCount; // esi@3
+    LibGV_MemoryAllocation *pFound; // ecx@3
+    BYTE *pIteratedAlloc; // edx@5
+    LibGV_MemoryAllocation *result; // eax@5
+
+    if ((unsigned int)allocPtr < pSystem->mStartAddr || (unsigned int)allocPtr >= pSystem->mEndAddr)
+        goto out_of_bounds;
+    unitCount = pSystem->mUnitsCount;
+    pFound = pSystem->mAllocs;
+    while (unitCount > 1)
+    {
+        pIteratedAlloc = pFound[unitCount / 2].mPDataStart;
+        result = &pFound[unitCount / 2];
+        if (allocPtr == pIteratedAlloc)
+            return result;
+        if (allocPtr > pIteratedAlloc)
+        {
+            --unitCount;
+            pFound = result + 1;
+        }
+        unitCount /= 2;
+    }
+    if (unitCount < 1 || pFound->mPDataStart != allocPtr)
+        out_of_bounds:
+    result = 0;
+    else
+        result = pFound;
+    return result;
+}
+*/
+
+MSG_FUNC_NOT_IMPL(0x40B0F7, LibGV_MemoryAllocation *__cdecl (system_struct *, void *), System_FindAlloc_40B0F7);
+
+// Frees a block
+void CC System_Free_40B099(int idx, void *ptr)
+{
+    LibGV_MemoryAllocation* pAlloc = System_FindAlloc_40B0F7(&gSystems_dword_78E980[idx], ptr);
+    if (pAlloc && pAlloc->mAllocType)
+    {
+        int numAllocsToMerge = 0;
+        
+        // Free the unit
+        pAlloc->mAllocType = LibGV_MemoryAllocation::eFree;
+
+        LibGV_MemoryAllocation* allocPtr = pAlloc;
+
+        // If the unit we are freeing is the first unit or the unit before the one 
+        // we are freeing is not free
+        if (pAlloc == &gSystems_dword_78E980[idx].mAllocs[0] || pAlloc[-1].mAllocType)
+        {
+            // Compact from the next alloc
+            allocPtr = pAlloc + 1;
+        }
+        else
+        {
+            // The block before is us free, so include it for merging
+            numAllocsToMerge = 1;
+        }
+
+        if (pAlloc[1].mAllocType == LibGV_MemoryAllocation::eFree)
+        {
+            // The block after us is free so include it for merging
+            ++numAllocsToMerge;
+        }
+
+        if (numAllocsToMerge)
+        {
+            System_sub_40B147(&gSystems_dword_78E980[idx], allocPtr, numAllocsToMerge);
+        }
+    }
+}
+MSG_FUNC_IMPL(0x40B099, System_Free_40B099);
+
+
+//MSG_FUNC_NOT_IMPL(0x40B147, int __cdecl(system_struct*, LibGV_MemoryAllocation*, int), System_sub_40B147);
+//MSG_FUNC_NOT_IMPL(0x40B099, void __cdecl(int, void*), System_Free_40B099);
+
 void DoTestSystem()
 {
     BYTE heap50kb[1024 * 50] = {};
@@ -291,13 +398,47 @@ void DoTestSystem()
     pSystem->mAllocs[1].mAllocType = LibGV_MemoryAllocation::eUsed;
     pSystem->mAllocs[1].mAllocType = 0;
 
-    void* ptr1 = System_mem_zerod_alloc_40AFA4(0, 123, (void**)LibGV_MemoryAllocation::eUsed);
-    void* ptr2 = System_mem_zerod_alloc_40AFA4(0, 55, (void**)LibGV_MemoryAllocation::eUsed);
-    void* ptr3 = System_mem_zerod_alloc_40AFA4(0, 7, (void**)LibGV_MemoryAllocation::eUsed);
-    void* ptr4 = System_mem_zerod_alloc_40AFA4(0, 700, (void**)LibGV_MemoryAllocation::eUsed);
-    void* ptr5 = System_mem_zerod_alloc_40AFA4(0, 4477, (void**)LibGV_MemoryAllocation::eUsed);
+    void* ptrs[8] = {};
+    ptrs[0] = System_mem_zerod_alloc_40AFA4(0, 123, (void**)LibGV_MemoryAllocation::eUsed);
+    ptrs[1] = System_mem_zerod_alloc_40AFA4(0, 55, (void**)LibGV_MemoryAllocation::eUsed);
+    ptrs[2] = System_mem_zerod_alloc_40AFA4(0, 7, (void**)LibGV_MemoryAllocation::eUsed);
+    ptrs[3] = System_mem_zerod_alloc_40AFA4(0, 700, (void**)LibGV_MemoryAllocation::eUsed);
+    ptrs[4] = System_mem_zerod_alloc_40AFA4(0, 4477, (void**)LibGV_MemoryAllocation::eUsed);
+    ptrs[5] = System_mem_zerod_alloc_40AFA4(0, 4477, (void**)LibGV_MemoryAllocation::eUsed);
+    ptrs[6] = System_mem_zerod_alloc_40AFA4(0, 4477, (void**)LibGV_MemoryAllocation::eUsed);
+    ptrs[7] = System_mem_zerod_alloc_40AFA4(0, 4477, (void**)LibGV_MemoryAllocation::eUsed);
 
-    ASSERT_NE(nullptr, ptr1);
+    for (int i = 0; i < 8; i++)
+    {
+        ASSERT_NE(nullptr, ptrs[i]);
+    }
+
+    // Free the allocs so that we have [used][free][used][free] pattern
+    System_Debug_sub_40ADEC(0);
+    System_Debug_sub_40AEC0(0);
+
+    System_Free_40B099(0, ptrs[1]);
+
+    System_Debug_sub_40ADEC(0);
+    System_Debug_sub_40AEC0(0);
+
+    System_Free_40B099(0, ptrs[3]);
+
+    System_Debug_sub_40ADEC(0);
+    System_Debug_sub_40AEC0(0);
+
+    System_Free_40B099(0, ptrs[5]);
+
+    System_Debug_sub_40ADEC(0);
+    System_Debug_sub_40AEC0(0);
+
+    System_Free_40B099(0, ptrs[7]);
+
+    System_Debug_sub_40ADEC(0);
+    System_Debug_sub_40AEC0(0);
+
+    // Free an alloc and check it gets merged
+    System_Free_40B099(0, ptrs[0]);
 
     System_Debug_sub_40ADEC(0);
     System_Debug_sub_40AEC0(0);
