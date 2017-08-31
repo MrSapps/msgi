@@ -277,9 +277,9 @@ void* CC System_2_zerod_allocate_memory_40B296(int size)
 MSG_FUNC_IMPL(0x40B296, System_2_zerod_allocate_memory_40B296);
 
 // Compacts free blocks
-int CC System_EraseContiguousBlocks_40B147(system_struct* pSystem, LibGV_MemoryAllocation* alloc, int numBlocksToErase)
+int CC System_EraseContiguousBlocks_40B147(system_struct* pSystem, LibGV_MemoryAllocation* pEraseFrom, int numBlocksToErase)
 {
-    const int startAllocIndex = alloc - pSystem->mAllocs;
+    const int startAllocIndex = pEraseFrom - pSystem->mAllocs;
     int numMovesCount = pSystem->mUnitsCount - startAllocIndex - numBlocksToErase;
     if (numMovesCount >= 0)
     {
@@ -296,7 +296,28 @@ int CC System_EraseContiguousBlocks_40B147(system_struct* pSystem, LibGV_MemoryA
 MSG_FUNC_IMPL(0x40B147, System_EraseContiguousBlocks_40B147);
 
 
-MSG_FUNC_NOT_IMPL(0x40B0F7, LibGV_MemoryAllocation *__cdecl (system_struct *, void *), System_FindAlloc_40B0F7);
+
+// Finds a block by doing a binary search
+LibGV_MemoryAllocation* CC System_FindAlloc_40B0F7(system_struct* pSystem, void* pFindMe)
+{
+    // First see if the pointer is within the heap range
+    if (pFindMe < pSystem->mStartAddr || pFindMe >= pSystem->mEndAddr)
+    {
+        return nullptr;
+    }
+
+    // TODO: The real function does a binary search here, I just do a slower brute force search..
+    for (DWORD i = 0; i < pSystem->mUnitsCount; i++)
+    {
+        if (pSystem->mAllocs[i].mPDataStart == pFindMe)
+        {
+            return &pSystem->mAllocs[i];
+        }
+    }
+    return nullptr;
+}
+
+MSG_FUNC_IMPL(0x40B0F7, System_FindAlloc_40B0F7);
 
 // Frees a block
 void CC System_Free_40B099(int idx, void *ptr)
@@ -304,45 +325,40 @@ void CC System_Free_40B099(int idx, void *ptr)
     LibGV_MemoryAllocation* pAlloc = System_FindAlloc_40B0F7(&gSystems_dword_78E980[idx], ptr);
     if (pAlloc && pAlloc->mAllocType)
     {
-        int numAllocsToMerge = 0;
+        int numToErase = 0;
         
         // Free the unit
         pAlloc->mAllocType = LibGV_MemoryAllocation::eFree;
 
-        LibGV_MemoryAllocation* allocPtr = pAlloc;
+        LibGV_MemoryAllocation* pEraseFrom = pAlloc;
 
         // If the unit we are freeing is the first unit or the unit before the one 
         // we are freeing is not free
         if (pAlloc == &gSystems_dword_78E980[idx].mAllocs[0] || pAlloc[-1].mAllocType)
         {
-            // Compact from the next alloc
-            allocPtr = pAlloc + 1;
+            pEraseFrom = pAlloc + 1;
         }
         else
         {
             // The block before is us free, so include it for merging
-            numAllocsToMerge = 1;
+            numToErase = 1;
         }
 
         if (pAlloc[1].mAllocType == LibGV_MemoryAllocation::eFree)
         {
             // The block after us is free so include it for merging
-            ++numAllocsToMerge;
+            ++numToErase;
         }
 
-        if (numAllocsToMerge)
+        if (numToErase > 0)
         {
-            System_EraseContiguousBlocks_40B147(&gSystems_dword_78E980[idx], allocPtr, numAllocsToMerge);
+            System_EraseContiguousBlocks_40B147(&gSystems_dword_78E980[idx], pEraseFrom, numToErase);
         }
     }
 }
 MSG_FUNC_IMPL(0x40B099, System_Free_40B099);
 
-
-//MSG_FUNC_NOT_IMPL(0x40B147, int __cdecl(system_struct*, LibGV_MemoryAllocation*, int), System_sub_40B147);
-//MSG_FUNC_NOT_IMPL(0x40B099, void __cdecl(int, void*), System_Free_40B099);
-
-void DoTestSystem()
+void TestInitAndInterleavedAllocFree()
 {
     BYTE heap50kb[1024 * 50] = {};
     system_struct* pSystem = System_init_40AC6C(0, 0, heap50kb, sizeof(heap50kb));
@@ -371,6 +387,8 @@ void DoTestSystem()
     {
         ASSERT_NE(nullptr, ptrs[i]);
     }
+
+    // TODO: Need to verify the actual allocs that exist at each free
 
     // Free the allocs so that we have [used][free][used][free] pattern
     System_Debug_sub_40ADEC(0);
@@ -401,4 +419,24 @@ void DoTestSystem()
 
     System_Debug_sub_40ADEC(0);
     System_Debug_sub_40AEC0(0);
+
+    System_Free_40B099(0, ptrs[2]);
+
+    System_Debug_sub_40ADEC(0);
+    System_Debug_sub_40AEC0(0);
+
+    System_Free_40B099(0, ptrs[6]);
+
+    System_Debug_sub_40ADEC(0);
+    System_Debug_sub_40AEC0(0);
+
+    System_Free_40B099(0, ptrs[4]);
+
+    System_Debug_sub_40ADEC(0);
+    System_Debug_sub_40AEC0(0);
+}
+
+void DoTestSystem()
+{
+    TestInitAndInterleavedAllocFree();
 }
