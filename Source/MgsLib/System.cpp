@@ -3,9 +3,10 @@
 #include <assert.h>
 #include <gmock/gmock.h>
 
-MSG_FUNC_NOT_IMPL(0x40ACB2, int __cdecl(int idx), System_sub_40ACB2);
-
 MGS_ARY(1, 0x78E980, system_struct, 3, gSystems_dword_78E980, {});
+
+MSG_FUNC_NOT_IMPL(0x40AD58, LibGV_MemoryAllocation* CC(system_struct* pSystem), System_sub_40AD58);
+MSG_FUNC_NOT_IMPL(0x40ACF4, int CC (system_struct* pSystem), System_sub_40ACF4);
 
 void SystemCpp_ForceLink() { }
 
@@ -331,6 +332,31 @@ int CC System_EraseContiguousBlocks_40B147(system_struct* pSystem, LibGV_MemoryA
 }
 MSG_FUNC_IMPL(0x40B147, System_EraseContiguousBlocks_40B147);
 
+void CC System_HouseKeeping_40ACB2(int idx)
+{
+    system_struct* pSystem = &gSystems_dword_78E980[idx];
+    const int flags = pSystem->mFlags;
+    if (pSystem->mFlags & (system_struct::eVoided | system_struct::eFailed))
+    {
+        if (flags & system_struct::eFailed)
+        {
+            if (flags & system_struct::eDynamic)
+            {
+                System_sub_40AD58(&gSystems_dword_78E980[idx]);
+                pSystem->mFlags &= ~(system_struct::eVoided | system_struct::eFailed);
+            }
+        }
+
+        if (flags & system_struct::eVoided)
+        {
+            System_sub_40ACF4(pSystem);
+            pSystem->mFlags &= ~system_struct::eVoided;
+        }
+    }
+    pSystem->mFlags &= ~(system_struct::eVoided | system_struct::eFailed);
+}
+MSG_FUNC_IMPL(0x40ACB2, System_HouseKeeping_40ACB2);
+
 // Finds a block by doing a binary search
 LibGV_MemoryAllocation* CC System_FindAlloc_40B0F7(system_struct* pSystem, void* pFindMe)
 {
@@ -350,7 +376,6 @@ LibGV_MemoryAllocation* CC System_FindAlloc_40B0F7(system_struct* pSystem, void*
     }
     return nullptr;
 }
-
 MSG_FUNC_IMPL(0x40B0F7, System_FindAlloc_40B0F7);
 
 // Frees a block

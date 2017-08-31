@@ -3987,8 +3987,8 @@ int __cdecl Main_sub_401C02()
             }
             --dword_6BED20;
         }
-        System_sub_40ACB2(activeBufferHW);
-        System_sub_40ACB2(2);
+        System_HouseKeeping_40ACB2(activeBufferHW);
+        System_HouseKeeping_40ACB2(2);
         sub_459ACE();
         sub_40162D(activeBufferHW);                 // calls ClearOTag
         result = sub_4021F2();
