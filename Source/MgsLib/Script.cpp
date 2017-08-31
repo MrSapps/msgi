@@ -388,24 +388,21 @@ DWORD* CC Script_PushArgs_409845(GCL_Proc_Arguments* pArgs)
         return nullptr;
     }
 
-    int argumentNumber = pArgs->mNumArgs;
-    DWORD* pCurrentArgStack = script_args_dword_6BFBB8;
     DWORD* oldArgStack = script_args_dword_6BFBB8;
-    DWORD* pInputArgs = &pArgs->mPArgs[argumentNumber - 1];
-    if (argumentNumber > 0)
+    DWORD* pInputArgsReverse = &pArgs->mPArgs[pArgs->mNumArgs - 1];
+    for (int i = 0; i < pArgs->mNumArgs; i++)
     {
-        do
-        {
-            const DWORD argumentValue = *pInputArgs;
-            --pInputArgs;
-            *pCurrentArgStack = argumentValue;
-            pCurrentArgStack = script_args_dword_6BFBB8 + 1;
-            --argumentNumber;
-            ++script_args_dword_6BFBB8;
-        } while (argumentNumber);
+        // Write arg
+        *script_args_dword_6BFBB8 = *pInputArgsReverse;
+        ++script_args_dword_6BFBB8;
+        --pInputArgsReverse;
     }
-    *pCurrentArgStack = pArgs->mNumArgs;
+
+    // Write num args
+    *script_args_dword_6BFBB8 = pArgs->mNumArgs;
     ++script_args_dword_6BFBB8;
+
+    // Return write start pos
     return oldArgStack;
 }
 MSG_FUNC_IMPLEX(0x00409845, Script_PushArgs_409845, true);
