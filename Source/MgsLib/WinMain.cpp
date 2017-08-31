@@ -4056,7 +4056,7 @@ void __cdecl Init_Gamed_sub_44E12B()
     // Creates res_loader which loads the init map ?
     sub_44E226();
 }
-MSG_FUNC_IMPL(0x44E12B, Init_Gamed_sub_44E12B);
+MSG_FUNC_IMPLEX(0x44E12B, Init_Gamed_sub_44E12B, false);
 
 
 signed int __cdecl Main()
@@ -4107,7 +4107,7 @@ signed int __cdecl Main()
     }
     return result;
 }
-MSG_FUNC_IMPL(0x00401005, Main);
+MSG_FUNC_IMPLEX(0x00401005, Main, false);
 
 // 0x00401000
 //MSG_FUNC_NOT_IMPL(0x00401000, int __cdecl(), DoMain);

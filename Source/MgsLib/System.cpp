@@ -44,7 +44,7 @@ system_struct* CC System_init_40AC6C(int index, int bIsDynamic, void* pMemory, i
     gSystems_dword_78E980[index].mAllocs[1].mAllocType = LibGV_MemoryAllocation::eUsed;
     return &gSystems_dword_78E980[index];
 }
-MSG_FUNC_IMPL(0x40AC6C, System_init_40AC6C);
+MSG_FUNC_IMPLEX(0x40AC6C, System_init_40AC6C, false);
 
 void CC System_DeInit_Systems_0_to_2_sub_40AC52()
 {
@@ -53,7 +53,7 @@ void CC System_DeInit_Systems_0_to_2_sub_40AC52()
         System_init_40AC6C(i, 0, nullptr, 0);
     }
 }
-MSG_FUNC_IMPL(0x40AC52, System_DeInit_Systems_0_to_2_sub_40AC52);
+MSG_FUNC_IMPLEX(0x40AC52, System_DeInit_Systems_0_to_2_sub_40AC52, false);
 
 void CC System_Debug_sub_40ADEC(int index)
 {
@@ -120,7 +120,7 @@ void CC System_Debug_sub_40ADEC(int index)
         numVoidedBytes,
         biggestFreeBlockSizeBytes);
 }
-MSG_FUNC_IMPL(0x40ADEC, System_Debug_sub_40ADEC);
+MSG_FUNC_IMPLEX(0x40ADEC, System_Debug_sub_40ADEC, false);
 
 void CC System_Debug_sub_40AEC0(int idx)
 {
@@ -181,7 +181,7 @@ void CC System_Debug_sub_40AEC0(int idx)
     }
     printf("\n");
 }
-MSG_FUNC_IMPL(0x40AEC0, System_Debug_sub_40AEC0);
+MSG_FUNC_IMPLEX(0x40AEC0, System_Debug_sub_40AEC0, false);
 
 LibGV_MemoryAllocation* CC System_sub_40B05B(system_struct* pSystem, LibGV_MemoryAllocation* pAlloc)
 {
@@ -206,7 +206,7 @@ LibGV_MemoryAllocation* CC System_sub_40B05B(system_struct* pSystem, LibGV_Memor
     ++pSystem->mUnitsCount;
     return &pSystem->mAllocs[idx];
 }
-MSG_FUNC_IMPL(0x40B05B, System_sub_40B05B);
+MSG_FUNC_IMPLEX(0x40B05B, System_sub_40B05B, false);
 
 LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struct* pSystem, unsigned int requestedSize)
 {
@@ -228,7 +228,7 @@ LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struc
     }
     return 0;
 }
-MSG_FUNC_IMPL(0x40B024, System_FindMatchingFreeAllocation_40B024);
+MSG_FUNC_IMPLEX(0x40B024, System_FindMatchingFreeAllocation_40B024, false);
 
 
 void CC System_VoidAllocation_40B187(int idx, void **pMem)
@@ -240,13 +240,13 @@ void CC System_VoidAllocation_40B187(int idx, void **pMem)
         gSystems_dword_78E980[idx].mFlags |= system_struct::eVoided;
     }
 }
-MSG_FUNC_IMPLEX(0x40B187, System_VoidAllocation_40B187, true);
+MSG_FUNC_IMPLEX(0x40B187, System_VoidAllocation_40B187, false);
 
 void CC System_2_VoidAllocation_40B2B5(void *ptr)
 {
     System_VoidAllocation_40B187(2, &ptr);
 }
-MSG_FUNC_IMPL(0x40B2B5, System_2_VoidAllocation_40B2B5);
+MSG_FUNC_IMPLEX(0x40B2B5, System_2_VoidAllocation_40B2B5, false);
 
 void CC Safe_System_2_VoidAllocation_40513B(void *ptr)
 {
@@ -255,7 +255,7 @@ void CC Safe_System_2_VoidAllocation_40513B(void *ptr)
         System_2_VoidAllocation_40B2B5(ptr);
     }
 }
-MSG_FUNC_IMPL(0x40513B, Safe_System_2_VoidAllocation_40513B);
+MSG_FUNC_IMPLEX(0x40513B, Safe_System_2_VoidAllocation_40513B, false);
 
 void* CC System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
 {
@@ -292,25 +292,25 @@ void* CC System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_p
     memset(pAlloc->mPDataStart, 0, alignedSize);
     return pAlloc->mPDataStart;
 }
-MSG_FUNC_IMPL(0x40AFA4, System_mem_zerod_alloc_40AFA4);
+MSG_FUNC_IMPLEX(0x40AFA4, System_mem_zerod_alloc_40AFA4, false);
 
 void* CC System_2_zerod_allocate_memory_40B296(int size)
 {
     return System_mem_zerod_alloc_40AFA4(2, size, (void**)LibGV_MemoryAllocation::eUsed);
 }
-MSG_FUNC_IMPL(0x40B296, System_2_zerod_allocate_memory_40B296);
+MSG_FUNC_IMPLEX(0x40B296, System_2_zerod_allocate_memory_40B296, false);
 
 void* CC System_mem_alloc_40AF91(int idx, int memSize)
 {
     return System_mem_zerod_alloc_40AFA4(idx, memSize, (void**)LibGV_MemoryAllocation::eUsed);
 }
-MSG_FUNC_IMPL(0x40AF91, System_mem_alloc_40AF91);
+MSG_FUNC_IMPLEX(0x40AF91, System_mem_alloc_40AF91, false);
 
 void CC System_2_free_40B2A7(void *pAlloc)
 {
     System_Free_40B099(2, pAlloc);
 }
-MSG_FUNC_IMPL(0x40B2A7, System_2_free_40B2A7);
+MSG_FUNC_IMPLEX(0x40B2A7, System_2_free_40B2A7, false);
 
 // Compacts free blocks
 int CC System_EraseContiguousBlocks_40B147(system_struct* pSystem, LibGV_MemoryAllocation* pEraseFrom, int numBlocksToErase)
@@ -329,7 +329,7 @@ int CC System_EraseContiguousBlocks_40B147(system_struct* pSystem, LibGV_MemoryA
     pSystem->mUnitsCount -= numBlocksToErase;
     return numMovesCount;
 }
-MSG_FUNC_IMPL(0x40B147, System_EraseContiguousBlocks_40B147);
+MSG_FUNC_IMPLEX(0x40B147, System_EraseContiguousBlocks_40B147, false);
 
 void CC System_HouseKeeping_40ACB2(int idx)
 {
@@ -354,7 +354,7 @@ void CC System_HouseKeeping_40ACB2(int idx)
     }
     pSystem->mFlags &= ~(system_struct::eVoided | system_struct::eFailed);
 }
-MSG_FUNC_IMPLEX(0x40ACB2, System_HouseKeeping_40ACB2, true);
+MSG_FUNC_IMPLEX(0x40ACB2, System_HouseKeeping_40ACB2, false);
 
 // Finds a block by doing a binary search
 LibGV_MemoryAllocation* CC System_FindAlloc_40B0F7(system_struct* pSystem, void* pFindMe)
@@ -375,7 +375,7 @@ LibGV_MemoryAllocation* CC System_FindAlloc_40B0F7(system_struct* pSystem, void*
     }
     return nullptr;
 }
-MSG_FUNC_IMPL(0x40B0F7, System_FindAlloc_40B0F7);
+MSG_FUNC_IMPLEX(0x40B0F7, System_FindAlloc_40B0F7, false);
 
 // Frees a block
 void CC System_Free_40B099(int idx, void *ptr)
@@ -414,7 +414,7 @@ void CC System_Free_40B099(int idx, void *ptr)
         }
     }
 }
-MSG_FUNC_IMPL(0x40B099, System_Free_40B099);
+MSG_FUNC_IMPLEX(0x40B099, System_Free_40B099, false);
 
 void TestInitAndInterleavedAllocFree()
 {

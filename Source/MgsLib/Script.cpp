@@ -51,7 +51,7 @@ proc_struct_sub* CC Script_GetCommand(WORD cmdToFind)
     printf("command not found\n");
     return 0;
 }
-MSG_FUNC_IMPL(0x00409ACC, Script_GetCommand);
+MSG_FUNC_IMPLEX(0x00409ACC, Script_GetCommand, false);
 
 
 int CC Script_InitCommandTable(proc_struct* pCmdTbl)
@@ -71,7 +71,7 @@ int CC Script_InitCommandTable(proc_struct* pCmdTbl)
     }
     return 0;
 }
-MSG_FUNC_IMPL(0x00409A4F, Script_InitCommandTable);
+MSG_FUNC_IMPLEX(0x00409A4F, Script_InitCommandTable, false);
 
 MSG_FUNC_NOT_IMPL(0x00451A5E, int __cdecl(BYTE*), Script_tbl_mesg_sub_451A5E);
 MSG_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
@@ -131,7 +131,7 @@ void CC Script_BindInits_452610()
     Script_binds_init_4525E6();
     Script_InitCommandTable(gScriptBindFns_66B0B8);
 }
-MSG_FUNC_IMPL(0x00452610, Script_BindInits_452610);
+MSG_FUNC_IMPLEX(0x00452610, Script_BindInits_452610, false);
 
 MSG_FUNC_NOT_IMPL(0x004090EA, int __cdecl(BYTE*), Script_tbl_if_sub_4090EA);
 MSG_FUNC_NOT_IMPL(0x0040915D, int __cdecl(BYTE*), Script_tbl_eval_sub_40915D);
@@ -157,7 +157,7 @@ void __cdecl Script_sub_4091FA()
 {
     Script_InitCommandTable(gEarlyScriptBinds_650700);
 }
-MSG_FUNC_IMPL(0x004091FA, Script_sub_4091FA);
+MSG_FUNC_IMPLEX(0x004091FA, Script_sub_4091FA, false);
 
 struct GCL_ProcInfo
 {
@@ -197,7 +197,7 @@ BYTE* CC Script_InitProcTables_sub_409C87(BYTE* pScript)
 
     return pScript + 4;
 }
-MSG_FUNC_IMPL(0x00409C87, Script_InitProcTables_sub_409C87);
+MSG_FUNC_IMPLEX(0x00409C87, Script_InitProcTables_sub_409C87, false);
 
 MGS_PTR(1, 0x6BFC68, BYTE**, gScriptMainProc_dword_6BFC68, 0);
 
@@ -221,7 +221,7 @@ int CC Script_Init_sub_409C19(BYTE* pScript)
 
     return 0;
 }
-MSG_FUNC_IMPL(0x00409C19, Script_Init_sub_409C19);
+MSG_FUNC_IMPLEX(0x00409C19, Script_Init_sub_409C19, false);
 
 
 BYTE* CC Script_FindProc(WORD procId)
@@ -236,14 +236,14 @@ BYTE* CC Script_FindProc(WORD procId)
     printf("PROC %X NOT FOUND\n", procId);
     return nullptr;
 }
-MSG_FUNC_IMPL(0x00409B1D, Script_FindProc);
+MSG_FUNC_IMPLEX(0x00409B1D, Script_FindProc, false);
 
 signed int CC Script_Run_Proc_sub_409B03(WORD procId, GCL_Proc_Arguments* pArgs)
 {
     BYTE* pScriptProc = Script_FindProc(procId);
     return Script_Run(pScriptProc + 3, pArgs);
 }
-MSG_FUNC_IMPL(0x409B03, Script_Run_Proc_sub_409B03);
+MSG_FUNC_IMPLEX(0x409B03, Script_Run_Proc_sub_409B03, false);
 
 signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs)
 {
@@ -261,7 +261,7 @@ signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs)
         return Script_Run(scriptProc + 3, pArgs);
     }
 }
-MSG_FUNC_IMPL(0x00409B53, Script_ProcCancelOrRun);
+MSG_FUNC_IMPLEX(0x00409B53, Script_ProcCancelOrRun, false);
 
 int CC Script_Operator_Evaluate(int operation, int v1, int v2)
 {
@@ -331,7 +331,7 @@ int CC Script_Operator_Evaluate(int operation, int v1, int v2)
     }
     return result;
 }
-MSG_FUNC_IMPLEX(0x00409E7C, Script_Operator_Evaluate, true);
+MSG_FUNC_IMPLEX(0x00409E7C, Script_Operator_Evaluate, false);
 
 MGS_VAR(1, 0x06BFC3C, BYTE**, gScriptStackPos_dword_6BFC3C, 0); // Pointer to an array of 32 BYTE*'s
 MGS_VAR(1, 0x078D7B4, BYTE*, gScriptExecuteRet_dword_78D7B4, 0);
@@ -344,19 +344,19 @@ void CC Script_Push(BYTE *arg)
     *gScriptStackPos_dword_6BFC3C = arg;
     ++(gScriptStackPos_dword_6BFC3C);
 }
-MSG_FUNC_IMPLEX(0x004098B7, Script_Push, true);
+MSG_FUNC_IMPLEX(0x004098B7, Script_Push, false);
 
 void CC Script_Pop()
 {
     --(gScriptStackPos_dword_6BFC3C);
 }
-MSG_FUNC_IMPLEX(0x004098CA, Script_Pop, true);
+MSG_FUNC_IMPLEX(0x004098CA, Script_Pop, false);
 
 void CC Script_SetReturnAddress(BYTE* pScript)
 {
     (gScriptExecuteRet_dword_78D7B4) = pScript;
 }
-MSG_FUNC_IMPLEX(0x004096C4, Script_SetReturnAddress, true);
+MSG_FUNC_IMPLEX(0x004096C4, Script_SetReturnAddress, false);
 
 
 int CC Script_CommandExecute(BYTE* pScript)
@@ -369,7 +369,7 @@ int CC Script_CommandExecute(BYTE* pScript)
     Script_Pop();
     return cmdRet;
 }
-MSG_FUNC_IMPLEX(0x00409A8D, Script_CommandExecute, true);
+MSG_FUNC_IMPLEX(0x00409A8D, Script_CommandExecute, false);
 
 DWORD* CC Script_PushArgs_409845(GCL_Proc_Arguments* pArgs)
 {
@@ -395,7 +395,7 @@ DWORD* CC Script_PushArgs_409845(GCL_Proc_Arguments* pArgs)
     // Return write start pos
     return oldArgStack;
 }
-MSG_FUNC_IMPLEX(0x00409845, Script_PushArgs_409845, true);
+MSG_FUNC_IMPLEX(0x00409845, Script_PushArgs_409845, false);
 
 void CC ScriptSetArgs_409893(DWORD* pArgs)
 {
@@ -404,9 +404,9 @@ void CC ScriptSetArgs_409893(DWORD* pArgs)
         script_args_dword_6BFBB8 = pArgs;
     }
 }
-MSG_FUNC_IMPLEX(0x00409893, ScriptSetArgs_409893, true);
+MSG_FUNC_IMPLEX(0x00409893, ScriptSetArgs_409893, false);
 
-int CC Script_Unknown6(BYTE* pScript, BYTE** pRet)
+int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
 {
     UNREFERENCED_PARAMETER(pScript);
     UNREFERENCED_PARAMETER(pRet);
@@ -440,7 +440,8 @@ signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
 
         if (cmd == 0x30)
         {
-            Script_Unknown6(pScript + 2, &pScriptBytes);
+            DWORD dwRet = 0;
+            Script_Unknown6(pScript + 2, &dwRet /* &pScriptBytes*/);
             const int length = *(pScript + 1);
             pScript = pScript + length + 1;
         }
@@ -469,7 +470,7 @@ signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
     printf("ERROR in script\n");
     return 1;
 }
-MSG_FUNC_IMPLEX(0x00409CAF, Script_Run, true);
+MSG_FUNC_IMPLEX(0x00409CAF, Script_Run, false);
 
 int CC Script_RunProc(BYTE* pScript)
 {
@@ -504,7 +505,7 @@ int CC Script_RunProc(BYTE* pScript)
     Script_ProcCancelOrRun(id, &args);
     return 0;
 }
-MSG_FUNC_IMPLEX(0x00409B92, Script_RunProc, true);
+MSG_FUNC_IMPLEX(0x00409B92, Script_RunProc, false);
 
 
 static void Test_Script_Operator_Evaluate()
@@ -549,3 +550,4 @@ void DoScriptTests()
 {
     Test_Script_Operator_Evaluate();
 }
+

@@ -88,7 +88,7 @@ void CC Actor_DumpActorSystem()
 
     IterateActors(fnEnterActorList, fnUpdateActor);
 }
-MSG_FUNC_IMPL(0x0040A0D4, Actor_DumpActorSystem);
+MSG_FUNC_IMPLEX(0x0040A0D4, Actor_DumpActorSystem, false);
 
 Actor* CC Actor_Init(Actor* pActor, TActorFunction fnUpdate, TActorFunction fnShutDown, const char* srcFileName)
 {
@@ -104,7 +104,7 @@ Actor* CC Actor_Init(Actor* pActor, TActorFunction fnUpdate, TActorFunction fnSh
     pActor->field_18 = 0;
     return pActor;
 }
-MSG_FUNC_IMPL(0x0040A347, Actor_Init);
+MSG_FUNC_IMPLEX(0x0040A347, Actor_Init, false);
 
 Actor* CC Actor_PushBack(int level, Actor* pActor, TActorFunction fnFree)
 {
@@ -123,7 +123,7 @@ Actor* CC Actor_PushBack(int level, Actor* pActor, TActorFunction fnFree)
 
     return pActor;
 }
-MSG_FUNC_IMPL(0x0040A2AF, Actor_PushBack);
+MSG_FUNC_IMPLEX(0x0040A2AF, Actor_PushBack, false);
 
 void CC Actor_KillActorsAtLevel(signed int killLevel)
 {
@@ -143,13 +143,13 @@ void CC Actor_KillActorsAtLevel(signed int killLevel)
 
     IterateActors(fnEnterActorList, fnUpdateActor);
 }
-MSG_FUNC_IMPL(0x0040A23D, Actor_KillActorsAtLevel);
+MSG_FUNC_IMPLEX(0x0040A23D, Actor_KillActorsAtLevel, false);
 
 void CC Actor_DestroyOnNextUpdate(Actor* pActor)
 {
     pActor->mFnUpdate = Actor_Destroy;
 }
-MSG_FUNC_IMPL(0x0040A3ED, Actor_DestroyOnNextUpdate);
+MSG_FUNC_IMPLEX(0x0040A3ED, Actor_DestroyOnNextUpdate, false);
 
 void CC Actor_Destroy(Actor* pActor)
 {
@@ -175,7 +175,7 @@ void CC Actor_Destroy(Actor* pActor)
         pActor->mFreeFunc(pActor);
     }
 }
-MSG_FUNC_IMPL(0x0040A37C, Actor_Destroy);
+MSG_FUNC_IMPLEX(0x0040A37C, Actor_Destroy, false);
 
 void CC Actor_UpdateActors()
 {
@@ -195,7 +195,7 @@ void CC Actor_UpdateActors()
 
     IterateActors(fnEnterActorList, fnUpdateActor);
 }
-MSG_FUNC_IMPL(0x0040A1BF, Actor_UpdateActors); 
+MSG_FUNC_IMPLEX(0x0040A1BF, Actor_UpdateActors, false); 
 
 void CC ActorList_Init()
 {
@@ -221,7 +221,7 @@ void CC ActorList_Init()
 
     gActorPauseFlags_dword_791A0C = 0;
 }
-MSG_FUNC_IMPL(0x0040A006, ActorList_Init);
+MSG_FUNC_IMPLEX(0x0040A006, ActorList_Init, false);
 
 ActorList* CC ActorList_Set_KillPause(int index, __int16 pause, __int16 kill)
 {
@@ -229,7 +229,7 @@ ActorList* CC ActorList_Set_KillPause(int index, __int16 pause, __int16 kill)
     gActorsList[index].mKill = kill;
     return &gActorsList[index];
 }
-MSG_FUNC_IMPL(0x0040A0AA, ActorList_Set_KillPause);
+MSG_FUNC_IMPLEX(0x0040A0AA, ActorList_Set_KillPause, false);
 
 void CC Actor_Remove(Actor* pActorToRemove)
 {
@@ -253,4 +253,4 @@ void CC Actor_Remove(Actor* pActorToRemove)
         printf("#");
     }
 }
-MSG_FUNC_IMPL(0x0040A3FC, Actor_Remove);
+MSG_FUNC_IMPLEX(0x0040A3FC, Actor_Remove, false);
