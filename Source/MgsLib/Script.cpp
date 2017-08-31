@@ -439,9 +439,8 @@ signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
         if (cmd == 0x30)
         {
             Script_Unknown6(pScript + 2, &pScriptBytes);
-            const int offset = (unsigned __int8)pScript[1];
-            BYTE* v6 = pScript + 1;
-            pScript = &v6[offset];
+            const int length = *(pScript + 1);
+            pScript = pScript + length + 1;
         }
         else if (cmd == 0x60)
         {
@@ -457,7 +456,7 @@ signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
         else if (cmd == 0x70)
         {
             Script_RunProc(pScript + 2);
-            const int length = (*pScript + 1);
+            const int length = *(pScript + 1);
             pScript = pScript + length + 1;
         }
         else
