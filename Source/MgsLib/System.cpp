@@ -5,10 +5,6 @@
 
 MSG_FUNC_NOT_IMPL(0x40ACB2, int __cdecl(int idx), System_sub_40ACB2);
 
-
-//MSG_FUNC_NOT_IMPL(0x40B024, LibGV_MemoryAllocation *__cdecl(system_struct *pSystem, unsigned int alignedSize), System_FindMatchingAllocation_40B024);
-//MSG_FUNC_NOT_IMPL(0x40B05B, LibGV_MemoryAllocation *__cdecl(system_struct *pSystem, LibGV_MemoryAllocation *pAlloc), System_sub_40B05B);
-
 MGS_ARY(1, 0x78E980, system_struct, 3, gSystems_dword_78E980, {});
 
 void SystemCpp_ForceLink() { }
@@ -233,6 +229,34 @@ LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struc
 }
 MSG_FUNC_IMPL(0x40B024, System_FindMatchingFreeAllocation_40B024);
 
+
+LibGV_MemoryAllocation* CC System_VoidAllocation_40B187(int idx, void *pMem)
+{
+    LibGV_MemoryAllocation* pFound = System_FindAlloc_40B0F7(&gSystems_dword_78E980[idx], pMem);
+    if (pFound)
+    {
+        pFound->mAllocType = LibGV_MemoryAllocation::eVoid;
+        gSystems_dword_78E980[idx].mFlags |= system_struct::eVoided;
+    }
+    return pFound;
+}
+MSG_FUNC_IMPL(0x40B187, System_VoidAllocation_40B187);
+
+void CC System_2_VoidAllocation_40B2B5(void *ptr)
+{
+    System_VoidAllocation_40B187(2, &ptr);
+}
+MSG_FUNC_IMPL(0x40B2B5, System_2_VoidAllocation_40B2B5);
+
+void CC Safe_System_2_VoidAllocation_40513B(void *ptr)
+{
+    if (ptr)
+    {
+        System_2_VoidAllocation_40B2B5(ptr);
+    }
+}
+MSG_FUNC_IMPL(0x40513B, Safe_System_2_VoidAllocation_40513B);
+
 void* CC System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr)
 {
     system_struct* pSystem = &gSystems_dword_78E980[idx];
@@ -276,6 +300,18 @@ void* CC System_2_zerod_allocate_memory_40B296(int size)
 }
 MSG_FUNC_IMPL(0x40B296, System_2_zerod_allocate_memory_40B296);
 
+void* CC System_mem_alloc_40AF91(int idx, int memSize)
+{
+    return System_mem_zerod_alloc_40AFA4(idx, memSize, (void**)LibGV_MemoryAllocation::eUsed);
+}
+MSG_FUNC_IMPL(0x40AF91, System_mem_alloc_40AF91);
+
+void CC System_2_free_40B2A7(void *pAlloc)
+{
+    System_Free_40B099(2, pAlloc);
+}
+MSG_FUNC_IMPL(0x40B2A7, System_2_free_40B2A7);
+
 // Compacts free blocks
 int CC System_EraseContiguousBlocks_40B147(system_struct* pSystem, LibGV_MemoryAllocation* pEraseFrom, int numBlocksToErase)
 {
@@ -294,8 +330,6 @@ int CC System_EraseContiguousBlocks_40B147(system_struct* pSystem, LibGV_MemoryA
     return numMovesCount;
 }
 MSG_FUNC_IMPL(0x40B147, System_EraseContiguousBlocks_40B147);
-
-
 
 // Finds a block by doing a binary search
 LibGV_MemoryAllocation* CC System_FindAlloc_40B0F7(system_struct* pSystem, void* pFindMe)

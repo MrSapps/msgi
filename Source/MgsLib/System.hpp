@@ -38,6 +38,9 @@ void CC System_Debug_sub_40AEC0(int idx);
 LibGV_MemoryAllocation* CC System_sub_40B05B(system_struct* pSystem, LibGV_MemoryAllocation* pAlloc);
 LibGV_MemoryAllocation* CC System_FindMatchingFreeAllocation_40B024(system_struct *pSystem, unsigned int requestedSize);
 void* CC System_mem_zerod_alloc_40AFA4(int idx, int size, void** alloc_type_or_ptr);
+void CC System_Free_40B099(int idx, void *ptr);
+void* CC System_mem_alloc_40AF91(int idx, int memSize);
+LibGV_MemoryAllocation* CC System_FindAlloc_40B0F7(system_struct* pSystem, void* pFindMe);
 
 void SystemCpp_ForceLink();
 EXTERN_MSG_FUNC_NOT_IMPL(0x40ACB2, int __cdecl(int idx), System_sub_40ACB2);
