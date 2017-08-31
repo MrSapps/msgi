@@ -338,6 +338,8 @@ MSG_FUNC_IMPLEX(0x00409E7C, Script_Operator_Evaluate, true);
 MGS_VAR(1, 0x06BFC3C, BYTE**, gScriptStackPos_dword_6BFC3C, 0); // Pointer to an array of 32 BYTE*'s
 MGS_VAR(1, 0x078D7B4, BYTE*, gScriptExecuteRet_dword_78D7B4, 0);
 
+MGS_VAR(1, 0x06BFBB8, DWORD*, script_args_dword_6BFBB8, 0);
+
 
 void CC Script_Push(BYTE *arg)
 {
@@ -371,6 +373,42 @@ int CC Script_CommandExecute(BYTE* pScript)
 }
 MSG_FUNC_IMPLEX(0x00409A8D, Script_CommandExecute, true);
 
+struct GCL_Proc_Arguments
+{
+    WORD mNumArgs;
+    WORD mPadding;
+    DWORD* mPArgs;
+};
+MSG_ASSERT_SIZEOF(GCL_Proc_Arguments, 8);
+
+DWORD* CC Script_PushArgs_409845(GCL_Proc_Arguments* pArgs)
+{
+    if (!pArgs)
+    {
+        return nullptr;
+    }
+
+    int argumentNumber = pArgs->mNumArgs;
+    DWORD* pCurrentArgStack = script_args_dword_6BFBB8;
+    DWORD* oldArgStack = script_args_dword_6BFBB8;
+    DWORD* pInputArgs = &pArgs->mPArgs[argumentNumber - 1];
+    if (argumentNumber > 0)
+    {
+        do
+        {
+            const DWORD argumentValue = *pInputArgs;
+            --pInputArgs;
+            *pCurrentArgStack = argumentValue;
+            pCurrentArgStack = script_args_dword_6BFBB8 + 1;
+            --argumentNumber;
+            ++script_args_dword_6BFBB8;
+        } while (argumentNumber);
+    }
+    *pCurrentArgStack = pArgs->mNumArgs;
+    ++script_args_dword_6BFBB8;
+    return oldArgStack;
+}
+MSG_FUNC_IMPLEX(0x00409845, Script_PushArgs_409845, true);
 
 static void Test_Script_Operator_Evaluate()
 {
