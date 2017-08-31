@@ -3,7 +3,7 @@
 #include "logger.hpp"
 #include "Task.hpp"
 #include "Script.hpp"
-
+#include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
 
@@ -34,7 +34,7 @@ struct proc_struct_sub
 
 MGS_PTR(1, 0x6BFC6C, proc_struct**, gScriptCmdTable_dword_6BFC6C, 0);
 
-proc_struct_sub *__cdecl Script_GetCommand(WORD cmdToFind)
+proc_struct_sub* CC Script_GetCommand(WORD cmdToFind)
 {
     proc_struct* i = *gScriptCmdTable_dword_6BFC6C;
     while (i)
@@ -54,7 +54,7 @@ proc_struct_sub *__cdecl Script_GetCommand(WORD cmdToFind)
 MSG_FUNC_IMPL(0x00409ACC, Script_GetCommand);
 
 
-int __cdecl Script_InitCommandTable(proc_struct* pCmdTbl)
+int CC Script_InitCommandTable(proc_struct* pCmdTbl)
 {
     pCmdTbl->pNext = *gScriptCmdTable_dword_6BFC6C;
     *gScriptCmdTable_dword_6BFC6C = pCmdTbl;
@@ -175,7 +175,7 @@ static DWORD ToDWORD(const BYTE* ptr)
     return (ptr[3]) | (ptr[2] << 8) | (ptr[1] << 16) | (ptr[0] << 24);
 }
 
-BYTE* __cdecl Script_InitProcTables_sub_409C87(BYTE* pScript)
+BYTE* CC Script_InitProcTables_sub_409C87(BYTE* pScript)
 {
     // pScript skips the first 4 bytes of the script
     for (;;)
@@ -200,7 +200,7 @@ MGS_PTR(1, 0x6BFC68, BYTE**, gScriptMainProc_dword_6BFC68, 0);
 
 MSG_FUNC_NOT_IMPL(0x45A6F6, int __cdecl(int a1, void* a2), sub_45A6F6);
 
-int __cdecl Script_Init_sub_409C19(BYTE* pScript)
+int CC Script_Init_sub_409C19(BYTE* pScript)
 {
     DWORD offset = ToDWORD(pScript);
     *gProcInfos = reinterpret_cast<GCL_ProcInfo*>(pScript + 4);
@@ -218,7 +218,7 @@ int __cdecl Script_Init_sub_409C19(BYTE* pScript)
 MSG_FUNC_IMPL(0x00409C19, Script_Init_sub_409C19);
 
 
-BYTE* __cdecl Script_FindProc(WORD procId)
+BYTE* CC Script_FindProc(WORD procId)
 {
     for (GCL_ProcInfo* pProcInfo = *gProcInfos; pProcInfo->mId; ++pProcInfo)
     {
@@ -232,14 +232,14 @@ BYTE* __cdecl Script_FindProc(WORD procId)
 }
 MSG_FUNC_IMPL(0x00409B1D, Script_FindProc);
 
-signed int __cdecl Script_Run_Proc_sub_409B03(WORD procId, int numArgs)
+signed int CC Script_Run_Proc_sub_409B03(WORD procId, int numArgs)
 {
     BYTE* pScriptProc = Script_FindProc(procId);
     return Script_Run(pScriptProc + 3, numArgs);
 }
 MSG_FUNC_IMPL(0x409B03, Script_Run_Proc_sub_409B03);
 
-signed int __cdecl Script_ProcCancelOrRun(WORD id, int numArgs)
+signed int CC Script_ProcCancelOrRun(WORD id, int numArgs)
 {
     if (script_cancel_non_zero_dword_7227A0 || BYTE1(byte1_flags_word_9942A8) & 0x20)
     {
@@ -257,68 +257,66 @@ signed int __cdecl Script_ProcCancelOrRun(WORD id, int numArgs)
 }
 MSG_FUNC_IMPL(0x00409B53, Script_ProcCancelOrRun);
 
-
-int __cdecl Script_Operator_Evaluate(int operation, int v1, int v2)
+int CC Script_Operator_Evaluate(int operation, int v1, int v2)
 {
     int result = 0;
     switch (operation)
     {
-    case 1:
+    case eNegate:
         result = -v2;
         break;
-    case 2:
+    case eIsZero:
         result = v2 == 0;
         break;
-    case 3:
+    case eComplement:
         result = ~v2;
         break;
-    case 4:
+    case eAdd:
         result = v2 + v1;
         break;
-    case 5:
+    case eSubtract:
         result = v1 - v2;
         break;
-    case 6:
+    case eMultiply:
         result = v2 * v1;
         break;
-    case 7:
+    case eDivide:
         result = v1 / v2;
         break;
-    case 8:
+    case eModulus:
         result = v1 % v2;
         break;
-    case 9:
+    case eEquals:
         result = v1 == v2;
         break;
-    case 10:
+    case eNotEquals:
         result = v1 != v2;
         break;
-    case 11:
+    case eLessThan:
         result = v1 < v2;
         break;
-    case 12:
+    case eLessThanOrEqual:
         result = v1 <= v2;
         break;
-    case 13:
+    case eGreaterThan:
         result = v1 > v2;
         break;
-    case 14:
+    case eGreaterThanOrEqual:
         result = v1 >= v2;
         break;
-    case 15:
+    case eBitWiseOR:
         result = v2 | v1;
         break;
-    case 16:
+    case eBitWiseAND:
         result = v2 & v1;
         break;
-    case 17:
+    case eBitWiseXOR:
         result = v2 ^ v1;
         break;
-    case 18:
-        result = v1 || v2; // TODO: Write a test case for real function, this might be wrong
-        printf("Check me\n");
+    case eOr:
+        result = v1 || v2;
         break;
-    case 19:
+    case eAnd:
         result = v1 && v2;
         break;
     default:
@@ -327,4 +325,47 @@ int __cdecl Script_Operator_Evaluate(int operation, int v1, int v2)
     }
     return result;
 }
-MSG_FUNC_IMPL(0x00409E7C, Script_Operator_Evaluate);
+MSG_FUNC_IMPLEX(0x00409E7C, Script_Operator_Evaluate, 1);
+
+static void Test_Script_Operator_Evaluate()
+{
+    ASSERT_EQ(-50, Script_Operator_Evaluate(eNegate, 0, 50));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eIsZero, 0, 50));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eIsZero, 0, 0));
+    ASSERT_EQ(~50, Script_Operator_Evaluate(eComplement, 0, 50));
+    ASSERT_EQ(4, Script_Operator_Evaluate(eAdd, 2, 2));
+    ASSERT_EQ(3, Script_Operator_Evaluate(eSubtract, 5, 2));
+    ASSERT_EQ(10, Script_Operator_Evaluate(eMultiply, 5, 2));
+    ASSERT_EQ(5, Script_Operator_Evaluate(eDivide, 10, 2));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eModulus, 10, 3));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eEquals, 10, 3));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eEquals, 10, 10));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eNotEquals, 10, 3));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eNotEquals, 10, 10));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eLessThan, 9, 10));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eLessThan, 10, 10));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eLessThanOrEqual, 9, 10));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eLessThanOrEqual, 10, 10));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eLessThanOrEqual, 11, 10));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eGreaterThan, 10, 9));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eGreaterThan, 10, 10));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eGreaterThanOrEqual, 10, 9));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eGreaterThanOrEqual, 10, 10));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eGreaterThanOrEqual, 10, 11));
+    ASSERT_EQ(5, Script_Operator_Evaluate(eBitWiseOR, 1, 4));
+    ASSERT_EQ(4, Script_Operator_Evaluate(eBitWiseAND, 5, 4));
+    ASSERT_EQ(6, Script_Operator_Evaluate(eBitWiseXOR, 2, 4));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eOr, 0, 0));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eOr, 1, 0));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eOr, 1, 1));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eOr, 0, 1));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eAnd, 0, 0));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eAnd, 1, 0));
+    ASSERT_EQ(1, Script_Operator_Evaluate(eAnd, 1, 1));
+    ASSERT_EQ(0, Script_Operator_Evaluate(eAnd, 0, 1));
+}
+
+void DoScriptTests()
+{
+    Test_Script_Operator_Evaluate();
+}

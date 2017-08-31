@@ -4239,9 +4239,15 @@ void ShutdownEngine()
     }
 }
 
+#include <gmock/gmock.h>
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
+    ::testing::GTEST_FLAG(throw_on_failure) = true;
+    int argCount = 0;
+    ::testing::InitGoogleMock(&argCount, &lpCmdLine);
+    DoScriptTests();
+
     int result; // eax@2
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
     void(__stdcall *pSetThreadExecutionState)(unsigned int); // [sp+Ch] [bp-460h]@13

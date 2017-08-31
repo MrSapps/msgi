@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\gmock\gmock.vcxproj">
+      <Project>{c4f72ba1-fa06-48bb-80c7-cfb655b970d7}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\MgsLib\MgsLib.vcxproj">
       <Project>{8d2d8161-0574-44e4-ad40-e4e23cd86df1}</Project>
     </ProjectReference>
