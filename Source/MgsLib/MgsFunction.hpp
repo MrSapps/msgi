@@ -456,7 +456,9 @@ extern TypeName& VarName;
 #define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, false, true, signature> name;
 #define MSG_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, false, signature> name(#name);
 #define MSG_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, false, true, decltype(funcName)> funcName##_(#funcName);
-#define MSG_FUNC_IMPLEX(addr, funcName, reverseHook) MgsFunction<addr, funcName, passThrough, true, decltype(funcName)> funcName##_(#funcName);
+
+// isImplemented == false means redirect game func to our func. isImplemented == true means redirect our func to game func.
+#define MSG_FUNC_IMPLEX(addr, funcName, isImplemented) MgsFunction<addr, funcName, !isImplemented, true, decltype(funcName)> funcName##_(#funcName);
 #define MSG_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, false, decltype(funcName)> funcName##_(#funcName);
 
 #define MSG_ASSERT_SIZEOF(structureName, expectedSize) static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize)

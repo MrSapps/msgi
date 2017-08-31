@@ -325,7 +325,7 @@ int CC Script_Operator_Evaluate(int operation, int v1, int v2)
     }
     return result;
 }
-MSG_FUNC_IMPLEX(0x00409E7C, Script_Operator_Evaluate, 1);
+MSG_FUNC_IMPLEX(0x00409E7C, Script_Operator_Evaluate, true);
 
 static void Test_Script_Operator_Evaluate()
 {

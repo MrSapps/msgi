@@ -4,7 +4,7 @@
 void LibDGCppForceLink() { }
 
 #define REDIRECT_LIBDG_DATA 1
-#define HOOK_LIBDG_FUNCS false
+#define HOOK_LIBDG_FUNCS true
 
 
 MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0, {});      // TODO: Rip array from exe
