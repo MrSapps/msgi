@@ -5,6 +5,16 @@
 void ScriptCpp_ForceLink();
 void CC Script_BindInits_452610();
 
+struct GCL_Proc_Arguments
+{
+    WORD mNumArgs;
+    WORD mPadding;
+    DWORD* mPArgs;
+};
+MSG_ASSERT_SIZEOF(GCL_Proc_Arguments, 8);
+
+signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs);
+
 enum GCLOperators
 {
     eNegate = 1,

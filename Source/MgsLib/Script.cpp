@@ -159,8 +159,6 @@ void __cdecl Script_sub_4091FA()
 }
 MSG_FUNC_IMPL(0x004091FA, Script_sub_4091FA);
 
-MSG_FUNC_NOT_IMPL(0x00409CAF, signed int __cdecl(BYTE* pScriptBytes, int numberOfArguments), Script_Run);
-
 struct GCL_ProcInfo
 {
     WORD mId;
@@ -240,14 +238,14 @@ BYTE* CC Script_FindProc(WORD procId)
 }
 MSG_FUNC_IMPL(0x00409B1D, Script_FindProc);
 
-signed int CC Script_Run_Proc_sub_409B03(WORD procId, int numArgs)
+signed int CC Script_Run_Proc_sub_409B03(WORD procId, GCL_Proc_Arguments* pArgs)
 {
     BYTE* pScriptProc = Script_FindProc(procId);
-    return Script_Run(pScriptProc + 3, numArgs);
+    return Script_Run(pScriptProc + 3, pArgs);
 }
 MSG_FUNC_IMPL(0x409B03, Script_Run_Proc_sub_409B03);
 
-signed int CC Script_ProcCancelOrRun(WORD id, int numArgs)
+signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs)
 {
     if (script_cancel_non_zero_dword_7227A0 || BYTE1(byte1_flags_word_9942A8) & 0x20)
     {
@@ -260,7 +258,7 @@ signed int CC Script_ProcCancelOrRun(WORD id, int numArgs)
         // 40 00 08 70 04 21 51 00 00 40 08 
         // 24 70 04 C8 CF 00 60 00 12 64 C0
         BYTE* scriptProc = Script_FindProc(id); // For id = 26069 / 0x000065d5
-        return Script_Run(scriptProc + 3, numArgs);
+        return Script_Run(scriptProc + 3, pArgs);
     }
 }
 MSG_FUNC_IMPL(0x00409B53, Script_ProcCancelOrRun);
@@ -373,14 +371,6 @@ int CC Script_CommandExecute(BYTE* pScript)
 }
 MSG_FUNC_IMPLEX(0x00409A8D, Script_CommandExecute, true);
 
-struct GCL_Proc_Arguments
-{
-    WORD mNumArgs;
-    WORD mPadding;
-    DWORD* mPArgs;
-};
-MSG_ASSERT_SIZEOF(GCL_Proc_Arguments, 8);
-
 DWORD* CC Script_PushArgs_409845(GCL_Proc_Arguments* pArgs)
 {
     if (!pArgs)
@@ -415,6 +405,70 @@ void CC ScriptSetArgs_409893(DWORD* pArgs)
     }
 }
 MSG_FUNC_IMPLEX(0x00409893, ScriptSetArgs_409893, true);
+
+int CC Script_Unknown6(BYTE* pScript, BYTE** pRet)
+{
+    UNREFERENCED_PARAMETER(pScript);
+    UNREFERENCED_PARAMETER(pRet);
+    return 0;
+}
+MSG_FUNC_IMPLEX(0x00409D77, Script_Unknown6, false); // TODO: Implement me
+
+int CC Script_RunProc(BYTE* pScript)
+{
+    UNREFERENCED_PARAMETER(pScript);
+    return 0;
+}
+MSG_FUNC_IMPLEX(0x00409B92, Script_RunProc, false); // TODO: Implement me
+
+signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
+{
+    BYTE* pScript = pScriptBytes;
+    DWORD* pStackOldArgs = Script_PushArgs_409845(pArgs);
+    while (pScript)
+    {
+        // Are we at the end?
+        BYTE cmd = *pScript;
+        if (!*pScript)
+        {
+            // Reset the stack
+            ScriptSetArgs_409893(pStackOldArgs);
+            return 0;
+        }
+
+        if (cmd == 0x30)
+        {
+            Script_Unknown6(pScript + 2, &pScriptBytes);
+            const int offset = (unsigned __int8)pScript[1];
+            BYTE* v6 = pScript + 1;
+            pScript = &v6[offset];
+        }
+        else if (cmd == 0x60)
+        {
+            if (Script_CommandExecute(pScript + 3) == 1)
+            {
+                // Returned error
+                return 1;
+            }
+
+            const int length = ToWORD(pScript + 1);
+            pScript = pScript + length + 1;
+        }
+        else if (cmd == 0x70)
+        {
+            Script_RunProc(pScript + 2);
+            const int length = (*pScript + 1);
+            pScript = pScript + length + 1;
+        }
+        else
+        {
+            printf("SCRIPT COMMAND ERROR %x\n", cmd);
+        }
+    }
+    printf("ERROR in script\n");
+    return 1;
+}
+MSG_FUNC_IMPLEX(0x00409CAF, Script_Run, true);
 
 static void Test_Script_Operator_Evaluate()
 {
