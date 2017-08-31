@@ -272,7 +272,7 @@ void __cdecl PrintDDError(const char* errMsg, HRESULT hrErr)
         }
     }
 }
-MSG_FUNC_IMPL(0x00422D40, PrintDDError);
+MSG_FUNC_IMPLEX(0x00422D40, PrintDDError, false);
 
 //MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), Render_RestoreAll);
 __int16 __cdecl Render_RestoreAll()
@@ -312,7 +312,7 @@ __int16 __cdecl Render_RestoreAll()
 
     return g_NumTextures;
 }
-MSG_FUNC_IMPL(0x0041CC30, Render_RestoreAll);
+MSG_FUNC_IMPLEX(0x0041CC30, Render_RestoreAll, false);
 
 //MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
 int __cdecl HandleExclusiveMode()
@@ -534,7 +534,7 @@ WORD CC ResourceNameHash(const char* string)
     rethash = hash & 0xFFFF;
     return static_cast<WORD>(rethash);
 }
-MSG_FUNC_IMPL(0x0040B38E, ResourceNameHash);
+MSG_FUNC_IMPLEX(0x0040B38E, ResourceNameHash, false);
 
 
 MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
@@ -604,7 +604,7 @@ weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a
     }
     return pFamas;
 }
-MSG_FUNC_IMPL(0x640C24, Res_Weapon_famas_96_sub_640C24);
+MSG_FUNC_IMPLEX(0x640C24, Res_Weapon_famas_96_sub_640C24, false);
 
 void __cdecl Input_AcquireOrUnAcquire();
 
@@ -1118,7 +1118,7 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescripti
     return pIdentifier->ddIdentifier.field430;
 }
 
-MSG_FUNC_IMPL(0x51E7FC, validateDeviceCaps);
+MSG_FUNC_IMPLEX(0x51E7FC, validateDeviceCaps, true);
 
 HRESULT CALLBACK EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
 {
@@ -1419,7 +1419,7 @@ bool __cdecl ClearDDSurfaceWhite()
     } while (hr == DDERR_WASSTILLDRAWING);
     return hr == S_OK;
 }
-MSG_FUNC_IMPL(0x41E990, ClearDDSurfaceWhite);
+MSG_FUNC_IMPLEX(0x41E990, ClearDDSurfaceWhite, false);
 
 #define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
 struct MGSVertex
@@ -2367,7 +2367,7 @@ signed int Render_sub_41E3C0()
     return result;
 }
 
-MSG_FUNC_IMPL(0x41E3C0, Render_sub_41E3C0);
+MSG_FUNC_IMPLEX(0x41E3C0, Render_sub_41E3C0, false);
 
 //MSG_FUNC_NOT_IMPL(0x41E130, int __cdecl(uint32_t, uint32_t, uint32_t*, MGSVertex*), ClearBackBuffer);
 int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
@@ -2439,7 +2439,7 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
     }
     return 1;
 }
-MSG_FUNC_IMPL(0x41E130, ClearBackBuffer);
+MSG_FUNC_IMPLEX(0x41E130, ClearBackBuffer, false);
 
 struct MGSSmallVert
 {
@@ -3589,8 +3589,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         a_pStructVert = (StructVert*)((intptr_t)a_pStructVert + dword_791C58 * 4);
     }
 }
-
-MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
+MSG_FUNC_IMPLEX(0x410560, ConvertPolys_Hardware, false);
 
 MGS_VAR(1, 0x6FC868, void*, g_pBackBufferSurface, 0);
 MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
@@ -3635,7 +3634,7 @@ int __cdecl Renderer_ClearOTag(DWORD* ot, int otSize)
     }
     return 0;
 }
-MSG_FUNC_IMPL(0x0044AB80, Renderer_ClearOTag);
+MSG_FUNC_IMPLEX(0x0044AB80, Renderer_ClearOTag, false);
 
 //MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
 void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
@@ -3693,7 +3692,7 @@ void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
         sub_51DE0A();
     }
 }
-MSG_FUNC_IMPL(0x4103B0, Render_DrawGeneric);
+MSG_FUNC_IMPLEX(0x4103B0, Render_DrawGeneric, false);
 
 struct VertsBlock
 {
