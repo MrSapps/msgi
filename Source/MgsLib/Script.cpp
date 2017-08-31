@@ -414,12 +414,14 @@ int CC Script_Unknown6(BYTE* pScript, BYTE** pRet)
 }
 MSG_FUNC_IMPLEX(0x00409D77, Script_Unknown6, false); // TODO: Implement me
 
-int CC Script_RunProc(BYTE* pScript)
+BYTE* CC Script_GCL_Execute(BYTE* pScript, BYTE** ppScript, DWORD* pRet)
 {
     UNREFERENCED_PARAMETER(pScript);
-    return 0;
+    UNREFERENCED_PARAMETER(ppScript);
+    UNREFERENCED_PARAMETER(pRet);
+    return nullptr;
 }
-MSG_FUNC_IMPLEX(0x00409B92, Script_RunProc, false); // TODO: Implement me
+MSG_FUNC_IMPLEX(0x004096CE, Script_GCL_Execute, false); // TODO: Implement me
 
 signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
 {
@@ -468,6 +470,42 @@ signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
     return 1;
 }
 MSG_FUNC_IMPLEX(0x00409CAF, Script_Run, true);
+
+int CC Script_RunProc(BYTE* pScript)
+{
+    // Get the proc id/hashed name
+    const WORD id = ToWORD(pScript);
+
+    WORD numArgs = 0;
+
+    DWORD argsArray[8] = {};
+    DWORD ret = 0;
+    BYTE* pExecRet = Script_GCL_Execute(pScript + 2, &pScript, &ret);
+    if (pScript)
+    {
+        DWORD* pArg = argsArray;
+        do
+        {
+            if (numArgs >= 8)
+            {
+                printf("TOO MANY ARGS PROC\n");
+            }
+           
+            *pArg = ret;
+            ++pArg;
+            ++numArgs;
+            pExecRet = Script_GCL_Execute(pExecRet, &pScript, &ret);
+        } while (pScript);
+    }
+
+    GCL_Proc_Arguments args = {};
+    args.mNumArgs = numArgs;
+    args.mPArgs = argsArray;
+    Script_ProcCancelOrRun(id, &args);
+    return 0;
+}
+MSG_FUNC_IMPLEX(0x00409B92, Script_RunProc, true);
+
 
 static void Test_Script_Operator_Evaluate()
 {

@@ -14,6 +14,7 @@ struct GCL_Proc_Arguments
 MSG_ASSERT_SIZEOF(GCL_Proc_Arguments, 8);
 
 signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs);
+int CC Script_RunProc(BYTE* pScript);
 
 enum GCLOperators
 {
