@@ -259,6 +259,7 @@ signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs)
         // 40 00 08 70 04 21 51 00 00 40 08 
         // 24 70 04 C8 CF 00 60 00 12 64 C0
         BYTE* scriptProc = Script_FindProc(id); // For id = 26069 / 0x000065d5
+        assert(scriptProc);
         return Script_Run(scriptProc + 3, pArgs);
     }
 }
@@ -413,7 +414,7 @@ int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
     UNREFERENCED_PARAMETER(pRet);
     return 0;
 }
-MSG_FUNC_IMPLEX(0x00409D77, Script_Unknown6, SCRIPT_IMPL); // TODO: Implement me
+MSG_FUNC_IMPLEX(0x00409D77, Script_Unknown6, false); // TODO: Implement me
 
 BYTE* CC Script_GCL_Execute(BYTE* pScript, BYTE** ppScript, DWORD* pRet)
 {
@@ -422,7 +423,7 @@ BYTE* CC Script_GCL_Execute(BYTE* pScript, BYTE** ppScript, DWORD* pRet)
     UNREFERENCED_PARAMETER(pRet);
     return nullptr;
 }
-MSG_FUNC_IMPLEX(0x004096CE, Script_GCL_Execute, SCRIPT_IMPL); // TODO: Implement me
+MSG_FUNC_IMPLEX(0x004096CE, Script_GCL_Execute, false); // TODO: Implement me
 
 signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
 {
