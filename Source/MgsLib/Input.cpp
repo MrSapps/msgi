@@ -3,6 +3,8 @@
 #include "MgsFunction.hpp"
 #include <assert.h>
 
+#define INPUT_IMPL true
+
 #define USE_DINPUT8 1
 
 #if USE_DINPUT8
@@ -418,7 +420,7 @@ HRESULT __cdecl Input_Read_43BD6E()
     }
     return 0;
 }
-MSG_FUNC_IMPL(0x43BD6E, Input_Read_43BD6E);
+MSG_FUNC_IMPLEX(0x43BD6E, Input_Read_43BD6E, INPUT_IMPL);
 
 // 0x0043B0B3
 BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE /*lpddoi*/, LPVOID /*pvRef*/)
@@ -426,7 +428,7 @@ BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE /*lpddoi*/, 
     ++nJoystickDeviceObjects;
     return DIENUM_CONTINUE;
 }
-MSG_FUNC_IMPL(0x0043B0B3, Input_Enum_Buttons_sub_43B0B3);
+MSG_FUNC_IMPLEX(0x0043B0B3, Input_Enum_Buttons_sub_43B0B3, INPUT_IMPL);
 
 // 0x0043B0C8
 BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID /*pvRef*/)
@@ -485,7 +487,7 @@ BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID /*pv
     
     return DIENUM_STOP;
 }
-MSG_FUNC_IMPL(0x0043B0C8, Input_Enum_Axis_43B0C8);
+MSG_FUNC_IMPLEX(0x0043B0C8, Input_Enum_Axis_43B0C8, INPUT_IMPL);
 
 // 0x0043B078
 BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID /*pvRef*/)
@@ -494,7 +496,7 @@ BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID /*pvR
     HRESULT hr = pDirectInput->CreateDevice(lpddi->guidInstance, &pJoystickDevice, NULL);
     return !SUCCEEDED(hr);
 }
-MSG_FUNC_IMPL(0x0043B078, Input_EnumDevicesCallback);
+MSG_FUNC_IMPLEX(0x0043B078, Input_EnumDevicesCallback, INPUT_IMPL);
 
 // 0x43C716
 int __cdecl Input_Shutdown_sub_43C716()
@@ -520,7 +522,7 @@ int __cdecl Input_Shutdown_sub_43C716()
     }
     return 0;
 }
-MSG_FUNC_IMPL(0x43C716, Input_Shutdown_sub_43C716);
+MSG_FUNC_IMPLEX(0x43C716, Input_Shutdown_sub_43C716, INPUT_IMPL);
 
 
 // 0x0043B1D1
@@ -729,7 +731,7 @@ int __cdecl Input_Init(HWND hWnd)
 
     return 0;
 }
-MSG_FUNC_IMPL(0x0043B1D1, Input_Init);
+MSG_FUNC_IMPLEX(0x0043B1D1, Input_Init, INPUT_IMPL);
 
 // 0x0042D69E
 int __cdecl Input_Start()
@@ -742,7 +744,7 @@ int __cdecl Input_Start()
         result = printf("$jim failed to init direct input");
     return result;
 }
-MSG_FUNC_IMPL(0x0042D69E, Input_Start);
+MSG_FUNC_IMPLEX(0x0042D69E, Input_Start, INPUT_IMPL);
 
 void __cdecl Input_AcquireOrUnAcquire()
 {
@@ -772,4 +774,4 @@ void __cdecl Input_AcquireOrUnAcquire()
         }
     }
 }
-MSG_FUNC_IMPL(0x0043BCF0, Input_AcquireOrUnAcquire);
+MSG_FUNC_IMPLEX(0x0043BCF0, Input_AcquireOrUnAcquire, INPUT_IMPL);

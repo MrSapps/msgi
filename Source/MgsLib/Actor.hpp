@@ -12,7 +12,7 @@ struct Actor
     Actor* pNext;
     TActorFunction mFnUpdate;
     TActorFunction mFnShutdown;
-    TActorFunction mFreeFunc;   // Used to free(pActor)?
+    TActorFunction mFreeFunc;
     const char* mName;
     DWORD field_18;
     DWORD field_1C;

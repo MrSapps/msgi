@@ -5,7 +5,7 @@
 #include "LibDG.hpp"
 
 #define REDIRECT_LIBGV_DATA 1
-#define HOOK_LIBGV_FUNCS false
+#define LIBGV_IMPL true
 
 // TODO: Actually a SYSTEM alloc from lib DG
 struct struct_8
@@ -43,15 +43,15 @@ MSG_ASSERT_SIZEOF(struct_lib_gv, 0x75C);
 MGS_VAR(REDIRECT_LIBGV_DATA, 0x6BFEE0, struct_lib_gv, g_lib_gv_stru_6BFEE0, {});
 
 // Other likely LibGvd funcs
-MSG_FUNC_NOT_IMPL(0x40A72A, struct_8 *__cdecl(), LibGvd_sub_40A72A);
-MSG_FUNC_NOT_IMPL(0x40A6CD, char* __cdecl(), LibGvd_sub_40A6CD);
-MSG_FUNC_NOT_IMPL(0x40A603, int __cdecl(int), LibGvd_sub_40A603);
+MSG_FUNC_NOT_IMPL(0x40A72A, struct_8* CC(), LibGvd_sub_40A72A);
+MSG_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
+MSG_FUNC_NOT_IMPL(0x40A603, int CC(int), LibGvd_sub_40A603);
 
 void LibGVCppForceLink() { }
 
-MSG_FUNC_NOT_IMPL(0x40B35E, void __cdecl(), LibGV_Reset_System2_Memory_40B35E);
-MSG_FUNC_NOT_IMPL(0x40A6AC, void __cdecl(), LibGV_Init_Allocs_40A6AC);
-MSG_FUNC_NOT_IMPL(0x40A4B1, void __cdecl(), sub_40A4B1);
+MSG_FUNC_NOT_IMPL(0x40B35E, void CC(), LibGV_Reset_System2_Memory_40B35E);
+MSG_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_Allocs_40A6AC);
+MSG_FUNC_NOT_IMPL(0x40A4B1, void CC(), sub_40A4B1);
 
 //MSG_FUNC_NOT_IMPL(0x4455A0, __int64 __cdecl(), TimingRelated_4455A0);
 
@@ -64,7 +64,7 @@ void __cdecl LibGV_40B3BC()
     g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_array2[0] = 0;
     g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx = 0;
 }
-MSG_FUNC_IMPLEX(0x40B3BC, LibGV_40B3BC, HOOK_LIBGV_FUNCS);
+MSG_FUNC_IMPLEX(0x40B3BC, LibGV_40B3BC, LIBGV_IMPL);
 
 struct PerformanceFreqStruct
 {
@@ -115,7 +115,7 @@ __int64 CC TimeGetElapsed_4455A0()
 
     return (TimerInitBaseLineAndGetCurrentTime_5201A6().QuadPart - sCurrentPeftCounter_qword_665508.QuadPart) / gPerformanceFreq_995648.mFreq60;
 }
-MSG_FUNC_IMPLEX(0x4455A0, TimeGetElapsed_4455A0, HOOK_LIBGV_FUNCS);
+MSG_FUNC_IMPLEX(0x4455A0, TimeGetElapsed_4455A0, LIBGV_IMPL);
 
 void CC LibGV_Update_40A54E(Actor* pActor)
 {
@@ -147,7 +147,7 @@ void CC LibGV_Update_40A54E(Actor* pActor)
         }
     } 
 }
-MSG_FUNC_IMPLEX(0x40A54E, LibGV_Update_40A54E, HOOK_LIBGV_FUNCS);
+MSG_FUNC_IMPLEX(0x40A54E, LibGV_Update_40A54E, LIBGV_IMPL);
 
 
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
@@ -165,14 +165,14 @@ void LibGv_Init_sub_40A4F6()
     g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00 = 0;
     //nullsub_6(nullsub_4);
 }
-MSG_FUNC_IMPLEX(0x40A4F6, LibGv_Init_sub_40A4F6, HOOK_LIBGV_FUNCS);
+MSG_FUNC_IMPLEX(0x40A4F6, LibGv_Init_sub_40A4F6, LIBGV_IMPL);
 
 
 void CC LibGv_ClearFunctionPointers_40A69D()
 {
     memset(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs, 0, sizeof(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs));
 }
-MSG_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, HOOK_LIBGV_FUNCS);
+MSG_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, LIBGV_IMPL);
 
 
 void __cdecl LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
@@ -183,4 +183,4 @@ void __cdecl LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
     assert(idx < _countof(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs));
     g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs[idx] = fn;
 }
-MSG_FUNC_IMPLEX(0x40A68D, LibGV_SetFnPtr_sub_40A68D, HOOK_LIBGV_FUNCS);
+MSG_FUNC_IMPLEX(0x40A68D, LibGV_SetFnPtr_sub_40A68D, LIBGV_IMPL);
