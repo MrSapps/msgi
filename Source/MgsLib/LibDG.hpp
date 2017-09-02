@@ -3,7 +3,7 @@
 #include "MgsFunction.hpp"
 #include "Actor.hpp"
 
-void LibDGCppForceLink();
+void LibDGCpp_ForceLink();
 
 using ResInitFn = void*;
 

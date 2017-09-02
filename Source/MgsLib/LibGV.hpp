@@ -2,7 +2,7 @@
 
 #include "MgsFunction.hpp"
 
-void LibGVCppForceLink();
+void LibGVCpp_ForceLink();
 
 using GV_FnPtr = int(__cdecl*)(DWORD*);
 

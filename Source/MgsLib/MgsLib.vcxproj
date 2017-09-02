@@ -78,6 +78,7 @@
     <ClInclude Include="LibGV.hpp" />
     <ClInclude Include="logger.hpp" />
     <ClInclude Include="MgsFunction.hpp" />
+    <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="Script.hpp" />
     <ClInclude Include="Sound.hpp" />
     <ClInclude Include="stdafx.h" />
@@ -92,6 +93,7 @@
     <ClCompile Include="LibDG.cpp" />
     <ClCompile Include="LibGV.cpp" />
     <ClCompile Include="MgsFunction.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="stdafx.cpp">

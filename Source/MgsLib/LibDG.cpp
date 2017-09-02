@@ -3,7 +3,7 @@
 
 #define LIBDG_IMPL true
 
-void LibDGCppForceLink() { }
+void LibDGCpp_ForceLink() { }
 
 #define REDIRECT_LIBDG_DATA 1
 

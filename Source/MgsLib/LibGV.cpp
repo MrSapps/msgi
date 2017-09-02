@@ -47,7 +47,7 @@ MSG_FUNC_NOT_IMPL(0x40A72A, struct_8* CC(), LibGvd_sub_40A72A);
 MSG_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
 MSG_FUNC_NOT_IMPL(0x40A603, int CC(int), LibGvd_sub_40A603);
 
-void LibGVCppForceLink() { }
+void LibGVCpp_ForceLink() { }
 
 MSG_FUNC_NOT_IMPL(0x40B35E, void CC(), LibGV_Reset_System2_Memory_40B35E);
 MSG_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_Allocs_40A6AC);

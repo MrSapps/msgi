@@ -452,6 +452,11 @@ TypeName& VarName = (Redirect && IsMgsi()) ? *reinterpret_cast<TypeName*>(Addr) 
 extern TypeName LocalVar_##VarName;\
 extern TypeName& VarName;
 
+#define MGS_ARY_EXTERN(TypeName, Size, VarName)\
+extern MgsVar Var_##VarName;\
+extern TypeName* VarName ;
+
+
 #define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, false, true, signature> name(#name);
 #define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, false, true, signature> name;
 #define MSG_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, false, signature> name(#name);
