@@ -1288,9 +1288,9 @@ void CC Render_DrawGeneric(StructVert* a_pStructVert)
 MSG_FUNC_IMPLEX(0x4103B0, Render_DrawGeneric, RENDERER_IMPL);
 
 //MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
-void CC Render_DrawIndex(uint32_t a_nIndex)
+void CC Render_DrawIndex(uint32_t activeBuffer)
 {
-    StructVert* pStructVert = (StructVert*)(0x6BC1EC + a_nIndex * 0x40);
+    StructVert* pStructVert = (StructVert*)(0x6BC1EC + activeBuffer * 0x40); //TODO: pStructVert is nullptr in underground escape route
     Render_DrawGeneric(pStructVert);
 }
 MSG_FUNC_IMPLEX(0x401619, Render_DrawIndex, RENDERER_IMPL);

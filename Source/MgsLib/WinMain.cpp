@@ -37,6 +37,7 @@
 #include "Renderer.hpp"
 #include "ResourceNameHash.hpp"
 #include "Psx.hpp"
+#include "Actor_Rank.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -2405,6 +2406,7 @@ MSG_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), sub_459ACE);
 MSG_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), sub_40162D);
 MSG_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
 
+
 int __cdecl Main_sub_401C02()
 {
     int result = 0;
@@ -2714,6 +2716,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     RendererCpp_ForceLink();
     ResourceNameHashCpp_ForceLink();
     PsxCpp_ForceLink();
+    Actor_Rank_ForceLink();
 
     if (IsMgsi())
     {

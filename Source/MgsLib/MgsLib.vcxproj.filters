@@ -63,6 +63,9 @@
     <ClInclude Include="Psx.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Actor_Rank.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -108,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Psx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor_Rank.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
