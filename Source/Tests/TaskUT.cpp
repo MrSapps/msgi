@@ -15,7 +15,7 @@ unsigned int __stdcall TaskThreadProc(void(*)(void))
 }
 
 // TODO: Need to rip the thread proc array
-TEST(Task, Init)
+TEST(Task, DISABLED_Init)
 {
     gThreadProcCalls = 0;
     Task_Init(30, TaskThreadProc);

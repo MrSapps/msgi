@@ -35,6 +35,7 @@
 #include "LibDG.hpp"
 #include "LibGV.hpp"
 #include "Renderer.hpp"
+#include "ResourceNameHash.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -396,16 +397,6 @@ MGS_VAR(1, 0x78E804, WORD, word_78E804, 0);
 MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
 MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
 
-WORD CC ResourceNameHash(const char* string)
-{
-    // hash = ( (hash << 0x05) | (hash >> 0x0b) ) + str[i].unpack("H*")[0].hex.to_i & 0xffff
-    unsigned int i, len = strlen(string), hash = 0;
-    uint16_t rethash;
-    for (i = 0; i < len; i++) hash = (((hash << 0x05) | (hash >> 0x0B)) + string[i]) & 0xFFFF;
-    rethash = hash & 0xFFFF;
-    return static_cast<WORD>(rethash);
-}
-MSG_FUNC_IMPLEX(0x0040B38E, ResourceNameHash, WINMAIN_IMPL);
 
 
 MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
@@ -2771,6 +2762,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     ::testing::InitGoogleMock(&argCount, &lpCmdLine);
     DoScriptTests();
     DoTestSystem();
+    DoResourceNameHashTest();
 
     int result; // eax@2
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
@@ -2791,6 +2783,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     LibDGCpp_ForceLink();
     LibGVCpp_ForceLink();
     RendererCpp_ForceLink();
+    ResourceNameHashCpp_ForceLink();
 
     if (IsMgsi())
     {
