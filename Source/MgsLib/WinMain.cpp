@@ -2400,7 +2400,7 @@ MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
 MGS_VAR(1, 0x6BED20, DWORD, dword_6BED20, 0);
 MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {}); // TODO: Check 2 is correct
 
-MSG_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(Rect16 *pRect), sub_40DD00);
+MSG_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(PSX_RECT *pRect), sub_40DD00);
 MSG_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), sub_459ACE);
 MSG_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), sub_40162D);
 MSG_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
@@ -2510,7 +2510,7 @@ signed int __cdecl Main()
     SetGraphDebug(0);
     //null_44AC80();
     SetDispMask(0);
-    Rect16 clearRect;
+    PSX_RECT clearRect;
     clearRect.x1 = 0;
     clearRect.y1 = 0;
     clearRect.x2 = 1024;

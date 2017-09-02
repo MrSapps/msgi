@@ -6,35 +6,64 @@ void PsxCpp_ForceLink() { }
 #define IMPL_PSX true
 
 MGS_VAR(1, 0x6C0E98, DRAWENV, gDrawEnv_6C0E98, {});
-MGS_VAR(1, 0x6BECF0, Rect16, gClipRect_6BECF0, {});
+MGS_VAR(1, 0x6BECF0, PSX_RECT, gClipRect_6BECF0, {});
 MGS_VAR(1, 0x6C0EAA, WORD, word_6C0EAA, 0x0);
 MGS_VAR(1, 0x6C0EA8, WORD, word_6C0EA8, 0x0);
+
+struct POLY_FT3
+{
+    DWORD* tag;      // Pointer to the next primitive
+    BYTE r0, g0, b0; // RGB color values
+    BYTE code;       // Primitive ID(reserved)
+    
+    short x0, y0;    // Vertex coordinates 
+    BYTE u0, v0;    // Texture coordinates
+    WORD clut;       // CLUT ID(color - look - up table for 4 - bit / 8 - bit mode only)
+
+    short x1, y1;    // Vertex coordinates
+    BYTE u1, v1;     // Texture coordinates
+    WORD tpage;      // Texture page ID
+
+    short x2, y2;    // Vertex coordinates
+    BYTE u2, v2;     // Texture coordinates
+    WORD pad1;       // Reserved by the system
+};
+MSG_ASSERT_SIZEOF(POLY_FT3, 32);
 
 struct POLY_F4
 {
     DWORD* tag;      // Pointer to the next primitive
     BYTE r0, g0, b0; // RGB color values
     BYTE code;       // Primitive ID(reserved)
-    WORD x0, y0;     // Vertex coordinates 
-    WORD x1, y1;     // Vertex coordinates 
-    WORD x2, y2;     // Vertex coordinates 
-    WORD x3, y3;     // Vertex coordinates
+    short x0, y0;    // Vertex coordinates 
+    short x1, y1;    // Vertex coordinates 
+    short x2, y2;    // Vertex coordinates 
+    short x3, y3;    // Vertex coordinates
 };
-MSG_ASSERT_SIZEOF(POLY_F4, 24);
+MSG_ASSERT_SIZEOF(POLY_F4, 0x18);
+
+struct RECT32
+{
+    DWORD x1, y1, x2, y2;
+};
+MSG_ASSERT_SIZEOF(RECT32, 16);
+
+#define PRINT_SIZE(sturcture, name)   printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", name, sizeof(sturcture), sizeof(sturcture), sizeof(sturcture) / sizeof(DWORD), sizeof(sturcture) / sizeof(DWORD))
 
 signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode)
 {
+
     printf(".Resetgraph(%d)\n", mode);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT", 8, 8, 2, 2);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT32", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_ENV", 64, 64, 16, 16);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DRAWENV", 92, 92, 23, 23);
+    PRINT_SIZE(PSX_RECT, "RECT");
+    PRINT_SIZE(RECT32, "RECT32");
+    PRINT_SIZE(DR_ENV, "DR_ENV");
+    PRINT_SIZE(DRAWENV, "DRAWENV");
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DISPENV", 20, 20, 5, 5);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_TAG", 8, 8, 2, 2);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_CODE", 4, 4, 1, 1);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F3", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F4", sizeof(POLY_F4), sizeof(POLY_F4), sizeof(POLY_F4) / sizeof(DWORD), sizeof(POLY_F4) / sizeof(DWORD));
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT3", 32, 32, 8, 8);
+    PRINT_SIZE(POLY_F4, "POLY_F4");
+    PRINT_SIZE(POLY_FT3, "POLY_FT3");
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT4", 40, 40, 10, 10);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_G3", 28, 28, 7, 7);
     printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_G4", 36, 36, 9, 9);
@@ -78,13 +107,12 @@ void CC SetDispMask(int mask)
 }
 MSG_FUNC_IMPLEX(0x0044AC40, SetDispMask, IMPL_PSX);
 
-int CC ClearImage(Rect16* pRect, BYTE r, BYTE g, BYTE b)
+int CC ClearImage(PSX_RECT* pRect, BYTE r, BYTE g, BYTE b)
 {
     printf(".ClearImage((%d,%d,%d,%d),r=%d,g=%d,b=%d)\n", pRect->x1, pRect->y1, pRect->x2, pRect->y2, r, g, b);
     return 0;
 }
 MSG_FUNC_IMPLEX(0x0044ABE0, ClearImage, IMPL_PSX);
-
 
 DRAWENV* CC Renderer_Set_DRAWENV_40DD90(DRAWENV* pDrawEnv)
 {
