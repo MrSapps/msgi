@@ -3,7 +3,7 @@
 #include "logger.hpp"
 #include "Task.hpp"
 #include "Script.hpp"
-#include "Actor.hpp"
+#include "Actor_Delay.hpp"
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
@@ -56,77 +56,6 @@ proc_struct_sub* CC Script_GetCommand(WORD cmdToFind)
     return 0;
 }
 MSG_FUNC_IMPLEX(0x00409ACC, Script_GetCommand, SCRIPT_IMPL);
-
-struct Actor_Delay
-{
-    Actor mBase;
-    DWORD mProcIdOrScriptPtr;
-    GCL_Proc_Arguments mGclProcArgs;
-    int mDelayCounter;
-    DWORD mActive;
-    DWORD field_34_args_array[8];
-};
-MSG_ASSERT_SIZEOF(Actor_Delay, 0x54);
-
-void CC Actor_Delay_Update_455451(Actor_Delay* pDelay)
-{
-    if (pDelay->mActive || !dword_7227A4)
-    {
-        if (--pDelay->mDelayCounter > 0)
-        {
-            return;
-        }
-
-        if (pDelay->mProcIdOrScriptPtr <= 0xFFFF)
-        {
-            // If less than MAX_WORD its a proc id
-            Script_ProcCancelOrRun(static_cast<WORD>(pDelay->mProcIdOrScriptPtr), &pDelay->mGclProcArgs);
-        }
-        else
-        {
-            // Else its a script ip ptr
-            Script_Run(reinterpret_cast<BYTE*>(pDelay->mProcIdOrScriptPtr), &pDelay->mGclProcArgs);
-        }
-    }
-    Actor_DestroyOnNextUpdate(&pDelay->mBase);
-}
-MSG_FUNC_IMPLEX(0x00455451, Actor_Delay_Update_455451, SCRIPT_IMPL);
-
-void CC Res_delay_84_sub_4553D1(DWORD scriptVar_p, GCL_Proc_Arguments* pArgs, int scriptVar_t)
-{
-    Actor_Delay* pDelay = Actor_ResourceAllocT<Actor_Delay>(6);
-    if (pDelay)
-    {
-        if (pArgs)
-        {
-            pDelay->mGclProcArgs.mPArgs = pDelay->field_34_args_array;
-            pDelay->mGclProcArgs.mNumArgs = pArgs->mNumArgs;
-            for (int i = 0; i < pArgs->mNumArgs; i++)
-            {
-                pDelay->field_34_args_array[i] = pArgs->mPArgs[i];
-            }
-        }
-        else
-        {
-            pDelay->mGclProcArgs.mNumArgs = 0;
-        }
-
-        int scriptVar_t2 = scriptVar_t;
-        if (scriptVar_t >= 0)
-        {
-            pDelay->mActive = 0;
-        }
-        else
-        {
-            pDelay->mActive = 1;
-            scriptVar_t2 = -scriptVar_t;
-        }
-        pDelay->mDelayCounter = scriptVar_t2;
-        pDelay->mProcIdOrScriptPtr = scriptVar_p;
-        Actor_Init(&pDelay->mBase, reinterpret_cast<TActorFunction>(Actor_Delay_Update_455451), nullptr, "C:\\mgs\\source\\Game\\delay.c");
-    }
-}
-MSG_FUNC_IMPLEX(0x004553D1, Res_delay_84_sub_4553D1, SCRIPT_IMPL);
 
 int CC Script_InitCommandTable(proc_struct* pCmdTbl)
 {
@@ -182,43 +111,6 @@ BYTE* CC Script_GCL_Execute(BYTE* pScript, BYTE** ppScript, DWORD* pRet)
     return nullptr;
 }
 MSG_FUNC_IMPLEX(0x004096CE, Script_GCL_Execute, false); // TODO: Implement me
-
-signed int CC Script_tbl_Delay_sub_4519C7(BYTE* /*pScript*/)
-{
-    int scriptVar_t = 0;
-    int scriptVar_p = 0;
-    if (Script_ParamExists('t'))
-    {
-        scriptVar_t = Script_get_int();
-    }
-
-    if (Script_ParamExists('p'))
-    {
-        scriptVar_p = Script_get_int();
-    }
-
-    if (Script_ParamExists('e'))
-    {
-        BYTE* pScriptAddress = Script_GetReturnAddress();
-        BYTE* notUsed = nullptr;
-        DWORD execRet = 0;
-        Script_GCL_Execute(pScriptAddress, &notUsed, &execRet);
-        scriptVar_p = execRet;
-    }
-
-    if (Script_ParamExists('g'))
-    {
-        scriptVar_t = -scriptVar_t;
-    }
-
-    if (scriptVar_t && scriptVar_p)
-    {
-        Res_delay_84_sub_4553D1(scriptVar_p, 0, scriptVar_t);
-        return 0;
-    }
-    return -1;
-}
-MSG_FUNC_IMPLEX(0x004519C7, Script_tbl_Delay_sub_4519C7, SCRIPT_IMPL);
 
 
 MSG_FUNC_NOT_IMPL(0x00451A5E, int __cdecl(BYTE*), Script_tbl_mesg_sub_451A5E);

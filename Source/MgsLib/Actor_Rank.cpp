@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Actor_Rank.hpp"
 
-void Actor_Rank_ForceLink() {}
+void Actor_RankCPP_ForceLink() {}
 
 BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, int pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type);
 

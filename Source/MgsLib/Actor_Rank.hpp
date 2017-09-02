@@ -3,7 +3,7 @@
 #include "MgsFunction.hpp"
 #include "Actor.hpp"
 
-void Actor_Rank_ForceLink();
+void Actor_RankCPP_ForceLink();
 
 struct Actor_Rank
 {

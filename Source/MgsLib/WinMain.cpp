@@ -38,6 +38,7 @@
 #include "ResourceNameHash.hpp"
 #include "Psx.hpp"
 #include "Actor_Rank.hpp"
+#include "Actor_Delay.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -2716,7 +2717,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     RendererCpp_ForceLink();
     ResourceNameHashCpp_ForceLink();
     PsxCpp_ForceLink();
-    Actor_Rank_ForceLink();
+    Actor_RankCPP_ForceLink();
+    Actor_DelayCpp_ForceLink();
 
     if (IsMgsi())
     {

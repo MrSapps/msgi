@@ -17,6 +17,9 @@ signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs);
 int CC Script_RunProc(BYTE* pScript);
 BYTE* CC Script_GCL_Execute(BYTE* pScript, BYTE** ppScript, DWORD* pRet);
 signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs);
+DWORD CC Script_ParamExists(char paramId);
+DWORD CC Script_get_int();
+BYTE* CC Script_GetReturnAddress();
 
 MGS_VAR_EXTERN(DWORD, dword_7227A4);
 
