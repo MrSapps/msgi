@@ -60,6 +60,9 @@
     <ClInclude Include="ResourceNameHash.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Psx.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -102,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ResourceNameHash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Psx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

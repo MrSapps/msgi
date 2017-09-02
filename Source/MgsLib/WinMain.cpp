@@ -36,6 +36,7 @@
 #include "LibGV.hpp"
 #include "Renderer.hpp"
 #include "ResourceNameHash.hpp"
+#include "Psx.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -2308,75 +2309,6 @@ signed int __cdecl DoInitAll()
 }
 MSG_FUNC_IMPL(0x00420810, DoInitAll);
 
-struct POLY_F4
-{
-    DWORD *tag;      // Pointer to the next primitive
-    BYTE r0, g0, b0; // RGB color values
-    BYTE code;       // Primitive ID(reserved)
-    WORD x0, y0;     // Vertex coordinates 
-    WORD x1, y1;     // Vertex coordinates 
-    WORD x2, y2;     // Vertex coordinates 
-    WORD x3, y3;     // Vertex coordinates
-};
-MSG_ASSERT_SIZEOF(POLY_F4, 24);
-
-// 0x0044A7B0
-signed int __cdecl Resetgraph_AndPrintPsxStructureSizes(int mode)
-{
-    printf(".Resetgraph(%d)\n", mode);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT", 8, 8, 2, 2);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT32", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_ENV", 64, 64, 16, 16);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DRAWENV", 92, 92, 23, 23);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DISPENV", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_TAG", 8, 8, 2, 2);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_CODE", 4, 4, 1, 1);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F3", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F4", sizeof(POLY_F4), sizeof(POLY_F4), sizeof(POLY_F4) / sizeof(DWORD), sizeof(POLY_F4) / sizeof(DWORD));
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT3", 32, 32, 8, 8);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT4", 40, 40, 10, 10);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_G3", 28, 28, 7, 7);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_G4", 36, 36, 9, 9);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_GT3", 40, 40, 10, 10);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_GT4", 52, 52, 13, 13);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_F2", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_G2", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_F3", 24, 24, 6, 6);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_G3", 32, 32, 8, 8);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_F4", 28, 28, 7, 7);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_G4", 40, 40, 10, 10);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "SPRT", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "SPRT_16", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "SPRT_8", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE_16", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE_8", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE_1", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_MODE", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_TWIN", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_AREA", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_OFFSET", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_MOVE", 24, 24, 6, 6);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_LOAD", 68, 68, 17, 17);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_TPAGE", 8, 8, 2, 2);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_STP", 12, 12, 3, 3);
-    return 1;
-}
-MSG_FUNC_IMPL(0x0044A7B0, Resetgraph_AndPrintPsxStructureSizes);
-
-
-// 0x0044AB30
-int __cdecl SetGraphDebug(int a1)
-{
-    printf(".SetGraphDebug(%d)\n", a1);
-    return 0;
-}
-
-// 0x0044AC40
-int __cdecl SetDispMask(int a1)
-{
-    return printf(".SetDispMask(%d)\n", a1);
-}
 
 // 0x00520157
 void DebugLog(const char *Format, ...)
@@ -2450,11 +2382,6 @@ void InstallVaradicCFunctionHooks()
     }
 }
 
-int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsigned __int8 b)
-{
-    DebugLog(".ClearImage((%d,%d,%d,%d),r=%d,g=%d,b=%d)\n", rect->x1, rect->y1, rect->x2, rect->y2, r, g, b);
-    return 0;
-}
 
 
 MGS_ARY(1, 0x7227C8, WORD, 5, word_7227C8, {}); // TODO: Struct?
@@ -2530,11 +2457,7 @@ __int16 __cdecl sub_44E1E0()
 //MSG_FUNC_NOT_IMPL(0x0040B36E, int __cdecl(), GetResidentTop);
 int __cdecl GetResidentTop()
 {
-    int result; // eax@1
-
-    result = gResidentTop_dword_78E960;
-    dword_78E964 = gResidentTop_dword_78E960;
-    return result;
+    return gResidentTop_dword_78E960;
 }
 
 
@@ -2790,6 +2713,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     LibGVCpp_ForceLink();
     RendererCpp_ForceLink();
     ResourceNameHashCpp_ForceLink();
+    PsxCpp_ForceLink();
 
     if (IsMgsi())
     {

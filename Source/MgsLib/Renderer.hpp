@@ -1,39 +1,10 @@
 #pragma once
 
 #include "MgsFunction.hpp"
+#include "Psx.hpp"
 
 #define DIRECTDRAW_VERSION 0x700
 #include <ddraw.h>
-
-struct Rect16
-{
-    WORD x1, y1, x2, y2;
-};
-MSG_ASSERT_SIZEOF(Rect16, 8);
-
-struct DR_ENV
-{
-    DWORD tag;
-    DWORD code[15];
-};
-MSG_ASSERT_SIZEOF(DR_ENV, 0x40);
-
-struct DRAWENV
-{
-    Rect16 clip;
-    WORD offx;
-    WORD offy;
-    Rect16 textureWindow;
-    BYTE texturePage;
-    BYTE dtd;
-    BYTE dfe;
-    BYTE isbg;
-    BYTE r0;
-    BYTE g0;
-    BYTE b0;
-    DR_ENV dr_env;
-};
-MSG_ASSERT_SIZEOF(DRAWENV, 0x5C);
 
 struct MGSVertex
 {
@@ -102,7 +73,6 @@ MGS_VAR_EXTERN(MGSVertex*, g_pMGSVertices);
 MGS_VAR_EXTERN(WORD*, g_pwTextureIndices);
 MGS_VAR_EXTERN(DWORD, dword_6FC774);
 MGS_VAR_EXTERN(WORD, g_NumTextures);
-MGS_VAR_EXTERN(Rect16, gClipRect_6BECF0);
 
 void RendererCpp_ForceLink();
 void CC PrintDDError(const char* errMsg, HRESULT hrErr);

@@ -10,10 +10,6 @@ void RendererCpp_ForceLink() { }
 MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
 MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
 
-MGS_VAR(1, 0x6C0E98, DRAWENV, gDrawEnv_6C0E98, {});
-MGS_VAR(1, 0x6BECF0, Rect16, gClipRect_6BECF0, {});
-MGS_VAR(1, 0x6C0EAA, WORD, word_6C0EAA, 0x0);
-MGS_VAR(1, 0x6C0EA8, WORD, word_6C0EA8, 0x0);
 
 MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 MGS_VAR(1, 0x6FC784, DWORD, g_nVertexOffset, 0);
@@ -81,61 +77,6 @@ MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint3
 MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 MSG_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct StructVert* a_pStructVert, int a_nSize), Render_Software);
 MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
-
-DRAWENV* CC Renderer_Set_DRAWENV_40DD90(DRAWENV* pDrawEnv)
-{
-    memcpy(&gDrawEnv_6C0E98, pDrawEnv, sizeof(DRAWENV));
-    
-    if (!word_6C0EAA)
-    {
-        word_6C0EAA = 255;
-    }
-
-    if (!word_6C0EA8)
-    {
-        word_6C0EA8 = 255;
-    }
-
-    return &gDrawEnv_6C0E98;
-}
-MSG_FUNC_IMPLEX(0x40DD90, Renderer_Set_DRAWENV_40DD90, RENDERER_IMPL);
-
-DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2)
-{
-    pDrawEnv->clip.x1 = clipX1;
-    pDrawEnv->clip.x2 = clipX2;
-    pDrawEnv->offx = clipX1;
-    pDrawEnv->clip.y2 = clipY2;
-    pDrawEnv->clip.y1 = clipY1;
-    pDrawEnv->offy = clipY1;
-    pDrawEnv->dtd = 1;
-    pDrawEnv->dfe = 0;
-    pDrawEnv->textureWindow.x1 = 0;
-    pDrawEnv->textureWindow.y1 = 0;
-    pDrawEnv->textureWindow.x2 = 0;
-    pDrawEnv->textureWindow.y2 = 0;
-    pDrawEnv->r0 = 0;
-    pDrawEnv->g0 = 0;
-    pDrawEnv->b0 = 0;
-    pDrawEnv->texturePage = 0;
-    pDrawEnv->isbg = 0;
-    return pDrawEnv;
-}
-MSG_FUNC_IMPLEX(0x401888, Renderer_DRAWENV_Init_401888, RENDERER_IMPL);
-
-DRAWENV* Renderer_Init_DRAWENV_40200D()
-{
-    DRAWENV drawEnv;
-    Renderer_DRAWENV_Init_401888(
-        &drawEnv,
-        gClipRect_6BECF0.x1,
-        gClipRect_6BECF0.y1,
-        gClipRect_6BECF0.x2,
-        gClipRect_6BECF0.y2);
-    return Renderer_Set_DRAWENV_40DD90(&drawEnv);
-}
-MSG_FUNC_IMPLEX(0x40200D, Renderer_Init_DRAWENV_40200D, RENDERER_IMPL);
-
 
 // TODO: Assert sizes
 struct MGSSmallVert

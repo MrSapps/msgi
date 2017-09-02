@@ -78,6 +78,7 @@
     <ClInclude Include="LibGV.hpp" />
     <ClInclude Include="logger.hpp" />
     <ClInclude Include="MgsFunction.hpp" />
+    <ClInclude Include="Psx.hpp" />
     <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="ResourceNameHash.hpp" />
     <ClInclude Include="Script.hpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="LibDG.cpp" />
     <ClCompile Include="LibGV.cpp" />
     <ClCompile Include="MgsFunction.cpp" />
+    <ClCompile Include="Psx.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResourceNameHash.cpp" />
     <ClCompile Include="Script.cpp" />
