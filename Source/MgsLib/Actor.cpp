@@ -53,6 +53,13 @@ static bool IterateActors(bShouldEnterList fnEnterList, bShouldContinue fnShould
     return false;
 }
 
+Actor* CC Actor_ResourceAlloc(int actor_system_idx, int size)
+{
+    UNREFERENCED_PARAMETER(actor_system_idx);
+    UNREFERENCED_PARAMETER(size);
+    return nullptr;
+}
+MSG_FUNC_IMPLEX(0x0040A30C, Actor_ResourceAlloc, false); // TODO: Implement me
 
 void CC Actor_DumpActorSystem()
 {
@@ -106,7 +113,7 @@ Actor* CC Actor_Init(Actor* pActor, TActorFunction fnUpdate, TActorFunction fnSh
     pActor->field_18 = 0;
     return pActor;
 }
-MSG_FUNC_IMPLEX(0x0040A347, Actor_Init, false);
+MSG_FUNC_IMPLEX(0x0040A347, Actor_Init, ACTOR_IMPL);
 
 Actor* CC Actor_PushBack(int level, Actor* pActor, TActorFunction fnFree)
 {
@@ -231,7 +238,7 @@ ActorList* CC ActorList_Set_KillPause(int index, __int16 pause, __int16 kill)
     gActorsList[index].mKill = kill;
     return &gActorsList[index];
 }
-MSG_FUNC_IMPLEX(0x0040A0AA, ActorList_Set_KillPause, false);
+MSG_FUNC_IMPLEX(0x0040A0AA, ActorList_Set_KillPause, ACTOR_IMPL);
 
 void CC Actor_Remove(Actor* pActorToRemove)
 {

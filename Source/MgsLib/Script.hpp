@@ -15,6 +15,10 @@ MSG_ASSERT_SIZEOF(GCL_Proc_Arguments, 8);
 
 signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs);
 int CC Script_RunProc(BYTE* pScript);
+BYTE* CC Script_GCL_Execute(BYTE* pScript, BYTE** ppScript, DWORD* pRet);
+signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs);
+
+MGS_VAR_EXTERN(DWORD, dword_7227A4);
 
 enum GCLOperators
 {

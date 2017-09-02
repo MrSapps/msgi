@@ -98,7 +98,6 @@ MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Rende
 MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
-MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
 MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 MSG_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
@@ -308,7 +307,6 @@ MGS_VAR(1, 0x995344, DWORD, gFrameTime_dword_995344, 0);
 MGS_VAR(1, 0x722780, DWORD, dword_722780, 0);
 MGS_VAR(1, 0x722784, DWORD, dword_722784, 0);
 MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
-MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
 MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
 MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
 MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
@@ -379,7 +377,16 @@ MGS_VAR(1, 0x0078E7C0, char * , gDest, nullptr);
 
 struct weapon_famas
 {
-    ActorList mActor;
+    Actor mBase;
+    DWORD field_20;
+    DWORD field_24;
+    DWORD field_28;
+    DWORD field_2C;
+    DWORD field_30;
+    DWORD field_34;
+    DWORD field_38;
+    DWORD field_3C;
+    DWORD field_40;
     DWORD field_44_a1;
     DWORD field_48_a2;
     DWORD field_4C_a3;
@@ -388,14 +395,14 @@ struct weapon_famas
     DWORD field_58;
     DWORD mbIsMp5;
 };
-static_assert(sizeof(weapon_famas) == 96, "weapon_famas should be 96");
+MSG_ASSERT_SIZEOF(weapon_famas, 96);
 
 MGS_VAR(1, 0x995368, WORD, word_995368, 0);
 MGS_VAR(1, 0x995320, WORD, word_995320, 0);
 MGS_VAR(1, 0x78E804, WORD, word_78E804, 0);
 
-MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
-MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
+MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_update_640CDC);
+MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), Res_famas_shutdown_640E9E);
 
 
 
@@ -403,40 +410,39 @@ MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
 MSG_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
 
 //MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
-signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, int a3, int bMp5)
+signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, int a3, int bMp5)
 {
-    int v4; // esi@1
-    int res; // eax@2
-    signed int result; // eax@5
-
-    v4 = (int)&a1->mActor.last;
+    WORD resNameHashed = 0;
     if (bMp5)
-        res = ResourceNameHash("mpfive");
-    else
-        res = ResourceNameHash("famas");
-    sub_44FF7C(v4, res, 109);
-    if (*(DWORD *)v4)
     {
-        sub_45011B(v4, a2, a3);
-        result = 0;
+        resNameHashed = ResourceNameHash("mpfive");
     }
     else
     {
-        result = -1;
+        resNameHashed = ResourceNameHash("famas");
     }
-    return result;
+
+    DWORD* pField20 = (DWORD*)&pFamas->field_20;
+    sub_44FF7C((int)pField20, resNameHashed, 'm');
+
+    if (*pField20)
+    {
+        sub_45011B((int)pField20, a2, a3);
+        return 0;
+    }
+
+    return -1;
 }
 
-// TODO : check if ActorList or Actor
-weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
+weapon_famas* CC Res_Weapon_famas_96_sub_640C24(ActorList* a1, ActorList *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
 {
-    weapon_famas* pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
+    weapon_famas* pFamas = Actor_ResourceAllocT<weapon_famas>(6);
     if (pFamas)
     {
-        Actor_Init(&pFamas->mActor.first, (void(__cdecl *)(Actor*))Res_famas_sub_640CDC.Ptr(), (void(__cdecl *)(Actor*))sub_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
-        if (Res_Weapon_famas_init_sub_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
+        Actor_Init(&pFamas->mBase, (TActorFunction)Res_famas_update_640CDC.Ptr(), (TActorFunction)Res_famas_shutdown_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
+        if (Res_Weapon_famas_loader_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
         {
-            Actor_DestroyOnNextUpdate(&pFamas->mActor.first);
+            Actor_DestroyOnNextUpdate(&pFamas->mBase);
             return 0;
         }
         pFamas->field_58 = 0;
@@ -456,7 +462,7 @@ weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a
     }
     else
     {
-        __int16 famasClipSize = word_78E804;
+        WORD famasClipSize = word_78E804;
         if (mp5ClipSize > 0 && word_78E804 > mp5ClipSize)
         {
             famasClipSize = mp5ClipSize;

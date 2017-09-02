@@ -30,6 +30,15 @@ MSG_ASSERT_SIZEOF(ActorList, 0x44);
 
 MGS_VAR_EXTERN(DWORD, gActorPauseFlags_dword_791A0C);
 
+// Helper to avoid casting all over the place
+template<class T>
+inline T* Actor_ResourceAllocT(int actor_system_idx)
+{
+    Actor* pActor = Actor_ResourceAlloc(actor_system_idx, sizeof(T));
+    return reinterpret_cast<T*>(pActor);
+}
+
+Actor* CC Actor_ResourceAlloc(int actor_system_idx, int size);
 Actor* CC Actor_Init(Actor* pActor, TActorFunction fnUpdate, TActorFunction fnShutDown, const char *srcFileName);
 Actor* CC Actor_PushBack(int level, Actor* pActor, TActorFunction fnFree);
 void CC Actor_KillActorsAtLevel(signed int killLevel);
