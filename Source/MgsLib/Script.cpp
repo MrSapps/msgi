@@ -166,6 +166,23 @@ BYTE* CC Script_GetReturnAddress()
 }
 MSG_FUNC_IMPLEX(0x004099A0, Script_GetReturnAddress, false); // TODO: Impl me
 
+int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
+{
+    UNREFERENCED_PARAMETER(pScript);
+    UNREFERENCED_PARAMETER(pRet);
+    return 0;
+}
+MSG_FUNC_IMPLEX(0x00409D77, Script_Unknown6, false); // TODO: Implement me
+
+BYTE* CC Script_GCL_Execute(BYTE* pScript, BYTE** ppScript, DWORD* pRet)
+{
+    UNREFERENCED_PARAMETER(pScript);
+    UNREFERENCED_PARAMETER(ppScript);
+    UNREFERENCED_PARAMETER(pRet);
+    return nullptr;
+}
+MSG_FUNC_IMPLEX(0x004096CE, Script_GCL_Execute, false); // TODO: Implement me
+
 signed int CC Script_tbl_Delay_sub_4519C7(BYTE* /*pScript*/)
 {
     int scriptVar_t = 0;
@@ -535,23 +552,6 @@ void CC ScriptSetArgs_409893(DWORD* pArgs)
     }
 }
 MSG_FUNC_IMPLEX(0x00409893, ScriptSetArgs_409893, SCRIPT_IMPL);
-
-int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
-{
-    UNREFERENCED_PARAMETER(pScript);
-    UNREFERENCED_PARAMETER(pRet);
-    return 0;
-}
-MSG_FUNC_IMPLEX(0x00409D77, Script_Unknown6, false); // TODO: Implement me
-
-BYTE* CC Script_GCL_Execute(BYTE* pScript, BYTE** ppScript, DWORD* pRet)
-{
-    UNREFERENCED_PARAMETER(pScript);
-    UNREFERENCED_PARAMETER(ppScript);
-    UNREFERENCED_PARAMETER(pRet);
-    return nullptr;
-}
-MSG_FUNC_IMPLEX(0x004096CE, Script_GCL_Execute, false); // TODO: Implement me
 
 signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
 {
