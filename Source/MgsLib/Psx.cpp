@@ -134,9 +134,7 @@ struct DR_MOVE
 };
 MSG_ASSERT_SIZEOF(DR_MOVE, 24);
 
-
-
-struct SPRT 
+struct SPRT
 {
     DWORD* tag;
     BYTE r0, g0, b0, code;
@@ -428,6 +426,27 @@ int CC ClearImage(PSX_RECT* pRect, BYTE r, BYTE g, BYTE b)
     return 0;
 }
 MSG_FUNC_IMPLEX(0x0044ABE0, ClearImage, IMPL_PSX);
+
+int CC Psx_OpenEvent(int desc, int spec, int mode, int func)
+{
+    printf("OpenEvent(%p,%d,%d,%p)\n", desc, spec, mode, func);
+    return 0;
+}
+MSG_FUNC_IMPLEX(0x0044CEC0, Psx_OpenEvent, IMPL_PSX);
+
+int CC EnableEvent(int pEvent)
+{
+    printf(".EnableEvent(%d)\n", pEvent);
+    return 0;
+}
+MSG_FUNC_IMPLEX(0x0044CF10, EnableEvent, IMPL_PSX);
+
+int CC CloseEvent(int pEvent)
+{
+    printf(".CloseEvent(%p)\n", pEvent);
+    return 0;
+}
+MSG_FUNC_IMPLEX(0x0044CEF0, CloseEvent, IMPL_PSX);
 
 DRAWENV* CC Renderer_Set_DRAWENV_40DD90(DRAWENV* pDrawEnv)
 {

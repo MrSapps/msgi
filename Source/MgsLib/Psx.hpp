@@ -41,3 +41,4 @@ signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode);
 int CC SetGraphDebug(int debug);
 void CC SetDispMask(int mask);
 int CC ClearImage(PSX_RECT* pRect, BYTE r, BYTE g, BYTE b);
+int CC Psx_OpenEvent(int desc, int spec, int mode, int func); // Psx_ to avoid windows.h name clash
