@@ -149,9 +149,6 @@ void CC LibGV_Update_40A54E(Actor* pActor)
 }
 MSG_FUNC_IMPLEX(0x40A54E, LibGV_Update_40A54E, LIBGV_IMPL);
 
-
-MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
-
 void LibGv_Init_sub_40A4F6()
 {
     ActorList_Init();

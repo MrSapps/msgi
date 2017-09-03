@@ -34,6 +34,25 @@ struct DRAWENV
 };
 MSG_ASSERT_SIZEOF(DRAWENV, 0x5C);
 
+struct POLY_FT4
+{
+    DWORD*  tag;
+    BYTE    r0, g0, b0, code;
+    short   x0, y0;
+    BYTE    u0, v0;
+    WORD    clut;
+    short   x1, y1;
+    BYTE    u1, v1;
+    WORD    tpage;
+    short   x2, y2;
+    BYTE    u2, v2;
+    WORD    pad1;
+    short   x3, y3;
+    BYTE    u3, v3;
+    WORD    pad2;
+};
+MSG_ASSERT_SIZEOF(POLY_FT4, 40);
+
 MGS_VAR_EXTERN(PSX_RECT, gClipRect_6BECF0);
 MGS_VAR_EXTERN(DRAWENV, gDrawEnv_6C0E98);
 
