@@ -10,7 +10,7 @@ void DoActor_RankTests();
 struct Actor_Rank
 {
     Actor mBase;
-    int field_20_dword_7919E0;
+    WORD* field_20_dword_7919E0;
     int field_24_ptr_16_prims;
     int field_28_ptr_9_prims;
 

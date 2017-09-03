@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Actor_Rank.hpp"
+#include "Script.hpp"
 #include <gmock/gmock.h>
 
 #define ACTOR_RANK_IMPL true
@@ -7,69 +8,19 @@
 void Actor_RankCPP_ForceLink() {}
 
 MGS_VAR_EXTERN(DWORD, game_state_dword_72279C);
-
-BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, int pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type);
-
-MSG_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, ACTOR_RANK_IMPL);
+MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
 BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, int pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type)
 {
-    // Forcing these to zero does nothing ??!
-    return Res_rank_prim_related_4767CE_.Ptr()(pRank, resourceNameHash, pData, 0, 0, 0, 0, flagQ, type);
+    return nullptr;
 }
-MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
-
-void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank);
-MSG_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, ACTOR_RANK_IMPL);
-
+MSG_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, false); // TODO
 
 void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
 {
-    POLY_FT4* poly = &pRank->field_234_rank_spe_camera;
-
-    // state 2 = text fade out
-    // state 3 = sound effect + text box telling to reload save for special items
-    // state 4 = ditto
-    // state 5 = black screen/nothing
-
-    pRank->field_484_state = 0;
-
-    poly->r0 = 255;
-    poly->g0 = 255;
-    poly->b0 = 0;
-
-    poly->x0 += 25;
-    poly->y0 += 25;
-
-    RankRenderPrimsQ_46ED0A_.Ptr()(pRank);
-
-    if (pRank->field_480_ticks > 50)
-    {
-        pRank->field_480_ticks = 0;
-    }
-
-    /*
-    BYTE* pDst = *(BYTE **)(pRank->field_24_ptr_16_prims + 4 * gActiveBuffer_dword_791A08 + 64);
-    BYTE* pSrc = (BYTE *)&pRank->field_2C_back_l_type0_0x40_start;
-    for (int i = 0; i < 16; ++i)
-    {
-        memcpy(pDst, pSrc, 40u);                   // PolyFT4?
-        BYTE* pDst = ((BYTE *)&pRank->field_41C_16_prim_dst + i);
-        pDst += 40;
-        pSrc += 40;
-    }
-
-    BYTE* pDst2 = *(BYTE **)(pRank->field_28_ptr_9_prims + 4 * gActiveBuffer_dword_791A08 + 64);
-    BYTE* pSrc2 = (BYTE *)&pRank->field_2AC_cur_lu;
-    for (int j = 0; j < 9; ++j)
-    {
-        memcpy(pDst2, pSrc2, 40u);                 // PolyFT4
-        BYTE* pDst2 = ((BYTE *)&pRank->field_45C_cur_ru_q + j);
-        pDst2 += 40;
-        pSrc2 += 40;
-    }*/
 
 }
+MSG_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, false); // TODO
 
 void CC POLYFT4_code_2_40E0D0(POLY_FT4* pPoly, BOOL bSetOrUnSetCode2)
 {
@@ -103,12 +54,81 @@ void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16
 }
 MSG_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
 
-
-void CC Rank_update_46EC75(Actor_Rank* pRank)
+void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
 {
 
 }
-MSG_FUNC_IMPLEX(0x46EC75, Rank_update_46EC75, false) // TODO
+MSG_FUNC_IMPLEX(0x46EDE8, Rank_RenderGameCompletionScreen, false); // TODO
+
+void CC Rank_ToState2If_473E69(Actor_Rank* pRank)
+{
+    if (pRank->field_20_dword_7919E0[1]) // TODO: Discover what this field really is
+    {
+        pRank->field_484_state = 2;
+        pRank->field_480_ticks = 0;
+    }
+}
+MSG_FUNC_IMPLEX(0x473E69, Rank_ToState2If_473E69, ACTOR_RANK_IMPL);
+
+void CC Rank_473E9C(Actor_Rank* pRank)
+{
+
+}
+MSG_FUNC_IMPLEX(0x473E9C, Rank_473E9C, false); // TODO
+
+void CC Rank_GameCompletionRelatedQ(Actor_Rank* pRank)
+{
+
+}
+MSG_FUNC_IMPLEX(0x470AE6, Rank_GameCompletionRelatedQ, false); // TODO
+
+void CC Rank_SaveAfterGameCompleteQ(Actor_Rank* pRank)
+{
+
+}
+MSG_FUNC_IMPLEX(0x474315, Rank_SaveAfterGameCompleteQ, false); // TODO
+
+void CC Rank_End_474CE8(Actor_Rank* pRank)
+{
+    Script_ProcCancelOrRun((WORD)pRank->field_418_script_t, nullptr);
+    Actor_DestroyOnNextUpdate(&pRank->mBase);
+}
+MSG_FUNC_IMPLEX(0x474CE8, Rank_End_474CE8, ACTOR_RANK_IMPL);
+
+void CC Rank_Animate_472832(Actor_Rank* pRank)
+{
+
+}
+MSG_FUNC_IMPLEX(0x472832, Rank_Animate_472832, false);  // TODO
+
+void CC Rank_update_46EC75(Actor_Rank* pRank)
+{
+    switch (pRank->field_484_state)
+    {
+    case 0:
+        // state 0 handler - animates the [SCORE] box ?
+        Rank_Animate_472832(pRank);
+        break;
+    case 1:
+        // renders only text with no background ??
+        Rank_RenderGameCompletionScreen(pRank);
+        Rank_ToState2If_473E69(pRank);
+        break;
+    case 2:
+        Rank_473E9C(pRank);
+        Rank_GameCompletionRelatedQ(pRank);
+        break;
+    case 3:
+        Rank_SaveAfterGameCompleteQ(pRank);
+        break;
+    case 4:
+        Rank_End_474CE8(pRank);
+        break;
+    }
+    RankRenderPrimsQ_46ED0A(pRank);
+    pRank->field_480_ticks++;
+}
+MSG_FUNC_IMPLEX(0x46EC75, Rank_update_46EC75, ACTOR_RANK_IMPL);
 
 void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 {
