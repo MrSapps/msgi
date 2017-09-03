@@ -4,6 +4,7 @@
 #include "Task.hpp"
 #include "Script.hpp"
 #include "Actor_Delay.hpp"
+#include "LibDG.hpp"
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
@@ -115,7 +116,6 @@ MSG_FUNC_IMPLEX(0x004096CE, Script_GCL_Execute, false); // TODO: Implement me
 
 MSG_FUNC_NOT_IMPL(0x00451A5E, int __cdecl(BYTE*), Script_tbl_mesg_sub_451A5E);
 MSG_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
-MSG_FUNC_NOT_IMPL(0x00451AC3, int __cdecl(BYTE*), Script_tbl_chara_sub_451AC3);
 MSG_FUNC_NOT_IMPL(0x0045151D, int __cdecl(BYTE*), Script_tbl_map_sub_45151D);
 MSG_FUNC_NOT_IMPL(0x00451673, int __cdecl(BYTE*), Script_tbl_hzd_related_sub_451673);
 MSG_FUNC_NOT_IMPL(0x004512E5, int __cdecl(BYTE*), script_tbl_camera_sub_4512E5);
@@ -139,7 +139,7 @@ MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
 {
     { 0x22FF, 0x0, Script_tbl_mesg_sub_451A5E.Ptr() },
     { 0xD4CB, 0x0, Script_tbl_ntrap_removeQ_451688.Ptr() },
-    { 0x9906, 0x0, Script_tbl_chara_sub_451AC3.Ptr() },
+    { 0x9906, 0x0, Script_tbl_chara_sub_451AC3 },
     { 0xC091, 0x0, Script_tbl_map_sub_45151D.Ptr() },
     { 0x7D50, 0x0, Script_tbl_hzd_related_sub_451673.Ptr() },
     { 0xEEE9, 0x0, script_tbl_camera_sub_4512E5.Ptr() },
