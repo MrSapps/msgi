@@ -107,47 +107,23 @@ int CC Menu_DrawText(const char* Format, int a2, int a3, int a4, int a5)
 }
 MSG_FUNC_IMPLEX(0x459B63, Menu_DrawText, false);  // TODO
 
-void CC RGB_459B0B(int r, int g, int b)
+void CC TextSetXYFlags_459B0B(int x, int y, int flags)
 {
-
-}
-MSG_FUNC_IMPLEX(0x459B0B, RGB_459B0B, false);  // TODO
-
-int CC sub_459B27(int r, int g, int b)
-{
-    return 0;
-}
-MSG_FUNC_IMPLEX(0x459B27, sub_459B27, false);  // TODO
-
-void CC Rank_update_46EC75(Actor_Rank* pRank)
-{
-    // x, y, ??
     // 0x1 = right align
     // 0x2 = center align
     // 0x10 = larger font size
     // other bits = left align/do nothing
-    DWORD flags = 0;
-    static int flagNo = 0;
+}
+MSG_FUNC_IMPLEX(0x459B0B, TextSetXYFlags_459B0B, false);  // TODO
 
+int CC TextSetRGB_459B27(int r, int g, int b)
+{
+    return 0;
+}
+MSG_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, false);  // TODO
 
-    if ((pRank->field_480_ticks % 30) == 0)
-    {
-        ++flagNo;
-        if (flagNo >= 31)
-        {
-            flagNo = 0;
-        }
-        flags = (1 << flagNo);
-        printf("Flags are now 0x%X\n", flags);
-    }
-    flags = (1 << flagNo);
-
-    RGB_459B0B(10, 20, flags);
-
-    // R G B
-    sub_459B27(0, 0, 255);
-    Menu_DrawText("1234 PAUL WAS HERE", 1, 255, 255,255);
-
+void CC Rank_update_46EC75(Actor_Rank* pRank)
+{
     switch (pRank->field_484_state)
     {
     case 0:
@@ -161,7 +137,7 @@ void CC Rank_update_46EC75(Actor_Rank* pRank)
         break;
     case 2:
         Rank_473E9C(pRank);
-        Rank_GameCompletionRelatedQ(pRank);
+        Rank_GameCompletionRelatedQ(pRank); // Only displays rank name?
         break;
     case 3:
         Rank_SaveAfterGameCompleteQ(pRank);
