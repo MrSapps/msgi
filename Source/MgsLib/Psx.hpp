@@ -36,7 +36,7 @@ MSG_ASSERT_SIZEOF(DRAWENV, 0x5C);
 
 struct POLY_FT4
 {
-    DWORD*  tag;
+    DWORD   tag;
     BYTE    r0, g0, b0, code;
     short   x0, y0;
     BYTE    u0, v0;

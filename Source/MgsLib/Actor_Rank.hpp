@@ -5,6 +5,7 @@
 #include "Psx.hpp"
 
 void Actor_RankCPP_ForceLink();
+void DoActor_RankTests();
 
 struct Actor_Rank
 {
@@ -153,3 +154,4 @@ struct Actor_Rank
     int field_5F4;
     int field_5F8_script_x;
 };
+MSG_ASSERT_SIZEOF(Actor_Rank, 0x5FC);

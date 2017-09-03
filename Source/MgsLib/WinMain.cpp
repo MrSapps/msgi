@@ -192,7 +192,7 @@ MGS_ARY(1, 0x689B68, struct jimUnk0x204, 2, array_689B68, {}); // TODO: Also 2?
 MGS_ARY(1, 0x6C0778, char, 0x400, unk_6C0778, {}); // TODO: Struct?
 MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
-MGS_VAR(1, 0x72279C, DWORD, dword_72279C, 0);
+MGS_VAR(1, 0x72279C, DWORD, game_state_dword_72279C, 0);
 
 
 
@@ -676,7 +676,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 if (gCheatsEnabled)
                 {
-                    dword_72279C = 0;
+                    game_state_dword_72279C = 0;
                     sub_521210();
                     sub_452E6E();
                     result = 0;
@@ -691,7 +691,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                 if (wParam == VK_ESCAPE)
                 {
                     dword_791DE4 = 1;
-                    if (dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
+                    if (game_state_dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
                     {
                         if (!dword_717354)
                         {
@@ -2695,6 +2695,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     DoScriptTests();
     DoTestSystem();
     DoResourceNameHashTest();
+    DoActor_RankTests();
 
     int result; // eax@2
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
