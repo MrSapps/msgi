@@ -147,7 +147,6 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         TextSetXYFlags_459B0B(181, 47, 16);
         break;
     }
-
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", field_488_time % 10);
 
@@ -166,112 +165,95 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         TextSetXYFlags_459B0B(193, 47, 16);
         break;
     }
-
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText(":", field_488_time % 10);
-    if (pRank->field_498_mc_no)
+ 
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(199, 57, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(199, 53, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(199, 47, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(199, 60, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(199, 57, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(199, 53, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(199, 47, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", field_48C_time_mins / 10);
 
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(208, 57, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(208, 53, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(208, 47, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(208, 60, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(208, 57, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(208, 53, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(208, 47, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", field_48C_time_mins % 10);
-    if (pRank->field_498_mc_no)
+
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(220, 57, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(220, 53, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(220, 47, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(220, 60, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(220, 57, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(220, 53, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(220, 47, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText(":", field_48C_time_mins % 10);
-    if (pRank->field_498_mc_no)
+
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(226, 57, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(226, 53, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(226, 47, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(226, 60, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(226, 57, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(226, 53, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(226, 47, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", field_490_time_secs / 10);
-    if (pRank->field_498_mc_no)
+
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(235, 57, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(235, 53, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(235, 47, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(235, 60, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(235, 57, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(235, 53, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(235, 47, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", field_490_time_secs % 10);
@@ -279,28 +261,24 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
 
 static void Rank_RenderNumSaves(Actor_Rank* pRank)
 {
-
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(164, 68, 17);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(164, 64, 17);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(164, 58, 17);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(164, 74, 17);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(164, 68, 17);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(164, 64, 17);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(164, 58, 17);
+        break;
     }
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("SAVE /");
+
     WORD gNumSaves_word_78E890_copy = gNumSaves_word_78E890;
     if (gNumSaves_word_78E890 >= 1000)
     {
@@ -310,92 +288,78 @@ static void Rank_RenderNumSaves(Actor_Rank* pRank)
     WORD savesMod100Div10 = gNumSaves_word_78E890_copy % 100 / 10;
     if (gNumSaves_word_78E890_copy / 100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(172, 68, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(172, 64, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(172, 58, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(172, 74, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(172, 68, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(172, 64, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(172, 58, 16);
+            break;
         }
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", savesDiv100);
     }
+
     if (savesMod100Div10 || savesDiv100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(181, 68, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(181, 64, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(181, 58, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(181, 74, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(181, 68, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(181, 64, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(181, 58, 16);
+            break;
         }
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", savesMod100Div10);
     }
 
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(190, 68, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(190, 64, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(190, 58, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(190, 74, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(190, 68, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(190, 64, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(190, 58, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", gNumSaves_word_78E890_copy % 10);
-    if (pRank->field_498_mc_no)
+
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(214, 68, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(214, 64, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(214, 58, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(214, 74, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(214, 68, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(214, 64, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(214, 58, 16);
+        break;
     }
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("TIMES");
@@ -403,27 +367,24 @@ static void Rank_RenderNumSaves(Actor_Rank* pRank)
 
 static void Rank_RenderNumContinues(Actor_Rank* pRank)
 {
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(164, 79, 17);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(164, 75, 17);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(164, 69, 17);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(164, 88, 17);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(164, 79, 17);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(164, 75, 17);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(164, 69, 17);
+        break;
     }
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("CONTINUE /");
+
     DWORD numContinues = gContinues_word_78E88E;
     if (gContinues_word_78E88E >= 1000)
     {
@@ -433,120 +394,100 @@ static void Rank_RenderNumContinues(Actor_Rank* pRank)
     DWORD numContinuesMod100Div10 = numContinues % 100 / 10;
     if (numContinues / 100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(172, 79, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(172, 75, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(172, 69, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(172, 88, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(172, 79, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(172, 75, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(172, 69, 16);
+            break;
         }
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", numContinuesDiv100);
     }
     if (numContinuesMod100Div10 || numContinuesDiv100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(181, 79, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(181, 75, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(181, 69, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(181, 88, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(181, 79, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(181, 75, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(181, 69, 16);
+            break;
         }
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", numContinuesMod100Div10);
     }
 
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(190, 79, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(190, 75, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(190, 69, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(190, 88, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(190, 79, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(190, 75, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(190, 69, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", numContinues % 10);
 
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(214, 79, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(214, 75, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(214, 69, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(214, 88, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(214, 79, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(214, 75, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(214, 69, 16);
+        break;
     }
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("TIMES");
-
 }
 
 static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
 {
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(164, 90, 17);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(164, 86, 17);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(164, 80, 17);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(164, 102, 17);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(164, 90, 17);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(164, 86, 17);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(164, 80, 17);
+        break;
     }
+
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("BEING FOUND /");
     DWORD numTimesSpotted = gTimesSpotted_word_78E87C;
@@ -558,93 +499,78 @@ static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
     DWORD numTimesSpottedMod100Div10 = numTimesSpotted % 100 / 10;
     if (numTimesSpotted / 100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(172, 90, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(172, 86, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(172, 80, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(172, 102, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(172, 90, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(172, 86, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(172, 80, 16);
+            break;
         }
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", numTimesSpottedDiv100);
     }
+
     if (numTimesSpottedMod100Div10 || numTimesSpottedDiv100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(181, 90, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(181, 86, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(181, 80, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(181, 102, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(181, 90, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(181, 86, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(181, 80, 16);
+            break;
         }
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", numTimesSpottedMod100Div10);
     }
 
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(190, 90, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(190, 86, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(190, 80, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(190, 102, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(190, 90, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(190, 86, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(190, 80, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", numTimesSpotted % 10);
 
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(214, 90, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(214, 86, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(214, 80, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(214, 102, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(214, 90, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(214, 86, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(214, 80, 16);
+        break;
     }
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("TIMES");
@@ -652,27 +578,24 @@ static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
 
 static void Rank_RenderNumKilled(Actor_Rank* pRank)
 {
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(164, 101, 17);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(164, 97, 17);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(164, 91, 17);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(164, 116, 17);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(164, 101, 17);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(164, 97, 17);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(164, 91, 17);
+        break;
     }
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("ENEMIES /");
+
     DWORD numEnemiesKilled = gNumEnemiesKilled_word_78E87E;
     if (gNumEnemiesKilled_word_78E87E >= 1000)
     {
@@ -682,92 +605,78 @@ static void Rank_RenderNumKilled(Actor_Rank* pRank)
     DWORD numEnemiesKilledMod100Div10 = numEnemiesKilled % 100 / 10;
     if (numEnemiesKilled / 100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(172, 101, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(172, 97, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(172, 91, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(172, 116, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(172, 101, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(172, 97, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(172, 91, 16);
+            break;
         }
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", numEnemiesKilledDiv100);
     }
+
     if (numEnemiesKilledMod100Div10 || numEnemiesKilledDiv100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(181, 101, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(181, 97, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(181, 91, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(181, 116, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(181, 101, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(181, 97, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(181, 91, 16);
+            break;
         }
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", numEnemiesKilledMod100Div10);
     }
 
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(190, 101, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(190, 97, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(190, 91, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(190, 116, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(190, 101, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(190, 97, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(190, 91, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", numEnemiesKilled % 10);
-    if (pRank->field_498_mc_no)
+
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(214, 101, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(214, 97, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(214, 91, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(214, 116, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(214, 101, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(214, 97, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(214, 91, 16);
+        break;
     }
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("KILLED");
@@ -775,28 +684,24 @@ static void Rank_RenderNumKilled(Actor_Rank* pRank)
 
 static void Rank_RenderNumRations(Actor_Rank* pRank)
 {
-
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(164, 112, 17);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(164, 108, 17);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(164, 102, 17);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(164, 130, 17);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(164, 112, 17);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(164, 108, 17);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(164, 102, 17);
+        break;
     }
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("RATIONS /");
+
     DWORD numRations = gNumRations_word_78E88C;
     if (gNumRations_word_78E88C >= 1000)
     {
@@ -806,93 +711,79 @@ static void Rank_RenderNumRations(Actor_Rank* pRank)
     DWORD numRationsMod100Div10 = numRations % 100 / 10;
     if (numRations / 100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(172, 112, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(172, 108, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(172, 102, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(172, 130, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(172, 112, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(172, 108, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(172, 102, 16);
+            break;
         }
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", numRationsDiv100);
     }
+
     if (numRationsMod100Div10 || numRationsDiv100)
     {
-        if (pRank->field_498_mc_no)
+        switch (pRank->field_498_mc_no)
         {
-            switch (pRank->field_498_mc_no)
-            {
-            case 1:
-                TextSetXYFlags_459B0B(181, 112, 16);
-                break;
-            case 2:
-                TextSetXYFlags_459B0B(181, 108, 16);
-                break;
-            case 3:
-                TextSetXYFlags_459B0B(181, 102, 16);
-                break;
-            }
-        }
-        else
-        {
+        case 0:
             TextSetXYFlags_459B0B(181, 130, 16);
+            break;
+        case 1:
+            TextSetXYFlags_459B0B(181, 112, 16);
+            break;
+        case 2:
+            TextSetXYFlags_459B0B(181, 108, 16);
+            break;
+        case 3:
+            TextSetXYFlags_459B0B(181, 102, 16);
+            break;
         }
+
         TextSetRGB_459B27(140, 181, 181);
         Menu_DrawText("%d", numRationsMod100Div10);
     }
 
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(190, 112, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(190, 108, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(190, 102, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(190, 130, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(190, 112, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(190, 108, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(190, 102, 16);
+        break;
     }
     TextSetRGB_459B27(140, 181, 181);
     Menu_DrawText("%d", numRations % 10);
 
-    if (pRank->field_498_mc_no)
+    switch (pRank->field_498_mc_no)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 1:
-            TextSetXYFlags_459B0B(214, 112, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(214, 108, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(214, 102, 16);
-            break;
-        }
-    }
-    else
-    {
+    case 0:
         TextSetXYFlags_459B0B(214, 130, 16);
+        break;
+    case 1:
+        TextSetXYFlags_459B0B(214, 112, 16);
+        break;
+    case 2:
+        TextSetXYFlags_459B0B(214, 108, 16);
+        break;
+    case 3:
+        TextSetXYFlags_459B0B(214, 102, 16);
+        break;
     }
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("USED");
@@ -920,29 +811,26 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
                 Menu_DrawText("GAME LEVEL /");
                 TextSetXYFlags_459B0B(172, 46, 16);
                 TextSetRGB_459B27(140, 181, 181);
-                if (gDiffcultyLevel == -1)
+        
+                switch (gDiffcultyLevel)
                 {
+                case -1:
                     Menu_DrawText("VERY EASY");
-                }
-                else if (gDiffcultyLevel)
-                {
-                    switch (gDiffcultyLevel)
-                    {
-                    case 1:
-                        Menu_DrawText("NORMAL");
-                        break;
-                    case 2:
-                        Menu_DrawText("HARD");
-                        break;
-                    case 3:
-                        Menu_DrawText("EXTREME");
-                        break;
-                    }
-                }
-                else
-                {
+                    break;
+                case 0:
                     Menu_DrawText("EASY");
+                    break;
+                case 1:
+                    Menu_DrawText("NORMAL");
+                    break;
+                case 2:
+                    Menu_DrawText("HARD");
+                    break;
+                case 3:
+                    Menu_DrawText("EXTREME");
+                    break;
                 }
+     
             }
             else if (pRank->field_4A0_stealth)
             {
@@ -972,29 +860,26 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
                 Menu_DrawText("GAME LEVEL /");
                 TextSetXYFlags_459B0B(172, 42, 16);
                 TextSetRGB_459B27(140, 181, 181);
-                if (gDiffcultyLevel == -1)
+   
+                switch (gDiffcultyLevel)
                 {
+                case -1:
                     Menu_DrawText("VERY EASY");
-                }
-                else if (gDiffcultyLevel)
-                {
-                    switch (gDiffcultyLevel)
-                    {
-                    case 1:
-                        Menu_DrawText("NORMAL");
-                        break;
-                    case 2:
-                        Menu_DrawText("HARD");
-                        break;
-                    case 3:
-                        Menu_DrawText("EXTREME");
-                        break;
-                    }
-                }
-                else
-                {
+                    break;
+                case 0:
                     Menu_DrawText("EASY");
+                    break;
+                case 1:
+                    Menu_DrawText("NORMAL");
+                    break;
+                case 2:
+                    Menu_DrawText("HARD");
+                    break;
+                case 3:
+                    Menu_DrawText("EXTREME");
+                    break;
                 }
+
                 if (pRank->field_4A0_stealth)
                 {
                     TextSetXYFlags_459B0B(164, 119, 17);
@@ -1034,29 +919,26 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
             Menu_DrawText("GAME LEVEL /");
             TextSetXYFlags_459B0B(172, 36, 16);
             TextSetRGB_459B27(140, 181, 181);
-            if (gDiffcultyLevel == -1)
+           
+            switch (gDiffcultyLevel)
             {
+            case -1:
                 Menu_DrawText("VERY EASY");
-            }
-            else if (gDiffcultyLevel)
-            {
-                switch (gDiffcultyLevel)
-                {
-                case 1:
-                    Menu_DrawText("NORMAL");
-                    break;
-                case 2:
-                    Menu_DrawText("HARD");
-                    break;
-                case 3:
-                    Menu_DrawText("EXTREME");
-                    break;
-                }
-            }
-            else
-            {
+                break;
+            case 0:
                 Menu_DrawText("EASY");
+                break;
+            case 1:
+                Menu_DrawText("NORMAL");
+                break;
+            case 2:
+                Menu_DrawText("HARD");
+                break;
+            case 3:
+                Menu_DrawText("EXTREME");
+                break;
             }
+  
             TextSetXYFlags_459B0B(164, 113, 17);
             TextSetRGB_459B27(82, 140, 123);
             Menu_DrawText("USED ITEMS /");
