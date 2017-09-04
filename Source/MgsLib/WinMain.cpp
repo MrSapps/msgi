@@ -1250,10 +1250,14 @@ int __cdecl jim_enumerate_devices()
         {
             memcpy(&Buf1, &(g_pDeviceIdentifiers + varC)->ddIdentifier, 0x434);   // Copy of var_450 included same way as earlier
             if (file_msgvideocfg_Write2(&Buf1, -1) == 1)
+            {
                 var8++;
+            }
         }
         if (File_msgvideocfg_Write(&Buf1, varC) == 0)
+        {
             var8++;
+        }
     }
 
     if (gNumDrivers_dword_77C608 > 2)
@@ -1353,7 +1357,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     mgs_fputs("InitAll {\n", gFile);
     mgs_fflush(gFile);
     gLogFile = gFile;
-    Input_Start();
+    //Input_Start();
     mgs_fputs("jim_enumerate_devices()\n", gFile);
     mgs_fflush(gFile);
     v55 = jim_enumerate_devices();
@@ -2080,8 +2084,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     return result;
 }
-
-//MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
+MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
 
 //MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), SetDDSurfaceTexture);
@@ -2348,6 +2351,13 @@ int mgs_printf(const char *fmt, ...)
     return ret;
 }
 
+// HACK: Prevents game init delay where DDRAW GetDeviceIdentifier checks if the driver is signed
+// which then takes 8-12 seconds to complete.
+LONG WINAPI Hook_WinVerifyTrust(HWND hwnd, GUID* pgActionID, LPVOID pWVTData)
+{
+    return 0;
+}
+
 // The varadic template hook class can't also mixing in varadic C functions, so we have too hook these manually
 // good news is that these kind of functions are rare.
 void InstallVaradicCFunctionHooks()
@@ -2384,7 +2394,13 @@ void InstallVaradicCFunctionHooks()
     {
         abort();
     }
-    
+
+    FARPROC winTrust = GetProcAddress(LoadLibraryA("WinTrust.dll"), "WinVerifyTrust");
+    err = DetourAttach(&(PVOID&)winTrust, Hook_WinVerifyTrust);
+    if (err != NO_ERROR)
+    {
+        abort();
+    }
 
     err = DetourTransactionCommit();
     if (err != NO_ERROR)
@@ -2629,6 +2645,7 @@ void ShutdownEngine()
 }
 
 #include <gmock/gmock.h>
+
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
