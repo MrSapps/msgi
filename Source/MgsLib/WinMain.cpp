@@ -39,6 +39,7 @@
 #include "Psx.hpp"
 #include "Actor_Rank.hpp"
 #include "Actor_Delay.hpp"
+#include "Actor_GameD.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -74,11 +75,8 @@ MSG_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
 MSG_FUNC_NOT_IMPL(0x0040111A, int __cdecl(), sub_40111A);
 MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
 MSG_FUNC_NOT_IMPL(0x0040B725, int __cdecl(), sub_40B725);
-MSG_FUNC_NOT_IMPL(0x0044E381, void __cdecl(Actor*), GameD_Update_44E381);
-MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
-MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
-MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
-MSG_FUNC_NOT_IMPL(0x0044E226, Actor* __cdecl(), sub_44E226);
+
+
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
 MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
 MSG_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
@@ -306,23 +304,15 @@ int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
 }
 
 
-MGS_VAR(1, 0x995344, DWORD, gFrameTime_dword_995344, 0);
-MGS_VAR(1, 0x722780, DWORD, dword_722780, 0);
-MGS_VAR(1, 0x722784, DWORD, dword_722784, 0);
-MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
-MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
-MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
-MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
-MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
-MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
-
-MGS_VAR(1, 0x722760, Actor, g_gamed_722760, {}); // TODO: Will actually big an Actor + other data
 
 
 
-MGS_VAR(1, 0x78E7FC, signed short int, word_78E7FC, 0);
-MGS_VAR(1, 0x78E7FE, WORD, word_78E7FE, 0);
-MGS_VAR(1, 0x78E960, DWORD, gResidentTop_dword_78E960, 0);
+
+
+
+
+
+
 MGS_VAR(1, 0x78E964, DWORD, dword_78E964, 0);
 MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
@@ -2385,18 +2375,6 @@ void InstallVaradicCFunctionHooks()
 }
 
 
-
-MGS_ARY(1, 0x7227C8, WORD, 5, word_7227C8, {}); // TODO: Struct?
-
-// 0x44EAED
-void *__cdecl Stage_GetNameHashStack_44EAED()
-{
-    return memset(word_7227C8, 0, 0x10u);
-}
-
-
-
-
 MGS_VAR(1, 0x791A08, int, gActiveBuffer_dword_791A08, 0);
 MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
 MGS_VAR(1, 0x6BED20, DWORD, dword_6BED20, 0);
@@ -2449,60 +2427,6 @@ MSG_FUNC_IMPL(0x401C02, Main_sub_401C02);
 
 
 
-//MSG_FUNC_NOT_IMPL(0x44E1E0, __int16 __cdecl(), sub_44E1E0);
-__int16 __cdecl sub_44E1E0()
-{
-    word_78E7FE = word_78E7FC = -1;
-    return -1;
-}
-
-
-//MSG_FUNC_NOT_IMPL(0x0040B36E, int __cdecl(), GetResidentTop);
-int __cdecl GetResidentTop()
-{
-    return gResidentTop_dword_78E960;
-}
-
-
-// TODO: Is a global that inherits from Actor
-MGS_VAR(1, 0x725FC0, Actor, gMenuMan_stru_725FC0, {});
-
-Actor *__cdecl Menu_Related1()
-{
-    Actor_PushBack(1, &gMenuMan_stru_725FC0, 0);
-    return Actor_Init(&gMenuMan_stru_725FC0, 0, 0, "C:\\mgs\\source\\Menu\\menuman.c");
-}
-MSG_FUNC_IMPL(0x00459A9A, Menu_Related1);
-
-void __cdecl Init_Gamed_sub_44E12B()
-{
-    gFrameTime_dword_995344 = 0;
-    dword_7227A4 = 0;
-    script_cancel_non_zero_dword_7227A0 = 0;
-    dword_9942B8 = 0;
-    Menu_Related1();
-    Stage_GetNameHashStack_44EAED();
-    LibDG_SetActiveResourceInitFuncPtrs_457B5B();
-    Script_BindInits_452610();
-    LibGV_SetFnPtr_sub_40A68D('b', (GV_FnPtr)LibDG_CHARA_44E9D2);
-    sub_44E1E0();
-    Actor_PushBack(1, &g_gamed_722760, nullptr);
-    Actor_Init(&g_gamed_722760, GameD_Update_44E381.Ptr(), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
-
-    sub_44E1F9();
-    sub_44E287();
-    sub_44E212();
-    word_78E7E8 = (WORD)(dword_78D7B0 + 1);
-    dword_995324 = (int)&dword_7919C0;
-    GetResidentTop();
-    dword_722780 = 0;
-    dword_722784 = 0;
-    
-  
-    // Creates res_loader which loads the init map ?
-    sub_44E226();
-}
-MSG_FUNC_IMPLEX(0x44E12B, Init_Gamed_sub_44E12B, WINMAIN_IMPL);
 
 
 signed int __cdecl Main()
@@ -2531,7 +2455,7 @@ signed int __cdecl Main()
     sub_40111A();
     sub_4090A7();
     sub_40B725();
-    Init_Gamed_sub_44E12B();
+    Init_Gamed_Create_44E12B();
 
     for (;;)
     {

@@ -21,7 +21,7 @@ struct struct_lib_gv
     DWORD gRenderedFramesCount_dword_6BFF00;
     DWORD dword_6BFF04_time_related;
     struct_8* struct_8_ptr_6BFF08; // Seems to point to one of mStruct8_128Array_06BFF80
-    GV_FnPtr field_6BFF0C_fn_ptrs[26];
+    GV_FnPtr field_6BFF0C_26_fn_ptrs[26];
     struct_8* struct_8_ptr_6BFF74;
     struct_8* struct_8_ptr_6BFF78;
     //DWORD pad_field_6BFF7C; // TODO: This isn't in ida, how can the rest of this struct be correct????
@@ -167,17 +167,17 @@ MSG_FUNC_IMPLEX(0x40A4F6, LibGv_Init_sub_40A4F6, LIBGV_IMPL);
 
 void CC LibGv_ClearFunctionPointers_40A69D()
 {
-    memset(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs, 0, sizeof(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs));
+    memset(g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs, 0, sizeof(g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs));
 }
 MSG_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, LIBGV_IMPL);
 
 
-void __cdecl LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
+void CC LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
 {
     // Convert the a-z index to 0-25
     const int idx = id - 'a';
 
-    assert(idx < _countof(g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs));
-    g_lib_gv_stru_6BFEE0.field_6BFF0C_fn_ptrs[idx] = fn;
+    assert(idx < _countof(g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs));
+    g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs[idx] = fn;
 }
 MSG_FUNC_IMPLEX(0x40A68D, LibGV_SetFnPtr_sub_40A68D, LIBGV_IMPL);

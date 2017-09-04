@@ -73,6 +73,7 @@
   <ItemGroup>
     <ClInclude Include="Actor.hpp" />
     <ClInclude Include="Actor_Delay.hpp" />
+    <ClInclude Include="Actor_GameD.hpp" />
     <ClInclude Include="Actor_Rank.hpp" />
     <ClInclude Include="File.hpp" />
     <ClInclude Include="Input.hpp" />
@@ -93,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Actor_Delay.cpp" />
+    <ClCompile Include="Actor_GameD.cpp" />
     <ClCompile Include="Actor_Rank.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="Input.cpp" />
