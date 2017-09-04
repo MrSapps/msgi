@@ -2,6 +2,7 @@
 #include "Actor_Rank.hpp"
 #include "Script.hpp"
 #include <gmock/gmock.h>
+#include <array>
 
 #define ACTOR_RANK_IMPL true
 
@@ -682,244 +683,67 @@ static void Rank_RenderNumKilled(Actor_Rank* pRank)
     Menu_DrawText("KILLED");
 }
 
+static void Rank_RenderText(Actor_Rank* pRank, const char* text, int formatParam, int xpos, std::array<int, 4> yposes, int flags, int r, int g, int b)
+{
+    TextSetXYFlags_459B0B(xpos, yposes[pRank->field_498_mc_no], flags);
+    TextSetRGB_459B27(r, g, b);
+    Menu_DrawText(text, formatParam);
+}
+
+
 static void Rank_RenderNumRations(Actor_Rank* pRank)
 {
-    switch (pRank->field_498_mc_no)
-    {
-    case 0:
-        TextSetXYFlags_459B0B(164, 130, 17);
-        break;
-    case 1:
-        TextSetXYFlags_459B0B(164, 112, 17);
-        break;
-    case 2:
-        TextSetXYFlags_459B0B(164, 108, 17);
-        break;
-    case 3:
-        TextSetXYFlags_459B0B(164, 102, 17);
-        break;
-    }
-    TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("RATIONS /");
+    std::array<int, 4> ypos = { 130, 112, 108, 102 };
+    const int r = 140;
+    const int g = 181;
+    const int b = 181;
 
-    DWORD numRations = gNumRations_word_78E88C;
+    Rank_RenderText(pRank, "RATIONS /", 0, 164, ypos, 17, 82, 140, 123);
+
+    DWORD numRationsCapped = gNumRations_word_78E88C;
     if (gNumRations_word_78E88C >= 1000)
     {
-        numRations = 999;
+        numRationsCapped = 999;
     }
-    DWORD numRationsDiv100 = numRations / 100;
-    DWORD numRationsMod100Div10 = numRations % 100 / 10;
-    if (numRations / 100)
+    
+    const DWORD numRationsDiv100 = numRationsCapped / 100;
+    const DWORD numRationsMod100Div10 = numRationsCapped % 100 / 10;
+    if (numRationsCapped / 100)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 0:
-            TextSetXYFlags_459B0B(172, 130, 16);
-            break;
-        case 1:
-            TextSetXYFlags_459B0B(172, 112, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(172, 108, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(172, 102, 16);
-            break;
-        }
-        TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", numRationsDiv100);
+        Rank_RenderText(pRank, "%d", numRationsDiv100, 172, ypos, 16, r, g, b);
     }
 
     if (numRationsMod100Div10 || numRationsDiv100)
     {
-        switch (pRank->field_498_mc_no)
-        {
-        case 0:
-            TextSetXYFlags_459B0B(181, 130, 16);
-            break;
-        case 1:
-            TextSetXYFlags_459B0B(181, 112, 16);
-            break;
-        case 2:
-            TextSetXYFlags_459B0B(181, 108, 16);
-            break;
-        case 3:
-            TextSetXYFlags_459B0B(181, 102, 16);
-            break;
-        }
-
-        TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", numRationsMod100Div10);
+        Rank_RenderText(pRank, "%d", numRationsMod100Div10 % 10, 181, ypos, 16, r, g, b);
     }
 
-    switch (pRank->field_498_mc_no)
-    {
-    case 0:
-        TextSetXYFlags_459B0B(190, 130, 16);
-        break;
-    case 1:
-        TextSetXYFlags_459B0B(190, 112, 16);
-        break;
-    case 2:
-        TextSetXYFlags_459B0B(190, 108, 16);
-        break;
-    case 3:
-        TextSetXYFlags_459B0B(190, 102, 16);
-        break;
-    }
-    TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", numRations % 10);
-
-    switch (pRank->field_498_mc_no)
-    {
-    case 0:
-        TextSetXYFlags_459B0B(214, 130, 16);
-        break;
-    case 1:
-        TextSetXYFlags_459B0B(214, 112, 16);
-        break;
-    case 2:
-        TextSetXYFlags_459B0B(214, 108, 16);
-        break;
-    case 3:
-        TextSetXYFlags_459B0B(214, 102, 16);
-        break;
-    }
-    TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("USED");
+    Rank_RenderText(pRank, "%d", numRationsCapped % 10, 190, ypos, 16, r, g, b);
+    Rank_RenderText(pRank, "USED", 0, 214, ypos, 16, 82, 140, 123);
 }
 
 void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
 {
-    
+
     Rank_RenderPlayTime(pRank);
     Rank_RenderNumSaves(pRank);
     Rank_RenderNumContinues(pRank);
     Rank_RenderTimesSpotted(pRank);
     Rank_RenderNumKilled(pRank);
     Rank_RenderNumRations(pRank);
-    
 
-    if (pRank->field_498_mc_no)
+    // If pRank->field_498_mc_no == 0 then "GAME LEVEL" is never displayed, along with USED ITEM list
+
+    if (pRank->field_498_mc_no == 1)
     {
-        if (pRank->field_498_mc_no == 1)
+        if (pRank->field_49C_radar)
         {
-            if (pRank->field_49C_radar)
-            {
-                TextSetXYFlags_459B0B(164, 46, 17);
-                TextSetRGB_459B27(82, 140, 123);
-                Menu_DrawText("GAME LEVEL /");
-                TextSetXYFlags_459B0B(172, 46, 16);
-                TextSetRGB_459B27(140, 181, 181);
-        
-                switch (gDiffcultyLevel)
-                {
-                case -1:
-                    Menu_DrawText("VERY EASY");
-                    break;
-                case 0:
-                    Menu_DrawText("EASY");
-                    break;
-                case 1:
-                    Menu_DrawText("NORMAL");
-                    break;
-                case 2:
-                    Menu_DrawText("HARD");
-                    break;
-                case 3:
-                    Menu_DrawText("EXTREME");
-                    break;
-                }
-     
-            }
-            else if (pRank->field_4A0_stealth)
-            {
-                TextSetXYFlags_459B0B(164, 112, 17);
-                TextSetRGB_459B27(82, 140, 123);
-                Menu_DrawText("USED ITEM /");
-                TextSetXYFlags_459B0B(172, 112, 16);
-                TextSetRGB_459B27(140, 181, 181);
-                Menu_DrawText("STEALTH");
-            }
-            else
-            {
-                TextSetXYFlags_459B0B(164, 112, 17);
-                TextSetRGB_459B27(82, 140, 123);
-                Menu_DrawText("USED ITEM /");
-                TextSetXYFlags_459B0B(172, 112, 16);
-                TextSetRGB_459B27(140, 181, 181);
-                Menu_DrawText("BANDANA");
-            }
-        }
-        else if (pRank->field_498_mc_no == 2)
-        {
-            if (pRank->field_49C_radar)
-            {
-                TextSetXYFlags_459B0B(164, 42, 17);
-                TextSetRGB_459B27(82, 140, 123);
-                Menu_DrawText("GAME LEVEL /");
-                TextSetXYFlags_459B0B(172, 42, 16);
-                TextSetRGB_459B27(140, 181, 181);
-   
-                switch (gDiffcultyLevel)
-                {
-                case -1:
-                    Menu_DrawText("VERY EASY");
-                    break;
-                case 0:
-                    Menu_DrawText("EASY");
-                    break;
-                case 1:
-                    Menu_DrawText("NORMAL");
-                    break;
-                case 2:
-                    Menu_DrawText("HARD");
-                    break;
-                case 3:
-                    Menu_DrawText("EXTREME");
-                    break;
-                }
-
-                if (pRank->field_4A0_stealth)
-                {
-                    TextSetXYFlags_459B0B(164, 119, 17);
-                    TextSetRGB_459B27(82, 140, 123);
-                    Menu_DrawText("USED ITEM /");
-                    TextSetXYFlags_459B0B(172, 119, 16);
-                    TextSetRGB_459B27(140, 181, 181);
-                    Menu_DrawText("STEALTH");
-                }
-                else
-                {
-                    TextSetXYFlags_459B0B(164, 119, 17);
-                    TextSetRGB_459B27(82, 140, 123);
-                    Menu_DrawText("USED ITEM /");
-                    TextSetXYFlags_459B0B(172, 119, 16);
-                    TextSetRGB_459B27(140, 181, 181);
-                    Menu_DrawText("BANDANA");
-                }
-            }
-            else
-            {
-                TextSetXYFlags_459B0B(164, 108, 17);
-                TextSetRGB_459B27(82, 140, 123);
-                Menu_DrawText("USED ITEMS /");
-                TextSetXYFlags_459B0B(172, 108, 16);
-                TextSetRGB_459B27(140, 181, 181);
-                Menu_DrawText("STEALTH");
-                TextSetXYFlags_459B0B(172, 119, 16);
-                TextSetRGB_459B27(140, 181, 181);
-                Menu_DrawText("BANDANA");
-            }
-        }
-        else
-        {
-            TextSetXYFlags_459B0B(164, 36, 17);
+            TextSetXYFlags_459B0B(164, 46, 17);
             TextSetRGB_459B27(82, 140, 123);
             Menu_DrawText("GAME LEVEL /");
-            TextSetXYFlags_459B0B(172, 36, 16);
+            TextSetXYFlags_459B0B(172, 46, 16);
             TextSetRGB_459B27(140, 181, 181);
-           
+
             switch (gDiffcultyLevel)
             {
             case -1:
@@ -938,20 +762,126 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
                 Menu_DrawText("EXTREME");
                 break;
             }
-  
-            TextSetXYFlags_459B0B(164, 113, 17);
+
+        }
+        else if (pRank->field_4A0_stealth)
+        {
+            TextSetXYFlags_459B0B(164, 112, 17);
             TextSetRGB_459B27(82, 140, 123);
-            Menu_DrawText("USED ITEMS /");
-            TextSetXYFlags_459B0B(172, 113, 16);
+            Menu_DrawText("USED ITEM /");
+            TextSetXYFlags_459B0B(172, 112, 16);
             TextSetRGB_459B27(140, 181, 181);
             Menu_DrawText("STEALTH");
-            TextSetXYFlags_459B0B(172, 124, 16);
+        }
+        else
+        {
+            TextSetXYFlags_459B0B(164, 112, 17);
+            TextSetRGB_459B27(82, 140, 123);
+            Menu_DrawText("USED ITEM /");
+            TextSetXYFlags_459B0B(172, 112, 16);
             TextSetRGB_459B27(140, 181, 181);
             Menu_DrawText("BANDANA");
         }
     }
-    
-    
+    else if (pRank->field_498_mc_no == 2)
+    {
+        if (pRank->field_49C_radar)
+        {
+            TextSetXYFlags_459B0B(164, 42, 17);
+            TextSetRGB_459B27(82, 140, 123);
+            Menu_DrawText("GAME LEVEL /");
+            TextSetXYFlags_459B0B(172, 42, 16);
+            TextSetRGB_459B27(140, 181, 181);
+
+            switch (gDiffcultyLevel)
+            {
+            case -1:
+                Menu_DrawText("VERY EASY");
+                break;
+            case 0:
+                Menu_DrawText("EASY");
+                break;
+            case 1:
+                Menu_DrawText("NORMAL");
+                break;
+            case 2:
+                Menu_DrawText("HARD");
+                break;
+            case 3:
+                Menu_DrawText("EXTREME");
+                break;
+            }
+
+            if (pRank->field_4A0_stealth)
+            {
+                TextSetXYFlags_459B0B(164, 119, 17);
+                TextSetRGB_459B27(82, 140, 123);
+                Menu_DrawText("USED ITEM /");
+                TextSetXYFlags_459B0B(172, 119, 16);
+                TextSetRGB_459B27(140, 181, 181);
+                Menu_DrawText("STEALTH");
+            }
+            else
+            {
+                TextSetXYFlags_459B0B(164, 119, 17);
+                TextSetRGB_459B27(82, 140, 123);
+                Menu_DrawText("USED ITEM /");
+                TextSetXYFlags_459B0B(172, 119, 16);
+                TextSetRGB_459B27(140, 181, 181);
+                Menu_DrawText("BANDANA");
+            }
+        }
+        else
+        {
+            TextSetXYFlags_459B0B(164, 108, 17);
+            TextSetRGB_459B27(82, 140, 123);
+            Menu_DrawText("USED ITEMS /");
+            TextSetXYFlags_459B0B(172, 108, 16);
+            TextSetRGB_459B27(140, 181, 181);
+            Menu_DrawText("STEALTH");
+            TextSetXYFlags_459B0B(172, 119, 16);
+            TextSetRGB_459B27(140, 181, 181);
+            Menu_DrawText("BANDANA");
+        }
+    }
+    else if (pRank->field_498_mc_no == 3) // Or != 0
+    {
+        TextSetXYFlags_459B0B(164, 36, 17);
+        TextSetRGB_459B27(82, 140, 123);
+        Menu_DrawText("GAME LEVEL /");
+        TextSetXYFlags_459B0B(172, 36, 16);
+        TextSetRGB_459B27(140, 181, 181);
+
+        switch (gDiffcultyLevel)
+        {
+        case -1:
+            Menu_DrawText("VERY EASY");
+            break;
+        case 0:
+            Menu_DrawText("EASY");
+            break;
+        case 1:
+            Menu_DrawText("NORMAL");
+            break;
+        case 2:
+            Menu_DrawText("HARD");
+            break;
+        case 3:
+            Menu_DrawText("EXTREME");
+            break;
+        }
+
+        TextSetXYFlags_459B0B(164, 113, 17);
+        TextSetRGB_459B27(82, 140, 123);
+        Menu_DrawText("USED ITEMS /");
+        TextSetXYFlags_459B0B(172, 113, 16);
+        TextSetRGB_459B27(140, 181, 181);
+        Menu_DrawText("STEALTH");
+        TextSetXYFlags_459B0B(172, 124, 16);
+        TextSetRGB_459B27(140, 181, 181);
+        Menu_DrawText("BANDANA");
+    }
+
     TextSetXYFlags_459B0B(115 - gRankXPosTable_byte_67676C[pRank->field_494_ranking], 143, 16);
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText("CODE NAME");
@@ -1007,6 +937,15 @@ MSG_FUNC_IMPLEX(0x472832, Rank_Animate_472832, false);  // TODO
 
 void CC Rank_update_46EC75(Actor_Rank* pRank)
 {
+    if ((pRank->field_480_ticks % 60) == 0)
+    {
+        pRank->field_498_mc_no++;
+        if (pRank->field_498_mc_no > 3)
+        {
+            pRank->field_498_mc_no = 0;
+        }
+    }
+
     switch (pRank->field_484_state)
     {
     case 0:
