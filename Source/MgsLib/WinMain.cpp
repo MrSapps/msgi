@@ -767,7 +767,26 @@ struct MessageBoxStruct
 };
 
 MGS_ARY(1, 0x664EC0, MessageBoxStruct, 8, stru_664EC0, {});
-MGS_ARY(1, 0x00662EC0, char, 8*1024, gStrErrStrings, {}); // 2d array of [8][1024]
+
+struct ErrorStrings
+{
+    char mStrings[8][1024];
+};
+
+const ErrorStrings kArray_00662EC0 =
+{
+    { 
+        "Hold down the Inventory and Weapon item buttons",
+        "if you do not want to play Alternate Round",
+        "RADAR OFF",
+        "Another copy of Metal Gear Solid Integral or VR missions is running, please exit first.",
+        "Metal Gear Solid has detected that your graphics accelerator does not support the functions needed to run the game in Hardware mode.  The game will run correctly, but only in software mode.",
+        "Metal Gear Solid has detected that your graphics accelerator does not support all the functions needed to run the game correctly in Hardware mode.  The game will now default to start in software mode.  You can change this to run with your hardware acceleator at any time from the Video Options / Advanced menu.  This is not recomended as correct game functionality cannot be assured.",
+        "Metal Gear Solid requires at least 4 MB of video accelerator memory available.  Currently, there is not enough video memory on this system to run the game in Hardware mode.  The game will run correctly, but only in software mode.  If more video memory is made available, Metal Gear Solid will run in hardware mode.  For more information, contact your hardware manufacturer.",
+        "Metal Gear Solid has detected that you have a joystick in use on this system.  Please ensure that this joystick is centered prior to playing the game, otherwise the joystick input will override any keyboard direction input."
+    }
+};
+MGS_VAR(1, 0x00662EC0, const ErrorStrings, gStrErrStrings, kArray_00662EC0);
 
 // 0x0043CBD9
 int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uType)
@@ -809,7 +828,7 @@ int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uTyp
 
             if (msgIdx >= 0)
             {
-                result = MessageBoxA(hWnd, &gStrErrStrings[msgIdx * 1024], lpCaption, uType);
+                result = MessageBoxA(hWnd, gStrErrStrings.mStrings[msgIdx], lpCaption, uType);
             }
         }
         else
@@ -820,7 +839,7 @@ int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uTyp
     }
     else
     {
-        result = MessageBoxA(hWnd, &gStrErrStrings[errCode * 1024], lpCaption, uType);
+        result = MessageBoxA(hWnd, gStrErrStrings.mStrings[errCode], lpCaption, uType);
     }
     return result;
 }

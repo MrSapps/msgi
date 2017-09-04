@@ -25,7 +25,24 @@ MGS_ARY(1, 0x6571F4, DWORD, 14, dword_6571F4, {});// TODO: Check 14 is big enoug
 
 char* sidewinderEtc = (char*)0x657298; // TODO: Dump array
 DWORD* dword_65726C = (DWORD*)0x65726C;
-char* buttonNames = (char*)0x65510C; // TODO: Dump array
+
+struct ButtonName
+{
+    char mName[0x19];
+};
+
+struct ButtonNames
+{
+    ButtonName mNames[66];
+};
+
+struct ButtonNamesArray
+{
+    ButtonNames mNames[4];
+};
+
+MGS_VAR(1, 0x65510C, ButtonNamesArray, buttonNames, {}); // TODO: Dump array
+
 char* buttonList = (char*)0x654A98; // TODO: Dump array
 MGS_VAR(1, 0x71D68C, int, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
@@ -525,9 +542,7 @@ int __cdecl Input_Shutdown_sub_43C716()
 MSG_FUNC_IMPLEX(0x43C716, Input_Shutdown_sub_43C716, INPUT_IMPL);
 
 
-// 0x0043B1D1
-//MSG_FUNC_NOT_IMPL(0x0043B1D1, int __cdecl(HWND), InitDirectInput);
-int __cdecl Input_Init(HWND hWnd)
+HRESULT CC Input_Init(HWND hWnd)
 {
     char productName[0x80];
     char instanceName[0x80];
@@ -540,8 +555,10 @@ int __cdecl Input_Init(HWND hWnd)
     HRESULT hr = DirectInputCreateExMGS(gHInstance, DIRECTINPUT_VERSION, IID_IDirectInput7A_MGS, (LPVOID*)&pDirectInput, 0);
 #endif
 
-    if (hr < 0)
+    if (FAILED(hr))
+    {
         return hr;
+    }
 
 #if USE_DINPUT8
     hr = pDirectInput->EnumDevices(DI8DEVCLASS_GAMECTRL, Input_EnumDevicesCallback, 0, DIEDFL_ATTACHEDONLY);
@@ -549,7 +566,7 @@ int __cdecl Input_Init(HWND hWnd)
     hr = pDirectInput->EnumDevices(DIDEVTYPE_JOYSTICK, Input_EnumDevicesCallback, 0, DIEDFL_ATTACHEDONLY);
 #endif
 
-    if (hr >= 0)
+    if (SUCCEEDED(hr))
     {
         if (pJoystickDevice != 0)
         {
@@ -558,15 +575,15 @@ int __cdecl Input_Init(HWND hWnd)
             JoystickDeviceInfos.dwSize = sizeof(DIDEVICEINSTANCEA);
             HRESULT hGetInfosRes = pJoystickDevice->GetDeviceInfo(&JoystickDeviceInfos);
             hr = pJoystickDevice->SetDataFormat(&c_dfDIJoystick);
-            if (hr >= 0)
+            if (SUCCEEDED(hr))
             {
                 hr = pJoystickDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
-                if (hr >= 0)
+                if (SUCCEEDED(hr))
                 {
                     memset(&JoystickDeviceCaps, 0, 0x2Cu);
                     JoystickDeviceCaps.dwSize = 0x2C;
                     hr = pJoystickDevice->GetCapabilities(&JoystickDeviceCaps);
-                    if (hr >= 0)
+                    if (SUCCEEDED(hr))
                     {
                         pJoystickDevice->EnumObjects(Input_Enum_Axis_43B0C8, hWnd, DIDFT_AXIS);
                         pJoystickDevice->EnumObjects(Input_Enum_Buttons_sub_43B0B3, hWnd, DIDFT_BUTTON);
@@ -579,7 +596,7 @@ int __cdecl Input_Init(HWND hWnd)
                         } while (hr == E_ACCESSDENIED);
 #endif
 
-                        if (hr >= 0)
+                        if (SUCCEEDED(hr))
                         {
                             if (hGetInfosRes >= 0)
                             {
@@ -607,16 +624,17 @@ int __cdecl Input_Init(HWND hWnd)
                                     if (var14 != 0)
                                     {
                                         if (i == 5)
+                                        {
                                             i = 4;
+                                        }
 
                                         dword_71D790 = 1;
                                         dword_71D41C = dword_65726C[i * 2];
                                         gJoyStickId_dword_71D798 = i + 1;
 
-                                        for (int nButton = 0; nButton < 0x38; nButton++)
+                                        for (int nButton = 0; nButton < 56; nButton++)
                                         {
-                                            size_t offset = i * 0x672 + nButton * 0x19;
-                                            strcpy(&buttonList[nButton * 0x19], &buttonNames[offset]);
+                                            strcpy(&buttonList[nButton * 0x19], buttonNames.mNames[i].mNames[nButton].mName);
                                         }
                                         break;
                                     }
@@ -699,7 +717,7 @@ int __cdecl Input_Init(HWND hWnd)
         }
     }
 
-    if (hr < 0 || pJoystickDevice == 0)
+    if (FAILED(hr) || pJoystickDevice == 0)
     {
         for (unsigned int i = 0; i < dword_6FD1DC; i++)
         {
@@ -709,12 +727,16 @@ int __cdecl Input_Init(HWND hWnd)
 
     // 0x43BBEC
     hr = pDirectInput->CreateDevice(GUID_SysMouse, &pMouseDevice, 0);
-    if (hr < 0)
+    if (FAILED(hr))
+    {
         return hr;
+    }
 
     hr = pMouseDevice->SetDataFormat(&c_dfDIMouse);
-    if (hr < 0)
+    if (FAILED(hr))
+    {
         return hr;
+    }
 
     if (gWindowedMode != 0)
     {
@@ -724,25 +746,26 @@ int __cdecl Input_Init(HWND hWnd)
     {
         hr = pMouseDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
     }
-    if (hr < 0)
+    if (FAILED(hr))
+    {
         return hr;
+    }
 
     hr = pMouseDevice->Acquire();
 
-    return 0;
+    return S_OK;
 }
 MSG_FUNC_IMPLEX(0x0043B1D1, Input_Init, INPUT_IMPL);
 
-// 0x0042D69E
-int __cdecl Input_Start()
-{
-    int result; // eax@1
 
+void CC Input_Start()
+{
     dword_717348 = 0;
-    result = Input_Init(gHwnd);
-    if (result < 0)
-        result = printf("$jim failed to init direct input");
-    return result;
+    const HRESULT hr = Input_Init(gHwnd);
+    if (FAILED(hr))
+    {
+        printf("$jim failed to init direct input");
+    }
 }
 MSG_FUNC_IMPLEX(0x0042D69E, Input_Start, INPUT_IMPL);
 
