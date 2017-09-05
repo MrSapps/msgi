@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "LibDG.hpp"
 #include "Script.hpp"
+#include "LibGV.hpp"
 
 #define LIBDG_IMPL true
 
@@ -8,6 +9,7 @@ void LibDGCpp_ForceLink() { }
 
 #define REDIRECT_LIBDG_DATA 1
 
+MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
 MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0,
 {
@@ -156,8 +158,8 @@ MGS_PTR(REDIRECT_LIBDG_DATA, 0x993F44, Res_Init_Record**, gpToDynamicResInitFunc
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x994304, DWORD, gSleep5000_after_res_funcs_1_dword_994304, 0);
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x99430C, DWORD, gSleep5000_after_res_funcs_2_dword_99430C, 0);
 
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB910, Actor, gLibDGD_1_stru_6BB910, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
-
 
 // TODO: Script_tbl_get_res_init_fn_457B9A - call GCL script to get res fn func ptr, then caller creates the resource
 MSG_FUNC_NOT_IMPL(0x457B9A, ResInitFn CC(BYTE *pScript), Script_tbl_get_res_init_fn_457B9A);
@@ -264,3 +266,55 @@ ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName)
     return result;
 }
 MSG_FUNC_IMPLEX(0x457BAC, LibDG_GetResourceInitFuncPtr_457BAC, LIBDG_IMPL);
+
+MSG_FUNC_NOT_IMPL(0x401A4F, void CC(int ClipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2, int a5), sub_401A4F);
+MSG_FUNC_NOT_IMPL(0x4012F2, void CC(int k320), sub_4012F2);
+MSG_FUNC_NOT_IMPL(0x4026E6, void CC(), LibDG_Reset_HashCounts_4026E6);
+MSG_FUNC_NOT_IMPL(0x4010A6, void CC(), LibDG_4010A6);
+
+signed int CC Returns1_402B1D()
+{
+    return 1;
+}
+MSG_FUNC_IMPLEX(0x402B1D, Returns1_402B1D, LIBDG_IMPL);
+
+MSG_FUNC_NOT_IMPL(0x402B25, signed int CC(int a2, int a3), MissionLog_Related1_402B25);
+MSG_FUNC_NOT_IMPL(0x402796, signed int CC(int a1), sub_402796);
+MSG_FUNC_NOT_IMPL(0x402A03, signed int CC(int a1), sub_402A03);
+MSG_FUNC_NOT_IMPL(0x402A29, signed int CC(int a1), sub_402A29);
+MSG_FUNC_NOT_IMPL(0x403290, signed int CC(int a1), sub_403290);
+MSG_FUNC_NOT_IMPL(0x402A5F, signed int CC(int a1), sub_402A5F);
+MSG_FUNC_NOT_IMPL(0x402AA9, signed int CC(int a1), sub_402AA9);
+
+MSG_FUNC_NOT_IMPL(0x40171C, void CC(int activeBuffer), LibDG_ExecFnPtrs_40171C);
+MSG_FUNC_NOT_IMPL(0x401234, void CC(Actor* pActor), LibDG_Update2_401234);
+
+void CC LibDG_Update1_4012ED(Actor* pActor)
+{
+    // This function is a jmp to a stub that does this
+    LibDG_ExecFnPtrs_40171C(gActiveBuffer_dword_791A08);
+}
+MSG_FUNC_IMPLEX(0x4012ED, LibDG_Update1_4012ED, LIBDG_IMPL);
+
+void CC LibDg_Init_40111A()
+{
+    //nullsub_8();
+    //nullsub_7(DeadCode_4011F8);
+    sub_401A4F(0, 0, 320, 240, 320);
+    sub_4012F2(320);
+    LibDG_Reset_HashCounts_4026E6();
+    LibDG_4010A6();
+    LibGV_SetFnPtr_sub_40A68D('p', (GV_FnPtr)MissionLog_Related1_402B25.Ptr());
+    LibGV_SetFnPtr_sub_40A68D('k', (GV_FnPtr)sub_402796.Ptr());
+    LibGV_SetFnPtr_sub_40A68D('l', (GV_FnPtr)Returns1_402B1D);
+    LibGV_SetFnPtr_sub_40A68D('n', (GV_FnPtr)sub_402A03.Ptr());
+    LibGV_SetFnPtr_sub_40A68D('o', (GV_FnPtr)sub_402A29.Ptr());
+    LibGV_SetFnPtr_sub_40A68D('z', (GV_FnPtr)sub_403290.Ptr());
+    LibGV_SetFnPtr_sub_40A68D('i', (GV_FnPtr)sub_402A5F.Ptr());
+    LibGV_SetFnPtr_sub_40A68D('s', (GV_FnPtr)sub_402AA9.Ptr());
+    Actor_PushBack(0, &gLibDG_2_stru_6BB930.mBase, 0);// Handles 2D rendering?
+    Actor_Init(&gLibDG_2_stru_6BB930.mBase, LibDG_Update2_401234.Ptr(), 0, "C:\\mgs\\source\\LibDG\\dgd.c");
+    Actor_PushBack(8, &gLibDGD_1_stru_6BB910, 0); // Handles 3D rendering?
+    Actor_Init(&gLibDGD_1_stru_6BB910, LibDG_Update1_4012ED, 0, "C:\\mgs\\source\\LibDG\\dgd.c");
+}
+MSG_FUNC_IMPLEX(0x40111A, LibDg_Init_40111A, LIBDG_IMPL);

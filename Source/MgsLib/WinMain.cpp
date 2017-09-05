@@ -72,7 +72,6 @@ MSG_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
 MSG_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
 MSG_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
 MSG_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
-MSG_FUNC_NOT_IMPL(0x0040111A, int __cdecl(), sub_40111A);
 MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
 
 
@@ -2486,7 +2485,7 @@ signed int __cdecl Main()
     //nullsub_9();
     LibGv_Init_sub_40A4F6();
     sub_408086();
-    sub_40111A();
+    LibDg_Init_40111A();
     sub_4090A7();
     LibGv_Set_Load_HZM_CallBack_40B725();
     Init_Gamed_Create_44E12B();

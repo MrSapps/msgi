@@ -32,5 +32,6 @@ signed int CC LibDG_CHARA_44E9D2(Res_Init_Record *pStartingRecord);
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B();
 void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C();
 ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName);
+void CC LibDg_Init_40111A();
 
 signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript);
