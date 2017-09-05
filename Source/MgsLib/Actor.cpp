@@ -6,8 +6,8 @@
 
 struct PauseKill
 {
-    WORD mPause;
-    WORD mKill;
+    u16 mPause;
+    u16 mKill;
 };
 MSG_ASSERT_SIZEOF(PauseKill, 0x4);
 
@@ -24,14 +24,14 @@ MGS_ARY(1, 0x6507EC, const PauseKill, 9, gPauseKills,
     { 0,  7 } 
 });
 MGS_ARY(1, 0x006BFC78, ActorList, 9, gActorsList, {});
-MGS_VAR(1, 0x791A0C, DWORD, gActorPauseFlags_dword_791A0C, 0);
-MGS_VAR(1, 0x9942A0, DWORD, dword_9942A0, 0);
+MGS_VAR(1, 0x791A0C, u32, gActorPauseFlags_dword_791A0C, 0);
+MGS_VAR(1, 0x9942A0, u32, dword_9942A0, 0);
 
 template<class bShouldEnterList, class bShouldContinue>
 static bool IterateActors(bShouldEnterList fnEnterList, bShouldContinue fnShouldContinue)
 {
     ActorList* pActorList = gActorsList;
-    for (int i = 9; i > 0; --i)
+    for (s32 i = 9; i > 0; --i)
     {
         if (fnEnterList(pActorList))
         {
@@ -53,7 +53,7 @@ static bool IterateActors(bShouldEnterList fnEnterList, bShouldContinue fnShould
     return false;
 }
 
-Actor* CC Actor_ResourceAlloc(int actor_system_idx, int size)
+Actor* CC Actor_ResourceAlloc(s32 actor_system_idx, s32 size)
 {
     UNREFERENCED_PARAMETER(actor_system_idx);
     UNREFERENCED_PARAMETER(size);
@@ -65,7 +65,7 @@ void CC Actor_DumpActorSystem()
 {
     printf("--DumpActorSystem--\n");
 
-    int i = 0;
+    s32 i = 0;
     auto fnEnterActorList = [&](ActorList* pActorList)
     {
         i++;
@@ -115,7 +115,7 @@ Actor* CC Actor_Init(Actor* pActor, TActorFunction fnUpdate, TActorFunction fnSh
 }
 MSG_FUNC_IMPLEX(0x0040A347, Actor_Init, ACTOR_IMPL);
 
-Actor* CC Actor_PushBack(int level, Actor* pActor, TActorFunction fnFree)
+Actor* CC Actor_PushBack(s32 level, Actor* pActor, TActorFunction fnFree)
 {
     Actor* pLast = &gActorsList[level].last;
     Actor* pLastPrevious = pLast->pPrevious;
@@ -134,7 +134,7 @@ Actor* CC Actor_PushBack(int level, Actor* pActor, TActorFunction fnFree)
 }
 MSG_FUNC_IMPLEX(0x0040A2AF, Actor_PushBack, ACTOR_IMPL);
 
-void CC Actor_KillActorsAtLevel(signed int killLevel)
+void CC Actor_KillActorsAtLevel(s32 killLevel)
 {
     auto fnEnterActorList = [&](ActorList* pActorList)
     {
@@ -210,7 +210,7 @@ void CC ActorList_Init()
 {
     ActorList* pActorList = gActorsList;
 
-    for (int i = 0; i < 9; i++)
+    for (s32 i = 0; i < 9; i++)
     {
         pActorList->first.pPrevious = 0;
         pActorList->first.pNext = &pActorList->last;
@@ -232,7 +232,7 @@ void CC ActorList_Init()
 }
 MSG_FUNC_IMPLEX(0x0040A006, ActorList_Init, ACTOR_IMPL);
 
-ActorList* CC ActorList_Set_KillPause(int index, __int16 pause, __int16 kill)
+ActorList* CC ActorList_Set_KillPause(s32 index, s16 pause, s16 kill)
 {
     gActorsList[index].mPause = pause;
     gActorsList[index].mKill = kill;
