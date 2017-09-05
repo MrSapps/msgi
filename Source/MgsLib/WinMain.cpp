@@ -74,7 +74,6 @@ MSG_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
 MSG_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
 MSG_FUNC_NOT_IMPL(0x0040111A, int __cdecl(), sub_40111A);
 MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
-MSG_FUNC_NOT_IMPL(0x0040B725, int __cdecl(), sub_40B725);
 
 
 MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
@@ -2489,7 +2488,7 @@ signed int __cdecl Main()
     sub_408086();
     sub_40111A();
     sub_4090A7();
-    sub_40B725();
+    LibGv_Set_Load_HZM_CallBack_40B725();
     Init_Gamed_Create_44E12B();
 
     for (;;)

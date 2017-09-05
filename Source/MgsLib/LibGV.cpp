@@ -52,6 +52,8 @@ void LibGVCpp_ForceLink() { }
 MSG_FUNC_NOT_IMPL(0x40B35E, void CC(), LibGV_Reset_System2_Memory_40B35E);
 MSG_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_Allocs_40A6AC);
 MSG_FUNC_NOT_IMPL(0x40A4B1, void CC(), sub_40A4B1);
+MSG_FUNC_NOT_IMPL(0x40B734, void CC(int), Hzm_load_40B734);
+
 
 //MSG_FUNC_NOT_IMPL(0x4455A0, __int64 __cdecl(), TimingRelated_4455A0);
 
@@ -171,6 +173,11 @@ void CC LibGv_ClearFunctionPointers_40A69D()
 }
 MSG_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, LIBGV_IMPL);
 
+void CC LibGv_Set_Load_HZM_CallBack_40B725()
+{
+    LibGV_SetFnPtr_sub_40A68D('h', (GV_FnPtr)Hzm_load_40B734.Ptr());
+}
+MSG_FUNC_IMPLEX(0x40B725, LibGv_Set_Load_HZM_CallBack_40B725, LIBGV_IMPL);
 
 void CC LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
 {
