@@ -2,6 +2,7 @@
 #include "LibDG.hpp"
 #include "Script.hpp"
 #include "LibGV.hpp"
+#include <assert.h>
 
 #define LIBDG_IMPL true
 
@@ -286,8 +287,68 @@ MSG_FUNC_NOT_IMPL(0x403290, signed int CC(int a1), sub_403290);
 MSG_FUNC_NOT_IMPL(0x402A5F, signed int CC(int a1), sub_402A5F);
 MSG_FUNC_NOT_IMPL(0x402AA9, signed int CC(int a1), sub_402AA9);
 
-MSG_FUNC_NOT_IMPL(0x40171C, void CC(int activeBuffer), LibDG_ExecFnPtrs_40171C);
+
 MSG_FUNC_NOT_IMPL(0x401234, void CC(Actor* pActor), LibDG_Update2_401234);
+
+
+MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 1);
+MGS_VAR(1, 0x6BC36C, DWORD, gPassedToLibGV_FnPtrs_dword_6BC36C, 0);
+MGS_VAR(1, 0x6BE4E8, DWORD, gUnkSize_1024_6BE4E8, 0);
+
+
+MSG_FUNC_NOT_IMPL(0x40B231, unsigned int CC(void* pMem, int size), MemClearUnknown_40B231);
+
+using TDG_FnPtr = int(CC*)(int,int);
+
+MSG_FUNC_NOT_IMPL(0x4061E7, int CC (int a1, int a2), sub_4061E7);
+MSG_FUNC_NOT_IMPL(0x405668, int CC(int a1, int a2), sub_405668);
+MSG_FUNC_NOT_IMPL(0x405180, int CC(int a1, int a2), sub_405180);
+MSG_FUNC_NOT_IMPL(0x4041A5, int CC(int a1, int a2), sub_4041A5);
+MSG_FUNC_NOT_IMPL(0x403528, int CC(int a1, int a2), sub_403528);
+MSG_FUNC_NOT_IMPL(0x40340A, int CC(int a1, int a2), sub_40340A);
+
+MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0, 
+{
+    sub_4061E7.Ptr(),
+    sub_405668.Ptr(),
+    sub_405180.Ptr(),
+    sub_4041A5.Ptr(),
+    sub_403528.Ptr(),
+    sub_40340A.Ptr(),
+    nullptr
+});
+
+// Returns the old pointer because the calling code will use it to restore it later
+TDG_FnPtr CC LibDG_SetFnPtr_4019FA(int idx, TDG_FnPtr fnPtr)
+{
+    TDG_FnPtr old = gLibDg_FuncPtrs_off_6500E0[idx];
+    gLibDg_FuncPtrs_off_6500E0[idx] = fnPtr;
+    return old;
+}
+MSG_FUNC_IMPLEX(0x4019FA, LibDG_SetFnPtr_4019FA, LIBDG_IMPL);
+
+void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
+{
+    if (!gLibDG_ExecPtrs_6BECE8)
+    {
+        MemClearUnknown_40B231((void*)&gUnkSize_1024_6BE4E8, 1024);
+
+        int count = 7;
+        // Check if extra function pointer slot is in use?
+        // TODO: Seems like this is dead code as the condition can never be true?
+        if (gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers != 0)
+        {
+            assert(false);
+            count++;
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            gLibDg_FuncPtrs_off_6500E0[i]((int)&gPassedToLibGV_FnPtrs_dword_6BC36C, activeBuffer);
+        }
+    }
+}
+MSG_FUNC_IMPLEX(0x40171C, LibDG_ExecFnPtrs_40171C, LIBDG_IMPL);
 
 void CC LibDG_Update1_4012ED(Actor* pActor)
 {
