@@ -155,3 +155,5 @@ struct Actor_Rank
     int field_5F8_script_x;
 };
 MSG_ASSERT_SIZEOF(Actor_Rank, 0x5FC);
+
+BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, POLY_FT4* pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type);

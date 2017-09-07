@@ -72,6 +72,9 @@
     <ClInclude Include="Actor_GameD.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Actor_Debug.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -126,6 +129,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Actor_GameD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor_Debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
