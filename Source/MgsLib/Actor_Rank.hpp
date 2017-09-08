@@ -44,17 +44,8 @@ struct Actor_Rank
 
     int field_414_script_e;
     DWORD *field_418_script_t;
-    DWORD field_41C_16_prim_dst[15];
-    DWORD *field_458_cur_lu_q; // TODO: Part of the array?
-    DWORD *field_45C_cur_ru_q; // 9 array starts here ??
-    DWORD *field_460_cur_ld_q;
-    DWORD *field_464_cur_rd_q;
-    DWORD *field_468_cur_u_q;
-    DWORD *field_46C_cur_d_q;
-    DWORD *field_470_cur_l_q;
-    DWORD *field_474_cur_r_q;
-    DWORD *field_478;
-    DWORD *field_47C_cur_c_q;
+    DWORD field_41C_16_prim_dst[16];
+    DWORD field_45C_8_prim_dst[9];
     DWORD field_480_ticks;
     DWORD field_484_state;
 

@@ -6,7 +6,7 @@
 #include "Actor_Debug.hpp"
 #include "ResourceNameHash.hpp"
 
-#define ACTOR_RANK_IMPL false
+#define ACTOR_RANK_IMPL true
 
 void Actor_RankCPP_ForceLink() {}
 
@@ -1135,34 +1135,34 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     pRank->field_284_rank_spe_mugen.r0 = 74;
     pRank->field_284_rank_spe_mugen.g0 = 107;
     pRank->field_284_rank_spe_mugen.b0 = 148;
-    pRank->field_458_cur_lu_q = 0;
+    pRank->field_41C_16_prim_dst[15] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_lu"), &pRank->field_2AC_cur_lu, 0, 0, 0, 0, 1, 0);
-    pRank->field_45C_cur_ru_q = 0;
+    pRank->field_45C_8_prim_dst[0] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_ru"), &pRank->field_2D4_cur_ru, 0, 0, 0, 0, 1, 0);
-    pRank->field_460_cur_ld_q = 0;
+    pRank->field_45C_8_prim_dst[1] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_ld"), &pRank->field_2FC_cur_ld, 0, 0, 0, 0, 1, 0);
-    pRank->field_464_cur_rd_q = 0;
+    pRank->field_45C_8_prim_dst[2] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_rd"), &pRank->field_324_cur_rd, 0, 0, 0, 0, 1, 0);
-    pRank->field_468_cur_u_q = 0;
+    pRank->field_45C_8_prim_dst[3] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_u"), &pRank->field_34C_cur_u, 0, 0, 0, 0, 1, 2);
-    pRank->field_46C_cur_d_q = 0;
+    pRank->field_45C_8_prim_dst[4] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_d"), &pRank->field_374_cur_d, 0, 0, 0, 0, 1, 2);
-    pRank->field_470_cur_l_q = 0;
+    pRank->field_45C_8_prim_dst[5] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_l"), &pRank->field_39C_cur_l, 0, 0, 0, 0, 1, 1);
-    pRank->field_474_cur_r_q = 0;
+    pRank->field_45C_8_prim_dst[6] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_r"), &pRank->field_3C4_cur_r, 0, 0, 0, 0, 1, 1);
-    pRank->field_478 = 0;
+    pRank->field_45C_8_prim_dst[7] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_c"), &pRank->field_3EC_cur_c, 0, 0, 0, 0, 1, 3);
-    pRank->field_47C_cur_c_q = 0;
+    pRank->field_45C_8_prim_dst[8] = 0;
 
     pRank->field_20_dword_7919E0 = (WORD *)&dword_7919E0;
 
@@ -1199,7 +1199,8 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     for (int i = 0; i < 1; ++i)
     {
         BYTE* v44 = Script_GetReturnAddress();
-        *(&pRank->field_5C8 + 56 * i) = (int)Script_read_string_arg_sub_40997B(v44);
+        auto scriptVar = Script_read_string_arg_sub_40997B(v44);
+        *(&pRank->field_5C8 + 56 * i) = (int)scriptVar;
         *((WORD *)&pRank->field_5CC + 112 * i) = 0;
         Rank_47589A(pRank, i);
     }
@@ -1212,6 +1213,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
 
     if (pRank->field_5F8_script_x)
     {
+        // Go directly to the "please reload this save to play with special items screen"
         if (pRank->field_5F8_script_x == 1)
         {
             for (int i = 0; i < 16; ++i)
