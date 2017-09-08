@@ -4,14 +4,16 @@
 #include "Actor_Rank.hpp"
 
 
-MSG_FUNC_NOT_IMPL(0x405050, Prim_unknown* CC(int maybeFlags, int numItems, __int16 rQ, int gQ, int bQ), PrimAlloc_405050);
-MSG_FUNC_NOT_IMPL(0x401805, signed int CC(Prim_unknown* pPrimBuffer), PrimAddQ_401805);
 
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
-    memcpy((pDebug->mPrimData /*+ gActiveBuffer_dword_791A08*/)->field_40_pDataStart, &pDebug->mPolyFt4, sizeof(POLY_FT4));
+    TextSetXYFlags_459B0B(181, 47, 0);
+    TextSetRGB_459B27(255, 255, 255);
+    Menu_DrawText("A textual test");
+
+    memcpy((pDebug->mPrimData /*+ gActiveBuffer_dword_791A08*/)->field_40_pDataStart, &pDebug->mPolyF4, sizeof(POLY_FT4));
     pDebug->mPrimData->mBase.field_0 = 3;
 
 }
@@ -24,7 +26,7 @@ MGS_VAR_EXTERN(u32, dword_9942A0);
 
 static int CC Debug_Loader(Actor_Debug* pDebug)
 {
-    pDebug->mPolyFt4 = {};
+    pDebug->mPolyF4 = {};
 
     int numPrims = 1;
     Prim_unknown* pPrim16Data = PrimAlloc_405050(2066, numPrims, 0, 0, 0);
@@ -35,24 +37,28 @@ static int CC Debug_Loader(Actor_Debug* pDebug)
     }
     pDebug->mPrimData = pPrim16Data;
 
-    const WORD resHash = ResourceNameHash("back_l");
-    Res_rank_prim_related_4767CE(nullptr, resHash, &pDebug->mPolyFt4, -160, -112, 0, 112, 0, 0);
+    //const WORD resHash = ResourceNameHash("back_l");
+    //Res_rank_prim_related_4767CE(nullptr, resHash, &pDebug->mPolyF4, -160, -112, 0, 112, 0, 0);
   
-    pDebug->mPolyFt4.r0 = 255;
-    pDebug->mPolyFt4.g0 = 255;
-    pDebug->mPolyFt4.b0 = 255;
+    pDebug->mPolyF4.tag = 0x9000000;
+    pDebug->mPolyF4.code = 2;
 
-    pDebug->mPolyFt4.x0 = 0;
-    pDebug->mPolyFt4.y0 = 0;
+    pDebug->mPolyF4.r0 = 255;
+    pDebug->mPolyF4.g0 = 255;
+    pDebug->mPolyF4.b0 = 255;
+    
+    pDebug->mPolyF4.x0 = 0;
+    pDebug->mPolyF4.y0 = 0;
 
-    pDebug->mPolyFt4.x1 = 50;
-    pDebug->mPolyFt4.y1 = 50;
+    pDebug->mPolyF4.x1 = 0;
+    pDebug->mPolyF4.y1 = 100;
 
-    pDebug->mPolyFt4.x2 = 100;
-    pDebug->mPolyFt4.y2 = 100;
+    pDebug->mPolyF4.x2 = 100;
+    pDebug->mPolyF4.y2 = 100;
 
-    pDebug->mPolyFt4.x3 = 250;
-    pDebug->mPolyFt4.y3 = 250;
+    pDebug->mPolyF4.x3= 0;
+    pDebug->mPolyF4.y3 = 100;
+
 
     return 0;
 }

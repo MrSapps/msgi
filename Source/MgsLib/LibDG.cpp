@@ -165,7 +165,6 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
 // TODO: Script_tbl_get_res_init_fn_457B9A - call GCL script to get res fn func ptr, then caller creates the resource
 MSG_FUNC_NOT_IMPL(0x457B9A, ResInitFn CC(BYTE *pScript), Script_tbl_get_res_init_fn_457B9A);
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x722A40, DWORD, dword_722A40, 0);
-MSG_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 
 signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript)
 {

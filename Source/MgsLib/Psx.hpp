@@ -53,6 +53,18 @@ struct POLY_FT4
 };
 MSG_ASSERT_SIZEOF(POLY_FT4, 40);
 
+struct POLY_F4
+{
+    DWORD tag;      // Pointer to the next primitive
+    BYTE r0, g0, b0; // RGB color values
+    BYTE code;       // Primitive ID(reserved)
+    short x0, y0;    // Vertex coordinates 
+    short x1, y1;    // Vertex coordinates 
+    short x2, y2;    // Vertex coordinates 
+    short x3, y3;    // Vertex coordinates
+};
+MSG_ASSERT_SIZEOF(POLY_F4, 0x18);
+
 MGS_VAR_EXTERN(PSX_RECT, gClipRect_6BECF0);
 MGS_VAR_EXTERN(DRAWENV, gDrawEnv_6C0E98);
 

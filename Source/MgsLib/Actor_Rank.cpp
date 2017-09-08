@@ -3,15 +3,17 @@
 #include "Script.hpp"
 #include <gmock/gmock.h>
 #include <array>
+#include "Actor_Debug.hpp"
+#include "ResourceNameHash.hpp"
 
-#define ACTOR_RANK_IMPL true
+#define ACTOR_RANK_IMPL false
 
 void Actor_RankCPP_ForceLink() {}
 
 MGS_VAR_EXTERN(DWORD, game_state_dword_72279C);
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
-BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, int pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type)
+BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, POLY_FT4* pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type)
 {
     return nullptr;
 }
@@ -19,7 +21,31 @@ MSG_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, false); // TODO
 
 void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
 {
+    signed int i; // [sp+10h] [bp-Ch]@1
+    signed int j; // [sp+10h] [bp-Ch]@4
+    char *pDst; // [sp+14h] [bp-8h]@1
+    char *pDst2; // [sp+14h] [bp-8h]@4
+    char *pSrc2; // [sp+18h] [bp-4h]@4
 
+    pDst = *(char **)(pRank->field_24_ptr_16_prims + 4 * gActiveBuffer_dword_791A08 + 64);
+    POLY_FT4* pSrc = &pRank->field_2C_back_l_type0_0x40_start;
+    for (i = 0; i < 1; ++i)
+    {
+        memcpy(pDst, pSrc, sizeof(POLY_FT4));                   // PolyFT4?
+        *(WORD *)pDst = 3;// pRank->field_41C_16_prim_dst[i];
+        pDst += 40;
+        pSrc++;
+    }
+    /*
+    pDst2 = *(char **)(pRank->field_28_ptr_9_prims + 4 * gActiveBuffer_dword_791A08 + 64);
+    pSrc2 = (char *)&pRank->field_2AC_cur_lu;
+    for (j = 0; j < 9; ++j)
+    {
+        memcpy(pDst2, pSrc2, 40u);                 // PolyFT4
+        *(WORD *)pDst2 = *((DWORD *)&pRank->field_45C_cur_ru_q + j);
+        pDst2 += 40;
+        pSrc2 += 40;
+    }*/
 }
 MSG_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, false); // TODO
 
@@ -56,7 +82,7 @@ void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16
 MSG_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
 
 
-int CC Menu_DrawText(const char* Format, int a2 = 0, int a3 = 0, int a4 = 0, int a5 = 0)
+int CC Menu_DrawText(const char* Format, int a2, int a3, int a4, int a5)
 {
     return 0;
 }
@@ -981,11 +1007,247 @@ void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 }
 MSG_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
 
+MSG_FUNC_NOT_IMPL(0x405050, Prim_unknown* CC(int maybeFlags, int numItems, __int16 rQ, int gQ, int bQ), PrimAlloc_405050);
+MSG_FUNC_NOT_IMPL(0x401805, signed int CC(Prim_unknown* pPrimBuffer), PrimAddQ_401805);
+
+MGS_VAR_EXTERN(u32, dword_9942A0); // From Actor
+
+MGS_VAR(1, 0x7919E0, char*, dword_7919E0, 0);
+MGS_VAR(1, 0x78E896, WORD, gGameTime_word_78E896, 0);
+MGS_VAR(1, 0x78E898, WORD, gGameTime_word_78E898, 0);
+
+MSG_FUNC_NOT_IMPL(0x475BCE, __int16 __cdecl(Actor_Rank *pRank), Rank_RankCalcs_475BCE);
+MSG_FUNC_NOT_IMPL(0x40997B, BYTE* CC (BYTE* pScript), Script_read_string_arg_sub_40997B);
+MSG_FUNC_NOT_IMPL(0x47589A, int __cdecl(Actor_Rank *pRank, int index), Rank_47589A);
+MSG_FUNC_NOT_IMPL(0x475A4A, int __cdecl(Actor_Rank *a2, int idx), Rank_475A4A);
+MSG_FUNC_NOT_IMPL(0x4742E1, int __cdecl(Actor_Rank *a1, int a2, signed int a3), Rank_4742E1);
+
+
 int CC Res_rank_loader(Actor_Rank* pRank, int a3)
 {
+    dword_9942A0 = (u32)a3;
+    pRank->field_5E0_896 = 896;
+    pRank->field_5E4_256 = 256;
+    pRank->field_5E8_896 = 896;
+    pRank->field_5EC_276 = 276;
+
+    Prim_unknown* pPrim16Data = PrimAlloc_405050(2066, 16, 0, 0, 0);
+    if (pPrim16Data)
+    {
+        PrimAddQ_401805(pPrim16Data);
+        pPrim16Data->field_28_dword_9942A0 = (signed __int16)dword_9942A0;
+    }
+    pRank->field_24_ptr_16_prims = pPrim16Data;
+    
+    Prim_unknown* pPrim9Data = PrimAlloc_405050(2066, 9, 0, 0, 0);
+    if (pPrim9Data)
+    {
+        PrimAddQ_401805(pPrim9Data);
+        pPrim9Data->field_28_dword_9942A0 = (signed __int16)dword_9942A0;
+    }
+    pRank->field_28_ptr_9_prims = pPrim9Data;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("back_l"), &pRank->field_2C_back_l_type0_0x40_start, -160, -112, 0, 112, 0, 0);
+    pRank->field_41C_16_prim_dst[0] = 0;
+    
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("back_r"), &pRank->field_54_back_r_type0, 0, -112, 160, 112, 0, 0);
+    pRank->field_41C_16_prim_dst[1] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_rank"), &pRank->field_7C_rank_rank_type0, -34, -94, 34, -82, 1, 0);
+    pRank->field_7C_rank_rank_type0.r0 = 46;
+    pRank->field_7C_rank_rank_type0.g0 = 72;
+    pRank->field_7C_rank_rank_type0.b0 = 61;
+    pRank->field_41C_16_prim_dst[2] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_rank"), &pRank->field_A4_rank_rank_type0, -34, -94, 34, -82, 1, 0);
+    pRank->field_A4_rank_rank_type0.r0 = 46;
+    pRank->field_A4_rank_rank_type0.g0 = 72;
+    pRank->field_A4_rank_rank_type0.b0 = 61;
+    pRank->field_41C_16_prim_dst[3] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_line1"), &pRank->field_CC_rank_line1_type1, 125, -57, 129, 13, 0, 1);
+    pRank->field_CC_rank_line1_type1.r0 = 82;
+    pRank->field_CC_rank_line1_type1.g0 = 140;
+    pRank->field_CC_rank_line1_type1.b0 = 123;
+    pRank->field_41C_16_prim_dst[4] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_line1"), &pRank->field_F4_rank_line1_type1, -125, -57, -121, 13, 0, 1);
+    pRank->field_F4_rank_line1_type1.r0 = 82;
+    pRank->field_F4_rank_line1_type1.g0 = 140;
+    pRank->field_F4_rank_line1_type1.b0 = 123;
+    pRank->field_41C_16_prim_dst[5] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_line2"), &pRank->field_11C_rank_line2, 8, -52, 90, -51, 0, 2);
+    pRank->field_11C_rank_line2.r0 = 140;
+    pRank->field_11C_rank_line2.g0 = 181;
+    pRank->field_11C_rank_line2.b0 = 181;
+    pRank->field_41C_16_prim_dst[6] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_line2"), &pRank->field_144_rank_line2, 8, -38, 44, -37, 0, 2);
+    pRank->field_144_rank_line2.r0 = 140;
+    pRank->field_144_rank_line2.g0 = 181;
+    pRank->field_144_rank_line2.b0 = 181;
+    pRank->field_41C_16_prim_dst[7] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_line2"), &pRank->field_16C_rank_line2, 8, -24, 44, -23, 0, 2);
+    pRank->field_16C_rank_line2.r0 = 140;
+    pRank->field_16C_rank_line2.g0 = 181;
+    pRank->field_16C_rank_line2.b0 = 181;
+    pRank->field_41C_16_prim_dst[8] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_line2"), &pRank->field_194_rank_line2, 8, -10, 44, -9, 0, 2);
+    pRank->field_194_rank_line2.r0 = 140;
+    pRank->field_194_rank_line2.g0 = 181;
+    pRank->field_194_rank_line2.b0 = 181;
+    pRank->field_41C_16_prim_dst[9] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_line2"), &pRank->field_1BC_rank_line2, 8, 4, 44, 5, 0, 2);
+    pRank->field_1BC_rank_line2.r0 = 140;
+    pRank->field_1BC_rank_line2.g0 = 181;
+    pRank->field_1BC_rank_line2.b0 = 181;
+    pRank->field_41C_16_prim_dst[10] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_line2"), &pRank->field_1E4_rank_line2, 8, 18, 44, 19, 0, 2);
+    pRank->field_1E4_rank_line2.r0 = 140;
+    pRank->field_1E4_rank_line2.g0 = 181;
+    pRank->field_1E4_rank_line2.b0 = 181;
+    pRank->field_41C_16_prim_dst[11] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_fox"), &pRank->field_20C_rank_fox, -22, 34, 22, 42, 0, 0);
+    pRank->field_20C_rank_fox.r0 = 165;
+    pRank->field_20C_rank_fox.g0 = 74;
+    pRank->field_20C_rank_fox.b0 = 74;
+    pRank->field_41C_16_prim_dst[12] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_spe_camera"), &pRank->field_234_rank_spe_camera, -22, 33, 22, 42, 0, 0);
+    pRank->field_234_rank_spe_camera.r0 = 74;
+    pRank->field_234_rank_spe_camera.g0 = 107;
+    pRank->field_234_rank_spe_camera.b0 = 148;
+    pRank->field_41C_16_prim_dst[13] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_spe_stealth"), &pRank->field_25C_rank_spe_stealth, -22, 33, 22, 42, 0, 0);
+    pRank->field_25C_rank_spe_stealth.r0 = 74;
+    pRank->field_25C_rank_spe_stealth.g0 = 107;
+    pRank->field_25C_rank_spe_stealth.b0 = 148;
+    pRank->field_41C_16_prim_dst[14] = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_spe_mugen"), &pRank->field_284_rank_spe_mugen, -22, 33, 22, 42, 0, 0);
+    pRank->field_284_rank_spe_mugen.r0 = 74;
+    pRank->field_284_rank_spe_mugen.g0 = 107;
+    pRank->field_284_rank_spe_mugen.b0 = 148;
+    pRank->field_458_cur_lu_q = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_lu"), &pRank->field_2AC_cur_lu, 0, 0, 0, 0, 1, 0);
+    pRank->field_45C_cur_ru_q = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_ru"), &pRank->field_2D4_cur_ru, 0, 0, 0, 0, 1, 0);
+    pRank->field_460_cur_ld_q = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_ld"), &pRank->field_2FC_cur_ld, 0, 0, 0, 0, 1, 0);
+    pRank->field_464_cur_rd_q = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_rd"), &pRank->field_324_cur_rd, 0, 0, 0, 0, 1, 0);
+    pRank->field_468_cur_u_q = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_u"), &pRank->field_34C_cur_u, 0, 0, 0, 0, 1, 2);
+    pRank->field_46C_cur_d_q = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_d"), &pRank->field_374_cur_d, 0, 0, 0, 0, 1, 2);
+    pRank->field_470_cur_l_q = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_l"), &pRank->field_39C_cur_l, 0, 0, 0, 0, 1, 1);
+    pRank->field_474_cur_r_q = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_r"), &pRank->field_3C4_cur_r, 0, 0, 0, 0, 1, 1);
+    pRank->field_478 = 0;
+
+    Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_c"), &pRank->field_3EC_cur_c, 0, 0, 0, 0, 1, 3);
+    pRank->field_47C_cur_c_q = 0;
+
+    pRank->field_20_dword_7919E0 = (WORD *)&dword_7919E0;
+
+    if (Script_ParamExists('x'))
+    {
+        BYTE* script_x = Script_GetReturnAddress();
+        pRank->field_5F8_script_x = Script_Unknown8(script_x);
+    }
+    else
+    {
+        pRank->field_5F8_script_x = 0;
+    }
+
+    if (Script_ParamExists('e'))
+    {
+        BYTE* script_e = Script_GetReturnAddress();
+        pRank->field_414_script_e = Script_Unknown8(script_e);
+    }
+    else
+    {
+        pRank->field_414_script_e = -1;
+    }
+
+    if (Script_ParamExists('t'))
+    {
+        BYTE* script_t = Script_GetReturnAddress();
+        pRank->field_418_script_t = (DWORD *)Script_Unknown8(script_t);
+    }
+    else
+    {
+        pRank->field_418_script_t = (DWORD *)-1;
+    }
+
+    for (int i = 0; i < 1; ++i)
+    {
+        BYTE* v44 = Script_GetReturnAddress();
+        *(&pRank->field_5C8 + 56 * i) = (int)Script_read_string_arg_sub_40997B(v44);
+        *((WORD *)&pRank->field_5CC + 112 * i) = 0;
+        Rank_47589A(pRank, i);
+    }
+
+    for (int i = 0; i < 1; ++i)
+    {
+        Rank_475A4A(pRank, i);
+        Rank_4742E1(pRank, i, 0);
+    }
+
+    if (pRank->field_5F8_script_x)
+    {
+        if (pRank->field_5F8_script_x == 1)
+        {
+            for (int i = 0; i < 16; ++i)
+            {
+                pRank->field_41C_16_prim_dst[i] = 0;
+            }
+            Rank_4742E1(pRank, 0, 0);
+            pRank->field_484_state = 3;
+            pRank->field_5F0 = 0;
+            pRank->field_5F4 = 0;
+        }
+    }
+    else
+    {
+        pRank->field_480_ticks = 0;
+        pRank->field_484_state = 0;
+        pRank->field_488_time = gGameTime_word_78E896;
+        pRank->field_48C_time_mins = gGameTime_word_78E898 / 60;
+        pRank->field_490_time_secs = gGameTime_word_78E898 % 60;
+        pRank->field_498_mc_no = 0;
+        pRank->field_49C_radar = 0;
+        pRank->field_4A0_stealth = 0;
+        pRank->field_4A4_mugen = 0;
+        pRank->field_4A8_spe_no = 0;
+        pRank->field_4AC_camera = 0;
+        pRank->field_4B0_stealth = 0;
+        pRank->field_4B4_mugen = 0;
+        pRank->field_5F4 = 0;
+        Rank_RankCalcs_475BCE(pRank);
+    }
+
+    RankRenderPrimsQ_46ED0A(pRank);
+
     return 0;
 }
-MSG_FUNC_IMPLEX(0x474D98, Res_rank_loader, false) // TODO
+MSG_FUNC_IMPLEX(0x474D98, Res_rank_loader, ACTOR_RANK_IMPL)
 
 signed int CC Res_rank_1532_sub_46EC0E(DWORD scriptUnknown, int a_dword_722A40, BYTE* pScript)
 {

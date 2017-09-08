@@ -14,6 +14,8 @@ MGS_VAR_EXTERN(DWORD, script_cancel_non_zero_dword_7227A0);
 
 #define SCRIPT_IMPL true
 
+MSG_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
+
 void ScriptCpp_ForceLink()
 {
 

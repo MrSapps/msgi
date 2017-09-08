@@ -21,6 +21,8 @@ DWORD CC Script_ParamExists(char paramId);
 DWORD CC Script_get_int();
 BYTE* CC Script_GetReturnAddress();
 
+EXTERN_MSG_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
+
 MGS_VAR_EXTERN(DWORD, dword_7227A4);
 
 enum GCLOperators

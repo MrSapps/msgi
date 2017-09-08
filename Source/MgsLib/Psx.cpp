@@ -40,18 +40,6 @@ struct POLY_F3
 };
 MSG_ASSERT_SIZEOF(POLY_F3, 20);
 
-struct POLY_F4
-{
-    DWORD* tag;      // Pointer to the next primitive
-    BYTE r0, g0, b0; // RGB color values
-    BYTE code;       // Primitive ID(reserved)
-    short x0, y0;    // Vertex coordinates 
-    short x1, y1;    // Vertex coordinates 
-    short x2, y2;    // Vertex coordinates 
-    short x3, y3;    // Vertex coordinates
-};
-MSG_ASSERT_SIZEOF(POLY_F4, 0x18);
-
 struct RECT32
 {
     DWORD x1, y1, x2, y2;
@@ -431,6 +419,8 @@ MSG_FUNC_IMPLEX(0x0044CEF0, CloseEvent, IMPL_PSX);
 
 DRAWENV* CC Renderer_Set_DRAWENV_40DD90(DRAWENV* pDrawEnv)
 {
+    pDrawEnv->b0 = 255;
+
     memcpy(&gDrawEnv_6C0E98, pDrawEnv, sizeof(DRAWENV));
 
     if (!word_6C0EAA)
@@ -463,7 +453,7 @@ DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __in
     pDrawEnv->textureWindow.y2 = 0;
     pDrawEnv->r0 = 0;
     pDrawEnv->g0 = 0;
-    pDrawEnv->b0 = 0;
+    pDrawEnv->b0 = 255;
     pDrawEnv->texturePage = 0;
     pDrawEnv->isbg = 0;
     return pDrawEnv;

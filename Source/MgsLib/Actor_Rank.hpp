@@ -7,12 +7,14 @@
 void Actor_RankCPP_ForceLink();
 void DoActor_RankTests();
 
+struct Prim_unknown;
+
 struct Actor_Rank
 {
     Actor mBase;
     WORD* field_20_dword_7919E0;
-    int field_24_ptr_16_prims;
-    int field_28_ptr_9_prims;
+    Prim_unknown* field_24_ptr_16_prims;
+    Prim_unknown* field_28_ptr_9_prims;
 
     POLY_FT4 field_2C_back_l_type0_0x40_start;      // Back ground left half
     POLY_FT4 field_54_back_r_type0;                 // Back ground right half
@@ -157,3 +159,9 @@ struct Actor_Rank
 MSG_ASSERT_SIZEOF(Actor_Rank, 0x5FC);
 
 BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, POLY_FT4* pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type);
+int CC Menu_DrawText(const char* Format, int a2 = 0, int a3 = 0, int a4 = 0, int a5 = 0);
+void CC TextSetXYFlags_459B0B(int x, int y, int flags);
+int CC TextSetRGB_459B27(int r, int g, int b);
+
+EXTERN_MSG_FUNC_NOT_IMPL(0x405050, Prim_unknown* CC(int maybeFlags, int numItems, __int16 rQ, int gQ, int bQ), PrimAlloc_405050);
+EXTERN_MSG_FUNC_NOT_IMPL(0x401805, signed int CC(Prim_unknown* pPrimBuffer), PrimAddQ_401805);

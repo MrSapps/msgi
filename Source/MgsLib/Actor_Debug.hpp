@@ -45,7 +45,7 @@ struct Actor_Debug
 {
     Actor mBase;
     Prim_unknown* mPrimData;
-    POLY_FT4 mPolyFt4;
+    POLY_F4 mPolyF4;
 };
 
 void AddDebugActor();

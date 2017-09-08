@@ -3,6 +3,7 @@
 #include "Script.hpp"
 #include "LibDG.hpp"
 #include "LibGV.hpp"
+#include "Actor_Debug.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
@@ -107,5 +108,6 @@ void CC Init_Gamed_Create_44E12B()
     gamed_unk_722784 = 0;
 
     Create_loader_44E226();
+   // AddDebugActor();
 }
 MSG_FUNC_IMPLEX(0x44E12B, Init_Gamed_Create_44E12B, ACTOR_GAMED_IMPL);
