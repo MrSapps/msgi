@@ -125,8 +125,8 @@ struct struct_gv
     // These vars are named to match how they look from gLibGVStruct1_6BC36C position, it was later discovered
     // that these are item 1 in an array of 3 struct_gvs
 
-    int gPassedToLibGV_FnPtrs_dword_6BC36C; // 257 pointers?
-    int dword_6BC370_ptr_data_block; // 256 pointers?
+    int mOrderingTable1; // 257 pointers?
+    int mOrderingTable2; // 256 pointers?
     s16 word_6BC374_8;
     s16 word_6BC376_16;
     s16 word_6BC378_1;

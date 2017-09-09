@@ -1184,6 +1184,7 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
 
         if (size_dword_791C58 == 0)
         {
+            // = 0x650A5C byte[256] ?
             uint8_t* pValue = (uint8_t*)(0x650A5C + otItemType_dword_791C54);
             size_dword_791C58 = *pValue;
         }
