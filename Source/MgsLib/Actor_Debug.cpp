@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Actor_Debug.hpp"
 #include "ResourceNameHash.hpp"
+#include "LibDG.hpp"
 #include "Actor_Rank.hpp"
 
 
@@ -32,7 +33,7 @@ static int CC Debug_Loader(Actor_Debug* pDebug)
     Prim_unknown* pPrim16Data = PrimAlloc_405050(2066, numPrims, 0, 0, 0);
     if (pPrim16Data)
     {
-        PrimAddQ_401805(pPrim16Data);
+        PrimAdd_401805(pPrim16Data);
         pPrim16Data->field_28_dword_9942A0 = (signed __int16)dword_9942A0;
     }
     pDebug->mPrimData = pPrim16Data;

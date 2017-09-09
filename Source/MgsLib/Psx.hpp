@@ -1,12 +1,13 @@
 #pragma once
 
 #include "MgsFunction.hpp"
+#include "types.hpp"
 
 void PsxCpp_ForceLink();
 
 struct PSX_RECT // Should be called RECT but will clash with windows.h for now
 {
-    WORD x1, y1, x2, y2;
+    s16 x1, y1, x2, y2;
 };
 MSG_ASSERT_SIZEOF(PSX_RECT, 8);
 

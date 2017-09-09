@@ -3,7 +3,7 @@
 #include "Script.hpp"
 #include <gmock/gmock.h>
 #include <array>
-#include "Actor_Debug.hpp"
+#include "LibDG.hpp"
 #include "ResourceNameHash.hpp"
 
 #define ACTOR_RANK_IMPL true
@@ -1008,7 +1008,6 @@ void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 MSG_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
 
 MSG_FUNC_NOT_IMPL(0x405050, Prim_unknown* CC(int maybeFlags, int numItems, __int16 rQ, int gQ, int bQ), PrimAlloc_405050);
-MSG_FUNC_NOT_IMPL(0x401805, signed int CC(Prim_unknown* pPrimBuffer), PrimAddQ_401805);
 
 MGS_VAR_EXTERN(u32, dword_9942A0); // From Actor
 
@@ -1034,7 +1033,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     Prim_unknown* pPrim16Data = PrimAlloc_405050(2066, 16, 0, 0, 0);
     if (pPrim16Data)
     {
-        PrimAddQ_401805(pPrim16Data);
+        PrimAdd_401805(pPrim16Data);
         pPrim16Data->field_28_dword_9942A0 = (signed __int16)dword_9942A0;
     }
     pRank->field_24_ptr_16_prims = pPrim16Data;
@@ -1042,7 +1041,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     Prim_unknown* pPrim9Data = PrimAlloc_405050(2066, 9, 0, 0, 0);
     if (pPrim9Data)
     {
-        PrimAddQ_401805(pPrim9Data);
+        PrimAdd_401805(pPrim9Data);
         pPrim9Data->field_28_dword_9942A0 = (signed __int16)dword_9942A0;
     }
     pRank->field_28_ptr_9_prims = pPrim9Data;

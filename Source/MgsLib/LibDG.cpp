@@ -3,6 +3,7 @@
 #include "Script.hpp"
 #include "LibGV.hpp"
 #include <assert.h>
+#include "Psx.hpp"
 
 #define LIBDG_IMPL true
 
@@ -166,6 +167,108 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
 MSG_FUNC_NOT_IMPL(0x457B9A, ResInitFn CC(BYTE *pScript), Script_tbl_get_res_init_fn_457B9A);
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x722A40, DWORD, dword_722A40, 0);
 
+#pragma pack(push)
+#pragma pack(2)
+struct Prim_Object
+{
+    int field_0;
+    int field_4;
+    int field_8;
+    int field_C;
+    int field_10;
+    int field_14;
+    int field_18;
+    int field_1C;
+    int field_20_size0x20;
+    int field_24;
+    int field_28_flags;
+    s16 field_2C;
+    s16 field_2E_inner_count;
+    s16 field_30;
+    s16 field_32_hasInners;
+    int field_34;
+    int field_38;
+    int field_3C;
+    int field_40;
+    int field_44;
+    int field_48_92b_size;
+    int field_4C;
+    s16 field_50_fn_ptr;
+    s16 field_52;
+    s16 field_54;
+    int field_56;
+    s16 field_5A;  // This de-aligns the rest of the struct
+    int field_5C;
+    int field_60;
+    int field_64;
+    int field_68_92b_size;
+    int field_6C;
+    int field_70_pInners;
+    int field_74;
+    int field_78;
+    int field_7C;
+    int field_80;
+    int field_84;
+    int field_88;
+    int field_8C;
+    int field_90;
+    int field_94;
+    int field_98;
+    int field_9C_array_ptr;
+    int field_A0;
+};
+MSG_ASSERT_SIZEOF(Prim_Object, 0xA4);
+
+struct struct_gv
+{
+    // These vars are named to match how they look from gLibGVStruct1_6BC36C position, it was later discovered
+    // that these are item 1 in an array of 3 struct_gvs
+
+    int gPassedToLibGV_FnPtrs_dword_6BC36C; // 257 pointers?
+    int dword_6BC370_ptr_data_block; // 256 pointers?
+    s16 word_6BC374_8;
+    s16 word_6BC376_16;
+    s16 word_6BC378_1;
+    s16 word_6BC37A_0_1EC_size;
+    int dword_6BC37C_32byte_size;
+    int dword_6BC380;
+    int dword_6BC384;
+    int dword_6BC388;
+    int dword_6BC38C;
+    int dword_6BC390;
+    int dword_6BC394;
+    int dword_6BC398;
+    int dword_6BC39C;
+    s16 word_6BC3A0;
+    s16 word_6BC3A6;
+    PSX_RECT rect;
+    s16 word_6BC3AC;
+    int align1;
+    s16 align2;
+    int dword_6BC3B4;
+    int dword_6BC3B8;
+    s16 word_6BC3BC;
+    s16 g_PrimQueue1_word_6BC3BE_256;
+    s16 gPrimQueue2_word_6BC3C0_256;
+    s16 gObjectQueue_word_6BC3C2_0;
+    Prim_Object **gObjects_dword_6BC3C4;
+    PSX_RECT* dword_6BC3C8_pStructure_rect;
+    int dword_6BC3CC_rectx2;
+    PSX_RECT dword_6BC3D0_rect;
+    int dword_6BC3D8_dst[16];
+    int dword_6BC418_dst[16];
+    int dword_6BC458[16];
+    int dword_6BC498[16];
+    int dword_6BC4D8_src_dr_env1[16];
+    int dword_6BC518_src_offsetted_dr_evn[16];
+};
+MSG_ASSERT_SIZEOF(struct_gv, 0x1EC);
+#pragma pack(pop)
+
+MGS_VAR(1, 0x6BC36C, struct_gv, gLibGVStruct0_6BC180, {}); // TODO: Probably an array of 3?
+MGS_VAR(1, 0x6BC36C, struct_gv, gLibGVStruct1_6BC36C, {});
+MGS_VAR(1, 0x6BC36C, struct_gv, gLibGVStruct2_6BC558, {});
+
 signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript)
 {
     BYTE* scriptRet = Script_GetReturnAddress();
@@ -291,29 +394,28 @@ MSG_FUNC_NOT_IMPL(0x401234, void CC(Actor* pActor), LibDG_Update2_401234);
 
 
 MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 1);
-MGS_VAR(1, 0x6BC36C, DWORD, gPassedToLibGV_FnPtrs_dword_6BC36C, 0);
 MGS_VAR(1, 0x6BE4E8, DWORD, gUnkSize_1024_6BE4E8, 0);
 
 
 MSG_FUNC_NOT_IMPL(0x40B231, unsigned int CC(void* pMem, int size), MemClearUnknown_40B231);
 
-using TDG_FnPtr = int(CC*)(int,int);
+using TDG_FnPtr = void(CC*)(struct_gv* pGv, int activeBuffer);
 
-MSG_FUNC_NOT_IMPL(0x4061E7, int CC (int a1, int a2), sub_4061E7);
-MSG_FUNC_NOT_IMPL(0x405668, int CC(int a1, int a2), sub_405668);
-MSG_FUNC_NOT_IMPL(0x405180, int CC(int a1, int a2), sub_405180);
-MSG_FUNC_NOT_IMPL(0x4041A5, int CC(int a1, int a2), sub_4041A5);
-MSG_FUNC_NOT_IMPL(0x403528, int CC(int a1, int a2), sub_403528);
-MSG_FUNC_NOT_IMPL(0x40340A, int CC(int a1, int a2), sub_40340A);
+MSG_FUNC_NOT_IMPL(0x4061E7, void CC(struct_gv* pGv, int activeBuffer), LibGV_4061E7);
+MSG_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
+MSG_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
+MSG_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_4041A5);
+MSG_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
+MSG_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_40340A);
 
 MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0, 
 {
-    sub_4061E7.Ptr(),
-    sub_405668.Ptr(),
-    sub_405180.Ptr(),
-    sub_4041A5.Ptr(),
-    sub_403528.Ptr(),
-    sub_40340A.Ptr(),
+    LibGV_4061E7.Ptr(),
+    LibGV_405668.Ptr(),
+    LibGV_405180.Ptr(),
+    LibGV_4041A5.Ptr(),
+    LibGV_403528.Ptr(),
+    LibGV_40340A.Ptr(),
     nullptr
 });
 
@@ -325,29 +427,6 @@ TDG_FnPtr CC LibDG_SetFnPtr_4019FA(int idx, TDG_FnPtr fnPtr)
     return old;
 }
 MSG_FUNC_IMPLEX(0x4019FA, LibDG_SetFnPtr_4019FA, LIBDG_IMPL);
-
-void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
-{
-    if (!gLibDG_ExecPtrs_6BECE8)
-    {
-        MemClearUnknown_40B231((void*)&gUnkSize_1024_6BE4E8, 1024);
-
-        int count = 7;
-        // Check if extra function pointer slot is in use?
-        // TODO: Seems like this is dead code as the condition can never be true?
-        if (gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers != 0)
-        {
-            assert(false);
-            count++;
-        }
-
-        for (int i = 0; i < count; i++)
-        {
-            gLibDg_FuncPtrs_off_6500E0[i]((int)&gPassedToLibGV_FnPtrs_dword_6BC36C, activeBuffer);
-        }
-    }
-}
-MSG_FUNC_IMPLEX(0x40171C, LibDG_ExecFnPtrs_40171C, LIBDG_IMPL);
 
 void CC LibDG_Update1_4012ED(Actor* pActor)
 {
@@ -378,3 +457,42 @@ void CC LibDg_Init_40111A()
     Actor_Init(&gLibDGD_1_stru_6BB910, LibDG_Update1_4012ED, 0, "C:\\mgs\\source\\LibDG\\dgd.c");
 }
 MSG_FUNC_IMPLEX(0x40111A, LibDg_Init_40111A, LIBDG_IMPL);
+
+signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
+{
+    struct_gv* pGv = &gLibGVStruct1_6BC36C;
+    assert(pPrimBuffer->field_2C_r_index == 0);
+    pGv = pGv + pPrimBuffer->field_2C_r_index; // Always 0?
+    if (pGv->gPrimQueue2_word_6BC3C0_256 > pGv->gObjectQueue_word_6BC3C2_0)
+    {
+        const s16 newCount = pGv->gPrimQueue2_word_6BC3C0_256 - 1;
+        pGv->gObjects_dword_6BC3C4[newCount] = (Prim_Object *)pPrimBuffer;
+        pGv->gPrimQueue2_word_6BC3C0_256 = newCount;
+        return 0;
+    }
+    return -1;
+}
+MSG_FUNC_IMPLEX(0x401805, PrimAdd_401805, LIBDG_IMPL);
+
+void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
+{
+    if (!gLibDG_ExecPtrs_6BECE8)
+    {
+        MemClearUnknown_40B231((void*)&gUnkSize_1024_6BE4E8, 1024);
+
+        int count = 7;
+        // Check if extra function pointer slot is in use?
+        // TODO: Seems like this is dead code as the condition can never be true?
+        if (gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers != 0)
+        {
+            assert(false);
+            count++;
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            gLibDg_FuncPtrs_off_6500E0[i](&gLibGVStruct1_6BC36C, activeBuffer);
+        }
+    }
+}
+MSG_FUNC_IMPLEX(0x40171C, LibDG_ExecFnPtrs_40171C, LIBDG_IMPL);
