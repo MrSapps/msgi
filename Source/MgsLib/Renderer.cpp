@@ -2,6 +2,7 @@
 #include "Renderer.hpp"
 #define DIRECT3D_VERSION 0x700
 #include "d3d.h"
+#include "LibDG.hpp"
 
 #define RENDERER_IMPL true
 
@@ -1290,7 +1291,7 @@ MSG_FUNC_IMPLEX(0x4103B0, Render_DrawGeneric, RENDERER_IMPL);
 //MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
 void CC Render_DrawIndex(uint32_t activeBuffer)
 {
-    StructVert* pStructVert = (StructVert*)(0x6BC1EC + activeBuffer * 0x40); //TODO: pStructVert is nullptr in underground escape route
+    StructVert* pStructVert = (StructVert*)&gLibGvStruct0_6BC180.dword_6BC3D8_dst[16 * activeBuffer];
     Render_DrawGeneric(pStructVert);
 }
 MSG_FUNC_IMPLEX(0x401619, Render_DrawIndex, RENDERER_IMPL);

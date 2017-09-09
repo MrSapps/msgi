@@ -3,7 +3,6 @@
 #include "Script.hpp"
 #include "LibGV.hpp"
 #include <assert.h>
-#include "Psx.hpp"
 
 #define LIBDG_IMPL true
 
@@ -167,107 +166,9 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
 MSG_FUNC_NOT_IMPL(0x457B9A, ResInitFn CC(BYTE *pScript), Script_tbl_get_res_init_fn_457B9A);
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x722A40, DWORD, dword_722A40, 0);
 
-#pragma pack(push)
-#pragma pack(2)
-struct Prim_Object
-{
-    int field_0;
-    int field_4;
-    int field_8;
-    int field_C;
-    int field_10;
-    int field_14;
-    int field_18;
-    int field_1C;
-    int field_20_size0x20;
-    int field_24;
-    int field_28_flags;
-    s16 field_2C;
-    s16 field_2E_inner_count;
-    s16 field_30;
-    s16 field_32_hasInners;
-    int field_34;
-    int field_38;
-    int field_3C;
-    int field_40;
-    int field_44;
-    int field_48_92b_size;
-    int field_4C;
-    s16 field_50_fn_ptr;
-    s16 field_52;
-    s16 field_54;
-    int field_56;
-    s16 field_5A;  // This de-aligns the rest of the struct
-    int field_5C;
-    int field_60;
-    int field_64;
-    int field_68_92b_size;
-    int field_6C;
-    int field_70_pInners;
-    int field_74;
-    int field_78;
-    int field_7C;
-    int field_80;
-    int field_84;
-    int field_88;
-    int field_8C;
-    int field_90;
-    int field_94;
-    int field_98;
-    int field_9C_array_ptr;
-    int field_A0;
-};
-MSG_ASSERT_SIZEOF(Prim_Object, 0xA4);
-
-struct struct_gv
-{
-    // These vars are named to match how they look from gLibGVStruct1_6BC36C position, it was later discovered
-    // that these are item 1 in an array of 3 struct_gvs
-
-    int gPassedToLibGV_FnPtrs_dword_6BC36C; // 257 pointers?
-    int dword_6BC370_ptr_data_block; // 256 pointers?
-    s16 word_6BC374_8;
-    s16 word_6BC376_16;
-    s16 word_6BC378_1;
-    s16 word_6BC37A_0_1EC_size;
-    int dword_6BC37C_32byte_size;
-    int dword_6BC380;
-    int dword_6BC384;
-    int dword_6BC388;
-    int dword_6BC38C;
-    int dword_6BC390;
-    int dword_6BC394;
-    int dword_6BC398;
-    int dword_6BC39C;
-    s16 word_6BC3A0;
-    s16 word_6BC3A6;
-    PSX_RECT rect;
-    s16 word_6BC3AC;
-    int align1;
-    s16 align2;
-    int dword_6BC3B4;
-    int dword_6BC3B8;
-    s16 word_6BC3BC;
-    s16 g_PrimQueue1_word_6BC3BE_256;
-    s16 gPrimQueue2_word_6BC3C0_256;
-    s16 gObjectQueue_word_6BC3C2_0;
-    Prim_Object **gObjects_dword_6BC3C4;
-    PSX_RECT* dword_6BC3C8_pStructure_rect;
-    int dword_6BC3CC_rectx2;
-    PSX_RECT dword_6BC3D0_rect;
-    int dword_6BC3D8_dst[16];
-    int dword_6BC418_dst[16];
-    int dword_6BC458[16];
-    int dword_6BC498[16];
-    int dword_6BC4D8_src_dr_env1[16];
-    int dword_6BC518_src_offsetted_dr_evn[16];
-};
-MSG_ASSERT_SIZEOF(struct_gv, 0x1EC);
-#pragma pack(pop)
-
-MGS_VAR(1, 0x6BC36C, struct_gv, gLibGVStruct0_6BC180, {}); // TODO: Probably an array of 3?
+MGS_VAR(1, 0x6BC180, struct_gv, gLibGvStruct0_6BC180, {}); // TODO: Probably an array of 3?
 MGS_VAR(1, 0x6BC36C, struct_gv, gLibGVStruct1_6BC36C, {});
-MGS_VAR(1, 0x6BC36C, struct_gv, gLibGVStruct2_6BC558, {});
+MGS_VAR(1, 0x6BC558, struct_gv, gLibGVStruct2_6BC558, {});
 
 signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript)
 {
@@ -401,7 +302,54 @@ MSG_FUNC_NOT_IMPL(0x40B231, unsigned int CC(void* pMem, int size), MemClearUnkno
 
 using TDG_FnPtr = void(CC*)(struct_gv* pGv, int activeBuffer);
 
-MSG_FUNC_NOT_IMPL(0x4061E7, void CC(struct_gv* pGv, int activeBuffer), LibGV_4061E7);
+MSG_FUNC_NOT_IMPL(0x4065AA, int CC(struct_gv* pGv, int activeBuffer), sub_4065AA);
+MSG_FUNC_NOT_IMPL(0x4064B1, void CC(Prim_Object *pObject, int activeBuffer, char a3, int a4), sub_4064B1);
+
+
+MGS_VAR(1, 0x78D32C, DWORD, dword_78D32C, 0);
+
+
+
+void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
+{
+    //sub_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
+
+    Prim_Object **pObjects = pGv->gObjects_dword_6BC3C4;
+    if (pGv->gObjectQueue_word_6BC3C2_0 > 0)
+    {
+        s16 objectQueueCount = pGv->gObjectQueue_word_6BC3C2_0;
+        do
+        {
+            Prim_Object* pObject = *pObjects;
+            ++pObjects;
+            s16 v5 = 0;
+
+            const int flags = pObject->field_28_flags;
+            if (!(pObject->field_28_flags & 0x80) && (!pObject->field_2C || pObject->field_2C & dword_78D32C))
+            {
+                v5 = 2;
+                if (flags & 0x20)
+                {
+                    // TODO: Implement me
+                    /*
+                    *(QWORD *)&stru_993E40 = *(QWORD *)&pObject->field_68_92b_size;
+                    *((QWORD *)&stru_993E40 + 1) = *(QWORD *)&pObject->field_70_pInners;
+                    *((QWORD *)&stru_993E40 + 2) = *(QWORD *)&pObject->field_78;
+                    *((QWORD *)&stru_993E40 + 3) = *(QWORD *)&pObject->field_80;
+                    sub_4062CB(pObject->field_24 + 8);
+                    v5 = sub_40640F();
+                    */
+                }
+            }
+            pObject->field_32_hasInners = v5;
+            sub_4064B1(pObject, activeBuffer, flags, v5);
+            --objectQueueCount;
+        } while (objectQueueCount);
+    }
+    sub_4065AA(pGv, activeBuffer);
+}
+MSG_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, LIBDG_IMPL);
+
 MSG_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
 MSG_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
 MSG_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_4041A5);
@@ -410,7 +358,7 @@ MSG_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_403
 
 MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0, 
 {
-    LibGV_4061E7.Ptr(),
+    LibGV_4061E7,
     LibGV_405668.Ptr(),
     LibGV_405180.Ptr(),
     LibGV_4041A5.Ptr(),
@@ -466,7 +414,7 @@ signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
     if (pGv->gPrimQueue2_word_6BC3C0_256 > pGv->gObjectQueue_word_6BC3C2_0)
     {
         const s16 newCount = pGv->gPrimQueue2_word_6BC3C0_256 - 1;
-        pGv->gObjects_dword_6BC3C4[newCount] = (Prim_Object *)pPrimBuffer;
+        pGv->gObjects_dword_6BC3C4[newCount] = (Prim_Object *)pPrimBuffer; // PrimObject = Prim_unknown + extra ??
         pGv->gPrimQueue2_word_6BC3C0_256 = newCount;
         return 0;
     }

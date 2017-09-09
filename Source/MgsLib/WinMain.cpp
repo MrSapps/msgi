@@ -2410,16 +2410,16 @@ void InstallVaradicCFunctionHooks()
 
 MGS_VAR(1, 0x791A08, int, gActiveBuffer_dword_791A08, 0);
 MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
-MGS_VAR(1, 0x6BED20, DWORD, dword_6BED20, 0);
+MGS_VAR(1, 0x6BED20, DWORD, counter_dword_6BED20, 0);
 MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {}); // TODO: Check 2 is correct
 
 MSG_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(PSX_RECT *pRect), sub_40DD00);
-MSG_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), sub_459ACE);
-MSG_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), sub_40162D);
+MSG_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), TextReset_459ACE);
+MSG_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), OT_Related_40162D);
 MSG_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
 
 
-int __cdecl Main_sub_401C02()
+int CC Main_sub_401C02()
 {
     int result = 0;
     if (gSoftwareRendering)
@@ -2430,7 +2430,7 @@ int __cdecl Main_sub_401C02()
     else
     {
         const int activeBufferHW = gActiveBuffer_dword_791A08;
-        if (dword_6BED20 <= 0)
+        if (counter_dword_6BED20 <= 0)
         {
             if (gLastActiveBuffer_dword_650110 < 0 || gActiveBuffer_dword_791A08 != gLastActiveBuffer_dword_650110)
             {
@@ -2446,12 +2446,12 @@ int __cdecl Main_sub_401C02()
             {
                 gLastActiveBuffer_dword_650110 = gActiveBuffer_dword_791A08;
             }
-            --dword_6BED20;
+            --counter_dword_6BED20;
         }
         System_HouseKeeping_40ACB2(activeBufferHW);
         System_HouseKeeping_40ACB2(2);
-        sub_459ACE();
-        sub_40162D(activeBufferHW);                 // calls ClearOTag
+        TextReset_459ACE();
+        OT_Related_40162D(activeBufferHW);                 // calls ClearOTag
         result = sub_4021F2();
     }
     return result;
