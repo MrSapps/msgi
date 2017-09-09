@@ -17,7 +17,7 @@ MGS_VAR(1, 0x6FC784, DWORD, g_nVertexOffset, 0);
 MGS_VAR(1, 0x791C80, float, g_fXOffset, 0);
 MGS_VAR(1, 0x791C84, float, g_fYOffset, 0);
 MGS_VAR(1, 0x00650D30, DWORD, gModX2, 0);
-MGS_VAR(1, 0x791C54, DWORD, dword_791C54, 0);
+MGS_VAR(1, 0x791C54, DWORD, otItemType_dword_791C54, 0);
 
 MGS_VAR(1, 0x791C5C, float, g_fV3, 0);
 MGS_VAR(1, 0x791C60, float, g_fV2, 0);
@@ -30,7 +30,7 @@ MGS_VAR(1, 0x791C78, float, g_fU0, 0);
 
 MGS_VAR(1, 0x688CD0, DWORD, dword_688CD0, 0);
 MGS_VAR(1, 0x688CD4, DWORD, dword_688CD4, 0);
-MGS_VAR(1, 0x791C58, DWORD, dword_791C58, 0);
+MGS_VAR(1, 0x791C58, DWORD, size_dword_791C58, 0);
 
 MGS_VAR(1, 0x6C0EA0, WORD, g_wXOffset, 0);
 MGS_VAR(1, 0x6C0EA2, WORD, g_wYOffset, 0);
@@ -76,7 +76,7 @@ return ret;
 MSG_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
 MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
 MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
-MSG_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct StructVert* a_pStructVert, int a_nSize), Render_Software);
+MSG_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct TaggedOrderingTablePointer* a_pStructVert, int a_nSize), Render_Software);
 MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
 
 // TODO: Assert sizes
@@ -92,11 +92,11 @@ struct MGSFloatVert
     float y;
 };
 
-struct StructVert
+struct TaggedOrderingTablePointer
 {
-    uint8_t pad0;
-    uint8_t pad1;
-    uint8_t pad2;
+    uint8_t mPointerB0;
+    uint8_t mPointerB1;
+    uint8_t mPointerB2;
     uint8_t structType;
 };
 
@@ -117,7 +117,7 @@ struct MGSLargeVert
     uint16_t textureIdx;
 };
 
-struct StructVertType1
+struct StructVertType1 // TODO: Poly_FT4 ??
 {
     uint8_t diffuseR;
     uint8_t diffuseG;
@@ -181,14 +181,14 @@ struct StructVertType5
 
 struct VertsBlock
 {
-    StructVert header;
+    TaggedOrderingTablePointer header;
     uint8_t padding[0x3C];
 };
 static_assert(sizeof(VertsBlock) == 0x40, "VertsBlock must be of size 0x40");
 
-struct PrimitivesChain
+struct PrimitivesChain // TODO: same as struct_gv ??
 {
-    StructVert* pStructVerts0[2];
+    TaggedOrderingTablePointer* pStructVerts0[2];
     uint8_t nNumStructs;
     uint8_t padding0;
     uint8_t padding1;
@@ -365,7 +365,7 @@ static uint32_t calculateModX2Diffuse(uint32_t diffuseR, uint32_t diffuseG, uint
 
 static void handleBlendMode(uint16_t nBlend)
 {
-    if ((dword_791C54 & 2) != 0)
+    if ((otItemType_dword_791C54 & 2) != 0)
     {
         gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 1 + ((nBlend >> 5) & 3);
     }
@@ -377,7 +377,7 @@ static void handleBlendMode(uint16_t nBlend)
 
 static void handleBlendMode(uint16_t nBlend, uint16_t offset)
 {
-    if ((dword_791C54 & 2) != 0)
+    if ((otItemType_dword_791C54 & 2) != 0)
     {
         gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 1 + offset + ((nBlend >> 5) & 3);
     }
@@ -401,18 +401,20 @@ static void convertVertexType4(StructVertType4* pStructVert, uint32_t nIndex, fl
 
 // Untested for the moment
 //MSG_FUNC_NOT_IMPL(0x410560, int __cdecl(StructVert* a_pStructVert, int a_nSize), ConvertPolys_Hardware);
-int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
+int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
 {
     uint32_t var14 = dword_688CD4;
     uint32_t var1C = dword_688CD0;
 
     for (;;)
     {
-        if (a_nSize <= 0)
+        if (otItemSize <= 0)
+        {
             return 1;
+        }
 
-        dword_791C54 = a_pStructVert->structType;
-        dword_791C58 = 0;
+        otItemType_dword_791C54 = otItem->structType;
+        size_dword_791C58 = 0;
         g_fV3 = g_fV2 = g_fV1 = g_fV0 = 0;
         g_fU3 = g_fU2 = g_fU1 = g_fU0 = 0;
 
@@ -422,17 +424,19 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         // 100-103 case has an issue, causes corrupted text
         //LOG_INFO("VTX type: " << dword_791C54);
 
-        switch (dword_791C54)
+        switch (otItemType_dword_791C54)
         {
         case 0:
+        {
             return 1;
+        }
 
         case 32: // monochrome 3 point polygon
         case 33:
         case 34:
         case 35:
         {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            StructVertType0* pStructVert = (StructVertType0*)otItem;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
             handleBlendMode(word_6C0EAC);
@@ -446,7 +450,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLELIST;
             gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
 
-            dword_791C58 = 4;
+            size_dword_791C58 = 4;
             break;
         }
 
@@ -455,7 +459,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 42:
         case 43:
         {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            StructVertType0* pStructVert = (StructVertType0*)otItem;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
             handleBlendMode(word_6C0EAC);
@@ -470,7 +474,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
-            dword_791C58 = 5;
+            size_dword_791C58 = 5;
             break;
         }
 
@@ -479,7 +483,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 46:
         case 47:
         {
-            StructVertType1* pStructVert = (StructVertType1*)a_pStructVert;
+            StructVertType1* pStructVert = (StructVertType1*)otItem;
             uint32_t TextureIdx0, TextureIdx1;
             Render_ComputeTextureIdx(pStructVert->TexVtx[1].textureIdx, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
             TextureIdx0 &= 0xFFFF;
@@ -514,7 +518,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
-            dword_791C58 = 9;
+            size_dword_791C58 = 9;
             break;
         }
 
@@ -523,7 +527,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 50:
         case 51:
         {
-            StructVertType2* pStructVert = (StructVertType2*)a_pStructVert;
+            StructVertType2* pStructVert = (StructVertType2*)otItem;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
             handleBlendMode(word_6C0EAC);
@@ -537,7 +541,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLELIST;
 
-            dword_791C58 = 6;
+            size_dword_791C58 = 6;
             break;
         }
 
@@ -546,7 +550,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 54:
         case 55:
         {
-            StructVertType3* pStructVert = (StructVertType3*)a_pStructVert;
+            StructVertType3* pStructVert = (StructVertType3*)otItem;
 
             uint32_t TextureIdx0, TextureIdx1;
             Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1);
@@ -580,7 +584,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLELIST;
 
-            dword_791C58 = 9;
+            size_dword_791C58 = 9;
         }
 
         case 56:
@@ -588,7 +592,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 58:
         case 59:
         {
-            StructVertType2* pStructVert = (StructVertType2*)a_pStructVert;
+            StructVertType2* pStructVert = (StructVertType2*)otItem;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
             handleBlendMode(word_6C0EAC);
@@ -623,7 +627,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                 gPrimStructArray[g_nPrimitiveIndex].dwVertexCount += 4;
             }
 
-            dword_791C58 = 8;
+            size_dword_791C58 = 8;
             break;
         }
 
@@ -632,7 +636,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 62:
         case 63:
         {
-            StructVertType3* pStructVert = (StructVertType3*)a_pStructVert;
+            StructVertType3* pStructVert = (StructVertType3*)otItem;
             float position[16];
             position[11] = 0.5f;
             position[10] = 0.5f;
@@ -722,7 +726,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
                     if (*pIndex == 0xEDED)
                     {
                         gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFF0;
-                        dword_791C54 &= 0xFFFFFFFD;
+                        otItemType_dword_791C54 &= 0xFFFFFFFD;
                     }
                 }
             }
@@ -771,7 +775,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
-            dword_791C58 = 0xC;
+            size_dword_791C58 = 0xC;
             break;
         }
 
@@ -780,7 +784,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 66:
         case 67:
         {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            StructVertType0* pStructVert = (StructVertType0*)otItem;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
             float fXSize, fYSize;
@@ -801,7 +805,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
             gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
 
-            dword_791C58 = 3;
+            size_dword_791C58 = 3;
             break;
         }
 
@@ -810,7 +814,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 74:
         case 75:
         {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            StructVertType0* pStructVert = (StructVertType0*)otItem;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
             handleBlendMode(word_6C0EAC);
@@ -824,7 +828,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_LINESTRIP;
             gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
 
-            dword_791C58 = 5;
+            size_dword_791C58 = 5;
             break;
         }
 
@@ -833,7 +837,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 78:
         case 79:
         {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            StructVertType0* pStructVert = (StructVertType0*)otItem;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
             handleBlendMode(word_6C0EAC);
@@ -848,7 +852,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_LINESTRIP;
             gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
 
-            dword_791C58 = 6;
+            size_dword_791C58 = 6;
             break;
         }
 
@@ -857,7 +861,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 82:
         case 83:
         {
-            StructVertType2* pStructVert = (StructVertType2*)a_pStructVert;
+            StructVertType2* pStructVert = (StructVertType2*)otItem;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
             handleBlendMode(word_6C0EAC);
@@ -870,7 +874,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_LINELIST;
             gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
 
-            dword_791C58 = 4;
+            size_dword_791C58 = 4;
             break;
         }
 
@@ -879,7 +883,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 98:
         case 99:
         {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            StructVertType0* pStructVert = (StructVertType0*)otItem;
             g_fXOffset = g_wXOffset;
             g_fYOffset = g_wYOffset;
 
@@ -903,7 +907,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
             gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
 
-            dword_791C58 = 3;
+            size_dword_791C58 = 3;
             break;
         }
 
@@ -912,7 +916,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 102:
         case 103:
         {
-            StructVertType1* pStructVert = (StructVertType1*)a_pStructVert;
+            StructVertType1* pStructVert = (StructVertType1*)otItem;
             float fInverseRes = 1.0f / gXRes;
 
             int16_t diffX = (int16_t)pStructVert->TexVtx[1].Vtx.x;
@@ -988,7 +992,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
-            dword_791C58 = 4;
+            size_dword_791C58 = 4;
             break;
         }
 
@@ -997,7 +1001,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 106:
         case 107:
         {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            StructVertType0* pStructVert = (StructVertType0*)otItem;
             float fHalfOffset = (((gXRes - 1.0f) / 2.0f) + 1.0f) / gXRes;
 
             g_fXOffset = g_wXOffset;
@@ -1024,13 +1028,13 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
             gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
 
-            dword_791C58 = 2;
+            size_dword_791C58 = 2;
             break;
         }
 
         case 128: // $80     move image in frame buffer
         {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
+            StructVertType0* pStructVert = (StructVertType0*)otItem;
             int16_t rawPos[4];
 
             // source coord
@@ -1048,7 +1052,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             // move image
             sub_40D540(rawPos, varD8, varDC);
 
-            dword_791C58 = 4;
+            size_dword_791C58 = 4;
             break;
         }
 
@@ -1057,7 +1061,7 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         case 146:
         case 147:
         {
-            StructVertType4* pStructVert = (StructVertType4*)a_pStructVert;
+            StructVertType4* pStructVert = (StructVertType4*)otItem;
             if ((pStructVert->Vtx[0].textureIdx & 0x8000) != 0)
             {
                 gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFF0;
@@ -1098,41 +1102,41 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
-            dword_791C58 = 0xD;
+            size_dword_791C58 = 0xD;
             break;
         }
 
         case 225:
         {
-            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
+            StructVertType5* pStructVert = (StructVertType5*)otItem;
 
             word_6C0EAC = pStructVert->field0 & 0x1FF;
             word_6C0EAE = (((pStructVert->field0 >> 10) & 1) << 8) | ((pStructVert->field0 >> 9) & 1);
 
-            dword_791C58 = 1;
+            size_dword_791C58 = 1;
             break;
         }
 
         case 226:
         {
-            dword_791C58 = 1;
+            size_dword_791C58 = 1;
             break;
         }
 
         case 227:
         {
-            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
+            StructVertType5* pStructVert = (StructVertType5*)otItem;
 
             gDrawEnv_6C0E98.clip.x1 = pStructVert->field0 & 0x3FF;
             word_6C0E9A = (pStructVert->field0 >> 10) & 0x3FF;
 
-            dword_791C58 = 1;
+            size_dword_791C58 = 1;
             break;
         }
 
         case 228:
         {
-            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
+            StructVertType5* pStructVert = (StructVertType5*)otItem;
 
             word_6C0E9C = (pStructVert->field0 & 0x3FF) - gDrawEnv_6C0E98.clip.x1 + 1;
             word_6C0E9E = ((pStructVert->field0 >> 10) & 0x3FF) - word_6C0E9A + 1;
@@ -1148,24 +1152,24 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
             gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = 0x7D0; // ?
             gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
 
-            dword_791C58 = 1;
+            size_dword_791C58 = 1;
             break;
         }
 
         case 229:
         {
-            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
+            StructVertType5* pStructVert = (StructVertType5*)otItem;
 
             g_wXOffset = pStructVert->field0 & 0x7FF;
             g_wYOffset = (pStructVert->field0 >> 11) & 0x3FF;
 
-            dword_791C58 = 1;
+            size_dword_791C58 = 1;
             break;
         }
 
         case 255:
         {
-            dword_791C58 = 1;
+            size_dword_791C58 = 1;
             break;
         }
 
@@ -1174,18 +1178,23 @@ int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
         }
 
         if (gPrimStructArray[g_nPrimitiveIndex].dwVertexCount != 0)
-            g_nPrimitiveIndex++;
-
-        if (dword_791C58 == 0)
         {
-            uint8_t* pValue = (uint8_t*)(0x650A5C + dword_791C54);
-            dword_791C58 = *pValue;
+            g_nPrimitiveIndex++;
         }
-        if (dword_791C58 == 0)
-            dword_791C58 = 1;
 
-        a_nSize -= dword_791C58;
-        a_pStructVert = (StructVert*)((intptr_t)a_pStructVert + dword_791C58 * 4);
+        if (size_dword_791C58 == 0)
+        {
+            uint8_t* pValue = (uint8_t*)(0x650A5C + otItemType_dword_791C54);
+            size_dword_791C58 = *pValue;
+        }
+
+        if (size_dword_791C58 == 0)
+        {
+            size_dword_791C58 = 1;
+        }
+
+        otItemSize -= size_dword_791C58;
+        otItem = (TaggedOrderingTablePointer*)((intptr_t)otItem + size_dword_791C58 * 4);
     }
 }
 MSG_FUNC_IMPLEX(0x410560, ConvertPolys_Hardware, RENDERER_IMPL);
@@ -1232,7 +1241,7 @@ MSG_FUNC_IMPLEX(0x0044AB80, Renderer_ClearOTag, RENDERER_IMPL);
 
 
 //MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
-void CC Render_DrawGeneric(StructVert* a_pStructVert)
+void CC Render_DrawGeneric(TaggedOrderingTablePointer* a_pStructVert)
 {
     if (dword_6FC718 == 1)
     {
@@ -1269,7 +1278,7 @@ void CC Render_DrawGeneric(StructVert* a_pStructVert)
 
             // Get the pointer bytes of the OT, the remainder byte is the type.. TODO - how does the vertex info fit into the OT?
             uint32_t nextStructVert = ((uint32_t*)a_pStructVert)[0] & 0x00FFFFFF;
-            a_pStructVert = (StructVert*)nextStructVert;
+            a_pStructVert = (TaggedOrderingTablePointer*)nextStructVert;
         } while ((uint32_t)a_pStructVert != OT_END_TAG);
 
         if (gSoftwareRendering != 0)
@@ -1291,7 +1300,7 @@ MSG_FUNC_IMPLEX(0x4103B0, Render_DrawGeneric, RENDERER_IMPL);
 //MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
 void CC Render_DrawIndex(uint32_t activeBuffer)
 {
-    StructVert* pStructVert = (StructVert*)&gLibGvStruct0_6BC180.dword_6BC3D8_dst[16 * activeBuffer];
+    TaggedOrderingTablePointer* pStructVert = (TaggedOrderingTablePointer*)&gLibGvStruct0_6BC180.dword_6BC3D8_dst[16 * activeBuffer];
     Render_DrawGeneric(pStructVert);
 }
 MSG_FUNC_IMPLEX(0x401619, Render_DrawIndex, RENDERER_IMPL);
