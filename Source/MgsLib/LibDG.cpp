@@ -295,7 +295,7 @@ MGS_FUNC_NOT_IMPL(0x401234, void CC(Actor* pActor), LibDG_Update2_401234);
 
 
 MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 1);
-MGS_ARY(1, 0x6BE4E8, DWORD, 512, gUnkSize_1024_6BE4E8, {}); // TODO: Might just be 256?
+MGS_ARY(1, 0x6BE4E8, DWORD*, 512, gUnkSize_1024_6BE4E8, {}); // TODO: Might just be 256?
 
 
 MGS_FUNC_NOT_IMPL(0x40B231, unsigned int CC(void* pMem, int size), MemClearUnknown_40B231);
@@ -397,41 +397,35 @@ MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, true); // TODO: Implement me
 void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
 {
     struct_gv *pGv2; // edx@1
-    DWORD *unk1024; // ecx@1
     int otPtr; // eax@1
-    int *unkItem; // esi@2
-    int **otItemPtrPtr; // eax@3
+    DWORD **otItemPtrPtr; // eax@3
     int unkByte012Ptr; // edi@3
     unsigned __int16 v9; // di@5
     int otrPtrNext; // [sp+Ch] [bp-4h]@1
     int count256; // [sp+18h] [bp+8h]@1
 
     pGv2 = pGv;
-    unk1024 = gUnkSize_1024_6BE4E8;
     dword_991E40[0] = (int)gUnkSize_1024_6BE4E8;  // 256 DWORD's
     otPtr = *(&pGv->mOrderingTable1 + activeBuffer);
     dword_991E40[1] = otPtr + 4;
     otrPtrNext = dword_991E40[1];
     count256 = 256;
-    do
+    for (int i = 0; i < 256; i++)
     {
-        unkItem = (int *)*unk1024;
-        ++unk1024;
+        DWORD* unkItem = gUnkSize_1024_6BE4E8[i];
         if (unkItem) // Only has ptrs for "3d objects" ?
         {
-            
             do
             {
-                DWORD unkByte3Idx = (unsigned int)(*unkItem >> 24); // Get single 3rd byte
-                otItemPtrPtr = (int **)(otrPtrNext + 4 * unkByte3Idx); // Index into the OT using this byte
+                DWORD unkByte3Idx = *unkItem >> 24; // Get single 3rd byte
+                otItemPtrPtr = (DWORD **)(otrPtrNext + 4 * unkByte3Idx); // Index into the OT using this byte
                 unkByte012Ptr = *unkItem & 0xFFFFFF; // Other 3 bytes
                 *unkItem = (unsigned int)*otItemPtrPtr | 0xC000000; // Set UNK to point to the OT
                 *otItemPtrPtr = unkItem; // Set OT to point to the UNK
-                unkItem = (int *)unkByte012Ptr; // To next unk entry ?
+                unkItem = (DWORD *)unkByte012Ptr; // To next unk entry ?
             } while (unkByte012Ptr);
         }
-        --count256;
-    } while (count256);
+    }
 
     v9 = dword_78D32C;
     
