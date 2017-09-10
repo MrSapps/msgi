@@ -2425,7 +2425,7 @@ int CC Main_sub_401C02()
     if (gSoftwareRendering)
     {
         // SW rendering path not implemented
-        abort();
+        MGS_FATAL("Software rendering path not implemented");
     }
     else
     {

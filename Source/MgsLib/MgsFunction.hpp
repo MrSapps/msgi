@@ -475,5 +475,6 @@ extern TypeName* VarName ;
 #define BYTE1(x)   BYTEn(x,  1)
 #define BYTE2(x)   BYTEn(x,  2)
 #define BYTE3(x)   BYTEn(x,  3)
+#define HIWORD(l)           ((WORD)((((DWORD_PTR)(l)) >> 16) & 0xffff))
 
 #define MGS_FATAL(x)  ::MessageBox(NULL, "ERROR", x, MB_ICONERROR | MB_OK); __debugbreak(); abort();

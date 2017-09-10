@@ -2,6 +2,7 @@
 #include "LibDG.hpp"
 #include "Script.hpp"
 #include "LibGV.hpp"
+#include "Actor_GameD.hpp"
 #include <assert.h>
 
 #define LIBDG_IMPL true
@@ -290,8 +291,89 @@ MGS_FUNC_NOT_IMPL(0x403290, signed int CC(int a1), sub_403290);
 MGS_FUNC_NOT_IMPL(0x402A5F, signed int CC(int a1), sub_402A5F);
 MGS_FUNC_NOT_IMPL(0x402AA9, signed int CC(int a1), sub_402AA9);
 
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB908, DWORD, dword_6BB908, 0);
 
-MGS_FUNC_NOT_IMPL(0x401234, void CC(Actor* pActor), LibDG_Update2_401234);
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x7919CE, DWORD, dword_7919CE, 0);
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x7919D4, DWORD, dword_7919D4, 0);
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x650090, DWORD, dword_650090, 0);
+
+
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x9942AB, BYTE, byte_9942AB, 0);
+
+
+
+MGS_VAR_EXTERN(DWORD, game_state_dword_72279C);
+MGS_FUNC_NOT_IMPL(0x40A857, void CC(), sub_40A857);
+int CC Main_sub_401C02();
+
+MGS_FUNC_NOT_IMPL(0x5200D2, signed __int64 CC(), sub_5200D2);
+
+signed __int64 CC WaitFor_445580(int totalCount)
+{
+    __int64 result = 0;
+    for (int i = 0; i < totalCount; i++)
+    {
+        result = sub_5200D2();
+    }
+    return result;
+}
+MGS_FUNC_IMPLEX(0x445580, WaitFor_445580, LIBDG_IMPL);
+
+void CC LibDG_Update2_401234(Actor* pLibDg)
+{
+    static int sTimeStamp_dword_650094 = 0;
+
+    dword_6BB908 = 0;
+
+    gLibDG_2_stru_6BB930.dword_6BB954 = gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers;
+
+    if (BYTE3(game_state_dword_72279C) & 0x20)
+    {
+        int bDontFlipBuffers = gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers;
+
+        if (sTimeStamp_dword_650094 == -1)
+        {
+            sTimeStamp_dword_650094 = TimeGetElapsed_4455A0();
+            bDontFlipBuffers = 0;
+            gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers = 0;
+        }
+
+        if (!bDontFlipBuffers)
+        {
+            WaitFor_445580(dword_650090);
+        }
+
+        // TODO: This is not 100% correct - but I don't think 
+        // dword_6BB950_do_not_flip_buffers can ever be set to 1?
+        int elapsed = TimeGetElapsed_4455A0();
+        if (elapsed - (sTimeStamp_dword_650094 + 2) < 0)
+        {
+            sTimeStamp_dword_650094 += 2;
+        }
+        gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers = 0;
+    }
+    else
+    {
+        WaitFor_445580(dword_650090);
+        sTimeStamp_dword_650094 = -1;
+        gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers = 0;
+    }
+
+    Main_sub_401C02();
+    
+    sub_40A857(); // Probably input related as input no longer works if not called?
+
+    dword_995324 = (int)&dword_7919C0;
+
+    if (byte_9942AB & 0x10)
+    {
+        if (HIWORD(dword_7919CE) | (WORD)dword_7919D4)
+        {
+            dword_995324 = 0x7919D0; // TODO: Is actually set to (int)&dword_7919CE + 2; ??
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x401234, LibDG_Update2_401234, LIBDG_IMPL);
 
 
 MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 1);
@@ -454,6 +536,10 @@ MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0,
 // Returns the old pointer because the calling code will use it to restore it later
 TDG_FnPtr CC LibDG_SetFnPtr_4019FA(int idx, TDG_FnPtr fnPtr)
 {
+    if (idx == 7)
+    {
+        MGS_FATAL("LibDG_SetFnPtr_4019FA - should never be reached");
+    }
     TDG_FnPtr old = gLibDg_FuncPtrs_off_6500E0[idx];
     gLibDg_FuncPtrs_off_6500E0[idx] = fnPtr;
     return old;
@@ -484,9 +570,9 @@ void CC LibDg_Init_40111A()
     LibGV_SetFnPtr_sub_40A68D('i', (GV_FnPtr)sub_402A5F.Ptr());
     LibGV_SetFnPtr_sub_40A68D('s', (GV_FnPtr)sub_402AA9.Ptr());
     Actor_PushBack(0, &gLibDG_2_stru_6BB930.mBase, 0);// Handles 2D rendering?
-    Actor_Init(&gLibDG_2_stru_6BB930.mBase, LibDG_Update2_401234.Ptr(), 0, "C:\\mgs\\source\\LibDG\\dgd.c");
+    Actor_Init(&gLibDG_2_stru_6BB930.mBase, LibDG_Update2_401234, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
     Actor_PushBack(8, &gLibDGD_1_stru_6BB910, 0); // Handles 3D rendering?
-    Actor_Init(&gLibDGD_1_stru_6BB910, LibDG_Update1_4012ED, 0, "C:\\mgs\\source\\LibDG\\dgd.c");
+    Actor_Init(&gLibDGD_1_stru_6BB910, LibDG_Update1_4012ED, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
 }
 MGS_FUNC_IMPLEX(0x40111A, LibDg_Init_40111A, LIBDG_IMPL);
 
