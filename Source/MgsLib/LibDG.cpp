@@ -359,32 +359,32 @@ MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403
 MGS_ARY(1, 0x991E40, int, 8, dword_991E40, {});
 
 
-void __cdecl sub_4034C6(int pPrimDataStart, int count, int size)
+void CC sub_4034C6(int pPrimDataStart, int count, int size)
 {
-    int dword_991E40_1_ot_ptr; // edi@1
-    int pData; // ecx@2
-    int tag; // eax@3
-    signed int v6; // eax@4
-    signed int maybe_z; // eax@6
-    int dword_991E40_2_field_2E_w_or_h; // [sp+4h] [bp-4h]@1
-
-    dword_991E40_1_ot_ptr = dword_991E40[1];
-    dword_991E40_2_field_2E_w_or_h = dword_991E40[2];
+    DWORD* dword_991E40_1_ot_ptr = (DWORD*)dword_991E40[1];
+    const int dword_991E40_2_field_2E_w_or_h = dword_991E40[2];
     if (count - 1 >= 0)
     {
-        pData = pPrimDataStart;
+        int pData = pPrimDataStart;
         do
         {
-            tag = *(WORD *)pData;
+            const int tag = *(WORD *)pData;
             if (tag > 0)
             {
-                v6 = tag - dword_991E40_2_field_2E_w_or_h;
+                signed int v6 = tag - dword_991E40_2_field_2E_w_or_h;
                 if (v6 < 0)
+                {
                     v6 = 0;
-                maybe_z = v6 >> 8;
+                }
 
-                *(DWORD *)pData ^= (*(DWORD *)pData ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
-                *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z) ^= (pData ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
+                const signed int maybe_z = v6 >> 8;
+
+                *(DWORD *)pData &= 0xFF000000;
+                *(DWORD *)pData |= dword_991E40_1_ot_ptr[maybe_z] & 0xFFFFFF;
+
+                dword_991E40_1_ot_ptr[maybe_z] &= 0xFF000000;
+                dword_991E40_1_ot_ptr[maybe_z] |= pData & 0xFFFFFF;
+                
             }
             pData += size;
             --count;
