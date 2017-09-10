@@ -359,40 +359,34 @@ MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403
 MGS_ARY(1, 0x991E40, int, 8, dword_991E40, {});
 
 
-void __cdecl sub_4034C6(BYTE* pPrimDataStart, int count, int size)
+void __cdecl sub_4034C6(int pPrimDataStart, int count, int size)
 {
-    DWORD* dword_991E40_1_ot_ptr; // edi@1
-    BYTE* pPrim; // ecx@2
+    int dword_991E40_1_ot_ptr; // edi@1
+    int pData; // ecx@2
     int tag; // eax@3
     signed int v6; // eax@4
     signed int maybe_z; // eax@6
     int dword_991E40_2_field_2E_w_or_h; // [sp+4h] [bp-4h]@1
 
-    dword_991E40_1_ot_ptr = (DWORD*)dword_991E40[1];
+    dword_991E40_1_ot_ptr = dword_991E40[1];
     dword_991E40_2_field_2E_w_or_h = dword_991E40[2];
     if (count - 1 >= 0)
     {
-        pPrim = pPrimDataStart;
+        pData = pPrimDataStart;
         do
         {
-            tag = *(WORD *)pPrim;
+            tag = *(WORD *)pData;
             if (tag > 0)
             {
                 v6 = tag - dword_991E40_2_field_2E_w_or_h;
                 if (v6 < 0)
-                {
                     v6 = 0;
-                }
+                maybe_z = v6 >> 8;
 
-                maybe_z = v6 >> 8; // Extract byte
-
-                DWORD otPointerBits = dword_991E40_1_ot_ptr[maybe_z] & 0xFFFFFF;
-
-
-                *(DWORD *)pPrim ^= (*(DWORD *)pPrim ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
-                *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z) ^= ((DWORD)pPrim ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
+                *(DWORD *)pData ^= (*(DWORD *)pData ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
+                *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z) ^= (pData ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
             }
-            pPrim += size;
+            pData += size;
             --count;
         } while (count);
     }
@@ -450,7 +444,7 @@ void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
         {
             dword_991E40[2] = p->field_2E_w_or_h;
             sub_4034C6(
-                (BYTE*)*(&p->field_40_pDataStart + activeBuffer),
+                (int)*(&p->field_40_pDataStart + activeBuffer),
                 p->field_2A_num_items,
                 p->field_30_size);
         }
