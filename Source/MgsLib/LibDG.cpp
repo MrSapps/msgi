@@ -304,7 +304,7 @@ using TDG_FnPtr = void(CC*)(struct_gv* pGv, int activeBuffer);
 
 MGS_FUNC_NOT_IMPL(0x4065AA, int CC(struct_gv* pGv, int activeBuffer), sub_4065AA);
 MGS_FUNC_NOT_IMPL(0x4064B1, void CC(Prim_Object *pObject, int activeBuffer, char a3, int a4), sub_4064B1);
-
+MGS_FUNC_NOT_IMPL(0x401DA8, int CC(PSX_RECT* pRect, int a2), sub_401DA8);
 
 MGS_VAR(1, 0x78D32C, DWORD, dword_78D32C, 0);
 
@@ -312,7 +312,8 @@ MGS_VAR(1, 0x78D32C, DWORD, dword_78D32C, 0);
 
 void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
 {
-    //sub_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
+    /*
+    sub_401DA8((PSX_RECT*)&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
 
     Prim_Object **pObjects = pGv->gObjects_dword_6BC3C4;
     if (pGv->gObjectQueue_word_6BC3C2_0 > 0)
@@ -330,27 +331,24 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
                 v5 = 2;
                 if (flags & 0x20)
                 {
-                    MGS_FATAL("Not implemented");
 
-                    // TODO: Implement me
-                    /*
                     *(QWORD *)&stru_993E40 = *(QWORD *)&pObject->field_68_92b_size;
                     *((QWORD *)&stru_993E40 + 1) = *(QWORD *)&pObject->field_70_pInners;
                     *((QWORD *)&stru_993E40 + 2) = *(QWORD *)&pObject->field_78;
                     *((QWORD *)&stru_993E40 + 3) = *(QWORD *)&pObject->field_80;
                     sub_4062CB(pObject->field_24 + 8);
                     v5 = sub_40640F();
-                    */
                 }
             }
             pObject->field_32_hasInners = v5;
-            sub_4064B1(pObject, activeBuffer, flags, v5);
+            sub_4064B1(pObject, activeBuffer, static_cast<char>(flags), v5);
             --objectQueueCount;
         } while (objectQueueCount);
     }
     sub_4065AA(pGv, activeBuffer);
+    */
 }
-MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, false); // TODO: Fully implement
 
 MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
 MGS_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
@@ -435,8 +433,8 @@ void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
         // TODO: Seems like this is dead code as the condition can never be true?
         if (gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers != 0)
         {
-            assert(false);
             count++;
+            MGS_FATAL("LibDG_ExecFnPtrs_40171C - should never be reached");
         }
 
         for (int i = 0; i < count; i++)
