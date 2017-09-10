@@ -15,7 +15,7 @@ static void CC Debug_Update(Actor_Debug* pDebug)
     Menu_DrawText("A textual test");
 
     memcpy((pDebug->mPrimData /*+ gActiveBuffer_dword_791A08*/)->field_40_pDataStart, &pDebug->mPolyF4, sizeof(POLY_FT4));
-    pDebug->mPrimData->mBase.field_0 = 3;
+    pDebug->mPrimData->mBase.field_0_ptr = 3;
 
 }
 

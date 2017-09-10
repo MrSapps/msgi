@@ -295,7 +295,7 @@ MGS_FUNC_NOT_IMPL(0x401234, void CC(Actor* pActor), LibDG_Update2_401234);
 
 
 MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 1);
-MGS_VAR(1, 0x6BE4E8, DWORD, gUnkSize_1024_6BE4E8, 0);
+MGS_ARY(1, 0x6BE4E8, DWORD, 512, gUnkSize_1024_6BE4E8, {}); // TODO: Might just be 256?
 
 
 MGS_FUNC_NOT_IMPL(0x40B231, unsigned int CC(void* pMem, int size), MemClearUnknown_40B231);
@@ -354,7 +354,105 @@ MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405
 MGS_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
 MGS_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_4041A5);
 MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
-MGS_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_40340A);
+//MGS_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_40340A);
+
+MGS_ARY(1, 0x991E40, int, 8, dword_991E40, {});
+
+
+void __cdecl sub_4034C6(int pPrimDataStart, int count, int size)
+{
+    int dword_991E40_1_ot_ptr; // edi@1
+    int pData; // ecx@2
+    int tag; // eax@3
+    signed int v6; // eax@4
+    signed int maybe_z; // eax@6
+    int dword_991E40_2_field_2E_w_or_h; // [sp+4h] [bp-4h]@1
+
+    dword_991E40_1_ot_ptr = dword_991E40[1];
+    dword_991E40_2_field_2E_w_or_h = dword_991E40[2];
+    if (count - 1 >= 0)
+    {
+        pData = pPrimDataStart;
+        do
+        {
+            tag = *(WORD *)pData;
+            if (tag > 0)
+            {
+                v6 = tag - dword_991E40_2_field_2E_w_or_h;
+                if (v6 < 0)
+                    v6 = 0;
+                maybe_z = v6 >> 8;
+
+                *(DWORD *)pData ^= (*(DWORD *)pData ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
+                *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z) ^= (pData ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
+            }
+            pData += size;
+            --count;
+        } while (count);
+    }
+}
+MGS_FUNC_IMPLEX(0x4034C6, sub_4034C6, true); // TODO: Implement me
+
+void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
+{
+    struct_gv *pGv2; // edx@1
+    DWORD *unk1024; // ecx@1
+    int otPtr; // eax@1
+    int *unkItem; // esi@2
+    int **v6; // eax@3
+    int otItem24BitsPtr; // edi@3
+    unsigned __int16 v9; // di@5
+    int otrPtrNext; // [sp+Ch] [bp-4h]@1
+    int count256; // [sp+18h] [bp+8h]@1
+
+    pGv2 = pGv;
+    unk1024 = gUnkSize_1024_6BE4E8;
+    dword_991E40[0] = (int)gUnkSize_1024_6BE4E8;  // 256 DWORD's
+    otPtr = *(&pGv->mOrderingTable1 + activeBuffer);
+    dword_991E40[1] = otPtr + 4;
+    otrPtrNext = dword_991E40[1];
+    count256 = 256;
+    do
+    {
+        unkItem = (int *)*unk1024;
+        ++unk1024;
+        if (unkItem) // Only has ptrs for "3d objects" ?
+        {
+            
+            do
+            {
+                v6 = (int **)(otrPtrNext + 4 * ((unsigned int)*unkItem >> 24));
+                otItem24BitsPtr = *unkItem & 0xFFFFFF;
+                *unkItem = (unsigned int)*v6 | 0xC000000;
+                *v6 = unkItem;
+                unkItem = (int *)otItem24BitsPtr;
+            } while (otItem24BitsPtr);
+        }
+        --count256;
+    } while (count256);
+
+    v9 = dword_78D32C;
+    
+    int primCount = pGv2->g_PrimQueue1_word_6BC3BE_256 - pGv2->gPrimQueue2_word_6BC3C0_256;
+    for (int i = 0; i < primCount; i++)
+    {
+        Prim_unknown* pPrim = (Prim_unknown*)&pGv2->gObjects_dword_6BC3C4[pGv2->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
+        DWORD field_0_ptr = pPrim->mBase.field_0_ptr;
+        Prim_unknown* p = (Prim_unknown*)field_0_ptr;
+
+        if (!(BYTE1(p->field_24_maybe_flags) & 1)
+            && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & v9))
+        {
+            dword_991E40[2] = p->field_2E_w_or_h;
+            sub_4034C6(
+                (int)*(&p->field_40_pDataStart + activeBuffer),
+                p->field_2A_num_items,
+                p->field_30_size);
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x40340A, LibGV_40340A, true); // TODO: Implement me
+
 
 MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0, 
 {
@@ -363,7 +461,7 @@ MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0,
     LibGV_405180.Ptr(),
     LibGV_4041A5.Ptr(),
     LibGV_403528.Ptr(),
-    LibGV_40340A.Ptr(),
+    LibGV_40340A,
     nullptr
 });
 
@@ -426,7 +524,7 @@ void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
 {
     if (!gLibDG_ExecPtrs_6BECE8)
     {
-        MemClearUnknown_40B231((void*)&gUnkSize_1024_6BE4E8, 1024);
+        MemClearUnknown_40B231(gUnkSize_1024_6BE4E8, 1024);
 
         int count = 7;
         // Check if extra function pointer slot is in use?

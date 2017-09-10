@@ -32,12 +32,11 @@ MGS_VAR_EXTERN(LibDG_Struct, gLibDG_2_stru_6BB930);
 
 struct Prim_base
 {
-    WORD field_0;
-    WORD field_2;
-    DWORD field_4;
-    DWORD field_8;
-    DWORD field_C;
-    DWORD field_10;
+    DWORD field_0_ptr;
+    DWORD field_4_ptr;
+    DWORD field_8_ptr;
+    DWORD field_C_ptr;
+    DWORD field_10_countq;
     DWORD field_14;
     DWORD field_18;
     DWORD field_1C;
@@ -53,7 +52,7 @@ struct Prim_unknown
     WORD field_2A_num_items;
     WORD field_2C_r_index;
     WORD field_2E_w_or_h;
-    WORD field_30;
+    WORD field_30_size;
     WORD field_32;
     WORD field_34;
     WORD field_36;

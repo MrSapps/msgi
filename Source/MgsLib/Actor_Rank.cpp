@@ -23,11 +23,11 @@ void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
 {
     signed int i; // [sp+10h] [bp-Ch]@1
     signed int j; // [sp+10h] [bp-Ch]@4
-    char *pDst; // [sp+14h] [bp-8h]@1
+    POLY_FT4 *pDst; // [sp+14h] [bp-8h]@1
     char *pDst2; // [sp+14h] [bp-8h]@4
     char *pSrc2; // [sp+18h] [bp-4h]@4
 
-    pDst = *(char **)(pRank->field_24_ptr_16_prims + 4 * gActiveBuffer_dword_791A08 + 64);
+    pDst = (POLY_FT4 *)*(&pRank->field_24_ptr_16_prims->field_40_pDataStart + gActiveBuffer_dword_791A08);
     POLY_FT4* pSrc = &pRank->field_2C_back_l_type0_0x40_start;
     for (i = 0; i < 1; ++i)
     {
