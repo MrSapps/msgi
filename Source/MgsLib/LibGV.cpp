@@ -13,7 +13,7 @@ struct struct_8
     DWORD mId;
     DWORD* field_4;
 };
-MSG_ASSERT_SIZEOF(struct_8, 0x8);
+MGS_ASSERT_SIZEOF(struct_8, 0x8);
 
 struct struct_lib_gv
 {
@@ -38,21 +38,21 @@ struct struct_lib_gv
     DWORD gGv_dword_6C04F4_array2[81];
     DWORD gGv_dword_6C0638_active_array_idx;
 };
-MSG_ASSERT_SIZEOF(struct_lib_gv, 0x75C);
+MGS_ASSERT_SIZEOF(struct_lib_gv, 0x75C);
 
 MGS_VAR(REDIRECT_LIBGV_DATA, 0x6BFEE0, struct_lib_gv, g_lib_gv_stru_6BFEE0, {});
 
 // Other likely LibGvd funcs
-MSG_FUNC_NOT_IMPL(0x40A72A, struct_8* CC(), LibGvd_sub_40A72A);
-MSG_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
-MSG_FUNC_NOT_IMPL(0x40A603, int CC(int), LibGvd_sub_40A603);
+MGS_FUNC_NOT_IMPL(0x40A72A, struct_8* CC(), LibGvd_sub_40A72A);
+MGS_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
+MGS_FUNC_NOT_IMPL(0x40A603, int CC(int), LibGvd_sub_40A603);
 
 void LibGVCpp_ForceLink() { }
 
-MSG_FUNC_NOT_IMPL(0x40B35E, void CC(), LibGV_Reset_System2_Memory_40B35E);
-MSG_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_Allocs_40A6AC);
-MSG_FUNC_NOT_IMPL(0x40A4B1, void CC(), sub_40A4B1);
-MSG_FUNC_NOT_IMPL(0x40B734, void CC(int), Hzm_load_40B734);
+MGS_FUNC_NOT_IMPL(0x40B35E, void CC(), LibGV_Reset_System2_Memory_40B35E);
+MGS_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_Allocs_40A6AC);
+MGS_FUNC_NOT_IMPL(0x40A4B1, void CC(), sub_40A4B1);
+MGS_FUNC_NOT_IMPL(0x40B734, void CC(int), Hzm_load_40B734);
 
 
 //MSG_FUNC_NOT_IMPL(0x4455A0, __int64 __cdecl(), TimingRelated_4455A0);
@@ -66,7 +66,7 @@ void __cdecl LibGV_40B3BC()
     g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_array2[0] = 0;
     g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx = 0;
 }
-MSG_FUNC_IMPLEX(0x40B3BC, LibGV_40B3BC, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40B3BC, LibGV_40B3BC, LIBGV_IMPL);
 
 struct PerformanceFreqStruct
 {
@@ -117,7 +117,7 @@ __int64 CC TimeGetElapsed_4455A0()
 
     return (TimerInitBaseLineAndGetCurrentTime_5201A6().QuadPart - sCurrentPeftCounter_qword_665508.QuadPart) / gPerformanceFreq_995648.mFreq60;
 }
-MSG_FUNC_IMPLEX(0x4455A0, TimeGetElapsed_4455A0, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x4455A0, TimeGetElapsed_4455A0, LIBGV_IMPL);
 
 void CC LibGV_Update_40A54E(Actor* pActor)
 {
@@ -149,7 +149,7 @@ void CC LibGV_Update_40A54E(Actor* pActor)
         }
     } 
 }
-MSG_FUNC_IMPLEX(0x40A54E, LibGV_Update_40A54E, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40A54E, LibGV_Update_40A54E, LIBGV_IMPL);
 
 void LibGv_Init_sub_40A4F6()
 {
@@ -164,20 +164,20 @@ void LibGv_Init_sub_40A4F6()
     g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00 = 0;
     //nullsub_6(nullsub_4);
 }
-MSG_FUNC_IMPLEX(0x40A4F6, LibGv_Init_sub_40A4F6, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40A4F6, LibGv_Init_sub_40A4F6, LIBGV_IMPL);
 
 
 void CC LibGv_ClearFunctionPointers_40A69D()
 {
     memset(g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs, 0, sizeof(g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs));
 }
-MSG_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, LIBGV_IMPL);
 
 void CC LibGv_Set_Load_HZM_CallBack_40B725()
 {
     LibGV_SetFnPtr_sub_40A68D('h', (GV_FnPtr)Hzm_load_40B734.Ptr());
 }
-MSG_FUNC_IMPLEX(0x40B725, LibGv_Set_Load_HZM_CallBack_40B725, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40B725, LibGv_Set_Load_HZM_CallBack_40B725, LIBGV_IMPL);
 
 void CC LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
 {
@@ -187,4 +187,4 @@ void CC LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
     assert(idx < _countof(g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs));
     g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs[idx] = fn;
 }
-MSG_FUNC_IMPLEX(0x40A68D, LibGV_SetFnPtr_sub_40A68D, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40A68D, LibGV_SetFnPtr_sub_40A68D, LIBGV_IMPL);

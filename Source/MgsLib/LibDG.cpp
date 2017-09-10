@@ -163,7 +163,7 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB910, Actor, gLibDGD_1_stru_6BB910, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
 
 // TODO: Script_tbl_get_res_init_fn_457B9A - call GCL script to get res fn func ptr, then caller creates the resource
-MSG_FUNC_NOT_IMPL(0x457B9A, ResInitFn CC(BYTE *pScript), Script_tbl_get_res_init_fn_457B9A);
+MGS_FUNC_NOT_IMPL(0x457B9A, ResInitFn CC(BYTE *pScript), Script_tbl_get_res_init_fn_457B9A);
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x722A40, DWORD, dword_722A40, 0);
 
 MGS_VAR(1, 0x6BC180, struct_gv, gLibGvStruct0_6BC180, {}); // TODO: Probably an array of 3?
@@ -183,7 +183,7 @@ signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript)
     }
     return -1;
 }
-MSG_FUNC_IMPLEX(0x00451AC3, Script_tbl_chara_sub_451AC3, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x00451AC3, Script_tbl_chara_sub_451AC3, LIBDG_IMPL);
 
 signed int CC LibDG_CHARA_44E9D2(Res_Init_Record* pStartingRecord)
 {
@@ -226,21 +226,21 @@ signed int CC LibDG_CHARA_44E9D2(Res_Init_Record* pStartingRecord)
 
     return 1;
 }
-MSG_FUNC_IMPLEX(0x0044E9D2, LibDG_CHARA_44E9D2, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x0044E9D2, LibDG_CHARA_44E9D2, LIBDG_IMPL);
 
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B()
 {
     memcpy(gDynamicResFuncs_word_994320, gKnownResInitFuncs_669AE0, 4096u); // 4096u = sizeof(gResInitFuncs_669AE0)
     *gpToDynamicResInitFuncs_dword_993F44 = gDynamicResFuncs_word_994320;
 }
-MSG_FUNC_IMPLEX(0x457B5B, LibDG_SetActiveResourceInitFuncPtrs_457B5B, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x457B5B, LibDG_SetActiveResourceInitFuncPtrs_457B5B, LIBDG_IMPL);
 
 void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C()
 {
     memset(gDynamicResFuncs_word_994320, 0, 4096u); // 4096u = sizeof(gResInitFuncs_669AE0)
     *gpToDynamicResInitFuncs_dword_993F44 = gDynamicResFuncs_word_994320;
 }
-MSG_FUNC_IMPLEX(0x457B7C, LibDG_ClearActiveResourceFunctionPointerList_457B7C, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x457B7C, LibDG_ClearActiveResourceFunctionPointerList_457B7C, LIBDG_IMPL);
 
 static ResInitFn FindFnPtrByHash(Res_Init_Record* arrayToSearch, WORD hashName)
 {
@@ -269,41 +269,41 @@ ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName)
     result = FindFnPtrByHash(*gpToDynamicResInitFuncs_dword_993F44, hashedName);
     return result;
 }
-MSG_FUNC_IMPLEX(0x457BAC, LibDG_GetResourceInitFuncPtr_457BAC, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x457BAC, LibDG_GetResourceInitFuncPtr_457BAC, LIBDG_IMPL);
 
-MSG_FUNC_NOT_IMPL(0x401A4F, void CC(int ClipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2, int a5), sub_401A4F);
-MSG_FUNC_NOT_IMPL(0x4012F2, void CC(int k320), sub_4012F2);
-MSG_FUNC_NOT_IMPL(0x4026E6, void CC(), LibDG_Reset_HashCounts_4026E6);
-MSG_FUNC_NOT_IMPL(0x4010A6, void CC(), LibDG_4010A6);
+MGS_FUNC_NOT_IMPL(0x401A4F, void CC(int ClipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2, int a5), sub_401A4F);
+MGS_FUNC_NOT_IMPL(0x4012F2, void CC(int k320), sub_4012F2);
+MGS_FUNC_NOT_IMPL(0x4026E6, void CC(), LibDG_Reset_HashCounts_4026E6);
+MGS_FUNC_NOT_IMPL(0x4010A6, void CC(), LibDG_4010A6);
 
 signed int CC Returns1_402B1D()
 {
     return 1;
 }
-MSG_FUNC_IMPLEX(0x402B1D, Returns1_402B1D, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x402B1D, Returns1_402B1D, LIBDG_IMPL);
 
-MSG_FUNC_NOT_IMPL(0x402B25, signed int CC(int a2, int a3), MissionLog_Related1_402B25);
-MSG_FUNC_NOT_IMPL(0x402796, signed int CC(int a1), sub_402796);
-MSG_FUNC_NOT_IMPL(0x402A03, signed int CC(int a1), sub_402A03);
-MSG_FUNC_NOT_IMPL(0x402A29, signed int CC(int a1), sub_402A29);
-MSG_FUNC_NOT_IMPL(0x403290, signed int CC(int a1), sub_403290);
-MSG_FUNC_NOT_IMPL(0x402A5F, signed int CC(int a1), sub_402A5F);
-MSG_FUNC_NOT_IMPL(0x402AA9, signed int CC(int a1), sub_402AA9);
+MGS_FUNC_NOT_IMPL(0x402B25, signed int CC(int a2, int a3), MissionLog_Related1_402B25);
+MGS_FUNC_NOT_IMPL(0x402796, signed int CC(int a1), sub_402796);
+MGS_FUNC_NOT_IMPL(0x402A03, signed int CC(int a1), sub_402A03);
+MGS_FUNC_NOT_IMPL(0x402A29, signed int CC(int a1), sub_402A29);
+MGS_FUNC_NOT_IMPL(0x403290, signed int CC(int a1), sub_403290);
+MGS_FUNC_NOT_IMPL(0x402A5F, signed int CC(int a1), sub_402A5F);
+MGS_FUNC_NOT_IMPL(0x402AA9, signed int CC(int a1), sub_402AA9);
 
 
-MSG_FUNC_NOT_IMPL(0x401234, void CC(Actor* pActor), LibDG_Update2_401234);
+MGS_FUNC_NOT_IMPL(0x401234, void CC(Actor* pActor), LibDG_Update2_401234);
 
 
 MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 1);
 MGS_VAR(1, 0x6BE4E8, DWORD, gUnkSize_1024_6BE4E8, 0);
 
 
-MSG_FUNC_NOT_IMPL(0x40B231, unsigned int CC(void* pMem, int size), MemClearUnknown_40B231);
+MGS_FUNC_NOT_IMPL(0x40B231, unsigned int CC(void* pMem, int size), MemClearUnknown_40B231);
 
 using TDG_FnPtr = void(CC*)(struct_gv* pGv, int activeBuffer);
 
-MSG_FUNC_NOT_IMPL(0x4065AA, int CC(struct_gv* pGv, int activeBuffer), sub_4065AA);
-MSG_FUNC_NOT_IMPL(0x4064B1, void CC(Prim_Object *pObject, int activeBuffer, char a3, int a4), sub_4064B1);
+MGS_FUNC_NOT_IMPL(0x4065AA, int CC(struct_gv* pGv, int activeBuffer), sub_4065AA);
+MGS_FUNC_NOT_IMPL(0x4064B1, void CC(Prim_Object *pObject, int activeBuffer, char a3, int a4), sub_4064B1);
 
 
 MGS_VAR(1, 0x78D32C, DWORD, dword_78D32C, 0);
@@ -330,6 +330,8 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
                 v5 = 2;
                 if (flags & 0x20)
                 {
+                    MGS_FATAL("Not implemented");
+
                     // TODO: Implement me
                     /*
                     *(QWORD *)&stru_993E40 = *(QWORD *)&pObject->field_68_92b_size;
@@ -348,13 +350,13 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
     }
     sub_4065AA(pGv, activeBuffer);
 }
-MSG_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, LIBDG_IMPL);
 
-MSG_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
-MSG_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
-MSG_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_4041A5);
-MSG_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
-MSG_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_40340A);
+MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
+MGS_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
+MGS_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_4041A5);
+MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
+MGS_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_40340A);
 
 MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0, 
 {
@@ -374,14 +376,14 @@ TDG_FnPtr CC LibDG_SetFnPtr_4019FA(int idx, TDG_FnPtr fnPtr)
     gLibDg_FuncPtrs_off_6500E0[idx] = fnPtr;
     return old;
 }
-MSG_FUNC_IMPLEX(0x4019FA, LibDG_SetFnPtr_4019FA, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x4019FA, LibDG_SetFnPtr_4019FA, LIBDG_IMPL);
 
 void CC LibDG_Update1_4012ED(Actor* pActor)
 {
     // This function is a jmp to a stub that does this
     LibDG_ExecFnPtrs_40171C(gActiveBuffer_dword_791A08);
 }
-MSG_FUNC_IMPLEX(0x4012ED, LibDG_Update1_4012ED, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x4012ED, LibDG_Update1_4012ED, LIBDG_IMPL);
 
 void CC LibDg_Init_40111A()
 {
@@ -404,7 +406,7 @@ void CC LibDg_Init_40111A()
     Actor_PushBack(8, &gLibDGD_1_stru_6BB910, 0); // Handles 3D rendering?
     Actor_Init(&gLibDGD_1_stru_6BB910, LibDG_Update1_4012ED, 0, "C:\\mgs\\source\\LibDG\\dgd.c");
 }
-MSG_FUNC_IMPLEX(0x40111A, LibDg_Init_40111A, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x40111A, LibDg_Init_40111A, LIBDG_IMPL);
 
 signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
 {
@@ -420,7 +422,7 @@ signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
     }
     return -1;
 }
-MSG_FUNC_IMPLEX(0x401805, PrimAdd_401805, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x401805, PrimAdd_401805, LIBDG_IMPL);
 
 void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
 {
@@ -443,4 +445,4 @@ void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
         }
     }
 }
-MSG_FUNC_IMPLEX(0x40171C, LibDG_ExecFnPtrs_40171C, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x40171C, LibDG_ExecFnPtrs_40171C, LIBDG_IMPL);

@@ -28,7 +28,7 @@ struct POLY_FT3
     BYTE u2, v2;     // Texture coordinates
     WORD pad1;       // Reserved by the system
 };
-MSG_ASSERT_SIZEOF(POLY_FT3, 32);
+MGS_ASSERT_SIZEOF(POLY_FT3, 32);
 
 struct POLY_F3 
 {
@@ -38,13 +38,13 @@ struct POLY_F3
     short x1, y1;
     short x2, y2;
 };
-MSG_ASSERT_SIZEOF(POLY_F3, 20);
+MGS_ASSERT_SIZEOF(POLY_F3, 20);
 
 struct RECT32
 {
     DWORD x1, y1, x2, y2;
 };
-MSG_ASSERT_SIZEOF(RECT32, 16);
+MGS_ASSERT_SIZEOF(RECT32, 16);
 
 
 struct DISPENV 
@@ -57,7 +57,7 @@ struct DISPENV
     BYTE isrgb24;    // 24 - bit mode flag. 0: 16 - bit mode; 1: 24 - bit mode
     BYTE pad0, pad1; // Reserved by system
 };
-MSG_ASSERT_SIZEOF(DISPENV, 20);
+MGS_ASSERT_SIZEOF(DISPENV, 20);
 
 struct P_TAG
 {
@@ -65,62 +65,62 @@ struct P_TAG
     unsigned len : 8; // Tagged pointer bits?
     BYTE r0, g0, b0, code;
 };
-MSG_ASSERT_SIZEOF(P_TAG, 8);
+MGS_ASSERT_SIZEOF(P_TAG, 8);
 
 struct P_CODE
 {
     BYTE r0, g0, b0, code;
 };
-MSG_ASSERT_SIZEOF(P_CODE, 4);
+MGS_ASSERT_SIZEOF(P_CODE, 4);
 
 struct DR_STP 
 {
     DWORD* tag;     // Pointer to the next primitive in primitive list(reserved)
     DWORD code[2];  // Primitive ID
 };
-MSG_ASSERT_SIZEOF(DR_STP, 12);
+MGS_ASSERT_SIZEOF(DR_STP, 12);
 
 struct DR_TPAGE
 {
     DWORD* tag;     // Pointer to the next primitive in primitive list(reserved)
     DWORD code[2];  // New texture page information specified by SetDrawTPage()
 };
-MSG_ASSERT_SIZEOF(DR_TPAGE, 12);
+MGS_ASSERT_SIZEOF(DR_TPAGE, 12);
 
 struct DR_MODE
 {
     DWORD* tag;     // Pointer to the next primitive in primitive list
     DWORD code[2];  // New drawing environment information as specified by SetDrawMode()
 };
-MSG_ASSERT_SIZEOF(DR_MODE, 12);
+MGS_ASSERT_SIZEOF(DR_MODE, 12);
 
 struct DR_TWIN
 {
     DWORD* tag;     // Pointer to the next primitive in primitive list
     DWORD code[2];  // New texture window information specified by SetDrawTexWindow()
 };
-MSG_ASSERT_SIZEOF(DR_TWIN, 12);
+MGS_ASSERT_SIZEOF(DR_TWIN, 12);
 
 struct DR_AREA
 {
     DWORD* tag;     // Pointer to the next primitive in primitive list
     DWORD code[2];  // New drawing area information specified by SetDrawArea()
 };
-MSG_ASSERT_SIZEOF(DR_AREA, 12);
+MGS_ASSERT_SIZEOF(DR_AREA, 12);
 
 struct DR_OFFSET
 {
     DWORD* tag;     // Pointer to the next primitive in primitive list
     DWORD code[2];  // New drawing offset information specified by SetDrawOffset()
 };
-MSG_ASSERT_SIZEOF(DR_OFFSET, 12);
+MGS_ASSERT_SIZEOF(DR_OFFSET, 12);
 
 struct DR_MOVE
 {
     DWORD* tag;     // Pointer to the next primitive in primitive list
     DWORD code[5];  // Primitive ID
 };
-MSG_ASSERT_SIZEOF(DR_MOVE, 24);
+MGS_ASSERT_SIZEOF(DR_MOVE, 24);
 
 struct SPRT
 {
@@ -131,7 +131,7 @@ struct SPRT
     WORD clut;
     short w, h; // Custom sized sprite
 };
-MSG_ASSERT_SIZEOF(SPRT, 20);
+MGS_ASSERT_SIZEOF(SPRT, 20);
 
 struct SPRT_16  // 16x16 sprite
 {
@@ -141,7 +141,7 @@ struct SPRT_16  // 16x16 sprite
     BYTE u0, v0;
     WORD clut;
 };
-MSG_ASSERT_SIZEOF(SPRT_16, 16);
+MGS_ASSERT_SIZEOF(SPRT_16, 16);
 
 struct SPRT_8  // 8x8 sprite
 {
@@ -151,7 +151,7 @@ struct SPRT_8  // 8x8 sprite
     BYTE u0, v0;
     WORD clut;
 };
-MSG_ASSERT_SIZEOF(SPRT_8, 16);
+MGS_ASSERT_SIZEOF(SPRT_8, 16);
 
 struct TILE
 {
@@ -160,7 +160,7 @@ struct TILE
     short x0, y0;
     short w, h;
 };
-MSG_ASSERT_SIZEOF(TILE, 16);
+MGS_ASSERT_SIZEOF(TILE, 16);
 
 struct TILE_16
 {
@@ -168,7 +168,7 @@ struct TILE_16
     BYTE r0, g0, b0, code;
     short x0, y0;
 };
-MSG_ASSERT_SIZEOF(TILE_16, 12);
+MGS_ASSERT_SIZEOF(TILE_16, 12);
 
 struct TILE_8
 {
@@ -176,7 +176,7 @@ struct TILE_8
     BYTE r0, g0, b0, code;
     short x0, y0;
 };
-MSG_ASSERT_SIZEOF(TILE_8, 12);
+MGS_ASSERT_SIZEOF(TILE_8, 12);
 
 struct TILE_1
 {
@@ -184,7 +184,7 @@ struct TILE_1
     BYTE r0, g0, b0, code;
     short x0, y0;
 };
-MSG_ASSERT_SIZEOF(TILE_1, 12);
+MGS_ASSERT_SIZEOF(TILE_1, 12);
 
 struct DR_LOAD
 {
@@ -192,7 +192,7 @@ struct DR_LOAD
     DWORD code[3];  // Primitive ID
     DWORD p[13];    // Transfer data
 };
-MSG_ASSERT_SIZEOF(DR_LOAD, 68);
+MGS_ASSERT_SIZEOF(DR_LOAD, 68);
 
 struct LINE_F2
 {
@@ -201,7 +201,7 @@ struct LINE_F2
     short   x0, y0;
     short   x1, y1;
 };
-MSG_ASSERT_SIZEOF(LINE_F2, 16);
+MGS_ASSERT_SIZEOF(LINE_F2, 16);
 
 struct LINE_G2
 {
@@ -211,7 +211,7 @@ struct LINE_G2
     BYTE    r1, g1, b1, p1;
     short   x1, y1;
 };
-MSG_ASSERT_SIZEOF(LINE_G2, 20);
+MGS_ASSERT_SIZEOF(LINE_G2, 20);
 
 struct LINE_F3
 {
@@ -222,7 +222,7 @@ struct LINE_F3
     short   x2, y2;
     DWORD   pad;
 };
-MSG_ASSERT_SIZEOF(LINE_F3, 24);
+MGS_ASSERT_SIZEOF(LINE_F3, 24);
 
 struct LINE_G3 
 {
@@ -235,7 +235,7 @@ struct LINE_G3
     short   x2, y2;
     DWORD   pad;
 };
-MSG_ASSERT_SIZEOF(LINE_G3, 32);
+MGS_ASSERT_SIZEOF(LINE_G3, 32);
 
 struct LINE_F4
 {
@@ -247,7 +247,7 @@ struct LINE_F4
     short   x3, y3;
     DWORD   pad;
 };
-MSG_ASSERT_SIZEOF(LINE_F4, 28);
+MGS_ASSERT_SIZEOF(LINE_F4, 28);
 
 struct LINE_G4 
 {
@@ -262,7 +262,7 @@ struct LINE_G4
     short   x3, y3;
     BYTE    pad;
 };
-MSG_ASSERT_SIZEOF(LINE_G4, 40);
+MGS_ASSERT_SIZEOF(LINE_G4, 40);
 
 struct POLY_G3 
 {
@@ -274,7 +274,7 @@ struct POLY_G3
     BYTE    r2, g2, b2, pad2;
     short   x2, y2;
 };
-MSG_ASSERT_SIZEOF(POLY_G3, 28);
+MGS_ASSERT_SIZEOF(POLY_G3, 28);
 
 struct POLY_G4
 {
@@ -288,7 +288,7 @@ struct POLY_G4
     BYTE    r3, g3, b3, pad3;
     short   x3, y3;
 };
-MSG_ASSERT_SIZEOF(POLY_G4, 36);
+MGS_ASSERT_SIZEOF(POLY_G4, 36);
 
 struct POLY_GT3 
 {
@@ -306,7 +306,7 @@ struct POLY_GT3
     BYTE    u2, v2;
     WORD    pad2;
 };
-MSG_ASSERT_SIZEOF(POLY_GT3, 40);
+MGS_ASSERT_SIZEOF(POLY_GT3, 40);
 
 struct POLY_GT4 
 {
@@ -328,7 +328,7 @@ struct POLY_GT4
     BYTE    u3, v3;
     WORD    pad3;
 };
-MSG_ASSERT_SIZEOF(POLY_GT4, 52);
+MGS_ASSERT_SIZEOF(POLY_GT4, 52);
 
 #define PRINT_SIZE(sturcture, name)   printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", name, sizeof(sturcture), sizeof(sturcture), sizeof(sturcture) / sizeof(DWORD), sizeof(sturcture) / sizeof(DWORD))
 
@@ -374,48 +374,48 @@ signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode)
     PRINT_SIZE(DR_STP, "DR_STP");
     return 1;
 }
-MSG_FUNC_IMPLEX(0x0044A7B0, Resetgraph_AndPrintPsxStructureSizes, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x0044A7B0, Resetgraph_AndPrintPsxStructureSizes, IMPL_PSX);
 
 int CC SetGraphDebug(int debug)
 {
     printf(".SetGraphDebug(%d)\n", debug);
     return 0;
 }
-MSG_FUNC_IMPLEX(0x0044AB30, SetGraphDebug, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x0044AB30, SetGraphDebug, IMPL_PSX);
 
 void CC SetDispMask(int mask)
 {
     printf(".SetDispMask(%d)\n", mask);
 }
-MSG_FUNC_IMPLEX(0x0044AC40, SetDispMask, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x0044AC40, SetDispMask, IMPL_PSX);
 
 int CC ClearImage(PSX_RECT* pRect, BYTE r, BYTE g, BYTE b)
 {
     printf(".ClearImage((%d,%d,%d,%d),r=%d,g=%d,b=%d)\n", pRect->x1, pRect->y1, pRect->x2, pRect->y2, r, g, b);
     return 0;
 }
-MSG_FUNC_IMPLEX(0x0044ABE0, ClearImage, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x0044ABE0, ClearImage, IMPL_PSX);
 
 int CC Psx_OpenEvent(int desc, int spec, int mode, int func)
 {
     printf("OpenEvent(%p,%d,%d,%p)\n", desc, spec, mode, func);
     return 0;
 }
-MSG_FUNC_IMPLEX(0x0044CEC0, Psx_OpenEvent, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x0044CEC0, Psx_OpenEvent, IMPL_PSX);
 
 int CC EnableEvent(int pEvent)
 {
     printf(".EnableEvent(%d)\n", pEvent);
     return 0;
 }
-MSG_FUNC_IMPLEX(0x0044CF10, EnableEvent, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x0044CF10, EnableEvent, IMPL_PSX);
 
 int CC CloseEvent(int pEvent)
 {
     printf(".CloseEvent(%p)\n", pEvent);
     return 0;
 }
-MSG_FUNC_IMPLEX(0x0044CEF0, CloseEvent, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x0044CEF0, CloseEvent, IMPL_PSX);
 
 DRAWENV* CC Renderer_Set_DRAWENV_40DD90(DRAWENV* pDrawEnv)
 {
@@ -435,7 +435,7 @@ DRAWENV* CC Renderer_Set_DRAWENV_40DD90(DRAWENV* pDrawEnv)
 
     return &gDrawEnv_6C0E98;
 }
-MSG_FUNC_IMPLEX(0x40DD90, Renderer_Set_DRAWENV_40DD90, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x40DD90, Renderer_Set_DRAWENV_40DD90, IMPL_PSX);
 
 DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2)
 {
@@ -458,7 +458,7 @@ DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __in
     pDrawEnv->isbg = 0;
     return pDrawEnv;
 }
-MSG_FUNC_IMPLEX(0x401888, Renderer_DRAWENV_Init_401888, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x401888, Renderer_DRAWENV_Init_401888, IMPL_PSX);
 
 DRAWENV* Renderer_Init_DRAWENV_40200D()
 {
@@ -471,4 +471,4 @@ DRAWENV* Renderer_Init_DRAWENV_40200D()
         gClipRect_6BECF0.y2);
     return Renderer_Set_DRAWENV_40DD90(&drawEnv);
 }
-MSG_FUNC_IMPLEX(0x40200D, Renderer_Init_DRAWENV_40200D, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x40200D, Renderer_Init_DRAWENV_40200D, IMPL_PSX);

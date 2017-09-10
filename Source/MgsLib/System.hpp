@@ -13,7 +13,7 @@ struct LibGV_MemoryAllocation
     };
     DWORD mAllocType;
 };
-MSG_ASSERT_SIZEOF(LibGV_MemoryAllocation, 8);
+MGS_ASSERT_SIZEOF(LibGV_MemoryAllocation, 8);
 
 struct system_struct
 {
@@ -29,7 +29,7 @@ struct system_struct
     DWORD mUnitsCount;
     LibGV_MemoryAllocation mAllocs[512];
 };
-MSG_ASSERT_SIZEOF(system_struct, 0x1010);
+MGS_ASSERT_SIZEOF(system_struct, 0x1010);
 
 system_struct* CC System_init_40AC6C(int index, int bIsDynamic, void* pMemory, int size);
 void CC System_DeInit_Systems_0_to_2_sub_40AC52();

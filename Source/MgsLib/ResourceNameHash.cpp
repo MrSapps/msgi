@@ -25,4 +25,4 @@ WORD CC ResourceNameHash(const char* pName)
     }
     return hash;
 }
-MSG_FUNC_IMPLEX(0x0040B38E, ResourceNameHash, RESOURCENAMEHASH_IMPL);
+MGS_FUNC_IMPLEX(0x0040B38E, ResourceNameHash, RESOURCENAMEHASH_IMPL);

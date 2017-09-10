@@ -66,7 +66,7 @@ extern DWORD& gActive_dword_688CDC;
 extern DWORD& dword_73490C;
 extern DWORD& dword_734908;
 
-MSG_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
+MGS_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
 
 MGS_ARY(1, 0x71D30C, DWORD, 65, gButtonStates_dword_71D30C, {});
 MGS_ARY(1, 0x71D204, DWORD, 55, gKeyBoardButtonStates_dword_71D204, {});
@@ -437,7 +437,7 @@ HRESULT __cdecl Input_Read_43BD6E()
     }
     return 0;
 }
-MSG_FUNC_IMPLEX(0x43BD6E, Input_Read_43BD6E, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x43BD6E, Input_Read_43BD6E, INPUT_IMPL);
 
 // 0x0043B0B3
 BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE /*lpddoi*/, LPVOID /*pvRef*/)
@@ -445,7 +445,7 @@ BOOL WINAPI Input_Enum_Buttons_sub_43B0B3(LPCDIDEVICEOBJECTINSTANCE /*lpddoi*/, 
     ++nJoystickDeviceObjects;
     return DIENUM_CONTINUE;
 }
-MSG_FUNC_IMPLEX(0x0043B0B3, Input_Enum_Buttons_sub_43B0B3, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x0043B0B3, Input_Enum_Buttons_sub_43B0B3, INPUT_IMPL);
 
 // 0x0043B0C8
 BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID /*pvRef*/)
@@ -504,7 +504,7 @@ BOOL WINAPI Input_Enum_Axis_43B0C8(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID /*pv
     
     return DIENUM_STOP;
 }
-MSG_FUNC_IMPLEX(0x0043B0C8, Input_Enum_Axis_43B0C8, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x0043B0C8, Input_Enum_Axis_43B0C8, INPUT_IMPL);
 
 // 0x0043B078
 BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID /*pvRef*/)
@@ -513,7 +513,7 @@ BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID /*pvR
     HRESULT hr = pDirectInput->CreateDevice(lpddi->guidInstance, &pJoystickDevice, NULL);
     return !SUCCEEDED(hr);
 }
-MSG_FUNC_IMPLEX(0x0043B078, Input_EnumDevicesCallback, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x0043B078, Input_EnumDevicesCallback, INPUT_IMPL);
 
 // 0x43C716
 int __cdecl Input_Shutdown_sub_43C716()
@@ -539,7 +539,7 @@ int __cdecl Input_Shutdown_sub_43C716()
     }
     return 0;
 }
-MSG_FUNC_IMPLEX(0x43C716, Input_Shutdown_sub_43C716, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x43C716, Input_Shutdown_sub_43C716, INPUT_IMPL);
 
 
 HRESULT CC Input_Init(HWND hWnd)
@@ -755,7 +755,7 @@ HRESULT CC Input_Init(HWND hWnd)
 
     return S_OK;
 }
-MSG_FUNC_IMPLEX(0x0043B1D1, Input_Init, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x0043B1D1, Input_Init, INPUT_IMPL);
 
 
 void CC Input_Start()
@@ -767,7 +767,7 @@ void CC Input_Start()
         printf("$jim failed to init direct input");
     }
 }
-MSG_FUNC_IMPLEX(0x0042D69E, Input_Start, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x0042D69E, Input_Start, INPUT_IMPL);
 
 void __cdecl Input_AcquireOrUnAcquire()
 {
@@ -797,4 +797,4 @@ void __cdecl Input_AcquireOrUnAcquire()
         }
     }
 }
-MSG_FUNC_IMPLEX(0x0043BCF0, Input_AcquireOrUnAcquire, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x0043BCF0, Input_AcquireOrUnAcquire, INPUT_IMPL);

@@ -11,7 +11,7 @@ struct GCL_Proc_Arguments
     WORD mPadding;
     DWORD* mPArgs;
 };
-MSG_ASSERT_SIZEOF(GCL_Proc_Arguments, 8);
+MGS_ASSERT_SIZEOF(GCL_Proc_Arguments, 8);
 
 signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs);
 int CC Script_RunProc(BYTE* pScript);
@@ -21,7 +21,7 @@ DWORD CC Script_ParamExists(char paramId);
 DWORD CC Script_get_int();
 BYTE* CC Script_GetReturnAddress();
 
-EXTERN_MSG_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
+EXTERN_MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 
 MGS_VAR_EXTERN(DWORD, dword_7227A4);
 

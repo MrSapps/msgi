@@ -8,8 +8,8 @@
 
 void RendererCpp_ForceLink() { }
 
-MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
-MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
+MGS_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
+MGS_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
 
 
 MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
@@ -73,11 +73,11 @@ return ret;
 }
 */
 
-MSG_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
-MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
-MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
-MSG_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct TaggedOrderingTablePointer* a_pStructVert, int a_nSize), Render_Software);
-MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
+MGS_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
+MGS_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
+MGS_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
+MGS_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct TaggedOrderingTablePointer* a_pStructVert, int a_nSize), Render_Software);
+MGS_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
 
 // TODO: Assert sizes
 struct MGSSmallVert
@@ -1198,7 +1198,7 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
         otItem = (TaggedOrderingTablePointer*)((intptr_t)otItem + size_dword_791C58 * 4);
     }
 }
-MSG_FUNC_IMPLEX(0x410560, ConvertPolys_Hardware, RENDERER_IMPL);
+MGS_FUNC_IMPLEX(0x410560, ConvertPolys_Hardware, RENDERER_IMPL);
 
 
 #define OT_END_TAG 0xFFFFFF
@@ -1238,7 +1238,7 @@ int CC Renderer_ClearOTag(DWORD* ot, int otSize)
     }
     return 0;
 }
-MSG_FUNC_IMPLEX(0x0044AB80, Renderer_ClearOTag, RENDERER_IMPL);
+MGS_FUNC_IMPLEX(0x0044AB80, Renderer_ClearOTag, RENDERER_IMPL);
 
 
 //MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
@@ -1296,7 +1296,7 @@ void CC Render_DrawGeneric(TaggedOrderingTablePointer* a_pStructVert)
         sub_51DE0A();
     }
 }
-MSG_FUNC_IMPLEX(0x4103B0, Render_DrawGeneric, RENDERER_IMPL);
+MGS_FUNC_IMPLEX(0x4103B0, Render_DrawGeneric, RENDERER_IMPL);
 
 //MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
 void CC Render_DrawIndex(uint32_t activeBuffer)
@@ -1304,7 +1304,7 @@ void CC Render_DrawIndex(uint32_t activeBuffer)
     TaggedOrderingTablePointer* pStructVert = (TaggedOrderingTablePointer*)&gLibGvStruct0_6BC180.dword_6BC3D8_dst[16 * activeBuffer];
     Render_DrawGeneric(pStructVert);
 }
-MSG_FUNC_IMPLEX(0x401619, Render_DrawIndex, RENDERER_IMPL);
+MGS_FUNC_IMPLEX(0x401619, Render_DrawIndex, RENDERER_IMPL);
 
 
 //MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), Render_RestoreAll);
@@ -1345,7 +1345,7 @@ __int16 CC Render_RestoreAll()
 
     return g_NumTextures;
 }
-MSG_FUNC_IMPLEX(0x0041CC30, Render_RestoreAll, RENDERER_IMPL);
+MGS_FUNC_IMPLEX(0x0041CC30, Render_RestoreAll, RENDERER_IMPL);
 
 
 //MSG_FUNC_NOT_IMPL(0x00422D40, char *__cdecl(char*, HRESULT), PrintDDError);
@@ -1388,4 +1388,4 @@ void CC PrintDDError(const char* errMsg, HRESULT hrErr)
         }
     }
 }
-MSG_FUNC_IMPLEX(0x00422D40, PrintDDError, RENDERER_IMPL);
+MGS_FUNC_IMPLEX(0x00422D40, PrintDDError, RENDERER_IMPL);

@@ -14,7 +14,7 @@ struct Res_Init_Record
     WORD mPadding;
     ResInitFn mInitFunctionPointer;
 };
-MSG_ASSERT_SIZEOF(Res_Init_Record, 0x8);
+MGS_ASSERT_SIZEOF(Res_Init_Record, 0x8);
 
 struct LibDG_Struct
 {
@@ -26,7 +26,7 @@ struct LibDG_Struct
     BYTE gR_byte_6BB95A;
     BYTE mPadding;
 };
-MSG_ASSERT_SIZEOF(LibDG_Struct, 0x2C);
+MGS_ASSERT_SIZEOF(LibDG_Struct, 0x2C);
 MGS_VAR_EXTERN(LibDG_Struct, gLibDG_2_stru_6BB930);
 
 
@@ -42,7 +42,7 @@ struct Prim_base
     DWORD field_18;
     DWORD field_1C;
 };
-MSG_ASSERT_SIZEOF(Prim_base, 0x20);
+MGS_ASSERT_SIZEOF(Prim_base, 0x20);
 
 struct Prim_unknown
 {
@@ -65,7 +65,7 @@ struct Prim_unknown
     DWORD field_4C;
     DWORD field_50;
 };
-MSG_ASSERT_SIZEOF(Prim_unknown, 0x54);
+MGS_ASSERT_SIZEOF(Prim_unknown, 0x54);
 
 
 #pragma pack(push)
@@ -118,14 +118,14 @@ struct Prim_Object
     int field_9C_array_ptr;
     int field_A0;
 };
-MSG_ASSERT_SIZEOF(Prim_Object, 0xA4);
+MGS_ASSERT_SIZEOF(Prim_Object, 0xA4);
 
 struct struct_gv
 {
     // These vars are named to match how they look from gLibGVStruct1_6BC36C position, it was later discovered
     // that these are item 1 in an array of 3 struct_gvs
 
-    int mOrderingTable1; // 257 pointers?
+    int mOrderingTable1; // 257 pointers? // One for each active buffer
     int mOrderingTable2; // 256 pointers?
     s16 word_6BC374_8;
     s16 word_6BC376_16;
@@ -156,14 +156,14 @@ struct struct_gv
     PSX_RECT* dword_6BC3C8_pStructure_rect;
     int dword_6BC3CC_rectx2;
     PSX_RECT dword_6BC3D0_rect;
-    int dword_6BC3D8_dst[16];
+    int dword_6BC3D8_dst[16]; // One for each active buffer
     int dword_6BC418_dst[16];
     int dword_6BC458[16];
     int dword_6BC498[16];
     int dword_6BC4D8_src_dr_env1[16];
     int dword_6BC518_src_offsetted_dr_evn[16];
 };
-MSG_ASSERT_SIZEOF(struct_gv, 0x1EC);
+MGS_ASSERT_SIZEOF(struct_gv, 0x1EC);
 #pragma pack(pop)
 MGS_VAR_EXTERN(struct_gv, gLibGvStruct0_6BC180);
 

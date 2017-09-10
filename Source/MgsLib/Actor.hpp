@@ -18,7 +18,7 @@ struct Actor
     s32 field_18;
     s32 field_1C;
 };
-MSG_ASSERT_SIZEOF(Actor, 0x20);
+MGS_ASSERT_SIZEOF(Actor, 0x20);
 
 struct ActorList
 {
@@ -27,7 +27,7 @@ struct ActorList
     s16 mPause;
     s16 mKill;
 };
-MSG_ASSERT_SIZEOF(ActorList, 0x44);
+MGS_ASSERT_SIZEOF(ActorList, 0x44);
 
 MGS_VAR_EXTERN(u32, gActorPauseFlags_dword_791A0C);
 

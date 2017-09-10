@@ -27,10 +27,10 @@ MGS_VAR(1, 0x78E960, DWORD, gResidentTop_dword_78E960, 0);
 MGS_VAR(1, 0x722780, DWORD, gamed_unk_722780, 0);
 MGS_VAR(1, 0x722784, DWORD, gamed_unk_722784, 0);
 
-MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
-MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
-MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
-MSG_FUNC_NOT_IMPL(0x0044E381, void CC(Actor*), GameD_Update_44E381);
+MGS_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
+MGS_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
+MGS_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
+MGS_FUNC_NOT_IMPL(0x0044E381, void CC(Actor*), GameD_Update_44E381);
 
 
 void CC Res_MenuMan_create_459A9A()
@@ -38,32 +38,32 @@ void CC Res_MenuMan_create_459A9A()
     Actor_PushBack(1, &gMenuMan_stru_725FC0, nullptr);
     Actor_Init(&gMenuMan_stru_725FC0, nullptr, nullptr, "C:\\mgs\\source\\Menu\\menuman.c");
 }
-MSG_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, ACTOR_GAMED_IMPL);
+MGS_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, ACTOR_GAMED_IMPL);
 
 void* CC Stage_GetNameHashStack_44EAED()
 {
     return memset(word_7227C8, 0, 0x10u);
 }
-MSG_FUNC_IMPLEX(0x0044EAED, Stage_GetNameHashStack_44EAED, ACTOR_GAMED_IMPL);
+MGS_FUNC_IMPLEX(0x0044EAED, Stage_GetNameHashStack_44EAED, ACTOR_GAMED_IMPL);
 
 void CC sub_44E1E0()
 {
     gLoadItemFuncIdx_word_78E7FC = -1;
     word_78E7FE = -1;
 }
-MSG_FUNC_IMPLEX(0x0044E1E0, sub_44E1E0, ACTOR_GAMED_IMPL);
+MGS_FUNC_IMPLEX(0x0044E1E0, sub_44E1E0, ACTOR_GAMED_IMPL);
 
 int CC GetResidentTop()
 {
     return gResidentTop_dword_78E960;
 }
-MSG_FUNC_IMPLEX(0x0040B36E, GetResidentTop, ACTOR_GAMED_IMPL);
+MGS_FUNC_IMPLEX(0x0040B36E, GetResidentTop, ACTOR_GAMED_IMPL);
 
 MGS_VAR(1, 0x78E7EC, WORD, stage_name_hash_word_78E7EC, 0);
 MGS_VAR(1, 0x6893D4, DWORD, dword_6893D4, 0);
 
-MSG_FUNC_NOT_IMPL(0x0044EB83, char* CC(), File_StageName_44EB83);
-MSG_FUNC_NOT_IMPL(0x00457BDD, void CC(const char*), Res_loader_Create_457BDD);
+MGS_FUNC_NOT_IMPL(0x0044EB83, char* CC(), File_StageName_44EB83);
+MGS_FUNC_NOT_IMPL(0x00457BDD, void CC(const char*), Res_loader_Create_457BDD);
 
 void CC Create_loader_44E226()
 {
@@ -81,7 +81,7 @@ void CC Create_loader_44E226()
     }
     Res_loader_Create_457BDD(strStageName);
 }
-MSG_FUNC_IMPLEX(0x0044E226, Create_loader_44E226, ACTOR_GAMED_IMPL);
+MGS_FUNC_IMPLEX(0x0044E226, Create_loader_44E226, ACTOR_GAMED_IMPL);
 
 void CC Init_Gamed_Create_44E12B()
 {
@@ -110,4 +110,4 @@ void CC Init_Gamed_Create_44E12B()
     Create_loader_44E226();
    // AddDebugActor();
 }
-MSG_FUNC_IMPLEX(0x44E12B, Init_Gamed_Create_44E12B, ACTOR_GAMED_IMPL);
+MGS_FUNC_IMPLEX(0x44E12B, Init_Gamed_Create_44E12B, ACTOR_GAMED_IMPL);

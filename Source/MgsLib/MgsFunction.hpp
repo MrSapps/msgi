@@ -457,21 +457,23 @@ extern MgsVar Var_##VarName;\
 extern TypeName* VarName ;
 
 
-#define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, false, true, signature> name(#name);
-#define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, false, true, signature> name;
-#define MSG_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, false, signature> name(#name);
-#define MSG_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, false, true, decltype(funcName)> funcName##_(#funcName);
+#define MGS_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, false, true, signature> name(#name);
+#define EXTERN_MGS_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, false, true, signature> name;
+#define MGS_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, false, signature> name(#name);
+#define MGS_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, false, true, decltype(funcName)> funcName##_(#funcName);
 
 // isImplemented == false means redirect game func to our func. isImplemented == true means redirect our func to game func.
-#define MSG_FUNC_IMPLEX(addr, funcName, isImplemented) MgsFunction<addr, funcName, !isImplemented, true, decltype(funcName)> funcName##_(#funcName);
-#define MSG_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, false, decltype(funcName)> funcName##_(#funcName);
+#define MGS_FUNC_IMPLEX(addr, funcName, isImplemented) MgsFunction<addr, funcName, !isImplemented, true, decltype(funcName)> funcName##_(#funcName);
+#define MGS_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, false, decltype(funcName)> funcName##_(#funcName);
 
-#define MSG_ASSERT_SIZEOF(structureName, expectedSize) static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize)
+#define MGS_ASSERT_SIZEOF(structureName, expectedSize) static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize)
 
 #define CC __cdecl
-#define MSG_COUNTOF(x) _countof(x)
+#define MGS_COUNTOF(x) _countof(x)
 
 #define BYTEn(x, n)   (*((BYTE*)&(x)+n))
 #define BYTE1(x)   BYTEn(x,  1)
 #define BYTE2(x)   BYTEn(x,  2)
 #define BYTE3(x)   BYTEn(x,  3)
+
+#define MGS_FATAL(x)  ::MessageBox(NULL, "ERROR", x, MB_ICONERROR | MB_OK); __debugbreak(); abort();

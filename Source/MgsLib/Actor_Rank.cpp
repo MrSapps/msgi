@@ -17,7 +17,7 @@ BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, 
 {
     return nullptr;
 }
-MSG_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, false); // TODO
+MGS_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, false); // TODO
 
 void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
 {
@@ -47,7 +47,7 @@ void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
         pSrc2 += 40;
     }*/
 }
-MSG_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, false); // TODO
+MGS_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, false); // TODO
 
 void CC POLYFT4_code_2_40E0D0(POLY_FT4* pPoly, BOOL bSetOrUnSetCode2)
 {
@@ -60,7 +60,7 @@ void CC POLYFT4_code_2_40E0D0(POLY_FT4* pPoly, BOOL bSetOrUnSetCode2)
         pPoly->code &= ~2u;
     }
 }
-MSG_FUNC_IMPLEX(0x40E0D0, POLYFT4_code_2_40E0D0, ACTOR_RANK_IMPL);
+MGS_FUNC_IMPLEX(0x40E0D0, POLYFT4_code_2_40E0D0, ACTOR_RANK_IMPL);
 
 void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16 x0, __int16 y0, __int16 x1, __int16 y2, int bSetCode2)
 {
@@ -79,14 +79,14 @@ void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16
     pPoly->y3 = y2;
     POLYFT4_code_2_40E0D0(pPoly, bSetCode2);
 }
-MSG_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
+MGS_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
 
 
 int CC Menu_DrawText(const char* Format, int a2, int a3, int a4, int a5)
 {
     return 0;
 }
-MSG_FUNC_IMPLEX(0x459B63, Menu_DrawText, false);  // TODO
+MGS_FUNC_IMPLEX(0x459B63, Menu_DrawText, false);  // TODO
 
 void CC TextSetXYFlags_459B0B(int x, int y, int flags)
 {
@@ -95,13 +95,13 @@ void CC TextSetXYFlags_459B0B(int x, int y, int flags)
     // 0x10 = larger font size
     // other bits = left align/do nothing
 }
-MSG_FUNC_IMPLEX(0x459B0B, TextSetXYFlags_459B0B, false);  // TODO
+MGS_FUNC_IMPLEX(0x459B0B, TextSetXYFlags_459B0B, false);  // TODO
 
 int CC TextSetRGB_459B27(int r, int g, int b)
 {
     return 0;
 }
-MSG_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, false);  // TODO
+MGS_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, false);  // TODO
 
 // TODO: Vars
 WORD gNumSaves_word_78E890 = 5;
@@ -918,7 +918,7 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
         Menu_DrawText("SPECIAL ITEMS");
     }
 }
-MSG_FUNC_IMPLEX(0x46EDE8, Rank_RenderGameCompletionScreen, ACTOR_RANK_IMPL);
+MGS_FUNC_IMPLEX(0x46EDE8, Rank_RenderGameCompletionScreen, ACTOR_RANK_IMPL);
 
 void CC Rank_ToState2If_473E69(Actor_Rank* pRank)
 {
@@ -928,38 +928,38 @@ void CC Rank_ToState2If_473E69(Actor_Rank* pRank)
         pRank->field_480_ticks = 0;
     }
 }
-MSG_FUNC_IMPLEX(0x473E69, Rank_ToState2If_473E69, ACTOR_RANK_IMPL);
+MGS_FUNC_IMPLEX(0x473E69, Rank_ToState2If_473E69, ACTOR_RANK_IMPL);
 
 void CC Rank_473E9C(Actor_Rank* pRank)
 {
 
 }
-MSG_FUNC_IMPLEX(0x473E9C, Rank_473E9C, false); // TODO
+MGS_FUNC_IMPLEX(0x473E9C, Rank_473E9C, false); // TODO
 
 void CC Rank_GameCompletionRelatedQ(Actor_Rank* pRank)
 {
 
 }
-MSG_FUNC_IMPLEX(0x470AE6, Rank_GameCompletionRelatedQ, false); // TODO
+MGS_FUNC_IMPLEX(0x470AE6, Rank_GameCompletionRelatedQ, false); // TODO
 
 void CC Rank_SaveAfterGameCompleteQ(Actor_Rank* pRank)
 {
 
 }
-MSG_FUNC_IMPLEX(0x474315, Rank_SaveAfterGameCompleteQ, false); // TODO
+MGS_FUNC_IMPLEX(0x474315, Rank_SaveAfterGameCompleteQ, false); // TODO
 
 void CC Rank_End_474CE8(Actor_Rank* pRank)
 {
     Script_ProcCancelOrRun((WORD)pRank->field_418_script_t, nullptr);
     Actor_DestroyOnNextUpdate(&pRank->mBase);
 }
-MSG_FUNC_IMPLEX(0x474CE8, Rank_End_474CE8, ACTOR_RANK_IMPL);
+MGS_FUNC_IMPLEX(0x474CE8, Rank_End_474CE8, ACTOR_RANK_IMPL);
 
 void CC Rank_Animate_472832(Actor_Rank* pRank)
 {
 
 }
-MSG_FUNC_IMPLEX(0x472832, Rank_Animate_472832, false);  // TODO
+MGS_FUNC_IMPLEX(0x472832, Rank_Animate_472832, false);  // TODO
 
 void CC Rank_update_46EC75(Actor_Rank* pRank)
 {
@@ -999,15 +999,15 @@ void CC Rank_update_46EC75(Actor_Rank* pRank)
     RankRenderPrimsQ_46ED0A(pRank);
     pRank->field_480_ticks++;
 }
-MSG_FUNC_IMPLEX(0x46EC75, Rank_update_46EC75, ACTOR_RANK_IMPL);
+MGS_FUNC_IMPLEX(0x46EC75, Rank_update_46EC75, ACTOR_RANK_IMPL);
 
 void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 {
 
 }
-MSG_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
+MGS_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
 
-MSG_FUNC_NOT_IMPL(0x405050, Prim_unknown* CC(int maybeFlags, int numItems, __int16 rQ, int gQ, int bQ), PrimAlloc_405050);
+MGS_FUNC_NOT_IMPL(0x405050, Prim_unknown* CC(int maybeFlags, int numItems, __int16 rQ, int gQ, int bQ), PrimAlloc_405050);
 
 MGS_VAR_EXTERN(u32, dword_9942A0); // From Actor
 
@@ -1015,11 +1015,11 @@ MGS_VAR(1, 0x7919E0, char*, dword_7919E0, 0);
 MGS_VAR(1, 0x78E896, WORD, gGameTime_word_78E896, 0);
 MGS_VAR(1, 0x78E898, WORD, gGameTime_word_78E898, 0);
 
-MSG_FUNC_NOT_IMPL(0x475BCE, __int16 __cdecl(Actor_Rank *pRank), Rank_RankCalcs_475BCE);
-MSG_FUNC_NOT_IMPL(0x40997B, BYTE* CC (BYTE* pScript), Script_read_string_arg_sub_40997B);
-MSG_FUNC_NOT_IMPL(0x47589A, int __cdecl(Actor_Rank *pRank, int index), Rank_47589A);
-MSG_FUNC_NOT_IMPL(0x475A4A, int __cdecl(Actor_Rank *a2, int idx), Rank_475A4A);
-MSG_FUNC_NOT_IMPL(0x4742E1, int __cdecl(Actor_Rank *a1, int a2, signed int a3), Rank_4742E1);
+MGS_FUNC_NOT_IMPL(0x475BCE, __int16 __cdecl(Actor_Rank *pRank), Rank_RankCalcs_475BCE);
+MGS_FUNC_NOT_IMPL(0x40997B, BYTE* CC (BYTE* pScript), Script_read_string_arg_sub_40997B);
+MGS_FUNC_NOT_IMPL(0x47589A, int __cdecl(Actor_Rank *pRank, int index), Rank_47589A);
+MGS_FUNC_NOT_IMPL(0x475A4A, int __cdecl(Actor_Rank *a2, int idx), Rank_475A4A);
+MGS_FUNC_NOT_IMPL(0x4742E1, int __cdecl(Actor_Rank *a1, int a2, signed int a3), Rank_4742E1);
 
 
 int CC Res_rank_loader(Actor_Rank* pRank, int a3)
@@ -1248,7 +1248,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
 
     return 0;
 }
-MSG_FUNC_IMPLEX(0x474D98, Res_rank_loader, ACTOR_RANK_IMPL)
+MGS_FUNC_IMPLEX(0x474D98, Res_rank_loader, ACTOR_RANK_IMPL)
 
 signed int CC Res_rank_1532_sub_46EC0E(DWORD scriptUnknown, int a_dword_722A40, BYTE* pScript)
 {
@@ -1271,7 +1271,7 @@ signed int CC Res_rank_1532_sub_46EC0E(DWORD scriptUnknown, int a_dword_722A40, 
 
     return 1;
 }
-MSG_FUNC_IMPLEX(0x46EC0E, Res_rank_1532_sub_46EC0E, ACTOR_RANK_IMPL);
+MGS_FUNC_IMPLEX(0x46EC0E, Res_rank_1532_sub_46EC0E, ACTOR_RANK_IMPL);
 
 
 static void Test_Rank_Set_POLYFT4_code_40E0D0()

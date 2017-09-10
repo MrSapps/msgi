@@ -9,14 +9,14 @@ struct PSX_RECT // Should be called RECT but will clash with windows.h for now
 {
     s16 x1, y1, x2, y2;
 };
-MSG_ASSERT_SIZEOF(PSX_RECT, 8);
+MGS_ASSERT_SIZEOF(PSX_RECT, 8);
 
 struct DR_ENV
 {
     DWORD tag;
     DWORD code[15];
 };
-MSG_ASSERT_SIZEOF(DR_ENV, 0x40);
+MGS_ASSERT_SIZEOF(DR_ENV, 0x40);
 
 struct DRAWENV
 {
@@ -33,7 +33,7 @@ struct DRAWENV
     BYTE b0;
     DR_ENV dr_env;
 };
-MSG_ASSERT_SIZEOF(DRAWENV, 0x5C);
+MGS_ASSERT_SIZEOF(DRAWENV, 0x5C);
 
 struct POLY_FT4
 {
@@ -52,7 +52,7 @@ struct POLY_FT4
     BYTE    u3, v3;
     WORD    pad2;
 };
-MSG_ASSERT_SIZEOF(POLY_FT4, 40);
+MGS_ASSERT_SIZEOF(POLY_FT4, 40);
 
 struct POLY_F4
 {
@@ -64,7 +64,7 @@ struct POLY_F4
     short x2, y2;    // Vertex coordinates 
     short x3, y3;    // Vertex coordinates
 };
-MSG_ASSERT_SIZEOF(POLY_F4, 0x18);
+MGS_ASSERT_SIZEOF(POLY_F4, 0x18);
 
 MGS_VAR_EXTERN(PSX_RECT, gClipRect_6BECF0);
 MGS_VAR_EXTERN(DRAWENV, gDrawEnv_6C0E98);

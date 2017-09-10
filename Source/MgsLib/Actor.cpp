@@ -9,7 +9,7 @@ struct PauseKill
     u16 mPause;
     u16 mKill;
 };
-MSG_ASSERT_SIZEOF(PauseKill, 0x4);
+MGS_ASSERT_SIZEOF(PauseKill, 0x4);
 
 MGS_ARY(1, 0x6507EC, const PauseKill, 9, gPauseKills,
 { 
@@ -59,7 +59,7 @@ Actor* CC Actor_ResourceAlloc(s32 actor_system_idx, s32 size)
     UNREFERENCED_PARAMETER(size);
     return nullptr;
 }
-MSG_FUNC_IMPLEX(0x0040A30C, Actor_ResourceAlloc, false); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x0040A30C, Actor_ResourceAlloc, false); // TODO: Implement me
 
 void CC Actor_DumpActorSystem()
 {
@@ -97,7 +97,7 @@ void CC Actor_DumpActorSystem()
 
     IterateActors(fnEnterActorList, fnUpdateActor);
 }
-MSG_FUNC_IMPLEX(0x0040A0D4, Actor_DumpActorSystem, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A0D4, Actor_DumpActorSystem, ACTOR_IMPL);
 
 Actor* CC Actor_Init(Actor* pActor, TActorFunction fnUpdate, TActorFunction fnShutDown, const char* srcFileName)
 {
@@ -113,7 +113,7 @@ Actor* CC Actor_Init(Actor* pActor, TActorFunction fnUpdate, TActorFunction fnSh
     pActor->field_18 = 0;
     return pActor;
 }
-MSG_FUNC_IMPLEX(0x0040A347, Actor_Init, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A347, Actor_Init, ACTOR_IMPL);
 
 Actor* CC Actor_PushBack(s32 level, Actor* pActor, TActorFunction fnFree)
 {
@@ -132,7 +132,7 @@ Actor* CC Actor_PushBack(s32 level, Actor* pActor, TActorFunction fnFree)
 
     return pActor;
 }
-MSG_FUNC_IMPLEX(0x0040A2AF, Actor_PushBack, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A2AF, Actor_PushBack, ACTOR_IMPL);
 
 void CC Actor_KillActorsAtLevel(s32 killLevel)
 {
@@ -152,13 +152,13 @@ void CC Actor_KillActorsAtLevel(s32 killLevel)
 
     IterateActors(fnEnterActorList, fnUpdateActor);
 }
-MSG_FUNC_IMPLEX(0x0040A23D, Actor_KillActorsAtLevel, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A23D, Actor_KillActorsAtLevel, ACTOR_IMPL);
 
 void CC Actor_DestroyOnNextUpdate(Actor* pActor)
 {
     pActor->mFnUpdate = Actor_Destroy;
 }
-MSG_FUNC_IMPLEX(0x0040A3ED, Actor_DestroyOnNextUpdate, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A3ED, Actor_DestroyOnNextUpdate, ACTOR_IMPL);
 
 void CC Actor_Destroy(Actor* pActor)
 {
@@ -184,7 +184,7 @@ void CC Actor_Destroy(Actor* pActor)
         pActor->mFreeFunc(pActor);
     }
 }
-MSG_FUNC_IMPLEX(0x0040A37C, Actor_Destroy, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A37C, Actor_Destroy, ACTOR_IMPL);
 
 void CC Actor_UpdateActors()
 {
@@ -204,7 +204,7 @@ void CC Actor_UpdateActors()
 
     IterateActors(fnEnterActorList, fnUpdateActor);
 }
-MSG_FUNC_IMPLEX(0x0040A1BF, Actor_UpdateActors, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A1BF, Actor_UpdateActors, ACTOR_IMPL);
 
 void CC ActorList_Init()
 {
@@ -230,7 +230,7 @@ void CC ActorList_Init()
 
     gActorPauseFlags_dword_791A0C = 0;
 }
-MSG_FUNC_IMPLEX(0x0040A006, ActorList_Init, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A006, ActorList_Init, ACTOR_IMPL);
 
 ActorList* CC ActorList_Set_KillPause(s32 index, s16 pause, s16 kill)
 {
@@ -238,7 +238,7 @@ ActorList* CC ActorList_Set_KillPause(s32 index, s16 pause, s16 kill)
     gActorsList[index].mKill = kill;
     return &gActorsList[index];
 }
-MSG_FUNC_IMPLEX(0x0040A0AA, ActorList_Set_KillPause, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A0AA, ActorList_Set_KillPause, ACTOR_IMPL);
 
 void CC Actor_Remove(Actor* pActorToRemove)
 {
@@ -262,4 +262,4 @@ void CC Actor_Remove(Actor* pActorToRemove)
         printf("#");
     }
 }
-MSG_FUNC_IMPLEX(0x0040A3FC, Actor_Remove, ACTOR_IMPL);
+MGS_FUNC_IMPLEX(0x0040A3FC, Actor_Remove, ACTOR_IMPL);

@@ -15,7 +15,7 @@ struct Actor_Delay
     DWORD mActive;
     DWORD field_34_args_array[8];
 };
-MSG_ASSERT_SIZEOF(Actor_Delay, 0x54);
+MGS_ASSERT_SIZEOF(Actor_Delay, 0x54);
 
 void CC Actor_Delay_Update_455451(Actor_Delay* pDelay)
 {
@@ -39,7 +39,7 @@ void CC Actor_Delay_Update_455451(Actor_Delay* pDelay)
     }
     Actor_DestroyOnNextUpdate(&pDelay->mBase);
 }
-MSG_FUNC_IMPLEX(0x00455451, Actor_Delay_Update_455451, ACTOR_DELAY_IMPL);
+MGS_FUNC_IMPLEX(0x00455451, Actor_Delay_Update_455451, ACTOR_DELAY_IMPL);
 
 void CC Res_delay_84_sub_4553D1(DWORD scriptVar_p, GCL_Proc_Arguments* pArgs, int scriptVar_t)
 {
@@ -75,7 +75,7 @@ void CC Res_delay_84_sub_4553D1(DWORD scriptVar_p, GCL_Proc_Arguments* pArgs, in
         Actor_Init(&pDelay->mBase, reinterpret_cast<TActorFunction>(Actor_Delay_Update_455451), nullptr, "C:\\mgs\\source\\Game\\delay.c");
     }
 }
-MSG_FUNC_IMPLEX(0x004553D1, Res_delay_84_sub_4553D1, ACTOR_DELAY_IMPL);
+MGS_FUNC_IMPLEX(0x004553D1, Res_delay_84_sub_4553D1, ACTOR_DELAY_IMPL);
 
 signed int CC Script_tbl_Delay_sub_4519C7(BYTE* /*pScript*/)
 {
@@ -112,4 +112,4 @@ signed int CC Script_tbl_Delay_sub_4519C7(BYTE* /*pScript*/)
     }
     return -1;
 }
-MSG_FUNC_IMPLEX(0x004519C7, Script_tbl_Delay_sub_4519C7, ACTOR_DELAY_IMPL);
+MGS_FUNC_IMPLEX(0x004519C7, Script_tbl_Delay_sub_4519C7, ACTOR_DELAY_IMPL);

@@ -64,44 +64,44 @@ static_assert(sizeof(rend_struct) == 0x20, "rend_struct should be 0x20");
 struct Actor;
 struct ActorList;
 
-MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
-MSG_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
-MSG_FUNC_NOT_IMPL(0x00421680, signed __int64 __cdecl(), FpsTimerSetupQ);
-MSG_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
-MSG_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
-MSG_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
-MSG_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
-MSG_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
-MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
+MGS_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
+MGS_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
+MGS_FUNC_NOT_IMPL(0x00421680, signed __int64 __cdecl(), FpsTimerSetupQ);
+MGS_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
+MGS_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
+MGS_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
+MGS_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
+MGS_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
+MGS_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
 
 
-MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
-MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
-MSG_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
-MSG_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
-MSG_FUNC_NOT_IMPL(0x0041EC40, signed int __cdecl(), sub_41EC40);
-MSG_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), sub_43C850);
-MSG_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
-MSG_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, GUID**), sub_51F1E1);
-MSG_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
-MSG_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
-MSG_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
-MSG_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), Render_TextureScratchAlloc);
-MSG_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
-MSG_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
-MSG_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
-MSG_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
-MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
-MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_SetRenderState);
-MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Render_InitTextureStages);
-MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
-MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
-MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
-MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
-MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
-MSG_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
-MSG_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
-MSG_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
+MGS_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
+MGS_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
+MGS_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
+MGS_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
+MGS_FUNC_NOT_IMPL(0x0041EC40, signed int __cdecl(), sub_41EC40);
+MGS_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), sub_43C850);
+MGS_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
+MGS_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, GUID**), sub_51F1E1);
+MGS_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
+MGS_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
+MGS_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
+MGS_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), Render_TextureScratchAlloc);
+MGS_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
+MGS_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
+MGS_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
+MGS_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
+MGS_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
+MGS_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_SetRenderState);
+MGS_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Render_InitTextureStages);
+MGS_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
+MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
+MGS_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
+MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
+MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
+MGS_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
+MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
+MGS_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
 
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
 MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
@@ -386,19 +386,19 @@ struct weapon_famas
     DWORD field_58;
     DWORD mbIsMp5;
 };
-MSG_ASSERT_SIZEOF(weapon_famas, 96);
+MGS_ASSERT_SIZEOF(weapon_famas, 96);
 
 MGS_VAR(1, 0x995368, WORD, word_995368, 0);
 MGS_VAR(1, 0x995320, WORD, word_995320, 0);
 MGS_VAR(1, 0x78E804, WORD, word_78E804, 0);
 
-MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_update_640CDC);
-MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), Res_famas_shutdown_640E9E);
+MGS_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_update_640CDC);
+MGS_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), Res_famas_shutdown_640E9E);
 
 
 
-MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
-MSG_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
+MGS_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
+MGS_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
 
 //MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
 signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, int a3, int bMp5)
@@ -463,7 +463,7 @@ weapon_famas* CC Res_Weapon_famas_96_sub_640C24(ActorList* a1, ActorList *a2, vo
     }
     return pFamas;
 }
-MSG_FUNC_IMPLEX(0x640C24, Res_Weapon_famas_96_sub_640C24, WINMAIN_IMPL);
+MGS_FUNC_IMPLEX(0x640C24, Res_Weapon_famas_96_sub_640C24, WINMAIN_IMPL);
 
 void __cdecl Input_AcquireOrUnAcquire();
 
@@ -857,9 +857,9 @@ HFONT __cdecl FontCreate_423F1B(int cWidth, int cHeight)
     return result;
 }
 
-MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
-MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
-MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
+MGS_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
+MGS_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
+MGS_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
 
 MGS_VAR(1, 0x68C3B8, DWORD, dword_68C3B8, 0);
 MGS_VAR(1, 0x775F48, uint8_t, byte_775F48, 0);
@@ -867,7 +867,7 @@ MGS_VAR(1, 0x774B48, uint8_t, byte_774B48, 0);
 MGS_VAR(1, 0x776450, uint8_t, byte_776450, 0);
 
 
-MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
+MGS_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
 
 //MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), validateDeviceCaps);
 int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescription*/, LPSTR lpDeviceName, jimDeviceIdentifier* pIdentifier)
@@ -999,7 +999,7 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescripti
     return pIdentifier->ddIdentifier.field430;
 }
 
-MSG_FUNC_IMPLEX(0x51E7FC, validateDeviceCaps, WINMAIN_IMPL);
+MGS_FUNC_IMPLEX(0x51E7FC, validateDeviceCaps, WINMAIN_IMPL);
 
 HRESULT CALLBACK EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
 {
@@ -1304,7 +1304,7 @@ bool __cdecl ClearDDSurfaceWhite()
     } while (hr == DDERR_WASSTILLDRAWING);
     return hr == S_OK;
 }
-MSG_FUNC_IMPLEX(0x41E990, ClearDDSurfaceWhite, WINMAIN_IMPL);
+MGS_FUNC_IMPLEX(0x41E990, ClearDDSurfaceWhite, WINMAIN_IMPL);
 
 #define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
 
@@ -2082,7 +2082,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     return result;
 }
-MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
+MGS_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
 
 //MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), SetDDSurfaceTexture);
@@ -2236,7 +2236,7 @@ signed int Render_sub_41E3C0()
     return result;
 }
 
-MSG_FUNC_IMPLEX(0x41E3C0, Render_sub_41E3C0, WINMAIN_IMPL);
+MGS_FUNC_IMPLEX(0x41E3C0, Render_sub_41E3C0, WINMAIN_IMPL);
 
 //MSG_FUNC_NOT_IMPL(0x41E130, int __cdecl(uint32_t, uint32_t, uint32_t*, MGSVertex*), ClearBackBuffer);
 int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
@@ -2308,9 +2308,9 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
     }
     return 1;
 }
-MSG_FUNC_IMPLEX(0x41E130, ClearBackBuffer, WINMAIN_IMPL);
+MGS_FUNC_IMPLEX(0x41E130, ClearBackBuffer, WINMAIN_IMPL);
 
-MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
+MGS_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
 
 // 0x00420810
 signed int __cdecl DoInitAll()
@@ -2319,7 +2319,7 @@ signed int __cdecl DoInitAll()
     MessageBox_Error(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
     return ret;
 }
-MSG_FUNC_IMPL(0x00420810, DoInitAll);
+MGS_FUNC_IMPL(0x00420810, DoInitAll);
 
 
 // 0x00520157
@@ -2413,10 +2413,10 @@ MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
 MGS_VAR(1, 0x6BED20, DWORD, counter_dword_6BED20, 0);
 MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {}); // TODO: Check 2 is correct
 
-MSG_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(PSX_RECT *pRect), sub_40DD00);
-MSG_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), TextReset_459ACE);
-MSG_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), OT_Related_40162D);
-MSG_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
+MGS_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(PSX_RECT *pRect), sub_40DD00);
+MGS_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), TextReset_459ACE);
+MGS_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), OT_Related_40162D);
+MGS_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
 
 
 int CC Main_sub_401C02()
@@ -2456,7 +2456,7 @@ int CC Main_sub_401C02()
     }
     return result;
 }
-MSG_FUNC_IMPL(0x401C02, Main_sub_401C02);
+MGS_FUNC_IMPL(0x401C02, Main_sub_401C02);
 
 
 
@@ -2510,7 +2510,7 @@ signed int __cdecl Main()
     }
     return result;
 }
-MSG_FUNC_IMPLEX(0x00401005, Main, WINMAIN_IMPL);
+MGS_FUNC_IMPLEX(0x00401005, Main, WINMAIN_IMPL);
 
 // 0x00401000
 //MSG_FUNC_NOT_IMPL(0x00401000, int __cdecl(), DoMain);
@@ -2521,7 +2521,7 @@ int __cdecl DoMain()
 
 MGS_VAR(1, 0x6FC73C, IUnknown*, dword_6FC73C, nullptr); // TODO: Check what this is
 
-MSG_FUNC_NOT_IMPL(0x4241A4, void* __cdecl(void *), sub_4241A4);
+MGS_FUNC_NOT_IMPL(0x4241A4, void* __cdecl(void *), sub_4241A4);
 
 // 00423020
 void __cdecl ClearAll()
@@ -2626,7 +2626,7 @@ void __cdecl DoClearAll()
 {
     ClearAll();
 }
-MSG_FUNC_IMPL(0x004232B0, DoClearAll);
+MGS_FUNC_IMPL(0x004232B0, DoClearAll);
 
 // 0x0051D180
 void ShutdownEngine()

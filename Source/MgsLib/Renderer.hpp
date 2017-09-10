@@ -17,7 +17,7 @@ struct MGSVertex
     float u;
     float v;
 };
-MSG_ASSERT_SIZEOF(MGSVertex, 0x20);
+MGS_ASSERT_SIZEOF(MGSVertex, 0x20);
 
 struct texture_struct
 {
@@ -46,7 +46,7 @@ struct texture_struct
     DWORD field_48;
     DWORD field_4C;
 };
-MSG_ASSERT_SIZEOF(texture_struct, 0x50);
+MGS_ASSERT_SIZEOF(texture_struct, 0x50);
 
 struct prim_struct
 {
@@ -57,7 +57,7 @@ struct prim_struct
     DWORD mPrimTypeQ;
     DWORD dwVertexCount;
 };
-MSG_ASSERT_SIZEOF(prim_struct, 0x14);
+MGS_ASSERT_SIZEOF(prim_struct, 0x14);
 
 MGS_VAR_EXTERN(DWORD, dword_6FC718);
 MGS_VAR_EXTERN(DWORD, dword_688CD0);
