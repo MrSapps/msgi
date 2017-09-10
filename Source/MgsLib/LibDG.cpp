@@ -401,7 +401,7 @@ void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
     dword_991E40[0] = (int)gUnkSize_1024_6BE4E8;  // 256 DWORD's
     int otPtr = *(&pGv->mOrderingTable1 + activeBuffer);
     dword_991E40[1] = otPtr + 4;
-    DWORD* otrPtrNext = (DWORD*)dword_991E40[1];
+    DWORD** otrPtrNext = (DWORD**)dword_991E40[1];
     for (int i = 0; i < 256; i++)
     {
         DWORD* unkItem = gUnkSize_1024_6BE4E8[i];
@@ -410,7 +410,7 @@ void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
             do
             {
                 DWORD unkByte3Idx = *unkItem >> 24; // Get single 3rd byte
-                DWORD** otItemPtrPtr = (DWORD **)(&otrPtrNext[unkByte3Idx]); // Index into the OT using this byte
+                DWORD** otItemPtrPtr = &otrPtrNext[unkByte3Idx]; // Index into the OT using this byte
                 unkByte012Ptr = *unkItem & 0xFFFFFF; // Other 3 bytes
                 *unkItem = (unsigned int)*otItemPtrPtr | 0xC000000; // Set UNK to point to the OT
                 *otItemPtrPtr = unkItem; // Set OT to point to the UNK
