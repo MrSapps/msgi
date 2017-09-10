@@ -359,34 +359,40 @@ MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403
 MGS_ARY(1, 0x991E40, int, 8, dword_991E40, {});
 
 
-void __cdecl sub_4034C6(int pPrimDataStart, int count, int size)
+void __cdecl sub_4034C6(BYTE* pPrimDataStart, int count, int size)
 {
-    int dword_991E40_1_ot_ptr; // edi@1
-    int pData; // ecx@2
+    DWORD* dword_991E40_1_ot_ptr; // edi@1
+    BYTE* pPrim; // ecx@2
     int tag; // eax@3
     signed int v6; // eax@4
     signed int maybe_z; // eax@6
     int dword_991E40_2_field_2E_w_or_h; // [sp+4h] [bp-4h]@1
 
-    dword_991E40_1_ot_ptr = dword_991E40[1];
+    dword_991E40_1_ot_ptr = (DWORD*)dword_991E40[1];
     dword_991E40_2_field_2E_w_or_h = dword_991E40[2];
     if (count - 1 >= 0)
     {
-        pData = pPrimDataStart;
+        pPrim = pPrimDataStart;
         do
         {
-            tag = *(WORD *)pData;
+            tag = *(WORD *)pPrim;
             if (tag > 0)
             {
                 v6 = tag - dword_991E40_2_field_2E_w_or_h;
                 if (v6 < 0)
+                {
                     v6 = 0;
-                maybe_z = v6 >> 8;
+                }
 
-                *(DWORD *)pData ^= (*(DWORD *)pData ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
-                *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z) ^= (pData ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
+                maybe_z = v6 >> 8; // Extract byte
+
+                DWORD otPointerBits = dword_991E40_1_ot_ptr[maybe_z] & 0xFFFFFF;
+
+
+                *(DWORD *)pPrim ^= (*(DWORD *)pPrim ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
+                *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z) ^= ((DWORD)pPrim ^ *(DWORD *)(dword_991E40_1_ot_ptr + 4 * maybe_z)) & 0xFFFFFF;
             }
-            pData += size;
+            pPrim += size;
             --count;
         } while (count);
     }
@@ -433,19 +439,18 @@ void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
 
     v9 = dword_78D32C;
     
-    int primCount = pGv2->g_PrimQueue1_word_6BC3BE_256 - pGv2->gPrimQueue2_word_6BC3C0_256;
+    const int primCount = pGv2->g_PrimQueue1_word_6BC3BE_256 - pGv2->gPrimQueue2_word_6BC3C0_256;
     for (int i = 0; i < primCount; i++)
     {
         Prim_unknown* pPrim = (Prim_unknown*)&pGv2->gObjects_dword_6BC3C4[pGv2->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
         DWORD field_0_ptr = pPrim->mBase.field_0_ptr;
         Prim_unknown* p = (Prim_unknown*)field_0_ptr;
 
-        if (!(BYTE1(p->field_24_maybe_flags) & 1)
-            && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & v9))
+        if (!(BYTE1(p->field_24_maybe_flags) & 1) && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & v9))
         {
             dword_991E40[2] = p->field_2E_w_or_h;
             sub_4034C6(
-                (int)*(&p->field_40_pDataStart + activeBuffer),
+                (BYTE*)*(&p->field_40_pDataStart + activeBuffer),
                 p->field_2A_num_items,
                 p->field_30_size);
         }
