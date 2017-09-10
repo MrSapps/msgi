@@ -359,7 +359,7 @@ MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403
 MGS_ARY(1, 0x991E40, int, 8, dword_991E40, {});
 
 
-void CC sub_4034C6(int pPrimDataStart, int count, int size)
+void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 {
     DWORD* dword_991E40_1_ot_ptr = (DWORD*)dword_991E40[1];
     const int dword_991E40_2_field_2E_w_or_h = dword_991E40[2];
@@ -379,9 +379,11 @@ void CC sub_4034C6(int pPrimDataStart, int count, int size)
 
                 const signed int maybe_z = v6 >> 8;
 
+                // Start of prim points to next OT entry?
                 *(DWORD *)pData &= 0xFF000000;
                 *(DWORD *)pData |= dword_991E40_1_ot_ptr[maybe_z] & 0xFFFFFF;
 
+                // OT points to prim
                 dword_991E40_1_ot_ptr[maybe_z] &= 0xFF000000;
                 dword_991E40_1_ot_ptr[maybe_z] |= pData & 0xFFFFFF;
                 
@@ -391,7 +393,7 @@ void CC sub_4034C6(int pPrimDataStart, int count, int size)
         } while (count);
     }
 }
-MGS_FUNC_IMPLEX(0x4034C6, sub_4034C6, true); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, true); // TODO: Implement me
 
 void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
 {
@@ -443,7 +445,7 @@ void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
         if (!(BYTE1(p->field_24_maybe_flags) & 1) && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & v9))
         {
             dword_991E40[2] = p->field_2E_w_or_h;
-            sub_4034C6(
+            OrderingTableAdd_4034C6(
                 (int)*(&p->field_40_pDataStart + activeBuffer),
                 p->field_2A_num_items,
                 p->field_30_size);
