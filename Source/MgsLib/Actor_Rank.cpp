@@ -1250,7 +1250,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
 }
 MGS_FUNC_IMPLEX(0x474D98, Res_rank_loader, ACTOR_RANK_IMPL)
 
-signed int CC Res_rank_1532_sub_46EC0E(DWORD scriptUnknown, int a_dword_722A40, BYTE* pScript)
+signed int CC Res_rank_Create_46EC0E(DWORD scriptUnknown, int a_dword_722A40, BYTE* pScript)
 {
     game_state_dword_72279C |= 0x4A6000u; // TODO: Could be a code loc?
 
@@ -1271,7 +1271,7 @@ signed int CC Res_rank_1532_sub_46EC0E(DWORD scriptUnknown, int a_dword_722A40, 
 
     return 1;
 }
-MGS_FUNC_IMPLEX(0x46EC0E, Res_rank_1532_sub_46EC0E, ACTOR_RANK_IMPL);
+MGS_FUNC_IMPLEX(0x46EC0E, Res_rank_Create_46EC0E, ACTOR_RANK_IMPL);
 
 
 static void Test_Rank_Set_POLYFT4_code_40E0D0()
