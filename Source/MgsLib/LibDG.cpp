@@ -381,12 +381,11 @@ void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 
                 // Start of prim points to next OT entry?
                 *(DWORD *)pData &= 0xFF000000;
-                *(DWORD *)pData |= dword_991E40_1_ot_ptr[maybe_z] & 0xFFFFFF;
+                *(DWORD *)pData |= dword_991E40_1_ot_ptr[maybe_z] & 0x00FFFFFF;
 
                 // OT points to prim
                 dword_991E40_1_ot_ptr[maybe_z] &= 0xFF000000;
-                dword_991E40_1_ot_ptr[maybe_z] |= pData & 0xFFFFFF;
-                
+                dword_991E40_1_ot_ptr[maybe_z] |= pData & 0x00FFFFFF;
             }
             pData += size;
             --count;
@@ -439,8 +438,7 @@ void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
     for (int i = 0; i < primCount; i++)
     {
         Prim_unknown* pPrim = (Prim_unknown*)&pGv2->gObjects_dword_6BC3C4[pGv2->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
-        DWORD field_0_ptr = pPrim->mBase.field_0_ptr;
-        Prim_unknown* p = (Prim_unknown*)field_0_ptr;
+        Prim_unknown* p = (Prim_unknown*)pPrim->mBase.field_0_ptr;
 
         if (!(BYTE1(p->field_24_maybe_flags) & 1) && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & v9))
         {
