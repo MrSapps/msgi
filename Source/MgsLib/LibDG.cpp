@@ -400,8 +400,8 @@ void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
     DWORD *unk1024; // ecx@1
     int otPtr; // eax@1
     int *unkItem; // esi@2
-    int **v6; // eax@3
-    int otItem24BitsPtr; // edi@3
+    int **otItemPtrPtr; // eax@3
+    int unkByte012Ptr; // edi@3
     unsigned __int16 v9; // di@5
     int otrPtrNext; // [sp+Ch] [bp-4h]@1
     int count256; // [sp+18h] [bp+8h]@1
@@ -422,12 +422,13 @@ void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
             
             do
             {
-                v6 = (int **)(otrPtrNext + 4 * ((unsigned int)*unkItem >> 24));
-                otItem24BitsPtr = *unkItem & 0xFFFFFF;
-                *unkItem = (unsigned int)*v6 | 0xC000000;
-                *v6 = unkItem;
-                unkItem = (int *)otItem24BitsPtr;
-            } while (otItem24BitsPtr);
+                DWORD unkByte3Idx = (unsigned int)(*unkItem >> 24); // Get single 3rd byte
+                otItemPtrPtr = (int **)(otrPtrNext + 4 * unkByte3Idx); // Index into the OT using this byte
+                unkByte012Ptr = *unkItem & 0xFFFFFF; // Other 3 bytes
+                *unkItem = (unsigned int)*otItemPtrPtr | 0xC000000; // Set UNK to point to the OT
+                *otItemPtrPtr = unkItem; // Set OT to point to the UNK
+                unkItem = (int *)unkByte012Ptr; // To next unk entry ?
+            } while (unkByte012Ptr);
         }
         --count256;
     } while (count256);
