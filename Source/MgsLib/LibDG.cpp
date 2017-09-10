@@ -394,22 +394,14 @@ void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 }
 MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, true); // TODO: Implement me
 
-void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
+void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
 {
-    struct_gv *pGv2; // edx@1
-    int otPtr; // eax@1
-    DWORD **otItemPtrPtr; // eax@3
     int unkByte012Ptr; // edi@3
-    unsigned __int16 v9; // di@5
-    int otrPtrNext; // [sp+Ch] [bp-4h]@1
-    int count256; // [sp+18h] [bp+8h]@1
 
-    pGv2 = pGv;
     dword_991E40[0] = (int)gUnkSize_1024_6BE4E8;  // 256 DWORD's
-    otPtr = *(&pGv->mOrderingTable1 + activeBuffer);
+    int otPtr = *(&pGv->mOrderingTable1 + activeBuffer);
     dword_991E40[1] = otPtr + 4;
-    otrPtrNext = dword_991E40[1];
-    count256 = 256;
+    DWORD* otrPtrNext = (DWORD*)dword_991E40[1];
     for (int i = 0; i < 256; i++)
     {
         DWORD* unkItem = gUnkSize_1024_6BE4E8[i];
@@ -418,7 +410,7 @@ void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
             do
             {
                 DWORD unkByte3Idx = *unkItem >> 24; // Get single 3rd byte
-                otItemPtrPtr = (DWORD **)(otrPtrNext + 4 * unkByte3Idx); // Index into the OT using this byte
+                DWORD** otItemPtrPtr = (DWORD **)(&otrPtrNext[unkByte3Idx]); // Index into the OT using this byte
                 unkByte012Ptr = *unkItem & 0xFFFFFF; // Other 3 bytes
                 *unkItem = (unsigned int)*otItemPtrPtr | 0xC000000; // Set UNK to point to the OT
                 *otItemPtrPtr = unkItem; // Set OT to point to the UNK
@@ -427,12 +419,12 @@ void __cdecl LibGV_40340A(struct_gv *pGv, int activeBuffer)
         }
     }
 
-    v9 = dword_78D32C;
+    unsigned __int16 v9 = dword_78D32C;
     
-    const int primCount = pGv2->g_PrimQueue1_word_6BC3BE_256 - pGv2->gPrimQueue2_word_6BC3C0_256;
+    const int primCount = pGv->g_PrimQueue1_word_6BC3BE_256 - pGv->gPrimQueue2_word_6BC3C0_256;
     for (int i = 0; i < primCount; i++)
     {
-        Prim_unknown* pPrim = (Prim_unknown*)&pGv2->gObjects_dword_6BC3C4[pGv2->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
+        Prim_unknown* pPrim = (Prim_unknown*)&pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
         Prim_unknown* p = (Prim_unknown*)pPrim->mBase.field_0_ptr;
 
         if (!(BYTE1(p->field_24_maybe_flags) & 1) && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & v9))
