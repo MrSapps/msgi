@@ -210,7 +210,7 @@ int CC Res_loader_CountOfNonDotLines_408E67(const char* pInput)
     } while (pInput);
     return count;
 }
-MGS_FUNC_IMPLEX(0x457BDD, Res_loader_CountOfNonDotLines_408E67, ACTOR_LOADER_IMPL);
+MGS_FUNC_IMPLEX(0x408E67, Res_loader_CountOfNonDotLines_408E67, ACTOR_LOADER_IMPL);
 
 signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
 {
