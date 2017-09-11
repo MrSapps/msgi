@@ -330,6 +330,50 @@ void CC Res_loader_Create_457BDD(const char* strStageName)
 }
 MGS_FUNC_IMPLEX(0x457BDD, Res_loader_Create_457BDD, ACTOR_LOADER_IMPL);
 
+const char* CC Res_loader_GetLine_408E1B(const char* pInput, char* pOutputLine)
+{
+    *pOutputLine = '\0';
+        
+    // Skip new lines
+    while (*pInput == '\r' || *pInput == '\n')
+    {
+        pInput++;
+    }
+
+    // Bail if at end
+    if (*pInput == '\0')
+    {
+        return nullptr;
+    }
+
+    // Keep going till new line or end
+    while (*pInput != '\0')
+    {
+        if (*pInput == '\n' || *pInput == '\r')
+        {
+            pInput++;
+            break;
+        }
+
+        // Copy to output
+        *pOutputLine = *pInput;
+        pOutputLine++;
+
+        pInput++;
+    }
+
+    *pOutputLine = '\0';
+
+    // Bail if at end
+    if (*pInput == '\0')
+    {
+        return nullptr;
+    }
+
+    return pInput;
+}
+MGS_FUNC_IMPLEX(0x408E1B, Res_loader_GetLine_408E1B, ACTOR_LOADER_IMPL);
+
 static void Res_loader_Is_Extension_4088F2_Test()
 {
     ASSERT_EQ(true, Res_loader_Is_Extension_4088F2("blah.dar", "dar"));
@@ -339,7 +383,29 @@ static void Res_loader_Is_Extension_4088F2_Test()
     ASSERT_EQ(false, Res_loader_Is_Extension_4088F2("dar.exe", "dar"));
 }
 
+static void Res_loader_408E1B_Test()
+{
+    const char* kInput = "Line1\r\r\n\nLine2\nblah3\rLOLS4";
+    char buffer[40] = {};
+    const char* ret = Res_loader_GetLine_408E1B(kInput, buffer);
+    ASSERT_STREQ("\r\n\nLine2\nblah3\rLOLS4", ret);
+    ASSERT_STREQ("Line1", buffer);
+
+    ret = Res_loader_GetLine_408E1B(ret, buffer);
+    ASSERT_STREQ("blah3\rLOLS4", ret);
+    ASSERT_STREQ("Line2", buffer);
+
+    ret = Res_loader_GetLine_408E1B(ret, buffer);
+    ASSERT_STREQ("LOLS4", ret);
+    ASSERT_STREQ("blah3", buffer);
+    
+    ret = Res_loader_GetLine_408E1B(ret, buffer);
+    ASSERT_TRUE(ret == nullptr);
+    ASSERT_STREQ("LOLS4", buffer);
+}
+
 void DoTests()
 {
     Res_loader_Is_Extension_4088F2_Test();
+    Res_loader_408E1B_Test();
 }
