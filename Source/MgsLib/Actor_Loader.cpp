@@ -5,10 +5,16 @@
 #include "Timer.hpp"
 #include "System.hpp"
 #include "Sound.hpp"
+#include <gmock/gmock.h>
 
 #define ACTOR_LOADER_IMPL true
 
-void Actor_LoaderCpp_ForceLink() { }
+void DoTests();
+
+void Actor_LoaderCpp_ForceLink() 
+{
+    DoTests();
+}
 
 struct Actor_Loader_Impl
 {
@@ -17,10 +23,10 @@ struct Actor_Loader_Impl
     int field_8_unknown_state;
     char* field_C_c_str_ptr_field_2C;
     int field_10;
-    int field_14;
+    int field_14_load_ret;
     int field_18_state;
-    int field_1C_c_str_data_cnf_sys_allocd;
-    int field_20_c_str;
+    void* field_1C_c_str_data_cnf_sys_allocd;
+    char* field_20_c_str;
     s16 field_24_field_2C_char_state_resident_type;
     s16 field_26_padding_q;
     void* field_28_sys2_alloc_file_buffer;
@@ -29,6 +35,19 @@ struct Actor_Loader_Impl
     int field_70_count_file_first_dword;
 };
 MGS_ASSERT_SIZEOF(Actor_Loader_Impl, 0x74);
+
+MGS_FUNC_NOT_IMPL(0x00408EEF, signed int CC(char* fileName, void** buffer, signed int type), FS_LoadRequest);
+MGS_FUNC_NOT_IMPL(0x0051D2ED, void CC(), File_HITEXT_INIT);
+MGS_FUNC_NOT_IMPL(0x00401F77, void CC(__int16 a1), Res_loader_tick_helper_401F77);
+
+MGS_VAR(1, 0x71D13C, DWORD, dword_71D13C, 0);
+MGS_VAR(1, 0x6BFBA4, DWORD, dword_6BFBA4, 0);
+MGS_VAR(1, 0x71D138, DWORD, dword_71D138, 0);
+MGS_VAR(1, 0x78D7AC, DWORD, gFixupLibDg_Allocs_And_Hahses_dword_78D7AC, 0);
+MGS_VAR(1, 0x650478, DWORD, dword_650478, 0);
+MGS_VAR(1, 0x99533C, DWORD, dword_99533C, 0);
+
+MGS_ARY(1, 0x6504C8, char, 256, gStage_Name_byte_6504C8, {});
 
 void CC Res_loader_shutdown_helper_408E95(void* ptr)
 {
@@ -45,24 +64,11 @@ void CC Res_loader_48_end_457C95(Actor_Loader* pLoader)
 }
 MGS_FUNC_IMPLEX(0x457C95, Res_loader_48_end_457C95, ACTOR_LOADER_IMPL);
 
-MGS_VAR(1, 0x71D13C, DWORD, dword_71D13C, 0);
-MGS_VAR(1, 0x6BFBA4, DWORD, dword_6BFBA4, 0);
-MGS_VAR(1, 0x71D138, DWORD, dword_71D138, 0);
-MGS_VAR(1, 0x78D7AC, DWORD, gFixupLibDg_Allocs_And_Hahses_dword_78D7AC, 0);
-MGS_VAR(1, 0x650478, DWORD, dword_650478, 0);
-MGS_VAR(1, 0x99533C, DWORD, dword_99533C, 0);
-
-
-MGS_ARY(1, 0x6504C8, char, 256, gStage_Name_byte_6504C8, {});
-
 void CC Stage_SetNameQ(const char* stageName)
 {
     sprintf(gStage_Name_byte_6504C8, "stage/%s", stageName);
 }
 MGS_FUNC_IMPLEX(0x408ED8, Stage_SetNameQ, ACTOR_LOADER_IMPL);
-
-MGS_FUNC_NOT_IMPL(0x00408EEF, signed int CC(char* fileName, void** buffer, signed int type), FS_LoadRequest);
-MGS_FUNC_NOT_IMPL(0x0051D2ED, void CC(), File_HITEXT_INIT);
 
 Actor_Loader_Impl* CC Stage_LoadRelated_DataCnf_Q2(const char* strStageNameParam)
 {
@@ -90,7 +96,7 @@ Actor_Loader_Impl* CC Stage_LoadRelated_DataCnf_Q2(const char* strStageNameParam
 
     Stage_SetNameQ(strStageName);
 
-    if (FS_LoadRequest("data.cnf", (void **)&pAllocated->field_1C_c_str_data_cnf_sys_allocd, 1) >= 0)
+    if (FS_LoadRequest("data.cnf", &pAllocated->field_1C_c_str_data_cnf_sys_allocd, 1) >= 0)
     {
         File_HITEXT_INIT();
 
@@ -114,9 +120,155 @@ Actor_Loader_Impl* CC Stage_LoadRelated_DataCnf_Q2(const char* strStageNameParam
 }
 MGS_FUNC_IMPLEX(0x408918, Stage_LoadRelated_DataCnf_Q2, ACTOR_LOADER_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x00401F77, void CC(__int16 a1), Res_loader_tick_helper_401F77);
-MGS_FUNC_NOT_IMPL(0x00408A73, signed int CC(Actor_Loader_Impl* pSystemStruct), Res_loader_help2_408A73);
 
+MGS_VAR(1, 0x6BFBA0, char*, Str1_6BFBA0, 0);
+MGS_VAR(1, 0x78D7A8, DWORD, Actor_Loader_Impl_Field10_dword_78D7A8, 0);
+
+MGS_FUNC_NOT_IMPL(0x00408D6C, signed int CC(Actor_Loader_Impl* pSystemStruct), Res_loader_408D6C);
+MGS_FUNC_NOT_IMPL(0x00408FAE, int(), Res_loader_load_file_to_mem_408FAE);
+MGS_FUNC_NOT_IMPL(0x0040A5C3, int CC(char* arg0), sub_40A5C3);
+MGS_FUNC_NOT_IMPL(0x0040A77F, int CC(int sys2FileBuffer, signed int maybe_id, int resident_type), LibGV_id_conflict_40A77F);
+MGS_FUNC_NOT_IMPL(0x0051D1DB, char* CC(char* a1), Res_loader_51D1DB);
+MGS_FUNC_NOT_IMPL(0x00408E67, int CC(char* a1), Res_loader_408E67);
+
+/*
+signed int CC Res_loader_408D6C(Actor_Loader_Impl* pSystemStruct);
+int Res_loader_load_file_to_mem_408FAE();
+int CC sub_40A5C3(char* arg0);
+int CC LibGV_id_conflict_40A77F(int sys2FileBuffer, signed int maybe_id, int resident_type);
+char* CC Res_loader_51D1DB(char* a1);
+int CC Res_loader_408E67(char* a1);
+*/
+bool CC Res_loader_Is_Extension_4088F2(const char* fileName, const char* extension)
+{
+    const char* dotPos = strchr(fileName, '.');
+    if (dotPos)
+    {
+        dotPos++;
+    }
+    else
+    {
+        dotPos = fileName;
+    }
+    return strcmp(dotPos, extension) == 0;
+}
+MGS_FUNC_IMPLEX(0x4088F2, Res_loader_Is_Extension_4088F2, ACTOR_LOADER_IMPL);
+
+signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
+{
+    switch (pSystemStruct->field_18_state)
+    {
+    case 0:
+        if (Res_loader_load_file_to_mem_408FAE() <= 0) // Returns 0 so always true
+        {
+            pSystemStruct->field_18_state = 1;
+            pSystemStruct->field_20_c_str = (char*)pSystemStruct->field_1C_c_str_data_cnf_sys_allocd;
+            pSystemStruct->field_24_field_2C_char_state_resident_type = 1;
+            pSystemStruct->field_4_str_pos = Res_loader_408E67((char *)pSystemStruct->field_1C_c_str_data_cnf_sys_allocd);
+            pSystemStruct->field_8_unknown_state = 0;
+        }
+        break;
+
+    case 1:
+        if (Res_loader_408D6C(pSystemStruct) <= 0)
+        {
+            return 0;
+        }
+        pSystemStruct->field_18_state = 2;
+        break;
+
+    case 2:
+        pSystemStruct->field_14_load_ret = Res_loader_load_file_to_mem_408FAE(); // Always returns 0
+        if (pSystemStruct->field_14_load_ret <= 0) // Always true
+        {
+            if (Res_loader_Is_Extension_4088F2(pSystemStruct->field_C_c_str_ptr_field_2C, "dar"))
+            {
+                int* file_first_dword = (int *)pSystemStruct->field_28_sys2_alloc_file_buffer;
+                pSystemStruct->field_70_count_file_first_dword = *file_first_dword;
+                pSystemStruct->field_6C_count_file_second_dword = (int)(file_first_dword + 1);
+                pSystemStruct->field_18_state = 3;
+            }
+            else
+            {
+                if (pSystemStruct->field_24_field_2C_char_state_resident_type == 3)
+                {
+                    // dead branch ??
+                    //int v3 = pSystemStruct->field_26_padding_q;
+                }
+                else
+                {
+                    Actor_Loader_Impl_Field10_dword_78D7A8 = pSystemStruct->field_10;
+                    s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
+                    int maybe_id = sub_40A5C3(pSystemStruct->field_C_c_str_ptr_field_2C);
+                    LibGV_id_conflict_40A77F((int)pSystemStruct->field_28_sys2_alloc_file_buffer, maybe_id, resident_type);
+                    if (!pSystemStruct->field_24_field_2C_char_state_resident_type)
+                    {
+                        System_2_free_40B2A7(pSystemStruct->field_28_sys2_alloc_file_buffer);
+                    }
+                }
+                pSystemStruct->field_18_state = 1;
+            }
+        }
+        break;
+
+    case 3:
+        if (strstr(pSystemStruct->field_2C_c_str, ".dar"))
+        {
+            strstr(pSystemStruct->field_2C_c_str, "tex"); // ?? not used
+        }
+        int counter2 = pSystemStruct->field_6C_count_file_second_dword;
+        int counter = pSystemStruct->field_70_count_file_first_dword;
+        do
+        {
+            pSystemStruct->field_6C_count_file_second_dword = counter2;
+            pSystemStruct->field_70_count_file_first_dword = counter;
+            char* v12 = pSystemStruct->field_2C_c_str;
+            char v7 = 0;
+            do
+            {
+                *v12 = *(BYTE *)counter2;
+                v7 = *v12++;
+                ++counter2;
+            } while (v7);
+
+            int* v8 = (int *)(((4 - (counter2 & 3)) & 3) + counter2);
+            int v13 = *v8;
+            int counter2a = (int)(v8 + 1);
+
+            if (strstr(pSystemStruct->field_2C_c_str, "pcx"))
+            {
+                Res_loader_51D1DB(pSystemStruct->field_2C_c_str);
+            }
+
+            s16 resident_type2 = pSystemStruct->field_24_field_2C_char_state_resident_type;
+            Str1_6BFBA0 = pSystemStruct->field_2C_c_str;
+            int maybe_id2 = sub_40A5C3(pSystemStruct->field_2C_c_str);
+            int v17 = LibGV_id_conflict_40A77F(counter2a, maybe_id2, resident_type2);
+
+            if (!v17)
+            {
+                return 1;
+            }
+
+            if (v17 < 0)
+            {
+                printf("INIT_ERROR in %s !!\n", pSystemStruct->field_2C_c_str);
+                return 0;
+            }
+            counter2 = counter2a + v13 + 1;
+            --counter;
+        } while (counter > 0);
+
+        if (!pSystemStruct->field_24_field_2C_char_state_resident_type)
+        {
+            System_2_free_40B2A7(pSystemStruct->field_28_sys2_alloc_file_buffer);
+        }
+        pSystemStruct->field_18_state = 1;
+        break;
+    }
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x408A73, Res_loader_help2_408A73, ACTOR_LOADER_IMPL);
 
 signed int CC Res_loader_j_helper2_408A68(Actor_Loader_Impl* pSystemStruct)
 {
@@ -177,3 +329,17 @@ void CC Res_loader_Create_457BDD(const char* strStageName)
     gLoaderState_dword_9942B8 = 0;
 }
 MGS_FUNC_IMPLEX(0x457BDD, Res_loader_Create_457BDD, ACTOR_LOADER_IMPL);
+
+static void Res_loader_Is_Extension_4088F2_Test()
+{
+    ASSERT_EQ(true, Res_loader_Is_Extension_4088F2("blah.dar", "dar"));
+    ASSERT_EQ(true, Res_loader_Is_Extension_4088F2("dar", "dar"));
+    ASSERT_EQ(true, Res_loader_Is_Extension_4088F2(".dar", "dar"));
+    ASSERT_EQ(false, Res_loader_Is_Extension_4088F2(".DAR", "dar"));
+    ASSERT_EQ(false, Res_loader_Is_Extension_4088F2("dar.exe", "dar"));
+}
+
+void DoTests()
+{
+    Res_loader_Is_Extension_4088F2_Test();
+}
