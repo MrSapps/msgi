@@ -3,6 +3,7 @@
 #include "Actor.hpp"
 #include <assert.h>
 #include "LibDG.hpp"
+#include "Timer.hpp"
 
 #define REDIRECT_LIBGV_DATA 1
 #define LIBGV_IMPL true
@@ -67,44 +68,6 @@ void __cdecl LibGV_40B3BC()
     g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx = 0;
 }
 MGS_FUNC_IMPLEX(0x40B3BC, LibGV_40B3BC, LIBGV_IMPL);
-
-struct PerformanceFreqStruct
-{
-    LONGLONG mFreq60;
-    LONGLONG mFreq30;
-    LONGLONG mFreq24;
-    LONGLONG mFreq23;
-    LONGLONG mFreq22;
-    LONGLONG mFreq21;
-    LONGLONG mFreq20;
-    LONGLONG mFreq25;
-    LONGLONG mFreq15;
-};
-PerformanceFreqStruct gPerformanceFreq_995648;
-
-LARGE_INTEGER CC TimerInitBaseLineAndGetCurrentTime_5201A6()
-{
-    LARGE_INTEGER currentCounter = {};
-    static bool sDoneQuery_dword_77C920 = false;
-    static LARGE_INTEGER sLargeInteger_stru_995690 = {};
-
-    if (!sDoneQuery_dword_77C920)
-    {
-        QueryPerformanceFrequency(&sLargeInteger_stru_995690);
-        gPerformanceFreq_995648.mFreq60 = sLargeInteger_stru_995690.QuadPart / 60;
-        gPerformanceFreq_995648.mFreq30 = sLargeInteger_stru_995690.QuadPart / 30;
-        gPerformanceFreq_995648.mFreq24 = sLargeInteger_stru_995690.QuadPart / 24;
-        gPerformanceFreq_995648.mFreq23 = sLargeInteger_stru_995690.QuadPart / 23;
-        gPerformanceFreq_995648.mFreq22 = sLargeInteger_stru_995690.QuadPart / 22;
-        gPerformanceFreq_995648.mFreq21 = sLargeInteger_stru_995690.QuadPart / 21;
-        gPerformanceFreq_995648.mFreq20 = sLargeInteger_stru_995690.QuadPart / 20;
-        gPerformanceFreq_995648.mFreq25 = sLargeInteger_stru_995690.QuadPart / 25;
-        gPerformanceFreq_995648.mFreq15 = sLargeInteger_stru_995690.QuadPart / 15;
-        sDoneQuery_dword_77C920 = true;
-    }
-    QueryPerformanceCounter(&currentCounter);
-    return currentCounter;
-}
 
 __int64 CC TimeGetElapsed_4455A0()
 {

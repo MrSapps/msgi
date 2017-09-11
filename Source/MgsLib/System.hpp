@@ -42,6 +42,14 @@ void CC System_Free_40B099(int idx, void *ptr);
 void* CC System_mem_alloc_40AF91(int idx, int memSize);
 LibGV_MemoryAllocation* CC System_FindAlloc_40B0F7(system_struct* pSystem, void* pFindMe);
 void CC System_HouseKeeping_40ACB2(int idx);
+void CC System_2_free_40B2A7(void* pAlloc);
+void* CC System_2_zerod_allocate_memory_40B296(int size);
+
+template<class T>
+T* CC System_2_zerod_allocate_memory_40B296_T()
+{
+    return reinterpret_cast<T*>(System_2_zerod_allocate_memory_40B296(sizeof(T)));
+}
 
 void SystemCpp_ForceLink();
 

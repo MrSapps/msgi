@@ -24,6 +24,7 @@ BYTE* CC Script_GetReturnAddress();
 EXTERN_MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 
 MGS_VAR_EXTERN(DWORD, dword_7227A4);
+MGS_VAR_EXTERN(DWORD, script_cancel_non_zero_dword_7227A0);
 
 enum GCLOperators
 {

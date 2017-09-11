@@ -10,8 +10,6 @@
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
 MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
 
-MGS_VAR_EXTERN(DWORD, script_cancel_non_zero_dword_7227A0);
-
 #define SCRIPT_IMPL true
 
 MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);

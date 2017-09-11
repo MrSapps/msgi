@@ -4,13 +4,14 @@
 #include "LibDG.hpp"
 #include "LibGV.hpp"
 #include "Actor_Debug.hpp"
+#include "Actor_Loader.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
 MGS_VAR(1, 0x722760, Actor, g_gamed_722760, {}); // TODO: Will actually big an Actor + other data
 MGS_VAR(1, 0x995344, DWORD, gFrameTime_dword_995344, 0);
 MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
-MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
+MGS_VAR(1, 0x9942B8, int, gLoaderState_dword_9942B8, 0);
 // TODO: Is a global that inherits from Actor
 MGS_VAR(1, 0x725FC0, Actor, gMenuMan_stru_725FC0, {});
 MGS_ARY(1, 0x7227C8, WORD, 5, word_7227C8, {}); // TODO: Struct?
@@ -63,7 +64,6 @@ MGS_VAR(1, 0x78E7EC, WORD, stage_name_hash_word_78E7EC, 0);
 MGS_VAR(1, 0x6893D4, DWORD, dword_6893D4, 0);
 
 MGS_FUNC_NOT_IMPL(0x0044EB83, char* CC(), File_StageName_44EB83);
-MGS_FUNC_NOT_IMPL(0x00457BDD, void CC(const char*), Res_loader_Create_457BDD);
 
 void CC Create_loader_44E226()
 {
@@ -88,7 +88,7 @@ void CC Init_Gamed_Create_44E12B()
     gFrameTime_dword_995344 = 0;
     dword_7227A4 = 0;
     script_cancel_non_zero_dword_7227A0 = 0;
-    dword_9942B8 = 0;
+    gLoaderState_dword_9942B8 = 0;
     Res_MenuMan_create_459A9A();
     Stage_GetNameHashStack_44EAED();
     LibDG_SetActiveResourceInitFuncPtrs_457B5B();

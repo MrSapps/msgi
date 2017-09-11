@@ -308,7 +308,7 @@ void* CC System_mem_alloc_40AF91(int idx, int memSize)
 }
 MGS_FUNC_IMPLEX(0x40AF91, System_mem_alloc_40AF91, SYSTEM_IMPL);
 
-void CC System_2_free_40B2A7(void *pAlloc)
+void CC System_2_free_40B2A7(void* pAlloc)
 {
     System_Free_40B099(2, pAlloc);
 }

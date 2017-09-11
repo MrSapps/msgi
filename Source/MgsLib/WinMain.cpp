@@ -40,6 +40,8 @@
 #include "Actor_Rank.hpp"
 #include "Actor_Delay.hpp"
 #include "Actor_GameD.hpp"
+#include "Actor_Loader.hpp"
+#include "Timer.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -66,7 +68,6 @@ struct ActorList;
 
 MGS_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
 MGS_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
-MGS_FUNC_NOT_IMPL(0x00421680, signed __int64 __cdecl(), FpsTimerSetupQ);
 MGS_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
 MGS_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
 MGS_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
@@ -226,7 +227,7 @@ int __cdecl HandleExclusiveMode()
     while (g_pDirectDraw->TestCooperativeLevel() != 0);
 
     sub_51E086();
-    FpsTimerSetupQ();
+    Timer_30_1();
     Task_ResumeQ();
     Sound_PlaySample();
 
@@ -570,7 +571,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             gActive_dword_688CDC = 0;
         }
         Input_AcquireOrUnAcquire();
-        FpsTimerSetupQ();
+        Timer_30_1();
         result = 1;
     }
     else
@@ -2678,6 +2679,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     PsxCpp_ForceLink();
     Actor_RankCPP_ForceLink();
     Actor_DelayCpp_ForceLink();
+    Actor_LoaderCpp_ForceLink();
 
     if (IsMgsi())
     {
@@ -2825,7 +2827,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
                         {
                             Sound_SetSoundFxVolume(gSoundFxVol_dword_651D98);
                             Sound_SetMusicVolume(gMusicVol_dword_716F68);
-                            FpsTimerSetupQ();
+                            Timer_30_1();
 
                             /* HACK: Leave cursor showing while developing
                             for (i = 1024; i && ShowCursor(0) >= 0; --i)// some hack to hide the cursor

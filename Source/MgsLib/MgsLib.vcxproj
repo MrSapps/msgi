@@ -75,6 +75,7 @@
     <ClInclude Include="Actor_Debug.hpp" />
     <ClInclude Include="Actor_Delay.hpp" />
     <ClInclude Include="Actor_GameD.hpp" />
+    <ClInclude Include="Actor_Loader.hpp" />
     <ClInclude Include="Actor_Rank.hpp" />
     <ClInclude Include="File.hpp" />
     <ClInclude Include="Input.hpp" />
@@ -91,12 +92,14 @@
     <ClInclude Include="System.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Task.hpp" />
+    <ClInclude Include="Timer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Actor_Debug.cpp" />
     <ClCompile Include="Actor_Delay.cpp" />
     <ClCompile Include="Actor_GameD.cpp" />
+    <ClCompile Include="Actor_Loader.cpp" />
     <ClCompile Include="Actor_Rank.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -114,6 +117,7 @@
     </ClCompile>
     <ClCompile Include="System.cpp" />
     <ClCompile Include="Task.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>

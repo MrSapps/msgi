@@ -345,6 +345,8 @@ void CC LibDG_Update2_401234(Actor* pLibDg)
 
         // TODO: This is not 100% correct - but I don't think 
         // dword_6BB950_do_not_flip_buffers can ever be set to 1?
+        //MGS_WARN_ONCE("Possibly wrong behavior here"); // TODO: Impl MGS_WARN_ONCE
+
         int elapsed = TimeGetElapsed_4455A0();
         if (elapsed - (sTimeStamp_dword_650094 + 2) < 0)
         {
