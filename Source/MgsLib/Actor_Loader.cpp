@@ -19,13 +19,13 @@ void Actor_LoaderCpp_ForceLink()
 struct Actor_Loader_Impl
 {
     int field_0;
-    int field_4_str_pos;
+    int field_4_data_cnf_line_count;
     int field_8_unknown_state;
     char* field_C_c_str_ptr_field_2C;
     int field_10;
     int field_14_load_ret;
     int field_18_state;
-    void* field_1C_c_str_data_cnf_sys_allocd;
+    char* field_1C_c_str_data_cnf_sys_allocd;
     char* field_20_c_str;
     s16 field_24_field_2C_char_state_resident_type;
     s16 field_26_padding_q;
@@ -96,7 +96,7 @@ Actor_Loader_Impl* CC Stage_LoadRelated_DataCnf_Q2(const char* strStageNameParam
 
     Stage_SetNameQ(strStageName);
 
-    if (FS_LoadRequest("data.cnf", &pAllocated->field_1C_c_str_data_cnf_sys_allocd, 1) >= 0)
+    if (FS_LoadRequest("data.cnf", (void**)&pAllocated->field_1C_c_str_data_cnf_sys_allocd, 1) >= 0)
     {
         File_HITEXT_INIT();
 
@@ -129,7 +129,6 @@ MGS_FUNC_NOT_IMPL(0x00408FAE, int(), Res_loader_load_file_to_mem_408FAE);
 MGS_FUNC_NOT_IMPL(0x0040A5C3, int CC(char* arg0), sub_40A5C3);
 MGS_FUNC_NOT_IMPL(0x0040A77F, int CC(int sys2FileBuffer, signed int maybe_id, int resident_type), LibGV_id_conflict_40A77F);
 MGS_FUNC_NOT_IMPL(0x0051D1DB, char* CC(char* a1), Res_loader_51D1DB);
-MGS_FUNC_NOT_IMPL(0x00408E67, int CC(char* a1), Res_loader_408E67);
 
 /*
 signed int CC Res_loader_408D6C(Actor_Loader_Impl* pSystemStruct);
@@ -137,7 +136,6 @@ int Res_loader_load_file_to_mem_408FAE();
 int CC sub_40A5C3(char* arg0);
 int CC LibGV_id_conflict_40A77F(int sys2FileBuffer, signed int maybe_id, int resident_type);
 char* CC Res_loader_51D1DB(char* a1);
-int CC Res_loader_408E67(char* a1);
 */
 bool CC Res_loader_Is_Extension_4088F2(const char* fileName, const char* extension)
 {
@@ -154,6 +152,66 @@ bool CC Res_loader_Is_Extension_4088F2(const char* fileName, const char* extensi
 }
 MGS_FUNC_IMPLEX(0x4088F2, Res_loader_Is_Extension_4088F2, ACTOR_LOADER_IMPL);
 
+const char* CC Res_loader_GetLine_408E1B(const char* pInput, char* pOutputLine)
+{
+    *pOutputLine = '\0';
+
+    // Skip new lines
+    while (*pInput == '\r' || *pInput == '\n')
+    {
+        pInput++;
+    }
+
+    // Bail if at end
+    if (*pInput == '\0')
+    {
+        return nullptr;
+    }
+
+    // Keep going till new line or end
+    while (*pInput != '\0')
+    {
+        if (*pInput == '\n' || *pInput == '\r')
+        {
+            pInput++;
+            break;
+        }
+
+        // Copy to output
+        *pOutputLine = *pInput;
+        pOutputLine++;
+
+        pInput++;
+    }
+
+    *pOutputLine = '\0';
+
+    // Bail if at end
+    if (*pInput == '\0')
+    {
+        return nullptr;
+    }
+
+    return pInput;
+}
+MGS_FUNC_IMPLEX(0x408E1B, Res_loader_GetLine_408E1B, ACTOR_LOADER_IMPL);
+
+int CC Res_loader_CountOfNonDotLines_408E67(const char* pInput)
+{
+    int count = 0;
+    char line[64] = {};
+    do
+    {
+        pInput = Res_loader_GetLine_408E1B(pInput, line);
+        if (line[0] != '.')
+        {
+            count++;
+        }
+    } while (pInput);
+    return count;
+}
+MGS_FUNC_IMPLEX(0x457BDD, Res_loader_CountOfNonDotLines_408E67, ACTOR_LOADER_IMPL);
+
 signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
 {
     switch (pSystemStruct->field_18_state)
@@ -162,9 +220,9 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
         if (Res_loader_load_file_to_mem_408FAE() <= 0) // Returns 0 so always true
         {
             pSystemStruct->field_18_state = 1;
-            pSystemStruct->field_20_c_str = (char*)pSystemStruct->field_1C_c_str_data_cnf_sys_allocd;
+            pSystemStruct->field_20_c_str = pSystemStruct->field_1C_c_str_data_cnf_sys_allocd;
             pSystemStruct->field_24_field_2C_char_state_resident_type = 1;
-            pSystemStruct->field_4_str_pos = Res_loader_408E67((char *)pSystemStruct->field_1C_c_str_data_cnf_sys_allocd);
+            pSystemStruct->field_4_data_cnf_line_count = Res_loader_CountOfNonDotLines_408E67(pSystemStruct->field_1C_c_str_data_cnf_sys_allocd);
             pSystemStruct->field_8_unknown_state = 0;
         }
         break;
@@ -329,50 +387,6 @@ void CC Res_loader_Create_457BDD(const char* strStageName)
     gLoaderState_dword_9942B8 = 0;
 }
 MGS_FUNC_IMPLEX(0x457BDD, Res_loader_Create_457BDD, ACTOR_LOADER_IMPL);
-
-const char* CC Res_loader_GetLine_408E1B(const char* pInput, char* pOutputLine)
-{
-    *pOutputLine = '\0';
-        
-    // Skip new lines
-    while (*pInput == '\r' || *pInput == '\n')
-    {
-        pInput++;
-    }
-
-    // Bail if at end
-    if (*pInput == '\0')
-    {
-        return nullptr;
-    }
-
-    // Keep going till new line or end
-    while (*pInput != '\0')
-    {
-        if (*pInput == '\n' || *pInput == '\r')
-        {
-            pInput++;
-            break;
-        }
-
-        // Copy to output
-        *pOutputLine = *pInput;
-        pOutputLine++;
-
-        pInput++;
-    }
-
-    *pOutputLine = '\0';
-
-    // Bail if at end
-    if (*pInput == '\0')
-    {
-        return nullptr;
-    }
-
-    return pInput;
-}
-MGS_FUNC_IMPLEX(0x408E1B, Res_loader_GetLine_408E1B, ACTOR_LOADER_IMPL);
 
 static void Res_loader_Is_Extension_4088F2_Test()
 {
