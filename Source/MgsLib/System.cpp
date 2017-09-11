@@ -17,7 +17,7 @@ static bool IsPowerOf2(int i)
     return !(i & (i - 1));
 }
 
-static DWORD RoundUpPowerOf2(DWORD numToRound, int multiple)
+DWORD RoundUpPowerOf2(DWORD numToRound, int multiple)
 {
     assert(multiple && IsPowerOf2(multiple));
     return (numToRound + multiple - 1) & -multiple;

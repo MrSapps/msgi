@@ -31,6 +31,14 @@ struct system_struct
 };
 MGS_ASSERT_SIZEOF(system_struct, 0x1010);
 
+DWORD RoundUpPowerOf2(DWORD numToRound, int multiple);
+
+template<class T>
+T RoundUpPowerOf2Ptr(T numToRound, int multiple)
+{
+    return reinterpret_cast<T>(RoundUpPowerOf2(reinterpret_cast<DWORD>(numToRound), multiple));
+}
+
 system_struct* CC System_init_40AC6C(int index, int bIsDynamic, void* pMemory, int size);
 void CC System_DeInit_Systems_0_to_2_sub_40AC52();
 void CC System_Debug_sub_40ADEC(int index);

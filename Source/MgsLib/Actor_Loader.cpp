@@ -31,7 +31,7 @@ struct Actor_Loader_Impl
     s16 field_26_padding_q;
     void* field_28_sys2_alloc_file_buffer;
     char field_2C_c_str[64];
-    int field_6C_count_file_second_dword;
+    char* field_6C_pointer_file_second_dword;
     int field_70_count_file_first_dword;
 };
 MGS_ASSERT_SIZEOF(Actor_Loader_Impl, 0x74);
@@ -243,7 +243,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
             {
                 int* file_first_dword = (int *)pSystemStruct->field_28_sys2_alloc_file_buffer;
                 pSystemStruct->field_70_count_file_first_dword = *file_first_dword;
-                pSystemStruct->field_6C_count_file_second_dword = (int)(file_first_dword + 1);
+                pSystemStruct->field_6C_pointer_file_second_dword = (char*)(file_first_dword + 1);
                 pSystemStruct->field_18_state = 3;
             }
             else
@@ -274,48 +274,54 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
         {
             strstr(pSystemStruct->field_2C_c_str, "tex"); // ?? not used
         }
-        int counter2 = pSystemStruct->field_6C_count_file_second_dword;
-        int counter = pSystemStruct->field_70_count_file_first_dword;
+
+        char* darDataPointer = pSystemStruct->field_6C_pointer_file_second_dword;
+        int darItemCount = pSystemStruct->field_70_count_file_first_dword;
         do
         {
-            pSystemStruct->field_6C_count_file_second_dword = counter2;
-            pSystemStruct->field_70_count_file_first_dword = counter;
-            char* v12 = pSystemStruct->field_2C_c_str;
-            char v7 = 0;
+            pSystemStruct->field_6C_pointer_file_second_dword = darDataPointer;
+            pSystemStruct->field_70_count_file_first_dword = darItemCount;
+            
+            // Copy the string from the file data into field_2C_c_str
+            char* pFileName = pSystemStruct->field_2C_c_str;
+            char fileDataChar = 0;
             do
             {
-                *v12 = *(BYTE *)counter2;
-                v7 = *v12++;
-                ++counter2;
-            } while (v7);
+                *pFileName = *darDataPointer;
+                fileDataChar = *pFileName++;
+                ++darDataPointer;
+            } while (fileDataChar);
 
-            int* v8 = (int *)(((4 - (counter2 & 3)) & 3) + counter2);
-            int v13 = *v8;
-            int counter2a = (int)(v8 + 1);
+            char* pAfterFileNameData = RoundUpPowerOf2Ptr(darDataPointer, 4);
+
+            DWORD darItemFileSize = *(DWORD*)pAfterFileNameData;
+            char* darFilePointer = pAfterFileNameData + 4;
 
             if (strstr(pSystemStruct->field_2C_c_str, "pcx"))
             {
                 Res_loader_51D1DB(pSystemStruct->field_2C_c_str);
             }
 
-            s16 resident_type2 = pSystemStruct->field_24_field_2C_char_state_resident_type;
+            const s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
             Str1_6BFBA0 = pSystemStruct->field_2C_c_str;
-            int maybe_id2 = sub_40A5C3(pSystemStruct->field_2C_c_str);
-            int v17 = LibGV_id_conflict_40A77F(counter2a, maybe_id2, resident_type2);
+            const int maybe_id2 = sub_40A5C3(pSystemStruct->field_2C_c_str);
+            const int libGvRet = LibGV_id_conflict_40A77F((int)darFilePointer, maybe_id2, resident_type);
 
-            if (!v17)
+            if (!libGvRet)
             {
                 return 1;
             }
 
-            if (v17 < 0)
+            if (libGvRet < 0)
             {
                 printf("INIT_ERROR in %s !!\n", pSystemStruct->field_2C_c_str);
                 return 0;
             }
-            counter2 = counter2a + v13 + 1;
-            --counter;
-        } while (counter > 0);
+
+            // Move to the next file in the DAR
+            darDataPointer = &darFilePointer[darItemFileSize + 1];
+            --darItemCount;
+        } while (darItemCount > 0);
 
         if (!pSystemStruct->field_24_field_2C_char_state_resident_type)
         {
