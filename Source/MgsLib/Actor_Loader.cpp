@@ -291,6 +291,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
                 fileDataChar = *pFileName++;
                 ++darDataPointer;
             } while (fileDataChar);
+            LOG_INFO("Processing DAR item: " << pSystemStruct->field_2C_c_str);
 
             char* pAfterFileNameData = RoundUpPowerOf2Ptr(darDataPointer, 4);
 
@@ -299,6 +300,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
 
             if (strstr(pSystemStruct->field_2C_c_str, "pcx"))
             {
+                // HITEXT look up ??
                 Res_loader_51D1DB(pSystemStruct->field_2C_c_str);
             }
 
@@ -393,6 +395,31 @@ void CC Res_loader_Create_457BDD(const char* strStageName)
     gLoaderState_dword_9942B8 = 0;
 }
 MGS_FUNC_IMPLEX(0x457BDD, Res_loader_Create_457BDD, ACTOR_LOADER_IMPL);
+
+struct HiTexRecord
+{
+    DWORD field_0_id;
+    DWORD field_4_is_in_use;
+    char* field_8_name;
+};
+MGS_ASSERT_SIZEOF(HiTexRecord, 0xC);
+
+MGS_VAR(1, 0x734A30, DWORD, gNum_HiTexs_dword_734A30, 0);
+MGS_ARY(1, 0x9956A0, HiTexRecord, 8192, gHiText_recs_9956A0, {});
+
+const char* CC HITEX_NAME(DWORD id)
+{
+    for (DWORD i = 0; i < gNum_HiTexs_dword_734A30; i++)
+    {
+        if (gHiText_recs_9956A0[i].field_4_is_in_use && gHiText_recs_9956A0[i].field_0_id == id)
+        {
+            printf("HITEX_NAME: Id: %-5d Name: %s\n", id, gHiText_recs_9956A0[i].field_8_name);
+            return gHiText_recs_9956A0[i].field_8_name;
+        }
+    }
+    return nullptr;
+}
+MGS_FUNC_IMPLEX(0x0051D4BC, HITEX_NAME, ACTOR_LOADER_IMPL);
 
 static void Res_loader_Is_Extension_4088F2_Test()
 {
