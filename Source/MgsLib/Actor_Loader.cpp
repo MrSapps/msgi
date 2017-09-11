@@ -127,15 +127,8 @@ MGS_FUNC_NOT_IMPL(0x00408D6C, signed int CC(Actor_Loader_Impl* pSystemStruct), R
 MGS_FUNC_NOT_IMPL(0x00408FAE, int(), Res_loader_load_file_to_mem_408FAE);
 MGS_FUNC_NOT_IMPL(0x0040A5C3, int CC(char* arg0), sub_40A5C3);
 MGS_FUNC_NOT_IMPL(0x0040A77F, int CC(int sys2FileBuffer, signed int maybe_id, int resident_type), LibGV_id_conflict_40A77F);
-MGS_FUNC_NOT_IMPL(0x0051D1DB, char* CC(char* a1), Res_loader_51D1DB);
 
-/*
-signed int CC Res_loader_408D6C(Actor_Loader_Impl* pSystemStruct);
-int Res_loader_load_file_to_mem_408FAE();
-int CC sub_40A5C3(char* arg0);
-int CC LibGV_id_conflict_40A77F(int sys2FileBuffer, signed int maybe_id, int resident_type);
-char* CC Res_loader_51D1DB(char* a1);
-*/
+
 bool CC Res_loader_Is_Extension_4088F2(const char* fileName, const char* extension)
 {
     const char* dotPos = strchr(fileName, '.');
@@ -299,8 +292,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
 
             if (strstr(pSystemStruct->field_2C_c_str, "pcx"))
             {
-                // HITEXT look up ??
-                Res_loader_51D1DB(pSystemStruct->field_2C_c_str);
+                Res_loader_EnableHiTex_51D1DB(pSystemStruct->field_2C_c_str);
             }
 
             const s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
@@ -423,6 +415,7 @@ void CC File_HITEXT_INIT()
     }
 
     dword_6893D4 = 0;
+    gNum_HiTexs_dword_734A30 = 0;
 
     FILE* hFile = fopen("hitex.dir", "rt");
     if (!hFile)
@@ -477,7 +470,7 @@ void CC File_HITEXT_INIT()
 
     fclose(hFile);
 }
-MGS_FUNC_IMPLEX(0x0051D2ED, File_HITEXT_INIT, false);
+MGS_FUNC_IMPLEX(0x0051D2ED, File_HITEXT_INIT, ACTOR_LOADER_IMPL);
 
 const char* CC HITEX_NAME(DWORD id)
 {
@@ -492,6 +485,31 @@ const char* CC HITEX_NAME(DWORD id)
     return nullptr;
 }
 MGS_FUNC_IMPLEX(0x0051D4BC, HITEX_NAME, ACTOR_LOADER_IMPL);
+
+void CC Res_loader_EnableHiTex_51D1DB(const char* pcxName)
+{
+    for (DWORD i = 0; i < gNum_HiTexs_dword_734A30; i++)
+    {
+        const char* tgaName = strchr(gHiText_recs_9956A0[i].field_8_name, '/');
+        if (tgaName)
+        {
+            // Consume the /
+            tgaName++;
+        }
+        if (*tgaName)
+        {
+            if (strlen(tgaName) == strlen(pcxName))
+            {
+                if (strncmp(tgaName, pcxName, strlen(tgaName) - 3) == 0)
+                {
+                    gHiText_recs_9956A0[i].field_4_is_in_use = 1;
+                    return;
+                }
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x51D1DB, Res_loader_EnableHiTex_51D1DB, ACTOR_LOADER_IMPL);
 
 static void Res_loader_Is_Extension_4088F2_Test()
 {
