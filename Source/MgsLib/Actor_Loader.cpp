@@ -37,7 +37,6 @@ struct Actor_Loader_Impl
 MGS_ASSERT_SIZEOF(Actor_Loader_Impl, 0x74);
 
 MGS_FUNC_NOT_IMPL(0x00408EEF, signed int CC(char* fileName, void** buffer, signed int type), FS_LoadRequest);
-MGS_FUNC_NOT_IMPL(0x0051D2ED, void CC(), File_HITEXT_INIT);
 MGS_FUNC_NOT_IMPL(0x00401F77, void CC(__int16 a1), Res_loader_tick_helper_401F77);
 
 MGS_VAR(1, 0x71D13C, DWORD, dword_71D13C, 0);
@@ -406,6 +405,79 @@ MGS_ASSERT_SIZEOF(HiTexRecord, 0xC);
 
 MGS_VAR(1, 0x734A30, DWORD, gNum_HiTexs_dword_734A30, 0);
 MGS_ARY(1, 0x9956A0, HiTexRecord, 8192, gHiText_recs_9956A0, {});
+
+MGS_FUNC_NOT_IMPL(0x51D47A, int CC(char* str), HiTexHash_51D47A);
+
+void CC File_HITEXT_INIT()
+{
+    // Free existing HiTex entries
+    for (DWORD i = 0; i < gNum_HiTexs_dword_734A30; i++)
+    {
+        free(gHiText_recs_9956A0[i].field_8_name);
+        gHiText_recs_9956A0[i].field_0_id = 0;
+        const bool dword_6893D4_is_zero = dword_6893D4 == 0;
+        if (!dword_6893D4_is_zero)
+        {
+            gHiText_recs_9956A0[i].field_4_is_in_use = 0;
+        }
+    }
+
+    dword_6893D4 = 0;
+
+    FILE* hFile = fopen("hitex.dir", "rt");
+    if (!hFile)
+    {
+        return;
+    }
+
+    char fileBuffer[256];
+    for (;;)
+    {
+        memset(fileBuffer, 0, sizeof(fileBuffer));
+        fgets(fileBuffer, 256, hFile);
+
+        // Remove any trailing line feed
+        char* newLinePos = strchr(fileBuffer, '\r');
+        if (newLinePos)
+        {
+            *newLinePos = 0;
+        }
+
+        // Remove any trailing new line
+        newLinePos = strchr(fileBuffer, '\n');
+        if (newLinePos)
+        {
+            *newLinePos = 0;
+        }
+
+        // Bail if no more data
+        if (!*fileBuffer)
+        {
+            break;
+        }
+
+        // Replace \\ with /
+        char* tmp = fileBuffer;
+        while (*tmp)
+        {
+            if (*tmp == '\\')
+            {
+                *tmp = '/';
+            }
+            tmp++;
+        }
+
+        gHiText_recs_9956A0[gNum_HiTexs_dword_734A30].field_8_name = _strdup(fileBuffer);
+        const DWORD id = HiTexHash_51D47A(fileBuffer);
+        const DWORD idx = gNum_HiTexs_dword_734A30;
+        gHiText_recs_9956A0[idx].field_0_id = id;
+        printf("HITEX_INIT: Id: %-5d Name: %s\n", id, gHiText_recs_9956A0[idx].field_8_name);
+        gNum_HiTexs_dword_734A30++;
+    }
+
+    fclose(hFile);
+}
+MGS_FUNC_IMPLEX(0x0051D2ED, File_HITEXT_INIT, false);
 
 const char* CC HITEX_NAME(DWORD id)
 {
