@@ -107,7 +107,7 @@ DWORD CC Hash_40A5C3(const char* pName)
 }
 MGS_FUNC_IMPLEX(0x0040A5C3, Hash_40A5C3, RESOURCENAMEHASH_IMPL);
 
-DWORD CC Hash_40A58B(WORD resourceNameHashed, char extensionChar)
+DWORD CC Hash_40A58B(WORD resourceNameHashed, int extensionChar)
 {
     extensionChar = extensionChar - 0x61;
     if (extensionChar - 0x61 >= 0x1A)
@@ -117,3 +117,10 @@ DWORD CC Hash_40A58B(WORD resourceNameHashed, char extensionChar)
     return resourceNameHashed + (extensionChar << 16);
 }
 MGS_FUNC_IMPLEX(0x0040A58B, Hash_40A58B, RESOURCENAMEHASH_IMPL);
+
+
+DWORD CC Hash_40A5A2(const char* pName, int extensionChar)
+{
+    return Hash_40A58B(ResourceNameHash(pName), extensionChar);
+}
+MGS_FUNC_IMPLEX(0x0040A5A2, Hash_40A5A2, RESOURCENAMEHASH_IMPL);
