@@ -126,7 +126,6 @@ MGS_VAR(1, 0x78D7A8, DWORD, Actor_Loader_Impl_Field10_dword_78D7A8, 0);
 
 MGS_FUNC_NOT_IMPL(0x00408D6C, signed int CC(Actor_Loader_Impl* pSystemStruct), Res_loader_408D6C);
 MGS_FUNC_NOT_IMPL(0x00408FAE, int(), Res_loader_load_file_to_mem_408FAE);
-MGS_FUNC_NOT_IMPL(0x0040A5C3, int CC(char* arg0), sub_40A5C3);
 MGS_FUNC_NOT_IMPL(0x0040A77F, int CC(int sys2FileBuffer, signed int maybe_id, int resident_type), LibGV_id_conflict_40A77F);
 
 
@@ -250,7 +249,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
                 {
                     Actor_Loader_Impl_Field10_dword_78D7A8 = pSystemStruct->field_10;
                     s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
-                    int maybe_id = sub_40A5C3(pSystemStruct->field_C_c_str_ptr_field_2C);
+                    int maybe_id = Hash_40A5C3(pSystemStruct->field_C_c_str_ptr_field_2C);
                     LibGV_id_conflict_40A77F((int)pSystemStruct->field_28_sys2_alloc_file_buffer, maybe_id, resident_type);
                     if (!pSystemStruct->field_24_field_2C_char_state_resident_type)
                     {
@@ -298,7 +297,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
 
             const s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
             Str1_6BFBA0 = pSystemStruct->field_2C_c_str;
-            const int maybe_id2 = sub_40A5C3(pSystemStruct->field_2C_c_str);
+            const int maybe_id2 = Hash_40A5C3(pSystemStruct->field_2C_c_str);
             const int libGvRet = LibGV_id_conflict_40A77F((int)darFileDataPointer, maybe_id2, resident_type);
 
             if (!libGvRet)
