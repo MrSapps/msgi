@@ -5,6 +5,7 @@
 #include "Timer.hpp"
 #include "System.hpp"
 #include "Sound.hpp"
+#include "ResourceNameHash.hpp"
 #include <gmock/gmock.h>
 
 #define ACTOR_LOADER_IMPL true
@@ -288,7 +289,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
             char* pAfterFileNameData = RoundUpPowerOf2Ptr(darDataPointer, 4);
 
             DWORD darItemFileSize = *(DWORD*)pAfterFileNameData;
-            char* darFilePointer = pAfterFileNameData + 4;
+            char* darFileDataPointer = pAfterFileNameData + 4;
 
             if (strstr(pSystemStruct->field_2C_c_str, "pcx"))
             {
@@ -298,7 +299,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
             const s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
             Str1_6BFBA0 = pSystemStruct->field_2C_c_str;
             const int maybe_id2 = sub_40A5C3(pSystemStruct->field_2C_c_str);
-            const int libGvRet = LibGV_id_conflict_40A77F((int)darFilePointer, maybe_id2, resident_type);
+            const int libGvRet = LibGV_id_conflict_40A77F((int)darFileDataPointer, maybe_id2, resident_type);
 
             if (!libGvRet)
             {
@@ -312,7 +313,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
             }
 
             // Move to the next file in the DAR
-            darDataPointer = &darFilePointer[darItemFileSize + 1];
+            darDataPointer = &darFileDataPointer[darItemFileSize + 1];
             --darItemCount;
         } while (darItemCount > 0);
 
@@ -397,8 +398,6 @@ MGS_ASSERT_SIZEOF(HiTexRecord, 0xC);
 
 MGS_VAR(1, 0x734A30, DWORD, gNum_HiTexs_dword_734A30, 0);
 MGS_ARY(1, 0x9956A0, HiTexRecord, 8192, gHiText_recs_9956A0, {});
-
-MGS_FUNC_NOT_IMPL(0x51D47A, int CC(char* str), HiTexHash_51D47A);
 
 void CC File_HITEXT_INIT()
 {
