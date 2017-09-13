@@ -20,6 +20,7 @@ signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs);
 DWORD CC Script_ParamExists(char paramId);
 DWORD CC Script_get_int();
 BYTE* CC Script_GetReturnAddress();
+void CC ScriptEngineInit_4090A7();
 
 EXTERN_MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 

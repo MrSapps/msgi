@@ -5,14 +5,18 @@
 #include "Script.hpp"
 #include "Actor_Delay.hpp"
 #include "LibDG.hpp"
+#include "LibGV.hpp"
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
 MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
+MGS_VAR(1, 0x6BFBB4, int, gScriptFileNameHashedToLoad_6BFBB4, 0);
 
 #define SCRIPT_IMPL true
 
 MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
+MGS_FUNC_NOT_IMPL(0x409A3A, void CC(), Script_sub_409A3A);
+MGS_FUNC_NOT_IMPL(0x4093ED, void CC(), SaveDataStructuresRelated_4093ED);
 
 void ScriptCpp_ForceLink()
 {
@@ -191,7 +195,7 @@ MGS_ARY(1, 0x6506E0, proc_struct_sub, 4, gEarlyScriptBinds_Tbl_6506E0,
 });
 MGS_ARY(1, 0x650700, proc_struct, 1, gEarlyScriptBinds_650700, { nullptr, 4, gEarlyScriptBinds_Tbl_6506E0 }); // TODO: Not an array, only done this way so it compiles
 
-void __cdecl Script_sub_4091FA()
+void CC Script_sub_4091FA()
 {
     Script_InitCommandTable(gEarlyScriptBinds_650700);
 }
@@ -241,6 +245,7 @@ MGS_PTR(1, 0x6BFC68, BYTE**, gScriptMainProc_dword_6BFC68, 0);
 
 MGS_FUNC_NOT_IMPL(0x45A6F6, int __cdecl(int a1, void* a2), sub_45A6F6);
 
+
 int CC Script_Init_sub_409C19(BYTE* pScript)
 {
     DWORD offset = ToDWORD(pScript);
@@ -261,6 +266,33 @@ int CC Script_Init_sub_409C19(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x00409C19, Script_Init_sub_409C19, SCRIPT_IMPL);
 
+signed int CC GCX_FileHandler_4090CF(void* pScript, int fileNameHashed)
+{
+    if (fileNameHashed == gScriptFileNameHashedToLoad_6BFBB4)
+    {
+        Script_Init_sub_409C19(reinterpret_cast<BYTE*>(pScript));
+    }
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x004090CF, GCX_FileHandler_4090CF, SCRIPT_IMPL);
+
+void CC Script_Set_MainOrDemo_40908E(int bMain)
+{
+    gScriptFileNameHashedToLoad_6BFBB4 = bMain != 1  ? 
+        0x6EA54 :  // scenerio 
+        0x6A242;   // demo
+}
+MGS_FUNC_IMPLEX(0x0040908E, Script_Set_MainOrDemo_40908E, SCRIPT_IMPL);
+
+void CC ScriptEngineInit_4090A7()
+{
+    Script_sub_409A3A(); // Stack setup?
+    SaveDataStructuresRelated_4093ED(); // Script vars memory?
+    Script_sub_4091FA();
+    LibGV_Set_FileExtHandler_40A68D('g', GCX_FileHandler_4090CF); // .gcx
+    gScriptFileNameHashedToLoad_6BFBB4 = 0x6EA54;       // Load only scenerio gcx by default instead of demo gcx
+}
+MGS_FUNC_IMPLEX(0x004090A7, ScriptEngineInit_4090A7, SCRIPT_IMPL);
 
 BYTE* CC Script_FindProc(WORD procId)
 {
