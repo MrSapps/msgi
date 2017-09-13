@@ -28,11 +28,23 @@ static void TestHash_40A5C3()
     ASSERT_EQ(0xFF9F72D5, Hash_40A5C3("Ñ¦Ñ-í+Ñ»"));
 }
 
+static void TestHash_40A58B()
+{
+    ASSERT_EQ(0x13BCAA, Hash_40A58B(ResourceNameHash("Blah"), 't'));
+}
+
+static void TestHash_40A5A2()
+{
+    ASSERT_EQ(0x13BCAA, Hash_40A5A2("Blah", 't'));
+}
+
 void DoResourceNameHashTest()
 {
     TestResourceNameHash();
     TestHiTexHash_51D47A();
     TestHash_40A5C3();
+    TestHash_40A58B();
+    TestHash_40A5A2();
 }
 
 static WORD HashInternal(const BYTE* buffer, size_t len)
@@ -107,19 +119,20 @@ DWORD CC Hash_40A5C3(const char* pName)
 }
 MGS_FUNC_IMPLEX(0x0040A5C3, Hash_40A5C3, RESOURCENAMEHASH_IMPL);
 
-DWORD CC Hash_40A58B(WORD resourceNameHashed, int extensionChar)
+DWORD CC Hash_40A58B(WORD resourceNameHashed, char extensionChar)
 {
-    extensionChar = extensionChar - 0x61;
-    if (extensionChar - 0x61 >= 0x1A)
+    int extHahs = extensionChar;
+    extHahs = extHahs - 0x61;
+    if (extHahs >= 0x1A)
     {
-        extensionChar += 0x20;
+        extHahs += 0x20;
     }
-    return resourceNameHashed + (extensionChar << 16);
+    return resourceNameHashed + (extHahs << 16);
 }
 MGS_FUNC_IMPLEX(0x0040A58B, Hash_40A58B, RESOURCENAMEHASH_IMPL);
 
 
-DWORD CC Hash_40A5A2(const char* pName, int extensionChar)
+DWORD CC Hash_40A5A2(const char* pName, char extensionChar)
 {
     return Hash_40A58B(ResourceNameHash(pName), extensionChar);
 }
