@@ -570,7 +570,7 @@ void CC LibDg_Init_40111A()
     LibGV_Set_FileExtHandler_40A68D('n', sub_402A03.Ptr());                 // .n
     LibGV_Set_FileExtHandler_40A68D('o', sub_402A29.Ptr());                 // .oar
     LibGV_Set_FileExtHandler_40A68D('z', sub_403290.Ptr());                 // .zmd
-    LibGV_Set_FileExtHandler_40A68D('i', sub_402A5F.Ptr());                 // ??
+    LibGV_Set_FileExtHandler_40A68D('i', sub_402A5F.Ptr());                 // .img
     LibGV_Set_FileExtHandler_40A68D('s', sub_402AA9.Ptr());                 // .sgt
     Actor_PushBack(0, &gLibDG_2_stru_6BB930.mBase, 0);// Handles 2D rendering?
     Actor_Init(&gLibDG_2_stru_6BB930.mBase, LibDG_Update2_401234, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
