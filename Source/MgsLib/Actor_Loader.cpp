@@ -24,10 +24,10 @@ struct Actor_Loader_Impl
     int field_8_unknown_state;
     char* field_C_c_str_ptr_field_2C;
     int field_10;
-    int field_14_load_ret;
+    int field_14_last_loaded_file_size;
     int field_18_state;
     char* field_1C_c_str_data_cnf_sys_allocd;
-    char* field_20_c_str;
+    const char* field_20_c_str;
     s16 field_24_field_2C_char_state_resident_type;
     s16 field_26_padding_q;
     void* field_28_sys2_alloc_file_buffer;
@@ -131,7 +131,7 @@ signed int CC Res_loader_DataCnf_FileLoader_408D6C(Actor_Loader_Impl* pSystemStr
         for (;;)
         {
             char* curLine = pSystemStruct->field_2C_c_str;
-            pSystemStruct->field_20_c_str = (char*)Res_loader_GetLine_408E1B(pSystemStruct->field_20_c_str, pSystemStruct->field_2C_c_str);
+            pSystemStruct->field_20_c_str = Res_loader_GetLine_408E1B(pSystemStruct->field_20_c_str, pSystemStruct->field_2C_c_str);
 
             if (!*curLine)
             {
@@ -162,14 +162,14 @@ signed int CC Res_loader_DataCnf_FileLoader_408D6C(Actor_Loader_Impl* pSystemStr
             {
                 pSystemStruct->field_28_sys2_alloc_file_buffer = 0;
 
-                const int load_request_ret = FS_LoadRequest(
+                const int loadedFileSize = FS_LoadRequest(
                     pSystemStruct->field_2C_c_str,
                     &pSystemStruct->field_28_sys2_alloc_file_buffer,
                     pSystemStruct->field_24_field_2C_char_state_resident_type);
 
-                pSystemStruct->field_10 = load_request_ret;
+                pSystemStruct->field_10 = loadedFileSize;
 
-                if (load_request_ret >= 0)
+                if (loadedFileSize >= 0)
                 {
                     // Save the name of the last loaded file
                     pSystemStruct->field_C_c_str_ptr_field_2C = curLine;
@@ -180,7 +180,7 @@ signed int CC Res_loader_DataCnf_FileLoader_408D6C(Actor_Loader_Impl* pSystemStr
                     }
 
                     ++pSystemStruct->field_8_unknown_state;
-                    pSystemStruct->field_14_load_ret = load_request_ret;
+                    pSystemStruct->field_14_last_loaded_file_size = loadedFileSize;
                     return 1;
                 }
 
@@ -296,8 +296,8 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
         break;
 
     case 2:
-        pSystemStruct->field_14_load_ret = Res_loader_load_file_to_mem_408FAE(); // Always returns 0
-        if (pSystemStruct->field_14_load_ret <= 0) // Always true
+        pSystemStruct->field_14_last_loaded_file_size = Res_loader_load_file_to_mem_408FAE(); // Always returns 0
+        if (pSystemStruct->field_14_last_loaded_file_size <= 0) // Always true
         {
             if (Res_loader_Is_Extension_4088F2(pSystemStruct->field_C_c_str_ptr_field_2C, "dar"))
             {

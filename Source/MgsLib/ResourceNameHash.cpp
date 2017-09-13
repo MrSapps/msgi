@@ -121,13 +121,13 @@ MGS_FUNC_IMPLEX(0x0040A5C3, Hash_40A5C3, RESOURCENAMEHASH_IMPL);
 
 DWORD CC Hash_40A58B(WORD resourceNameHashed, char extensionChar)
 {
-    int extHahs = extensionChar;
-    extHahs = extHahs - 0x61;
-    if (extHahs >= 0x1A)
+    int extHash = extensionChar;
+    extHash = extHash - 0x61;
+    if (extHash >= 0x1A)
     {
-        extHahs += 0x20;
+        extHash += 0x20;
     }
-    return resourceNameHashed + (extHahs << 16);
+    return resourceNameHashed + (extHash << 16);
 }
 MGS_FUNC_IMPLEX(0x0040A58B, Hash_40A58B, RESOURCENAMEHASH_IMPL);
 
