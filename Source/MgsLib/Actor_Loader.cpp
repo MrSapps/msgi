@@ -22,7 +22,7 @@ struct Actor_Loader_Impl
     int field_0;
     int field_4_data_cnf_line_count;
     int field_8_unknown_state;
-    char* field_C_c_str_ptr_field_2C;
+    const char* field_C_c_str_ptr_field_2C;
     int field_10;
     int field_14_last_loaded_file_size;
     int field_18_state;
@@ -34,6 +34,14 @@ struct Actor_Loader_Impl
     char field_2C_c_str[64];
     char* field_6C_pointer_file_second_dword;
     int field_70_count_file_first_dword;
+
+    enum FileLoadModes
+    {
+        eNoCache = 0,
+        eCache = 1,
+        eResident = 2,
+        eSound = 3
+    };
 };
 MGS_ASSERT_SIZEOF(Actor_Loader_Impl, 0x74);
 
@@ -124,13 +132,14 @@ MGS_FUNC_IMPLEX(0x408918, Stage_LoadRelated_DataCnf_Q2, ACTOR_LOADER_IMPL);
 MGS_VAR(1, 0x6BFBA0, char*, Str1_6BFBA0, 0);
 MGS_VAR(1, 0x78D7A8, DWORD, Actor_Loader_Impl_Field10_dword_78D7A8, 0);
 
+
 signed int CC Res_loader_DataCnf_FileLoader_408D6C(Actor_Loader_Impl* pSystemStruct)
 {
     if (pSystemStruct->field_20_c_str) //data.cnf data
     {
         for (;;)
         {
-            char* curLine = pSystemStruct->field_2C_c_str;
+            const char* curLine = pSystemStruct->field_2C_c_str;
             pSystemStruct->field_20_c_str = Res_loader_GetLine_408E1B(pSystemStruct->field_20_c_str, pSystemStruct->field_2C_c_str);
 
             if (!*curLine)
@@ -144,17 +153,17 @@ signed int CC Res_loader_DataCnf_FileLoader_408D6C(Actor_Loader_Impl* pSystemStr
                 switch (pSystemStruct->field_2C_c_str[1])
                 {
                 case 'c': // .cache
-                    pSystemStruct->field_24_field_2C_char_state_resident_type = 1;
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader_Impl::eCache;
                     break;
                 case 'n': // .nocache
-                    pSystemStruct->field_24_field_2C_char_state_resident_type = 0;
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader_Impl::eNoCache;
                     break;
                 case 'r': // .resident
-                    pSystemStruct->field_24_field_2C_char_state_resident_type = 2;
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader_Impl::eResident;
                     gFixupLibDg_Allocs_And_Hahses_dword_78D7AC = 1;
                     break;
                 case 's': // .sound
-                    pSystemStruct->field_24_field_2C_char_state_resident_type = 3;
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader_Impl::eSound;
                     break;
                 }
             }
