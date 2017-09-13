@@ -53,7 +53,7 @@ void LibGVCpp_ForceLink() { }
 MGS_FUNC_NOT_IMPL(0x40B35E, void CC(), LibGV_Reset_System2_Memory_40B35E);
 MGS_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_Allocs_40A6AC);
 MGS_FUNC_NOT_IMPL(0x40A4B1, void CC(), sub_40A4B1);
-MGS_FUNC_NOT_IMPL(0x40B734, void CC(int), Hzm_load_40B734);
+MGS_FUNC_NOT_IMPL(0x40B734, int CC(void*, int), Hzm_load_40B734);
 
 MGS_FUNC_NOT_IMPL(0x40A618, LibGV_FileRecord* CC(int resHash), LibGV_Find_Item_40A618);
 
@@ -186,11 +186,11 @@ MGS_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, LIBGV_IMPL);
 
 void CC LibGv_Set_Load_HZM_CallBack_40B725()
 {
-    LibGV_SetFnPtr_sub_40A68D('h', (GV_FnPtr)Hzm_load_40B734.Ptr());
+    LibGV_Set_FileExtHandler_40A68D('h', Hzm_load_40B734.Ptr()); // .hzm
 }
 MGS_FUNC_IMPLEX(0x40B725, LibGv_Set_Load_HZM_CallBack_40B725, LIBGV_IMPL);
 
-void CC LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
+void CC LibGV_Set_FileExtHandler_40A68D(char id, GV_FnPtr fn)
 {
     // Convert the a-z index to 0-25
     const int idx = id - 'a';
@@ -198,4 +198,4 @@ void CC LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
     assert(idx < _countof(g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs));
     g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[idx] = fn;
 }
-MGS_FUNC_IMPLEX(0x40A68D, LibGV_SetFnPtr_sub_40A68D, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40A68D, LibGV_Set_FileExtHandler_40A68D, LIBGV_IMPL);

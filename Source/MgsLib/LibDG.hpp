@@ -166,7 +166,7 @@ MGS_ASSERT_SIZEOF(struct_gv, 0x1EC);
 #pragma pack(pop)
 MGS_VAR_EXTERN(struct_gv, gLibGvStruct0_6BC180);
 
-signed int CC LibDG_CHARA_44E9D2(Res_Init_Record *pStartingRecord);
+signed int CC LibDG_CHARA_44E9D2(void* pData, int fileNameHash);
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B();
 void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C();
 ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName);

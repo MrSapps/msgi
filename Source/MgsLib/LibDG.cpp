@@ -186,8 +186,9 @@ signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x00451AC3, Script_tbl_chara_sub_451AC3, LIBDG_IMPL);
 
-signed int CC LibDG_CHARA_44E9D2(Res_Init_Record* pStartingRecord)
+signed int CC LibDG_CHARA_44E9D2(void* pData, int fileNameHash)
 {
+    Res_Init_Record* pStartingRecord = reinterpret_cast<Res_Init_Record*>(pData);
     int dst_idx = 0;
     for (;;)
     {
@@ -277,19 +278,19 @@ MGS_FUNC_NOT_IMPL(0x4012F2, void CC(int k320), sub_4012F2);
 MGS_FUNC_NOT_IMPL(0x4026E6, void CC(), LibDG_Reset_HashCounts_4026E6);
 MGS_FUNC_NOT_IMPL(0x4010A6, void CC(), LibDG_4010A6);
 
-signed int CC Returns1_402B1D()
+signed int CC Returns1_402B1D(void*, int)
 {
     return 1;
 }
 MGS_FUNC_IMPLEX(0x402B1D, Returns1_402B1D, LIBDG_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x402B25, signed int CC(int a2, int a3), MissionLog_Related1_402B25);
-MGS_FUNC_NOT_IMPL(0x402796, signed int CC(int a1), sub_402796);
-MGS_FUNC_NOT_IMPL(0x402A03, signed int CC(int a1), sub_402A03);
-MGS_FUNC_NOT_IMPL(0x402A29, signed int CC(int a1), sub_402A29);
-MGS_FUNC_NOT_IMPL(0x403290, signed int CC(int a1), sub_403290);
-MGS_FUNC_NOT_IMPL(0x402A5F, signed int CC(int a1), sub_402A5F);
-MGS_FUNC_NOT_IMPL(0x402AA9, signed int CC(int a1), sub_402AA9);
+MGS_FUNC_NOT_IMPL(0x402B25, int CC(void* fileData, int fileNameHash), MissionLog_Related1_402B25);
+MGS_FUNC_NOT_IMPL(0x402796, int CC(void* fileData, int fileNameHash), sub_402796);
+MGS_FUNC_NOT_IMPL(0x402A03, int CC(void* fileData, int fileNameHash), sub_402A03);
+MGS_FUNC_NOT_IMPL(0x402A29, int CC(void* fileData, int fileNameHash), sub_402A29);
+MGS_FUNC_NOT_IMPL(0x403290, int CC(void* fileData, int fileNameHash), sub_403290);
+MGS_FUNC_NOT_IMPL(0x402A5F, int CC(void* fileData, int fileNameHash), sub_402A5F);
+MGS_FUNC_NOT_IMPL(0x402AA9, int CC(void* fileData, int fileNameHash), sub_402AA9);
 
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB908, DWORD, dword_6BB908, 0);
 
@@ -563,14 +564,14 @@ void CC LibDg_Init_40111A()
     sub_4012F2(320);
     LibDG_Reset_HashCounts_4026E6();
     LibDG_4010A6();
-    LibGV_SetFnPtr_sub_40A68D('p', (GV_FnPtr)MissionLog_Related1_402B25.Ptr());
-    LibGV_SetFnPtr_sub_40A68D('k', (GV_FnPtr)sub_402796.Ptr());
-    LibGV_SetFnPtr_sub_40A68D('l', (GV_FnPtr)Returns1_402B1D);
-    LibGV_SetFnPtr_sub_40A68D('n', (GV_FnPtr)sub_402A03.Ptr());
-    LibGV_SetFnPtr_sub_40A68D('o', (GV_FnPtr)sub_402A29.Ptr());
-    LibGV_SetFnPtr_sub_40A68D('z', (GV_FnPtr)sub_403290.Ptr());
-    LibGV_SetFnPtr_sub_40A68D('i', (GV_FnPtr)sub_402A5F.Ptr());
-    LibGV_SetFnPtr_sub_40A68D('s', (GV_FnPtr)sub_402AA9.Ptr());
+    LibGV_Set_FileExtHandler_40A68D('p', MissionLog_Related1_402B25.Ptr()); // .pcc/.pcx
+    LibGV_Set_FileExtHandler_40A68D('k', sub_402796.Ptr());                 // .kmd
+    LibGV_Set_FileExtHandler_40A68D('l', Returns1_402B1D);                  // ??
+    LibGV_Set_FileExtHandler_40A68D('n', sub_402A03.Ptr());                 // .n
+    LibGV_Set_FileExtHandler_40A68D('o', sub_402A29.Ptr());                 // .oar
+    LibGV_Set_FileExtHandler_40A68D('z', sub_403290.Ptr());                 // .zmd
+    LibGV_Set_FileExtHandler_40A68D('i', sub_402A5F.Ptr());                 // ??
+    LibGV_Set_FileExtHandler_40A68D('s', sub_402AA9.Ptr());                 // .sgt
     Actor_PushBack(0, &gLibDG_2_stru_6BB930.mBase, 0);// Handles 2D rendering?
     Actor_Init(&gLibDG_2_stru_6BB930.mBase, LibDG_Update2_401234, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
     Actor_PushBack(8, &gLibDGD_1_stru_6BB910, 0); // Handles 3D rendering?
