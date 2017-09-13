@@ -4,7 +4,7 @@
 
 void LibGVCpp_ForceLink();
 
-using GV_FnPtr = int(__cdecl*)(signed int, DWORD*);
+using GV_FnPtr = int(__cdecl*)(DWORD*, signed int);
 
 
 void LibGv_Init_sub_40A4F6();

@@ -83,7 +83,7 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
         auto fnFileLoader = g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[fileNameHash >> 16];
         if (fnFileLoader)
         {
-            const int loadFileResult = fnFileLoader(fileNameHash, (DWORD*)fileData);
+            const int loadFileResult = fnFileLoader((DWORD*)fileData, fileNameHash);
             if (loadFileResult <= 0)
             {
                 g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mId = 0;
@@ -97,7 +97,7 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
         auto fnFileLoader = g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[fileNameHash >> 16];
         if (fnFileLoader)
         {
-            const int loadFileResult = fnFileLoader(fileNameHash, (DWORD*)fileData);
+            const int loadFileResult = fnFileLoader((DWORD*)fileData, fileNameHash);
             if (loadFileResult > 0)
             {
                 return 1;
@@ -107,7 +107,7 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
         return 1;
     }
 }
-MGS_FUNC_IMPLEX(0x0040A77F, LibGV_LoadFile_40A77F, false);
+MGS_FUNC_IMPLEX(0x0040A77F, LibGV_LoadFile_40A77F, LIBGV_IMPL);
 
 void CC LibGV_40B3BC()
 {
