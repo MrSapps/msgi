@@ -509,9 +509,7 @@ void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
     const int primCount = pGv->g_PrimQueue1_word_6BC3BE_256 - pGv->gPrimQueue2_word_6BC3C0_256;
     for (int i = 0; i < primCount; i++)
     {
-        Prim_unknown* pPrim = (Prim_unknown*)&pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
-        Prim_unknown* p = (Prim_unknown*)pPrim->mBase.field_0_ptr;
-
+        Prim_unknown* p = pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
         if (!(BYTE1(p->field_24_maybe_flags) & 1) && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & v9))
         {
             dword_991E40[2] = p->field_2E_w_or_h;
@@ -587,7 +585,7 @@ signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
     if (pGv->gPrimQueue2_word_6BC3C0_256 > pGv->gObjectQueue_word_6BC3C2_0)
     {
         const s16 newCount = pGv->gPrimQueue2_word_6BC3C0_256 - 1;
-        pGv->gObjects_dword_6BC3C4[newCount] = (Prim_Object *)pPrimBuffer; // PrimObject = Prim_unknown + extra ??
+        pGv->gObjects_dword_6BC3C4[newCount] = pPrimBuffer; // PrimObject = Prim_unknown + extra ??
         pGv->gPrimQueue2_word_6BC3C0_256 = newCount;
         return 0;
     }

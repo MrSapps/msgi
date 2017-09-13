@@ -151,7 +151,7 @@ struct struct_gv
     s16 g_PrimQueue1_word_6BC3BE_256;
     s16 gPrimQueue2_word_6BC3C0_256;
     s16 gObjectQueue_word_6BC3C2_0;
-    Prim_Object **gObjects_dword_6BC3C4;
+    Prim_unknown **gObjects_dword_6BC3C4;
     PSX_RECT* dword_6BC3C8_pStructure_rect;
     int dword_6BC3CC_rectx2;
     PSX_RECT dword_6BC3D0_rect;
