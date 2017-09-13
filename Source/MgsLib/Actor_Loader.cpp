@@ -6,6 +6,7 @@
 #include "System.hpp"
 #include "Sound.hpp"
 #include "ResourceNameHash.hpp"
+#include "LibGV.hpp"
 #include <gmock/gmock.h>
 
 #define ACTOR_LOADER_IMPL true
@@ -34,14 +35,6 @@ struct Actor_Loader_Impl
     char field_2C_c_str[64];
     char* field_6C_pointer_file_second_dword;
     int field_70_count_file_first_dword;
-
-    enum FileLoadModes
-    {
-        eNoCache = 0,
-        eCache = 1,
-        eResident = 2,
-        eSound = 3
-    };
 };
 MGS_ASSERT_SIZEOF(Actor_Loader_Impl, 0x74);
 
@@ -153,17 +146,17 @@ signed int CC Res_loader_DataCnf_FileLoader_408D6C(Actor_Loader_Impl* pSystemStr
                 switch (pSystemStruct->field_2C_c_str[1])
                 {
                 case 'c': // .cache
-                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader_Impl::eCache;
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader::eCache;
                     break;
                 case 'n': // .nocache
-                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader_Impl::eNoCache;
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader::eNoCache;
                     break;
                 case 'r': // .resident
-                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader_Impl::eResident;
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader::eResident;
                     gFixupLibDg_Allocs_And_Hahses_dword_78D7AC = 1;
                     break;
                 case 's': // .sound
-                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader_Impl::eSound;
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = Actor_Loader::eSound;
                     break;
                 }
             }
@@ -203,7 +196,6 @@ MGS_FUNC_IMPLEX(0x408D6C, Res_loader_DataCnf_FileLoader_408D6C, ACTOR_LOADER_IMP
 
 
 MGS_FUNC_NOT_IMPL(0x00408FAE, int(), Res_loader_load_file_to_mem_408FAE);
-MGS_FUNC_NOT_IMPL(0x0040A77F, int CC(int sys2FileBuffer, signed int maybe_id, int resident_type), LibGV_id_conflict_40A77F);
 
 
 bool CC Res_loader_Is_Extension_4088F2(const char* fileName, const char* extension)
@@ -327,7 +319,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
                     Actor_Loader_Impl_Field10_dword_78D7A8 = pSystemStruct->field_10;
                     s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
                     int maybe_id = Hash_40A5C3(pSystemStruct->field_C_c_str_ptr_field_2C);
-                    LibGV_id_conflict_40A77F((int)pSystemStruct->field_28_sys2_alloc_file_buffer, maybe_id, resident_type);
+                    LibGV_LoadFile_40A77F(pSystemStruct->field_28_sys2_alloc_file_buffer, maybe_id, resident_type);
                     if (!pSystemStruct->field_24_field_2C_char_state_resident_type)
                     {
                         System_2_free_40B2A7(pSystemStruct->field_28_sys2_alloc_file_buffer);
@@ -375,7 +367,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
             const s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
             Str1_6BFBA0 = pSystemStruct->field_2C_c_str;
             const int maybe_id2 = Hash_40A5C3(pSystemStruct->field_2C_c_str);
-            const int libGvRet = LibGV_id_conflict_40A77F((int)darFileDataPointer, maybe_id2, resident_type);
+            const int libGvRet = LibGV_LoadFile_40A77F(darFileDataPointer, maybe_id2, resident_type);
 
             if (!libGvRet)
             {

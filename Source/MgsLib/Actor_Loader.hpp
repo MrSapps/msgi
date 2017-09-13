@@ -14,6 +14,13 @@ struct Actor_Loader
     int field_24_proc_cancel_flags;
     int mIsRunning;
     int field_2C_counter;
+    enum FileLoadModes
+    {
+        eNoCache = 0,
+        eCache = 1,
+        eResident = 2,
+        eSound = 3
+    };
 };
 MGS_ASSERT_SIZEOF(Actor_Loader, 0x30);
 

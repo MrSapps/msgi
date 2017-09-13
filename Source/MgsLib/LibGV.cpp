@@ -4,29 +4,29 @@
 #include <assert.h>
 #include "LibDG.hpp"
 #include "Timer.hpp"
+#include "Actor_Loader.hpp"
 
 #define REDIRECT_LIBGV_DATA 1
 #define LIBGV_IMPL true
 
-// TODO: Actually a SYSTEM alloc from lib DG
-struct struct_8
+
+struct LibGV_FileRecord
 {
     DWORD mId;
-    DWORD* field_4;
+    void* mFileBuffer;
 };
-MGS_ASSERT_SIZEOF(struct_8, 0x8);
+MGS_ASSERT_SIZEOF(LibGV_FileRecord, 0x8);
 
-struct struct_lib_gv
+struct LibGv_Struct
 {
     Actor mBase;
     DWORD gRenderedFramesCount_dword_6BFF00;
     DWORD dword_6BFF04_time_related;
-    struct_8* struct_8_ptr_6BFF08; // Seems to point to one of mStruct8_128Array_06BFF80
-    GV_FnPtr field_6BFF0C_26_fn_ptrs[26];
-    struct_8* struct_8_ptr_6BFF74;
-    struct_8* struct_8_ptr_6BFF78;
-    //DWORD pad_field_6BFF7C; // TODO: This isn't in ida, how can the rest of this struct be correct????
-    struct_8 mStruct8_128Array_06BFF80[128];
+    LibGV_FileRecord* dword_6BFF08_last_found_ptr; // Seems to point to one of mStruct8_128Array_06BFF80
+    GV_FnPtr dword_6BFF0C_fn_ptrs[26];
+    LibGV_FileRecord* dword_6BFF74_resident_top_alloc;
+    LibGV_FileRecord* dword_6BFF78_count;
+    LibGV_FileRecord mStruct8_128Array_06BFF80[128];
     DWORD mDWORD_Pad1;
     DWORD gGv_dword_6C0380;
     DWORD gGv_dword_6C0384;
@@ -39,12 +39,12 @@ struct struct_lib_gv
     DWORD gGv_dword_6C04F4_array2[81];
     DWORD gGv_dword_6C0638_active_array_idx;
 };
-MGS_ASSERT_SIZEOF(struct_lib_gv, 0x75C);
+MGS_ASSERT_SIZEOF(LibGv_Struct, 0x75C);
 
-MGS_VAR(REDIRECT_LIBGV_DATA, 0x6BFEE0, struct_lib_gv, g_lib_gv_stru_6BFEE0, {});
+MGS_VAR(REDIRECT_LIBGV_DATA, 0x6BFEE0, LibGv_Struct, g_lib_gv_stru_6BFEE0, {});
 
 // Other likely LibGvd funcs
-MGS_FUNC_NOT_IMPL(0x40A72A, struct_8* CC(), LibGvd_sub_40A72A);
+MGS_FUNC_NOT_IMPL(0x40A72A, LibGV_FileRecord* CC(), LibGvd_sub_40A72A);
 MGS_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
 MGS_FUNC_NOT_IMPL(0x40A603, int CC(int), LibGvd_sub_40A603);
 
@@ -55,13 +55,61 @@ MGS_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_Allocs_40A6AC);
 MGS_FUNC_NOT_IMPL(0x40A4B1, void CC(), sub_40A4B1);
 MGS_FUNC_NOT_IMPL(0x40B734, void CC(int), Hzm_load_40B734);
 
-
-//MSG_FUNC_NOT_IMPL(0x4455A0, __int64 __cdecl(), TimingRelated_4455A0);
+MGS_FUNC_NOT_IMPL(0x40A618, LibGV_FileRecord* CC(int resHash), LibGV_Find_Item_40A618);
 
 MGS_VAR(REDIRECT_LIBGV_DATA, 0x791A04, DWORD, dword_791A04, 0);
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
-void __cdecl LibGV_40B3BC()
+int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocType)
+{
+    if (allocType != Actor_Loader::eNoCache)
+    {
+        if (LibGV_Find_Item_40A618(fileNameHash) || (g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr == 0))
+        {
+            printf("id conflict\n");
+            return -1;
+        }
+
+        int hashWithNoCacheFlag = fileNameHash;
+        if (allocType != Actor_Loader::eCache)
+        {
+            hashWithNoCacheFlag = fileNameHash | 0x1000000;
+        }
+
+        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mId = hashWithNoCacheFlag;
+        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mFileBuffer = fileData;
+
+        // The first WORD of the hash is related to the file extension
+        auto fnFileLoader = g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[fileNameHash >> 16];
+        if (fnFileLoader)
+        {
+            const int loadFileResult = fnFileLoader(fileNameHash, (DWORD*)fileData);
+            if (loadFileResult <= 0)
+            {
+                g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mId = 0;
+                return loadFileResult;
+            }
+        }
+        return 1;
+    }
+    else
+    {
+        auto fnFileLoader = g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[fileNameHash >> 16];
+        if (fnFileLoader)
+        {
+            const int loadFileResult = fnFileLoader(fileNameHash, (DWORD*)fileData);
+            if (loadFileResult > 0)
+            {
+                return 1;
+            }
+            return loadFileResult;
+        }
+        return 1;
+    }
+}
+MGS_FUNC_IMPLEX(0x0040A77F, LibGV_LoadFile_40A77F, false);
+
+void CC LibGV_40B3BC()
 {
     g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_array1[0] = 0;
     g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_array2[0] = 0;
@@ -132,7 +180,7 @@ MGS_FUNC_IMPLEX(0x40A4F6, LibGv_Init_sub_40A4F6, LIBGV_IMPL);
 
 void CC LibGv_ClearFunctionPointers_40A69D()
 {
-    memset(g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs, 0, sizeof(g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs));
+    memset(g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs, 0, sizeof(g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs));
 }
 MGS_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, LIBGV_IMPL);
 
@@ -147,7 +195,7 @@ void CC LibGV_SetFnPtr_sub_40A68D(char id, GV_FnPtr fn)
     // Convert the a-z index to 0-25
     const int idx = id - 'a';
 
-    assert(idx < _countof(g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs));
-    g_lib_gv_stru_6BFEE0.field_6BFF0C_26_fn_ptrs[idx] = fn;
+    assert(idx < _countof(g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs));
+    g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[idx] = fn;
 }
 MGS_FUNC_IMPLEX(0x40A68D, LibGV_SetFnPtr_sub_40A68D, LIBGV_IMPL);
