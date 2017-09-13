@@ -124,7 +124,75 @@ MGS_FUNC_IMPLEX(0x408918, Stage_LoadRelated_DataCnf_Q2, ACTOR_LOADER_IMPL);
 MGS_VAR(1, 0x6BFBA0, char*, Str1_6BFBA0, 0);
 MGS_VAR(1, 0x78D7A8, DWORD, Actor_Loader_Impl_Field10_dword_78D7A8, 0);
 
-MGS_FUNC_NOT_IMPL(0x00408D6C, signed int CC(Actor_Loader_Impl* pSystemStruct), Res_loader_408D6C);
+signed int CC Res_loader_DataCnf_FileLoader_408D6C(Actor_Loader_Impl* pSystemStruct)
+{
+    if (pSystemStruct->field_20_c_str) //data.cnf data
+    {
+        for (;;)
+        {
+            char* curLine = pSystemStruct->field_2C_c_str;
+            pSystemStruct->field_20_c_str = (char*)Res_loader_GetLine_408E1B(pSystemStruct->field_20_c_str, pSystemStruct->field_2C_c_str);
+
+            if (!*curLine)
+            {
+                break;
+            }
+
+            if (*curLine == '.')
+            {
+                // Set the mode to load the next seen files from the data.cnf as 
+                switch (pSystemStruct->field_2C_c_str[1])
+                {
+                case 'c': // .cache
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = 1;
+                    break;
+                case 'n': // .nocache
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = 0;
+                    break;
+                case 'r': // .resident
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = 2;
+                    gFixupLibDg_Allocs_And_Hahses_dword_78D7AC = 1;
+                    break;
+                case 's': // .sound
+                    pSystemStruct->field_24_field_2C_char_state_resident_type = 3;
+                    break;
+                }
+            }
+            else
+            {
+                pSystemStruct->field_28_sys2_alloc_file_buffer = 0;
+
+                const int load_request_ret = FS_LoadRequest(
+                    pSystemStruct->field_2C_c_str,
+                    &pSystemStruct->field_28_sys2_alloc_file_buffer,
+                    pSystemStruct->field_24_field_2C_char_state_resident_type);
+
+                pSystemStruct->field_10 = load_request_ret;
+
+                if (load_request_ret >= 0)
+                {
+                    // Save the name of the last loaded file
+                    pSystemStruct->field_C_c_str_ptr_field_2C = curLine;
+                    if (*curLine == '*')
+                    {
+                        // Remove * from the start of the file name
+                        pSystemStruct->field_C_c_str_ptr_field_2C = &pSystemStruct->field_2C_c_str[1];
+                    }
+
+                    ++pSystemStruct->field_8_unknown_state;
+                    pSystemStruct->field_14_load_ret = load_request_ret;
+                    return 1;
+                }
+
+                return -1;
+            }
+        }
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x408D6C, Res_loader_DataCnf_FileLoader_408D6C, ACTOR_LOADER_IMPL);
+
+
 MGS_FUNC_NOT_IMPL(0x00408FAE, int(), Res_loader_load_file_to_mem_408FAE);
 MGS_FUNC_NOT_IMPL(0x0040A77F, int CC(int sys2FileBuffer, signed int maybe_id, int resident_type), LibGV_id_conflict_40A77F);
 
@@ -220,7 +288,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
         break;
 
     case 1:
-        if (Res_loader_408D6C(pSystemStruct) <= 0)
+        if (Res_loader_DataCnf_FileLoader_408D6C(pSystemStruct) <= 0)
         {
             return 0;
         }
