@@ -73,7 +73,6 @@ MGS_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_520
 MGS_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
 MGS_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
 MGS_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
-MGS_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
 
 
 MGS_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
@@ -2485,7 +2484,7 @@ signed int __cdecl Main()
     MemCardsInit();
     //nullsub_9();
     LibGv_Init_sub_40A4F6();
-    sub_408086();
+    j_FS_CloseFile_40907E();
     LibDg_Init_40111A();
     ScriptEngineInit_4090A7();
     LibGv_Set_Load_HZM_CallBack_40B725();

@@ -11,3 +11,5 @@ EXTERN_MGS_FUNC_NOT_IMPL(0x51F0F5, int CC(FILE* File, void* dstBuf, DWORD nNumbe
 
 
 signed int CC FS_LoadRequest(const char* fileName, void** buffer, signed int type);
+void CC j_FS_CloseFile_40907E();
+int Res_loader_load_file_to_mem_408FAE();

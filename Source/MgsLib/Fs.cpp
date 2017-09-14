@@ -38,6 +38,42 @@ static const char* FileLoadModeToString(signed int type)
     }
 }
 
+void CC FS_CloseFile_40907E()
+{
+    //Ret0_51EE8C();
+    gFileHandle_dword_6BFBA8 = (FILE *)-2;
+}
+MGS_FUNC_IMPLEX(0x0040907E, FS_CloseFile_40907E, FS_IMPL)
+
+void CC j_FS_CloseFile_40907E()
+{
+    FS_CloseFile_40907E();
+}
+MGS_FUNC_IMPLEX(0x00408086, j_FS_CloseFile_40907E, FS_IMPL)
+
+int CC FS_FileReadToMem_409040()
+{
+    if (gFileHandle_dword_6BFBA8 != (FILE *)-2)
+    {
+        File_NormalRead_51F0F5(gFileHandle_dword_6BFBA8, gFileBuffer_dword_6BFBB0, gFileSizeToRead_dword_6BFBAC);
+        File_Close_51F183(gFileHandle_dword_6BFBA8);
+        gFileSizeToRead_dword_6BFBAC = 0;
+        gFileHandle_dword_6BFBA8 = (FILE *)-2;
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x00409040, FS_FileReadToMem_409040, FS_IMPL)
+
+int Res_loader_load_file_to_mem_408FAE()
+{
+    File_NormalRead_51F0F5(gFileHandle_dword_6BFBA8, gFileBuffer_dword_6BFBB0, gFileSizeToRead_dword_6BFBAC);
+    File_Close_51F183(gFileHandle_dword_6BFBA8);
+    gFileSizeToRead_dword_6BFBAC = 0;
+    gFileHandle_dword_6BFBA8 = (FILE *)-2;
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x00408FAE, Res_loader_load_file_to_mem_408FAE, FS_IMPL)
+
 static void SetLoadedFileInfo(FILE* hFile, void** ppBuffer, int fileSize)
 {
     gFileBuffer_dword_6BFBB0 = *ppBuffer;

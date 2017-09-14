@@ -194,10 +194,6 @@ signed int CC Res_loader_DataCnf_FileLoader_408D6C(Actor_Loader_Impl* pSystemStr
 }
 MGS_FUNC_IMPLEX(0x408D6C, Res_loader_DataCnf_FileLoader_408D6C, ACTOR_LOADER_IMPL);
 
-
-MGS_FUNC_NOT_IMPL(0x00408FAE, int(), Res_loader_load_file_to_mem_408FAE);
-
-
 bool CC Res_loader_Is_Extension_4088F2(const char* fileName, const char* extension)
 {
     const char* dotPos = strchr(fileName, '.');

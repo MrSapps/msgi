@@ -22,7 +22,7 @@ struct LibGv_Struct
     Actor mBase;
     DWORD gRenderedFramesCount_dword_6BFF00;
     DWORD dword_6BFF04_time_related;
-    LibGV_FileRecord* dword_6BFF08_last_found_ptr; // Seems to point to one of mStruct8_128Array_06BFF80
+    LibGV_FileRecord* dword_6BFF08_last_free_ptr; // Seems to point to one of mStruct8_128Array_06BFF80
     GV_FnPtr dword_6BFF0C_fn_ptrs[26];
     LibGV_FileRecord* dword_6BFF74_resident_top_alloc;
     LibGV_FileRecord* dword_6BFF78_count;
@@ -46,7 +46,6 @@ MGS_VAR(REDIRECT_LIBGV_DATA, 0x6BFEE0, LibGv_Struct, g_lib_gv_stru_6BFEE0, {});
 // Other likely LibGvd funcs
 MGS_FUNC_NOT_IMPL(0x40A72A, LibGV_FileRecord* CC(), LibGvd_sub_40A72A);
 MGS_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
-MGS_FUNC_NOT_IMPL(0x40A603, int CC(int), LibGvd_sub_40A603);
 
 void LibGVCpp_ForceLink() { }
 
@@ -59,6 +58,17 @@ MGS_FUNC_NOT_IMPL(0x40A618, LibGV_FileRecord* CC(int resHash), LibGV_Find_Item_4
 
 MGS_VAR(REDIRECT_LIBGV_DATA, 0x791A04, DWORD, dword_791A04, 0);
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
+
+void* CC LibGV_FindFile_40A603(int hash)
+{
+    LibGV_FileRecord* pFound = LibGV_Find_Item_40A618(hash);
+    if (pFound)
+    {
+        return pFound->mFileBuffer;
+    }
+    return nullptr;
+}
+MGS_FUNC_IMPLEX(0x40A603, LibGV_FindFile_40A603, LIBGV_IMPL);
 
 int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocType)
 {
@@ -78,7 +88,7 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
     }
     else
     {
-        if (LibGV_Find_Item_40A618(fileNameHash) || (g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr == 0))
+        if (LibGV_Find_Item_40A618(fileNameHash) || (g_lib_gv_stru_6BFEE0.dword_6BFF08_last_free_ptr == 0))
         {
             printf("id conflict\n");
             return -1;
@@ -90,8 +100,8 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
             hashWithResidentOrSoundFlag = fileNameHash | 0x1000000;
         }
 
-        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mId = hashWithResidentOrSoundFlag;
-        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mFileBuffer = fileData;
+        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_free_ptr->mId = hashWithResidentOrSoundFlag;
+        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_free_ptr->mFileBuffer = fileData;
 
         // The first WORD of the hash is related to the file extension
         auto fnFileLoader = g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[fileNameHash >> 16];
@@ -100,7 +110,7 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
             const int loadFileResult = fnFileLoader((DWORD*)fileData, fileNameHash);
             if (loadFileResult <= 0)
             {
-                g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mId = 0;
+                g_lib_gv_stru_6BFEE0.dword_6BFF08_last_free_ptr->mId = 0;
                 return loadFileResult;
             }
         }
