@@ -62,7 +62,21 @@ MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
 int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocType)
 {
-    if (allocType != Actor_Loader::eNoCache)
+    if (allocType == Actor_Loader::eNoCache)
+    {
+        auto fnFileLoader = g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[fileNameHash >> 16];
+        if (fnFileLoader)
+        {
+            const int loadFileResult = fnFileLoader((DWORD*)fileData, fileNameHash);
+            if (loadFileResult > 0)
+            {
+                return 1;
+            }
+            return loadFileResult;
+        }
+        return 1;
+    }
+    else
     {
         if (LibGV_Find_Item_40A618(fileNameHash) || (g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr == 0))
         {
@@ -70,13 +84,13 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
             return -1;
         }
 
-        int hashWithNoCacheFlag = fileNameHash;
-        if (allocType != Actor_Loader::eCache)
+        int hashWithResidentOrSoundFlag = fileNameHash;
+        if (allocType != Actor_Loader::eCache) // Isn't cache or no cache, so must be resident or sound
         {
-            hashWithNoCacheFlag = fileNameHash | 0x1000000;
+            hashWithResidentOrSoundFlag = fileNameHash | 0x1000000;
         }
 
-        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mId = hashWithNoCacheFlag;
+        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mId = hashWithResidentOrSoundFlag;
         g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mFileBuffer = fileData;
 
         // The first WORD of the hash is related to the file extension
@@ -89,20 +103,6 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
                 g_lib_gv_stru_6BFEE0.dword_6BFF08_last_found_ptr->mId = 0;
                 return loadFileResult;
             }
-        }
-        return 1;
-    }
-    else
-    {
-        auto fnFileLoader = g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[fileNameHash >> 16];
-        if (fnFileLoader)
-        {
-            const int loadFileResult = fnFileLoader((DWORD*)fileData, fileNameHash);
-            if (loadFileResult > 0)
-            {
-                return 1;
-            }
-            return loadFileResult;
         }
         return 1;
     }

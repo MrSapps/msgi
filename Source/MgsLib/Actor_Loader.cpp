@@ -7,6 +7,7 @@
 #include "Sound.hpp"
 #include "ResourceNameHash.hpp"
 #include "LibGV.hpp"
+#include "Fs.hpp"
 #include <gmock/gmock.h>
 
 #define ACTOR_LOADER_IMPL true
@@ -38,7 +39,6 @@ struct Actor_Loader_Impl
 };
 MGS_ASSERT_SIZEOF(Actor_Loader_Impl, 0x74);
 
-MGS_FUNC_NOT_IMPL(0x00408EEF, signed int CC(char* fileName, void** buffer, signed int type), FS_LoadRequest);
 MGS_FUNC_NOT_IMPL(0x00401F77, void CC(__int16 a1), Res_loader_tick_helper_401F77);
 
 MGS_VAR(1, 0x71D13C, DWORD, dword_71D13C, 0);
@@ -320,7 +320,7 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
                     s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
                     int maybe_id = Hash_40A5C3(pSystemStruct->field_C_c_str_ptr_field_2C);
                     LibGV_LoadFile_40A77F(pSystemStruct->field_28_sys2_alloc_file_buffer, maybe_id, resident_type);
-                    if (!pSystemStruct->field_24_field_2C_char_state_resident_type)
+                    if (pSystemStruct->field_24_field_2C_char_state_resident_type == Actor_Loader::eNoCache)
                     {
                         System_2_free_40B2A7(pSystemStruct->field_28_sys2_alloc_file_buffer);
                     }
@@ -366,15 +366,15 @@ signed int CC Res_loader_help2_408A73(Actor_Loader_Impl* pSystemStruct)
 
             const s16 resident_type = pSystemStruct->field_24_field_2C_char_state_resident_type;
             Str1_6BFBA0 = pSystemStruct->field_2C_c_str;
-            const int maybe_id2 = Hash_40A5C3(pSystemStruct->field_2C_c_str);
-            const int libGvRet = LibGV_LoadFile_40A77F(darFileDataPointer, maybe_id2, resident_type);
+            const int fileNameHashed = Hash_40A5C3(pSystemStruct->field_2C_c_str);
+            const int loadFileRet = LibGV_LoadFile_40A77F(darFileDataPointer, fileNameHashed, resident_type);
 
-            if (!libGvRet)
+            if (!loadFileRet)
             {
                 return 1;
             }
 
-            if (libGvRet < 0)
+            if (loadFileRet < 0)
             {
                 printf("INIT_ERROR in %s !!\n", pSystemStruct->field_2C_c_str);
                 return 0;

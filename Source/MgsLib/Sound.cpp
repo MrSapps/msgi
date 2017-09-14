@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Sound.hpp"
 #include "File.hpp"
+#include "Fs.hpp"
 
 // TODO: Fix funcs using SKIP
 #define SOUND_IMPL true
@@ -663,10 +664,10 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
     bufferDesc.dwSize = 36;
     bufferDesc.dwFlags = 0x100C8;
     bufferDesc.lpwfxFormat = &waveFormat;
-    FILE* File = File_LoadDirFileQ(fileName, 0);
+    FILE* File = File_LoadDirFile_51EE8F(fileName, 0);
     if (File
-        && (File_NormalRead(File, v4, 20u), File_NormalRead(File, &waveFormat, 18u) == 18)
-        && (File_NormalRead(File, v4, 2u), File_NormalRead(File, &sizeToRead, 4u) == 4))
+        && (File_NormalRead_51F0F5(File, v4, 20u), File_NormalRead_51F0F5(File, &waveFormat, 18u) == 18)
+        && (File_NormalRead_51F0F5(File, v4, 2u), File_NormalRead_51F0F5(File, &sizeToRead, 4u) == 4))
     {
         bufferDesc.dwBufferBytes = sizeToRead;
         if (gDSound_dword_77E2C0)
@@ -698,7 +699,7 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
                     &v10,
                     0);
             }
-            v3 = File_NormalRead(File, soundBuffer, sizeToRead);
+            v3 = File_NormalRead_51F0F5(File, soundBuffer, sizeToRead);
             if (v3 != sizeToRead)
             {
                 return 0;
@@ -709,12 +710,12 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
                 v9,
                 v10);
         }
-        File_CloseQ(File);
+        File_Close_51F183(File);
         result = 1;
     }
     else
     {
-        File_CloseQ(File);
+        File_Close_51F183(File);
         result = 0;
     }
     return result;

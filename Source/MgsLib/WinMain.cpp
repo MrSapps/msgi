@@ -42,6 +42,7 @@
 #include "Actor_GameD.hpp"
 #include "Actor_Loader.hpp"
 #include "Timer.hpp"
+#include "Fs.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
@@ -2679,6 +2680,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     Actor_RankCPP_ForceLink();
     Actor_DelayCpp_ForceLink();
     Actor_LoaderCpp_ForceLink();
+    Fs_Cpp_ForceLink();
 
     if (IsMgsi())
     {

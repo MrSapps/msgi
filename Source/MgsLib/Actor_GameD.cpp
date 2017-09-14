@@ -5,6 +5,7 @@
 #include "LibGV.hpp"
 #include "Actor_Debug.hpp"
 #include "Actor_Loader.hpp"
+#include "System.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
@@ -24,7 +25,7 @@ MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
 MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
 MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
-MGS_VAR(1, 0x78E960, DWORD, gResidentTop_dword_78E960, 0);
+MGS_VAR(1, 0x78E960, BYTE*, gResidentTop_dword_78E960, 0);
 MGS_VAR(1, 0x722780, DWORD, gamed_unk_722780, 0);
 MGS_VAR(1, 0x722784, DWORD, gamed_unk_722784, 0);
 
@@ -33,6 +34,13 @@ MGS_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MGS_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
 MGS_FUNC_NOT_IMPL(0x0044E381, void CC(Actor*), GameD_Update_44E381);
 
+void* CC ResidentTopAllocate_40B379(int size)
+{
+    const int alignedSize = RoundUpPowerOf2(size, 4);
+    gResidentTop_dword_78E960 -= alignedSize;
+    return gResidentTop_dword_78E960;
+}
+MGS_FUNC_IMPLEX(0x0040B379, ResidentTopAllocate_40B379, ACTOR_GAMED_IMPL);
 
 void CC Res_MenuMan_create_459A9A()
 {
@@ -54,7 +62,7 @@ void CC sub_44E1E0()
 }
 MGS_FUNC_IMPLEX(0x0044E1E0, sub_44E1E0, ACTOR_GAMED_IMPL);
 
-int CC GetResidentTop()
+BYTE* CC GetResidentTop()
 {
     return gResidentTop_dword_78E960;
 }

@@ -78,6 +78,7 @@
     <ClInclude Include="Actor_Loader.hpp" />
     <ClInclude Include="Actor_Rank.hpp" />
     <ClInclude Include="File.hpp" />
+    <ClInclude Include="Fs.hpp" />
     <ClInclude Include="Input.hpp" />
     <ClInclude Include="LibDG.hpp" />
     <ClInclude Include="LibGV.hpp" />
@@ -102,6 +103,7 @@
     <ClCompile Include="Actor_Loader.cpp" />
     <ClCompile Include="Actor_Rank.cpp" />
     <ClCompile Include="File.cpp" />
+    <ClCompile Include="Fs.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="LibDG.cpp" />
     <ClCompile Include="LibGV.cpp" />

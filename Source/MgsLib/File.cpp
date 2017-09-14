@@ -84,8 +84,3 @@ TMgs_open mgs_open = (TMgs_open)0x0053DBE0;
 MGS_FUNC_NOT_IMPL(0x0053D680, int __cdecl(int), mgs_close);
 MGS_FUNC_NOT_IMPL(0x0053E180, int __cdecl(int, LONG, DWORD), mgs_lseek);
 MGS_FUNC_NOT_IMPL(0x0053D1A0, int __cdecl(int, void*, DWORD), mgs_read);
-
-// File lib
-MGS_FUNC_NOT_IMPL(0x0051EE8F, FILE *__cdecl(const char*, signed int), File_LoadDirFileQ);
-MGS_FUNC_NOT_IMPL(0x0051F0F5, size_t __cdecl(FILE*, void*, DWORD), File_NormalRead);
-MGS_FUNC_NOT_IMPL(0x0051F183, int __cdecl(FILE*), File_CloseQ);
