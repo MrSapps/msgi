@@ -543,3 +543,9 @@ void CC Psx_gte_normal_clip_446E90()
       - (gGte_sx2_dword_993EF8 - gGte_sx0_dword_993EF0) * (gGte_sy1_993EF6 - gGte_sy0_993EF2);
 }
 MGS_FUNC_IMPLEX(0x446E90, Psx_gte_normal_clip_446E90, IMPL_PSX);
+
+void CC Psx_gte_nop_44A460()
+{
+    ++gGteData_722688.gte_nop_count_722688;
+}
+MGS_FUNC_IMPLEX(0x44A460, Psx_gte_nop_44A460, IMPL_PSX);
