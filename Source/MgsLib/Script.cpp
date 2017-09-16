@@ -17,6 +17,13 @@ MGS_VAR(1, 0x6BFBB4, int, gScriptFileNameHashedToLoad_6BFBB4, 0);
 MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 MGS_FUNC_NOT_IMPL(0x409A3A, void CC(), Script_sub_409A3A);
 MGS_FUNC_NOT_IMPL(0x4093ED, void CC(), SaveDataStructuresRelated_4093ED);
+MGS_PTR(1, 0x6BFC68, BYTE**, gScriptMainProc_dword_6BFC68, 0);
+MGS_VAR(1, 0x06BFC3C, BYTE**, gScriptStackPos_dword_6BFC3C, 0); // Pointer to an array of 32 BYTE*'s
+MGS_VAR(1, 0x078D7B4, BYTE*, gScriptExecuteRet_dword_78D7B4, 0);
+MGS_VAR(1, 0x06BFBB8, DWORD*, script_args_dword_6BFBB8, 0);
+
+
+MGS_FUNC_NOT_IMPL(0x45A6F6, int __cdecl(int a1, void* a2), sub_45A6F6);
 
 void ScriptCpp_ForceLink()
 {
@@ -83,22 +90,50 @@ MGS_FUNC_IMPLEX(0x00409A4F, Script_InitCommandTable, SCRIPT_IMPL);
 
 DWORD CC Script_ParamExists(char paramId)
 {
-    UNREFERENCED_PARAMETER(paramId);
+    DWORD ret = 0;
+    BYTE* ppScript = nullptr;
+
+    BYTE* pushedArgumentValue = (BYTE *)*(gScriptStackPos_dword_6BFC3C - 1);
+    for (int i=0; i<4096; i++)
+    {
+        pushedArgumentValue = Script_GCL_Execute(pushedArgumentValue, &ppScript, &ret);
+        
+        if (!ppScript)
+        {
+            return 0;
+        }
+
+        // Check for [0x50][0xparamId]
+        if ((BYTE)ppScript == 0x50 && (signed int)ppScript >> 16 == paramId)
+        {
+            gScriptExecuteRet_dword_78D7B4 = (BYTE*)ret;
+            return ret;
+        }
+    }
     return 0;
 }
-MGS_FUNC_IMPLEX(0x004098D2, Script_ParamExists, false); // TODO: Impl me
+MGS_FUNC_IMPLEX(0x004098D2, Script_ParamExists, true); // TODO: Impl me
 
 DWORD CC Script_get_int()
 {
-    return 0;
+    BYTE* ppScript = nullptr;
+    DWORD pRet = 0;
+    BYTE* pScript = Script_GetReturnAddress();
+    gScriptExecuteRet_dword_78D7B4 = Script_GCL_Execute(pScript, &ppScript, &pRet);
+    return pRet;
 }
-MGS_FUNC_IMPLEX(0x004099B7, Script_get_int, false); // TODO: Impl me
+MGS_FUNC_IMPLEX(0x004099B7, Script_get_int, true); // TODO: Impl me
 
 BYTE* CC Script_GetReturnAddress()
 {
-    return nullptr;
+    BYTE* pScript = gScriptExecuteRet_dword_78D7B4;
+    if (!gScriptExecuteRet_dword_78D7B4 || !*gScriptExecuteRet_dword_78D7B4 || *gScriptExecuteRet_dword_78D7B4 == 0x50)
+    {
+        return nullptr;
+    }
+    return pScript;
 }
-MGS_FUNC_IMPLEX(0x004099A0, Script_GetReturnAddress, false); // TODO: Impl me
+MGS_FUNC_IMPLEX(0x004099A0, Script_GetReturnAddress, true); // TODO: Impl me
 
 int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
 {
@@ -241,11 +276,6 @@ BYTE* CC Script_InitProcTables_sub_409C87(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x00409C87, Script_InitProcTables_sub_409C87, SCRIPT_IMPL);
 
-MGS_PTR(1, 0x6BFC68, BYTE**, gScriptMainProc_dword_6BFC68, 0);
-
-MGS_FUNC_NOT_IMPL(0x45A6F6, int __cdecl(int a1, void* a2), sub_45A6F6);
-
-
 int CC Script_Init_sub_409C19(BYTE* pScript)
 {
     DWORD offset = ToDWORD(pScript);
@@ -324,10 +354,7 @@ signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs)
     }
     else
     {
-        // stage\init\scenerio.gcx @ 0x5FA
-        // 40 00 08 70 04 21 51 00 00 40 08 
-        // 24 70 04 C8 CF 00 60 00 12 64 C0
-        BYTE* scriptProc = Script_FindProc(id); // For id = 26069 / 0x000065d5
+        BYTE* scriptProc = Script_FindProc(id);
         assert(scriptProc);
         return Script_Run(scriptProc + 3, pArgs);
     }
@@ -404,12 +431,6 @@ int CC Script_Operator_Evaluate(int operation, int v1, int v2)
 }
 MGS_FUNC_IMPLEX(0x00409E7C, Script_Operator_Evaluate, SCRIPT_IMPL);
 
-MGS_VAR(1, 0x06BFC3C, BYTE**, gScriptStackPos_dword_6BFC3C, 0); // Pointer to an array of 32 BYTE*'s
-MGS_VAR(1, 0x078D7B4, BYTE*, gScriptExecuteRet_dword_78D7B4, 0);
-
-MGS_VAR(1, 0x06BFBB8, DWORD*, script_args_dword_6BFBB8, 0);
-
-
 void CC Script_Push(BYTE *arg)
 {
     *gScriptStackPos_dword_6BFC3C = arg;
@@ -428,7 +449,6 @@ void CC Script_SetReturnAddress(BYTE* pScript)
     (gScriptExecuteRet_dword_78D7B4) = pScript;
 }
 MGS_FUNC_IMPLEX(0x004096C4, Script_SetReturnAddress, SCRIPT_IMPL);
-
 
 int CC Script_CommandExecute(BYTE* pScript)
 {
