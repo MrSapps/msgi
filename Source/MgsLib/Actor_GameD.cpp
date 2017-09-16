@@ -9,7 +9,15 @@
 
 #define ACTOR_GAMED_IMPL true
 
-MGS_VAR(1, 0x722760, Actor, g_gamed_722760, {}); // TODO: Will actually big an Actor + other data
+struct GameD_Struct
+{
+    Actor mBase;
+    DWORD gamed_unk_722780;
+    DWORD gamed_unk_722784;
+};
+MGS_ASSERT_SIZEOF(GameD_Struct, 0x28);
+
+MGS_VAR(1, 0x722760, GameD_Struct, gGameD_stru_722760, {});
 MGS_VAR(1, 0x995344, DWORD, gFrameTime_dword_995344, 0);
 MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
 MGS_VAR(1, 0x9942B8, int, gLoaderState_dword_9942B8, 0);
@@ -26,8 +34,8 @@ MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
 MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 MGS_VAR(1, 0x78E960, BYTE*, gResidentTop_dword_78E960, 0);
-MGS_VAR(1, 0x722780, DWORD, gamed_unk_722780, 0);
-MGS_VAR(1, 0x722784, DWORD, gamed_unk_722784, 0);
+
+MGS_VAR(1, 0x78E964, BYTE*, gSavedTop_78E964, 0);
 
 MGS_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
 MGS_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
@@ -62,11 +70,11 @@ void CC sub_44E1E0()
 }
 MGS_FUNC_IMPLEX(0x0044E1E0, sub_44E1E0, ACTOR_GAMED_IMPL);
 
-BYTE* CC GetResidentTop()
+void CC SaveResidentTop()
 {
-    return gResidentTop_dword_78E960;
+    gSavedTop_78E964 = gResidentTop_dword_78E960;
 }
-MGS_FUNC_IMPLEX(0x0040B36E, GetResidentTop, ACTOR_GAMED_IMPL);
+MGS_FUNC_IMPLEX(0x0040B36E, SaveResidentTop, ACTOR_GAMED_IMPL);
 
 MGS_VAR(1, 0x78E7EC, WORD, stage_name_hash_word_78E7EC, 0);
 MGS_VAR(1, 0x6893D4, DWORD, dword_6893D4, 0);
@@ -103,17 +111,17 @@ void CC Init_Gamed_Create_44E12B()
     Script_BindInits_452610();
     LibGV_Set_FileExtHandler_40A68D('b', LibDG_CHARA_44E9D2); // Handles loading ".bin" files which sets loadable objects table
     sub_44E1E0();
-    Actor_PushBack(1, &g_gamed_722760, nullptr);
-    Actor_Init(&g_gamed_722760, GameD_Update_44E381.Ptr(), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
+    Actor_PushBack(1, &gGameD_stru_722760.mBase, nullptr);
+    Actor_Init(&gGameD_stru_722760.mBase, GameD_Update_44E381.Ptr(), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
 
     sub_44E1F9();
     sub_44E287();
     sub_44E212();
     word_78E7E8 = (WORD)(dword_78D7B0 + 1);
     dword_995324 = (int)&dword_7919C0;
-    GetResidentTop();
-    gamed_unk_722780 = 0;
-    gamed_unk_722784 = 0;
+    SaveResidentTop();
+    gGameD_stru_722760.gamed_unk_722780 = 0;
+    gGameD_stru_722760.gamed_unk_722784 = 0;
 
     Create_loader_44E226();
    // AddDebugActor();

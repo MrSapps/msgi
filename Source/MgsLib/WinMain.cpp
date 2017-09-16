@@ -311,7 +311,6 @@ int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
 
 
 
-MGS_VAR(1, 0x78E964, DWORD, dword_78E964, 0);
 MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
