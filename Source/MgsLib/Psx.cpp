@@ -472,3 +472,74 @@ DRAWENV* Renderer_Init_DRAWENV_40200D()
     return Renderer_Set_DRAWENV_40DD90(&drawEnv);
 }
 MGS_FUNC_IMPLEX(0x40200D, Renderer_Init_DRAWENV_40200D, IMPL_PSX);
+
+MGS_VAR(1, 0x993EF0, short, gGte_sx0_dword_993EF0, 0);
+MGS_VAR(1, 0x993EF2, short, gGte_sy0_993EF2, 0);
+MGS_VAR(1, 0x993EF4, short, gGte_sx1_dword_993EF4, 0);
+MGS_VAR(1, 0x993EF6, short, gGte_sy1_993EF6, 0);
+MGS_VAR(1, 0x993EF8, short, gGte_sx2_dword_993EF8, 0);
+MGS_VAR(1, 0x993EFA, short, gGte_sy2_993EFA, 0);
+
+MGS_VAR(1, 0x993F20, int, psx_nclip_result_dword_993F20, 0); // Or MAC0 ?
+
+struct GTE_Data
+{
+    int gte_nop_count_722688;
+    int gte_ncs_count_72268C;
+    int gte_gpf0_count_722690;
+    int gte_rtv0_count_722694;
+    int gte_sqr0_count_722698;
+    int gte_gpl0_count_72269C;
+    int gte_gpl12_count_7226A0;
+    int gte_nclip_count_7226A4;
+    int gte_rtv2tr_count_7226A8;
+    int gte_RT1_count_7226AC;
+    int gte_rt_count_7226B0;
+    int gte_LT1_count_7226B4;
+    int gte_rtv1_count_7226B8;
+    int gte_llv0_count_7226BC;
+    int gte_op12_count_7226C0;
+    int gte_ll_count_7226C4;
+    int gte_op0_count_7226C8;
+    int gte_cdp_count_7226CC;
+    int gte_rtpt_count_7226D0;
+    int gte_RT1TR_count_7226D4;
+    int gte_rtv1tr_count_7226D8;
+    int gte_nccs_count_7226DC;
+    int gte_rtir_count_7226E0;
+    int gte_dpcl_count_7226E4;
+    int gte_rtv2_count_7226E8;
+    int gte_gpf12_count_7226EC;
+    int gte_rtps_count_7226F0;
+    int gte_nct_count_7226F4;
+    int gte_intpl_count_7226F8;
+    int gte_rtv0tr_count_7226FC;
+    int gte_sqr12_count_722700;
+    int gte_dpcs_count_722704;
+    int gte_cc_count_722708;
+    int dword_722688;
+    int anonymous_1; // TODO: Name as above
+    int anonymous_2;
+    int anonymous_3;
+    int anonymous_4;
+    int anonymous_5;
+    int anonymous_6;
+    float anonymous_7;
+    int anonymous_8;
+    int anonymous_9;
+    int anonymous_10;
+    float anonymous_11;
+};
+MGS_ASSERT_SIZEOF(GTE_Data, 0xB4);
+
+MGS_VAR(1, 0x722688, GTE_Data, gGteData_722688, {});
+
+void CC Psx_gte_normal_clip_446E90()
+{
+    ++gGteData_722688.gte_nclip_count_7226A4;
+
+    psx_nclip_result_dword_993F20 = 
+        (gGte_sx1_dword_993EF4 - gGte_sx0_dword_993EF0) * (gGte_sy2_993EFA - gGte_sy0_993EF2)
+      - (gGte_sx2_dword_993EF8 - gGte_sx0_dword_993EF0) * (gGte_sy1_993EF6 - gGte_sy0_993EF2);
+}
+MGS_FUNC_IMPLEX(0x446E90, Psx_gte_normal_clip_446E90, IMPL_PSX);
