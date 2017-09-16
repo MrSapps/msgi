@@ -2507,6 +2507,8 @@ signed int __cdecl Main()
         // state from progressing.
         // In software rendering mode when game over it will crash, but this is an existing bug of the game.
         Actor_UpdateActors();
+
+        //PsxGpuDebug_44A4D0();
     }
     return result;
 }
