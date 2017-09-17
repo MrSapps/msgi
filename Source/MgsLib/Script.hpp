@@ -13,6 +13,14 @@ struct GCL_Proc_Arguments
 };
 MGS_ASSERT_SIZEOF(GCL_Proc_Arguments, 8);
 
+struct GCL_ProcInfo
+{
+    WORD mId;
+    WORD mOffset;
+};
+MGS_ASSERT_SIZEOF(GCL_ProcInfo, 4);
+
+BYTE* CC Script_InitProcTables_sub_409C87(BYTE* pScript);
 signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs);
 int CC Script_RunProc(BYTE* pScript);
 BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet);
@@ -52,3 +60,13 @@ enum GCLOperators
 };
 
 void DoScriptTests();
+
+static inline DWORD ToDWORD(const BYTE* ptr)
+{
+    return (ptr[3]) | (ptr[2] << 8) | (ptr[1] << 16) | (ptr[0] << 24);
+}
+
+static inline WORD ToWORD(const BYTE* ptr)
+{
+    return (ptr[1]) | (ptr[0] << 8);
+}

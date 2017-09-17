@@ -69,16 +69,6 @@ proc_struct_sub* CC Script_GetCommand(WORD cmdToFind)
 }
 MGS_FUNC_IMPLEX(0x00409ACC, Script_GetCommand, SCRIPT_IMPL);
 
-static DWORD ToDWORD(const BYTE* ptr)
-{
-    return (ptr[3]) | (ptr[2] << 8) | (ptr[1] << 16) | (ptr[0] << 24);
-}
-
-static WORD ToWORD(const BYTE* ptr)
-{
-    return (ptr[1]) | (ptr[0] << 8);
-}
-
 int CC Script_InitCommandTable(proc_struct* pCmdTbl)
 {
     pCmdTbl->pNext = *gScriptCmdTable_dword_6BFC6C;
@@ -554,10 +544,18 @@ void CC Script_BindInits_452610()
     Script_binds_init_4525E6();
     Script_InitCommandTable(gScriptBindFns_66B0B8);
 }
-MGS_FUNC_IMPLEX(0x00452610, Script_BindInits_452610, false);
+MGS_FUNC_IMPLEX(0x00452610, Script_BindInits_452610, SCRIPT_IMPL);
+
+int CC Script_tbl_eval_sub_40915D(BYTE* pScript)
+{
+    DWORD cmd = 0;
+    DWORD ret = 0;
+    Script_GCL_Execute(pScript, &cmd, &ret);
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x40915D, Script_tbl_eval_sub_40915D, SCRIPT_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x004090EA, int CC(BYTE*), Script_tbl_if_sub_4090EA);
-MGS_FUNC_NOT_IMPL(0x0040915D, int CC(BYTE*), Script_tbl_eval_sub_40915D);
 MGS_FUNC_NOT_IMPL(0x00409178, int CC(BYTE*), Script_tbl_unknown_loop_sub_409178);
 signed int script_tbl_nop_sub_4091F6(BYTE*)
 {
@@ -568,8 +566,8 @@ signed int script_tbl_nop_sub_4091F6(BYTE*)
 
 MGS_ARY(1, 0x6506E0, proc_struct_sub, 4, gEarlyScriptBinds_Tbl_6506E0,
 {
-    { 0x000D, 0x0, Script_tbl_if_sub_4090EA.Ptr() },
-    { 0x64C0, 0x0, Script_tbl_eval_sub_40915D.Ptr() },
+    { 0x0d86, 0x0, Script_tbl_if_sub_4090EA.Ptr() },
+    { 0x64C0, 0x0, Script_tbl_eval_sub_40915D },
     { 0xCD3A, 0x0, script_tbl_nop_sub_4091F6 },
     { 0x7636, 0x0, Script_tbl_unknown_loop_sub_409178.Ptr() }
 });
@@ -580,12 +578,6 @@ void CC Script_sub_4091FA()
     Script_InitCommandTable(gEarlyScriptBinds_650700);
 }
 MGS_FUNC_IMPLEX(0x004091FA, Script_sub_4091FA, SCRIPT_IMPL);
-
-struct GCL_ProcInfo
-{
-    WORD mId;
-    WORD mOffset;
-};
 
 MGS_PTR(1, 0x006BFC60, GCL_ProcInfo**, gProcInfos, nullptr);
 MGS_PTR(1, 0x006BFC64, BYTE**, dword_6BFC64, 0);
@@ -865,7 +857,7 @@ signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
             const int length = ToWORD(pScript + 1);
             pScript = pScript + length + 1;
         }
-        else if (cmd == 0x70)
+        else if (cmd == 0x70) // Call
         {
             Script_RunProc(pScript + 2);
             const int length = *(pScript + 1);
