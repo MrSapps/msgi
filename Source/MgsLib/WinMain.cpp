@@ -2645,16 +2645,20 @@ void ShutdownEngine()
 
 #include <gmock/gmock.h>
 
+static void RunTests()
+{
+    DoScriptTests();
+    DoTestSystem();
+    DoResourceNameHashTest();
+    DoActor_RankTests();
+}
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
     ::testing::GTEST_FLAG(throw_on_failure) = true;
     int argCount = 0;
     ::testing::InitGoogleMock(&argCount, &lpCmdLine);
-    DoScriptTests();
-    DoTestSystem();
-    DoResourceNameHashTest();
-    DoActor_RankTests();
+   
 
     int result; // eax@2
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
@@ -2686,6 +2690,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     {
         InstallVaradicCFunctionHooks();
     }
+
+    RunTests();
 
     if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
     {

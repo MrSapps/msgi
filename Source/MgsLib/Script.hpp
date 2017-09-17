@@ -15,12 +15,13 @@ MGS_ASSERT_SIZEOF(GCL_Proc_Arguments, 8);
 
 signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs);
 int CC Script_RunProc(BYTE* pScript);
-BYTE* CC Script_GCL_Execute(BYTE* pScript, BYTE** ppScript, DWORD* pRet);
+BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet);
 signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs);
 DWORD CC Script_ParamExists(char paramId);
 DWORD CC Script_get_int();
 BYTE* CC Script_GetReturnAddress();
 void CC ScriptEngineInit_4090A7();
+void CC ScriptSetArgs_409893(DWORD* pArgs);
 
 EXTERN_MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 

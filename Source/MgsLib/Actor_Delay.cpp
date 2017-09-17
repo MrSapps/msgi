@@ -94,7 +94,7 @@ signed int CC Script_tbl_Delay_sub_4519C7(BYTE* /*pScript*/)
     if (Script_ParamExists('e'))
     {
         BYTE* pScriptAddress = Script_GetReturnAddress();
-        BYTE* notUsed = nullptr;
+        DWORD notUsed = 0;
         DWORD execRet = 0;
         Script_GCL_Execute(pScriptAddress, &notUsed, &execRet);
         scriptVar_p = execRet;
