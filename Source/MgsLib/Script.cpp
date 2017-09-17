@@ -69,6 +69,16 @@ proc_struct_sub* CC Script_GetCommand(WORD cmdToFind)
 }
 MGS_FUNC_IMPLEX(0x00409ACC, Script_GetCommand, SCRIPT_IMPL);
 
+static DWORD ToDWORD(const BYTE* ptr)
+{
+    return (ptr[3]) | (ptr[2] << 8) | (ptr[1] << 16) | (ptr[0] << 24);
+}
+
+static WORD ToWORD(const BYTE* ptr)
+{
+    return (ptr[1]) | (ptr[0] << 8);
+}
+
 int CC Script_InitCommandTable(proc_struct* pCmdTbl)
 {
     pCmdTbl->pNext = *gScriptCmdTable_dword_6BFC6C;
@@ -112,7 +122,7 @@ DWORD CC Script_ParamExists(char paramId)
     }
     return 0;
 }
-MGS_FUNC_IMPLEX(0x004098D2, Script_ParamExists, true); // TODO: Impl me
+MGS_FUNC_IMPLEX(0x004098D2, Script_ParamExists, SCRIPT_IMPL);
 
 DWORD CC Script_get_int()
 {
@@ -122,7 +132,7 @@ DWORD CC Script_get_int()
     gScriptExecuteRet_dword_78D7B4 = Script_GCL_Execute(pScript, &ppScript, &pRet);
     return pRet;
 }
-MGS_FUNC_IMPLEX(0x004099B7, Script_get_int, true); // TODO: Impl me
+MGS_FUNC_IMPLEX(0x004099B7, Script_get_int, SCRIPT_IMPL);
 
 BYTE* CC Script_GetReturnAddress()
 {
@@ -133,7 +143,7 @@ BYTE* CC Script_GetReturnAddress()
     }
     return pScript;
 }
-MGS_FUNC_IMPLEX(0x004099A0, Script_GetReturnAddress, true); // TODO: Impl me
+MGS_FUNC_IMPLEX(0x004099A0, Script_GetReturnAddress, SCRIPT_IMPL);
 
 int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
 {
@@ -151,124 +161,116 @@ MGS_FUNC_IMPLEX(0x004094DC, Script_4094DC, false); // TODO: Implement me
 
 BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet)
 {
-    signed __int32 gcl_code; // eax@1
-    BYTE *pScriptByte1; // esi@1
-    int v6; // eax@11
-    int v7; // eax@13
-    DWORD v9; // eax@23
+    const signed __int32 gcl_code = *pScript;
 
-    gcl_code = *pScript;
-
-    if ((gcl_code & 0xF0) == 16)
+    if ((*ppScript & 0xF0) == 16)
     {
+        // Read var/mem ??
         return Script_4094DC(pScript, (unsigned int *)ppScript, (bool *)pRet);
     }
 
     *ppScript = gcl_code;
-    pScriptByte1 = pScript + 1;
+    BYTE* pScriptByte1 = pScript + 1;
 
     switch (gcl_code)
     {
+    // Read stack argument
     case 0x20:
-        *pRet = script_args_dword_6BFBB8[-(unsigned __int8)*pScriptByte1 - 1];
-        *ppScript = 1;
-        goto LABEL_28;
-
-    case 0x30:
-        {
-            *pRet = Script_Unknown6(pScript + 2, pRet);
-            pScriptByte1 += (unsigned __int8)*pScriptByte1;
-            goto exit_func;
-        }
-        break;
-
-    case 0x40:
-        {
-            *pRet = (DWORD)(pScript + 3);
-            __int16 v10 = *pScriptByte1;
-
-            pScriptByte1 = &pScript[((unsigned __int8)pScript[2] | v10) + 1];
-            goto exit_func;
-        }
-        break;
-
-    case  0x50:
-        {
-            v9 = (unsigned __int8)*pScriptByte1 << 16;
-            v9 |= 0x50;
-            //LOBYTE(v9) = 0x50;
-            *ppScript = v9;
-            *pRet = (DWORD)(pScript + 3);
-            v6 = (unsigned __int8)pScript[2];
-            goto LABEL_24;
-        }
-        break;
-
-    case 0:
-        pScriptByte1 = 0;
-        goto exit_func;
-
-    case 1:
     {
-        /*
-        LOBYTE(v8) = 0;
-        HIBYTE(v8) = *pScriptByte1;
-        */
-        __int16 v8 = *pScriptByte1;
-
-        v7 = (unsigned __int8)pScript[2] | v8;
-    LABEL_16:
-        pScriptByte1 = pScript + 3;
-        *pRet = v7;
-        goto exit_func;
+        *pRet = script_args_dword_6BFBB8[-*pScriptByte1 - 1];
+        *ppScript = 1;
+        pScriptByte1 = pScript + 2;
     }
     break;
 
+    // ??
+    case 0x30:
+    {
+        *pRet = Script_Unknown6(pScript + 2, pRet);
+        pScriptByte1 += *pScriptByte1;
+    }
+    break;
+
+    // Jump
+    case 0x40:
+    {
+        pScriptByte1 = &pScript[ToWORD(pScriptByte1) + 1];
+        *pRet = (DWORD)(pScript + 3);
+    }
+    break;
+
+    // Parameter
+    case 0x50:
+    {
+        DWORD paramTypeAndId = *pScriptByte1 << 16;
+        paramTypeAndId |= 0x50;
+        *ppScript = paramTypeAndId;
+        *pRet = (DWORD)(pScript + 3);
+        pScriptByte1 += pScript[2] + 1;
+    }
+    break;
+
+    // End
+    case 0:
+    {
+        pScriptByte1 = 0;
+    }
+    break;
+
+    // Read s16
+    case 1:
+    {
+        int value = static_cast<s16>(ToWORD(pScriptByte1));
+        *pRet = value;
+        pScriptByte1 = pScript + 3;
+    }
+    break;
+
+    // Read u8
     case 2:
     case 3:
     case 4:
-        *pRet = (unsigned __int8)*pScriptByte1;
-    LABEL_28:
+    {
+        *pRet = *pScriptByte1;
         pScriptByte1 = pScript + 2;
-        goto exit_func;
+    }
+    break;
 
+    // Read string
     case 7:
-        *pRet = (DWORD)(pScript + 2);
-        v6 = (unsigned __int8)*pScriptByte1;
-    LABEL_24:
-        pScriptByte1 += v6 + 1;
-        goto exit_func;
+    {
+        *pRet = reinterpret_cast<DWORD>(pScript + 2);
+        pScriptByte1 += *pScriptByte1 + 1;
+    }
+    break;
 
+    // Read u16
+    case 6:
     case 8:
-        LABEL_15:
-        v7 = 0;
-        v7 |= ((WORD)*pScriptByte1) << 8;
-        v7 |= pScript[2];
-        goto LABEL_16;
+    {
+        *pRet = ToWORD(pScriptByte1);
+        pScriptByte1 = pScript + 3;
+    }
+    break;
 
-    case 0xA:
-        unsigned __int16 v11; // ax@29
-        v11 |= ((WORD)*pScriptByte1) << 8;
-        v11 |= pScript[2];
-
-        /*
-        HIBYTE(v11) = *pScriptByte1;
-        LOBYTE(v11) = pScript[2];
-        */
+    // Read u32
+    case 9:
+    case 10:
+    {
+        *pRet = ToDWORD(pScriptByte1);
         pScriptByte1 = pScript + 5;
-        *pRet = (unsigned __int8)pScript[4] | (((unsigned __int8)pScript[3] | (v11 << 8)) << 8);
-        goto exit_func;
+    }
+    break;
 
     default:
         printf("GCL:WRONG CODE %x\n", gcl_code);
-        goto exit_func;
+        break;
     }
 
-exit_func:
     gScriptExecuteRet_dword_78D7B4 = pScriptByte1;
     return pScriptByte1;
 }
-MGS_FUNC_IMPLEX(0x004096CE, Script_GCL_Execute, false); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x004096CE, Script_GCL_Execute, SCRIPT_IMPL);
 
 static void Test_GCL_Execute_Read_DWORD_9()
 {
@@ -450,7 +452,7 @@ static void Test_GCL_Execute_ReadByte_4()
     ASSERT_EQ(0x04, ppScript);
 }
 
-static void Test_GCL_Execute_ReadDWORD_6()
+static void Test_GCL_Execute_ReadWORD_6()
 {
     DWORD ppScript = 0;
     DWORD ret = 0;
@@ -474,38 +476,22 @@ static void Test_GCL_Execute_ReadString_7()
     ASSERT_EQ(0x07, ppScript);
 }
 
-// 0 = nothing/error
-// 1 = read word
-// 2 = read byte
-// 3 = read byte
-// 4 = read byte
-// 5 = wrong code
-// 6 = read dword
-// 7 ? string ??
-// 8 = read word
-// 9 = read dword
-// 10 = read dword
-// 0x20 = read argument
-// 0x30 = unknown
-// 0x40 = jump
-// 0x50 = get param
-
 static void Test_GCL_Execute()
 {
+    Test_GCL_Execute_Read_WORD_8();
     Test_GCL_Execute_Read_DWORD_9();
     Test_GCL_Execute_Read_DWORD_10();
     Test_GCL_Execute_Read_Argument_Number_0x20();
     Test_GCL_Execute_Jump1_0x40();
     Test_GCL_Execute_Jump2_0x40();
     Test_GCL_Get_Param0x50();
-    Test_GCL_Execute_Read_WORD_8();
     Test_GCL_Execute_Zero_0();
     Test_GCL_Execute_WrongCodes_0x60_5();
     Test_GCL_Execute_Read_WORD_1();
     Test_GCL_Execute_ReadByte_2();
     Test_GCL_Execute_ReadByte_3();
     Test_GCL_Execute_ReadByte_4();
-    Test_GCL_Execute_ReadDWORD_6();
+    Test_GCL_Execute_ReadWORD_6();
     Test_GCL_Execute_ReadString_7();
 
     // Nibble1 being 0x10 is not tested because it calls external function
@@ -603,16 +589,6 @@ struct GCL_ProcInfo
 
 MGS_PTR(1, 0x006BFC60, GCL_ProcInfo**, gProcInfos, nullptr);
 MGS_PTR(1, 0x006BFC64, BYTE**, dword_6BFC64, 0);
-
-static DWORD ToDWORD(const BYTE* ptr)
-{
-    return (ptr[3]) | (ptr[2] << 8) | (ptr[1] << 16) | (ptr[0] << 24);
-}
-
-static WORD ToWORD(const BYTE* ptr)
-{
-    return (ptr[1]) | (ptr[0] << 8);
-}
 
 BYTE* CC Script_InitProcTables_sub_409C87(BYTE* pScript)
 {
