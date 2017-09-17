@@ -163,7 +163,7 @@ BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet)
 {
     const signed __int32 gcl_code = *pScript;
 
-    if ((*ppScript & 0xF0) == 16)
+    if ((gcl_code & 0xF0) == 16)
     {
         // Read var/mem ??
         return Script_4094DC(pScript, (unsigned int *)ppScript, (bool *)pRet);
