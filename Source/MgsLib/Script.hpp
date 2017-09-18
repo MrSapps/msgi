@@ -30,6 +30,7 @@ DWORD CC Script_get_int();
 BYTE* CC Script_GetReturnAddress();
 void CC ScriptEngineInit_4090A7();
 void CC ScriptSetArgs_409893(DWORD* pArgs);
+int CC Script_Operator_Evaluate(int operation, int v1, int v2);
 
 EXTERN_MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 

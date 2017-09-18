@@ -135,19 +135,199 @@ BYTE* CC Script_GetReturnAddress()
 }
 MGS_FUNC_IMPLEX(0x004099A0, Script_GetReturnAddress, SCRIPT_IMPL);
 
+
+MGS_FUNC_NOT_IMPL(0x40957B, int __cdecl(int, int), Script_VarWrite_40957B);
+
+MGS_VAR(1, 0x992040, DWORD, gScript_dword_992040, 0);
+
 int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
 {
-    UNREFERENCED_PARAMETER(pScript);
-    UNREFERENCED_PARAMETER(pRet);
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x00409D77, Script_Unknown6, false); // TODO: Implement me
+    DWORD retQ; // [sp+0h] [bp-14h]@15
+    int scriptByte2; // [sp+4h] [bp-10h]@7
+    DWORD scriptByte; // [sp+8h] [bp-Ch]@6
+    DWORD *pScriptContext; // [sp+Ch] [bp-8h]@1
+    BYTE *pScriptIp = pScript; // [sp+10h] [bp-4h]@1
 
-BYTE* CC Script_4094DC(BYTE* pScript, unsigned int* ppScript, bool* ret)
-{
-    return nullptr;
+    pScriptContext = &gScript_dword_992040;
+    for (;;)
+    {
+        for(;;)
+        {
+            if (!pScriptIp)
+            {
+                if (pRet)
+                {
+                    *pRet = 0;
+                }
+                return 0;
+            }
+            scriptByte = *pScriptIp;
+            if (scriptByte == 0x31)                 // exit code ?
+            {
+                break;
+            }
+
+            pScriptContext[1] = (DWORD)pScriptIp;
+            pScriptIp = Script_GCL_Execute(pScriptIp, &scriptByte, &retQ);
+            *pScriptContext = retQ;
+            pScriptContext += 2;
+        }
+
+        scriptByte2 = pScriptIp[1];
+
+        if (!scriptByte2)
+        {
+            break;
+        }
+
+        if (scriptByte2 == 0x14)
+        {
+            Script_VarWrite_40957B(*(pScriptContext - 3), *(pScriptContext - 2)); // Write var?
+            *(pScriptContext - 4) = *(pScriptContext - 2);
+        }
+        else
+        {
+            *(pScriptContext - 4) = Script_Operator_Evaluate(pScriptIp[1], *(pScriptContext - 4), *(pScriptContext - 2));
+            *(pScriptContext - 3) = 0;
+        }
+        pScriptContext -= 2;
+        pScriptIp += 2;
+    }
+
+    if (pRet)
+    {
+        *pRet = *(pScriptContext - 2);
+    }
+
+    return *(pScriptContext - 2);
 }
-MGS_FUNC_IMPLEX(0x004094DC, Script_4094DC, false); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x00409D77, Script_Unknown6, true); // TODO: Implement me
+
+MGS_ARY(1, 0x78E7E0, __int16, 96, save_data_192_word_78E7E0, {});
+MGS_ARY(1, 0x78D7C0, DWORD, 512, save_data_2048_unk_78D7C0, {});
+
+BYTE* CC Script_VarRead_4094DC(BYTE* pScript, DWORD* ppScript, DWORD* ret)
+{
+    DWORD scriptDWORD = ToDWORD(pScript);
+
+    const unsigned int topNibble = (scriptDWORD >> 24) & 0xF;
+    *ppScript = topNibble;
+    const __int16* pDataBank = save_data_192_word_78E7E0;
+    const DWORD tmpBits = scriptDWORD & 0xF00000;
+    if ((tmpBits) != 0x800000)
+    {
+        pDataBank = (const __int16 *)save_data_2048_unk_78D7C0;
+    }
+
+    WORD idx = ((unsigned __int16)scriptDWORD);
+    const __int16* pDataBankEntry = (const __int16 *)((char *)pDataBank + idx);
+
+    if (topNibble <= 1)
+    {
+        return pScript + 4;
+    }
+
+    if (topNibble == 1)
+    {
+        *ret = *pDataBankEntry;
+        return pScript + 4;
+    }
+
+    if (topNibble <= 3)
+    {
+        *ret = *(BYTE *)pDataBankEntry;
+        return pScript + 4;
+    }
+
+    if (topNibble == 4)
+    {
+        DWORD tmp = (scriptDWORD >> 16) & 0xF;
+        *ret = (*(BYTE *)pDataBankEntry & (unsigned __int8)(1 << (tmp))) != 0;
+        return pScript + 4;
+    }
+
+    if (topNibble == 6 || topNibble == 8)
+    {
+        *ret = (unsigned __int16)*pDataBankEntry;
+        return pScript + 4;
+    }
+    return pScript + 4;
+}
+MGS_FUNC_IMPLEX(0x004094DC, Script_VarRead_4094DC, true); // TODO: Implement me
+
+BYTE* CC Script_VarWrite_409615(BYTE* pScript)
+{
+    return pScript + 4;
+}
+MGS_FUNC_IMPLEX(0x00409615, Script_VarWrite_409615, false); // TODO: Implement me
+
+/*
+// Is var read          data type
+//[1]            [000]  [0000]
+
+// Is var read = b4
+// Bank select = b24
+// 0b100000000000000000000000
+//    if ((*pScript & 0xF0) == 0x10)
+
+
+// b1 = N1[is var] N2[read/data type]
+// b2 = N1[bank select ??] / N2[ bit to read if data type == 4 ?]
+// b3 = idx
+// b4 = idx
+
+// 0x F0 0000 ) != 0x800000
+//    BYTE script[] = { 0xA6, 0xBB, 0xCC, 0xDD, 0x4 };
+*/
+
+static void Test_Script_Read_s16_Bank1()
+{
+    memset(save_data_192_word_78E7E0, 0, 192);
+    memset(save_data_2048_unk_78D7C0, 0, 2048);
+
+    save_data_192_word_78E7E0[(0x1234 / 2)] = (__int16)0xAABB;
+    save_data_192_word_78E7E0[(0x1234 / 2) + 1] = (__int16)0xCCDD;
+
+    DWORD ppScript = 0;
+    DWORD ret = 0;
+
+    BYTE script[] = { 0xA1, 0x0C, 0x12, 0x34, 0xE };
+    BYTE* pExeRet = Script_VarRead_4094DC(script, &ppScript, &ret);
+
+    ASSERT_EQ(ret, 0xffffccdd); // read var
+    ASSERT_EQ(0x0e, *pExeRet);
+    ASSERT_EQ(0x01, ppScript); // top nibble
+}
+
+static void Test_Script_Read_s16_Bank2()
+{
+    memset(save_data_192_word_78E7E0, 0, 192);
+    memset(save_data_2048_unk_78D7C0, 0, 2048);
+
+    //save_data_192_word_78E7E0[(0x1234 / 2)] = (__int16)0xAABB;
+    //save_data_192_word_78E7E0[(0x1234 / 2) + 1] = (__int16)0xCCDD;
+
+    save_data_2048_unk_78D7C0[0x1234 / 4] = 0xAABBCCDD;
+
+    DWORD ppScript = 0;
+    DWORD ret = 0;
+
+    BYTE script[] = { 0xA1, 0x8C, 0x12, 0x34, 0xE };
+    BYTE* pExeRet = Script_VarRead_4094DC(script, &ppScript, &ret);
+
+    ASSERT_EQ(ret, 0xffffccdd); // read var
+    ASSERT_EQ(0x0e, *pExeRet);
+    ASSERT_EQ(0x04, ppScript); // top nibble
+
+}
+
+static void Test_Script_VarRead_4094DC()
+{
+    //Test_Script_Read_s16_Bank1();
+    //Test_Script_Read_s16_Bank2();
+    //Sleep(2000);
+    //ExitProcess(0);
+}
 
 BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet)
 {
@@ -155,8 +335,7 @@ BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet)
 
     if ((gcl_code & 0xF0) == 16)
     {
-        // Read var/mem ??
-        return Script_4094DC(pScript, (unsigned int *)ppScript, (bool *)pRet);
+        return Script_VarRead_4094DC(pScript, ppScript, pRet);
     }
 
     *ppScript = gcl_code;
@@ -555,7 +734,54 @@ int CC Script_tbl_eval_sub_40915D(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x40915D, Script_tbl_eval_sub_40915D, SCRIPT_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x004090EA, int CC(BYTE*), Script_tbl_if_sub_4090EA);
+//MGS_FUNC_NOT_IMPL(0x004090EA, int CC(BYTE*), Script_tbl_if_sub_4090EA);
+
+int CC Script_tbl_if_sub_4090EA(BYTE* pScript)
+{
+    BYTE* pScriptCopy = nullptr;
+    BYTE* execRet = nullptr;
+    DWORD pScriptBytes;
+    DWORD exec1 = 0;
+
+    DWORD cmdRet = 0;
+    pScriptCopy = pScript;
+execute_again:
+    
+    pScriptCopy = Script_GCL_Execute(pScriptCopy, &cmdRet, &exec1);
+
+    for(;;)
+    {
+        execRet = Script_GCL_Execute(pScriptCopy, &cmdRet, &pScriptBytes);
+        if (exec1)
+        {
+            break;
+        }
+
+        if (!Script_GCL_Execute(execRet, &cmdRet, &exec1))
+        {
+            return 0;
+        }
+
+        const WORD cmdId = cmdRet >> 16;
+        pScriptCopy = (BYTE *)exec1;
+        if (cmdId != 'e') // else
+        {
+            if (cmdId != 'i') // elseif
+            {
+                return 0;
+            }
+
+            goto execute_again;
+        }
+        exec1 = 1;
+    }
+
+    Script_Run((BYTE*)pScriptBytes, nullptr);
+
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x4090EA, Script_tbl_if_sub_4090EA, SCRIPT_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x00409178, int CC(BYTE*), Script_tbl_unknown_loop_sub_409178);
 signed int script_tbl_nop_sub_4091F6(BYTE*)
 {
@@ -566,7 +792,7 @@ signed int script_tbl_nop_sub_4091F6(BYTE*)
 
 MGS_ARY(1, 0x6506E0, proc_struct_sub, 4, gEarlyScriptBinds_Tbl_6506E0,
 {
-    { 0x0d86, 0x0, Script_tbl_if_sub_4090EA.Ptr() },
+    { 0x0d86, 0x0, Script_tbl_if_sub_4090EA },
     { 0x64C0, 0x0, Script_tbl_eval_sub_40915D },
     { 0xCD3A, 0x0, script_tbl_nop_sub_4091F6 },
     { 0x7636, 0x0, Script_tbl_unknown_loop_sub_409178.Ptr() }
@@ -952,4 +1178,5 @@ void DoScriptTests()
 {
     Test_Script_Operator_Evaluate();
     Test_GCL_Execute();
+    Test_Script_VarRead_4094DC();
 }
