@@ -3,8 +3,51 @@
 #include <string>
 #include "Script.hpp"
 #include "types.hpp"
+#include "ResourceNameHash.hpp"
 
 using vec_u8 = std::vector<u8>;
+
+template<class TOnPassword>
+static bool DoBruteForce(char* str, int index, int maxDepth, TOnPassword cb)
+{
+    // Actually there are more JP chars to deal with here - but this will probably get common ones..
+    static const char kAlphabet[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    static const int kAlphabetSize = MGS_COUNTOF(kAlphabet) - 1;
+    for (int i = 0; i < kAlphabetSize; ++i)
+    {
+        str[index] = kAlphabet[i];
+        if (index == maxDepth - 1)
+        {
+            if (cb(str))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if (DoBruteForce(str, index + 1, maxDepth, cb))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+template<int maxLen, class TOnPassword>
+static bool BruteForce(TOnPassword cb)
+{
+    char buf[maxLen + 1];
+    for (int i = 1; i <= maxLen; ++i)
+    {
+        memset(buf, 0, maxLen + 1);
+        if (DoBruteForce(buf, 0, i, cb))
+        {
+            return false;
+        }
+    }
+    return false;
+}
 
 bool IsMgsi()
 {
@@ -64,6 +107,19 @@ void DisAsmProc(u8* pScript);
 int main(int argc, char** argv)
 {
     std::cout << "GCL ASM" << std::endl;
+
+    /*
+    BruteForce<12>([](const char* text) 
+    {
+        if (ResourceNameHash(text) == 0xE253)
+        {
+            std::cout << "MATCH for : " << text << std::endl;
+            return false;
+        }
+        return false;
+    });
+    */
+
 
     Arguments arguments(argc, argv);
 

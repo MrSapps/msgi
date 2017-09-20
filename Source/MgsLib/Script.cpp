@@ -6,6 +6,7 @@
 #include "Actor_Delay.hpp"
 #include "LibDG.hpp"
 #include "LibGV.hpp"
+#include "ResourceNameHash.hpp"
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
@@ -253,7 +254,7 @@ BYTE* CC Script_VarRead_4094DC(BYTE* pScript, DWORD* ppScript, DWORD* ret)
     }
     return pScript + 4;
 }
-MGS_FUNC_IMPLEX(0x004094DC, Script_VarRead_4094DC, true); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x004094DC, Script_VarRead_4094DC, false); // TODO: Implement me
 
 BYTE* CC Script_VarWrite_409615(BYTE* pScript)
 {
@@ -688,6 +689,38 @@ MGS_FUNC_NOT_IMPL(0x004523C7, int __cdecl(BYTE*), Script_Tbl_rand_4523C7);
 MGS_FUNC_NOT_IMPL(0x004523E7, int __cdecl(BYTE*), Script_tbl_sub_4523E7);
 MGS_FUNC_NOT_IMPL(0x0045256B, int __cdecl(BYTE*), Script_tbl_print_sub_45256B);
 MGS_FUNC_NOT_IMPL(0x004525D6, int __cdecl(BYTE*), Script_tbl_jimaku_4525D6);
+
+
+static void TestCommonHashes()
+{
+    ASSERT_EQ(0x0d86, ResourceNameHash("if"));
+    ASSERT_EQ(0x64C0, ResourceNameHash("eval"));
+    //ASSERT_EQ(0xCD3A, ResourceNameHash("nop"));
+    //ASSERT_EQ(0x7636, ResourceNameHash("loop"));
+    ASSERT_EQ(0x22FF, ResourceNameHash("mesg"));
+    //ASSERT_EQ(0xD4CB, ResourceNameHash("ntrap_remove"));
+    ASSERT_EQ(0x9906, ResourceNameHash("chara"));
+    ASSERT_EQ(0xC091, ResourceNameHash("map"));
+    //ASSERT_EQ(0x7D50, ResourceNameHash("hzd"));
+    ASSERT_EQ(0xEEE9, ResourceNameHash("camera"));
+    ASSERT_EQ(0x306A, ResourceNameHash("light"));
+    //ASSERT_EQ(0x9A1F, ResourceNameHash("start"));
+    ASSERT_EQ(0x24E1, ResourceNameHash("radio"));
+    ASSERT_EQ(0xE43C, ResourceNameHash("str_status"));
+    ASSERT_EQ(0xA242, ResourceNameHash("demo"));
+    ASSERT_EQ(0xDBAB, ResourceNameHash("ntrap"));
+    ASSERT_EQ(0x430D, ResourceNameHash("delay"));
+    ASSERT_EQ(0xCC85, ResourceNameHash("pad"));
+    ASSERT_EQ(0x5C9E, ResourceNameHash("varsave"));
+    ASSERT_EQ(0x4AD9, ResourceNameHash("system"));
+    ASSERT_EQ(0x698D, ResourceNameHash("sound"));
+    ASSERT_EQ(0x226D, ResourceNameHash("menu"));
+    ASSERT_EQ(0x925E, ResourceNameHash("rand"));
+    //ASSERT_EQ(0xE257, ResourceNameHash("stage"));
+    ASSERT_EQ(0xB96E, ResourceNameHash("print"));
+    ASSERT_EQ(0xEC9D, ResourceNameHash("jimaku"));
+}
+
 MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
 {
     { 0x22FF, 0x0, Script_tbl_mesg_sub_451A5E.Ptr() },
@@ -1179,4 +1212,6 @@ void DoScriptTests()
     Test_Script_Operator_Evaluate();
     Test_GCL_Execute();
     Test_Script_VarRead_4094DC();
+
+    TestCommonHashes();
 }
