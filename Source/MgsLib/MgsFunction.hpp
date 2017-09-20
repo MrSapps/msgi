@@ -247,7 +247,7 @@ protected:
 private:
     void ApplyImpl(void* funcToHook, void* replacement)
     {
-        TRACE_ENTRYEXIT;
+        //TRACE_ENTRYEXIT;
 
         std::cout << "old addr " << funcToHook << " new addr " << replacement << std::endl;
 
