@@ -634,148 +634,134 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             gKeys[wParam] = lParam;
         }
         gKeys[wParam] = lParam;
-        if (wParam > VK_F7)
+
+        switch (wParam)
         {
-            switch (wParam)
+        case VK_F2:
+            if (gCheatsEnabled)
             {
-            case VK_F8:
-                if (gCheatsEnabled)
+                if (gRestoreHealthCheat_7348FC)
                 {
-                    dword_688CD0 = 0;
-                    result = 0;
+                    gRestoreHealthCheat_7348FC = 0;
                 }
                 else
                 {
-                    result = 0;
+                    gRestoreHealthCheat_7348FC = 1;
                 }
-                break;
-            case VK_F9:
-                if (gCheatsEnabled)
-                {
-                    dword_688CD0 = 1;
-                    result = 0;
-                }
-                else
-                {
-                    result = 0;
-                }
-                break;
-            case VK_F11:
-                if (gCheatsEnabled)
-                {
-                    dword_688CD4 ^= 1u;
-                    result = 0;
-                }
-                else
-                {
-                    result = 0;
-                }
-                break;
-            default:
-                if (wParam != VK_F12)
-                    goto LABEL_108;
-                if (gCheatsEnabled)
-                {
-                    dword_688CD8 ^= 1u;
-                    result = 0;
-                }
-                else
-                {
-                    result = 0;
-                }
-                break;
             }
-        }
-        else
-        {
-            if (wParam == VK_F7) // Restart level with collected items
+            result = 0;
+            break;
+        case VK_F4:
+            if (gCheatsEnabled)
             {
-                if (gCheatsEnabled)
-                {
-                    game_state_dword_72279C = 0;
-                    sub_521210();
-                    sub_452E6E();
-                    result = 0;
-                }
-                else
-                {
-                    result = 0;
-                }
+                gInfiniteAmmoCheat_650D4C ^= 1u;
+                result = 0;
             }
             else
             {
-                if (wParam == VK_ESCAPE)
-                {
-                    dword_791DE4 = 1;
-                    if (game_state_dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
-                    {
-                        if (!dword_717354 && !dword_717348 && !byte_9AD888 && !dword_733E34 && !dword_721E78)
-                        {
-                            dword_717354 = 1;
-                        }
-                    }
-                    goto LABEL_108;
-                }
-                switch (wParam)
-                {
-                case VK_F2:
-                    if (gCheatsEnabled)
-                    {
-                        if (gRestoreHealthCheat_7348FC)
-                        {
-                            gRestoreHealthCheat_7348FC = 0;
-                        }
-                        else
-                        {
-                            gRestoreHealthCheat_7348FC = 1;
-                        }
-                        result = 0;
-                    }
-                    else
-                    {
-                        result = 0;
-                    }
-                    break;
-                case VK_F4:
-                    if (gCheatsEnabled)
-                    {
-                        gInfiniteAmmoCheat_650D4C ^= 1u;
-                        result = 0;
-                    }
-                    else
-                    {
-                        result = 0;
-                    }
-                    break;
-                case VK_F5: // Disable free camera
-                    if (gCheatsEnabled)
-                    {
-                        gFreeCameraCheat_77C934 = 0;
-                        result = 0;
-                    }
-                    else
-                    {
-                        result = 0;
-                    }
-                    break;
+                result = 0;
+            }
+            break;
+        case VK_F5: // Disable free camera
+            if (gCheatsEnabled)
+            {
+                gFreeCameraCheat_77C934 = 0;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            break;
 
-                case VK_F6: // Enable free camera
-                    if (gCheatsEnabled)
-                    {
-                        gFreeCameraCheat_77C934 = 1;
-                        result = 0;
-                    }
-                    else
-                    {
-                        result = 0;
-                    }
+        case VK_F6: // Enable free camera
+            if (gCheatsEnabled)
+            {
+                gFreeCameraCheat_77C934 = 1;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            break;
 
-                default:
-                    goto LABEL_108;
+        case VK_F7:  // Restart level with collected items
+            if (gCheatsEnabled)
+            {
+                game_state_dword_72279C = 0;
+                sub_521210();
+                sub_452E6E();
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            break;
+
+        case VK_F8:
+            if (gCheatsEnabled)
+            {
+                dword_688CD0 = 0;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            break;
+        case VK_F9:
+            if (gCheatsEnabled)
+            {
+                dword_688CD0 = 1;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            break;
+        case VK_F11:
+            if (gCheatsEnabled)
+            {
+                dword_688CD4 ^= 1u;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            break;
+
+        case VK_F12:
+            if (gCheatsEnabled)
+            {
+                dword_688CD8 ^= 1u;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            break;
+
+        case VK_ESCAPE:
+            dword_791DE4 = 1;
+            if (game_state_dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
+            {
+                if (!dword_717354 && !dword_717348 && !byte_9AD888 && !dword_733E34 && !dword_721E78)
+                {
+                    dword_717354 = 1;
                 }
             }
+            goto LABEL_108;
+
+        default:
+            goto LABEL_108;
         }
     }
+    
     return result;
 }
 
