@@ -100,7 +100,7 @@ MGS_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
 MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 MGS_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
-MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
+MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), Render_Restore_Surfaces_51E086);
 MGS_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
 
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
@@ -190,18 +190,19 @@ MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 MGS_VAR(1, 0x72279C, DWORD, game_state_dword_72279C, 0);
 
-
-
-//MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
-int __cdecl HandleExclusiveMode()
+int CC HandleExclusiveMode()
 {
-    MSG oMsg;
+    MSG oMsg = {};
 
     if (!g_pDirectDraw)
+    {
         return 0;
+    }
 
     if (g_pDirectDraw->TestCooperativeLevel() != DDERR_NOEXCLUSIVEMODE)
+    {
         return 0;
+    }
 
     Sound_StopSample();
     sub_4583BB();
@@ -225,19 +226,22 @@ int __cdecl HandleExclusiveMode()
     }
     while (g_pDirectDraw->TestCooperativeLevel() != 0);
 
-    sub_51E086();
+    Render_Restore_Surfaces_51E086();
     Timer_30_1();
     Task_ResumeQ();
     Sound_PlaySample();
 
     if (dword_732E64 == 1)
+    {
         PostMessageA(gHwnd, WM_KEYDOWN, VK_ESCAPE, 0);
+    }
 
     return 0;
 }
+MGS_FUNC_IMPLEX(0x51E1D9, HandleExclusiveMode, WINMAIN_IMPL);
 
 //MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
-int __cdecl MainLoop()
+int CC MainLoop()
 {
     //char var11C[0xFF] = { 0xFF };
     //char var21B[0xFF] = { 0xFF };
@@ -263,7 +267,9 @@ int __cdecl MainLoop()
         byte_9AD89B = 0;
 
         if (sub_42BE0A() == 0xFFFFFFEF)
+        {
             return 0;
+        }
 
         dword_6FC718 = 1;
         dword_717354 = 0;
@@ -278,7 +284,9 @@ int __cdecl MainLoop()
     HandleExclusiveMode();
 
     if (PeekMessageA(&oMsg, 0, 0, 0, 1) == 0)
+    {
         return 1;
+    }
 
     if (oMsg.message == WM_QUIT)
     {
@@ -405,7 +413,7 @@ signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, 
     WORD resNameHashed = 0;
     if (bMp5)
     {
-        resNameHashed = ResourceNameHash("mpfive");
+        resNameHashed = ResourceNameHash("op_back_l");
     }
     else
     {
@@ -509,80 +517,75 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
 
         v4 = (float)dword_73490C / 1024.0f;
         v5 = (float)dword_734908 / 1024.0f;
-        
+
         sub_5202FE(0.0, v5, v4, 0.0);
 
         dword_734908 = 9 * dword_734908 / 10;
         dword_73490C = 9 * dword_73490C / 10;
     }
-    if (Msg > WM_CHAR)
+
+    switch (Msg)
     {
-        switch (Msg)
+    case WM_SYSKEYDOWN:
+        gKeys[wParam] = lParam;
+        gvirtualKeyRepeatCount = lParam;
+        gVirtualKeyCode = wParam;
+        if (wParam < 0x100)
         {
-        case WM_SYSKEYDOWN:
-            gKeys[wParam] = lParam;
-            gvirtualKeyRepeatCount = lParam;
-            gVirtualKeyCode = wParam;
-            if (wParam < 0x100)
-            {
-                byte_9AD880[wParam] = 1;
-            }
-
-            if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
-            {
-                gAltPressed = 1;
-                return 0;
-            }
-            if ((unsigned __int16)gVirtualKeyCode == VK_F10)
-            {
-                dword_71D194 = 1;
-                gF10Pressed = 1;
-                return 0;
-            }
-            break;
-
-        case WM_SYSKEYUP:
-            gvirtualKeyRepeatCount = lParam;
-            gVirtualKeyCode = wParam;
-            if (wParam < 0x100)
-            {
-                byte_9AD880[wParam] = 0;
-            }
-            if ((unsigned __int16)gVirtualKeyCode == VK_MENU) 
-            {
-                gAltPressed = 0;
-                return 0;
-            }
-            if ((unsigned __int16)gVirtualKeyCode == VK_F10) 
-            {
-                gF10Pressed = 0;
-                Actor_DumpActorSystem();
-                return 0;
-            }
-            break;
-
-        case WM_MOUSEMOVE:
-            if (gFreeCameraCheat_77C934)
-            {
-                dword_734908 = (unsigned __int16)lParam - dword_734900;
-                dword_73490C = (unsigned __int16)((unsigned int)lParam >> 16) - dword_734904;
-                dword_734900 = (unsigned __int16)lParam;
-                dword_734904 = (unsigned int)lParam >> 16;
-            }
-            break;
-
-        case WM_POWERBROADCAST:
-            return BROADCAST_QUERY_DENY;
+            byte_9AD880[wParam] = 1;
         }
-        return DefWindowProcA(hWnd, Msg, wParam, lParam);
-    }
-    if (Msg == WM_CHAR)
-    {
+
+        if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
+        {
+            gAltPressed = 1;
+            return 0;
+        }
+        if ((unsigned __int16)gVirtualKeyCode == VK_F10)
+        {
+            dword_71D194 = 1;
+            gF10Pressed = 1;
+            return 0;
+        }
+        break;
+
+    case WM_SYSKEYUP:
+        gvirtualKeyRepeatCount = lParam;
+        gVirtualKeyCode = wParam;
+        if (wParam < 0x100)
+        {
+            byte_9AD880[wParam] = 0;
+        }
+        if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
+        {
+            gAltPressed = 0;
+            return 0;
+        }
+        if ((unsigned __int16)gVirtualKeyCode == VK_F10)
+        {
+            gF10Pressed = 0;
+            Actor_DumpActorSystem();
+            return 0;
+        }
+        break;
+
+    case WM_MOUSEMOVE:
+        if (gFreeCameraCheat_77C934)
+        {
+            dword_734908 = (unsigned __int16)lParam - dword_734900;
+            dword_73490C = (unsigned __int16)((unsigned int)lParam >> 16) - dword_734904;
+            dword_734900 = (unsigned __int16)lParam;
+            dword_734904 = (unsigned int)lParam >> 16;
+        }
+        break;
+
+    case WM_POWERBROADCAST:
+        return BROADCAST_QUERY_DENY;
+
+    case WM_CHAR:
         byte_9AD988 = static_cast<BYTE>(wParam);
         return DefWindowProcA(hWnd, Msg, wParam, lParam);
-    }
-    if (Msg == WM_ACTIVATE)
-    {
+
+    case WM_ACTIVATE:
         if ((WORD)wParam)
         {
             printf("$jim - WM_ACTIVATE (active)\n");
@@ -596,45 +599,9 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
         Input_AcquireOrUnAcquire();
         Timer_30_1();
         result = 1;
-    }
-    else
-    {
-        if (Msg == WM_PAINT)
-        {
-            printf("$jim - WM_PAINT\n");
-            if (dword_71D17C)
-            {
-                WmPaint_Handler((HDC)wParam);
-                return 0;
-            }
-            return DefWindowProcA(hWnd, Msg, wParam, lParam);
-        }
-        if (Msg == WM_CLOSE)
-        {
-            PostQuitMessage(0);
-            return 0;
-        }
-        if (Msg != WM_KEYDOWN)
-        {
-            if (Msg != WM_KEYUP)
-            {
-                return DefWindowProcA(hWnd, Msg, wParam, lParam);
-            }
-        LABEL_108:
-            if (wParam < 0x100)
-            {
-                byte_9AD880[wParam] = Msg == WM_KEYDOWN;
-            }
-            return DefWindowProcA(hWnd, Msg, wParam, lParam);
-        }
-        v7 = MapVirtualKeyA(wParam, 0);
-        if (v7)
-        {
-            GetKeyNameTextA(v7 << 16, String, 256);
-            gKeys[wParam] = lParam;
-        }
-        gKeys[wParam] = lParam;
+        break;
 
+    case WM_KEYDOWN:
         switch (wParam)
         {
         case VK_F2:
@@ -650,7 +617,8 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                 }
             }
             result = 0;
-            break;
+            goto LABEL_108;
+
         case VK_F4:
             if (gCheatsEnabled)
             {
@@ -661,7 +629,8 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 result = 0;
             }
-            break;
+            goto LABEL_108;
+
         case VK_F5: // Disable free camera
             if (gCheatsEnabled)
             {
@@ -672,7 +641,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 result = 0;
             }
-            break;
+            goto LABEL_108;
 
         case VK_F6: // Enable free camera
             if (gCheatsEnabled)
@@ -684,7 +653,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 result = 0;
             }
-            break;
+            goto LABEL_108;
 
         case VK_F7:  // Restart level with collected items
             if (gCheatsEnabled)
@@ -698,7 +667,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 result = 0;
             }
-            break;
+            goto LABEL_108;
 
         case VK_F8:
             if (gCheatsEnabled)
@@ -710,7 +679,8 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 result = 0;
             }
-            break;
+            goto LABEL_108;
+
         case VK_F9:
             if (gCheatsEnabled)
             {
@@ -721,7 +691,8 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 result = 0;
             }
-            break;
+            goto LABEL_108;
+
         case VK_F11:
             if (gCheatsEnabled)
             {
@@ -732,7 +703,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 result = 0;
             }
-            break;
+            goto LABEL_108;
 
         case VK_F12:
             if (gCheatsEnabled)
@@ -744,7 +715,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 result = 0;
             }
-            break;
+            goto LABEL_108;
 
         case VK_ESCAPE:
             dword_791DE4 = 1;
@@ -756,12 +727,40 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                 }
             }
             goto LABEL_108;
-
-        default:
-            goto LABEL_108;
         }
+
+    case WM_KEYUP:
+    LABEL_108:
+        if (wParam < 0x100)
+        {
+            byte_9AD880[wParam] = Msg == WM_KEYDOWN;
+        }
+        v7 = MapVirtualKeyA(wParam, 0);
+        if (v7)
+        {
+            GetKeyNameTextA(v7 << 16, String, 256);
+            gKeys[wParam] = lParam;
+        }
+        gKeys[wParam] = lParam;
+        return DefWindowProcA(hWnd, Msg, wParam, lParam);
+
+    case WM_PAINT:
+        printf("$jim - WM_PAINT\n");
+        if (dword_71D17C)
+        {
+            WmPaint_Handler((HDC)wParam);
+            return 0;
+        }
+        return DefWindowProcA(hWnd, Msg, wParam, lParam);
+
+    case WM_CLOSE:
+        PostQuitMessage(0);
+        return 0;
+
+    default:
+        return DefWindowProcA(hWnd, Msg, wParam, lParam);
     }
-    
+
     return result;
 }
 
