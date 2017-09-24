@@ -995,6 +995,10 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescripti
 
     pIdentifier->ddIdentifier.field430 |= status;
 
+#ifdef HARDWARE_RENDERING_FORCE
+    pIdentifier->ddIdentifier.field430 = 0;
+#endif
+
     return pIdentifier->ddIdentifier.field430;
 }
 
@@ -1036,7 +1040,8 @@ HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDevice
     jimDeviceIdentifier* pGlobalIdentifier = g_pDeviceIdentifiers +gNumDrivers_dword_77C608;
 
     memset(pGlobalIdentifier, 0, sizeof(jimDeviceIdentifier));
-    
+
+#ifndef HARDWARE_RENDERING_FORCE
     if ((pDesc->dwDevCaps & D3DDEVCAPS_HWRASTERIZATION) && !(pDesc->dwDevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) && (pDesc->dwDeviceRenderBitDepth & DDBD_16))
     {
         if (pIdentifier->ddIdentifier.field434 == 0)
@@ -1046,6 +1051,7 @@ HRESULT CALLBACK Enum3DDevicesCallback(LPSTR lpDeviceDescription, LPSTR lpDevice
     {
         return 1;
     }
+#endif
 
     memcpy(&pGlobalIdentifier->deviceGUID, &pDesc->deviceGUID, sizeof(GUID));
     pGlobalIdentifier->pDeviceGUID = &pGlobalIdentifier->deviceGUID;
