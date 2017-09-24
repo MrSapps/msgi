@@ -698,7 +698,7 @@ static void TestCommonHashes()
     //ASSERT_EQ(0xCD3A, ResourceNameHash("nop"));
     //ASSERT_EQ(0x7636, ResourceNameHash("loop"));
     ASSERT_EQ(0x22FF, ResourceNameHash("mesg"));
-    //ASSERT_EQ(0xD4CB, ResourceNameHash("ntrap_remove"));
+    ASSERT_EQ(0xD4CB, ResourceNameHash("trap"));
     ASSERT_EQ(0x9906, ResourceNameHash("chara"));
     ASSERT_EQ(0xC091, ResourceNameHash("map"));
     //ASSERT_EQ(0x7D50, ResourceNameHash("hzd"));
