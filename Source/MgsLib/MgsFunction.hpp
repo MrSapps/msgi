@@ -101,14 +101,14 @@ enum CallingConvention
     eStdCall
 };
 
-template <DWORD kOldAddr, void* kNewAddr, bool kLogArgs, CallingConvention convention, class Signature, class ReturnType, class... Args>
+template <DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, CallingConvention convention, class Signature, class ReturnType, class... Args>
 class MgsFunctionImpl : public MgsFunctionBase
 {
 public:
     using TFuncType = Signature*;
 
-    MgsFunctionImpl(const char* fnName, bool passThrough)
-        : mFnName(fnName), mPassThrough(passThrough)
+    MgsFunctionImpl(const char* fnName)
+        : mFnName(fnName)
     {
         auto it = GetMgsFunctionTable().find(kOldAddr);
         if (it != std::end(GetMgsFunctionTable()))
@@ -134,11 +134,6 @@ public:
 
     ReturnType operator()(Args ... args)
     {
-        if (mPassThrough && IsMgsi())
-        {
-            return mRealFuncPtr(args...);
-        }
-
 #if ENABLE_LOGGING
         if (kLogArgs)
         {
@@ -154,10 +149,14 @@ public:
 
 #pragma warning(push)
 #pragma warning(disable:4127) // conditional expression is constant
-        if (kNewAddr)
+        if (kNewAddr && !kReverseHook)
         {
             // Call "newAddr" since we've replaced the function completely
             return reinterpret_cast<TFuncType>(kNewAddr)(args...);
+        }
+        else if (kOldAddr && kReverseHook)
+        {
+            return reinterpret_cast<TFuncType>(kOldAddr)(args...);
         }
         else
         {
@@ -230,11 +229,29 @@ protected:
 
     virtual void Apply() override
     {
-        TRACE_ENTRYEXIT;
+#pragma warning(push)
+#pragma warning(disable:4127) // conditional expression is constant
+        if (kReverseHook)
+        {
+            // Redirect calls to our reimpl to the game function
+            ApplyImpl(kNewAddr, reinterpret_cast<void*>(kOldAddr));
+        }
+        else
+        {
+            // Redirect internal game function to our reimpl
+            ApplyImpl(reinterpret_cast<void*>(kOldAddr), kNewAddr);
+        }
+#pragma warning(pop)
+    }
 
-        std::cout << "old addr " << kOldAddr << " new addr " << kNewAddr << std::endl;
+private:
+    void ApplyImpl(void* funcToHook, void* replacement)
+    {
+        //TRACE_ENTRYEXIT;
 
-        mRealFuncPtr = (TFuncType)kOldAddr;
+        std::cout << "old addr " << funcToHook << " new addr " << replacement << std::endl;
+
+        mRealFuncPtr = (TFuncType)funcToHook;
 
         LONG err = 0;
 #pragma warning(push)
@@ -258,31 +275,30 @@ protected:
         }
     }
 
-private:
     TFuncType mRealFuncPtr = nullptr;
     const char* mFnName = nullptr;
     bool mPassThrough = false;
 };
 
-template<DWORD kOldAddr, void* kNewAddr, bool kLogArgs, class ReturnType>
+template<DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, class ReturnType>
 class MgsFunction;
 
 // __cdecl partial specialization
-template<DWORD kOldAddr, bool kLogArgs, void* kNewAddr, class ReturnType, class... Args>
-class MgsFunction    <kOldAddr, kNewAddr, kLogArgs, ReturnType __cdecl(Args...) > : public
-    MgsFunctionImpl<kOldAddr, kNewAddr, kLogArgs, eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
+template<DWORD kOldAddr, bool kLogArgs, bool kReverseHook, void* kNewAddr, class ReturnType, class... Args>
+class MgsFunction    <kOldAddr, kNewAddr, kReverseHook, kLogArgs, ReturnType __cdecl(Args...) > : public
+    MgsFunctionImpl<kOldAddr, kNewAddr, kReverseHook, kLogArgs, eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
 {
 public:
-    MgsFunction(const char* name, bool passThrough = false) : MgsFunctionImpl(name, passThrough) { }
+    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
 };
 
 // __stdcall partial specialization
-template<DWORD kOldAddr, void* kNewAddr, bool kLogArgs, class ReturnType, class ... Args>
-class MgsFunction    <kOldAddr, kNewAddr, kLogArgs, ReturnType __stdcall(Args...) > : public
-    MgsFunctionImpl<kOldAddr, kNewAddr, kLogArgs, eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
+template<DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, class ReturnType, class ... Args>
+class MgsFunction    <kOldAddr, kNewAddr, kReverseHook, kLogArgs, ReturnType __stdcall(Args...) > : public
+    MgsFunctionImpl<kOldAddr, kNewAddr, kReverseHook, kLogArgs, eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
 {
 public:
-    MgsFunction(const char* name, bool passThrough = false) : MgsFunctionImpl(name, passThrough) { }
+    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
 };
 
 class AutoCs
@@ -432,10 +448,33 @@ TypeName LocalVar_##VarName = Value;\
 MgsVar Var_##VarName(#VarName, Addr, sizeof(LocalVar_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
 TypeName& VarName = (Redirect && IsMgsi()) ? *reinterpret_cast<TypeName*>(Addr) : LocalVar_##VarName;
 
-#define MSG_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, true, signature> name(#name);
-#define EXTERN_MSG_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, true, signature> name;
-#define MSG_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, signature> name(#name);
-#define MSG_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, true, decltype(funcName)> funcName##_(#funcName);
-#define MSG_FUNC_IMPLEX(addr, funcName, passThrough) MgsFunction<addr, funcName, true, decltype(funcName)> funcName##_(#funcName, passThrough);
-#define MSG_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, decltype(funcName)> funcName##_(#funcName);
+#define MGS_VAR_EXTERN(TypeName, VarName)\
+extern TypeName LocalVar_##VarName;\
+extern TypeName& VarName;
 
+#define MGS_ARY_EXTERN(TypeName, Size, VarName)\
+extern MgsVar Var_##VarName;\
+extern TypeName* VarName ;
+
+
+#define MGS_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, false, true, signature> name(#name);
+#define EXTERN_MGS_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, false, true, signature> name;
+#define MGS_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, false, signature> name(#name);
+#define MGS_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, false, true, decltype(funcName)> funcName##_(#funcName);
+
+// isImplemented == false means redirect game func to our func. isImplemented == true means redirect our func to game func.
+#define MGS_FUNC_IMPLEX(addr, funcName, isImplemented) MgsFunction<addr, funcName, !isImplemented, true, decltype(funcName)> funcName##_(#funcName);
+#define MGS_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, false, decltype(funcName)> funcName##_(#funcName);
+
+#define MGS_ASSERT_SIZEOF(structureName, expectedSize) static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize)
+
+#define CC __cdecl
+#define MGS_COUNTOF(x) _countof(x)
+
+#define BYTEn(x, n)   (*((BYTE*)&(x)+n))
+#define BYTE1(x)   BYTEn(x,  1)
+#define BYTE2(x)   BYTEn(x,  2)
+#define BYTE3(x)   BYTEn(x,  3)
+#define HIWORD(l)           ((WORD)((((DWORD_PTR)(l)) >> 16) & 0xffff))
+
+#define MGS_FATAL(x)  ::MessageBox(NULL, "ERROR", x, MB_ICONERROR | MB_OK); __debugbreak(); abort();

@@ -71,27 +71,55 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Actor.hpp" />
+    <ClInclude Include="Actor_Debug.hpp" />
+    <ClInclude Include="Actor_Delay.hpp" />
+    <ClInclude Include="Actor_GameD.hpp" />
+    <ClInclude Include="Actor_Loader.hpp" />
+    <ClInclude Include="Actor_Rank.hpp" />
     <ClInclude Include="File.hpp" />
+    <ClInclude Include="Fs.hpp" />
     <ClInclude Include="Input.hpp" />
+    <ClInclude Include="LibDG.hpp" />
+    <ClInclude Include="LibGV.hpp" />
     <ClInclude Include="logger.hpp" />
     <ClInclude Include="MgsFunction.hpp" />
+    <ClInclude Include="Psx.hpp" />
+    <ClInclude Include="Renderer.hpp" />
+    <ClInclude Include="ResourceNameHash.hpp" />
     <ClInclude Include="Script.hpp" />
     <ClInclude Include="Sound.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="System.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Task.hpp" />
+    <ClInclude Include="Timer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Actor_Debug.cpp" />
+    <ClCompile Include="Actor_Delay.cpp" />
+    <ClCompile Include="Actor_GameD.cpp" />
+    <ClCompile Include="Actor_Loader.cpp" />
+    <ClCompile Include="Actor_Rank.cpp" />
     <ClCompile Include="File.cpp" />
+    <ClCompile Include="Fs.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="LibDG.cpp" />
+    <ClCompile Include="LibGV.cpp" />
     <ClCompile Include="MgsFunction.cpp" />
+    <ClCompile Include="Psx.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="ResourceNameHash.cpp" />
     <ClCompile Include="Script.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="System.cpp" />
     <ClCompile Include="Task.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "Sound.hpp"
 #include "File.hpp"
+#include "Fs.hpp"
+
+// TODO: Fix funcs using SKIP
+#define SOUND_IMPL true
 
 using QWORD = __int64;
 
@@ -289,44 +293,44 @@ MGS_PTR(1, 0x77E1E8, double*, dbl_77E1E8, nullptr); // array?
 MGS_PTR(1, 0x68E2C8, DWORD*, dword_68E2C8, nullptr); // array?
 MGS_VAR(1, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
 
-#define SKIP true
+#define SKIP false
 
-MSG_FUNC_IMPLEX(0x0052269C, Sound_Init, false);
-MSG_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, false);
-MSG_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, false);
-MSG_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, false);
-MSG_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, false);
-MSG_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, false);
-MSG_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, false);
-MSG_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, false);
-MSG_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, false);
-MSG_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, false);
-MSG_FUNC_IMPLEX(0x00522A33, Sound_InitFx, false);
-MSG_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, false);
-MSG_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, false);
-MSG_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, false);
-MSG_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
-MSG_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, false);
-MSG_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, false);
-MSG_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, false);
-MSG_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, false);
-MSG_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, false);
-MSG_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, false);
-MSG_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);  // causes raspy codec if redirected
-MSG_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP); // causes raspy codec if redirected
-MSG_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, false);
-MSG_FUNC_IMPLEX(0x00523232, Sound_Start2SamplesQ, false);
-MSG_FUNC_IMPLEX(0x00523466, Sound_Stop2Samples, false);
-MSG_FUNC_IMPLEX(0x0052313B, Sound_StopSample, false);
-MSG_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, false);
-MSG_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, false);
-MSG_FUNC_IMPLEX(0x005224C8, Sound_SetSoundFxVolume, false);
-MSG_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
-MSG_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, false);
-MSG_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, false);
-MSG_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, false);
-MSG_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP); // calls to broken funcs
-MSG_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP); // calls to broken funcs
+MGS_FUNC_IMPLEX(0x0052269C, Sound_Init, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x005234EA, Sound_GetSamp1PosQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x005224BE, Sound_GetSomeStateQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00522A33, Sound_InitFx, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x005227FF, Sound_LoadBufferFromFile, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00522A9C, Sound_LoadFxRelatedQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00522B8D, Sound_LoadFxRelatedQ2, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
+MGS_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);  // causes raspy codec if redirected
+MGS_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP); // causes raspy codec if redirected
+MGS_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523232, Sound_Start2SamplesQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523466, Sound_Stop2Samples, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x0052313B, Sound_StopSample, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x0052255B, Sound_SetMusicVolume, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x005224C8, Sound_SetSoundFxVolume, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
+MGS_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP); // calls to broken funcs
+MGS_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP); // calls to broken funcs
 
 
 #pragma comment(lib, "Winmm.lib") // timegettime()
@@ -336,7 +340,7 @@ void SoundCpp_ForceLink()
     // Make sure the linker won't throw this module away
 }
 
-MSG_FUNC_NOT_IMPL(0x005530A8, HRESULT __stdcall(LPGUID, LPDIRECTSOUND*, LPUNKNOWN), MgsDirectSoundCreate);
+MGS_FUNC_NOT_IMPL(0x005530A8, HRESULT __stdcall(LPGUID, LPDIRECTSOUND*, LPUNKNOWN), MgsDirectSoundCreate);
 
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
@@ -660,10 +664,10 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
     bufferDesc.dwSize = 36;
     bufferDesc.dwFlags = 0x100C8;
     bufferDesc.lpwfxFormat = &waveFormat;
-    FILE* File = File_LoadDirFileQ(fileName, 0);
+    FILE* File = File_LoadDirFile_51EE8F(fileName, 0);
     if (File
-        && (File_NormalRead(File, v4, 20u), File_NormalRead(File, &waveFormat, 18u) == 18)
-        && (File_NormalRead(File, v4, 2u), File_NormalRead(File, &sizeToRead, 4u) == 4))
+        && (File_NormalRead_51F0F5(File, v4, 20u), File_NormalRead_51F0F5(File, &waveFormat, 18u) == 18)
+        && (File_NormalRead_51F0F5(File, v4, 2u), File_NormalRead_51F0F5(File, &sizeToRead, 4u) == 4))
     {
         bufferDesc.dwBufferBytes = sizeToRead;
         if (gDSound_dword_77E2C0)
@@ -695,7 +699,7 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
                     &v10,
                     0);
             }
-            v3 = File_NormalRead(File, soundBuffer, sizeToRead);
+            v3 = File_NormalRead_51F0F5(File, soundBuffer, sizeToRead);
             if (v3 != sizeToRead)
             {
                 return 0;
@@ -706,12 +710,12 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
                 v9,
                 v10);
         }
-        File_CloseQ(File);
+        File_Close_51F183(File);
         result = 1;
     }
     else
     {
-        File_CloseQ(File);
+        File_Close_51F183(File);
         result = 0;
     }
     return result;

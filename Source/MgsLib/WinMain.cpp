@@ -10,6 +10,8 @@
 #include <map>
 #include <detours.h>
 
+#define WINMAIN_IMPL true
+
 // When changing this, delete the cfg files the game creates else it will get into a bad state and probably crash
 #define HARDWARE_RENDERING_FORCE 1
 
@@ -28,54 +30,26 @@
 #include "Input.hpp"
 #include "Task.hpp"
 #include "Script.hpp"
+#include "Actor.hpp"
+#include "System.hpp"
+#include "LibDG.hpp"
+#include "LibGV.hpp"
+#include "Renderer.hpp"
+#include "ResourceNameHash.hpp"
+#include "Psx.hpp"
+#include "Actor_Rank.hpp"
+#include "Actor_Delay.hpp"
+#include "Actor_GameD.hpp"
+#include "Actor_Loader.hpp"
+#include "Timer.hpp"
+#include "Fs.hpp"
 
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "ddraw.lib")
 #pragma comment(lib, "dsound.lib")
 
-struct texture_struct
-{
-    IDirectDrawSurface7* mSurface;
-    WORD field_4;
-    WORD field_6;
-    WORD field_8;
-    WORD field_A;
-    WORD field_C;
-    WORD field_E;
-    WORD field_10;
-    WORD field_12;
-    DWORD float_field_14;
-    DWORD float_field_18;
-    DWORD mSurfaceType;
-    DWORD field_20;
-    DWORD field_24;
-    DWORD field_28;
-    DWORD field_2C;
-    DWORD field_30;
-    DWORD field_34;
-    DWORD field_38;
-    DWORD field_3C;
-    DWORD field_40;
-    DWORD field_44;
-    DWORD field_48;
-    DWORD field_4C;
-};
-static_assert(sizeof(texture_struct) == 0x50, "texture_struct should be 0x50");
 
-MGS_ARY(1, 0x6C0F00, texture_struct, 1500, gTextures_dword_6C0F00, {}); // Array of 1500 items
-
-struct prim_struct
-{
-    DWORD field_0;
-    WORD nTextureIndex;
-    WORD nBlendMode;
-    DWORD mShadeMode;
-    DWORD mPrimTypeQ;
-    DWORD dwVertexCount;
-};
-static_assert(sizeof(prim_struct) == 0x14, "prim_struct should be 0x14");
-MGS_VAR(1, 0x6C0EFC, prim_struct*, gPrimStructArray, nullptr); // Dynamically allocated array of 15000 items
 
 struct rend_struct
 {
@@ -93,63 +67,49 @@ static_assert(sizeof(rend_struct) == 0x20, "rend_struct should be 0x20");
 struct Actor;
 struct ActorList;
 
-MSG_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
-MSG_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
-MSG_FUNC_NOT_IMPL(0x00421680, signed __int64 __cdecl(), FpsTimerSetupQ);
-MSG_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
-MSG_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
-MSG_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
-MSG_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
-MSG_FUNC_NOT_IMPL(0x0040A4F6, void __cdecl(), sub_40A4F6);
-MSG_FUNC_NOT_IMPL(0x00408086, int __cdecl(), sub_408086);
-MSG_FUNC_NOT_IMPL(0x0040111A, int __cdecl(), sub_40111A);
-MSG_FUNC_NOT_IMPL(0x004090A7, int __cdecl(), sub_4090A7);
-MSG_FUNC_NOT_IMPL(0x0040B725, int __cdecl(), sub_40B725);
-MSG_FUNC_NOT_IMPL(0x00452610, int __cdecl(), sub_452610);
-MSG_FUNC_NOT_IMPL(0x0044E9D2, int __cdecl(DWORD*), sub_44E9D2);
-MSG_FUNC_NOT_IMPL(0x0044E381, void* __cdecl(int), sub_44E381);
-MSG_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), unknown_libname_3); // Note: Not a CRT func!!
-MSG_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
-MSG_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
-MSG_FUNC_NOT_IMPL(0x0044E226, Actor* __cdecl(), sub_44E226);
-MSG_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
-MSG_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
-MSG_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
-MSG_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
-MSG_FUNC_NOT_IMPL(0x0041EC40, signed int __cdecl(), sub_41EC40);
-MSG_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), sub_43C850);
-MSG_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
-MSG_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, GUID**), sub_51F1E1);
-MSG_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
-MSG_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
-MSG_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
-MSG_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), Render_TextureScratchAlloc);
-MSG_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
-MSG_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
-MSG_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
-MSG_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
-MSG_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
-MSG_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_SetRenderState);
-MSG_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Render_InitTextureStages);
-MSG_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
-MSG_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
-MSG_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
-//MSG_FUNC_NOT_IMPL(0x0040A3FC, int __cdecl (actor_related_struct*), Actor_Unknown3);
-MSG_FUNC_NOT_IMPL(0x0040A3ED, Actor* __cdecl(Actor*), Actor_SetRemoveFnPtr);
-MSG_FUNC_NOT_IMPL(0x0040A30C, void* __cdecl(int, int), ResourceCtorQ);
-MSG_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
-MSG_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
-MSG_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
-MSG_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
-MSG_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
+MGS_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
+MGS_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
+MGS_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
+MGS_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
+MGS_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
+MGS_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
+
+
+MGS_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
+MGS_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
+MGS_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
+MGS_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
+MGS_FUNC_NOT_IMPL(0x0041EC40, signed int __cdecl(), sub_41EC40);
+MGS_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), sub_43C850);
+MGS_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
+MGS_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, GUID**), sub_51F1E1);
+MGS_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
+MGS_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
+MGS_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
+MGS_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), Render_TextureScratchAlloc);
+MGS_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
+MGS_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
+MGS_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
+MGS_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
+MGS_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
+MGS_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_SetRenderState);
+MGS_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Render_InitTextureStages);
+MGS_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
+MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
+MGS_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
+MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
+MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
+MGS_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
+MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
+MGS_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
 
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
 MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
 MGS_VAR(1, 0x73491C, DWORD, dword_73491C, 0);
 MGS_VAR(1, 0x71D164, DWORD, dword_71D164, 0);
-MGS_VAR(1, 0x6FC718, DWORD, dword_6FC718, 0);
-MGS_VAR(1, 0x6FC720, DWORD, dword_6FC720, 0);
-MGS_VAR(1, 0x6FC768, DWORD, dword_6FC768, 0);
+
+
+
 MGS_VAR(1, 0x78E7F8, WORD, word_78E7F8, 0);
 MGS_VAR(1, 0x78E7F6, WORD, word_78E7F6, 0);
 MGS_VAR(1, 0x717354, DWORD, dword_717354, 0);
@@ -165,9 +125,8 @@ MGS_VAR(1, 0x6FC748, IDirect3D7 *, g_pDirect3D, nullptr);
 MGS_VAR(1, 0x6C0EF8, IDirectDrawGammaControl *, g_pGammaControl, nullptr);
 MGS_VAR(1, 0x6DF214, DWORD, g_dwDisplayWidth, 0);
 MGS_VAR(1, 0x6DF1FC, DWORD, g_dwDisplayHeight, 0);
-MGS_VAR(1, 0x6FC734, LPDIRECTDRAWSURFACE7, g_pPrimarySurface, nullptr);
 MGS_VAR(1, 0x6FC750, LPDIRECTDRAWCLIPPER, g_pClipper, nullptr);
-MGS_VAR(1, 0x6FC738, LPDIRECTDRAWSURFACE7, g_pBackBuffer, nullptr);
+
 MGS_VAR(1, 0x6FC74C, LPDIRECT3DDEVICE7, g_pDirect3DDevice, nullptr);
 MGS_VAR(1, 0x6FC740, LPDIRECTDRAWSURFACE7, g_pDDSurface, nullptr);
 
@@ -186,7 +145,7 @@ MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
 MGS_VAR(1, 0x6FC728, DWORD *, gImageBufer_dword_6FC728, 0);
 MGS_VAR(1, 0x6DEF7C, void *, dword_6DEF7C, nullptr);
 MGS_VAR(1, 0x6DEF90, void *, dword_6DEF90, nullptr);
-MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices, 0);
+
 MGS_VAR(1, 0x6FC798, DWORD, gAlphaModulate_dword_6FC798, 0);
 MGS_VAR(1, 0x6FC7C0, DWORD, dword_6FC7C0, 0);
 MGS_VAR(1, 0x716F6C, DWORD, dword_716F6C, 0);
@@ -229,91 +188,9 @@ MGS_ARY(1, 0x689B68, struct jimUnk0x204, 2, array_689B68, {}); // TODO: Also 2?
 MGS_ARY(1, 0x6C0778, char, 0x400, unk_6C0778, {}); // TODO: Struct?
 MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
-MGS_VAR(1, 0x72279C, DWORD, dword_72279C, 0);
-MGS_VAR(1, 0x6FC78C, WORD, g_NumTextures, 0);
+MGS_VAR(1, 0x72279C, DWORD, game_state_dword_72279C, 0);
 
 
-//MSG_FUNC_NOT_IMPL(0x00422D40, char *__cdecl(char*, HRESULT), PrintDDError);
-void __cdecl PrintDDError(const char* errMsg, HRESULT hrErr)
-{
-    char* pStrErr = nullptr;
-    switch (hrErr)
-    {
-    case DDERR_NOBLTHW:                 pStrErr = "DD - NOBLTHW";                   break;
-    case DDERR_WRONGMODE:               pStrErr = "DD - WRONGMODE";                 break;
-    case DDERR_IMPLICITLYCREATED:       pStrErr = "DD - IMPLICITLYCREATED";         break;
-    case DDERR_CLIPPERISUSINGHWND:      pStrErr = "DD - CLIPPERISUSINGHWND";        break;
-    case DDERR_WASSTILLDRAWING:         pStrErr = "DD - WASSTILLDRAWING";           break;
-    case DDERR_SURFACELOST:             pStrErr = "DD - SURFACELOST";               break;
-    case DDERR_NOEXCLUSIVEMODE:         pStrErr = "DD - NOEXCLUSIVEMODE";           break;
-    case DDERR_SURFACEBUSY:             pStrErr = "DD - DSURFACEBUSY";              break;
-    case DDERR_INVALIDRECT:             pStrErr = "DD - INVALIDRECT";               break;
-    case DDERR_INCOMPATIBLEPRIMARY:     pStrErr = "DD - DDERR_INCOMPATIBLEPRIMARY"; break;
-    case DDERR_INVALIDCLIPLIST:         pStrErr = "DD - INVALIDCLIPLIST";           break;
-    case DDERR_INVALIDOBJECT:           pStrErr = "DD - INVALIDOBJECT";             break;
-    case DDERR_EXCEPTION:               pStrErr = "DD - EXCEPTION";                 break;
-    case DDERR_INVALIDPARAMS:           pStrErr = "DD - INVALIDPARAMS";             break;
-    case DDERR_OUTOFMEMORY:             pStrErr = "DD - DDERR_OUTOFMEMORY";         break;
-    case DDERR_UNSUPPORTED:             pStrErr = "DD - UNSUPPORTED";               break;
-    case DDERR_GENERIC:                 pStrErr = "DD - GENERIC";                   break;
-    }
-
-    char Dest[224] = {};
-    if (!pStrErr)
-    {
-        sprintf(Dest, "Code Err=%i", hrErr);
-        pStrErr = Dest;
-    }
-
-    if (hrErr != S_OK)
-    {
-        for (int i = 0; i < 5; ++i)
-        {
-            printf("!edq %s !  %s\n", errMsg, pStrErr);
-        }
-    }
-}
-MSG_FUNC_IMPL(0x00422D40, PrintDDError);
-
-//MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), Render_RestoreAll);
-__int16 __cdecl Render_RestoreAll()
-{
-    if (g_pPrimarySurface->IsLost() == DDERR_SURFACELOST)
-    {
-        const HRESULT hr = g_pPrimarySurface->Restore();
-        if (FAILED(hr))
-        {
-            PrintDDError("Prim restore caput", hr);
-        }
-    }
-
-    if (g_pBackBuffer->IsLost() == DDERR_SURFACELOST)
-    {
-        const HRESULT hr = g_pBackBuffer->Restore();
-        if (FAILED(hr))
-        {
-            PrintDDError("Ren restore caput", hr);
-        }
-    }
-
-    for (int i = 0; i < g_NumTextures; i++)
-    {
-        if (gTextures_dword_6C0F00[i].mSurface)
-        {
-            if (gTextures_dword_6C0F00[i].mSurface->IsLost() == DDERR_SURFACELOST)
-            {
-                const HRESULT hr = gTextures_dword_6C0F00[i].mSurface->Restore();
-                if (FAILED(hr))
-                {
-                    PrintDDError("tex #%i restore caput", i);
-                }
-            }
-        }
-    }
-
-    return g_NumTextures;
-}
-MSG_FUNC_IMPL(0x0041CC30, Render_RestoreAll);
 
 //MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
 int __cdecl HandleExclusiveMode()
@@ -349,7 +226,7 @@ int __cdecl HandleExclusiveMode()
     while (g_pDirectDraw->TestCooperativeLevel() != 0);
 
     sub_51E086();
-    FpsTimerSetupQ();
+    Timer_30_1();
     Task_ResumeQ();
     Sound_PlaySample();
 
@@ -424,104 +301,17 @@ int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
     return ((fn)(0x452E6E))();
 }
 
-struct Actor
-{
-    Actor* pPrevious;
-    Actor* pNext;
-    void(__cdecl *update)(Actor*);
-    void(__cdecl *fnUnknown3)(Actor*);
-    void(__cdecl *fnUnknown2)(Actor*);
-    char* mNamePtr;
-    DWORD field_18;
-    DWORD field_1C;
-};
-static_assert(sizeof(Actor) == 0x20, "Actor should be 0x20");
-
-// TODO: Could be linked list header?
-struct struct_8
-{
-    DWORD mId;
-    DWORD* field_4;
-};
-static_assert(sizeof(struct_8) == 0x8, "struct_8 should be 0x8");
-
-struct struct_lib_gvd
-{
-    Actor mActor;
-    DWORD field_6BFF00;
-    DWORD field_6BFF04;
-    struct_8* struct_8_ptr_6BFF08; // Seems to point to one of mStruct8_128Array_06BFF80
-    int(__cdecl* field_6BFF0C[26])(DWORD*);
-    struct_8* struct_8_ptr_6BFF74;
-    struct_8* struct_8_ptr_6BFF78;
-    DWORD pad_field_6BFF7C;
-    struct_8 mStruct8_128Array_06BFF80[128];
-    DWORD field_6C0380;
-    DWORD field_6C0384;
-    DWORD field_6C0388[6];
-    DWORD field_6C03A0;
-    DWORD field_6C03A4;
-    DWORD field_6C03B0[81];
-};
-// TODO: This is actually probably bigger!
-static_assert(sizeof(struct_lib_gvd) == 0x60C, "struct_lib_gvd should be 0x60C");
-
-MGS_VAR(1, 0x6BFEE0, struct_lib_gvd, g_lib_gvd_stru_6BFEE0, {});
-
-void __cdecl LibGvd_sub_40A69D()
-{
-    memset(g_lib_gvd_stru_6BFEE0.field_6BFF0C, 0, sizeof(g_lib_gvd_stru_6BFEE0.field_6BFF0C));
-}
-MSG_FUNC_IMPL(0x40A69D, LibGvd_sub_40A69D);
-
-// Other likely LibGvd funcs
-MSG_FUNC_NOT_IMPL(0x40A72A, struct_8 *__cdecl(), LibGvd_sub_40A72A);
-MSG_FUNC_NOT_IMPL(0x40A6CD, char* __cdecl(), LibGvd_sub_40A6CD);
-MSG_FUNC_NOT_IMPL(0x40A6AC, struct_8 *__cdecl(), LibGvd_128_inits_sub_40A6AC);
-MSG_FUNC_NOT_IMPL(0x40A603, int __cdecl(int), LibGvd_sub_40A603);
 
 
-struct ActorList
-{
-    Actor first;
-    Actor last;
-    WORD mPause;
-    WORD mKill;
-};
-static_assert(sizeof(ActorList) == 0x44, "ActorList should be 0x44");
 
-struct Rect16
-{
-    WORD x1, y1, x2, y2;
-};
-static_assert(sizeof(Rect16) == 8, "Rect16 should be 8");
 
-MGS_VAR(1, 0x995344, DWORD, dword_995344, 0);
-MGS_VAR(1, 0x722780, DWORD, dword_722780, 0);
-MGS_VAR(1, 0x722784, DWORD, dword_722784, 0);
-MGS_VAR(1, 0x7227A0, DWORD, dword_7227A0, 0);
-MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
-MGS_VAR(1, 0x9942B8, DWORD, dword_9942B8, 0);
-MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
-MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
-MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
-MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 
-MGS_VAR(1, 0x722760, Actor, g_gamed_722760, {}); // TODO: Will actually big an Actor + other data
 
-//actor_related_struct* gActors = (actor_related_struct*)0x006BFC78; // Array of 9 items, TODO: Check correct
-MGS_ARY(1, 0x006BFC78, ActorList, 9, gActors, {});
 
-MGS_VAR(1, 0x78E7FC, signed short int, word_78E7FC, 0);
-MGS_VAR(1, 0x78E7FE, WORD, word_78E7FE, 0);
-MGS_VAR(1, 0x78E960, DWORD, gResidentTop_dword_78E960, 0);
-MGS_VAR(1, 0x78E964, DWORD, dword_78E964, 0);
-MGS_VAR(1, 0x791A0C, DWORD, dword_791A0C, 0);
-MGS_VAR(1, 0x9942A0, DWORD, dword_9942A0, 0);
+
+
+
 MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
-MGS_ARY(1, 0x994320, WORD, 2048, word_994320, {}); // todo: struct?
-MGS_ARY(1, 0x669AE0, WORD, 2048, word_669AE0, {}); // todo: struct?
-MGS_VAR(1, 0x993F44, DWORD, dword_993F44, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
 MGS_VAR(1, 0x787778, DWORD, dword_787778, 0);
@@ -533,16 +323,15 @@ MGS_VAR(1, 0x00650D14, DWORD, gWindowedMode, 0);
 MGS_VAR(1, 0x00688DB8, char*, off_688DB8, "");
 MGS_VAR(1, 0x6FC7A0, DWORD, dword_6FC7A0, 0);
 MGS_VAR(1, 0x00650D24, DWORD, gNoEffects, 0);
-MGS_VAR(1, 0x00650D28, float, gXRes, 0.0f);
+
 MGS_VAR(1, 0x00650D34, DWORD, gNoFilter, 0);
-MGS_VAR(1, 0x00650D30, DWORD, gModX2, 0);
 MGS_VAR(1, 0x00650D40, DWORD, gNoTrueType, 0);
 MGS_VAR(1, 0x006FC76C, DWORD, gFps, 0);
 MGS_VAR(1, 0x006FC7A4, DWORD, gColourKey, 0);
 MGS_VAR(1, 0x00650D38, int, gBlendMode, 0);
 MGS_VAR(1, 0x00650D20, DWORD, gLowRes, 0);
 MGS_VAR(1, 0x688D40, char*, off_688D40, "");
-MGS_VAR(1, 0x006FC794, DWORD, gSoftwareRendering, 0);
+
 MGS_VAR(1, 0x0071D1D0, HINSTANCE, gHInstance, 0);
 MGS_VAR(1, 0x651D98, DWORD, gSoundFxVol_dword_651D98, 0);
 MGS_VAR(1, 0x716F68, DWORD, gMusicVol_dword_716F68, 0);
@@ -567,8 +356,7 @@ MGS_VAR(1, 0x734904, DWORD, dword_734904, 0);
 MGS_VAR(1, 0x9AD988, BYTE, byte_9AD988,0);
 MGS_VAR(1, 0x688CDC, DWORD, gActive_dword_688CDC, 0);
 MGS_VAR(1, 0x71D17C, DWORD, dword_71D17C, 0 );
-MGS_VAR(1, 0x688CD0, DWORD, dword_688CD0, 0);
-MGS_VAR(1, 0x688CD4, DWORD, dword_688CD4, 0);
+
 MGS_VAR(1, 0x688CD8, DWORD, dword_688CD8, 0);
 MGS_VAR(1, 0x791DE4, DWORD, dword_791DE4, 0);
 MGS_VAR(1, 0x9AD888, BYTE, byte_9AD888, 0);
@@ -579,7 +367,16 @@ MGS_VAR(1, 0x0078E7C0, char * , gDest, nullptr);
 
 struct weapon_famas
 {
-    ActorList mActor;
+    Actor mBase;
+    DWORD field_20;
+    DWORD field_24;
+    DWORD field_28;
+    DWORD field_2C;
+    DWORD field_30;
+    DWORD field_34;
+    DWORD field_38;
+    DWORD field_3C;
+    DWORD field_40;
     DWORD field_44_a1;
     DWORD field_48_a2;
     DWORD field_4C_a3;
@@ -588,60 +385,54 @@ struct weapon_famas
     DWORD field_58;
     DWORD mbIsMp5;
 };
-static_assert(sizeof(weapon_famas) == 96, "weapon_famas should be 96");
+MGS_ASSERT_SIZEOF(weapon_famas, 96);
 
 MGS_VAR(1, 0x995368, WORD, word_995368, 0);
 MGS_VAR(1, 0x995320, WORD, word_995320, 0);
 MGS_VAR(1, 0x78E804, WORD, word_78E804, 0);
 
-MSG_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_sub_640CDC);
-MSG_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), sub_640E9E);
+MGS_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_update_640CDC);
+MGS_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), Res_famas_shutdown_640E9E);
 
-Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *fn1)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName);
 
-MSG_FUNC_NOT_IMPL(0x0040B38E, int __cdecl(char*), ResourceRequestQ);
-MSG_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
-MSG_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
+
+MGS_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
+MGS_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
 
 //MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
-signed int __cdecl Res_Weapon_famas_init_sub_640EAD(weapon_famas *a1, int a2, int a3, int bMp5)
+signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, int a3, int bMp5)
 {
-    int v4; // esi@1
-    int res; // eax@2
-    signed int result; // eax@5
-
-    v4 = (int)&a1->mActor.last;
+    WORD resNameHashed = 0;
     if (bMp5)
-        res = ResourceRequestQ("mpfive");
-    else
-        res = ResourceRequestQ("famas");
-    sub_44FF7C(v4, res, 109);
-    if (*(DWORD *)v4)
     {
-        sub_45011B(v4, a2, a3);
-        result = 0;
+        resNameHashed = ResourceNameHash("mpfive");
     }
     else
     {
-        result = -1;
+        resNameHashed = ResourceNameHash("famas");
     }
-    return result;
+
+    DWORD* pField20 = (DWORD*)&pFamas->field_20;
+    sub_44FF7C((int)pField20, resNameHashed, 'm');
+
+    if (*pField20)
+    {
+        sub_45011B((int)pField20, a2, a3);
+        return 0;
+    }
+
+    return -1;
 }
 
-// TODO : check if ActorList or Actor
-weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
+weapon_famas* CC Res_Weapon_famas_96_sub_640C24(ActorList* a1, ActorList *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
 {
-    weapon_famas *pFamas; // eax@1 MAPDST
-    WORD v8; // eax@5
-    __int16 v9; // cx@6
-
-    pFamas = (weapon_famas *)ResourceCtorQ(6, 96);
+    weapon_famas* pFamas = Actor_ResourceAllocT<weapon_famas>(6);
     if (pFamas)
     {
-        Actor_Init(&pFamas->mActor.first, (void(__cdecl *)(Actor*))Res_famas_sub_640CDC.Ptr(), (void(__cdecl *)(Actor*))sub_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
-        if (Res_Weapon_famas_init_sub_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
+        Actor_Init(&pFamas->mBase, (TActorFunction)Res_famas_update_640CDC.Ptr(), (TActorFunction)Res_famas_shutdown_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
+        if (Res_Weapon_famas_loader_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
         {
-            Actor_SetRemoveFnPtr(&pFamas->mActor.first);
+            Actor_DestroyOnNextUpdate(&pFamas->mBase);
             return 0;
         }
         pFamas->field_58 = 0;
@@ -652,78 +443,26 @@ weapon_famas *__cdecl Res_Weapon_famas_96_sub_640C24(ActorList *a1, ActorList *a
         pFamas->field_54 = 1;
         pFamas->mbIsMp5 = bMp5;
     }
-    v8 = (word_995368 != 0) + 25;                 // 25 is the ammo clip size
+
+    const WORD mp5ClipSize = (word_995368 != 0) + 25;                 // 25 is the ammo clip size
     if (bMp5)
     {
-        word_995368 = (word_995368 != 0) + 25; // Remainder in clip
-        word_995320 = v8; // clip size?
+        word_995320 = mp5ClipSize;
+        word_995368 = mp5ClipSize;
     }
     else
     {
-        v9 = word_78E804;
-        if (v8 > 0 && word_78E804 > v8)
-            v9 = (word_995368 != 0) + 25;
-        word_995320 = (word_995368 != 0) + 25;
-        word_995368 = v9;
+        WORD famasClipSize = word_78E804;
+        if (mp5ClipSize > 0 && word_78E804 > mp5ClipSize)
+        {
+            famasClipSize = mp5ClipSize;
+        }
+        word_995320 = mp5ClipSize;
+        word_995368 = famasClipSize;
     }
     return pFamas;
 }
-MSG_FUNC_IMPL(0x640C24, Res_Weapon_famas_96_sub_640C24);
-
-//MSG_FUNC_NOT_IMPL(0x0040A0D4, int __cdecl(), Actor_DumpActorSystem);
-int __cdecl Actor_DumpActorSystem()
-{
-    int result; // eax@1
-    int v1; // [sp+0h] [bp-18h]@6
-    Actor* pNextActor; // [sp+4h] [bp-14h]@4
-    Actor* pActorCopy; // [sp+8h] [bp-10h]@3
-    signed int i; // [sp+10h] [bp-8h]@1
-    ActorList* pActor; // [sp+14h] [bp-4h]@1
-
-    pActor = gActors;
-    result = printf("--DumpActorSystem--\n");
-    for (i = 0; i < 9; ++i)
-    {
-        printf("Lv %d Pause %d Kill %d\n", i, pActor->mPause, pActor->mKill);
-        pActorCopy = &pActor->first;
-        do
-        {
-            pNextActor = pActorCopy->pNext;
-            if (pActorCopy->update)
-            {
-                if (pActorCopy->field_1C <= 0)
-                    v1 = 0;
-                else
-                    v1 = 100 * pActorCopy->field_18 / pActorCopy->field_1C;
-                printf("Lv%d %04d.%02d %p %s\n", i, v1 / 100, v1 % 100, pActorCopy->update, pActorCopy->mNamePtr);
-                pActorCopy->field_1C = 0;
-                pActorCopy->field_18 = 0;
-            }
-            pActorCopy = pNextActor;
-        } while (pNextActor);
-        ++pActor;
-        result = i + 1;
-    }
-    return result;
-}
-
-//MSG_FUNC_NOT_IMPL(0x0040A37C, void __cdecl (Actor*), Actor_Remove);
-void __cdecl Actor_Remove(Actor* pActor)
-{
-    if (!pActor)
-        return;
-
-    pActor->pNext->pPrevious = pActor->pPrevious;
-    pActor->pPrevious->pNext = pActor->pNext;
-    pActor->pPrevious = 0;
-    pActor->pNext = 0;
-
-    if (pActor->fnUnknown3)
-        pActor->fnUnknown3(pActor);
-
-    if (pActor->fnUnknown2)
-        pActor->fnUnknown2(pActor);
-}
+MGS_FUNC_IMPLEX(0x640C24, Res_Weapon_famas_96_sub_640C24, WINMAIN_IMPL);
 
 void __cdecl Input_AcquireOrUnAcquire();
 
@@ -830,7 +569,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             gActive_dword_688CDC = 0;
         }
         Input_AcquireOrUnAcquire();
-        FpsTimerSetupQ();
+        Timer_30_1();
         result = 1;
     }
     else
@@ -924,7 +663,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             {
                 if (gCheatsEnabled)
                 {
-                    dword_72279C = 0;
+                    game_state_dword_72279C = 0;
                     sub_521210();
                     sub_452E6E();
                     result = 0;
@@ -939,7 +678,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
                 if (wParam == VK_ESCAPE)
                 {
                     dword_791DE4 = 1;
-                    if (dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
+                    if (game_state_dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
                     {
                         if (!dword_717354)
                         {
@@ -1025,7 +764,26 @@ struct MessageBoxStruct
 };
 
 MGS_ARY(1, 0x664EC0, MessageBoxStruct, 8, stru_664EC0, {});
-MGS_ARY(1, 0x00662EC0, char, 8*1024, gStrErrStrings, {}); // 2d array of [8][1024]
+
+struct ErrorStrings
+{
+    char mStrings[8][1024];
+};
+
+const ErrorStrings kArray_00662EC0 =
+{
+    { 
+        "Hold down the Inventory and Weapon item buttons",
+        "if you do not want to play Alternate Round",
+        "RADAR OFF",
+        "Another copy of Metal Gear Solid Integral or VR missions is running, please exit first.",
+        "Metal Gear Solid has detected that your graphics accelerator does not support the functions needed to run the game in Hardware mode.  The game will run correctly, but only in software mode.",
+        "Metal Gear Solid has detected that your graphics accelerator does not support all the functions needed to run the game correctly in Hardware mode.  The game will now default to start in software mode.  You can change this to run with your hardware acceleator at any time from the Video Options / Advanced menu.  This is not recomended as correct game functionality cannot be assured.",
+        "Metal Gear Solid requires at least 4 MB of video accelerator memory available.  Currently, there is not enough video memory on this system to run the game in Hardware mode.  The game will run correctly, but only in software mode.  If more video memory is made available, Metal Gear Solid will run in hardware mode.  For more information, contact your hardware manufacturer.",
+        "Metal Gear Solid has detected that you have a joystick in use on this system.  Please ensure that this joystick is centered prior to playing the game, otherwise the joystick input will override any keyboard direction input."
+    }
+};
+MGS_VAR(1, 0x00662EC0, const ErrorStrings, gStrErrStrings, kArray_00662EC0);
 
 // 0x0043CBD9
 int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uType)
@@ -1067,7 +825,7 @@ int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uTyp
 
             if (msgIdx >= 0)
             {
-                result = MessageBoxA(hWnd, &gStrErrStrings[msgIdx * 1024], lpCaption, uType);
+                result = MessageBoxA(hWnd, gStrErrStrings.mStrings[msgIdx], lpCaption, uType);
             }
         }
         else
@@ -1078,26 +836,29 @@ int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uTyp
     }
     else
     {
-        result = MessageBoxA(hWnd, &gStrErrStrings[errCode * 1024], lpCaption, uType);
+        result = MessageBoxA(hWnd, gStrErrStrings.mStrings[errCode], lpCaption, uType);
     }
     return result;
 }
 
 // 0x423F1B
-HFONT __cdecl sub_423F1B(int cWidth, int cHeight)
+HFONT __cdecl FontCreate_423F1B(int cWidth, int cHeight)
 {
     HFONT result; // eax@3
 
     if (gFont)
+    {
         DeleteObject(gFont);
+    }
+
     result = CreateFontA(cHeight, cWidth, 0, 0, 500, 0, 0, 0, 1u, 0, 0, 2u, 0, "Arial");
     gFont = result;
     return result;
 }
 
-MSG_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
-MSG_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
-MSG_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
+MGS_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
+MGS_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
+MGS_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
 
 MGS_VAR(1, 0x68C3B8, DWORD, dword_68C3B8, 0);
 MGS_VAR(1, 0x775F48, uint8_t, byte_775F48, 0);
@@ -1105,7 +866,7 @@ MGS_VAR(1, 0x774B48, uint8_t, byte_774B48, 0);
 MGS_VAR(1, 0x776450, uint8_t, byte_776450, 0);
 
 
-MSG_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
+MGS_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
 
 //MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), validateDeviceCaps);
 int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescription*/, LPSTR lpDeviceName, jimDeviceIdentifier* pIdentifier)
@@ -1237,7 +998,7 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescripti
     return pIdentifier->ddIdentifier.field430;
 }
 
-MSG_FUNC_IMPL(0x51E7FC, validateDeviceCaps);
+MGS_FUNC_IMPLEX(0x51E7FC, validateDeviceCaps, WINMAIN_IMPL);
 
 HRESULT CALLBACK EnumModesCallback(LPDDSURFACEDESC2 pDesc, LPVOID pUser)
 {
@@ -1486,10 +1247,14 @@ int __cdecl jim_enumerate_devices()
         {
             memcpy(&Buf1, &(g_pDeviceIdentifiers + varC)->ddIdentifier, 0x434);   // Copy of var_450 included same way as earlier
             if (file_msgvideocfg_Write2(&Buf1, -1) == 1)
+            {
                 var8++;
+            }
         }
         if (File_msgvideocfg_Write(&Buf1, varC) == 0)
+        {
             var8++;
+        }
     }
 
     if (gNumDrivers_dword_77C608 > 2)
@@ -1538,23 +1303,9 @@ bool __cdecl ClearDDSurfaceWhite()
     } while (hr == DDERR_WASSTILLDRAWING);
     return hr == S_OK;
 }
-MSG_FUNC_IMPL(0x41E990, ClearDDSurfaceWhite);
+MGS_FUNC_IMPLEX(0x41E990, ClearDDSurfaceWhite, WINMAIN_IMPL);
 
 #define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
-struct MGSVertex
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    DWORD diffuse;
-    DWORD specular;
-    float u;
-    float v;
-};
-static_assert(sizeof(MGSVertex) == 0x20, "MGSVertex must be of size 0x20");
-
-MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 
 
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
@@ -1603,7 +1354,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     mgs_fputs("InitAll {\n", gFile);
     mgs_fflush(gFile);
     gLogFile = gFile;
-    Input_Start();
+    //Input_Start();
     mgs_fputs("jim_enumerate_devices()\n", gFile);
     mgs_fflush(gFile);
     v55 = jim_enumerate_devices();
@@ -2283,7 +2034,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gNoEffects = 0;
         dword_716F60 = 0;
     }
-    sub_423F1B(0, static_cast<int>(14.0 * gXRes));
+    FontCreate_423F1B(0, static_cast<int>(14.0 * gXRes));
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
@@ -2330,8 +2081,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     return result;
 }
-
-//MSG_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
+MGS_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
 
 //MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), SetDDSurfaceTexture);
@@ -2358,7 +2108,6 @@ HRESULT __cdecl SetDDSurfaceTexture()
 
 int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices);
 
-MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
 
 signed int Render_sub_41E3C0()
 {
@@ -2486,7 +2235,7 @@ signed int Render_sub_41E3C0()
     return result;
 }
 
-MSG_FUNC_IMPL(0x41E3C0, Render_sub_41E3C0);
+MGS_FUNC_IMPLEX(0x41E3C0, Render_sub_41E3C0, WINMAIN_IMPL);
 
 //MSG_FUNC_NOT_IMPL(0x41E130, int __cdecl(uint32_t, uint32_t, uint32_t*, MGSVertex*), ClearBackBuffer);
 int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
@@ -2558,1295 +2307,9 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
     }
     return 1;
 }
-MSG_FUNC_IMPL(0x41E130, ClearBackBuffer);
+MGS_FUNC_IMPLEX(0x41E130, ClearBackBuffer, WINMAIN_IMPL);
 
-struct MGSSmallVert
-{
-    WORD x; // 11.1 bits
-    WORD y; // 11.1 bits
-};
-
-struct MGSFloatVert
-{
-    float x;
-    float y;
-};
-
-struct StructVert
-{
-    uint8_t pad0;
-    uint8_t pad1;
-    uint8_t pad2;
-    uint8_t structType;
-};
-
-struct StructVertType0
-{
-    uint8_t diffuseR;
-    uint8_t diffuseG;
-    uint8_t diffuseB;
-    uint8_t structType;
-    MGSSmallVert Vtxs[4];
-};
-
-struct MGSLargeVert
-{
-    MGSSmallVert Vtx;
-    uint8_t u;
-    uint8_t v;
-    uint16_t textureIdx;
-};
-
-struct StructVertType1
-{
-    uint8_t diffuseR;
-    uint8_t diffuseG;
-    uint8_t diffuseB;
-    uint8_t structType;
-    MGSLargeVert TexVtx[4];
-};
-
-struct MGSDiffuseVert
-{
-    uint8_t diffuseR;
-    uint8_t diffuseG;
-    uint8_t diffuseB;
-    uint8_t padding;
-    MGSSmallVert Vtx;
-};
-
-struct StructVertType2
-{
-    MGSDiffuseVert DifVtx[4];
-};
-
-struct MGSLargeVertDif
-{
-    uint8_t diffuseR;
-    uint8_t diffuseG;
-    uint8_t diffuseB;
-    uint8_t padding;
-    MGSSmallVert Vtx;
-    uint8_t u;
-    uint8_t v;
-    uint16_t textureIdx;
-};
-
-struct StructVertType3
-{
-    MGSLargeVertDif DifVtx[4];
-};
-
-struct MGSVertType4
-{
-    MGSFloatVert Vtx;
-    uint8_t u;
-    uint8_t v;
-    uint16_t textureIdx;
-};
-
-struct StructVertType4
-{
-    uint8_t diffuseR;
-    uint8_t diffuseG;
-    uint8_t diffuseB;
-    uint8_t padding;
-    MGSVertType4 Vtx[4];
-};
-
-struct StructVertType5
-{
-    uint32_t field0;
-};
-
-
-struct DR_ENV
-{
-    DWORD tag;
-    DWORD code[15];
-};
-static_assert(sizeof(DR_ENV) == 0x40, "DR_ENV size must be 0x40");
-
-struct DRAWENV
-{
-    Rect16 clip;
-    WORD offx;
-    WORD offy;
-    Rect16 textureWindow;
-    BYTE texturePage;
-    BYTE dtd;
-    BYTE dfe;
-    BYTE isbg;
-    BYTE r0;
-    BYTE g0;
-    BYTE b0;
-    DR_ENV dr_env;
-};
-static_assert(sizeof(DRAWENV) == 0x5C, "DRAWENV size must be 0x5C");
-
-
-MGS_VAR(1, 0x791C54, DWORD, dword_791C54, 0);
-MGS_VAR(1, 0x791C58, DWORD, dword_791C58, 0);
-MGS_VAR(1, 0x791C5C, float, g_fV3, 0);
-MGS_VAR(1, 0x791C60, float, g_fV2, 0);
-MGS_VAR(1, 0x791C64, float, g_fV1, 0);
-MGS_VAR(1, 0x791C68, float, g_fV0, 0);
-MGS_VAR(1, 0x791C6C, float, g_fU3, 0);
-MGS_VAR(1, 0x791C70, float, g_fU2, 0);
-MGS_VAR(1, 0x791C74, float, g_fU1, 0);
-MGS_VAR(1, 0x791C78, float, g_fU0, 0);
-MGS_VAR(1, 0x6FC788, DWORD, g_nPrimitiveIndex, 0);
-MGS_VAR(1, 0x6FC784, DWORD, g_nVertexOffset, 0);
-MGS_VAR(1, 0x6C0EA0, WORD, g_wXOffset, 0);
-MGS_VAR(1, 0x6C0EA2, WORD, g_wYOffset, 0);
-MGS_VAR(1, 0x791C80, float, g_fXOffset, 0);
-MGS_VAR(1, 0x791C84, float, g_fYOffset, 0);
-MGS_VAR(1, 0x791C7C, DWORD, g_nTextureIndex, 0);
-MGS_VAR(1, 0x6C0EAC, WORD, word_6C0EAC, 0);
-MGS_VAR(1, 0x6C0EAE, WORD, word_6C0EAE, 0);
-MGS_VAR(1, 0x6C0E98, DRAWENV, gDrawEnv_6C0E98, {});
-MGS_VAR(1, 0x6C0E9A, WORD, word_6C0E9A, 0);
-MGS_VAR(1, 0x6C0E9C, WORD, word_6C0E9C, 0);
-MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
-
-
-MSG_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
-MSG_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
-
-
-/* TODO: Implement me
-uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV);
-MSG_FUNC_IMPL(0x40CD80, Render_ComputeUVs)
-
-uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV)
-{
-    uint32_t ret = Render_ComputeUVs_.Ptr()(textureIdx, a1, u, v, outU, outV);
-    //LOG_INFO("t: " << textureIdx << " a: " << a1 << " u " << u << " v " << v << " ou " << *outU << " ov " << *outV);
-    return ret;
-}
-*/
-
-MSG_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
-
-MSG_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
-MSG_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
-
-
-void convertVertexType0(StructVertType0* pStructVert, uint32_t nIndex)
-{
-    int32_t signedX, signedY;
-    signedX = pStructVert->Vtxs[nIndex].x << 20;
-    signedX >>= 20;
-    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
-
-    signedY = pStructVert->Vtxs[nIndex].y << 20;
-    signedY >>= 20;
-    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-
-    uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
-}
-
-void convertColorWZType0(StructVertType0* pStructVert)
-{
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-
-    uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
-}
-
-void convertVertexType1(StructVertType1* pStructVert, uint32_t nIndex, float u, float v)
-{
-    int32_t signedX, signedY;
-    signedX = pStructVert->TexVtx[nIndex].Vtx.x << 20;
-    signedX >>= 20;
-    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
-
-    signedY = pStructVert->TexVtx[nIndex].Vtx.y << 20;
-    signedY >>= 20;
-    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-    g_pMGSVertices[g_nVertexOffset].u = u;
-    g_pMGSVertices[g_nVertexOffset].v = v;
-
-    uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
-    if (gModX2 == 0)
-    {
-        uint32_t R = (pStructVert->diffuseR * 0x19A) >> 8;
-        uint32_t G = (pStructVert->diffuseG * 0x19A) >> 8;
-        uint32_t B = (pStructVert->diffuseB * 0x19A) >> 8;
-        R = min(R, 0xFF);
-        G = min(G, 0xFF);
-        B = min(B, 0xFF);
-        diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
-    }
-    
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
-}
-
-void convertExceptPosType1(StructVertType1* pStructVert, float u, float v)
-{
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-    g_pMGSVertices[g_nVertexOffset].u = u;
-    g_pMGSVertices[g_nVertexOffset].v = v;
-
-    uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
-    if (gModX2 == 0)
-    {
-        uint32_t R = (pStructVert->diffuseR * 0x19A) >> 8;
-        uint32_t G = (pStructVert->diffuseG * 0x19A) >> 8;
-        uint32_t B = (pStructVert->diffuseB * 0x19A) >> 8;
-        R = min(R, 0xFF);
-        G = min(G, 0xFF);
-        B = min(B, 0xFF);
-        diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
-    }
-
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
-}
-
-void convertVertexType2(StructVertType2* pStructVert, uint32_t nIndex)
-{
-    int32_t signedX, signedY;
-    signedX = pStructVert->DifVtx[nIndex].Vtx.x << 20;
-    signedX >>= 20;
-    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
-
-    signedY = pStructVert->DifVtx[nIndex].Vtx.y << 20;
-    signedY >>= 20;
-    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-
-    uint32_t diffuseColor = 0xFF000000 | (pStructVert->DifVtx[nIndex].diffuseR << 16) | (pStructVert->DifVtx[nIndex].diffuseG << 8) | (pStructVert->DifVtx[nIndex].diffuseB);
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
-}
-
-void convertVertexType3(StructVertType3* pStructVert, uint32_t nIndex, float u, float v)
-{
-    int32_t signedX, signedY;
-    signedX = pStructVert->DifVtx[nIndex].Vtx.x << 20;
-    signedX >>= 20;
-    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
-
-    signedY = pStructVert->DifVtx[nIndex].Vtx.y << 20;
-    signedY >>= 20;
-    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-    g_pMGSVertices[g_nVertexOffset].u = u;
-    g_pMGSVertices[g_nVertexOffset].v = v;
-
-    uint32_t diffuseColor = 0xFF000000 | (pStructVert->DifVtx[nIndex].diffuseR << 16) | (pStructVert->DifVtx[nIndex].diffuseG << 8) | (pStructVert->DifVtx[nIndex].diffuseB);
-    if (gModX2 == 0)
-    {
-        uint32_t R = (pStructVert->DifVtx[nIndex].diffuseR * 0x19A) >> 8;
-        uint32_t G = (pStructVert->DifVtx[nIndex].diffuseG * 0x19A) >> 8;
-        uint32_t B = (pStructVert->DifVtx[nIndex].diffuseB * 0x19A) >> 8;
-        R = min(R, 0xFF);
-        G = min(G, 0xFF);
-        B = min(B, 0xFF);
-        diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
-    }
-
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
-}
-
-float convertPositionFloat(WORD n)
-{
-    int32_t signedN;
-    signedN = n << 20;
-    signedN >>= 20;
-    return (float)signedN;
-}
-
-uint32_t calculateModX2Diffuse(uint32_t diffuseR, uint32_t diffuseG, uint32_t diffuseB)
-{
-    uint32_t diffuseColor = 0xFF000000 | (diffuseR << 16) | (diffuseG << 8) | (diffuseB);
-    if (gModX2 == 0)
-    {
-        uint32_t R = (diffuseR * 0x19A) >> 8;
-        uint32_t G = (diffuseG * 0x19A) >> 8;
-        uint32_t B = (diffuseB * 0x19A) >> 8;
-        R = min(R, 0xFF);
-        G = min(G, 0xFF);
-        B = min(B, 0xFF);
-        diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
-    }
-
-    return diffuseColor;
-}
-
-void handleBlendMode(uint16_t nBlend)
-{
-    if ((dword_791C54 & 2) != 0)
-        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 1 + ((nBlend >> 5) & 3);
-    else
-        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 0;
-}
-
-void handleBlendMode(uint16_t nBlend, uint16_t offset)
-{
-    if ((dword_791C54 & 2) != 0)
-        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 1 + offset + ((nBlend >> 5) & 3);
-    else
-        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = offset;
-}
-
-void convertVertexType4(StructVertType4* pStructVert, uint32_t nIndex, float u, float v)
-{
-    g_pMGSVertices[g_nVertexOffset].x = pStructVert->Vtx[nIndex].Vtx.x + g_fXOffset;
-    g_pMGSVertices[g_nVertexOffset].y = pStructVert->Vtx[nIndex].Vtx.y + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-    g_pMGSVertices[g_nVertexOffset].u = u;
-    g_pMGSVertices[g_nVertexOffset].v = v;
-    g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->diffuseR, pStructVert->diffuseG, pStructVert->diffuseB);
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
-}
-
-MSG_FUNC_NOT_IMPL(0x418A70, int __cdecl(StructVert* a_pStructVert, int a_nSize), Render_Software);
-
-// Untested for the moment
-//MSG_FUNC_NOT_IMPL(0x410560, int __cdecl(StructVert* a_pStructVert, int a_nSize), ConvertPolys_Hardware);
-int __cdecl ConvertPolys_Hardware(StructVert* a_pStructVert, int a_nSize)
-{
-    uint32_t var14 = dword_688CD4;
-    uint32_t var1C = dword_688CD0;
-
-    for (;;)
-    {
-        if (a_nSize <= 0)
-            return 1;
-
-        dword_791C54 = a_pStructVert->structType;
-        dword_791C58 = 0;
-        g_fV3 = g_fV2 = g_fV1 = g_fV0 = 0;
-        g_fU3 = g_fU2 = g_fU1 = g_fU0 = 0;
-
-        gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 0;
-        gPrimStructArray[g_nPrimitiveIndex].nBlendMode = 0;
-
-        // 100-103 case has an issue, causes corrupted text
-        //LOG_INFO("VTX type: " << dword_791C54);
-
-        switch (dword_791C54)
-        {
-        case 0:
-            return 1;
-
-        case 32: // monochrome 3 point polygon
-        case 33:
-        case 34:
-        case 35:
-        {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
-
-            convertVertexType0(pStructVert, 0);
-            convertVertexType0(pStructVert, 1);
-            convertVertexType0(pStructVert, 2);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 3;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLELIST;
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-
-            dword_791C58 = 4;
-            break;
-        }
-
-        case 40: // monchrome 4 point polygon
-        case 41:
-        case 42:
-        case 43:
-        {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
-
-            convertVertexType0(pStructVert, 0);
-            convertVertexType0(pStructVert, 1);
-            convertVertexType0(pStructVert, 2);
-            convertVertexType0(pStructVert, 3);
-
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-
-            dword_791C58 = 5;
-            break;
-        }
-
-        case 44:
-        case 45:
-        case 46:
-        case 47:
-        {
-            StructVertType1* pStructVert = (StructVertType1*)a_pStructVert;
-            uint32_t TextureIdx0, TextureIdx1;
-            Render_ComputeTextureIdx(pStructVert->TexVtx[1].textureIdx, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
-            TextureIdx0 &= 0xFFFF;
-            TextureIdx1 &= 0xFFFF;
-
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-            g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
-
-            if (g_nTextureIndex >= g_NumTextures)
-            {
-                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
-            }
-            else
-            {
-                const uint32_t texturePage = (pStructVert->TexVtx[1].textureIdx & 0x180) >> 7;
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[1].u, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v, &g_fU2, &g_fV2);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[3].u, pStructVert->TexVtx[3].v, &g_fU3, &g_fV3);
-            }
-
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(pStructVert->TexVtx[1].textureIdx);
-
-            convertVertexType1(pStructVert, 0, g_fU0, g_fV0);
-            convertVertexType1(pStructVert, 1, g_fU1, g_fV1);
-            convertVertexType1(pStructVert, 2, g_fU2, g_fV2);
-            convertVertexType1(pStructVert, 3, g_fU3, g_fV3);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-
-            dword_791C58 = 9;
-            break;
-        }
-
-        case 48:
-        case 49:
-        case 50:
-        case 51:
-        {
-            StructVertType2* pStructVert = (StructVertType2*)a_pStructVert;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
-
-            convertVertexType2(pStructVert, 0);
-            convertVertexType2(pStructVert, 1);
-            convertVertexType2(pStructVert, 2);
-
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 3;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLELIST;
-
-            dword_791C58 = 6;
-            break;
-        }
-
-        case 52:
-        case 53:
-        case 54:
-        case 55:
-        {
-            StructVertType3* pStructVert = (StructVertType3*)a_pStructVert;
-
-            uint32_t TextureIdx0, TextureIdx1;
-            Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1);
-            TextureIdx0 &= 0xFFFF;
-            TextureIdx1 &= 0xFFFF;
-
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-            g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
-
-            if (g_nTextureIndex >= g_NumTextures)
-            {
-                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
-            }
-            else
-            {
-                const uint32_t texturePage = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
-            }
-
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(pStructVert->DifVtx[1].textureIdx);
-
-            convertVertexType3(pStructVert, 0, g_fU0, g_fV0);
-            convertVertexType3(pStructVert, 1, g_fU1, g_fV1);
-            convertVertexType3(pStructVert, 2, g_fU2, g_fV2);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 3;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLELIST;
-
-            dword_791C58 = 9;
-        }
-
-        case 56:
-        case 57:
-        case 58:
-        case 59:
-        {
-            StructVertType2* pStructVert = (StructVertType2*)a_pStructVert;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
-
-            if (gPrimStructArray[g_nPrimitiveIndex].nBlendMode == 3)
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    pStructVert->DifVtx[i].diffuseB = (uint8_t)min(pStructVert->DifVtx[i].diffuseB << 2, 0xFF);
-                    pStructVert->DifVtx[i].diffuseG = (uint8_t)min(pStructVert->DifVtx[i].diffuseG << 2, 0xFF);
-                    pStructVert->DifVtx[i].diffuseR = (uint8_t)min(pStructVert->DifVtx[i].diffuseR << 2, 0xFF);
-                }
-            }
-            
-            convertVertexType2(pStructVert, 0);
-            convertVertexType2(pStructVert, 1);
-            convertVertexType2(pStructVert, 2);
-            convertVertexType2(pStructVert, 3);
-
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-
-            if (gPrimStructArray[g_nPrimitiveIndex].nBlendMode == 3 && dword_6FC774 != 0)
-            {
-                convertVertexType2(pStructVert, 0);
-                convertVertexType2(pStructVert, 1);
-                convertVertexType2(pStructVert, 2);
-                convertVertexType2(pStructVert, 3);
-
-                gPrimStructArray[g_nPrimitiveIndex].dwVertexCount += 4;
-            }
-
-            dword_791C58 = 8;
-            break;
-        }
-
-        case 60:
-        case 61:
-        case 62:
-        case 63:
-        {
-            StructVertType3* pStructVert = (StructVertType3*)a_pStructVert;
-            float position[16];
-            position[11] = 0.5f;
-            position[10] = 0.5f;
-            position[ 9] = 0.5f;
-            position[ 8] = 0.5f;
-            position[15] = 1.0f;
-            position[14] = 0.999999f;
-            position[13] = 0.999999f;
-            position[12] = 0.999999f;
-
-            position[3] = convertPositionFloat(pStructVert->DifVtx[0].Vtx.x);
-            position[2] = convertPositionFloat(pStructVert->DifVtx[1].Vtx.x);
-            position[1] = convertPositionFloat(pStructVert->DifVtx[2].Vtx.x);
-            // TODO: FIX ME 3 is out of bounds
-            position[0] = convertPositionFloat(pStructVert->DifVtx[3].Vtx.x);
-
-            position[7] = convertPositionFloat(pStructVert->DifVtx[0].Vtx.y);
-            position[6] = convertPositionFloat(pStructVert->DifVtx[1].Vtx.y);
-            position[5] = convertPositionFloat(pStructVert->DifVtx[2].Vtx.y);
-            position[4] = convertPositionFloat(pStructVert->DifVtx[3].Vtx.y);
-
-            if ((pStructVert->DifVtx[3].textureIdx & 0x8000) != 0 && var1C != 0)
-            {
-                float* var68 = (float*)(0x734A40 + ((pStructVert->DifVtx[3].textureIdx & 0xFFF) << 6)); // TODO : Var this struct (sizeof = 0x40)
-                if (var68[8] > 0.0005f)
-                    position[15] = 1.0f / var68[8];
-                if (var68[9] > 0.0005f)
-                    position[14] = 1.0f / var68[9];
-                if (var68[10] > 0.0005f)
-                    position[13] = 1.0f / var68[10];
-                if (var68[11] > 0.0005f)
-                    position[12] = 1.0f / var68[11];
-
-                if (var14 != 0)
-                {
-                    position[3] = var68[0];
-                    position[2] = var68[1];
-                    position[1] = var68[2];
-                    position[0] = var68[3];
-
-                    position[7] = var68[4];
-                    position[6] = var68[5];
-                    position[5] = var68[6];
-                    position[4] = var68[7];
-                }
-            }
-
-            uint32_t TextureIdx0, TextureIdx1;
-            if (Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
-            {
-                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFE;
-                g_fU0 = (float)(TextureIdx0 & 0xFFFF);
-                g_fV0 = (float)(TextureIdx1 & 0xFFFF);
-
-                Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &TextureIdx0, &TextureIdx1);
-                g_fU1 = (float)(TextureIdx0 & 0xFFFF);
-                g_fV1 = (float)(TextureIdx1 & 0xFFFF);
-
-                Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &TextureIdx0, &TextureIdx1);
-                g_fU2 = (float)(TextureIdx0 & 0xFFFF);
-                g_fV2 = (float)(TextureIdx1 & 0xFFFF);
-
-                Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &TextureIdx0, &TextureIdx1);
-                g_fU3 = (float)(TextureIdx0 & 0xFFFF);
-                g_fV3 = (float)(TextureIdx1 & 0xFFFF);
-            }
-            else
-            {
-                TextureIdx0 &= 0xFFFF;
-                TextureIdx1 &= 0xFFFF;
-
-                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-                g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
-
-                if (g_nTextureIndex >= g_NumTextures)
-                {
-                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
-                }
-                else
-                {
-                    const uint32_t texturePage = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &g_fU3, &g_fV3);
-
-                    uint16_t* pIndex = (uint16_t*)(0x6FC728 + ((pStructVert->DifVtx[0].textureIdx >> 6) << 11) + ((pStructVert->DifVtx[0].textureIdx & 0x3F) << 5));
-                    if (*pIndex == 0xEDED)
-                    {
-                        gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFF0;
-                        dword_791C54 &= 0xFFFFFFFD;
-                    }
-                }
-            }
-            
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(pStructVert->DifVtx[1].textureIdx);
-
-            g_pMGSVertices[g_nVertexOffset].x = position[ 3] + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = position[ 7] + g_fYOffset;
-            g_pMGSVertices[g_nVertexOffset].z = position[11];
-            g_pMGSVertices[g_nVertexOffset].w = position[15];
-            g_pMGSVertices[g_nVertexOffset].u = g_fU0;
-            g_pMGSVertices[g_nVertexOffset].v = g_fV0;
-            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[0].diffuseR, pStructVert->DifVtx[0].diffuseG, pStructVert->DifVtx[0].diffuseB);
-            g_nVertexOffset++;
-
-            g_pMGSVertices[g_nVertexOffset].x = position[ 2] + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = position[ 6] + g_fYOffset;
-            g_pMGSVertices[g_nVertexOffset].z = position[10];
-            g_pMGSVertices[g_nVertexOffset].w = position[14];
-            g_pMGSVertices[g_nVertexOffset].u = g_fU1;
-            g_pMGSVertices[g_nVertexOffset].v = g_fV1;
-            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[1].diffuseR, pStructVert->DifVtx[1].diffuseG, pStructVert->DifVtx[1].diffuseB);
-            g_nVertexOffset++;
-
-            g_pMGSVertices[g_nVertexOffset].x = position[ 1] + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = position[ 5] + g_fYOffset;
-            g_pMGSVertices[g_nVertexOffset].z = position[ 9];
-            g_pMGSVertices[g_nVertexOffset].w = position[13];
-            g_pMGSVertices[g_nVertexOffset].u = g_fU2;
-            g_pMGSVertices[g_nVertexOffset].v = g_fV2;
-            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[2].diffuseR, pStructVert->DifVtx[2].diffuseG, pStructVert->DifVtx[2].diffuseB);
-            g_nVertexOffset++;
-
-            g_pMGSVertices[g_nVertexOffset].x = position[ 0] + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = position[ 4] + g_fYOffset;
-            g_pMGSVertices[g_nVertexOffset].z = position[ 8];
-            g_pMGSVertices[g_nVertexOffset].w = position[12];
-            g_pMGSVertices[g_nVertexOffset].u = g_fU3;
-            g_pMGSVertices[g_nVertexOffset].v = g_fV3;
-            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[3].diffuseR, pStructVert->DifVtx[3].diffuseG, pStructVert->DifVtx[3].diffuseB);
-            g_nVertexOffset++;
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-
-            dword_791C58 = 0xC;
-            break;
-        }
-
-        case 64:
-        case 65:
-        case 66:
-        case 67:
-        {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            float fXSize, fYSize;
-            sub_40FF20(pStructVert->Vtxs[0].x, pStructVert->Vtxs[0].y, pStructVert->Vtxs[1].x, pStructVert->Vtxs[1].y, &fXSize, &fYSize);
-            handleBlendMode(word_6C0EAC);
-
-            convertVertexType0(pStructVert, 0);
-            convertVertexType0(pStructVert, 0);
-            g_pMGSVertices[g_nVertexOffset - 1].x += fXSize;
-            g_pMGSVertices[g_nVertexOffset - 1].y += fYSize;
-            convertVertexType0(pStructVert, 1);
-            convertVertexType0(pStructVert, 1);
-            g_pMGSVertices[g_nVertexOffset - 1].x += fXSize;
-            g_pMGSVertices[g_nVertexOffset - 1].y += fYSize;
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-
-            dword_791C58 = 3;
-            break;
-        }
-
-        case 72:
-        case 73:
-        case 74:
-        case 75:
-        {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
-
-            convertVertexType0(pStructVert, 0);
-            convertVertexType0(pStructVert, 1);
-            convertVertexType0(pStructVert, 2);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 3;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_LINESTRIP;
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-
-            dword_791C58 = 5;
-            break;
-        }
-
-        case 76:
-        case 77:
-        case 78:
-        case 79:
-        {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
-
-            convertVertexType0(pStructVert, 0);
-            convertVertexType0(pStructVert, 1);
-            convertVertexType0(pStructVert, 2);
-            convertVertexType0(pStructVert, 3);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_LINESTRIP;
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-
-            dword_791C58 = 6;
-            break;
-        }
-
-        case 80:
-        case 81:
-        case 82:
-        case 83:
-        {
-            StructVertType2* pStructVert = (StructVertType2*)a_pStructVert;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
-
-            convertVertexType2(pStructVert, 0);
-            convertVertexType2(pStructVert, 1);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 2;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_LINELIST;
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-
-            dword_791C58 = 4;
-            break;
-        }
-
-        case 96:
-        case 97:
-        case 98:
-        case 99:
-        {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-
-            float fSecondX = convertPositionFloat(pStructVert->Vtxs[0].x) + (float)((int16_t)pStructVert->Vtxs[1].x);
-            float fSecondY = convertPositionFloat(pStructVert->Vtxs[0].y) + (float)((int16_t)pStructVert->Vtxs[1].y);
-
-            handleBlendMode(word_6C0EAC);
-            convertVertexType0(pStructVert, 0);
-            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = convertPositionFloat(pStructVert->Vtxs[0].y) + g_fYOffset;
-            convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = convertPositionFloat(pStructVert->Vtxs[0].x) + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
-            convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
-            convertColorWZType0(pStructVert);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-
-            dword_791C58 = 3;
-            break;
-        }
-
-        case 100:
-        case 101:
-        case 102:
-        case 103:
-        {
-            StructVertType1* pStructVert = (StructVertType1*)a_pStructVert;
-            float fInverseRes = 1.0f / gXRes;
-
-            int16_t diffX = (int16_t)pStructVert->TexVtx[1].Vtx.x;
-            int16_t diffY = (int16_t)pStructVert->TexVtx[1].Vtx.y;
-            float fSecondX = convertPositionFloat(pStructVert->TexVtx[0].Vtx.x) + (float)diffX;
-            float fSecondY = convertPositionFloat(pStructVert->TexVtx[0].Vtx.y) + (float)diffY;
-
-            uint32_t TextureIdx0, TextureIdx1;
-            if (Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
-            {
-                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFD;
-                g_fU0 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
-                g_fV0 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
-
-                Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
-                g_fU1 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
-                g_fV1 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
-
-                Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
-                g_fU2 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
-                g_fV2 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
-
-                Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
-                g_fU3 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
-                g_fV3 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
-            }
-            else
-            {
-                if (pStructVert->TexVtx[0].textureIdx & 0x8000)
-                {
-                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 1 + (pStructVert->TexVtx[0].textureIdx & 0xF);
-                    g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
-                    pStructVert->TexVtx[0].u = 0;
-                    pStructVert->TexVtx[0].v = 0;
-                }
-                else
-                {
-                    TextureIdx0 &= 0xFFFF;
-                    TextureIdx1 &= 0xFFFF;
-                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-                    g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
-                }
-                if (g_nTextureIndex >= g_NumTextures)
-                {
-                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
-                }
-                else
-                {
-                    const uint32_t texturePage = (word_6C0EAC & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v + diffY, &g_fU3, &g_fV3);
-                }
-            }
-
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC, 0x8000);
-
-            convertVertexType1(pStructVert, 0, g_fU0, g_fV0);
-            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = convertPositionFloat(pStructVert->TexVtx[0].Vtx.y) + g_fYOffset;
-            convertExceptPosType1(pStructVert, g_fU1, g_fV1);
-            g_pMGSVertices[g_nVertexOffset].x = convertPositionFloat(pStructVert->TexVtx[0].Vtx.x) + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
-            convertExceptPosType1(pStructVert, g_fU2, g_fV2);
-            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
-            convertExceptPosType1(pStructVert, g_fU3, g_fV3);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-
-            dword_791C58 = 4;
-            break;
-        }
-
-        case 104:
-        case 105:
-        case 106:
-        case 107:
-        {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
-            float fHalfOffset = (((gXRes - 1.0f) / 2.0f) + 1.0f) / gXRes;
-
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
-
-            float centerX = convertPositionFloat(pStructVert->Vtxs[0].x);
-            float centerY = convertPositionFloat(pStructVert->Vtxs[0].y);
-            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset - fHalfOffset;
-            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset - fHalfOffset;
-            convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset + fHalfOffset;
-            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset - fHalfOffset;
-            convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset - fHalfOffset;
-            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset + fHalfOffset;
-            convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset + fHalfOffset;
-            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset + fHalfOffset;
-            convertColorWZType0(pStructVert);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-
-            dword_791C58 = 2;
-            break;
-        }
-
-        case 128: // $80     move image in frame buffer
-        {
-            StructVertType0* pStructVert = (StructVertType0*)a_pStructVert;
-            int16_t rawPos[4];
-
-            // source coord
-            rawPos[1] = pStructVert->Vtxs[0].y;
-            rawPos[0] = pStructVert->Vtxs[0].x;
-
-            // dest coord
-            int16_t varDC = pStructVert->Vtxs[1].y;
-            int16_t varD8 = pStructVert->Vtxs[1].x;
-
-            // w/h to xfer
-            rawPos[3] = pStructVert->Vtxs[2].y;
-            rawPos[2] = pStructVert->Vtxs[2].x;
-
-            // move image
-            sub_40D540(rawPos, varD8, varDC);
-
-            dword_791C58 = 4;
-            break;
-        }
-
-        case 144:
-        case 145:
-        case 146:
-        case 147:
-        {
-            StructVertType4* pStructVert = (StructVertType4*)a_pStructVert;
-            if ((pStructVert->Vtx[0].textureIdx & 0x8000) != 0)
-            {
-                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFF0;
-            }
-            else
-            {
-                uint32_t TextureIdx0, TextureIdx1;
-                Render_ComputeTextureIdx(pStructVert->Vtx[1].textureIdx, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &TextureIdx0, &TextureIdx1);
-                TextureIdx0 &= 0xFFFF;
-                TextureIdx1 &= 0xFFFF;
-                gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-                g_nTextureIndex = gPrimStructArray[g_nPrimitiveIndex].nTextureIndex;
-
-                if (g_nTextureIndex >= g_NumTextures)
-                {
-                    gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0;
-                }
-                else
-                {
-                    const uint32_t texturePage = (pStructVert->Vtx[1].textureIdx & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[1].u, pStructVert->Vtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[2].u, pStructVert->Vtx[2].v, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[3].u, pStructVert->Vtx[3].v, &g_fU3, &g_fV3);
-                }
-            }
-            
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
-
-            convertVertexType4(pStructVert, 0, g_fU0, g_fV0);
-            convertVertexType4(pStructVert, 1, g_fU1, g_fV1);
-            convertVertexType4(pStructVert, 2, g_fU2, g_fV2);
-            convertVertexType4(pStructVert, 3, g_fU3, g_fV3);
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 4;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-
-            dword_791C58 = 0xD;
-            break;
-        }
-
-        case 225:
-        {
-            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
-
-            word_6C0EAC = pStructVert->field0 & 0x1FF;
-            word_6C0EAE = (((pStructVert->field0 >> 10) & 1) << 8) | ((pStructVert->field0 >> 9) & 1);
-
-            dword_791C58 = 1;
-            break;
-        }
-
-        case 226:
-        {
-            dword_791C58 = 1;
-            break;
-        }
-
-        case 227:
-        {
-            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
-
-            gDrawEnv_6C0E98.clip.x1 = pStructVert->field0 & 0x3FF;
-            word_6C0E9A = (pStructVert->field0 >> 10) & 0x3FF;
-
-            dword_791C58 = 1;
-            break;
-        }
-
-        case 228:
-        {
-            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
-
-            word_6C0E9C = (pStructVert->field0 & 0x3FF) - gDrawEnv_6C0E98.clip.x1 + 1;
-            word_6C0E9E = ((pStructVert->field0 >> 10) & 0x3FF) - word_6C0E9A + 1;
-
-            g_pMGSVertices[g_nVertexOffset].x = (float)gDrawEnv_6C0E98.clip.x1;
-            g_pMGSVertices[g_nVertexOffset].y = (float)word_6C0E9A;
-            g_pMGSVertices[g_nVertexOffset].u = (float)word_6C0E9C;
-            g_pMGSVertices[g_nVertexOffset].v = (float)word_6C0E9E;
-            g_nVertexOffset++;
-
-            gPrimStructArray[g_nPrimitiveIndex].dwVertexCount = 1;
-            gPrimStructArray[g_nPrimitiveIndex].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[g_nPrimitiveIndex].mPrimTypeQ = 0x7D0; // ?
-            gPrimStructArray[g_nPrimitiveIndex].nTextureIndex = 0xFFFF;
-
-            dword_791C58 = 1;
-            break;
-        }
-
-        case 229:
-        {
-            StructVertType5* pStructVert = (StructVertType5*)a_pStructVert;
-
-            g_wXOffset = pStructVert->field0 & 0x7FF;
-            g_wYOffset = (pStructVert->field0 >> 11) & 0x3FF;
-
-            dword_791C58 = 1;
-            break;
-        }
-
-        case 255:
-        {
-            dword_791C58 = 1;
-            break;
-        }
-
-        default:
-            break;
-        }
-
-        if (gPrimStructArray[g_nPrimitiveIndex].dwVertexCount != 0)
-            g_nPrimitiveIndex++;
-
-        if (dword_791C58 == 0)
-        {
-            uint8_t* pValue = (uint8_t*)(0x650A5C + dword_791C54);
-            dword_791C58 = *pValue;
-        }
-        if (dword_791C58 == 0)
-            dword_791C58 = 1;
-
-        a_nSize -= dword_791C58;
-        a_pStructVert = (StructVert*)((intptr_t)a_pStructVert + dword_791C58 * 4);
-    }
-}
-
-MSG_FUNC_IMPL(0x410560, ConvertPolys_Hardware);
-
-MGS_VAR(1, 0x6FC868, void*, g_pBackBufferSurface, 0);
-MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
-
-MSG_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
-MSG_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
-
-#define OT_END_TAG 0xFFFFFF
-
-int __cdecl Renderer_ClearOTag(DWORD* ot, int otSize)
-{
-    if (otSize - 1 <= 0)
-    {
-        // As we only have 1 item, set the start of the table to be the end marker
-        *ot = OT_END_TAG;
-    }
-    else
-    {
-        // Get a pointer to the last item
-        DWORD* pOTItem = &ot[otSize - 1];
-        int count = otSize - 1;
-        do
-        {
-            // Set the current item to point to the previous item
-            *pOTItem = reinterpret_cast<DWORD>(pOTItem - 1);
-            if (reinterpret_cast<DWORD>(pOTItem) & 0xFF000000)
-            {
-                printf(
-                    "\n"
-                    "\n"
-                    "***** ERROR: ClearOTag() found a pointer which uses more than 24 bit *****\n"
-                    " Invalid pointer value caused overflow [%x]\n"
-                    "\n",
-                    *pOTItem);
-            }
-            --pOTItem;
-            --count;
-        } while (count);
-
-        // Set the first item to the end marker
-        *ot = OT_END_TAG;
-    }
-    return 0;
-}
-MSG_FUNC_IMPL(0x0044AB80, Renderer_ClearOTag);
-
-//MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
-void __cdecl Render_DrawGeneric(StructVert* a_pStructVert)
-{
-    if (dword_6FC718 == 1)
-    {
-        dword_6FC718 = 0;
-        dword_6FC720 = 1;
-        return;
-    }
-
-    dword_6FC718 = 0;
-    if (dword_6FC720 == 0)
-    {
-        if (gSoftwareRendering != 0)
-        {
-            DDSURFACEDESC2 desc;
-            memset(&desc, 0, sizeof(DDSURFACEDESC2));
-            desc.dwSize = sizeof(DDSURFACEDESC2);
-            g_pBackBuffer->Lock(NULL, &desc, 0, 0);
-            g_pBackBufferSurface = desc.lpSurface;
-            g_BackBufferPitch = desc.lPitch;
-        }
-        do
-        {
-            if (a_pStructVert->structType != 0 && dword_6FC768 == 0)
-            {
-                if (gSoftwareRendering != 0)
-                {
-                    Render_Software(&a_pStructVert[1], a_pStructVert->structType);
-                }
-                else
-                {
-                    ConvertPolys_Hardware(&a_pStructVert[1], a_pStructVert->structType);
-                }
-            }
-
-            // Get the pointer bytes of the OT, the remainder byte is the type.. TODO - how does the vertex info fit into the OT?
-            uint32_t nextStructVert = ((uint32_t*)a_pStructVert)[0] & 0x00FFFFFF;
-            a_pStructVert = (StructVert*)nextStructVert;
-        }
-        while ((uint32_t)a_pStructVert != OT_END_TAG);
-
-        if (gSoftwareRendering != 0)
-        {
-            g_pBackBuffer->Unlock(0);
-        }
-        if (gSoftwareRendering == 0)
-        {
-            Render_DrawHardware();
-        }
-    }
-    if (gSoftwareRendering == 0)
-    {
-        sub_51DE0A();
-    }
-}
-MSG_FUNC_IMPL(0x4103B0, Render_DrawGeneric);
-
-struct VertsBlock
-{
-    StructVert header;
-    uint8_t padding[0x3C];
-};
-static_assert(sizeof(VertsBlock) == 0x40, "VertsBlock must be of size 0x40");
-
-struct PrimitivesChain
-{
-    StructVert* pStructVerts0[2];
-    uint8_t nNumStructs;
-    uint8_t padding0;
-    uint8_t padding1;
-    uint8_t padding2;
-    uint16_t fieldC;
-    uint8_t fieldE[0x4E];
-    uint32_t field5C;
-    uint32_t field60;
-    uint32_t field64;
-    uint32_t field68;
-    VertsBlock vertBlock0[2];
-    VertsBlock vertBlock1[2];
-    VertsBlock vertBlock2[2];
-};
-static_assert(sizeof(PrimitivesChain) == 0x1EC, "PrimitivesChain must be of size 0x1EC");
-
-
-//MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
-void __cdecl Render_DrawIndex(uint32_t a_nIndex)
-{
-    StructVert* pStructVert = (StructVert*)(0x6BC1EC + a_nIndex * 0x40);
-    Render_DrawGeneric(pStructVert);
-}
+MGS_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
 
 // 0x00420810
 signed int __cdecl DoInitAll()
@@ -3855,76 +2318,8 @@ signed int __cdecl DoInitAll()
     MessageBox_Error(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
     return ret;
 }
-MSG_FUNC_IMPL(0x00420810, DoInitAll);
+MGS_FUNC_IMPL(0x00420810, DoInitAll);
 
-// 0x457B5B
-void *__cdecl sub_457B5B()
-{
-    void *result; // eax@1
-
-    // TODO: FIX ME make pointer/array
-    result = memcpy(word_994320, word_669AE0, 0x1000u);
-    dword_993F44 = (int)&word_994320[0];
-    return result;
-}
-
-// 0x0044A7B0
-signed int __cdecl Resetgraph(int a1)
-{
-    printf(".Resetgraph(%d)\n", a1);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT", 8, 8, 2, 2);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "RECT32", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_ENV", 64, 64, 16, 16);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DRAWENV", 92, 92, 23, 23);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DISPENV", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_TAG", 8, 8, 2, 2);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "P_CODE", 4, 4, 1, 1);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F3", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_F4", 24, 24, 6, 6);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT3", 32, 32, 8, 8);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_FT4", 40, 40, 10, 10);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_G3", 28, 28, 7, 7);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_G4", 36, 36, 9, 9);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_GT3", 40, 40, 10, 10);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "POLY_GT4", 52, 52, 13, 13);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_F2", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_G2", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_F3", 24, 24, 6, 6);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_G3", 32, 32, 8, 8);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_F4", 28, 28, 7, 7);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "LINE_G4", 40, 40, 10, 10);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "SPRT", 20, 20, 5, 5);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "SPRT_16", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "SPRT_8", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE", 16, 16, 4, 4);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE_16", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE_8", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "TILE_1", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_MODE", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_TWIN", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_AREA", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_OFFSET", 12, 12, 3, 3);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_MOVE", 24, 24, 6, 6);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_LOAD", 68, 68, 17, 17);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_TPAGE", 8, 8, 2, 2);
-    printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", "DR_STP", 12, 12, 3, 3);
-    return 1;
-}
-MSG_FUNC_IMPL(0x0044A7B0, Resetgraph);
-
-
-// 0x0044AB30
-int __cdecl SetGraphDebug(int a1)
-{
-    printf(".SetGraphDebug(%d)\n", a1);
-    return 0;
-}
-
-// 0x0044AC40
-int __cdecl SetDispMask(int a1)
-{
-    return printf(".SetDispMask(%d)\n", a1);
-}
 
 // 0x00520157
 void DebugLog(const char *Format, ...)
@@ -3951,6 +2346,13 @@ int mgs_printf(const char *fmt, ...)
     
 
     return ret;
+}
+
+// HACK: Prevents game init delay where DDRAW GetDeviceIdentifier checks if the driver is signed
+// which then takes 8-12 seconds to complete.
+LONG WINAPI Hook_WinVerifyTrust(HWND hwnd, GUID* pgActionID, LPVOID pWVTData)
+{
+    return 0;
 }
 
 // The varadic template hook class can't also mixing in varadic C functions, so we have too hook these manually
@@ -3989,7 +2391,13 @@ void InstallVaradicCFunctionHooks()
     {
         abort();
     }
-    
+
+    FARPROC winTrust = GetProcAddress(LoadLibraryA("WinTrust.dll"), "WinVerifyTrust");
+    err = DetourAttach(&(PVOID&)winTrust, Hook_WinVerifyTrust);
+    if (err != NO_ERROR)
+    {
+        abort();
+    }
 
     err = DetourTransactionCommit();
     if (err != NO_ERROR)
@@ -3998,97 +2406,30 @@ void InstallVaradicCFunctionHooks()
     }
 }
 
-int __cdecl ClearImage(Rect16 *rect, unsigned __int8 r, unsigned __int8 g, unsigned __int8 b)
-{
-    DebugLog(".ClearImage((%d,%d,%d,%d),r=%d,g=%d,b=%d)\n", rect->x1, rect->y1, rect->x2, rect->y2, r, g, b);
-    return 0;
-}
-
-
-MGS_ARY(1, 0x7227C8, WORD, 5, word_7227C8, {}); // TODO: Struct?
-
-// 0x44EAED
-void *__cdecl sub_44EAED()
-{
-    return memset(word_7227C8, 0, 0x10u);
-}
-
-DRAWENV *__cdecl Renderer_DRAWENV_Init_401888(DRAWENV *ptr, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2)
-{
-    ptr->clip.x1 = clipX1;
-    ptr->clip.x2 = clipX2;
-    ptr->offx = clipX1;
-    ptr->clip.y2 = clipY2;
-    ptr->clip.y1 = clipY1;
-    ptr->offy = clipY1;
-    ptr->dtd = 1;
-    ptr->dfe = 0;
-    ptr->textureWindow.x1 = 0;
-    ptr->textureWindow.y1 = 0;
-    ptr->textureWindow.x2 = 0;
-    ptr->textureWindow.y2 = 0;
-    ptr->r0 = 0;
-    ptr->g0 = 0;
-    ptr->b0 = 0;
-    ptr->texturePage = 0;
-    ptr->isbg = 0;
-    return ptr;
-}
-MSG_FUNC_IMPL(0x401888, Renderer_DRAWENV_Init_401888);
-
-MGS_VAR(1, 0x6BECF0, Rect16, gClipRect_6BECF0, {});
-
-MGS_VAR(1, 0x6C0EAA, WORD, word_6C0EAA, 0x0);
-MGS_VAR(1, 0x6C0EA8, WORD, word_6C0EA8, 0x0);
-
-
-DRAWENV *__cdecl Renderer_Set_DRAWENV_40DD90(DRAWENV *pDrawEnv)
-{
-    memcpy(&gDrawEnv_6C0E98, pDrawEnv, sizeof(gDrawEnv_6C0E98));
-    if (!word_6C0EAA)
-        word_6C0EAA = 255;
-    if (!word_6C0EA8)
-        word_6C0EA8 = 255;
-    return &gDrawEnv_6C0E98;
-}
-MSG_FUNC_IMPL(0x40DD90, Renderer_Set_DRAWENV_40DD90);
-
-DRAWENV *Renderer_Init_DRAWENV_40200D()
-{
-    DRAWENV drawEnv;
-    Renderer_DRAWENV_Init_401888(
-        &drawEnv,
-        gClipRect_6BECF0.x1,
-        gClipRect_6BECF0.y1,
-        gClipRect_6BECF0.x2,
-        gClipRect_6BECF0.y2);
-    return Renderer_Set_DRAWENV_40DD90(&drawEnv);
-}
-MSG_FUNC_IMPL(0x40200D, Renderer_Init_DRAWENV_40200D);
 
 MGS_VAR(1, 0x791A08, int, gActiveBuffer_dword_791A08, 0);
 MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
-MGS_VAR(1, 0x6BED20, DWORD, dword_6BED20, 0);
+MGS_VAR(1, 0x6BED20, DWORD, counter_dword_6BED20, 0);
 MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {}); // TODO: Check 2 is correct
 
-MSG_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(Rect16 *pRect), sub_40DD00);
-MSG_FUNC_NOT_IMPL(0x40ACB2, int __cdecl(int idx), System_sub_40ACB2);
-MSG_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), sub_459ACE);
-MSG_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), sub_40162D);
-MSG_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
+MGS_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(PSX_RECT *pRect), sub_40DD00);
+MGS_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), TextReset_459ACE);
+MGS_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), OT_Related_40162D);
+MGS_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
 
-int __cdecl Main_sub_401C02()
+
+int CC Main_sub_401C02()
 {
     int result = 0;
     if (gSoftwareRendering)
     {
         // SW rendering path not implemented
-        abort();
+        MGS_FATAL("Software rendering path not implemented");
     }
     else
     {
         const int activeBufferHW = gActiveBuffer_dword_791A08;
-        if (dword_6BED20 <= 0)
+        if (counter_dword_6BED20 <= 0)
         {
             if (gLastActiveBuffer_dword_650110 < 0 || gActiveBuffer_dword_791A08 != gLastActiveBuffer_dword_650110)
             {
@@ -4104,297 +2445,31 @@ int __cdecl Main_sub_401C02()
             {
                 gLastActiveBuffer_dword_650110 = gActiveBuffer_dword_791A08;
             }
-            --dword_6BED20;
+            --counter_dword_6BED20;
         }
-        System_sub_40ACB2(activeBufferHW);
-        System_sub_40ACB2(2);
-        sub_459ACE();
-        sub_40162D(activeBufferHW);                 // calls ClearOTag
+        System_HouseKeeping_40ACB2(activeBufferHW);
+        System_HouseKeeping_40ACB2(2);
+        TextReset_459ACE();
+        OT_Related_40162D(activeBufferHW);                 // calls ClearOTag
         result = sub_4021F2();
     }
     return result;
 }
-MSG_FUNC_IMPL(0x401C02, Main_sub_401C02);
+MGS_FUNC_IMPL(0x401C02, Main_sub_401C02);
 
 
-// 0x40A68D
-//MSG_FUNC_NOT_IMPL(0x40A68D, int __cdecl(int, int), sub_40A68D);
-void __cdecl LibGvd_SetFnPtr_sub_40A68D(int number, int(__cdecl* fn)(DWORD*))
-{
-    const int idx = number - 0x61; // Some compiler optimization, just adds this onto g_lib_gvd_stru_6BFEE0 to index the array
-    assert(idx < _countof(g_lib_gvd_stru_6BFEE0.field_6BFF0C));
-    g_lib_gvd_stru_6BFEE0.field_6BFF0C[idx] = fn;
-}
-MSG_FUNC_IMPL(0x40A68D, LibGvd_SetFnPtr_sub_40A68D);
-
-struct_8 *__cdecl LibGvd_sub_40A618(DWORD id)
-{
-    signed int cnt;
-    int v4;
-
-    cnt = 128;
-    v4 = 128 - id % 128;
-    struct_8* result = &g_lib_gvd_stru_6BFEE0.mStruct8_128Array_06BFF80[id % 128];
-
-    while (result->mId & 0xFFFFFF)
-    {
-        if ((result->mId & 0xFFFFFF) == id) // 3 bytes are id
-        {
-            return result;
-        }
-        
-        ++result;
-        
-        if (!--v4)
-        {
-            result = &g_lib_gvd_stru_6BFEE0.mStruct8_128Array_06BFF80[0];
-        }
-
-        if (--cnt <= 0)
-        {
-            g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08 = 0;
-            return 0;
-        }
-    }
-    g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08 = result;
-    return 0;
-}
-MSG_FUNC_IMPL(0x40A618, LibGvd_sub_40A618);
-
-signed int __cdecl LibGvd_sub_40A662(int a1, DWORD* a2)
-{
-    if (!LibGvd_sub_40A618(a1) && g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08 != 0)
-    {
-        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->mId = a1;
-        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->field_4 = a2;
-        return 0;
-    }
-    return -1;
-}
-MSG_FUNC_IMPL(0x40A662, LibGvd_sub_40A662);
-
-/* TODO FIX ME - this seems to halt the game states, can't see why..
-int __cdecl LibGvd_sub_40A77F(DWORD* a1, signed int a2, int a3);
-MSG_FUNC_IMPL(0x40A77F, LibGvd_sub_40A77F);
-int __cdecl LibGvd_sub_40A77F(DWORD* a1, signed int a2, int a3)
-{
-    int result = 0;
-    if (a3)
-    {
-        if (LibGvd_sub_40A618(a2) || g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08 == 0)
-        {
-            printf("id conflict\n");
-            return -1;
-        }
-
-        signed int v6 = a2;
-        if (a3 != 1)
-        {
-            v6 = a2 | 0x1000000;
-        }
-
-        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->mId = v6;
-        g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->field_4 = a1;
-        const auto v7 = g_lib_gvd_stru_6BFEE0.field_6BFF0C[a2 / 0x10000];
-        if (v7)
-        {
-            result = v7(a1);
-            if (result <= 0)
-            {
-                g_lib_gvd_stru_6BFEE0.struct_8_ptr_6BFF08->mId = 0;
-                return result;
-            }
-        }
-        return 1;
-    }
-
-    auto v3 = g_lib_gvd_stru_6BFEE0.field_6BFF0C[a2 / 0x10000];
-
-    if (!v3)
-    {
-        return 1;
-    }
-
-    result = v3(a1);
-
-    if (result > 0)
-    {
-        return 1;
-    }
-
-    return result;
-}
-*/
-
-//MSG_FUNC_NOT_IMPL(0x44E1E0, __int16 __cdecl(), sub_44E1E0);
-__int16 __cdecl sub_44E1E0()
-{
-    word_78E7FE = word_78E7FC = -1;
-    return -1;
-}
-
-//MSG_FUNC_NOT_IMPL(0x0040A347, Actor* __cdecl (Actor*, (void(__cdecl *)(Actor*)), (void(__cdecl *)(Actor*)), char*), Actor_Init);
-Actor* __cdecl Actor_Init(Actor* a1, void(__cdecl *update)(Actor*), void(__cdecl *fn2)(Actor*), char *srcFileName)
-{
-    a1->update = update;
-    a1->fnUnknown3 = fn2;
-    a1->mNamePtr = srcFileName;
-    a1->field_1C = 0;
-    a1->field_18 = 0;
-    return a1;
-}
-MSG_FUNC_IMPL(0x0040A347, Actor_Init);
-
-//MSG_FUNC_NOT_IMPL(0x0040B36E, int __cdecl(), GetResidentTop);
-int __cdecl GetResidentTop()
-{
-    int result; // eax@1
-
-    result = gResidentTop_dword_78E960;
-    dword_78E964 = gResidentTop_dword_78E960;
-    return result;
-}
-
-Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Actor*));
-
-// TODO: Is a global that inherits from Actor
-MGS_VAR(1, 0x725FC0, Actor, gMenuMan_stru_725FC0, {});
-
-Actor *__cdecl Menu_Related1()
-{
-    Actor_PushBack(1, &gMenuMan_stru_725FC0, 0);
-    return Actor_Init(&gMenuMan_stru_725FC0, 0, 0, "C:\\mgs\\source\\Menu\\menuman.c");
-}
-MSG_FUNC_IMPL(0x00459A9A, Menu_Related1);
 
 
-//MSG_FUNC_NOT_IMPL(0x44E12B, void *__cdecl(), sub_44E12B);
-void *__cdecl sub_44E12B()
-{
-    dword_995344 = 0;
-    dword_7227A4 = 0;
-    dword_7227A0 = 0;
-    dword_9942B8 = 0;
-    Menu_Related1();
-    sub_44EAED();
-    sub_457B5B();
-    sub_452610();
-    LibGvd_SetFnPtr_sub_40A68D(98, sub_44E9D2.Ptr());
-    sub_44E1E0();
-    Actor_PushBack(1, &g_gamed_722760, 0);
-    Actor_Init(&g_gamed_722760, (void(__cdecl*)(Actor*))sub_44E381.Ptr(), 0, "C:\\mgs\\source\\Game\\gamed.c");
 
-    unknown_libname_3();
-    sub_44E287();
-    sub_44E212();
-    word_78E7E8 = (WORD)(dword_78D7B0 + 1);
-    dword_995324 = (int)&dword_7919C0;
-    GetResidentTop();
-    dword_722780 = 0;
-    dword_722784 = 0;
-    return sub_44E226();
-}
-MSG_FUNC_IMPL(0x44E12B, sub_44E12B);
-
-//MSG_FUNC_NOT_IMPL(0x0040A1BF, int __cdecl(), Actor_UpdateActors);
-int __cdecl Actor_UpdateActors()
-{
-    int result; // eax@8
-    Actor *v1; // [sp+0h] [bp-18h]@5
-    Actor *v2; // [sp+4h] [bp-14h]@4
-    signed int i; // [sp+10h] [bp-8h]@1
-    ActorList *pActor; // [sp+14h] [bp-4h]@1
-
-    pActor = gActors;
-
-
-    for (i = 9; i > 0; --i)
-    {
-        if (!(dword_791A0C & pActor->mPause))
-        {
-            v2 = &pActor->first;
-            do
-            {
-                v1 = v2->pNext;
-                auto fn = v2->update;
-
-                // bool isFamasFunc = fn == (void*)0x640CDC;
-
-                if (fn)
-                {
-                    fn(v2);
-                }
-                dword_9942A0 = 0;
-                v2 = v1;
-            } while (v1);
-        }
-        ++pActor;
-        result = i - 1;
-    }
-    return result;
-}
-
-struct PauseKill
-{
-    WORD mPause;
-    WORD mKill;
-};
-
-MGS_ARY(1, 0x6507EC, PauseKill, 9, gPauseKills, { { 0, 7 }, { 0, 7 }, { 9, 4 }, { 9, 4 }, { 0xF, 4 }, { 0xF, 4 }, { 0xF, 4 }, { 9, 4 }, { 0, 7 } });
-
-//MSG_FUNC_NOT_IMPL(0x0040A006, void __cdecl(), ActorList_Init);
-void __cdecl ActorList_Init()
-{
-    ActorList* pActor = gActors;
-
-    for (int i = 0; i < 9; i++)
-    {
-        pActor->first.pPrevious = 0;
-        pActor->first.pNext = &pActor->last;
-        pActor->last.pPrevious = &pActor->first;
-        pActor->last.pNext = 0;
-
-        pActor->first.fnUnknown2 = 0;
-        pActor->first.fnUnknown3 = 0;
-        pActor->last.fnUnknown2 = 0;
-        pActor->last.fnUnknown3 = 0;
-
-        pActor->mPause = gPauseKills[i].mPause;
-        pActor->mKill = gPauseKills[i].mKill;
-
-        pActor++;
-    }
-
-    dword_791A0C = 0;
-}
-
-//MSG_FUNC_NOT_IMPL(0x0040A2AF, Actor* __cdecl(int, Actor*, void(__cdecl *)(Actor*)), Actor_PushBack);
-Actor* __cdecl Actor_PushBack(int a_nLvl, Actor* a_pActor, void(__cdecl *fn)(Actor*))
-{
-    Actor* pLast = &gActors[a_nLvl].last;
-    Actor* pLastPrevious = pLast->pPrevious;
-    pLast->pPrevious = a_pActor;
-    pLastPrevious->pNext = a_pActor;
-    a_pActor->pNext = pLast;
-    a_pActor->pPrevious = pLastPrevious;
-    a_pActor->fnUnknown3 = 0;
-    a_pActor->update = 0;
-    a_pActor->fnUnknown2 = fn;
-
-    return a_pActor;
-}
-
-// 0x00401005
-//MSG_FUNC_NOT_IMPL(0x00401005, signed int __cdecl(), Main);
 signed int __cdecl Main()
 {
-    signed int result; // eax@2
-    Rect16 clearRect; // [sp+4h] [bp-8h]@1
+    signed int result = 0;
 
-    Resetgraph(0);
+    Resetgraph_AndPrintPsxStructureSizes(0);
     SetGraphDebug(0);
     //null_44AC80();
     SetDispMask(0);
+    PSX_RECT clearRect;
     clearRect.x1 = 0;
     clearRect.y1 = 0;
     clearRect.x2 = 1024;
@@ -4407,27 +2482,36 @@ signed int __cdecl Main()
     //nullsub_8();
     MemCardsInit();
     //nullsub_9();
-    sub_40A4F6();
-    sub_408086();
-    sub_40111A();
-    sub_4090A7();
-    sub_40B725();
-    sub_44E12B();
+    LibGv_Init_sub_40A4F6();
+    j_FS_CloseFile_40907E();
+    LibDg_Init_40111A();
+    ScriptEngineInit_4090A7();
+    LibGv_Set_Load_HZM_CallBack_40B725();
+    Init_Gamed_Create_44E12B();
+
     for (;;)
     {
         result = MainLoop();
         if (!result)
+        {
             break;
-        if (gExitMainGameLoop)
-            break;
+        }
 
-        // HACK: Somtimes the game crashes somewhere deep in here, not calling this seems to prevent the game
+        if (gExitMainGameLoop)
+        {
+            break;
+        }
+
+        // HACK: Sometimes the game crashes somewhere deep in here, not calling this seems to prevent the game
         // state from progressing.
-        // In software rendering mode when gameover it will crash, but this is an existing bug of the game.
+        // In software rendering mode when game over it will crash, but this is an existing bug of the game.
         Actor_UpdateActors();
+
+        //PsxGpuDebug_44A4D0();
     }
     return result;
 }
+MGS_FUNC_IMPLEX(0x00401005, Main, WINMAIN_IMPL);
 
 // 0x00401000
 //MSG_FUNC_NOT_IMPL(0x00401000, int __cdecl(), DoMain);
@@ -4438,7 +2522,7 @@ int __cdecl DoMain()
 
 MGS_VAR(1, 0x6FC73C, IUnknown*, dword_6FC73C, nullptr); // TODO: Check what this is
 
-MSG_FUNC_NOT_IMPL(0x4241A4, void* __cdecl(void *), sub_4241A4);
+MGS_FUNC_NOT_IMPL(0x4241A4, void* __cdecl(void *), sub_4241A4);
 
 // 00423020
 void __cdecl ClearAll()
@@ -4543,7 +2627,7 @@ void __cdecl DoClearAll()
 {
     ClearAll();
 }
-MSG_FUNC_IMPL(0x004232B0, DoClearAll);
+MGS_FUNC_IMPL(0x004232B0, DoClearAll);
 
 // 0x0051D180
 void ShutdownEngine()
@@ -4559,9 +2643,23 @@ void ShutdownEngine()
     }
 }
 
+#include <gmock/gmock.h>
+
+static void RunTests()
+{
+    DoScriptTests();
+    DoTestSystem();
+    DoResourceNameHashTest();
+    DoActor_RankTests();
+}
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
+    ::testing::GTEST_FLAG(throw_on_failure) = true;
+    int argCount = 0;
+    ::testing::InitGoogleMock(&argCount, &lpCmdLine);
+   
+
     int result; // eax@2
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13
     void(__stdcall *pSetThreadExecutionState)(unsigned int); // [sp+Ch] [bp-460h]@13
@@ -4573,15 +2671,27 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     char *bRestart; // [sp+464h] [bp-8h]@8
     //int i; // [sp+468h] [bp-4h]@70
 
+    SystemCpp_ForceLink();
     ScriptCpp_ForceLink();
     TaskCpp_ForceLink();
     SoundCpp_ForceLink();
     SoundCpp_Debug();
- 
+    LibDGCpp_ForceLink();
+    LibGVCpp_ForceLink();
+    RendererCpp_ForceLink();
+    ResourceNameHashCpp_ForceLink();
+    PsxCpp_ForceLink();
+    Actor_RankCPP_ForceLink();
+    Actor_DelayCpp_ForceLink();
+    Actor_LoaderCpp_ForceLink();
+    Fs_Cpp_ForceLink();
+
     if (IsMgsi())
     {
         InstallVaradicCFunctionHooks();
     }
+
+    RunTests();
 
     if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
     {
@@ -4724,7 +2834,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
                         {
                             Sound_SetSoundFxVolume(gSoundFxVol_dword_651D98);
                             Sound_SetMusicVolume(gMusicVol_dword_716F68);
-                            FpsTimerSetupQ();
+                            Timer_30_1();
 
                             /* HACK: Leave cursor showing while developing
                             for (i = 1024; i && ShowCursor(0) >= 0; --i)// some hack to hide the cursor

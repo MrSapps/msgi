@@ -182,8 +182,8 @@ void DynamicVarSnapShot::Restore()
     }
     else
     {
-        void* pointerValue = (*(DWORD**)mAddr);
-        memcpy(pointerValue, mBufferCopy.data(), mBufferCopy.size());
+        void* pointerValue2 = (*(DWORD**)mAddr);
+        memcpy(pointerValue2, mBufferCopy.data(), mBufferCopy.size());
     }
 }
 
