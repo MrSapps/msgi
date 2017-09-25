@@ -79,7 +79,6 @@ MGS_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *c
 MGS_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
 MGS_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
 MGS_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
-MGS_FUNC_NOT_IMPL(0x0041EC40, signed int __cdecl(), sub_41EC40);
 MGS_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), sub_43C850);
 MGS_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
 MGS_FUNC_NOT_IMPL(0x0051F1E1, int __cdecl(GUID**, GUID**), sub_51F1E1);
@@ -140,6 +139,7 @@ MGS_VAR(1, 0x77C60C, DWORD, gDriverNum_dword_77C60C, 0);
 MGS_VAR(1, 0x77C608, DWORD, gNumDrivers_dword_77C608, 0);
 MGS_PTR(1, 0x776B94, DWORD *, dword_776B94, nullptr); // TODO: Array?
 MGS_PTR(1, 0x776B90, DWORD *, dword_776B90, nullptr);
+MGS_VAR(1, 0x716F70, DWORD, dword_716F70, 0);
 MGS_VAR(1, 0x716F74, DWORD, dword_716F74, 0);
 MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
 MGS_VAR(1, 0x6FC728, DWORD *, gImageBufer_dword_6FC728, 0);
@@ -190,6 +190,30 @@ MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 MGS_VAR(1, 0x72279C, DWORD, game_state_dword_72279C, 0);
 
+
+
+//MGS_FUNC_NOT_IMPL(0x0041EC40, int __cdecl(), sub_41EC40);
+int __cdecl sub_41EC40()
+{
+    int nDriverIndex = gNumDrivers_dword_77C608 - 1;
+
+    for (; nDriverIndex >= 0; nDriverIndex--)
+    {
+        int unkDword = array_689B68[nDriverIndex + 1].field200;
+
+        if ((unkDword & 0x10) != 0)
+            continue;
+
+        gDriverNum_dword_77C60C = nDriverIndex;
+        dword_716F70 = gNumDrivers_dword_77C608;
+        dword_716F74 = gDriverNum_dword_77C60C;
+
+        return 1;
+    }
+
+    return 0;
+}
+MGS_FUNC_IMPL(0x0041EC40, sub_41EC40);
 
 
 //MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
