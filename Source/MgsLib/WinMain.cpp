@@ -99,7 +99,7 @@ MGS_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
 MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 MGS_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
-MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), sub_51E086);
+MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), Render_Restore_Surfaces_51E086);
 MGS_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
 
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
@@ -113,7 +113,7 @@ MGS_VAR(1, 0x78E7F8, WORD, word_78E7F8, 0);
 MGS_VAR(1, 0x78E7F6, WORD, word_78E7F6, 0);
 MGS_VAR(1, 0x717354, DWORD, dword_717354, 0);
 MGS_VAR(1, 0x717348, DWORD, dword_717348, 0);
-MGS_VAR(1, 0x7348FC, DWORD, dword_7348FC, 0);
+MGS_VAR(1, 0x7348FC, DWORD, gRestoreHealthCheat_7348FC, 0);
 MGS_VAR(1, 0x732E64, DWORD, dword_732E64, 0);
 
 MGS_VAR(1, 0x64BDA8, const IID, IID_IDirectDraw7_MGS, {});
@@ -193,7 +193,7 @@ MGS_VAR(1, 0x72279C, DWORD, game_state_dword_72279C, 0);
 
 
 //MGS_FUNC_NOT_IMPL(0x0041EC40, int __cdecl(), sub_41EC40);
-int __cdecl sub_41EC40()
+int CC sub_41EC40()
 {
     int nDriverIndex = gNumDrivers_dword_77C608 - 1;
 
@@ -217,15 +217,19 @@ MGS_FUNC_IMPL(0x0041EC40, sub_41EC40);
 
 
 //MSG_FUNC_NOT_IMPL(0x51E1D9, int __cdecl(), HandleExclusiveMode);
-int __cdecl HandleExclusiveMode()
+int CC HandleExclusiveMode()
 {
-    MSG oMsg;
+    MSG oMsg = {};
 
     if (!g_pDirectDraw)
+    {
         return 0;
+    }
 
     if (g_pDirectDraw->TestCooperativeLevel() != DDERR_NOEXCLUSIVEMODE)
+    {
         return 0;
+    }
 
     Sound_StopSample();
     sub_4583BB();
@@ -249,19 +253,22 @@ int __cdecl HandleExclusiveMode()
     }
     while (g_pDirectDraw->TestCooperativeLevel() != 0);
 
-    sub_51E086();
+    Render_Restore_Surfaces_51E086();
     Timer_30_1();
     Task_ResumeQ();
     Sound_PlaySample();
 
     if (dword_732E64 == 1)
+    {
         PostMessageA(gHwnd, WM_KEYDOWN, VK_ESCAPE, 0);
+    }
 
     return 0;
 }
+MGS_FUNC_IMPLEX(0x51E1D9, HandleExclusiveMode, WINMAIN_IMPL);
 
 //MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
-int __cdecl MainLoop()
+int CC MainLoop()
 {
     //char var11C[0xFF] = { 0xFF };
     //char var21B[0xFF] = { 0xFF };
@@ -287,14 +294,16 @@ int __cdecl MainLoop()
         byte_9AD89B = 0;
 
         if (sub_42BE0A() == 0xFFFFFFEF)
+        {
             return 0;
+        }
 
         dword_6FC718 = 1;
         dword_717354 = 0;
         byte_9AD89B = 0;
         dword_717348 = 0;
     }
-    if (dword_7348FC != 0)
+    if (gRestoreHealthCheat_7348FC != 0)
     {
         word_78E7F6 = word_78E7F8 = 0x400;
     }
@@ -302,7 +311,9 @@ int __cdecl MainLoop()
     HandleExclusiveMode();
 
     if (PeekMessageA(&oMsg, 0, 0, 0, 1) == 0)
+    {
         return 1;
+    }
 
     if (oMsg.message == WM_QUIT)
     {
@@ -359,7 +370,7 @@ MGS_VAR(1, 0x688D40, char*, off_688D40, "");
 MGS_VAR(1, 0x0071D1D0, HINSTANCE, gHInstance, 0);
 MGS_VAR(1, 0x651D98, DWORD, gSoundFxVol_dword_651D98, 0);
 MGS_VAR(1, 0x716F68, DWORD, gMusicVol_dword_716F68, 0);
-MGS_VAR(1, 0x77C934, DWORD, dword_77C934, 0);
+MGS_VAR(1, 0x77C934, DWORD, gFreeCameraCheat_77C934, 0);
 MGS_VAR(1, 0x9AD8A5, BYTE, byte_9AD8A5, 0);
 MGS_VAR(1, 0x9AD8A7, BYTE, byte_9AD8A7, 0);
 MGS_VAR(1, 0x9AD8A6, BYTE, byte_9AD8A6, 0);
@@ -386,7 +397,7 @@ MGS_VAR(1, 0x791DE4, DWORD, dword_791DE4, 0);
 MGS_VAR(1, 0x9AD888, BYTE, byte_9AD888, 0);
 MGS_VAR(1, 0x733E34, DWORD, dword_733E34, 0);
 MGS_VAR(1, 0x721E78, DWORD, dword_721E78, 0);
-MGS_VAR(1, 0x650D4C, DWORD, dword_650D4C, 0);
+MGS_VAR(1, 0x650D4C, DWORD, gInfiniteAmmoCheat_650D4C, 0);
 MGS_VAR(1, 0x0078E7C0, char * , gDest, nullptr);
 
 struct weapon_famas
@@ -429,7 +440,7 @@ signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, 
     WORD resNameHashed = 0;
     if (bMp5)
     {
-        resNameHashed = ResourceNameHash("mpfive");
+        resNameHashed = ResourceNameHash("op_back_l");
     }
     else
     {
@@ -499,89 +510,109 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
     UINT v7; // [sp+20h] [bp-104h]@54
     CHAR String[256]; // [sp+24h] [bp-100h]@55
 
-    if (dword_77C934)
+    if (gFreeCameraCheat_77C934)
     {
         if (byte_9AD8A5)
+        {
             sub_5202FE(0.0, -0.003000000026077032, 0.0, 0.0);
+        }
+
         if (byte_9AD8A7)
+        {
             sub_5202FE(0.0, 0.003000000026077032, 0.0, 0.0);
+        }
+
         if (byte_9AD8A6)
+        {
             sub_5202FE(0.0, 0.0, -0.003000000026077032, 0.0);
+        }
+
         if (byte_9AD8A8)
+        {
             sub_5202FE(0.0, 0.0, 0.003000000026077032, 0.0);
+        }
+
         if (byte_9AD8C1)
+        {
             sub_5202FE(0.02999999932944775f, 0.0f, 0.0f, 0.0f);
+        }
+
         if (byte_9AD8DA)
+        {
             sub_5202FE(-0.02999999932944775f, 0.0f, 0.0f, 0.0f);
+        }
+
         v4 = (float)dword_73490C / 1024.0f;
         v5 = (float)dword_734908 / 1024.0f;
+
         sub_5202FE(0.0, v5, v4, 0.0);
+
         dword_734908 = 9 * dword_734908 / 10;
         dword_73490C = 9 * dword_73490C / 10;
     }
-    if (Msg > WM_CHAR)
+
+    switch (Msg)
     {
-        switch (Msg)
+    case WM_SYSKEYDOWN:
+        gKeys[wParam] = lParam;
+        gvirtualKeyRepeatCount = lParam;
+        gVirtualKeyCode = wParam;
+        if (wParam < 0x100)
         {
-        case WM_SYSKEYDOWN:
-            gKeys[wParam] = lParam;
-            gvirtualKeyRepeatCount = lParam;
-            gVirtualKeyCode = wParam;
-            if (wParam < 0x100)
-                byte_9AD880[wParam] = 1;
-            if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
-            {
-                gAltPressed = 1;
-                return 0;
-            }
-            if ((unsigned __int16)gVirtualKeyCode == VK_F10)
-            {
-                dword_71D194 = 1;
-                gF10Pressed = 1;
-                return 0;
-            }
-            break;
-
-        case WM_SYSKEYUP:
-            gvirtualKeyRepeatCount = lParam;
-            gVirtualKeyCode = wParam;
-            if (wParam < 0x100)
-                byte_9AD880[wParam] = 0;
-            if ((unsigned __int16)gVirtualKeyCode == VK_MENU) 
-            {
-                gAltPressed = 0;
-                return 0;
-            }
-            if ((unsigned __int16)gVirtualKeyCode == VK_F10) 
-            {
-                gF10Pressed = 0;
-                Actor_DumpActorSystem();
-                return 0;
-            }
-            break;
-
-        case WM_MOUSEMOVE:
-            if (dword_77C934)
-            {
-                dword_734908 = (unsigned __int16)lParam - dword_734900;
-                dword_73490C = (unsigned __int16)((unsigned int)lParam >> 16) - dword_734904;
-                dword_734900 = (unsigned __int16)lParam;
-                dword_734904 = (unsigned int)lParam >> 16;
-            }
-            break;
-
-        case WM_POWERBROADCAST:
-            return BROADCAST_QUERY_DENY;
+            byte_9AD880[wParam] = 1;
         }
-        return DefWindowProcA(hWnd, Msg, wParam, lParam);
-    }
-    if (Msg == WM_CHAR)
-    {
+
+        if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
+        {
+            gAltPressed = 1;
+            return 0;
+        }
+        if ((unsigned __int16)gVirtualKeyCode == VK_F10)
+        {
+            dword_71D194 = 1;
+            gF10Pressed = 1;
+            return 0;
+        }
+        break;
+
+    case WM_SYSKEYUP:
+        gvirtualKeyRepeatCount = lParam;
+        gVirtualKeyCode = wParam;
+        if (wParam < 0x100)
+        {
+            byte_9AD880[wParam] = 0;
+        }
+        if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
+        {
+            gAltPressed = 0;
+            return 0;
+        }
+        if ((unsigned __int16)gVirtualKeyCode == VK_F10)
+        {
+            gF10Pressed = 0;
+            Actor_DumpActorSystem();
+            return 0;
+        }
+        break;
+
+    case WM_MOUSEMOVE:
+        if (gFreeCameraCheat_77C934)
+        {
+            dword_734908 = (unsigned __int16)lParam - dword_734900;
+            dword_73490C = (unsigned __int16)((unsigned int)lParam >> 16) - dword_734904;
+            dword_734900 = (unsigned __int16)lParam;
+            dword_734904 = (unsigned int)lParam >> 16;
+        }
+        break;
+
+    case WM_POWERBROADCAST:
+        return BROADCAST_QUERY_DENY;
+
+    case WM_CHAR:
         byte_9AD988 = static_cast<BYTE>(wParam);
         return DefWindowProcA(hWnd, Msg, wParam, lParam);
-    }
-    if (Msg == WM_ACTIVATE)
-    {
+
+    case WM_ACTIVATE:
         if ((WORD)wParam)
         {
             printf("$jim - WM_ACTIVATE (active)\n");
@@ -595,32 +626,141 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
         Input_AcquireOrUnAcquire();
         Timer_30_1();
         result = 1;
-    }
-    else
-    {
-        if (Msg == WM_PAINT)
+        break;
+
+    case WM_KEYDOWN:
+        switch (wParam)
         {
-            printf("$jim - WM_PAINT\n");
-            if (dword_71D17C)
+        case VK_F2:
+            if (gCheatsEnabled)
             {
-                WmPaint_Handler((HDC)wParam);
-                return 0;
+                if (gRestoreHealthCheat_7348FC)
+                {
+                    gRestoreHealthCheat_7348FC = 0;
+                }
+                else
+                {
+                    gRestoreHealthCheat_7348FC = 1;
+                }
             }
-            return DefWindowProcA(hWnd, Msg, wParam, lParam);
+            result = 0;
+            goto LABEL_108;
+
+        case VK_F4:
+            if (gCheatsEnabled)
+            {
+                gInfiniteAmmoCheat_650D4C ^= 1u;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            goto LABEL_108;
+
+        case VK_F5: // Disable free camera
+            if (gCheatsEnabled)
+            {
+                gFreeCameraCheat_77C934 = 0;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            goto LABEL_108;
+
+        case VK_F6: // Enable free camera
+            if (gCheatsEnabled)
+            {
+                gFreeCameraCheat_77C934 = 1;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            goto LABEL_108;
+
+        case VK_F7:  // Restart level with collected items
+            if (gCheatsEnabled)
+            {
+                game_state_dword_72279C = 0;
+                sub_521210();
+                sub_452E6E();
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            goto LABEL_108;
+
+        case VK_F8:
+            if (gCheatsEnabled)
+            {
+                dword_688CD0 = 0;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            goto LABEL_108;
+
+        case VK_F9:
+            if (gCheatsEnabled)
+            {
+                dword_688CD0 = 1;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            goto LABEL_108;
+
+        case VK_F11:
+            if (gCheatsEnabled)
+            {
+                dword_688CD4 ^= 1u;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            goto LABEL_108;
+
+        case VK_F12:
+            if (gCheatsEnabled)
+            {
+                dword_688CD8 ^= 1u;
+                result = 0;
+            }
+            else
+            {
+                result = 0;
+            }
+            goto LABEL_108;
+
+        case VK_ESCAPE:
+            dword_791DE4 = 1;
+            if (game_state_dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
+            {
+                if (!dword_717354 && !dword_717348 && !byte_9AD888 && !dword_733E34 && !dword_721E78)
+                {
+                    dword_717354 = 1;
+                }
+            }
+            goto LABEL_108;
         }
-        if (Msg == WM_CLOSE)
+
+    case WM_KEYUP:
+    LABEL_108:
+        if (wParam < 0x100)
         {
-            PostQuitMessage(0);
-            return 0;
-        }
-        if (Msg != WM_KEYDOWN)
-        {
-            if (Msg != WM_KEYUP)
-                return DefWindowProcA(hWnd, Msg, wParam, lParam);
-        LABEL_108:
-            if (wParam < 0x100)
-                byte_9AD880[wParam] = Msg == WM_KEYDOWN;
-            return DefWindowProcA(hWnd, Msg, wParam, lParam);
+            byte_9AD880[wParam] = Msg == WM_KEYDOWN;
         }
         v7 = MapVirtualKeyA(wParam, 0);
         if (v7)
@@ -629,155 +769,25 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             gKeys[wParam] = lParam;
         }
         gKeys[wParam] = lParam;
-        if (wParam > VK_F7)
+        return DefWindowProcA(hWnd, Msg, wParam, lParam);
+
+    case WM_PAINT:
+        printf("$jim - WM_PAINT\n");
+        if (dword_71D17C)
         {
-            switch (wParam)
-            {
-            case VK_F8:
-                if (gCheatsEnabled)
-                {
-                    dword_688CD0 = 0;
-                    result = 0;
-                }
-                else
-                {
-                    result = 0;
-                }
-                break;
-            case VK_F9:
-                if (gCheatsEnabled)
-                {
-                    dword_688CD0 = 1;
-                    result = 0;
-                }
-                else
-                {
-                    result = 0;
-                }
-                break;
-            case VK_F11:
-                if (gCheatsEnabled)
-                {
-                    dword_688CD4 ^= 1u;
-                    result = 0;
-                }
-                else
-                {
-                    result = 0;
-                }
-                break;
-            default:
-                if (wParam != VK_F12)
-                    goto LABEL_108;
-                if (gCheatsEnabled)
-                {
-                    dword_688CD8 ^= 1u;
-                    result = 0;
-                }
-                else
-                {
-                    result = 0;
-                }
-                break;
-            }
+            WmPaint_Handler((HDC)wParam);
+            return 0;
         }
-        else
-        {
-            if (wParam == VK_F7)
-            {
-                if (gCheatsEnabled)
-                {
-                    game_state_dword_72279C = 0;
-                    sub_521210();
-                    sub_452E6E();
-                    result = 0;
-                }
-                else
-                {
-                    result = 0;
-                }
-            }
-            else
-            {
-                if (wParam == VK_ESCAPE)
-                {
-                    dword_791DE4 = 1;
-                    if (game_state_dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
-                    {
-                        if (!dword_717354)
-                        {
-                            if (!dword_717348)
-                            {
-                                if (!byte_9AD888)
-                                {
-                                    if (!dword_733E34)
-                                    {
-                                        if (!dword_721E78)
-                                        {
-                                            dword_717354 = 1;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    goto LABEL_108;
-                }
-                switch (wParam)
-                {
-                case VK_F2:
-                    if (gCheatsEnabled)
-                    {
-                        if (dword_7348FC)
-                            dword_7348FC = 0;
-                        else
-                            dword_7348FC = 1;
-                        result = 0;
-                    }
-                    else
-                    {
-                        result = 0;
-                    }
-                    break;
-                case VK_F4:
-                    if (gCheatsEnabled)
-                    {
-                        dword_650D4C ^= 1u;
-                        result = 0;
-                    }
-                    else
-                    {
-                        result = 0;
-                    }
-                    break;
-                case VK_F5:
-                    if (gCheatsEnabled)
-                    {
-                        dword_77C934 = 0;
-                        result = 0;
-                    }
-                    else
-                    {
-                        result = 0;
-                    }
-                    break;
-                default:
-                    if (wParam != VK_F6)
-                        goto LABEL_108;
-                    if (gCheatsEnabled)
-                    {
-                        dword_77C934 = 1;
-                        result = 0;
-                    }
-                    else
-                    {
-                        result = 0;
-                    }
-                    break;
-                }
-            }
-        }
+        return DefWindowProcA(hWnd, Msg, wParam, lParam);
+
+    case WM_CLOSE:
+        PostQuitMessage(0);
+        return 0;
+
+    default:
+        return DefWindowProcA(hWnd, Msg, wParam, lParam);
     }
+
     return result;
 }
 

@@ -12,4 +12,4 @@ struct Actor_Debug
     POLY_F4 mPolyF4;
 };
 
-void AddDebugActor();
+Actor_Debug* AddDebugActor();
