@@ -35,9 +35,9 @@ struct LibGv_Struct
     DWORD gGv_dword_6C03A4;
     DWORD gGv_dword_6C03A8;
     DWORD mDWORD_Pad2;
-    DWORD gGv_dword_6C03B0_array1[81];
-    DWORD gGv_dword_6C04F4_array2[81];
-    DWORD gGv_dword_6C0638_active_array_idx;
+    DWORD gGv_dword_6C03B0_mesg_array1[81];
+    DWORD gGv_dword_6C04F4_mesg_array2[81];
+    DWORD gGv_dword_6C0638_active_mesg_array_idx;
 };
 MGS_ASSERT_SIZEOF(LibGv_Struct, 0x75C);
 
@@ -119,13 +119,13 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
 }
 MGS_FUNC_IMPLEX(0x0040A77F, LibGV_LoadFile_40A77F, LIBGV_IMPL);
 
-void CC LibGV_40B3BC()
+void CC LibGV_mesg_init_40B3BC()
 {
-    g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_array1[0] = 0;
-    g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_array2[0] = 0;
-    g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx = 0;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_mesg_array1[0] = 0;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2[0] = 0;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx = 0;
 }
-MGS_FUNC_IMPLEX(0x40B3BC, LibGV_40B3BC, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40B3BC, LibGV_mesg_init_40B3BC, LIBGV_IMPL);
 
 __int64 CC TimeGetElapsed_4455A0()
 {
@@ -157,16 +157,16 @@ void CC LibGV_Update_40A54E(Actor* pActor)
 
     if (!gActorPauseFlags_dword_791A0C)
     {
-        assert(g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx >=0 && g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx <= 1);
-        g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx = 1 - g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx;
+        assert(g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx >=0 && g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx <= 1);
+        g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx = 1 - g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx;
 
-        if (g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_array_idx != 0)
+        if (g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx != 0)
         {
-            g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_array1[0] = 0;
+            g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_mesg_array1[0] = 0;
         }
         else
         {
-            g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_array2[0] = 0;
+            g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2[0] = 0;
         }
     } 
 }
