@@ -163,13 +163,18 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x99430C, DWORD, gSleep5000_after_res_funcs_2_dword
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB910, Actor, gLibDGD_1_stru_6BB910, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
 
-// TODO: Script_tbl_get_res_init_fn_457B9A - call GCL script to get res fn func ptr, then caller creates the resource
-MGS_FUNC_NOT_IMPL(0x457B9A, ResInitFn CC(BYTE *pScript), Script_tbl_get_res_init_fn_457B9A);
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x722A40, DWORD, dword_722A40, 0);
 
 MGS_VAR(1, 0x6BC180, struct_gv, gLibGvStruct0_6BC180, {}); // TODO: Probably an array of 3?
 MGS_VAR(1, 0x6BC36C, struct_gv, gLibGVStruct1_6BC36C, {});
 MGS_VAR(1, 0x6BC558, struct_gv, gLibGVStruct2_6BC558, {});
+
+ResInitFn CC Script_tbl_get_res_init_fn_457B9A(BYTE *pScript)
+{
+    const WORD hashedName = static_cast<WORD>(Script_Unknown8(pScript));
+    return LibDG_GetResourceInitFuncPtr_457BAC(hashedName);
+}
+MGS_FUNC_IMPLEX(0x00457B9A, Script_tbl_get_res_init_fn_457B9A, LIBDG_IMPL);
 
 signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript)
 {
