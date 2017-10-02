@@ -2,6 +2,7 @@
 
 #include "MgsFunction.hpp"
 
+void DoLibGv_Tests();
 void LibGVCpp_ForceLink();
 
 using GV_FnPtr = int(__cdecl*)(void*, int);

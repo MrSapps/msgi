@@ -5,6 +5,8 @@
 #include "LibDG.hpp"
 #include "Timer.hpp"
 #include "Actor_Loader.hpp"
+#include "ResourceNameHash.hpp"
+#include <gmock/gmock.h>
 
 #define REDIRECT_LIBGV_DATA 1
 #define LIBGV_IMPL true
@@ -16,6 +18,28 @@ struct LibGV_FileRecord
     void* mFileBuffer;
 };
 MGS_ASSERT_SIZEOF(LibGV_FileRecord, 0x8);
+
+struct LibGV_Msg
+{
+    WORD field_0_res_hash;
+    WORD field_2_num_same_messages;
+    WORD field_4_action_hash_or_ptr;
+    WORD field_6_hash;
+    WORD field_8_min1;
+    WORD field_A_min1;
+    WORD field_C_min1;
+    WORD field_E;
+    WORD field_10;
+    WORD field_12_num;
+};
+MGS_ASSERT_SIZEOF(LibGV_Msg, 0x14);
+
+struct LibGv_Msg_Array
+{
+    DWORD mCount;
+    LibGV_Msg mMessages[16];
+};
+MGS_ASSERT_SIZEOF(LibGv_Msg_Array, 0x144);
 
 struct LibGv_Struct
 {
@@ -35,8 +59,8 @@ struct LibGv_Struct
     DWORD gGv_dword_6C03A4;
     DWORD gGv_dword_6C03A8;
     DWORD mDWORD_Pad2;
-    DWORD gGv_dword_6C03B0_mesg_array1[81];
-    DWORD gGv_dword_6C04F4_mesg_array2[81];
+    LibGv_Msg_Array gGv_dword_6C03B0_mesg_array1;
+    LibGv_Msg_Array gGv_dword_6C04F4_mesg_array2;
     DWORD gGv_dword_6C0638_active_mesg_array_idx;
 };
 MGS_ASSERT_SIZEOF(LibGv_Struct, 0x75C);
@@ -119,13 +143,126 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
 }
 MGS_FUNC_IMPLEX(0x0040A77F, LibGV_LoadFile_40A77F, LIBGV_IMPL);
 
+
 void CC LibGV_mesg_init_40B3BC()
 {
-    g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_mesg_array1[0] = 0;
-    g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2[0] = 0;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_mesg_array1.mCount = 0;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mCount = 0;
     g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx = 0;
 }
 MGS_FUNC_IMPLEX(0x40B3BC, LibGV_mesg_init_40B3BC, LIBGV_IMPL);
+
+int CC LibGV_mesg_40B3ED(const LibGV_Msg* pSrcMsg)
+{
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x0040B3ED, LibGV_mesg_40B3ED, false);
+
+int CC LibGV_40B47C(int nameHash, LibGV_Msg** ppOut)
+{
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x0040B47C, LibGV_40B47C, false);
+
+int CC mesg_dr_gomon_lamp_on_off_504F25(int bOn)
+{
+    LibGV_Msg msg = {};
+
+    msg.field_0_res_hash = ResourceNameHash("dr_gomon");
+    msg.field_4_action_hash_or_ptr = ResourceNameHash("on");
+    if (bOn)
+    {
+        msg.field_6_hash = ResourceNameHash("dr_lamp_on");
+    }
+    else
+    {
+        msg.field_6_hash = ResourceNameHash("dr_lamp_off");
+    }
+    msg.field_12_num = 2;
+    return LibGV_mesg_40B3ED(&msg);
+}
+MGS_FUNC_IMPLEX(0x00504F25, mesg_dr_gomon_lamp_on_off_504F25, LIBGV_IMPL);
+
+void Test_mesg()
+{
+    LibGV_mesg_init_40B3BC();
+
+    for (int i = 0; i < 17; i++)
+    {
+        LibGV_Msg msg = {};
+
+        if (i < 8)
+        {
+            msg.field_0_res_hash = ResourceNameHash("dr_gomon");
+        }
+        else if (i == 8)
+        {
+            msg.field_0_res_hash = ResourceNameHash("1234");
+        }
+        else if (i == 13)
+        {
+            msg.field_0_res_hash = ResourceNameHash("dr_gomon");
+        }
+        else
+        {
+            msg.field_0_res_hash = ResourceNameHash("45667");
+        }
+
+        msg.field_2_num_same_messages = i + 10;
+        msg.field_4_action_hash_or_ptr = i + 20;
+        msg.field_6_hash = i + 30;
+        msg.field_8_min1 = i + 40;
+        msg.field_A_min1 = i + 50;
+        msg.field_C_min1 = i + 60;
+        msg.field_E = i + 70;
+        msg.field_10 = i + 80;
+        msg.field_12_num = i + 90;
+        if (i == 16)
+        {
+            ASSERT_EQ(-1, LibGV_mesg_40B3ED(&msg));
+        }
+        else
+        {
+            ASSERT_EQ(0, LibGV_mesg_40B3ED(&msg));
+        }
+    }
+
+    ASSERT_EQ(16, g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mCount);
+
+    for (int i = 0; i < 9; i++)
+    {
+        ASSERT_EQ(ResourceNameHash("dr_gomon"), g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mMessages[i].field_0_res_hash);
+        ASSERT_EQ(9-i, g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mMessages[i].field_2_num_same_messages);
+    }
+
+    ASSERT_EQ(ResourceNameHash("1234"), g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mMessages[9].field_0_res_hash);
+    ASSERT_EQ(1, g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mMessages[9].field_2_num_same_messages);
+
+    int count = 0;
+    for (int i = 10; i < 16; i++)
+    {
+        ASSERT_EQ(ResourceNameHash("45667"), g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mMessages[i].field_0_res_hash);
+        ASSERT_EQ(6-count, g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mMessages[i].field_2_num_same_messages);
+        count++;
+    }
+
+    const int kExpected[] = { 103, 97, 96, 95, 94, 93, 92, 91, 90, 98, 105, 104, 102, 101, 100, 99 };
+    for (int i = 0; i < 16; i++)
+    {
+        ASSERT_EQ(kExpected[i], g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mMessages[i].field_12_num);
+    }
+
+    /*
+    int out = 0;
+    int hash = ResourceNameHash("on");
+    int ret = LibGV_40B47C(hash, &out);
+
+    ASSERT_EQ(0, ret);
+
+    abort();
+    */
+}
+
 
 __int64 CC TimeGetElapsed_4455A0()
 {
@@ -162,11 +299,11 @@ void CC LibGV_Update_40A54E(Actor* pActor)
 
         if (g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx != 0)
         {
-            g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_mesg_array1[0] = 0;
+            g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_mesg_array1.mCount = 0;
         }
         else
         {
-            g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2[0] = 0;
+            g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mCount = 0;
         }
     } 
 }
@@ -209,3 +346,8 @@ void CC LibGV_Set_FileExtHandler_40A68D(char id, GV_FnPtr fn)
     g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs[idx] = fn;
 }
 MGS_FUNC_IMPLEX(0x40A68D, LibGV_Set_FileExtHandler_40A68D, LIBGV_IMPL);
+
+void DoLibGv_Tests()
+{
+    Test_mesg();
+}
