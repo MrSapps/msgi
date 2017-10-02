@@ -30,7 +30,7 @@ struct LibGV_Msg
     WORD field_C_min1;
     WORD field_E;
     WORD field_10;
-    WORD field_12_num;
+    WORD field_12_num_valid_fields;
 };
 MGS_ASSERT_SIZEOF(LibGV_Msg, 0x14);
 
@@ -152,17 +152,17 @@ void CC LibGV_mesg_init_40B3BC()
 }
 MGS_FUNC_IMPLEX(0x40B3BC, LibGV_mesg_init_40B3BC, LIBGV_IMPL);
 
-int CC LibGV_mesg_40B3ED(const LibGV_Msg* pSrcMsg)
+int CC LibGV_mesg_write_40B3ED(const LibGV_Msg* pSrcMsg)
 {
     return 0;
 }
-MGS_FUNC_IMPLEX(0x0040B3ED, LibGV_mesg_40B3ED, false);
+MGS_FUNC_IMPLEX(0x0040B3ED, LibGV_mesg_write_40B3ED, false);
 
-int CC LibGV_40B47C(int nameHash, LibGV_Msg** ppOut)
+int CC LibGV_mesg_read_40B47C(int nameHash, LibGV_Msg** ppOut)
 {
     return 0;
 }
-MGS_FUNC_IMPLEX(0x0040B47C, LibGV_40B47C, false);
+MGS_FUNC_IMPLEX(0x0040B47C, LibGV_mesg_read_40B47C, false);
 
 int CC mesg_dr_gomon_lamp_on_off_504F25(int bOn)
 {
@@ -178,8 +178,8 @@ int CC mesg_dr_gomon_lamp_on_off_504F25(int bOn)
     {
         msg.field_6_hash = ResourceNameHash("dr_lamp_off");
     }
-    msg.field_12_num = 2;
-    return LibGV_mesg_40B3ED(&msg);
+    msg.field_12_num_valid_fields = 2;
+    return LibGV_mesg_write_40B3ED(&msg);
 }
 MGS_FUNC_IMPLEX(0x00504F25, mesg_dr_gomon_lamp_on_off_504F25, LIBGV_IMPL);
 
@@ -187,7 +187,7 @@ void Test_mesg()
 {
     LibGV_mesg_init_40B3BC();
 
-    for (int i = 0; i < 17; i++)
+    for (WORD i = 0; i < 17; i++)
     {
         LibGV_Msg msg = {};
 
@@ -216,14 +216,14 @@ void Test_mesg()
         msg.field_C_min1 = i + 60;
         msg.field_E = i + 70;
         msg.field_10 = i + 80;
-        msg.field_12_num = i + 90;
+        msg.field_12_num_valid_fields = i + 90;
         if (i == 16)
         {
-            ASSERT_EQ(-1, LibGV_mesg_40B3ED(&msg));
+            ASSERT_EQ(-1, LibGV_mesg_write_40B3ED(&msg));
         }
         else
         {
-            ASSERT_EQ(0, LibGV_mesg_40B3ED(&msg));
+            ASSERT_EQ(0, LibGV_mesg_write_40B3ED(&msg));
         }
     }
 
@@ -249,18 +249,50 @@ void Test_mesg()
     const int kExpected[] = { 103, 97, 96, 95, 94, 93, 92, 91, 90, 98, 105, 104, 102, 101, 100, 99 };
     for (int i = 0; i < 16; i++)
     {
-        ASSERT_EQ(kExpected[i], g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mMessages[i].field_12_num);
+        ASSERT_EQ(kExpected[i], g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2.mMessages[i].field_12_num_valid_fields);
     }
 
-    /*
-    int out = 0;
-    int hash = ResourceNameHash("on");
-    int ret = LibGV_40B47C(hash, &out);
+    // Flip to looking in the correct array
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx = !g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx;
 
-    ASSERT_EQ(0, ret);
+    {
+        LibGV_Msg* out = nullptr;
+        int numMatches = LibGV_mesg_read_40B47C(ResourceNameHash("dr_gomon"), &out);
+        ASSERT_EQ(9, numMatches);
 
-    abort();
-    */
+        for (int i = 0; i < numMatches; i++)
+        {
+            ASSERT_EQ(9-i, out->field_2_num_same_messages);
+            out++;
+        }
+    }
+
+    {
+        LibGV_Msg* out = nullptr;
+        int numMatches = LibGV_mesg_read_40B47C(ResourceNameHash("1234"), &out);
+        ASSERT_EQ(1, numMatches);
+        ASSERT_EQ(1, out->field_2_num_same_messages);
+    }
+
+    {
+        LibGV_Msg* out = nullptr;
+        int numMatches = LibGV_mesg_read_40B47C(ResourceNameHash("45667"), &out);
+        ASSERT_EQ(6, numMatches);
+
+        for (int i = 0; i < numMatches; i++)
+        {
+            ASSERT_EQ(6 - i, out->field_2_num_same_messages);
+            out++;
+        }
+    }
+
+    // Again to prove reading does not erase from source
+    {
+        LibGV_Msg* out = nullptr;
+        int numMatches = LibGV_mesg_read_40B47C(ResourceNameHash("1234"), &out);
+        ASSERT_EQ(1, numMatches);
+        ASSERT_EQ(1, out->field_2_num_same_messages);
+    }
 }
 
 
