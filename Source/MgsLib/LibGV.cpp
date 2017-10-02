@@ -154,15 +154,78 @@ MGS_FUNC_IMPLEX(0x40B3BC, LibGV_mesg_init_40B3BC, LIBGV_IMPL);
 
 int CC LibGV_mesg_write_40B3ED(const LibGV_Msg* pSrcMsg)
 {
+    LibGv_Msg_Array* pArray = g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx ?
+        &g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_mesg_array1 :
+        &g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2;
+
+    if (pArray->mCount >= 16)
+    {
+        return -1;
+    }
+
+    int messageCount = pArray->mCount;
+    LibGV_Msg* pMsgIter = pArray->mMessages;
+    WORD matching_count = 0;
+    while (messageCount > 0)
+    {
+        // Find the last matching type
+        if (pMsgIter->field_0_res_hash == pSrcMsg->field_0_res_hash)
+        {
+            // Check if there is a message before the last match
+            LibGV_Msg* pCurMsg = &pMsgIter[messageCount];
+            if (messageCount - 1 >= 0)
+            {
+                // There is so move everything back by 1 element so we can put the new message there
+                LibGV_Msg* pDst = pCurMsg;
+                LibGV_Msg* pSrc = pCurMsg - 1;
+                for (int i = 0; i < messageCount; i++)
+                {
+                    memcpy(pDst, pSrc, sizeof(LibGV_Msg));
+                    pDst--;
+                    pSrc--;
+                }
+            }
+            matching_count = pMsgIter->field_2_num_same_messages;
+            break;
+        }
+        ++pMsgIter;
+        --messageCount;
+    }
+
+    // Write in the new message and update the use count
+    memcpy(pMsgIter, pSrcMsg, sizeof(LibGV_Msg));
+    pMsgIter->field_2_num_same_messages = matching_count + 1;
+    pArray->mCount++;
+
     return 0;
 }
-MGS_FUNC_IMPLEX(0x0040B3ED, LibGV_mesg_write_40B3ED, false);
+MGS_FUNC_IMPLEX(0x0040B3ED, LibGV_mesg_write_40B3ED, LIBGV_IMPL);
 
 int CC LibGV_mesg_read_40B47C(int nameHash, LibGV_Msg** ppOut)
 {
+    if (!gActorPauseFlags_dword_791A0C)
+    {
+        LibGv_Msg_Array* pArray = g_lib_gv_stru_6BFEE0.gGv_dword_6C0638_active_mesg_array_idx  ?
+              &g_lib_gv_stru_6BFEE0.gGv_dword_6C04F4_mesg_array2 :
+              &g_lib_gv_stru_6BFEE0.gGv_dword_6C03B0_mesg_array1;
+
+        int count = pArray->mCount;
+        if (pArray->mCount)
+        {
+            // TODO: Is 0x80000000 required? Can't see how it would ever be set
+            for (LibGV_Msg* pMsg = pArray->mMessages; (--count & 0x80000000) == 0; ++pMsg)
+            {
+                if (pMsg->field_0_res_hash == nameHash)
+                {
+                    *ppOut = pMsg;
+                    return pMsg->field_2_num_same_messages;
+                }
+            }
+        }
+    }
     return 0;
 }
-MGS_FUNC_IMPLEX(0x0040B47C, LibGV_mesg_read_40B47C, false);
+MGS_FUNC_IMPLEX(0x0040B47C, LibGV_mesg_read_40B47C, LIBGV_IMPL);
 
 int CC mesg_dr_gomon_lamp_on_off_504F25(int bOn)
 {
