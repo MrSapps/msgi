@@ -667,8 +667,34 @@ static void Test_GCL_Execute()
     // Nibble1 being 0x10 is not tested because it calls external function
     // 0x30 case is not tested because it calls external function
 }
+int CC Script_tbl_mesg_sub_451A5E(BYTE* /*pScript*/)
+{
+    LibGV_Msg msg = {};
+    msg.field_0_res_hash = static_cast<WORD>(Script_get_int());
+    WORD* pMsgField = &msg.field_4_action_hash_or_ptr;
+    WORD count = 0;
+    for(;;)
+    {
+        BYTE* scriptRet = Script_GetReturnAddress();
+        if (!scriptRet)
+        {
+            break;
+        }
+        DWORD scriptData = Script_Unknown8(scriptRet);
+        *pMsgField = static_cast<WORD>(scriptData);
+        ++pMsgField;
+        count++;
+    }
+    assert(count < 8);
+    msg.field_12_num_valid_fields = count;
 
-MGS_FUNC_NOT_IMPL(0x00451A5E, int __cdecl(BYTE*), Script_tbl_mesg_sub_451A5E);
+    LOG_INFO("GCL MSG write: 0x" << std::hex << msg.field_0_res_hash << " 0x" << msg.field_4_action_hash_or_ptr);
+
+    return (LibGV_mesg_write_40B3ED(&msg) >= 0) - 1;
+}
+MGS_FUNC_IMPLEX(0x451A5E, Script_tbl_mesg_sub_451A5E, SCRIPT_IMPL);
+
+
 MGS_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
 MGS_FUNC_NOT_IMPL(0x0045151D, int __cdecl(BYTE*), Script_tbl_map_sub_45151D);
 MGS_FUNC_NOT_IMPL(0x00451673, int __cdecl(BYTE*), Script_tbl_hzd_related_sub_451673);
@@ -723,7 +749,7 @@ static void TestCommonHashes()
 
 MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
 {
-    { 0x22FF, 0x0, Script_tbl_mesg_sub_451A5E.Ptr() },
+    { 0x22FF, 0x0, Script_tbl_mesg_sub_451A5E },
     { 0xD4CB, 0x0, Script_tbl_ntrap_removeQ_451688.Ptr() },
     { 0x9906, 0x0, Script_tbl_chara_sub_451AC3 },
     { 0xC091, 0x0, Script_tbl_map_sub_45151D.Ptr() },

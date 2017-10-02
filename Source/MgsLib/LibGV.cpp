@@ -19,21 +19,6 @@ struct LibGV_FileRecord
 };
 MGS_ASSERT_SIZEOF(LibGV_FileRecord, 0x8);
 
-struct LibGV_Msg
-{
-    WORD field_0_res_hash;
-    WORD field_2_num_same_messages;
-    WORD field_4_action_hash_or_ptr;
-    WORD field_6_hash;
-    WORD field_8_min1;
-    WORD field_A_min1;
-    WORD field_C_min1;
-    WORD field_E;
-    WORD field_10;
-    WORD field_12_num_valid_fields;
-};
-MGS_ASSERT_SIZEOF(LibGV_Msg, 0x14);
-
 struct LibGv_Msg_Array
 {
     DWORD mCount;
