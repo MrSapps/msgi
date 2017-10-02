@@ -212,7 +212,7 @@ int CC LibGV_mesg_read_40B47C(int nameHash, LibGV_Msg** ppOut)
 }
 MGS_FUNC_IMPLEX(0x0040B47C, LibGV_mesg_read_40B47C, LIBGV_IMPL);
 
-int CC mesg_dr_gomon_lamp_on_off_504F25(int bOn)
+int CC Res_otacom_update_helper_mesg_dr_gomon_lamp_on_off_504F25(int bOn)
 {
     LibGV_Msg msg = {};
 
@@ -229,7 +229,7 @@ int CC mesg_dr_gomon_lamp_on_off_504F25(int bOn)
     msg.field_12_num_valid_fields = 2;
     return LibGV_mesg_write_40B3ED(&msg);
 }
-MGS_FUNC_IMPLEX(0x00504F25, mesg_dr_gomon_lamp_on_off_504F25, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x00504F25, Res_otacom_update_helper_mesg_dr_gomon_lamp_on_off_504F25, LIBGV_IMPL);
 
 void Test_mesg()
 {
