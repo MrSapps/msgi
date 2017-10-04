@@ -1127,7 +1127,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR /*lp
     if (hm != 0)
         return TRUE;
 
-    hr = DirectDrawCreateExMGS(lpGUID, (LPVOID*)&pDirectDraw, &IID_IDirectDraw7_MGS, 0);
+    hr = DirectDrawCreateEx(lpGUID, (LPVOID*)&pDirectDraw, IID_IDirectDraw7, 0);
     if (hr < 0)
         return TRUE;
 
@@ -1234,7 +1234,7 @@ int __cdecl jim_enumerate_devices()
 
     gNumDrivers_dword_77C608 = 0;
     gDriverNum_dword_77C60C = 0;
-    DirectDrawEnumerateExA_MGS(DDEnumCallbackEx, 0, DDENUM_NONDISPLAYDEVICES);
+    DirectDrawEnumerateExA(DDEnumCallbackEx, 0, DDENUM_NONDISPLAYDEVICES);
 
     for (varC = 0; varC < gNumDrivers_dword_77C608; varC++)
     {
