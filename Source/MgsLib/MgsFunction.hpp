@@ -107,8 +107,8 @@ class MgsFunctionImpl : public MgsFunctionBase
 public:
     using TFuncType = Signature*;
 
-    MgsFunctionImpl(const char* fnName)
-        : mFnName(fnName)
+    MgsFunctionImpl(const char* fnName, bool useKNewAddr = true)
+        : mFnName(fnName), mUseKNewAddr(useKNewAddr)
     {
         auto it = GetMgsFunctionTable().find(kOldAddr);
         if (it != std::end(GetMgsFunctionTable()))
@@ -229,19 +229,22 @@ protected:
 
     virtual void Apply() override
     {
+        if (mUseKNewAddr)
+        {
 #pragma warning(push)
 #pragma warning(disable:4127) // conditional expression is constant
-        if (kReverseHook)
-        {
-            // Redirect calls to our reimpl to the game function
-            ApplyImpl(kNewAddr, reinterpret_cast<void*>(kOldAddr));
-        }
-        else
-        {
-            // Redirect internal game function to our reimpl
-            ApplyImpl(reinterpret_cast<void*>(kOldAddr), kNewAddr);
-        }
+            if (kReverseHook)
+            {
+                // Redirect calls to our reimpl to the game function
+                ApplyImpl(kNewAddr, reinterpret_cast<void*>(kOldAddr));
+            }
+            else
+            {
+                // Redirect internal game function to our reimpl
+                ApplyImpl(reinterpret_cast<void*>(kOldAddr), kNewAddr);
+            }
 #pragma warning(pop)
+        }
     }
 
 private:
@@ -278,6 +281,7 @@ private:
     TFuncType mRealFuncPtr = nullptr;
     const char* mFnName = nullptr;
     bool mPassThrough = false;
+    bool mUseKNewAddr = true;
 };
 
 template<DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, class ReturnType>
@@ -289,7 +293,7 @@ class MgsFunction    <kOldAddr, kNewAddr, kReverseHook, kLogArgs, ReturnType __c
     MgsFunctionImpl<kOldAddr, kNewAddr, kReverseHook, kLogArgs, eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
 {
 public:
-    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
+    MgsFunction(const char* name, bool useKNewAddr = true) : MgsFunctionImpl(name, useKNewAddr) { }
 };
 
 // __stdcall partial specialization
@@ -298,7 +302,7 @@ class MgsFunction    <kOldAddr, kNewAddr, kReverseHook, kLogArgs, ReturnType __s
     MgsFunctionImpl<kOldAddr, kNewAddr, kReverseHook, kLogArgs, eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
 {
 public:
-    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
+    MgsFunction(const char* name, bool useKNewAddr = true) : MgsFunctionImpl(name, useKNewAddr) { }
 };
 
 class AutoCs
@@ -465,6 +469,9 @@ extern TypeName* VarName ;
 // isImplemented == false means redirect game func to our func. isImplemented == true means redirect our func to game func.
 #define MGS_FUNC_IMPLEX(addr, funcName, isImplemented) MgsFunction<addr, funcName, !isImplemented, true, decltype(funcName)> funcName##_(#funcName);
 #define MGS_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, false, decltype(funcName)> funcName##_(#funcName);
+
+#define MGS_STDLIB(func, addr) MgsFunction<addr, func, false, true, decltype(func)> mgs_##func(#func, IsMgsi())
+#define EXTERN_MGS_STDLIB(func, addr) extern MgsFunction<addr, func, false, true, decltype(func)> mgs_##func;
 
 #define MGS_ASSERT_SIZEOF(structureName, expectedSize) static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize)
 

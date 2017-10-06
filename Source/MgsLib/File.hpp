@@ -2,30 +2,33 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <io.h>
 #include "MgsFunction.hpp"
 
-// stdlib
-EXTERN_MGS_FUNC_NOT_IMPL(0x0053CB40, FILE* __cdecl(const char*, const char*), mgs_fopen);
-EXTERN_MGS_FUNC_NOT_IMPL(0x0053C970, int __cdecl(const char*, FILE*), mgs_fputs);
-EXTERN_MGS_FUNC_NOT_IMPL(0x0053C6C0, int __cdecl(FILE*), mgs_fflush);
-EXTERN_MGS_FUNC_NOT_IMPL(0x0053C4A0, int __cdecl(FILE *File), mgs_fclose);
+// We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
+// stdlib used by MSGI.exe isn't the same as ours, mixing them will lead to a bad time.
+// Additionally we need to redirect the mgs_stdlibfunc() to stdlibfunc() when running as our own exe
+// otherwise it will be a stub that does nothing.
+
+// Warning 4996 is disabled globally for this library since we need to use the old names
+// until all functions using stdlib are reimplemented.
+
 
 // Memory allocation
-void *__cdecl mgs_malloc(size_t Size);
-void __cdecl mgs_free(void *Memory);
-void *__cdecl mgs_realloc(void *Memory, size_t NewSize);
-void *__cdecl mgs_calloc(size_t NumOfElements, size_t SizeOfElements);
+EXTERN_MGS_STDLIB(malloc, 0x00539990);
+EXTERN_MGS_STDLIB(free, 0x0053A400);
+EXTERN_MGS_STDLIB(realloc, 0x00539E20);
+EXTERN_MGS_STDLIB(calloc, 0x00539DA0);
 
+// File I/O
+EXTERN_MGS_STDLIB(fopen, 0x0053CB40);
+EXTERN_MGS_STDLIB(fputs, 0x0053C970);
+EXTERN_MGS_STDLIB(fflush, 0x0053C6C0);
+EXTERN_MGS_STDLIB(fclose, 0x0053C4A0);
 
-// Special case varadics..
-int msg_internal_fprintf(FILE *File, const char *Format, ...);
-using TMgs_fprintf = decltype(&msg_internal_fprintf);
-extern TMgs_fprintf mgs_fprintf;
+EXTERN_MGS_STDLIB(open, 0x0053C5F0);
+EXTERN_MGS_STDLIB(fprintf, 0x0053DBE0);
 
-int mgs_internal_open(const char *lpFileName, int a2, ...);
-using TMgs_open = decltype(&mgs_internal_open);
-extern TMgs_open mgs_open;
-
-EXTERN_MGS_FUNC_NOT_IMPL(0x0053D680, int __cdecl(int), mgs_close);
-EXTERN_MGS_FUNC_NOT_IMPL(0x0053E180, int __cdecl(int, LONG, DWORD), mgs_lseek);
-EXTERN_MGS_FUNC_NOT_IMPL(0x0053D1A0, int __cdecl(int, void*, DWORD), mgs_read);
+EXTERN_MGS_STDLIB(close, 0x0053D680);
+EXTERN_MGS_STDLIB(lseek, 0x0053E180);
+EXTERN_MGS_STDLIB(read, 0x0053D1A0);

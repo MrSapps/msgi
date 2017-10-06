@@ -1,86 +1,20 @@
 #include "stdafx.h"
 #include "File.hpp"
-
-// We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
-// stdlib used by MSGI.exe isn't the same as ours, mixing them will lead to a bad time.
-MGS_FUNC_NOT_IMPL(0x0053CB40, FILE* __cdecl(const char*, const char*), mgs_fopen);
-MGS_FUNC_NOT_IMPL(0x0053C970, int __cdecl(const char*, FILE*), mgs_fputs);
-MGS_FUNC_NOT_IMPL(0x0053C6C0, int __cdecl(FILE*), mgs_fflush);
-MGS_FUNC_NOT_IMPL(0x0053C4A0, int __cdecl(FILE *File), mgs_fclose);
-
+#include "MgsFunction.hpp"
 
 // Memory allocation
-MGS_FUNC_IMPL(0x00539990, mgs_malloc);
-MGS_FUNC_IMPL(0x0053A400, mgs_free);
-MGS_FUNC_IMPL(0x00539E20, mgs_realloc);
-MGS_FUNC_IMPL(0x00539DA0, mgs_calloc);
+MGS_STDLIB(malloc, 0x00539990);
+MGS_STDLIB(free, 0x0053A400);
+MGS_STDLIB(realloc, 0x00539E20);
+MGS_STDLIB(calloc, 0x00539DA0);
 
-void *__cdecl mgs_malloc(size_t Size)
-{
-    if (IsMgsi())
-    {
-        void* ptr = mgs_malloc_.Ptr()(Size);
-        if (ptr)
-        {
-            MgsVar::TrackAlloc(ptr, Size);
-        }
-        return ptr;
-    }
-    return malloc(Size);
-}
-
-void __cdecl mgs_free(void *Memory)
-{
-    if (IsMgsi())
-    {
-        if (Memory)
-        {
-            MgsVar::TrackFree(Memory);
-        }
-        mgs_free_.Ptr()(Memory);
-    }
-    else
-    {
-        free(Memory);
-    }
-}
-
-void *__cdecl mgs_realloc(void *Memory, size_t NewSize)
-{
-    if (IsMgsi())
-    {
-        // TODO: Track
-        //LOG_WARNING("realloc() not tracked");
-        return mgs_realloc_.Ptr()(Memory, NewSize);
-    }
-    else
-    {
-        return realloc(Memory, NewSize);
-    }
-}
-
-void *__cdecl mgs_calloc(size_t NumOfElements, size_t SizeOfElements)
-{
-    if (IsMgsi())
-    {
-        // TODO: Track
-        //LOG_WARNING("calloc() not tracked");
-        return mgs_calloc_.Ptr()(NumOfElements, SizeOfElements);
-    }
-    else
-    {
-        return calloc(NumOfElements, SizeOfElements);
-    }
-}
-
-
-// Can't seem to make this work, calling this will crash due to issue mentioned above
-//MSG_FUNC_NOT_IMPL(0x0053C5F0, int __cdecl(FILE*, const char*, ...), mgs_fprintf);
-// So temp HACK - just get a pointer to the MSG func and call directly, remove when all funcs using it
-// are re-impled
-TMgs_fprintf mgs_fprintf = (TMgs_fprintf)0x0053C5F0;
-TMgs_open mgs_open = (TMgs_open)0x0053DBE0;
-
-MGS_FUNC_NOT_IMPL(0x0053D680, int __cdecl(int), mgs_close);
-MGS_FUNC_NOT_IMPL(0x0053E180, int __cdecl(int, LONG, DWORD), mgs_lseek);
-MGS_FUNC_NOT_IMPL(0x0053D1A0, int __cdecl(int, void*, DWORD), mgs_read);
+// File I/O
+MGS_STDLIB(fopen, 0x0053CB40);
+MGS_STDLIB(fputs, 0x0053C970);
+MGS_STDLIB(fflush, 0x0053C6C0);
+MGS_STDLIB(fclose, 0x0053C4A0);
+MGS_STDLIB(open, 0x0053C5F0);
+MGS_STDLIB(fprintf, 0x0053DBE0);
+MGS_STDLIB(close, 0x0053D680);
+MGS_STDLIB(lseek, 0x0053E180);
+MGS_STDLIB(read, 0x0053D1A0);
