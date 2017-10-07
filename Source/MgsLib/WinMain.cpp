@@ -2874,8 +2874,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
                     {
                         if (Sound_Init(gHwnd) || AskUserToContinueIfNoSoundCard())
                         {
-                            Sound_SetSoundFxVolume(gSoundFxVol_dword_651D98);
-                            Sound_SetMusicVolume(gMusicVol_dword_716F68);
+                            Sound_SetSoundVolume(gSoundFxVol_dword_651D98);
+                            Sound_SetSoundMusicVolume(gMusicVol_dword_716F68);
                             Timer_30_1();
 
                             /* HACK: Leave cursor showing while developing

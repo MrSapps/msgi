@@ -29,16 +29,6 @@ TEST(Sound, DISABLED_Init_ShutDown)
     Sound_ShutDown();
 }
 
-
-// TODO: Needs array ripping
-TEST(Sound, DISABLED_Sound_SetMusicVolume)
-{
-    for (int i = 0; i <= 100; i++)
-    {
-        Sound_SetMusicVolume(i); // TODO: Check ret
-    }
-}
-
 TEST(Sound, Sound_HexCharToInt)
 {
     // Chars 0 to 9 converted to number
