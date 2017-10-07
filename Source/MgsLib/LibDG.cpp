@@ -155,7 +155,7 @@ MGS_ARY(REDIRECT_LIBDG_DATA, 0x650040, Res_Init_Record, 3, gStaticResInitFuncs_s
     { 0xB997, 0, (ResInitFn)0x0040BB8B }
 });
 
-MGS_PTR(REDIRECT_LIBDG_DATA, 0x993F44, Res_Init_Record**, gpToDynamicResInitFuncs_dword_993F44, nullptr);
+MGS_PTR(REDIRECT_LIBDG_DATA, 0x993F44, Res_Init_Record*, gpToDynamicResInitFuncs_dword_993F44, nullptr);
 
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x994304, DWORD, gSleep5000_after_res_funcs_1_dword_994304, 0);
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x99430C, DWORD, gSleep5000_after_res_funcs_2_dword_99430C, 0);
@@ -238,14 +238,14 @@ MGS_FUNC_IMPLEX(0x0044E9D2, LibDG_CHARA_44E9D2, LIBDG_IMPL);
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B()
 {
     memcpy(gDynamicResFuncs_word_994320, gKnownResInitFuncs_669AE0, 4096u); // 4096u = sizeof(gResInitFuncs_669AE0)
-    *gpToDynamicResInitFuncs_dword_993F44 = gDynamicResFuncs_word_994320;
+    gpToDynamicResInitFuncs_dword_993F44 = gDynamicResFuncs_word_994320;
 }
 MGS_FUNC_IMPLEX(0x457B5B, LibDG_SetActiveResourceInitFuncPtrs_457B5B, LIBDG_IMPL);
 
 void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C()
 {
     memset(gDynamicResFuncs_word_994320, 0, 4096u); // 4096u = sizeof(gResInitFuncs_669AE0)
-    *gpToDynamicResInitFuncs_dword_993F44 = gDynamicResFuncs_word_994320;
+    gpToDynamicResInitFuncs_dword_993F44 = gDynamicResFuncs_word_994320;
 }
 MGS_FUNC_IMPLEX(0x457B7C, LibDG_ClearActiveResourceFunctionPointerList_457B7C, LIBDG_IMPL);
 
@@ -273,7 +273,7 @@ ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName)
     }
 
     // Search in the 512 "dynamic" records
-    result = FindFnPtrByHash(*gpToDynamicResInitFuncs_dword_993F44, hashedName);
+    result = FindFnPtrByHash(gpToDynamicResInitFuncs_dword_993F44, hashedName);
     return result;
 }
 MGS_FUNC_IMPLEX(0x457BAC, LibDG_GetResourceInitFuncPtr_457BAC, LIBDG_IMPL);

@@ -37,7 +37,7 @@ MGS_VAR(1, 0x78E960, BYTE*, gResidentTop_dword_78E960, 0);
 
 MGS_VAR(1, 0x78E964, BYTE*, gSavedTop_78E964, 0);
 
-MGS_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), sub_44E212);
+MGS_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), Reset_GV_DG_44E212);
 MGS_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MGS_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
 MGS_FUNC_NOT_IMPL(0x0044E381, void CC(Actor*), GameD_Update_44E381);
@@ -116,7 +116,7 @@ void CC Init_Gamed_Create_44E12B()
 
     sub_44E1F9();
     sub_44E287();
-    sub_44E212();
+    Reset_GV_DG_44E212();
     word_78E7E8 = (WORD)(dword_78D7B0 + 1);
     dword_995324 = (int)&dword_7919C0;
     SaveResidentTop();

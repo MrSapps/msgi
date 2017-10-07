@@ -76,7 +76,6 @@ MGS_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
 
 
 MGS_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
-MGS_FUNC_NOT_IMPL(0x0051D09D, BOOL __cdecl(HWND, int, int), SetWindowSize);
 MGS_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
 MGS_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
 MGS_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), sub_43C850);
@@ -106,7 +105,18 @@ MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
 MGS_VAR(1, 0x73491C, DWORD, dword_73491C, 0);
 MGS_VAR(1, 0x71D164, DWORD, dword_71D164, 0);
 
-
+void CC SetWindowSize(HWND hWnd, int nWidth, int nHeight)
+{
+    RECT clientRect = {};
+    MoveWindow(hWnd, 0, 0, nWidth, nHeight, 0);
+    GetClientRect(hWnd, &clientRect);
+    int height = nHeight - (clientRect.bottom - clientRect.top) + nHeight;
+    int width = nWidth - (clientRect.right - clientRect.left) + nWidth;
+    int y = (GetSystemMetrics(SM_CYMAXIMIZED) - height) / 2;
+    int x = (GetSystemMetrics(SM_CXMAXIMIZED) - width) / 2;
+    MoveWindow(hWnd, x, y, width, height, TRUE);
+}
+MGS_FUNC_IMPLEX(0x0051D09D, SetWindowSize, WINMAIN_IMPL);
 
 MGS_VAR(1, 0x78E7F8, WORD, word_78E7F8, 0);
 MGS_VAR(1, 0x78E7F6, WORD, word_78E7F6, 0);
@@ -2403,22 +2413,25 @@ void InstallVaradicCFunctionHooks()
         abort();
     }
 
-    FARPROC oldPtr = (FARPROC)0x00520157;
-    err = DetourAttach(&(PVOID&)oldPtr, DebugLog);
-    
-
-    if (err != NO_ERROR)
+    if (IsMgsi())
     {
-        abort();
-    }
-    
-    using mgs_printf_Type = decltype(&mgs_printf);
-    mgs_printf_Type old_mgs_printf = (mgs_printf_Type)0x005398F0;
+        FARPROC oldPtr = (FARPROC)0x00520157;
+        err = DetourAttach(&(PVOID&)oldPtr, DebugLog);
 
-    err = DetourAttach(&(PVOID&)old_mgs_printf, mgs_printf);
-    if (err != NO_ERROR)
-    {
-        abort();
+
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
+
+        using mgs_printf_Type = decltype(&mgs_printf);
+        mgs_printf_Type old_mgs_printf = (mgs_printf_Type)0x005398F0;
+
+        err = DetourAttach(&(PVOID&)old_mgs_printf, mgs_printf);
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
     }
 
     FARPROC winTrust = GetProcAddress(LoadLibraryA("WinTrust.dll"), "WinVerifyTrust");
@@ -2716,10 +2729,9 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     Actor_LoaderCpp_ForceLink();
     Fs_Cpp_ForceLink();
 
-    if (IsMgsi())
-    {
-        InstallVaradicCFunctionHooks();
-    }
+
+    InstallVaradicCFunctionHooks();
+    
 
     RunTests();
 
@@ -2855,7 +2867,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
                 if (gHwnd)
                 {
                     SetWindowSize(gHwnd, 640, 480);
-                    ShowWindow(gHwnd, 5);
+                    ShowWindow(gHwnd, SW_SHOW);
                     UpdateWindow(gHwnd);
                     gHInstance = hInstance;
                     if (DoInitAll())

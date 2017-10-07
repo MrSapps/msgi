@@ -298,7 +298,9 @@ MGS_FUNC_IMPLEX(0x40AFA4, System_mem_zerod_alloc_40AFA4, SYSTEM_IMPL);
 
 void* CC System_2_zerod_allocate_memory_40B296(int size)
 {
-    return System_mem_zerod_alloc_40AFA4(2, size, (void**)LibGV_MemoryAllocation::eUsed);
+    void* ptr = System_mem_zerod_alloc_40AFA4(2, size, (void**)LibGV_MemoryAllocation::eUsed);;
+    assert(ptr != nullptr);
+    return ptr;
 }
 MGS_FUNC_IMPLEX(0x40B296, System_2_zerod_allocate_memory_40B296, SYSTEM_IMPL);
 

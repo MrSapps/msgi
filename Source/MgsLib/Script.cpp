@@ -49,11 +49,11 @@ struct proc_struct_sub
     proc_sub_ptr mCommandFunction;
 };
 
-MGS_PTR(1, 0x6BFC6C, proc_struct**, gScriptCmdTable_dword_6BFC6C, 0);
+MGS_PTR(1, 0x6BFC6C, proc_struct*, gScriptCmdTable_dword_6BFC6C, nullptr);
 
 proc_struct_sub* CC Script_GetCommand(WORD cmdToFind)
 {
-    proc_struct* i = *gScriptCmdTable_dword_6BFC6C;
+    proc_struct* i = gScriptCmdTable_dword_6BFC6C;
     while (i)
     {
         for (DWORD j = 0; j<i->mNumCommands; j++) // WARN: Real game does it backwards but can't see why
@@ -72,8 +72,8 @@ MGS_FUNC_IMPLEX(0x00409ACC, Script_GetCommand, SCRIPT_IMPL);
 
 int CC Script_InitCommandTable(proc_struct* pCmdTbl)
 {
-    pCmdTbl->pNext = *gScriptCmdTable_dword_6BFC6C;
-    *gScriptCmdTable_dword_6BFC6C = pCmdTbl;
+    pCmdTbl->pNext = gScriptCmdTable_dword_6BFC6C;
+    gScriptCmdTable_dword_6BFC6C = pCmdTbl;
     proc_struct_sub* pItem = pCmdTbl->pCommandsArray;
     if (pCmdTbl->mNumCommands > 0)
     {
