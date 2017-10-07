@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <io.h>
+#include <sys/stat.h>
 #include "MgsFunction.hpp"
 
 // We must call MSG version of stdlib functions for shared var, e.g the FILE* struct for the
@@ -25,10 +26,15 @@ EXTERN_MGS_STDLIB(fopen, 0x0053CB40);
 EXTERN_MGS_STDLIB(fputs, 0x0053C970);
 EXTERN_MGS_STDLIB(fflush, 0x0053C6C0);
 EXTERN_MGS_STDLIB(fclose, 0x0053C4A0);
+EXTERN_MGS_STDLIB(fwrite, 0x0053F550);
 
-EXTERN_MGS_STDLIB(open, 0x0053C5F0);
-EXTERN_MGS_STDLIB(fprintf, 0x0053DBE0);
+int mgs_open(const char* filename, int openFlag);
+int mgs_open(const char* filename, int openFlag, DWORD mode);
+int mgs_fprintf(FILE* file, const char* format, ...);
 
 EXTERN_MGS_STDLIB(close, 0x0053D680);
 EXTERN_MGS_STDLIB(lseek, 0x0053E180);
 EXTERN_MGS_STDLIB(read, 0x0053D1A0);
+
+void DebugLog(const char *Format, ...);
+int mgs_printf(const char* fmt, ...);
