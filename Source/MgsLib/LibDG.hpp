@@ -28,6 +28,7 @@ struct LibDG_Struct
 };
 MGS_ASSERT_SIZEOF(LibDG_Struct, 0x2C);
 MGS_VAR_EXTERN(LibDG_Struct, gLibDG_2_stru_6BB930);
+EXTERN_MGS_FUNC_NOT_IMPL(0x40B231, unsigned int CC(void* pMem, int size), MemClearUnknown_40B231);
 
 
 struct Prim_base

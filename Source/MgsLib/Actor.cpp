@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Actor.hpp"
 #include "MgsFunction.hpp"
+#include "System.hpp"
+#include "LibDG.hpp"
 
 #define ACTOR_IMPL true
 
@@ -55,9 +57,13 @@ static bool IterateActors(bShouldEnterList fnEnterList, bShouldContinue fnShould
 
 Actor* CC Actor_ResourceAlloc(s32 actor_system_idx, s32 size)
 {
-    UNREFERENCED_PARAMETER(actor_system_idx);
-    UNREFERENCED_PARAMETER(size);
-    return nullptr;
+    Actor* pMem = reinterpret_cast<Actor*>(System_2_zerod_allocate_memory_40B296(size));
+    if (pMem)
+    {
+        MemClearUnknown_40B231(pMem, size);
+        Actor_PushBack(actor_system_idx, pMem, reinterpret_cast<TActorFunction>(System_2_free_40B2A7));
+    }
+    return pMem;
 }
 MGS_FUNC_IMPLEX(0x0040A30C, Actor_ResourceAlloc, false); // TODO: Implement me
 
