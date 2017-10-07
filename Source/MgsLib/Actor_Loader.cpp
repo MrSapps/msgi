@@ -8,6 +8,8 @@
 #include "ResourceNameHash.hpp"
 #include "LibGV.hpp"
 #include "Fs.hpp"
+#include "Psx.hpp"
+#include "Renderer.hpp"
 #include <gmock/gmock.h>
 
 #define ACTOR_LOADER_IMPL true
@@ -39,8 +41,6 @@ struct Actor_Loader_Impl
 };
 MGS_ASSERT_SIZEOF(Actor_Loader_Impl, 0x74);
 
-MGS_FUNC_NOT_IMPL(0x00401F77, void CC(__int16 a1), Res_loader_tick_helper_401F77);
-
 MGS_VAR(1, 0x71D13C, DWORD, dword_71D13C, 0);
 MGS_VAR(1, 0x6BFBA4, DWORD, dword_6BFBA4, 0);
 MGS_VAR(1, 0x71D138, DWORD, dword_71D138, 0);
@@ -49,6 +49,16 @@ MGS_VAR(1, 0x650478, DWORD, dword_650478, 0);
 MGS_VAR(1, 0x99533C, DWORD, dword_99533C, 0);
 
 MGS_ARY(1, 0x6504C8, char, 256, gStage_Name_byte_6504C8, {});
+
+void CC Res_loader_tick_helper_401F77(__int16 yoff)
+{
+    gDispEnv_6BECF0.screen.y1 += yoff;
+    gDispEnv_6BECF0.screen.y2 -= yoff;
+    Render_Scene_DispEnv_40DD00(&gDispEnv_6BECF0);
+    gDispEnv_6BECF0.screen.y1 -= yoff;
+    gDispEnv_6BECF0.screen.y2 += yoff;
+}
+MGS_FUNC_IMPLEX(0x401F77, Res_loader_tick_helper_401F77, ACTOR_LOADER_IMPL);
 
 void CC Res_loader_shutdown_helper_408E95(void* ptr)
 {

@@ -66,7 +66,20 @@ struct POLY_F4
 };
 MGS_ASSERT_SIZEOF(POLY_F4, 0x18);
 
-MGS_VAR_EXTERN(PSX_RECT, gClipRect_6BECF0);
+
+struct DISPENV
+{
+    PSX_RECT disp;   // Display area within frame buffer.Width: 256, 320, 384, 512, or 640. Height : 240 or 480.
+    PSX_RECT screen; // Output screen display area.It is calculated without regard to the value of
+                     // disp, using the standard monitor screen upper left - hand point(0, 0) and
+                     // lower right - hand point(256, 240).
+    BYTE isinter;    // Interlace mode flag. 0: non - interlace; 1: interlace
+    BYTE isrgb24;    // 24 - bit mode flag. 0: 16 - bit mode; 1: 24 - bit mode
+    BYTE pad0, pad1; // Reserved by system
+};
+MGS_ASSERT_SIZEOF(DISPENV, 20);
+
+MGS_VAR_EXTERN(DISPENV, gDispEnv_6BECF0);
 MGS_VAR_EXTERN(DRAWENV, gDrawEnv_6C0E98);
 
 signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode);

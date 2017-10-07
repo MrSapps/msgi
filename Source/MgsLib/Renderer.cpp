@@ -10,7 +10,7 @@ void RendererCpp_ForceLink() { }
 
 MGS_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
 MGS_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
-
+MGS_FUNC_NOT_IMPL(0x40DD00, void __cdecl(DISPENV* pDispEnv), Render_Scene_DispEnv_40DD00);
 
 MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 MGS_VAR(1, 0x6FC784, DWORD, g_nVertexOffset, 0);

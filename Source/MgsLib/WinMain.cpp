@@ -2454,7 +2454,6 @@ MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
 MGS_VAR(1, 0x6BED20, DWORD, counter_dword_6BED20, 0);
 MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {}); // TODO: Check 2 is correct
 
-MGS_FUNC_NOT_IMPL(0x40DD00, struct DISPENV *__cdecl(PSX_RECT *pRect), sub_40DD00);
 MGS_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), TextReset_459ACE);
 MGS_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), OT_Related_40162D);
 MGS_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
@@ -2475,8 +2474,8 @@ int CC Main_sub_401C02()
         {
             if (gLastActiveBuffer_dword_650110 < 0 || gActiveBuffer_dword_791A08 != gLastActiveBuffer_dword_650110)
             {
-                gClipRect_6BECF0.x1 = static_cast<WORD>(dword_6BED18[gActiveBuffer_dword_791A08]);
-                sub_40DD00(&gClipRect_6BECF0);
+                gDispEnv_6BECF0.disp.x1 = static_cast<WORD>(dword_6BED18[gActiveBuffer_dword_791A08]);
+                Render_Scene_DispEnv_40DD00(&gDispEnv_6BECF0);
                 Render_DrawIndex(1 - activeBufferHW);
                 gLastActiveBuffer_dword_650110 = -1;
             }

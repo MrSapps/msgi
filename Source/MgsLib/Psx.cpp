@@ -6,7 +6,7 @@ void PsxCpp_ForceLink() { }
 #define IMPL_PSX true
 
 MGS_VAR(1, 0x6C0E98, DRAWENV, gDrawEnv_6C0E98, {});
-MGS_VAR(1, 0x6BECF0, PSX_RECT, gClipRect_6BECF0, {});
+MGS_VAR(1, 0x6BECF0, DISPENV, gDispEnv_6BECF0, {});
 MGS_VAR(1, 0x6C0EAA, WORD, word_6C0EAA, 0x0);
 MGS_VAR(1, 0x6C0EA8, WORD, word_6C0EA8, 0x0);
 
@@ -45,19 +45,6 @@ struct RECT32
     DWORD x1, y1, x2, y2;
 };
 MGS_ASSERT_SIZEOF(RECT32, 16);
-
-
-struct DISPENV 
-{
-    PSX_RECT disp;   // Display area within frame buffer.Width: 256, 320, 384, 512, or 640. Height : 240 or 480.
-    PSX_RECT screen; // Output screen display area.It is calculated without regard to the value of
-                     // disp, using the standard monitor screen upper left - hand point(0, 0) and
-                     // lower right - hand point(256, 240).
-    BYTE isinter;    // Interlace mode flag. 0: non - interlace; 1: interlace
-    BYTE isrgb24;    // 24 - bit mode flag. 0: 16 - bit mode; 1: 24 - bit mode
-    BYTE pad0, pad1; // Reserved by system
-};
-MGS_ASSERT_SIZEOF(DISPENV, 20);
 
 struct P_TAG
 {
@@ -465,10 +452,10 @@ DRAWENV* Renderer_Init_DRAWENV_40200D()
     DRAWENV drawEnv;
     Renderer_DRAWENV_Init_401888(
         &drawEnv,
-        gClipRect_6BECF0.x1,
-        gClipRect_6BECF0.y1,
-        gClipRect_6BECF0.x2,
-        gClipRect_6BECF0.y2);
+        gDispEnv_6BECF0.disp.x1,
+        gDispEnv_6BECF0.disp.y1,
+        gDispEnv_6BECF0.disp.x2,
+        gDispEnv_6BECF0.disp.y2);
     return Renderer_Set_DRAWENV_40DD90(&drawEnv);
 }
 MGS_FUNC_IMPLEX(0x40200D, Renderer_Init_DRAWENV_40200D, IMPL_PSX);
