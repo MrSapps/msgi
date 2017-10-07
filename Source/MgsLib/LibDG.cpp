@@ -375,11 +375,34 @@ void CC LibDG_Update2_401234(Actor* pLibDg)
 
     if (byte_9942AB & 0x10)
     {
-        if (HIWORD(dword_7919CE) | (WORD)dword_7919D4)
+        if (word_7919C2[7] | word_7919C2[9])
         {
-            dword_995324 = 0x7919D0; // TODO: Is actually set to (int)&dword_7919CE + 2; ??
+            dword_995324 = (int)&word_7919C2[7];
         }
     }
+
+    WORD* p = (WORD*)dword_995324;
+
+    //p[0] |= 0xffff; // Shift / X held
+    //p[1] |= 0xffff; // Tri/first person held
+   // p[3] |= 0xffff; // 3rd person cam force ?
+    //p[4] |= 0xffff; // can't dpad
+   // p[6] |= 0xffff;
+
+   // p[4] = 0x800; // Up 
+    //p[4] = 0x400; // Right
+   // p[4] = 0x1000; // Down
+    //p[4] = 0x2000; // Down
+    //p[4] = 0x4000; // Down
+    //p[4] = 0x8000; // Nothing
+    //p[4] = 0x1; // Down
+    //p[4] = 0x2;  // Down
+   // p[4] = 0x4;
+   // p[4] = 0x8;
+   // p[4] = 0x10;
+   // p[4] = 0x20;
+   // p[4] = 0x80; // down and right
+   // p[4] = 0x100;
 }
 MGS_FUNC_IMPLEX(0x401234, LibDG_Update2_401234, LIBDG_IMPL);
 

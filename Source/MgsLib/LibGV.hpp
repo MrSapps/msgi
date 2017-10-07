@@ -22,6 +22,7 @@ struct LibGV_Msg
     WORD field_12_num_valid_fields;
 };
 MGS_ASSERT_SIZEOF(LibGV_Msg, 0x14);
+MGS_ARY_EXTERN(WORD, 16, word_7919C2);
 
 int CC LibGV_mesg_write_40B3ED(const LibGV_Msg* pSrcMsg);
 

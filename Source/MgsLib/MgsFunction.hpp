@@ -452,7 +452,7 @@ TypeName* VarName = (Redirect && IsMgsi()) ? reinterpret_cast<TypeName*>(Addr) :
 #define MGS_PTR(Redirect, Addr, TypeName, VarName, Value)\
 TypeName LocalPtr_##VarName = Value;\
 MgsVar Var_##VarName(#VarName, Addr, sizeof(LocalPtr_##VarName), std::is_pointer<TypeName>::value, std::is_const<TypeName>::value);\
-std::remove_pointer<TypeName>::type * const VarName = (Redirect && IsMgsi()) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
+std::remove_pointer<TypeName>::type * VarName = (Redirect && IsMgsi()) ? reinterpret_cast<TypeName>(Addr) : LocalPtr_##VarName;
 
 #define MGS_VAR(Redirect, Addr, TypeName, VarName, Value)\
 TypeName LocalVar_##VarName = Value;\

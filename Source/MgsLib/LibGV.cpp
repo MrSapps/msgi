@@ -59,8 +59,32 @@ MGS_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
 void LibGVCpp_ForceLink() { }
 
 MGS_FUNC_NOT_IMPL(0x40B35E, void CC(), LibGV_Reset_System2_Memory_40B35E);
-MGS_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_Allocs_40A6AC);
-MGS_FUNC_NOT_IMPL(0x40A4B1, void CC(), sub_40A4B1);
+MGS_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_FileCache_40A6AC);
+
+MGS_ARY(1, 0x7919C2, WORD, 16, word_7919C2, {});
+
+void CC LibGV_mesg_init_40B3BC();
+
+void CC LibGV_40A4B1()
+{
+    LibGV_mesg_init_40B3BC();
+    WORD* ptr = &word_7919C2[0];                    // 0x5000
+    int counter = 2;
+    do
+    {
+        ptr[3] = -1;
+        ptr[1] = 0;
+        *ptr = 0;
+        *(ptr - 1) = 0;
+        ptr += 8;
+        --counter;
+    } while (counter);
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0380 = 0;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4 = 0;
+    memset(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388, 0, sizeof(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388));
+}
+MGS_FUNC_IMPLEX(0x40A4B1, LibGV_40A4B1, LIBGV_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x40B734, int CC(void*, int), Hzm_load_40B734);
 
 MGS_FUNC_NOT_IMPL(0x40A618, LibGV_FileRecord* CC(int resHash), LibGV_Find_Item_40A618);
@@ -394,8 +418,8 @@ void LibGv_Init_sub_40A4F6()
     ActorList_Init();
     LibGV_Reset_System2_Memory_40B35E();
     LibGv_ClearFunctionPointers_40A69D();
-    LibGV_Init_Allocs_40A6AC();
-    sub_40A4B1();
+    LibGV_Init_FileCache_40A6AC();
+    LibGV_40A4B1();
     Actor_PushBack(0, &g_lib_gv_stru_6BFEE0.mBase, nullptr);
     Actor_Init(&g_lib_gv_stru_6BFEE0.mBase, LibGV_Update_40A54E, nullptr, "C:\\mgs\\source\\LibGV\\gvd.c");
     gActiveBuffer_dword_791A08 = 0;
