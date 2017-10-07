@@ -74,9 +74,12 @@ MGS_VAR_EXTERN(WORD*, g_pwTextureIndices);
 MGS_VAR_EXTERN(DWORD, dword_6FC774);
 MGS_VAR_EXTERN(WORD, g_NumTextures);
 
-EXTERN_MGS_FUNC_NOT_IMPL(0x40DD00, void __cdecl(DISPENV* pDispEnv), Render_Scene_DispEnv_40DD00);
-
 void RendererCpp_ForceLink();
+
+EXTERN_MGS_FUNC_NOT_IMPL(0x422210, void __cdecl(), Render_Loop_SetWinTitle_422210);
+
+
+void CC Render_Scene_DispEnv_40DD00(DISPENV* pRect);
 void CC PrintDDError(const char* errMsg, HRESULT hrErr);
 __int16 CC Render_RestoreAll();
 void CC Render_DrawIndex(uint32_t a_nIndex);

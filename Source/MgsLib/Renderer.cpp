@@ -10,7 +10,32 @@ void RendererCpp_ForceLink() { }
 
 MGS_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
 MGS_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
-MGS_FUNC_NOT_IMPL(0x40DD00, void __cdecl(DISPENV* pDispEnv), Render_Scene_DispEnv_40DD00);
+MGS_FUNC_NOT_IMPL(0x422210, void __cdecl(), Render_Loop_SetWinTitle_422210);
+
+
+MGS_VAR(1, 0x6FC7B0, WORD, gDisp_w_word_6FC7B0, 0);
+MGS_VAR(1, 0x6FC7B2, WORD, gDisp_y_word_6FC7B2, 0);
+MGS_VAR(1, 0x6DF200, DISPENV, gDispEnv_6DF200, {});
+
+void CC Render_Scene_DispEnv_40DD00(DISPENV* pRect)
+{
+    int bChanged = memcmp(pRect, &gDispEnv_6DF200.disp, sizeof(PSX_RECT));
+    memcpy(&gDispEnv_6DF200, pRect, sizeof(gDispEnv_6DF200));
+    
+    gDisp_w_word_6FC7B0 = 0;
+    gDisp_y_word_6FC7B2 = gDispEnv_6DF200.disp.y1;
+    
+    if (!gDispEnv_6DF200.disp.x1)
+    {
+        gDisp_w_word_6FC7B0 = 320;
+    }
+
+    if (bChanged)
+    {
+        Render_Loop_SetWinTitle_422210();
+    }
+}
+MGS_FUNC_IMPLEX(0x40DD00, Render_Scene_DispEnv_40DD00, RENDERER_IMPL);
 
 MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
 MGS_VAR(1, 0x6FC784, DWORD, g_nVertexOffset, 0);
