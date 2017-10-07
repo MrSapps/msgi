@@ -15,17 +15,17 @@ MGS_FUNC_NOT_IMPL(0x422210, void __cdecl(), Render_Loop_SetWinTitle_422210);
 
 MGS_VAR(1, 0x6FC7B0, WORD, gDisp_w_word_6FC7B0, 0);
 MGS_VAR(1, 0x6FC7B2, WORD, gDisp_y_word_6FC7B2, 0);
-MGS_VAR(1, 0x6DF200, DISPENV, gDispEnv_6DF200, {});
+MGS_VAR(1, 0x6DF200, DISPENV, sDispEnv_6DF200, {});
 
 void CC Render_Scene_DispEnv_40DD00(DISPENV* pRect)
 {
-    int bChanged = memcmp(pRect, &gDispEnv_6DF200.disp, sizeof(PSX_RECT));
-    memcpy(&gDispEnv_6DF200, pRect, sizeof(gDispEnv_6DF200));
+    int bChanged = memcmp(pRect, &sDispEnv_6DF200.disp, sizeof(PSX_RECT));
+    memcpy(&sDispEnv_6DF200, pRect, sizeof(sDispEnv_6DF200));
     
     gDisp_w_word_6FC7B0 = 0;
-    gDisp_y_word_6FC7B2 = gDispEnv_6DF200.disp.y1;
+    gDisp_y_word_6FC7B2 = sDispEnv_6DF200.disp.y1;
     
-    if (!gDispEnv_6DF200.disp.x1)
+    if (!sDispEnv_6DF200.disp.x1)
     {
         gDisp_w_word_6FC7B0 = 320;
     }
