@@ -37,7 +37,7 @@ MGS_VAR(1, 0x78E960, BYTE*, gResidentTop_dword_78E960, 0);
 
 MGS_VAR(1, 0x78E964, BYTE*, gSavedTop_78E964, 0);
 
-MGS_FUNC_NOT_IMPL(0x0044E212, void* __cdecl(), Reset_GV_DG_44E212);
+
 MGS_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 MGS_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
 MGS_FUNC_NOT_IMPL(0x0044E381, void CC(Actor*), GameD_Update_44E381);
@@ -98,6 +98,47 @@ void CC Create_loader_44E226()
     Res_loader_Create_457BDD(strStageName);
 }
 MGS_FUNC_IMPLEX(0x0044E226, Create_loader_44E226, ACTOR_GAMED_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x402487, void CC(), LibDG_ClearTexturesCache_402487);
+MGS_FUNC_NOT_IMPL(0x40274C, void CC(), LibDG_Compact_Texture_Records_40274C);
+
+
+void CC LibDG_Clean_Texture_Cache_401110()
+{
+    LibDG_ClearTexturesCache_402487();
+    LibDG_Compact_Texture_Records_40274C();
+}
+MGS_FUNC_IMPLEX(0x00401110, LibDG_Clean_Texture_Cache_401110, ACTOR_GAMED_IMPL);
+
+MGS_ARY(1, 0x913E20, BYTE, 192512, gSystem0_memory_unk_913E20, {});
+MGS_ARY(1, 0x942E20, BYTE, 192512, gSystem1_memory_unk_942E20, {});
+
+void CC System_Init_0_And_1_40A465()
+{
+    System_init_40AC6C(0, 1, &gSystem0_memory_unk_913E20[0], 192512);
+    System_init_40AC6C(1, 1, &gSystem1_memory_unk_942E20[0], 192512);
+}
+MGS_FUNC_IMPLEX(0x0040A465, System_Init_0_And_1_40A465, ACTOR_GAMED_IMPL);
+
+MGS_ARY(1, 0x8A8E20, BYTE, 438272, gSystem2_memory_unk_8A8E20, {});
+
+void CC LibGV_40A4BB()
+{
+    LibGV_RestoreFileCacheFromResident_40A72A();
+    System_DeInit_Systems_0_to_2_sub_40AC52();
+    System_Init_0_And_1_40A465();
+    System_init_40AC6C(2, 0, &gSystem2_memory_unk_8A8E20[0], 438272);
+    printf("RESIDENT TOP %X\n", gResidentTop_dword_78E960);
+}
+MGS_FUNC_IMPLEX(0x0040A4BB, LibGV_40A4BB, ACTOR_GAMED_IMPL);
+
+void CC Reset_GV_DG_44E212()
+{
+    LibDG_Clean_Texture_Cache_401110();
+    LibGV_40A4BB();
+    LibDG_ClearActiveResourceFunctionPointerList_457B7C();
+}
+MGS_FUNC_IMPLEX(0x0044E212, Reset_GV_DG_44E212, ACTOR_GAMED_IMPL);
 
 void CC Init_Gamed_Create_44E12B()
 {

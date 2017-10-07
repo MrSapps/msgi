@@ -24,6 +24,15 @@ struct LibGV_Msg
 MGS_ASSERT_SIZEOF(LibGV_Msg, 0x14);
 MGS_ARY_EXTERN(WORD, 16, word_7919C2);
 
+struct LibGV_FileRecord
+{
+    DWORD mId;
+    void* mFileBuffer;
+};
+MGS_ASSERT_SIZEOF(LibGV_FileRecord, 0x8);
+
+EXTERN_MGS_FUNC_NOT_IMPL(0x40A72A, LibGV_FileRecord* CC(), LibGV_RestoreFileCacheFromResident_40A72A);
+
 int CC LibGV_mesg_write_40B3ED(const LibGV_Msg* pSrcMsg);
 
 void LibGv_Init_sub_40A4F6();

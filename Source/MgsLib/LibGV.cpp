@@ -11,14 +11,6 @@
 #define REDIRECT_LIBGV_DATA 1
 #define LIBGV_IMPL true
 
-
-struct LibGV_FileRecord
-{
-    DWORD mId;
-    void* mFileBuffer;
-};
-MGS_ASSERT_SIZEOF(LibGV_FileRecord, 0x8);
-
 struct LibGv_Msg_Array
 {
     DWORD mCount;
@@ -53,7 +45,7 @@ MGS_ASSERT_SIZEOF(LibGv_Struct, 0x75C);
 MGS_VAR(REDIRECT_LIBGV_DATA, 0x6BFEE0, LibGv_Struct, g_lib_gv_stru_6BFEE0, {});
 
 // Other likely LibGvd funcs
-MGS_FUNC_NOT_IMPL(0x40A72A, LibGV_FileRecord* CC(), LibGvd_sub_40A72A);
+MGS_FUNC_NOT_IMPL(0x40A72A, LibGV_FileRecord* CC(), LibGV_RestoreFileCacheFromResident_40A72A);
 MGS_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
 
 void LibGVCpp_ForceLink() { }
