@@ -105,10 +105,10 @@ MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
 MGS_VAR(1, 0x73491C, DWORD, dword_73491C, 0);
 MGS_VAR(1, 0x71D164, DWORD, dword_71D164, 0);
 
-void CC SetWindowSize(HWND hWnd, int nWidth, int nHeight)
+void CC CentreWindow(HWND hWnd, int nWidth, int nHeight)
 {
     RECT clientRect = {};
-    MoveWindow(hWnd, 0, 0, nWidth, nHeight, 0);
+    MoveWindow(hWnd, 0, 0, nWidth, nHeight, FALSE);
     GetClientRect(hWnd, &clientRect);
     int height = nHeight - (clientRect.bottom - clientRect.top) + nHeight;
     int width = nWidth - (clientRect.right - clientRect.left) + nWidth;
@@ -116,7 +116,7 @@ void CC SetWindowSize(HWND hWnd, int nWidth, int nHeight)
     int x = (GetSystemMetrics(SM_CXMAXIMIZED) - width) / 2;
     MoveWindow(hWnd, x, y, width, height, TRUE);
 }
-MGS_FUNC_IMPLEX(0x0051D09D, SetWindowSize, WINMAIN_IMPL);
+MGS_FUNC_IMPLEX(0x0051D09D, CentreWindow, WINMAIN_IMPL);
 
 MGS_VAR(1, 0x78E7F8, WORD, word_78E7F8, 0);
 MGS_VAR(1, 0x78E7F6, WORD, word_78E7F6, 0);
@@ -2866,7 +2866,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
                     0);
                 if (gHwnd)
                 {
-                    SetWindowSize(gHwnd, 640, 480);
+                    CentreWindow(gHwnd, 640, 480);
                     ShowWindow(gHwnd, SW_SHOW);
                     UpdateWindow(gHwnd);
                     gHInstance = hInstance;
