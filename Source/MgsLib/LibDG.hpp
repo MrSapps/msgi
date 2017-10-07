@@ -165,7 +165,9 @@ struct struct_gv
 };
 MGS_ASSERT_SIZEOF(struct_gv, 0x1EC);
 #pragma pack(pop)
+
 MGS_VAR_EXTERN(struct_gv, gLibGvStruct0_6BC180);
+MGS_ARY_EXTERN(DWORD, 2, dword_6BED18);
 
 signed int CC LibDG_CHARA_44E9D2(void* pData, int fileNameHash);
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B();

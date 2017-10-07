@@ -164,6 +164,7 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB910, Actor, gLibDGD_1_stru_6BB910, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
 
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x722A40, DWORD, dword_722A40, 0);
+MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {});
 
 MGS_VAR(1, 0x6BC180, struct_gv, gLibGvStruct0_6BC180, {}); // TODO: Probably an array of 3?
 MGS_VAR(1, 0x6BC36C, struct_gv, gLibGVStruct1_6BC36C, {});
@@ -278,10 +279,26 @@ ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName)
 }
 MGS_FUNC_IMPLEX(0x457BAC, LibDG_GetResourceInitFuncPtr_457BAC, LIBDG_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x401A4F, void CC(int ClipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2, int a5), sub_401A4F);
 MGS_FUNC_NOT_IMPL(0x4012F2, void CC(int k320), sub_4012F2);
 MGS_FUNC_NOT_IMPL(0x4026E6, void CC(), LibDG_Reset_HashCounts_4026E6);
 MGS_FUNC_NOT_IMPL(0x4010A6, void CC(), LibDG_4010A6);
+
+void CC LibGvInitDispEnv_401A4F(int ClipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2, int a320)
+{
+    gDispEnv_6BECF0.disp.y1 = clipY1;
+    gDispEnv_6BECF0.disp.x2 = clipX2;
+    gDispEnv_6BECF0.disp.y2 = clipY2;
+    gDispEnv_6BECF0.screen.x1 = 0;
+    gDispEnv_6BECF0.isinter = 0;
+    gDispEnv_6BECF0.isrgb24 = 0;
+    gDispEnv_6BECF0.disp.x1 = ClipX1;
+    dword_6BED18[0] = ClipX1;
+    gDispEnv_6BECF0.screen.x2 = 256;
+    gDispEnv_6BECF0.screen.y1 = 8;
+    gDispEnv_6BECF0.screen.y2 = 224;
+    dword_6BED18[1] = a320 + ClipX1;
+}
+MGS_FUNC_IMPLEX(0x401A4F, LibGvInitDispEnv_401A4F, LIBDG_IMPL);
 
 signed int CC Returns1_402B1D(void*, int)
 {
@@ -310,7 +327,7 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x9942AB, BYTE, byte_9942AB, 0);
 
 MGS_VAR_EXTERN(DWORD, game_state_dword_72279C);
 MGS_FUNC_NOT_IMPL(0x40A857, void CC(), sub_40A857);
-int CC Main_sub_401C02();
+void CC Main_sub_401C02();
 
 MGS_FUNC_NOT_IMPL(0x5200D2, signed __int64 CC(), sub_5200D2);
 
@@ -586,7 +603,7 @@ void CC LibDg_Init_40111A()
 {
     //nullsub_8();
     //nullsub_7(DeadCode_4011F8);
-    sub_401A4F(0, 0, 320, 240, 320);
+    LibGvInitDispEnv_401A4F(0, 0, 320, 240, 320);
     sub_4012F2(320);
     LibDG_Reset_HashCounts_4026E6();
     LibDG_4010A6();

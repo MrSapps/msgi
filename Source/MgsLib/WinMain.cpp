@@ -2452,16 +2452,14 @@ void InstallVaradicCFunctionHooks()
 MGS_VAR(1, 0x791A08, int, gActiveBuffer_dword_791A08, 0);
 MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
 MGS_VAR(1, 0x6BED20, DWORD, counter_dword_6BED20, 0);
-MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {}); // TODO: Check 2 is correct
 
 MGS_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), TextReset_459ACE);
 MGS_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), OT_Related_40162D);
 MGS_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
 
 
-int CC Main_sub_401C02()
+void CC Main_sub_401C02()
 {
-    int result = 0;
     if (gSoftwareRendering)
     {
         // SW rendering path not implemented
@@ -2492,9 +2490,8 @@ int CC Main_sub_401C02()
         System_HouseKeeping_40ACB2(2);
         TextReset_459ACE();
         OT_Related_40162D(activeBufferHW);                 // calls ClearOTag
-        result = sub_4021F2();
+        sub_4021F2();
     }
-    return result;
 }
 MGS_FUNC_IMPL(0x401C02, Main_sub_401C02);
 
