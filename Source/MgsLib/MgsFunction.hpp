@@ -131,21 +131,24 @@ public:
         }
     }
 
+    bool mStubCalled = false;
 
     ReturnType operator()(Args ... args)
     {
-#if ENABLE_LOGGING
-        if (kLogArgs)
+        if (!mStubCalled)
         {
-            if (!IsMgsi() && !mRealFuncPtr)
+            if (!IsMgsi() && !mRealFuncPtr && !mNewAddrOverride)
             {
                 std::cout << "WARNING: Unimpl call: " << mFnName << std::endl;
             }
+            mStubCalled = true;
+            /*
             std::cout << mFnName << " (";
             doPrint(std::cout, args...);
             std::cout << ")" << std::endl;
+            
+            */
         }
-#endif
 
 #pragma warning(push)
 #pragma warning(disable:4127) // conditional expression is constant
