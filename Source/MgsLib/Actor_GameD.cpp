@@ -34,7 +34,6 @@ MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
 MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 MGS_VAR(1, 0x78E960, BYTE*, gResidentTop_dword_78E960, 0);
-
 MGS_VAR(1, 0x78E964, BYTE*, gSavedTop_78E964, 0);
 
 

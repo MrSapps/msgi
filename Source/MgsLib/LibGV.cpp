@@ -6,6 +6,7 @@
 #include "Timer.hpp"
 #include "Actor_Loader.hpp"
 #include "ResourceNameHash.hpp"
+#include "Actor_GameD.hpp"
 #include <gmock/gmock.h>
 
 #define REDIRECT_LIBGV_DATA 1
@@ -50,10 +51,16 @@ MGS_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
 
 void LibGVCpp_ForceLink() { }
 
-MGS_FUNC_NOT_IMPL(0x40B35E, void CC(), LibGV_Reset_System2_Memory_40B35E);
 MGS_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_FileCache_40A6AC);
 
 MGS_ARY(1, 0x7919C2, WORD, 16, word_7919C2, {});
+
+void CC LibGV_Reset_System2_Memory_40B35E()
+{
+    gSavedTop_78E964 = gSystem2_memory_unk_8A8E20;
+    gResidentTop_dword_78E960 = gSystem2_memory_unk_8A8E20;
+}
+MGS_FUNC_IMPLEX(0x40B35E, LibGV_Reset_System2_Memory_40B35E, LIBGV_IMPL);
 
 void CC LibGV_mesg_init_40B3BC();
 
