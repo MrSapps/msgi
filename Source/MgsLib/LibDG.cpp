@@ -283,35 +283,29 @@ MGS_FUNC_IMPLEX(0x457BAC, LibDG_GetResourceInitFuncPtr_457BAC, LIBDG_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x401570, void __cdecl(struct_gv *gv, DRAWENV *pDrawEnv, int bNotBg), sub_401570);
 
-//MGS_FUNC_NOT_IMPL(0x4012F2, void CC(int k320), Gv3StructsInit_4012F2);
-
-MGS_ARY(1, 0x6BCB44, DWORD, 33, ordering_table_dword_6BCB44, {});
-MGS_ARY(1, 0x6BCBC8, DWORD, 289, ordering_table_dword_6BCBC8, {});
-MGS_ARY(1, 0x6BD04C, DWORD, 257, ordering_table_unk_6BD04C, {});
-MGS_ARY(1, 0x6BD450, DWORD, 513, ordering_table_dword_6BD450, {});
-MGS_ARY(1, 0x6BDC54, DWORD, 2, ordering_table_unk_6BDC54, {});
-MGS_ARY(1, 0x6BDC5C, DWORD, 259, ordering_table_dword_6BDC5C, {});
+MGS_ARY(1, 0x6BCB44, DWORD, 33, ot_gv0_0_6BCB44, {});
+MGS_ARY(1, 0x6BCBC8, DWORD, 289, ot_gv0_1_6BCBC8, {});
+MGS_ARY(1, 0x6BD04C, DWORD, 257, ot_gv1_0_6BD04C, {});
+MGS_ARY(1, 0x6BD450, DWORD, 513, ot_gv1_1_6BD450, {});
+MGS_ARY(1, 0x6BDC54, DWORD, 2, ot_gv2_0_6BDC54, {});
+MGS_ARY(1, 0x6BDC5C, DWORD, 259, ot_gv2_1_6BDC5C, {});
 
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE068, DR_ENV, stru_6BE068, {});
-MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE0A8, DR_ENV, pPacked, {});
-
- 
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE0A8, DR_ENV, pPacked_6BE0A8, {});
 
 MGS_ARY(1, 0x6BBD60, DWORD, 256, dg_dword_6BBD60_prim_ptrs, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BBD5C, DWORD, dg_dword_6BBD5C_k320, 0);
 MGS_ARY(1, 0x6BB95C, DWORD, 256, dg_dword_6BB95C_prim_ptrs, {});
 
-
-
-void __cdecl Gv3StructsInit_4012F2(int k320)
+void CC Gv3StructsInit_4012F2(int k320)
 {
     DRAWENV drawEnv = {};
     //DrawSynCallback(NullDrawSyncCallBack);
 
     gLibGvStruct0_6BC180.word_6BC376_16 = -1;
     dg_dword_6BBD5C_k320 = k320;
-    gLibGvStruct0_6BC180.mOrderingTables[0] = (int)ordering_table_dword_6BCB44;// ot start?
-    gLibGvStruct0_6BC180.mOrderingTables[1] = (int)ordering_table_dword_6BCBC8;// also part of ot?
+    gLibGvStruct0_6BC180.mOrderingTables[0] = (int)ot_gv0_0_6BCB44;// ot start?
+    gLibGvStruct0_6BC180.mOrderingTables[1] = (int)ot_gv0_1_6BCBC8;// also part of ot?
     gLibGvStruct0_6BC180.gPrimQueue2_word_6BC3C0_256 = 8;
     gLibGvStruct0_6BC180.g_PrimQueue1_word_6BC3BE_256 = 8;
     gLibGvStruct0_6BC180.gObjectQueue_word_6BC3C2_0 = 0;
@@ -337,8 +331,8 @@ void __cdecl Gv3StructsInit_4012F2(int k320)
         gLibGvStruct0_6BC180.dword_6BC518_src_offsetted_dr_evn,
         sizeof(gLibGvStruct0_6BC180.dword_6BC418_dst));
 
-    gLibGVStruct1_6BC36C.mOrderingTables[0] = (int)&ordering_table_unk_6BD04C[0];
-    gLibGVStruct1_6BC36C.mOrderingTables[1] = (int)&ordering_table_dword_6BD450[0];
+    gLibGVStruct1_6BC36C.mOrderingTables[0] = (int)&ot_gv1_0_6BD04C[0];
+    gLibGVStruct1_6BC36C.mOrderingTables[1] = (int)&ot_gv1_1_6BD450[0];
     gLibGVStruct1_6BC36C.gPrimQueue2_word_6BC3C0_256 = 256;
     gLibGVStruct1_6BC36C.g_PrimQueue1_word_6BC3BE_256 = 256;
     gLibGVStruct1_6BC36C.gObjectQueue_word_6BC3C2_0 = 0;
@@ -366,10 +360,10 @@ void __cdecl Gv3StructsInit_4012F2(int k320)
         sizeof(gLibGVStruct1_6BC36C.dword_6BC418_dst));
     
     memcpy(gLibGVStruct1_6BC36C.dword_6BC458, &stru_6BE068, sizeof(gLibGVStruct1_6BC36C.dword_6BC458));
-    memcpy(gLibGVStruct1_6BC36C.dword_6BC498, &pPacked, sizeof(gLibGVStruct1_6BC36C.dword_6BC498));
+    memcpy(gLibGVStruct1_6BC36C.dword_6BC498, &pPacked_6BE0A8, sizeof(gLibGVStruct1_6BC36C.dword_6BC498));
 
-    gLibGVStruct2_6BC558.mOrderingTables[0] = (int)&ordering_table_unk_6BDC54[0];
-    gLibGVStruct2_6BC558.mOrderingTables[1] = (int)&ordering_table_dword_6BDC5C[0];
+    gLibGVStruct2_6BC558.mOrderingTables[0] = (int)&ot_gv2_0_6BDC54[0];
+    gLibGVStruct2_6BC558.mOrderingTables[1] = (int)&ot_gv2_1_6BDC5C[0];
     gLibGVStruct2_6BC558.gPrimQueue2_word_6BC3C0_256 = 0;
     gLibGVStruct2_6BC558.g_PrimQueue1_word_6BC3BE_256 = 0;
     gLibGVStruct2_6BC558.gObjectQueue_word_6BC3C2_0 = 0;
@@ -395,7 +389,7 @@ void __cdecl Gv3StructsInit_4012F2(int k320)
         sizeof(gLibGVStruct2_6BC558.dword_6BC418_dst));
 
     memcpy(gLibGVStruct2_6BC558.dword_6BC458, &stru_6BE068, sizeof(gLibGVStruct2_6BC558.dword_6BC458));
-    memcpy(gLibGVStruct2_6BC558.dword_6BC498, &pPacked, sizeof(gLibGVStruct2_6BC558.dword_6BC498));
+    memcpy(gLibGVStruct2_6BC558.dword_6BC498, &pPacked_6BE0A8, sizeof(gLibGVStruct2_6BC558.dword_6BC498));
 }
 
 MGS_FUNC_NOT_IMPL(0x4026E6, void CC(), LibDG_Reset_HashCounts_4026E6);
