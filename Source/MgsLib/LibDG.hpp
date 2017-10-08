@@ -125,8 +125,7 @@ struct struct_gv
     // These vars are named to match how they look from gLibGVStruct1_6BC36C position, it was later discovered
     // that these are item 1 in an array of 3 struct_gvs
 
-    int mOrderingTable1; // 257 pointers? // One for each active buffer
-    int mOrderingTable2; // 256 pointers?
+    int mOrderingTables[2]; // 257 pointers? // One for each active buffer
     s16 word_6BC374_8;
     s16 word_6BC376_16;
     s16 word_6BC378_1;
@@ -153,8 +152,7 @@ struct struct_gv
     s16 gPrimQueue2_word_6BC3C0_256;
     s16 gObjectQueue_word_6BC3C2_0;
     Prim_unknown **gObjects_dword_6BC3C4;
-    PSX_RECT* dword_6BC3C8_pStructure_rect;
-    int dword_6BC3CC_rectx2;
+    PSX_RECT dword_6BC3C8_pStructure_rect;
     PSX_RECT dword_6BC3D0_rect;
     int dword_6BC3D8_dst[16]; // One for each active buffer
     int dword_6BC418_dst[16];
@@ -167,7 +165,11 @@ MGS_ASSERT_SIZEOF(struct_gv, 0x1EC);
 #pragma pack(pop)
 
 MGS_VAR_EXTERN(struct_gv, gLibGvStruct0_6BC180);
+MGS_VAR_EXTERN(struct_gv, gLibGVStruct1_6BC36C);
+MGS_VAR_EXTERN(struct_gv, gLibGVStruct2_6BC558);
+
 MGS_ARY_EXTERN(DWORD, 2, dword_6BED18);
+
 
 signed int CC LibDG_CHARA_44E9D2(void* pData, int fileNameHash);
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B();

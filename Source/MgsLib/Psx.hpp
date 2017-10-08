@@ -88,3 +88,4 @@ void CC SetDispMask(int mask);
 int CC ClearImage(PSX_RECT* pRect, BYTE r, BYTE g, BYTE b);
 int CC Psx_OpenEvent(int desc, int spec, int mode, int func); // Psx_ to avoid windows.h name clash
 void CC PsxGpuDebug_44A4D0();
+DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2);

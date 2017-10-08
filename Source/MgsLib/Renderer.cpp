@@ -1225,9 +1225,6 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
 }
 MGS_FUNC_IMPLEX(0x410560, ConvertPolys_Hardware, RENDERER_IMPL);
 
-
-#define OT_END_TAG 0xFFFFFF
-
 int CC Renderer_ClearOTag(DWORD* ot, int otSize)
 {
     if (otSize - 1 <= 0)

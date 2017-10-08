@@ -2454,9 +2454,62 @@ MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
 MGS_VAR(1, 0x6BED20, DWORD, counter_dword_6BED20, 0);
 
 MGS_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), TextReset_459ACE);
-MGS_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), OT_Related_40162D);
 MGS_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
 
+//MGS_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), OT_Related_40162D);
+#define OT_POINTER_BITS OT_END_TAG
+
+// TODO: This needs a lot of cleaning up + tests adding, seems to work OK for now
+void CC OT_Related_40162D(int activeBuffer)
+{
+    int gv0OtPtr = (int)&gLibGvStruct0_6BC180.mOrderingTables[activeBuffer];// ot addr?
+    for (int i=0; i<3; i++)
+    {
+        struct_gv* pCurGV = nullptr;
+        if (i == 0)
+        {
+            pCurGV = &gLibGvStruct0_6BC180;
+        }
+        else if (i == 1)
+        {
+            pCurGV = &gLibGVStruct1_6BC36C;
+        } 
+        else if (i == 2)
+        {
+            pCurGV = &gLibGVStruct2_6BC558;
+        }
+        DWORD** curGVOtPtr = (DWORD**)&pCurGV->mOrderingTables[activeBuffer];// pick ot1 or ot2 ?
+        DWORD* pActiveBufArray = activeBuffer ? (DWORD*)pCurGV->dword_6BC498 : (DWORD*)pCurGV->dword_6BC458;
+
+        char otSize = (pCurGV->word_6BC374_8 & 0xFF);
+        int pOtEnd = (int)&(*curGVOtPtr)[1 << otSize];
+        Renderer_ClearOTag(*curGVOtPtr, (1 << otSize) + 1);
+        
+        if (pCurGV->word_6BC37A_0_1EC_size > 0)
+        {
+            pCurGV->dword_6BC3C8_pStructure_rect = pCurGV->dword_6BC3D0_rect;
+
+            // The -32's are picking 2 arrays of 16 before the pointed to array
+            memcpy(pActiveBufArray - 32, activeBuffer ? pCurGV->dword_6BC518_src_offsetted_dr_evn : pCurGV->dword_6BC4D8_src_dr_env1 , 64u);
+            pCurGV->word_6BC37A_0_1EC_size--;
+        }
+
+        *(pActiveBufArray - 32) ^= (pOtEnd ^ *(pActiveBufArray - 32)) & OT_POINTER_BITS;
+        **curGVOtPtr ^= (**curGVOtPtr ^ (unsigned int)pActiveBufArray) & OT_POINTER_BITS;
+
+        if (pCurGV->word_6BC376_16 < 0)
+        {
+            *pActiveBufArray |= OT_POINTER_BITS;
+        }
+        else
+        {
+            DWORD* tmp = (DWORD *)(*(DWORD *)gv0OtPtr + 4 * pCurGV->word_6BC376_16);
+            *pActiveBufArray ^= (*tmp ^ *pActiveBufArray) & OT_POINTER_BITS;
+            *tmp ^= (*tmp ^ (unsigned int)(pActiveBufArray - 32)) & OT_POINTER_BITS;
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x40162D, OT_Related_40162D, true); // TODO
 
 void CC Main_sub_401C02()
 {
