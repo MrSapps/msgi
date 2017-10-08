@@ -287,11 +287,11 @@ MGS_FUNC_NOT_IMPL(0x401570, void __cdecl(struct_gv *gv, DRAWENV *pDrawEnv, int b
 
 MGS_ARY(1, 0x6BCB44, DWORD, 33, ordering_table_dword_6BCB44, {});
 MGS_ARY(1, 0x6BCBC8, DWORD, 289, ordering_table_dword_6BCBC8, {});
-MGS_ARY(1, 0x6BD04C, DWORD, 77, ordering_table_unk_6BD04C, {});
-
+MGS_ARY(1, 0x6BD04C, DWORD, 257, ordering_table_unk_6BD04C, {});
 MGS_ARY(1, 0x6BD450, DWORD, 513, ordering_table_dword_6BD450, {});
 MGS_ARY(1, 0x6BDC54, DWORD, 2, ordering_table_unk_6BDC54, {});
 MGS_ARY(1, 0x6BDC5C, DWORD, 259, ordering_table_dword_6BDC5C, {});
+
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE068, DR_ENV, stru_6BE068, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE0A8, DR_ENV, pPacked, {});
 
