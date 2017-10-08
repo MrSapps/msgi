@@ -100,6 +100,8 @@ MGS_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
 MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), Render_Restore_Surfaces_51E086);
 MGS_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
 
+MGS_VAR(1, 0x6FC748, IDirect3D7 *, g_pDirect3D, nullptr);
+
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
 MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
 MGS_VAR(1, 0x73491C, DWORD, dword_73491C, 0);
@@ -129,13 +131,12 @@ MGS_VAR(1, 0x732E64, DWORD, dword_732E64, 0);
 //MGS_VAR(1, 0x64BB98, const GUID, IID_IDirect3D7_MGS, {});
 //MGS_VAR(1, 0x64BCA8, const GUID, IID_IDirectDrawGammaControl_MGS, {});
 MGS_VAR(1, 0x6FC730, IDirectDraw7 *, g_pDirectDraw, nullptr);
-MGS_VAR(1, 0x6FC748, IDirect3D7 *, g_pDirect3D, nullptr);
 MGS_VAR(1, 0x6C0EF8, IDirectDrawGammaControl *, g_pGammaControl, nullptr);
 MGS_VAR(1, 0x6DF214, DWORD, g_dwDisplayWidth, 0);
 MGS_VAR(1, 0x6DF1FC, DWORD, g_dwDisplayHeight, 0);
 MGS_VAR(1, 0x6FC750, LPDIRECTDRAWCLIPPER, g_pClipper, nullptr);
 
-MGS_VAR(1, 0x6FC74C, LPDIRECT3DDEVICE7, g_pDirect3DDevice, nullptr);
+MGS_VAR(1, 0x6FC74C, LPDIRECT3DDEVICE7, gD3dDevice_6FC74C, nullptr);
 MGS_VAR(1, 0x6FC740, LPDIRECTDRAWSURFACE7, g_pDDSurface, nullptr);
 
 MGS_VAR(1, 0x006DEF78, FILE *, gFile, nullptr);
@@ -1634,23 +1635,23 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dword_650D2C = 16;
             }
         }
-        if (g_pPrimarySurface)
+        if (gPrimarySurface_6FC734)
         {
-            hr = g_pPrimarySurface->Release();
+            hr = gPrimarySurface_6FC734->Release();
             if (FAILED(hr))
             {
                 PrintDDError("Can't release primary surf", hr);
             }
-            g_pPrimarySurface = 0;
+            gPrimarySurface_6FC734 = 0;
         }
-        if (g_pBackBuffer)
+        if (g_pBackBuffer_6FC738)
         {
-            hr = g_pBackBuffer->Release();
+            hr = g_pBackBuffer_6FC738->Release();
             if (FAILED(hr))
             {
                 PrintDDError("Can't release render surf", hr);
             }
-            g_pBackBuffer = 0;
+            g_pBackBuffer_6FC738 = 0;
         }
         if (g_pClipper)
         {
@@ -1661,8 +1662,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             }
             g_pClipper = 0;
         }
-        g_pPrimarySurface = 0;
-        g_pBackBuffer = 0;
+        gPrimarySurface_6FC734 = 0;
+        g_pBackBuffer_6FC738 = 0;
         g_pClipper = 0;
         mgs_fputs("Setting cooperative level...\n", gFile);
         mgs_fflush(gFile);
@@ -1711,7 +1712,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
         mgs_fputs("Creating primary surface...\n", gFile);
         mgs_fflush(gFile);
-        hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc2, &g_pPrimarySurface, 0);
+        hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc2, &gPrimarySurface_6FC734, 0);
         if (hr < 0)
         {
             mgs_fputs(" . fail\n", gFile);
@@ -1747,7 +1748,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 PrintDDError("Can't obtain clipper zone", hr);
                 return 0;
             }
-            hr = g_pPrimarySurface->SetClipper(g_pClipper);
+            hr = gPrimarySurface_6FC734->SetClipper(g_pClipper);
             if (FAILED(hr))
             {
                 mgs_fputs(" . fail\n", gFile);
@@ -1799,7 +1800,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
             memcpy(&dxSurfaceDesc.ddpfPixelFormat, &pixelFormat3, sizeof(DDPIXELFORMAT));
 
-            hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc, &g_pBackBuffer, 0);
+            hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc, &g_pBackBuffer_6FC738, 0);
             if (hr < 0)
             {
                 mgs_fputs(" . fail\n", gFile);
@@ -1819,7 +1820,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxSurfaceDesc.dwHeight = g_dwDisplayHeight;
                 mgs_fputs("Creating back buffer for windowed mode...\n", gFile);
                 mgs_fflush(gFile);
-                hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc, &g_pBackBuffer, 0);
+                hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc, &g_pBackBuffer_6FC738, 0);
                 if (hr < 0)
                 {
                     mgs_fputs(" . fail\n", gFile);
@@ -1837,7 +1838,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxCaps1.dwCaps4 = 0;
                 mgs_fputs("Getting back buffer from pPrim chain...\n", gFile);
                 mgs_fflush(gFile);
-                g_pPrimarySurface->GetAttachedSurface(&dxCaps1, &g_pBackBuffer);
+                gPrimarySurface_6FC734->GetAttachedSurface(&dxCaps1, &g_pBackBuffer_6FC738);
                 if (hr < 0)
                 {
                     mgs_fputs(" . fail\n", gFile);
@@ -1864,7 +1865,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         mgs_fputs("Querying gamma interface...\n", gFile);
         mgs_fflush(gFile);
-        g_pPrimarySurface->QueryInterface(IID_IDirectDrawGammaControl, (LPVOID*)&g_pGammaControl);
+        gPrimarySurface_6FC734->QueryInterface(IID_IDirectDrawGammaControl, (LPVOID*)&g_pGammaControl);
         if (FAILED(hr))
         {
             mgs_fputs(" . fail\n", gFile);
@@ -1904,7 +1905,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs("Creating device...\n", gFile);
         mgs_fflush(gFile);
 
-        hr = g_pDirect3D->CreateDevice(*v33, g_pBackBuffer, &g_pDirect3DDevice);
+        hr = g_pDirect3D->CreateDevice(*v33, g_pBackBuffer_6FC738, &gD3dDevice_6FC74C);
 
         if (SUCCEEDED(hr))
         {
@@ -2013,14 +2014,14 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxViewport.dwHeight = g_dwDisplayHeight;
                 dxViewport.dvMinZ = 0;
                 dxViewport.dvMaxZ = 1.0f;
-                g_pDirect3DDevice->SetViewport(&dxViewport);
+                gD3dDevice_6FC74C->SetViewport(&dxViewport);
                 v2 = ((float)dword_651D94 - 50.0f) / 100.0f;
                 Render_SetBrightness_sub_41C820(v2);
             }
             else
             {
-                g_pDirect3DDevice->Release();
-                g_pDirect3DDevice = 0;
+                gD3dDevice_6FC74C->Release();
+                gD3dDevice_6FC74C = nullptr;
                 MessageBox_Error(0, 5, "Metal Gear Solid PC", MB_OK);
                 gSoftwareRendering = 1;
             }
@@ -2041,23 +2042,23 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             g_pGammaControl->Release();
         }
 
-        if (g_pBackBuffer)
+        if (g_pBackBuffer_6FC738)
         {
-            hr = g_pBackBuffer->Release();
+            hr = g_pBackBuffer_6FC738->Release();
             if (FAILED(hr))
             {
                 PrintDDError("Can't release render surf", hr);
             }
-            g_pBackBuffer = 0;
+            g_pBackBuffer_6FC738 = 0;
         }
-        if (g_pPrimarySurface)
+        if (gPrimarySurface_6FC734)
         {
-            hr = g_pPrimarySurface->Release();
+            hr = gPrimarySurface_6FC734->Release();
             if (FAILED(hr))
             {
                 PrintDDError("Can't relaese primary surf", hr);
             }
-            g_pPrimarySurface = 0;
+            gPrimarySurface_6FC734 = 0;
         }
         if (g_pClipper)
         {
@@ -2068,8 +2069,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             }
             g_pClipper = 0;
         }
-        g_pPrimarySurface = 0;
-        g_pBackBuffer = 0;
+        gPrimarySurface_6FC734 = 0;
+        g_pBackBuffer_6FC738 = 0;
         g_pClipper = 0;
         if (g_pDirect3D)
         {
@@ -2163,11 +2164,11 @@ HRESULT __cdecl SetDDSurfaceTexture()
             g_pDDSurface->Restore();
             ClearDDSurfaceWhite();
         }
-        hr = g_pDirect3DDevice->SetTexture(0, g_pDDSurface);
+        hr = gD3dDevice_6FC74C->SetTexture(0, g_pDDSurface);
     }
     else
     {
-        hr = g_pDirect3DDevice->SetTexture(0, NULL);
+        hr = gD3dDevice_6FC74C->SetTexture(0, NULL);
     }
 
     return hr;
@@ -2209,13 +2210,13 @@ signed int Render_sub_41E3C0()
     pPrim[1].w = 0.99999899f;
     pPrim[2].w = 0.99999899f;
 
-    g_pDirect3DDevice->GetCaps(&caps);
+    gD3dDevice_6FC74C->GetCaps(&caps);
     const DWORD srcBlendCaps = caps.dpcTriCaps.dwSrcBlendCaps;
     const DWORD dstBlendCaps = caps.dpcTriCaps.dwDestBlendCaps;
     Render_SetRenderState(9, 1);
     Render_SetRenderState(27, 1);
 
-    if (SUCCEEDED(g_pDirect3DDevice->ValidateDevice(&dwNumPasses)))
+    if (SUCCEEDED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
     {
         gAlphaModulate_dword_6FC798 = 0;
         Render_InitTextureStages(0, 4, 2);
@@ -2234,7 +2235,7 @@ signed int Render_sub_41E3C0()
             {
                 Render_SetRenderState(19, 5);
                 Render_SetRenderState(20, 5);
-                if (FAILED(g_pDirect3DDevice->ValidateDevice(&dwNumPasses)))
+                if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
                     {
@@ -2253,7 +2254,7 @@ signed int Render_sub_41E3C0()
             {
                 Render_SetRenderState(19, 5);
                 Render_SetRenderState(20, 2);
-                if (FAILED(g_pDirect3DDevice->ValidateDevice(&dwNumPasses)))
+                if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
                     {
@@ -2324,7 +2325,7 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
     bltFX.dwFillColor = a_ClearColor;
     
     do {
-        hr = g_pBackBuffer->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
+        hr = g_pBackBuffer_6FC738->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
     } while (hr == DDERR_WASSTILLDRAWING);
     if (hr != 0)
         return 0;
@@ -2337,16 +2338,16 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
     // happens a few times in this function, I keep it
     hr = SetDDSurfaceTexture();
 
-    hr = g_pDirect3DDevice->BeginScene();
+    hr = gD3dDevice_6FC74C->BeginScene();
     if (hr != 0)
         return 0;
 
-    hr = g_pDirect3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, MGSVERTEX_DEF, a_pVertices, 3, 0);
-    hr = g_pDirect3DDevice->SetTexture(0, NULL);
+    hr = gD3dDevice_6FC74C->DrawPrimitive(D3DPT_TRIANGLELIST, MGSVERTEX_DEF, a_pVertices, 3, 0);
+    hr = gD3dDevice_6FC74C->SetTexture(0, NULL);
     if (hr != 0)
         return 0;
 
-    hr = g_pDirect3DDevice->EndScene();
+    hr = gD3dDevice_6FC74C->EndScene();
     if (hr != 0)
         return 0;
 
@@ -2355,13 +2356,13 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
     ddDesc.dwSize = sizeof(DDSURFACEDESC2);
 
     do {
-        hr = g_pBackBuffer->Lock(NULL, &ddDesc, 0, 0);
+        hr = g_pBackBuffer_6FC738->Lock(NULL, &ddDesc, 0, 0);
     } while (hr == DDERR_WASSTILLDRAWING);
     if (hr != 0)
         return 0;
 
     WORD wFirstPixel = ((WORD*)ddDesc.lpSurface)[0];
-    g_pBackBuffer->Unlock(NULL);
+    g_pBackBuffer_6FC738->Unlock(NULL);
 
     *pFirstPixel = 0;
     if (g_surface565Mode != 0)
@@ -2619,9 +2620,9 @@ MGS_FUNC_NOT_IMPL(0x4241A4, void* __cdecl(void *), sub_4241A4);
 void __cdecl ClearAll()
 {
     puts(" *************************** CLEAR ALL START *************************");
-    if (g_NumTextures)
+    if (gNumTextures_word_6FC78C)
     {
-        for (int i = 0; i < g_NumTextures; ++i)
+        for (int i = 0; i < gNumTextures_word_6FC78C; ++i)
         {
             if (gTextures_dword_6C0F00[i].mSurfaceType == 5)
             {
@@ -2641,73 +2642,73 @@ void __cdecl ClearAll()
     if (dword_6FC73C)
     {
         dword_6FC73C->Release();
-        dword_6FC73C = 0;
+        dword_6FC73C = nullptr;
     }
 
-    if (g_pDirect3DDevice)
+    if (gD3dDevice_6FC74C)
     {
-        g_pDirect3DDevice->Release();
-        g_pDirect3DDevice = 0;
+        gD3dDevice_6FC74C->Release();
+        gD3dDevice_6FC74C = nullptr;
     }
 
-    if (g_pBackBuffer)
+    if (g_pBackBuffer_6FC738)
     {
-        g_pBackBuffer->Release();
-        g_pBackBuffer = 0;
+        g_pBackBuffer_6FC738->Release();
+        g_pBackBuffer_6FC738 = nullptr;
     }
 
     if (g_pClipper)
     {
         g_pClipper->Release();
-        g_pClipper = 0;
+        g_pClipper = nullptr;
     }
 
-    if (g_pPrimarySurface)
+    if (gPrimarySurface_6FC734)
     {
-        g_pPrimarySurface->Release();
-        g_pPrimarySurface = 0;
+        gPrimarySurface_6FC734->Release();
+        gPrimarySurface_6FC734 = nullptr;
     }
 
     if (g_pDirect3D)
     {
         g_pDirect3D->Release();
-        g_pDirect3D = 0;
+        g_pDirect3D = nullptr;
     }
 
     if (g_pDirectDraw)
     {
         g_pDirectDraw->Release();
-        g_pDirectDraw = 0;
+        g_pDirectDraw = nullptr;
     }
 
     if (g_pDDSurface)
     {
         g_pDDSurface->Release();
-        g_pDDSurface = 0;
+        g_pDDSurface = nullptr;
     }
 
     if (g_pMGSVertices)
     {
         mgs_free(g_pMGSVertices);
-        g_pMGSVertices = 0;
+        g_pMGSVertices = nullptr;
     }
 
     if (gPrimStructArray)
     {
         mgs_free(gPrimStructArray);
-        gPrimStructArray = 0;
+        gPrimStructArray = nullptr;
     }
 
     if (dword_6DEF7C)
     {
         mgs_free(dword_6DEF7C);
-        dword_6DEF7C = 0;
+        dword_6DEF7C = nullptr;
     }
 
     if (dword_6DEF90)
     {
         mgs_free(dword_6DEF90);
-        dword_6DEF90 = 0;
+        dword_6DEF90 = nullptr;
     }
 
     mgs_free(gImageBufer_dword_6FC728);

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Timer.hpp"
-#include "types.hpp"
 
 #define TIMER_IMPL true
 
@@ -8,7 +7,7 @@ MGS_VAR(1, 0x006DF218, LARGE_INTEGER, gTimer_Frequency, {});
 MGS_VAR(1, 0x006FC710, LARGE_INTEGER, gTimer_PerformanceCount, {});
 
 MGS_VAR(1, 0x006FC7D8, u64, dword_6FC7D8, 0);
-MGS_VAR(1, 0x006DF248, u64, qword_6DF248, 0);
+MGS_VAR(1, 0x006DF248, s64, qword_6DF248, 0);
 
 MGS_VAR(1, 0x995648, PerformanceFreqStruct, gPerformanceFreq_995648, {});
 

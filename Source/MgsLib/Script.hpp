@@ -36,6 +36,8 @@ EXTERN_MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 
 MGS_VAR_EXTERN(DWORD, dword_7227A4);
 MGS_VAR_EXTERN(DWORD, script_cancel_non_zero_dword_7227A0);
+MGS_ARY_EXTERN(__int16, 96, save_data_192_word_78E7E0);
+MGS_ARY_EXTERN(DWORD, 512, save_data_2048_unk_78D7C0);
 
 enum GCLOperators
 {
