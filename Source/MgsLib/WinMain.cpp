@@ -903,7 +903,7 @@ int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uTyp
     return result;
 }
 
-void CC FontCreate_423F1B(int cWidth, int cHeight)
+void CC Create_Arial_Font_423F1B(int cWidth, int cHeight)
 {
     if (gFont_6FC7E8)
     {
@@ -912,29 +912,30 @@ void CC FontCreate_423F1B(int cWidth, int cHeight)
 
     gFont_6FC7E8 = CreateFontA(cHeight, cWidth, 0, 0, 500, 0, 0, 0, 1u, 0, 0, 2u, 0, "Arial");
 }
-MGS_FUNC_IMPLEX(0x423F1B, FontCreate_423F1B, WINMAIN_IMPL);
+MGS_FUNC_IMPLEX(0x423F1B, Create_Arial_Font_423F1B, WINMAIN_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
 MGS_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
 MGS_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
 
 MGS_VAR(1, 0x68C3B8, DWORD, dword_68C3B8, 0);
-MGS_VAR(1, 0x775F48, uint8_t, byte_775F48, 0);
-MGS_VAR(1, 0x774B48, uint8_t, byte_774B48, 0);
-MGS_VAR(1, 0x776450, uint8_t, byte_776450, 0);
+MGS_ARY(1, 0x775F48, char, 1024, byte_775F48, {});
+MGS_ARY(1, 0x774B48, char, 1024, gErrStr_774B48, {});
+MGS_ARY(1, 0x776450, char, 1024, byte_776450, {});
 
 
 MGS_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
+
 
 //MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), validateDeviceCaps);
 int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescription*/, LPSTR lpDeviceName, jimDeviceIdentifier* pIdentifier)
 {
     byte_775F48 = 0;
-    byte_774B48 = 0;
+    gErrStr_774B48 = 0;
     byte_776450 = 0;
 
-    char* pStringError = (char*)&byte_776450;
-    char* pStringWarning = (char*)&byte_774B48;
+    char* pStringError = byte_776450;
+    char* pStringWarning = gErrStr_774B48;
     char localString[0x100];
     uint32_t status = 0;
 
@@ -1044,7 +1045,7 @@ int __cdecl validateDeviceCaps(LPD3DDEVICEDESC7 pDesc, LPSTR /*lpDeviceDescripti
         strcat(pStringError, "\n\tDevice doesn't meet minimum requirements, and will be ignored by the game\n");
         MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
     }
-    else if (((field480 & 2) == 0) && ((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (byte_774B48 != 0))
+    else if (((field480 & 2) == 0) && ((field480 & 1) == 0) && ((field480 & 0x40) == 0) && (gErrStr_774B48 != 0))
     {
         sprintf(localString, "%s / (%s)", pIdentifier->ddIdentifier.identifier.szDescription, lpDeviceName);
         strcat(pStringWarning, "\n\tDevice doesn't support everything the game needs\nBut it will be allowed for selection in Option/Advanced Menu\n");
@@ -2087,9 +2088,9 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 
     for (i = 0; i < 1500; ++i)
     {
-        gTextures_dword_6C0F00[i].mSurface = 0;
-        gTextures_dword_6C0F00[i].field_20 = 0;
-        gTextures_dword_6C0F00[i].field_24 = 0;
+        gTextures_6C0F00[i].mSurface = 0;
+        gTextures_6C0F00[i].field_20 = 0;
+        gTextures_6C0F00[i].field_24 = 0;
     }
     
     dword_6FC7C0 = Render_TextureScratchAlloc() == 0;
@@ -2098,7 +2099,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         gNoEffects = 0;
         dword_716F60 = 0;
     }
-    FontCreate_423F1B(0, static_cast<int>(14.0 * gXRes));
+    Create_Arial_Font_423F1B(0, static_cast<int>(14.0 * gXRes));
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
@@ -2620,16 +2621,16 @@ void __cdecl ClearAll()
     {
         for (int i = 0; i < gNumTextures_word_6FC78C; ++i)
         {
-            if (gTextures_dword_6C0F00[i].mSurfaceType == 5)
+            if (gTextures_6C0F00[i].mSurfaceType == 5)
             {
-                sub_4241A4(gTextures_dword_6C0F00[i].mSurface);
+                sub_4241A4(gTextures_6C0F00[i].mSurface);
             }
             else if (!gSoftwareRendering)
             {
-                if (gTextures_dword_6C0F00[i].mSurface)
+                if (gTextures_6C0F00[i].mSurface)
                 {
-                    gTextures_dword_6C0F00[i].mSurface->Release();
-                    gTextures_dword_6C0F00[i].mSurface = 0;
+                    gTextures_6C0F00[i].mSurface->Release();
+                    gTextures_6C0F00[i].mSurface = 0;
                 }
             }
         }

@@ -69,7 +69,7 @@ MGS_VAR_EXTERN(float, gXRes);
 MGS_VAR_EXTERN(LPDIRECTDRAWSURFACE7, gPrimarySurface_6FC734);
 MGS_VAR_EXTERN(LPDIRECTDRAWSURFACE7, g_pBackBuffer_6FC738);
 MGS_VAR_EXTERN(DWORD, gModX2);
-MGS_ARY_EXTERN(texture_struct, 1500, gTextures_dword_6C0F00);
+MGS_ARY_EXTERN(texture_struct, 1500, gTextures_6C0F00);
 MGS_VAR_EXTERN(prim_struct*, gPrimStructArray);
 MGS_VAR_EXTERN(MGSVertex*, g_pMGSVertices);
 MGS_VAR_EXTERN(WORD*, g_pwTextureIndices);

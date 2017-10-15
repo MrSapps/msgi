@@ -97,7 +97,7 @@ MGS_VAR(1, 0x6FC738, LPDIRECTDRAWSURFACE7, g_pBackBuffer_6FC738, nullptr);
 MGS_VAR(1, 0x6FC868, void*, g_pBackBufferSurface, 0);
 MGS_VAR(1, 0x6FC86C, DWORD, g_BackBufferPitch, 0);
 MGS_VAR(1, 0x6FC734, LPDIRECTDRAWSURFACE7, gPrimarySurface_6FC734, nullptr);
-MGS_ARY(1, 0x6C0F00, texture_struct, 1500, gTextures_dword_6C0F00, {}); // Array of 1500 items
+MGS_ARY(1, 0x6C0F00, texture_struct, 1500, gTextures_6C0F00, {}); // Array of 1500 items
 
 MGS_VAR(1, 0x6FC7DC, DWORD, gSkippedFrames_dword_6FC7DC, 0);
 MGS_VAR(1, 0x6FC724, DWORD, sSceneStarted_dword_6FC724, 0);
@@ -1662,11 +1662,11 @@ __int16 CC Render_RestoreAll()
 
     for (int i = 0; i < gNumTextures_word_6FC78C; i++)
     {
-        if (gTextures_dword_6C0F00[i].mSurface)
+        if (gTextures_6C0F00[i].mSurface)
         {
-            if (gTextures_dword_6C0F00[i].mSurface->IsLost() == DDERR_SURFACELOST)
+            if (gTextures_6C0F00[i].mSurface->IsLost() == DDERR_SURFACELOST)
             {
-                const HRESULT hr = gTextures_dword_6C0F00[i].mSurface->Restore();
+                const HRESULT hr = gTextures_6C0F00[i].mSurface->Restore();
                 if (FAILED(hr))
                 {
                     PrintDDError("tex #%i restore caput", i);
