@@ -102,7 +102,149 @@ private:
     }
 };
 
-void DisAsmProc(u8* pScript);
+class Decompiled;
+
+void DisAsmProc(u8* pScript, Decompiled& d);
+
+class Decompiled
+{
+public:
+    void BeginProc()
+    {
+        PrintWithIndent("function 0x");
+        mIndent++;
+    }
+
+    void Proc(WORD proc)
+    {
+        Print(proc);
+        PrintLineBreak();
+    }
+
+    void EndProc()
+    {
+        mIndent--;
+        PrintWithIndent("end function");
+        PrintLineBreak();
+        PrintLineBreak();
+    }
+
+    void BeginCall()
+    {
+        mCalls++;
+        PrintWithIndent("call(");
+    }
+
+    void Call(WORD proc)
+    {
+        Print(proc);
+    }
+
+    void EndCall()
+    {
+        mCalls--;
+        Print(")");
+        PrintLineBreak();
+    }
+
+    void BeginEval()
+    {
+        if (mIfs == 0)
+        {
+            PrintWithIndent("eval(");
+        }
+        else
+        {
+            Print("eval(");
+        }
+    }
+
+    void EndEval()
+    {
+        Print(")");
+        if (mIfs == 0)
+        {
+            PrintLineBreak();
+        }
+    }
+
+    void BeginIf()
+    {
+        mIfs++;
+        PrintWithIndent("if(");
+    }
+
+    void BeginLoad()
+    {
+        PrintWithIndent("load(");
+    }
+
+    void BeginChara()
+    {
+        PrintWithIndent("chara(");
+    }
+
+    void EndIf()
+    {
+        mIfs--;
+        Print(")");
+        PrintLineBreak();
+    }
+
+
+    void EndLoad()
+    {
+        Print(")");
+        PrintLineBreak();
+    }
+
+    void EndChara()
+    {
+        Print(")");
+        PrintLineBreak();
+    }
+
+private:
+    void PrintLineBreak()
+    {
+        std::cout << std::endl;
+    }
+
+    void PrintWithIndent(WORD num)
+    {
+        PrintIndent();
+        Print(num);
+    }
+
+    void PrintWithIndent(const char* msg)
+    {
+        PrintIndent();
+        Print(msg);
+    }
+
+    void PrintIndent()
+    {
+        for (int i = 0; i < mIndent * 4; i++)
+        {
+            std::cout << " ";
+        }
+    }
+
+    void Print(WORD num)
+    {
+        std::cout << std::hex << num;
+    }
+
+    void Print(const char* msg)
+    {
+        std::cout << msg;
+    }
+
+    int mIndent = 0;
+    int mCalls = 0;
+    int mIfs = 0;
+};
+
 
 int main(int argc, char** argv)
 {
@@ -126,12 +268,17 @@ int main(int argc, char** argv)
     // TODO: Hard coded for now - will make everything work nice once tool is useful
 
    // arguments.mInputFile = "C:\\Program Files (x86)\\Metal Gear Solid\\stage\\init\\scenerio.gcx";
-    arguments.mInputFile = "C:\\Program Files (x86)\\Metal Gear Solid\\stage\\s04a\\scenerio.gcx";
+    arguments.mInputFile = "C:\\users\\paulm\\desktop\\gcl.gcx";
 
     
     std::cout << "Input: " << arguments.mInputFile << std::endl;
 
     vec_u8 buffer = Utils::FileToByteVector(arguments.mInputFile.c_str());
+    if (buffer.empty())
+    {
+        std::cout << "Failed to open " << arguments.mInputFile << " or it is empty" << std::endl;
+        return 1;
+    }
 
     // Byte swap proc table
     u8* afterProcTable = Script_InitProcTables_sub_409C87(buffer.data());
@@ -158,17 +305,19 @@ int main(int argc, char** argv)
 
     std::cout << std::endl;
 
+    Decompiled d;
     for (int i = 0; i < procCount; i++)
     {
-        std::cout << "PROC(0x" << std::hex << procInfos[i].mId << ")" << std::endl;
-        DisAsmProc(afterProcTable + procInfos[i].mOffset);
-        std::cout << "END_PROC()" << std::endl << std::endl;
+        d.BeginProc();
+        d.Proc(procInfos[i].mId);
+        DisAsmProc(afterProcTable + procInfos[i].mOffset, d);
+        d.EndProc();
     }
 
     return 0;
 }
 
-u8* ReadGCL(u8* pScript, int len);
+u8* ReadGCL(u8* pScript, int len, Decompiled& d);
 
 /*
 [60] - built in command
@@ -196,24 +345,24 @@ u8* ReadGCL(u8* pScript, int len);
 
 */
 
-u8* HandleBuiltInCommand(u8* pScript, WORD cmdId, WORD cmdLen)
+u8* HandleBuiltInCommand(u8* pScript, WORD cmdId, WORD cmdLen, Decompiled& d)
 {
     switch (cmdId)
     {
     case 0x0d86:
-        std::cout << "IF(";
+        d.BeginIf();
         break;
 
     case 0xC8BB:
-        std::cout << "LOAD(";
+        d.BeginLoad();
         break;
 
     case 0x9906:
-        std::cout << "CHARA(";
+        d.BeginChara();
         break;
 
     case 0x64C0:
-        std::cout << "EVAL(";
+        d.BeginEval();
         break;
 
     default:
@@ -225,35 +374,80 @@ u8* HandleBuiltInCommand(u8* pScript, WORD cmdId, WORD cmdLen)
     pScript = pScript + 1;
     do
     {
-        pScript = ReadGCL(pScript, cmdLen);
+        pScript = ReadGCL(pScript, cmdLen, d);
     } while (pScript != pEnd);
-    std::cout << ")" << std::endl;
+    //std::cout << ")" << std::endl;
+
+
+    switch (cmdId)
+    {
+    case 0x0d86:
+        d.EndIf();
+        break;
+
+    case 0xC8BB:
+        d.EndLoad();
+        break;
+
+    case 0x9906:
+        d.EndChara();
+        break;
+
+    case 0x64C0:
+        d.EndEval();
+        break;
+
+    default:
+        return nullptr;
+    }
 
     return pScript;
 }
 
-void DisAsmProc(u8* pScript)
+static u8* HandleCall(u8* pScript, Decompiled& d)
+{
+    d.BeginCall();
+
+    pScript++; // Skip 0x70
+    const int length = *pScript;
+    pScript++; // Skip len
+    const WORD id = ToWORD(pScript);
+
+    d.Call(id);
+
+    // Skip proc id
+    pScript += 2;
+
+
+    if (pScript < pScript + length)
+    {
+        DisAsmProc(pScript, d);
+    }
+
+    // TODO: Pull args
+    //std::cout << "CALL(" << id << ")" << std::endl;
+
+    //pScript = pScript + length;
+    d.EndCall();
+
+    return pScript;
+}
+
+void DisAsmProc(u8* pScript, Decompiled& d)
 {
     for (;;)
     {
         switch (*pScript)
         {
         case 0:
-            std::cout << "END" << std::endl;
+           // std::cout << "END" << std::endl;
             return;
 
         // TODO: Only 30, 60 and 70 should be at the top level statements?
 
         case 0x70: // proc call
         {
-            pScript++;
-            const int length = *pScript;
-            const WORD id = ToWORD(pScript+1);
-
-            // TODO: Pull args
-            std::cout << "CALL(" << id << ")" << std::endl;
-
-            pScript = pScript + length;
+            pScript = HandleCall(pScript, d);
         }
         break;
 
@@ -261,7 +455,7 @@ void DisAsmProc(u8* pScript)
         {
             const int length = ToWORD(pScript + 1);
             const WORD cmdId = ToWORD(pScript + 3);
-            u8* pRet = HandleBuiltInCommand(&pScript[5], cmdId, length - 4);
+            u8* pRet = HandleBuiltInCommand(&pScript[5], cmdId, length - 4, d);
             if (pRet)
             {
                 pScript = pRet;
@@ -278,7 +472,7 @@ void DisAsmProc(u8* pScript)
             WORD jumpLocation = ToWORD(pScript + 1);
             pScript += 3;
 
-            std::cout << "JUMP_BY(0x" << std::hex << jumpLocation << ")" << std::endl;
+            //std::cout << "JUMP_BY(0x" << std::hex << jumpLocation << ")" << std::endl;
         }
         break;
 
@@ -296,7 +490,7 @@ struct ScriptCtx
     DWORD m4;
 };
 
-void HandleScript_Unknown6(u8* pScript, int len)
+void HandleScript_Unknown6(u8* pScript, int len, Decompiled& d)
 {
     ScriptCtx stack[99] = {};
     ScriptCtx* pCtx = &stack[0];
@@ -315,26 +509,26 @@ void HandleScript_Unknown6(u8* pScript, int len)
             {
                 break;
             }
-            pScript = ReadGCL(pScript, len);
+            pScript = ReadGCL(pScript, len, d);
         }
 
         pScript++;
 
         if (*pScript == 0)
         {
-            std::cout << "UNKNOWN6_END_2()" << std::endl;
+            //std::cout << "UNKNOWN6_END_2()" << std::endl;
             return;
         }
 
         if (*pScript == 0x14)
         {
-            std::cout << "VAR_WRITE()" << std::endl;
+            //std::cout << "VAR_WRITE()" << std::endl;
             //throw std::runtime_error("Impl me");
             //Script_VarWrite_40957B(pCtx->m3, pCtx->m2);
         }
         else
         {
-            std::cout << "LOGIC_OP()" << std::endl;
+            //std::cout << "LOGIC_OP()" << std::endl;
             //throw std::runtime_error("Impl me");
             //pCtx->m4 = Script_Operator_Evaluate(pScript[1], pCtx->m4, pCtx->m2);
             //pCtx->m3 = 0;
@@ -348,7 +542,7 @@ static u8* ReadVar(BYTE* pScript)
     return pScript = pScript + 4;
 }
 
-u8* ReadGCL(u8* pScript, int len)
+u8* ReadGCL(u8* pScript, int len, Decompiled& d)
 {
     u8* pEnd = pScript + len;
     //while (pScript != pEnd)
@@ -363,14 +557,7 @@ u8* ReadGCL(u8* pScript, int len)
             {
             case 0x70: // proc call TODO: Copy paste from above - not sure if calls should be allowed at this point ??
             {
-                pScript++;
-                const int length = *pScript;
-                const WORD id = ToWORD(pScript + 1);
-
-                // TODO: Pull args
-                std::cout << "CALL(" << id << ")" << std::endl;
-
-                pScript = pScript + length;
+                pScript = HandleCall(pScript, d);
             }
             break;
             // TODO: Copy paste from above - not sure if commands should be allowed at this point ??
@@ -378,7 +565,7 @@ u8* ReadGCL(u8* pScript, int len)
             {
                 const int length = ToWORD(pScript + 1);
                 const WORD cmdId = ToWORD(pScript + 3);
-                u8* pRet = HandleBuiltInCommand(&pScript[5], cmdId, length - 4);
+                u8* pRet = HandleBuiltInCommand(&pScript[5], cmdId, length - 4, d);
                 if (pRet)
                 {
                     pScript = pRet;
@@ -393,7 +580,7 @@ u8* ReadGCL(u8* pScript, int len)
             // Read stack argument
             case 0x20:
             {
-                std::cout << "READ_STACK(" << static_cast<WORD>(pScript[1]) << ")" << std::endl;
+                //std::cout << "READ_STACK(" << static_cast<WORD>(pScript[1]) << ")" << std::endl;
                 pScript = pScript + 2;
             }
             break;
@@ -401,7 +588,7 @@ u8* ReadGCL(u8* pScript, int len)
             // ??
             case 0x30:
             {
-                HandleScript_Unknown6(pScript + 2, pScript[1]);
+                HandleScript_Unknown6(pScript + 2, pScript[1], d);
                 pScript += *(pScript + 1);
             }
             break;
@@ -443,7 +630,7 @@ u8* ReadGCL(u8* pScript, int len)
             case 1:
             {
                 WORD w = ToWORD(&pScript[1]);
-                std::cout << "READ_S16(0x" << std::hex << (u16)w << ")" << std::endl;
+                //std::cout << "READ_S16(0x" << std::hex << (u16)w << ")" << std::endl;
                 pScript = pScript + 3;
             }
             break;
@@ -453,7 +640,7 @@ u8* ReadGCL(u8* pScript, int len)
             case 3:
             case 4:
             {
-                std::cout << "READ_U8(0x" << std::hex << static_cast<WORD>(pScript[1]) << ")" << std::endl;
+                //std::cout << "READ_U8(0x" << std::hex << static_cast<WORD>(pScript[1]) << ")" << std::endl;
                 pScript = pScript + 2;
             }
             break;
@@ -462,7 +649,7 @@ u8* ReadGCL(u8* pScript, int len)
             case 7:
             {
                 char* pStr = (char*)&pScript[2];
-                std::cout << "READ_STRING(" << pStr << ")" << std::endl;
+                //std::cout << "READ_STRING(" << pStr << ")" << std::endl;
                 pScript += *(pScript + 1) + 2;
             }
             break;
@@ -472,7 +659,7 @@ u8* ReadGCL(u8* pScript, int len)
             case 8:
             {
                 WORD w = ToWORD(&pScript[1]);
-                std::cout << "READ_U16(0x" << std::hex << w << ")" << std::endl;
+               // std::cout << "READ_U16(0x" << std::hex << w << ")" << std::endl;
                 pScript = pScript + 3;
             }
             break;
@@ -482,7 +669,7 @@ u8* ReadGCL(u8* pScript, int len)
             case 10:
             {
                 DWORD d = ToDWORD(&pScript[1]);
-                std::cout << "READ_U32(0x" << std::hex << d << ")" << std::endl;
+               // std::cout << "READ_U32(0x" << std::hex << d << ")" << std::endl;
                 pScript = pScript + 5;
             }
             break;
