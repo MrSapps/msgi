@@ -17,7 +17,7 @@ MGS_STDLIB(fflush, 0x0053C6C0);
 MGS_STDLIB(fclose, 0x0053C4A0);
 
 using TOpen = decltype(&open);
-TOpen gMgsOpen = (TOpen)0x0053C5F0;
+TOpen gMgsOpen = (TOpen)0x0053DBE0;
 
 int mgs_open(const char* filename, int openFlag)
 {
@@ -36,9 +36,6 @@ int mgs_open(const char* filename, int openFlag, DWORD mode)
     }
     return open(filename, openFlag, mode);
 }
-
-using Tfprintf = decltype(&fprintf);
-Tfprintf gfprintf = (Tfprintf)0x0053DBE0;
 
 int mgs_fprintf(FILE* file, const char* format, ...)
 {
