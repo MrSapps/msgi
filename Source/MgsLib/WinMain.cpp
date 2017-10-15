@@ -198,7 +198,7 @@ MGS_ARY(1, 0x776B68, struct jimDeviceIdentifier, 2, g_pDeviceIdentifiers_776B68,
 MGS_ARY(1, 0x689B68, struct jimUnk0x204, 2, array_689B68, {}); // TODO: Also 2?
 
 MGS_ARY(1, 0x6C0778, char, 0x400, unk_6C0778, {}); // TODO: Struct?
-MGS_VAR(1, 0x006FC7E8, HFONT, gFont, nullptr);
+MGS_VAR(1, 0x006FC7E8, HFONT, gFont_6FC7E8, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
 MGS_VAR(1, 0x72279C, DWORD, game_state_dword_72279C, 0);
 
@@ -903,20 +903,16 @@ int __cdecl MessageBox_Error(HWND hWnd, int errCode, LPCSTR lpCaption, UINT uTyp
     return result;
 }
 
-// 0x423F1B
-HFONT __cdecl FontCreate_423F1B(int cWidth, int cHeight)
+void CC FontCreate_423F1B(int cWidth, int cHeight)
 {
-    HFONT result; // eax@3
-
-    if (gFont)
+    if (gFont_6FC7E8)
     {
-        DeleteObject(gFont);
+        DeleteObject(gFont_6FC7E8);
     }
 
-    result = CreateFontA(cHeight, cWidth, 0, 0, 500, 0, 0, 0, 1u, 0, 0, 2u, 0, "Arial");
-    gFont = result;
-    return result;
+    gFont_6FC7E8 = CreateFontA(cHeight, cWidth, 0, 0, 500, 0, 0, 0, 1u, 0, 0, 2u, 0, "Arial");
 }
+MGS_FUNC_IMPLEX(0x423F1B, FontCreate_423F1B, WINMAIN_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
 MGS_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);

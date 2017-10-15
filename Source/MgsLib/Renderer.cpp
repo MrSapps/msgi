@@ -24,6 +24,8 @@ EXTERN_MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), Render_Restore_Surfaces_51E086
 
 MGS_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
 MGS_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
+MGS_FUNC_NOT_IMPL(0x52078F, const char* __cdecl(), SoundGetName_52078F);
+
 
 MGS_VAR(1, 0x6FC7B0, WORD, gDisp_w_word_6FC7B0, 0);
 MGS_VAR(1, 0x6FC7B2, WORD, gDisp_y_word_6FC7B2, 0);
@@ -132,6 +134,7 @@ double CC GetFPS_422A10()
 }
 MGS_FUNC_IMPLEX(0x422A10, GetFPS_422A10, RENDERER_IMPL);
 
+
 void CC Render_Loop_SetWinTitle_422210()
 {
     if (gSkipFrame_dword_6FC720)
@@ -165,9 +168,10 @@ void CC Render_Loop_SetWinTitle_422210()
         }
     }
 
-    HDC hdc = {};
+   
     if (gFps)
     {
+        HDC hdc = {};
         const char* pSkip = "";
         if (gSkipFrame_dword_6FC720)
         {
@@ -208,6 +212,21 @@ void CC Render_Loop_SetWinTitle_422210()
     }
 
     dword_650D44 = 1;
+
+    // Hard coded to off in the real game, we turn it on for the debug infos
+    //if (false)
+    {
+        HDC hdc = {};
+        const char* lpString = SoundGetName_52078F();
+        if (lpString)
+        {
+            g_pBackBuffer_6FC738->GetDC(&hdc);
+            SetBkMode(hdc, 1);
+            SetTextColor(hdc, 0xC03050u);
+            TextOutA(hdc, 20, 20, lpString, strlen(lpString));
+            g_pBackBuffer_6FC738->ReleaseDC(hdc);
+        }
+    }
 
     if (!gSkipFrame_dword_6FC720)
     {
