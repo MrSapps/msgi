@@ -698,7 +698,7 @@ void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
         {
             dword_991E40[2] = p->field_2E_w_or_h;
             OrderingTableAdd_4034C6(
-                (int)*(&p->field_40_pDataStart + activeBuffer),
+                (int)p->field_40_pDataStart[activeBuffer],
                 p->field_2A_num_items,
                 p->field_30_size);
         }

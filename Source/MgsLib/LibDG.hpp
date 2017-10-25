@@ -59,8 +59,7 @@ struct Prim_unknown
     WORD field_36;
     DWORD field_38_g;
     DWORD field_3C_b;
-    BYTE* field_40_pDataStart;
-    BYTE* field_44_pDataEnd;
+    BYTE* field_40_pDataStart[2];
     DWORD field_48;
     DWORD field_4C;
     DWORD field_50;

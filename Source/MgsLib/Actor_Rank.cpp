@@ -19,35 +19,43 @@ BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, 
 }
 MGS_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, false); // TODO
 
+union PolyTag 
+{
+    struct 
+    {
+        WORD LowPart;
+        WORD HighPart;
+    };
+    DWORD WordPart;
+};
+
+void SetDepth(POLY_FT4* p, u16 depth)
+{
+    PolyTag* pTag = (PolyTag*)&p->tag;
+    pTag->LowPart = depth;
+    //pTag->HighPart = 0x0900;
+}
+
 void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
 {
-    signed int i; // [sp+10h] [bp-Ch]@1
-    signed int j; // [sp+10h] [bp-Ch]@4
-    POLY_FT4 *pDst; // [sp+14h] [bp-8h]@1
-    char *pDst2; // [sp+14h] [bp-8h]@4
-    char *pSrc2; // [sp+18h] [bp-4h]@4
-
-    pDst = (POLY_FT4 *)*(&pRank->field_24_ptr_16_prims->field_40_pDataStart + gActiveBuffer_dword_791A08);
+    POLY_FT4* pDst = (POLY_FT4 *)pRank->field_24_ptr_16_prims->field_40_pDataStart[gActiveBuffer_dword_791A08];
     POLY_FT4* pSrc = &pRank->field_2C_back_l_type0_0x40_start;
-    for (i = 0; i < 1; ++i)
+
+    for (int i = 0; i < 16; i++)
     {
-        memcpy(pDst, pSrc, sizeof(POLY_FT4));                   // PolyFT4?
-        *(WORD *)pDst = 3;// pRank->field_41C_16_prim_dst[i];
-        pDst += 40;
-        pSrc++;
+        memcpy(&pDst[i], &pSrc[i], sizeof(POLY_FT4));
+        SetDepth(&pDst[i], pRank->field_41C_16_prim_dst[i]);
     }
-    /*
-    pDst2 = *(char **)(pRank->field_28_ptr_9_prims + 4 * gActiveBuffer_dword_791A08 + 64);
-    pSrc2 = (char *)&pRank->field_2AC_cur_lu;
-    for (j = 0; j < 9; ++j)
+
+    POLY_FT4* pDst2 = (POLY_FT4 *)pRank->field_28_ptr_9_prims->field_40_pDataStart[gActiveBuffer_dword_791A08];
+    POLY_FT4* pSrc2 = &pRank->field_2AC_cur_lu;
+    for (int i = 0; i < 9; i++)
     {
-        memcpy(pDst2, pSrc2, 40u);                 // PolyFT4
-        *(WORD *)pDst2 = *((DWORD *)&pRank->field_45C_cur_ru_q + j);
-        pDst2 += 40;
-        pSrc2 += 40;
-    }*/
+        memcpy(&pDst2[i], &pSrc2[i], sizeof(POLY_FT4));
+        SetDepth(&pDst2[i], pRank->field_45C_8_prim_dst[i]);
+    }
 }
-MGS_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, false); // TODO
+MGS_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, true); // TODO
 
 void CC POLYFT4_code_2_40E0D0(POLY_FT4* pPoly, BOOL bSetOrUnSetCode2)
 {
