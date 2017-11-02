@@ -15,134 +15,134 @@ MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
 MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0,
 {
-    { 0x002A, 0, (ResInitFn)0x00519A61 },                                                { 0x002F, 0, (ResInitFn)0x00519A9D },
-    { 0x0030, 0, (ResInitFn)0x00600135 },                                                { 0x0009, 0, (ResInitFn)0x005FFC1C },
-    { 0x000D, 0, (ResInitFn)0x005FF35B },                                                { 0x0048, 0, (ResInitFn)0x005C5666 },
-    { 0x0047, 0, (ResInitFn)0x005C5111 },                                                { 0x000A, 0, (ResInitFn)0x005FEFB9 },
-    { 0x0025, 0, (ResInitFn)0x005F7EE2 },                                                { 0x004A, 0, (ResInitFn)0x005683EF },
-    { 0x000E, 0, (ResInitFn)0x0051B59B },                                                { 0x0012, 0, (ResInitFn)0x005FECC3 },
-    { 0x0013, 0, (ResInitFn)0x005FE85B },                                                { 0x000B, 0, (ResInitFn)0x005FE69B },
-    { 0x0033, 0, (ResInitFn)0x0051B1CF },                                                { 0x003A, 0, (ResInitFn)0x005C4C4E },
-    { 0x0040, 0, (ResInitFn)0x005C445E },                                                { 0x0039, 0, (ResInitFn)0x005FD769 },
-    { 0x0034, 0, (ResInitFn)0x0051B051 },                                                { 0x0015, 0, (ResInitFn)0x00628ECC },
-    { 0x0016, 0, (ResInitFn)0x005BB2D5 },                                                { 0x0037, 0, (ResInitFn)0x005DF33A },
-    { 0x0038, 0, (ResInitFn)0x005DF50D },                                                { 0x001C, 0, (ResInitFn)0x00628A91 },
-    { 0x0001, 0, (ResInitFn)0x0043EC38 },                                                { 0x0003, 0, (ResInitFn)0x00441CF2 },
-    { 0x0004, 0, (ResInitFn)0x00441CF2 },                                                { 0x0045, 0, (ResInitFn)0x005C41C3 },
-    { 0x0010, 0, (ResInitFn)0x005ABCB7 },                                                { 0x0044, 0, (ResInitFn)0x005E7FC9 },
-    { 0x0019, 0, (ResInitFn)0x0051AED6 },                                                { 0x0042, 0, (ResInitFn)0x0061FFFF },
-    { 0x0022, 0, (ResInitFn)0x005BB23E },                                                { 0x0046, 0, (ResInitFn)0x006288F0 },
-    { 0x003B, 0, (ResInitFn)0x005C3D78 },                                                { 0x003F, 0, (ResInitFn)0x005C3580 },
-    { 0x0017, 0, (ResInitFn)0x0062862E },                                                { 0x0018, 0, (ResInitFn)0x005BB2D5 },
-    { 0x0020, 0, (ResInitFn)0x005C31B7 },                                                { 0x004B, 0, (ResInitFn)0x005FD23A },
-    { 0x000C, 0, (ResInitFn)0x0051A97A },                                                { 0x0028, 0, (ResInitFn)0x0062852B },
-    { 0x0011, 0, (ResInitFn)0x0051AD2A },                                                { 0x0049, 0, (ResInitFn)0x00627B86 },
-    { 0x0041, 0, (ResInitFn)0x005C2454 },                                                { 0x002D, 0, (ResInitFn)0x005ABC28 },
-    { 0x0035, 0, (ResInitFn)0x0051AB83 },                                                { 0x0036, 0, (ResInitFn)0x0051AC56 },
-    { 0x001A, 0, (ResInitFn)0x005BAC0B },                                                { 0x001B, 0, (ResInitFn)0x005BB0B2 },
-    { 0x001D, 0, (ResInitFn)0x005E1D68 },                                                { 0x0024, 0, (ResInitFn)0x005E1E8B },
-    { 0x0007, 0, (ResInitFn)0x00519E54 },                                                { 0x0029, 0, (ResInitFn)0x0063F7DF },
-    { 0x0014, 0, (ResInitFn)0x005B9F52 },                                                { 0x001F, 0, (ResInitFn)0x006282D3 },
-    { 0x000F, 0, (ResInitFn)0x005AB3EA },                                                { 0x0032, 0, (ResInitFn)0x005C22AC },
-    { 0x002C, 0, (ResInitFn)0x004438CF },                                                { 0x0008, 0, (ResInitFn)0x00519DEC },
-    { 0x0002, 0, (ResInitFn)0x00519A25 },                                                { 0x0031, 0, (ResInitFn)0x005FD006 },
-    { 0x003C, 0, (ResInitFn)0x00627ECA },                                                { 0x003D, 0, (ResInitFn)0x005FCA8F },
-    { 0x003E, 0, (ResInitFn)0x00519504 },                                                { 0x0026, 0, (ResInitFn)0x005197BC },
-    { 0x0027, 0, (ResInitFn)0x00519838 },                                                { 0x002E, 0, (ResInitFn)0x005FBEE0 },
-    { 0x0043, 0, (ResInitFn)0x00627C02 },                                                { 0x0006, 0, (ResInitFn)0x00519E54 },
-    { 0x0005, 0, (ResInitFn)0x006154A7 },                                                { 0x004C, 0, (ResInitFn)0x006153CF },
-    { 0x0021, 0, (ResInitFn)0x00627BFF },                                                { 0x0023, 0, (ResInitFn)0x005FF35B },
-    { 0x002B, 0, (ResInitFn)0x005FF35B },                                                { 0x001E, 0, (ResInitFn)0x00627715 },
-    { 0x40E9, 0, (ResInitFn)0x005FBB0A },                                                { 0xE068, 0, (ResInitFn)0x005FAF3E },
-    { 0xD53C, 0, (ResInitFn)0x005FA06A },                                                { 0x153E, 0, (ResInitFn)0x005F9170 },
-    { 0x9FFD, 0, (ResInitFn)0x00457B50 },                                                { 0x2D0A, 0, (ResInitFn)0x00457AC1 },
-    { 0x566F, 0, (ResInitFn)0x004B3B01 },                                                { 0x4974, 0, (ResInitFn)0x004B0578 },
-    { 0x4975, 0, (ResInitFn)0x004AC173 },                                                { 0x05EF, 0, (ResInitFn)0x005F8FFA },
-    { 0x2A90, 0, (ResInitFn)0x00627435 },                                                { 0x02C4, 0, (ResInitFn)0x005AB396 },
-    { 0x92BC, 0, (ResInitFn)0x005AA507 },                                                { 0x9988, 0, (ResInitFn)0x004ABBC9 },
-    { 0xF59E, 0, (ResInitFn)0x00514A19 },                                                { 0x6B6C, 0, (ResInitFn)0x005682F7 },
-    { 0x8185, 0, (ResInitFn)0x005F8E18 },                                                { 0x1158, 0, (ResInitFn)0x005F8573 },
-    { 0x4E95, 0, (ResInitFn)0x005F820B },                                                { 0x6A4C, 0, (ResInitFn)0x005F7EE8 },
-    { 0x9093, 0, (ResInitFn)0x005F7EE5 },                                                { 0xF74B, 0, (ResInitFn)0x005142ED },
-    { 0x32FC, 0, (ResInitFn)0x006270F3 },                                                { 0x6471, 0, (ResInitFn)0x00626FE4 },
-    { 0x1A02, 0, (ResInitFn)0x005F781C },                                                { 0x93B6, 0, (ResInitFn)0x004A2B6B },
-    { 0x7ECA, 0, (ResInitFn)0x0049FC71 },                                                { 0x6E90, 0, (ResInitFn)0x005A9076 },
-    { 0x56CC, 0, (ResInitFn)0x005A816F },                                                { 0xA9C5, 0, (ResInitFn)0x005F5F72 },
-    { 0x7BC2, 0, (ResInitFn)0x00626EA8 },                                                { 0xB99F, 0, (ResInitFn)0x0049EA8B },
-    { 0x51C6, 0, (ResInitFn)0x00626C7D },                                                { 0xF722, 0, (ResInitFn)0x0046BC36 },
-    { 0x43A0, 0, (ResInitFn)0x006262A0 },                                                { 0x788D, 0, (ResInitFn)0x00625DC1 },
-    { 0x7A05, 0, (ResInitFn)0x00625D63 },                                                { 0x3C0C, 0, (ResInitFn)0x005A04D6 },
-    { 0xC6D7, 0, (ResInitFn)0x005A7099 },                                                { 0xCC45, 0, (ResInitFn)0x005F2E0F },
-    { 0x22C6, 0, (ResInitFn)0x005A6143 },                                                { 0xECED, 0, (ResInitFn)0x004629FE },
-    { 0xA3FB, 0, (ResInitFn)0x005F1A1D },                                                { 0x8E60, 0, (ResInitFn)0x005F0B54 },
-    { 0xBE79, 0, (ResInitFn)0x005F07A4 },                                                { 0x6A98, 0, (ResInitFn)0x00513F69 },
-    { 0x76BC, 0, (ResInitFn)0x0051368C },                                                { 0xB4E6, 0, (ResInitFn)0x00457974 },
-    { 0xE97E, 0, (ResInitFn)0x0056781A },                                                { 0x3686, 0, (ResInitFn)0x0049B6AD },
-    { 0x9F7D, 0, (ResInitFn)0x00511789 },                                                { 0x9D00, 0, (ResInitFn)0x00624FDF },
-    { 0x58F0, 0, (ResInitFn)0x00624A97 },                                                { 0x6C0E, 0, (ResInitFn)0x005EA179 },
-    { 0xB997, 0, (ResInitFn)0x0040BB8B },                                                { 0x73F8, 0, (ResInitFn)0x00624208 },
-    { 0xB58D, 0, (ResInitFn)0x00623B32 },                                                { 0x4BE8, 0, (ResInitFn)0x00623714 },
-    { 0x3303, 0, (ResInitFn)0x005E9A03 },                                                { 0xAF6C, 0, (ResInitFn)0x0062345B },
-    { 0xB103, 0, (ResInitFn)0x0062330F },                                                { 0xE75A, 0, (ResInitFn)0x0062305A },
-    { 0x107C, 0, (ResInitFn)0x00622EEF },                                                { 0xAEF2, 0, (ResInitFn)0x00622D21 },
-    { 0x2ABC, 0, (ResInitFn)0x00621BDD },                                                { 0x9AB9, 0, (ResInitFn)0x005E80FE },
-    { 0xE253, 0, (ResInitFn)0x00456960 },                                                { 0x32E5, 0, (ResInitFn)0x0063F60E },
-    { 0xA9DD, 0, (ResInitFn)0x0063F43D },                                                { 0xB789, 0, (ResInitFn)0x0062190F },
-    { 0x3F9A, 0, (ResInitFn)0x00621797 },                                                { 0x76FE, 0, (ResInitFn)0x0062130E },
-    { 0xA12E, 0, (ResInitFn)0x0044200E },                                                { 0xC73E, 0, (ResInitFn)0x005E7FCF },
-    { 0x5D64, 0, (ResInitFn)0x00620DA7 },                                                { 0x118C, 0, (ResInitFn)0x00620978 },
-    { 0xD6FB, 0, (ResInitFn)0x00620833 },                                                { 0x84E1, 0, (ResInitFn)0x005115AE },
-    { 0x0FAD, 0, (ResInitFn)0x00511497 },                                                { 0xADD8, 0, (ResInitFn)0x0062052F },
-    { 0x8D5A, 0, (ResInitFn)0x006203E0 },                                                { 0x5A50, 0, (ResInitFn)0x0061FE1B },
-    { 0x2477, 0, (ResInitFn)0x0061F9A8 },                                                { 0xCCD3, 0, (ResInitFn)0x005E7FCC },
-    { 0x8E70, 0, (ResInitFn)0x0061F2D5 },                                                { 0xDB1F, 0, (ResInitFn)0x004DAA01 },
-    { 0x9EB7, 0, (ResInitFn)0x00567203 },                                                { 0xCB1F, 0, (ResInitFn)0x0056653D },
-    { 0x5F5A, 0, (ResInitFn)0x0063F0EF },                                                { 0xCBEB, 0, (ResInitFn)0x005E76AA },
-    { 0x0D9B, 0, (ResInitFn)0x005E6DD7 },                                                { 0x42E4, 0, (ResInitFn)0x005E6A41 },
-    { 0xDD8B, 0, (ResInitFn)0x00511349 },                                                { 0x8767, 0, (ResInitFn)0x0044D086 },
-    { 0x6A48, 0, (ResInitFn)0x0061E1DD },                                                { 0xA27E, 0, (ResInitFn)0x0061DDFA },
-    { 0xB757, 0, (ResInitFn)0x00462532 },                                                { 0x1EF9, 0, (ResInitFn)0x0050C653 },
-    { 0x81C7, 0, (ResInitFn)0x0049B678 },                                                { 0x4F02, 0, (ResInitFn)0x005B9F42 },
-    { 0xC6AC, 0, (ResInitFn)0x005E66A1 },                                                { 0x52BF, 0, (ResInitFn)0x005A60A2 },
-    { 0xA6F6, 0, (ResInitFn)0x004421C2 },                                                { 0x8B1A, 0, (ResInitFn)0x0050BF9B },
-    { 0x711F, 0, (ResInitFn)0x0061DC48 },                                                { 0x425F, 0, (ResInitFn)0x0061D52C },
-    { 0x921B, 0, (ResInitFn)0x0061CCCC },                                                { 0x7BF2, 0, (ResInitFn)0x005652F4 },
-    { 0xCF72, 0, (ResInitFn)0x0049AD6B },                                                { 0x53C7, 0, (ResInitFn)0x004606E2 },
-    { 0x9D71, 0, (ResInitFn)0x005C0C8B }, /* Res_m1e1_create_5C0C8B */                   { 0xD5EC, 0, (ResInitFn)0x005BFEA1 },
-    { 0xE448, 0, (ResInitFn)0x0061B8B9 },                                                { 0x450F, 0, (ResInitFn)0x0050A2E4 },
-    { 0xAF72, 0, (ResInitFn)0x00509679 },                                                { 0xC755, 0, (ResInitFn)0x00565013 },
-    { 0x5078, 0, (ResInitFn)0x005A53CA },                                                { 0xE271, 0, (ResInitFn)0x005644F4 },
-    { 0x4754, 0, (ResInitFn)0x005BE3F8 }, /* Res_mgrex_create_5BE3F8 */                  { 0x954B, 0, (ResInitFn)0x0061B32D },
-    { 0x1787, 0, (ResInitFn)0x005BD2D4 }, /* Res_hind_create_5BD2D4 */                   { 0xC218, 0, (ResInitFn)0x0061AB21 },
-    { 0xA2B5, 0, (ResInitFn)0x0045692F },                                                { 0x7ACF, 0, (ResInitFn)0x005E61CC },
-    { 0x6D78, 0, (ResInitFn)0x0061A71C },                                                { 0x0065, 0, (ResInitFn)0x0061A683 },
-    { 0xD4A5, 0, (ResInitFn)0x005E52D5 },                                                { 0x3453, 0, (ResInitFn)0x00456860 },
-    { 0x5345, 0, (ResInitFn)0x004561C6 },                                                { 0xB98C, 0, (ResInitFn)0x005A4F47 },
-    { 0xD3C0, 0, (ResInitFn)0x0050964C },                                                { 0xF002, 0, (ResInitFn)0x00508856 },
-    { 0x30BA, 0, (ResInitFn)0x00563A09 },                                                { 0x4811, 0, (ResInitFn)0x005A473D },
-    { 0xCF79, 0, (ResInitFn)0x00486BD4 },                                                { 0x3AC3, 0, (ResInitFn)0x00482D1F },
-    { 0xCFEF, 0, (ResInitFn)0x0047EE6E },                                                { 0x976C, 0, (ResInitFn)0x0047A5E5 },
-    { 0x8D31, 0, (ResInitFn)0x004792A6 },                                                { 0xB916, 0, (ResInitFn)0x00477F58 },
-    { 0xCBF8, 0, (ResInitFn)0x00456093 },                                                { 0x3ED7, 0, (ResInitFn)0x0061A311 },
-    { 0x720D, 0, (ResInitFn)0x00539051 },                                                { 0xFED1, 0, (ResInitFn)0x00455F32 },
-    { 0x20F2, 0, (ResInitFn)0x00619C50 },                                                { 0xDD95, 0, (ResInitFn)0x006198AB },
-    { 0x5F02, 0, (ResInitFn)0x006196C0 },                                                { 0x30CE, 0, (ResInitFn)0x005E40BB },
-    { 0xFDB6, 0, (ResInitFn)0x004612E8 },                                                { 0x8FDC, 0, (ResInitFn)0x00462529 },
-    { 0x6414, 0, (ResInitFn)0x00462395 },                                                { 0xAA13, 0, (ResInitFn)0x00460D44 },
-    { 0xCF00, 0, (ResInitFn)0x00460D1C },                                                { 0x10FF, 0, (ResInitFn)0x00508209 },
-    { 0xEDEB, 0, (ResInitFn)0x00505D37 },                                                { 0x8427, 0, (ResInitFn)0x005E3D51 },
-    { 0x17F5, 0, (ResInitFn)0x005E372A },                                                { 0x1FA5, 0, (ResInitFn)0x0043EEFB },
-    { 0xB032, 0, (ResInitFn)0x005E316B },                                                { 0xB033, 0, (ResInitFn)0x005E2B67 },
-    { 0xB7AE, 0, (ResInitFn)0x005E262D },                                                { 0xBC76, 0, (ResInitFn)0x005E2053 },
-    { 0x9C6C, 0, (ResInitFn)0x0061947E },                                                { 0xB47A, 0, (ResInitFn)0x0061870B },
-    { 0x9BC2, 0, (ResInitFn)0x005E1032 },                                                { 0xFC0B, 0, (ResInitFn)0x005E0C21 },
-    { 0x3AD2, 0, (ResInitFn)0x00505B87 },                                                { 0xCC89, 0, (ResInitFn)0x005E01D2 },
-    { 0x6D1B, 0, (ResInitFn)0x00476B30 },                                                { 0xD8DD, 0, (ResInitFn)0x005054F4 },
-    { 0xBF66, 0, (ResInitFn)0x00504B42 },                                                { 0xA404, 0, (ResInitFn)0x005045B7 },
-    { 0x27A2, 0, (ResInitFn)0x0050492D },                                                { 0xA76F, 0, (ResInitFn)0x004E8181 },
+    { 0x002A, 0, (ResInitFn)0x00519A61 }, /* Res_anime_pre_create_519A61 */              { 0x002F, 0, (ResInitFn)0x00519A9D }, /* Res_anime_pre_create_519A9D */
+    { 0x0030, 0, (ResInitFn)0x00600135 }, /* Res_blst_ln_600135 */                       { 0x0009, 0, (ResInitFn)0x005FFC1C }, /* Res_blood_5FFC1C */
+    { 0x000D, 0, (ResInitFn)0x005FF35B }, /* Res_d_bloods_5FF35B */                      { 0x0048, 0, (ResInitFn)0x005C5666 }, /* Res_blooddrp_create_5C5666 */
+    { 0x0047, 0, (ResInitFn)0x005C5111 }, /* Res_bloodhzd_create_5C5111 */               { 0x000A, 0, (ResInitFn)0x005FEFB9 }, /* Res_splash_create_5FEFB9 */
+    { 0x0025, 0, (ResInitFn)0x005F7EE2 }, /* Ret0_5F7EE2 */                              { 0x004A, 0, (ResInitFn)0x005683EF }, /* Res_liquid_bombled_create_5683EF */
+    { 0x000E, 0, (ResInitFn)0x0051B59B }, /* Res_anime_create_breath */                  { 0x0012, 0, (ResInitFn)0x005FECC3 }, /* Res_bubble_t_create_5FECC3 */
+    { 0x0013, 0, (ResInitFn)0x005FE85B }, /* Res_bubble_p_create_5FE85B */               { 0x000B, 0, (ResInitFn)0x005FE69B }, /* Res_bullet_create_5FE69B */
+    { 0x0033, 0, (ResInitFn)0x0051B1CF }, /* Res_anime_pre_create_51B1CF */              { 0x003A, 0, (ResInitFn)0x005C4C4E }, /* Res_celofan2_create_5C4C4E */
+    { 0x0040, 0, (ResInitFn)0x005C445E }, /* Res_celofan2_create_5C445E */               { 0x0039, 0, (ResInitFn)0x005FD769 }, /* Res_crsh_smk_create_5FD769 */
+    { 0x0034, 0, (ResInitFn)0x0051B051 }, /* Res_anime_pre_create_51B051 */              { 0x0015, 0, (ResInitFn)0x00628ECC }, /* Res_goggle_create_628ECC */
+    { 0x0016, 0, (ResInitFn)0x005BB2D5 }, /* Res_Equip_gglsight_create_5BB2D5 */         { 0x0037, 0, (ResInitFn)0x005DF33A }, /* Res_red_alr_create_5DF33A */
+    { 0x0038, 0, (ResInitFn)0x005DF50D },                                                { 0x001C, 0, (ResInitFn)0x00628A91 }, /* Res_envmap3_create_628A91 */
+    { 0x0001, 0, (ResInitFn)0x0043EC38 }, /* Res_blast_create_43EC38 */                  { 0x0003, 0, (ResInitFn)0x00441CF2 }, /* Res_fadeio_create_441CF2 */
+    { 0x0004, 0, (ResInitFn)0x00441CF2 }, /* Res_fadeio_create_441CF2 */                 { 0x0045, 0, (ResInitFn)0x005C41C3 }, /* Res_famaslit_create_5C41C3 */
+    { 0x0010, 0, (ResInitFn)0x005ABCB7 }, /* Res_demoasi_create_5ABCB7 */                { 0x0044, 0, (ResInitFn)0x005E7FC9 },
+    { 0x0019, 0, (ResInitFn)0x0051AED6 }, /* Res_anime_pre_create_51AED6 */              { 0x0042, 0, (ResInitFn)0x0061FFFF }, /* Res_gas_efct_create_61FFFF */
+    { 0x0022, 0, (ResInitFn)0x005BB23E }, /* Res_Equip_gmsight_create_5BB23E */          { 0x0046, 0, (ResInitFn)0x006288F0 }, /* Res_realshdw_create_6288F0 */
+    { 0x003B, 0, (ResInitFn)0x005C3D78 }, /* Res_inverlt_create_5C3D78 */                { 0x003F, 0, (ResInitFn)0x005C3580 }, /* Res_inverlt2_create_5C3580 */
+    { 0x0017, 0, (ResInitFn)0x0062862E }, /* Res_Takabe_goggleir_create_62862E */        { 0x0018, 0, (ResInitFn)0x005BB2D5 }, /* Res_Equip_gglsight_create_5BB2D5 */
+    { 0x0020, 0, (ResInitFn)0x005C31B7 }, /* Res_Kojo_mgrexlzr_create_5C31B7 */          { 0x004B, 0, (ResInitFn)0x005FD23A }, /* Res_mg_room_create_5FD23A */
+    { 0x000C, 0, (ResInitFn)0x0051A97A }, /* Res_anime_pre_create_51A97A */              { 0x0028, 0, (ResInitFn)0x0062852B }, /* Res_sepia_create_62852B */
+    { 0x0011, 0, (ResInitFn)0x0051AD2A }, /* Res_anime_pre_create_51AD2A */              { 0x0049, 0, (ResInitFn)0x00627B86 }, /* Res_windcrcl_create_627B86 */
+    { 0x0041, 0, (ResInitFn)0x005C2454 }, /* Res_ninjalzr_create_5C2454 */               { 0x002D, 0, (ResInitFn)0x005ABC28 }, /* Res_katana_create_5ABC28 */
+    { 0x0035, 0, (ResInitFn)0x0051AB83 }, /* Res_anime_pre_create_51AB83 */              { 0x0036, 0, (ResInitFn)0x0051AC56 }, /* Res_anime_pre_create_51AC56 */
+    { 0x001A, 0, (ResInitFn)0x005BAC0B }, /* Res_Equip_kogaku2_create_5BAC0B */          { 0x001B, 0, (ResInitFn)0x005BB0B2 }, /* Res_kogaku2_create_5BB0B2 */
+    { 0x001D, 0, (ResInitFn)0x005E1D68 }, /* Res_plasma_create_5E1D68 */                 { 0x0024, 0, (ResInitFn)0x005E1E8B }, /* Res_plasma_create_5E1E8B */
+    { 0x0007, 0, (ResInitFn)0x00519E54 }, /* Res_anime_pre_create_519E54 */              { 0x0029, 0, (ResInitFn)0x0063F7DF }, /* Res_rfsight_create_63F7DF */
+    { 0x0014, 0, (ResInitFn)0x005B9F52 }, /* Res_Equip_scope_create_5B9F52 */            { 0x001F, 0, (ResInitFn)0x006282D3 }, /* Res_sepia_6282D3 */
+    { 0x000F, 0, (ResInitFn)0x005AB3EA }, /* Res_Enemy_demokage_create_5AB3EA */         { 0x0032, 0, (ResInitFn)0x005C22AC }, /* Res_Kojo_m1e1smke_create_5C22AC */
+    { 0x002C, 0, (ResInitFn)0x004438CF }, /* Res_sight_create_4438CF */                  { 0x0008, 0, (ResInitFn)0x00519DEC }, /* Res_anime_pre_create_519DEC */
+    { 0x0002, 0, (ResInitFn)0x00519A25 }, /* Res_anime_pre_create_519A25 */              { 0x0031, 0, (ResInitFn)0x005FD006 }, /* Res_smke_ln_create_5FD006 */
+    { 0x003C, 0, (ResInitFn)0x00627ECA }, /* Res_spark2_create_627ECA */                 { 0x003D, 0, (ResInitFn)0x005FCA8F }, /* Res_spark_create_5FCA8F */
+    { 0x003E, 0, (ResInitFn)0x00519504 }, /* Res_anime_pre_create_519504 */              { 0x0026, 0, (ResInitFn)0x005197BC }, /* Res_anime_pre_create_5197BC */
+    { 0x0027, 0, (ResInitFn)0x00519838 }, /* Res_anime_pre_create_519838 */              { 0x002E, 0, (ResInitFn)0x005FBEE0 }, /* Res_sub_room_create_5FBEE0 */
+    { 0x0043, 0, (ResInitFn)0x00627C02 }, /* Res_sub_efct_create_627C02 */               { 0x0006, 0, (ResInitFn)0x00519E54 }, /* Res_anime_pre_create_519E54 */
+    { 0x0005, 0, (ResInitFn)0x006154A7 }, /* Res_telop_create_6154A7 */                  { 0x004C, 0, (ResInitFn)0x006153CF }, /* Res_telop_create_6153CF */
+    { 0x0021, 0, (ResInitFn)0x00627BFF }, /* Ret0_627BFF */                              { 0x0023, 0, (ResInitFn)0x005FF35B }, /* Res_d_bloods_create_5FF35B */
+    { 0x002B, 0, (ResInitFn)0x005FF35B }, /* Res_d_bloods_create_5FF35B */               { 0x001E, 0, (ResInitFn)0x00627715 }, /* Res_windcrcl_create_627715 */
+    { 0x40E9, 0, (ResInitFn)0x005FBB0A }, /* Res_10a_demo_create_5FBB0A */               { 0xE068, 0, (ResInitFn)0x005FAF3E }, /* Res_s11_objs_create_5FAF3E */
+    { 0xD53C, 0, (ResInitFn)0x005FA06A }, /* Res_11b_demo_create_5FA06A */               { 0x153E, 0, (ResInitFn)0x005F9170 }, /* Res_11g_demo_create_5F9170 */
+    { 0x9FFD, 0, (ResInitFn)0x00457B50 },                                                { 0x2D0A, 0, (ResInitFn)0x00457AC1 }, /* Res_second_457AC1 */
+    { 0x566F, 0, (ResInitFn)0x004B3B01 }, /* Res_abst_create_4B3B01 */                   { 0x4974, 0, (ResInitFn)0x004B0578 }, /* Res_ab_demo1_create_4B0578 */
+    { 0x4975, 0, (ResInitFn)0x004AC173 }, /* Res_ab_demo2_create_4AC173 */               { 0x05EF, 0, (ResInitFn)0x005F8FFA }, /* Res_a_shower_create_5F8FFA */
+    { 0x2A90, 0, (ResInitFn)0x00627435 }, /* Res_gclarray_create_627435 */               { 0x02C4, 0, (ResInitFn)0x005AB396 }, /* Res_asiato_create_5AB396 */
+    { 0x92BC, 0, (ResInitFn)0x005AA507 }, /* Res_asioto_create_5AA507 */                 { 0x9988, 0, (ResInitFn)0x004ABBC9 }, /* Res_at_create_4ABBC9 */
+    { 0xF59E, 0, (ResInitFn)0x00514A19 }, /* Res_belong_create_514A19 */                 { 0x6B6C, 0, (ResInitFn)0x005682F7 }, /* Res_b_smoke_create_5682F7 */
+    { 0x8185, 0, (ResInitFn)0x005F8E18 }, /* Res_blink_tx_create_5F8E18 */               { 0x1158, 0, (ResInitFn)0x005F8573 }, /* Res_mel10_create_5F8573 */
+    { 0x4E95, 0, (ResInitFn)0x005F820B }, /* Res_blood_cl_create_5F820B */               { 0x6A4C, 0, (ResInitFn)0x005F7EE8 }, /* Res_blood_bl_create_5F7EE8 */
+    { 0x9093, 0, (ResInitFn)0x005F7EE5 }, /* Ret0_5F7EE5 */                              { 0xF74B, 0, (ResInitFn)0x005142ED }, /* Res_boxall_5142ED */
+    { 0x32FC, 0, (ResInitFn)0x006270F3 }, /* Res_breakobj_create_6270F3 */               { 0x6471, 0, (ResInitFn)0x00626FE4 }, /* Res_btn_chk_create_626FE4 */
+    { 0x1A02, 0, (ResInitFn)0x005F781C }, /* Res_bubble_s_create_5F781C */               { 0x93B6, 0, (ResInitFn)0x004A2B6B }, /* Res_b_select_create_4A2B6B */
+    { 0x7ECA, 0, (ResInitFn)0x0049FC71 }, /* Res_wire_create_49FC71 */                   { 0x6E90, 0, (ResInitFn)0x005A9076 }, /* Res_camera_5A9076 */
+    { 0x56CC, 0, (ResInitFn)0x005A816F }, /* Res_camera2_create_5A816F */                { 0xA9C5, 0, (ResInitFn)0x005F5F72 }, /* Res_guncame_create_5F5F72 */
+    { 0x7BC2, 0, (ResInitFn)0x00626EA8 }, /* Res_camshake_create_626EA8 */               { 0xB99F, 0, (ResInitFn)0x0049EA8B }, /* Res_cape_create_49EA8B */
+    { 0x51C6, 0, (ResInitFn)0x00626C7D }, /* Res_cat_in_create_626C7D */                 { 0xF722, 0, (ResInitFn)0x0046BC36 }, /* Res_change_46BC36 */
+    { 0x43A0, 0, (ResInitFn)0x006262A0 }, /* Res_ir_cens_create_6262A0 */                { 0x788D, 0, (ResInitFn)0x00625DC1 }, /* Res_chair_create_625DC1 */
+    { 0x7A05, 0, (ResInitFn)0x00625D63 }, /* Res_cinema_create_625D63 */                 { 0x3C0C, 0, (ResInitFn)0x005A04D6 }, /* Res_jirai_5A04D6 */
+    { 0xC6D7, 0, (ResInitFn)0x005A7099 }, /* Res_command_create_5A7099 */                { 0xCC45, 0, (ResInitFn)0x005F2E0F }, /* Res_dyncon_create_5F2E0F */
+    { 0x22C6, 0, (ResInitFn)0x005A6143 }, /* Res_timer_create_5A6143 */                  { 0xECED, 0, (ResInitFn)0x004629FE },
+    { 0xA3FB, 0, (ResInitFn)0x005F1A1D }, /* Res_crane_create_5F1A1D */                  { 0x8E60, 0, (ResInitFn)0x005F0B54 }, /* Res_crow_create_5F0B54 */
+    { 0xBE79, 0, (ResInitFn)0x005F07A4 }, /* Res_death_sp_create_5F07A4 */               { 0x6A98, 0, (ResInitFn)0x00513F69 }, /* Res_dsmoke_513F69 */
+    { 0x76BC, 0, (ResInitFn)0x0051368C }, /* Res_dsmoke2_51368C */                       { 0xB4E6, 0, (ResInitFn)0x00457974 }, /* Res_cancel_457974 */
+    { 0xE97E, 0, (ResInitFn)0x0056781A }, /* Res_doll_create_56781A */                   { 0x3686, 0, (ResInitFn)0x0049B6AD }, /* Res_demosel_create_49B6AD */
+    { 0x9F7D, 0, (ResInitFn)0x00511789 }, /* Res_display_create_511789 */                { 0x9D00, 0, (ResInitFn)0x00624FDF }, /* Res_dummy_fl_create_624FDF */
+    { 0x58F0, 0, (ResInitFn)0x00624A97 }, /* Res_dummy_wl_624A97 */                      { 0x6C0E, 0, (ResInitFn)0x005EA179 }, /* Res_dog_create_5EA179 */
+    { 0xB997, 0, (ResInitFn)0x0040BB8B }, /* Res_door_create_40BB8B */                   { 0x73F8, 0, (ResInitFn)0x00624208 }, /* Res_door2_create_624208 */
+    { 0xB58D, 0, (ResInitFn)0x00623B32 }, /* Res_drum_create_623B32 */                   { 0x4BE8, 0, (ResInitFn)0x00623714 }, /* Res_drum2_create_623714 */
+    { 0x3303, 0, (ResInitFn)0x005E9A03 }, /* Res_ductmous_create_5E9A03 */               { 0xAF6C, 0, (ResInitFn)0x0062345B }, /* Res_dymc_flr_create_62345B */
+    { 0xB103, 0, (ResInitFn)0x0062330F }, /* Res_dymc_seg_create_62330F */               { 0xE75A, 0, (ResInitFn)0x0062305A }, /* Res_ed_telop_create_62305A */
+    { 0x107C, 0, (ResInitFn)0x00622EEF }, /* Res_elc_damg_create_622EEF */               { 0xAEF2, 0, (ResInitFn)0x00622D21 }, /* Res_elc_flr_create_622D21 */
+    { 0x2ABC, 0, (ResInitFn)0x00621BDD }, /* Res_elevator_create_621BDD */               { 0x9AB9, 0, (ResInitFn)0x005E80FE }, /* Res_valcan_ele_crow_create_5E80FE */
+    { 0xE253, 0, (ResInitFn)0x00456960 }, /* Res_evpanel_create_456960 */                { 0x32E5, 0, (ResInitFn)0x0063F60E }, /* Res_emitter_create_63F60E */
+    { 0xA9DD, 0, (ResInitFn)0x0063F43D }, /* Res_emitter2_create_63F43D */               { 0xB789, 0, (ResInitFn)0x0062190F }, /* Res_ending2_create_62190F */
+    { 0x3F9A, 0, (ResInitFn)0x00621797 }, /* Res_env_snd_create_621797 */                { 0x76FE, 0, (ResInitFn)0x0062130E }, /* Res_env_test_create_62130E */
+    { 0xA12E, 0, (ResInitFn)0x0044200E }, /* Res_fadeio_create_44200E */                 { 0xC73E, 0, (ResInitFn)0x005E7FCF }, /* Res_fall_spl_create_5E7FCF */
+    { 0x5D64, 0, (ResInitFn)0x00620DA7 }, /* Res_o2_damge_create_620DA7 */               { 0x118C, 0, (ResInitFn)0x00620978 }, /* Res_findtrap_create_620978 */
+    { 0xD6FB, 0, (ResInitFn)0x00620833 }, /* Res_fog_create_620833 */                    { 0x84E1, 0, (ResInitFn)0x005115AE }, /* Res_fonttext_5115AE */
+    { 0x0FAD, 0, (ResInitFn)0x00511497 }, /* Res_motse_511497 */                         { 0xADD8, 0, (ResInitFn)0x0062052F }, /* Res_furnace_create_62052F */
+    { 0x8D5A, 0, (ResInitFn)0x006203E0 }, /* Res_gasdamge_create_6203E0 */               { 0x5A50, 0, (ResInitFn)0x0061FE1B }, /* Res_gas_efct_create_61FE1B */
+    { 0x2477, 0, (ResInitFn)0x0061F9A8 }, /* Res_jeep_emy_create_61F9A8 */               { 0xCCD3, 0, (ResInitFn)0x005E7FCC },
+    { 0x8E70, 0, (ResInitFn)0x0061F2D5 }, /* Res_glass_create_61F2D5 */                  { 0xDB1F, 0, (ResInitFn)0x004DAA01 }, /* Res_goal_create_4DAA01 */
+    { 0x9EB7, 0, (ResInitFn)0x00567203 }, /* Res_godzcom_create_567203 */                { 0xCB1F, 0, (ResInitFn)0x0056653D }, /* Res_godzila_56653D */
+    { 0x5F5A, 0, (ResInitFn)0x0063F0EF }, /* Res_grdcam_63F0EF */                        { 0xCBEB, 0, (ResInitFn)0x005E76AA }, /* Res_bg_hex_create_5E76AA */
+    { 0x0D9B, 0, (ResInitFn)0x005E6DD7 }, /* Res_bg_hex_s_loader_5E6DD7 */               { 0x42E4, 0, (ResInitFn)0x005E6A41 }, /* Res_hiyoko_create_5E6A41 */
+    { 0xDD8B, 0, (ResInitFn)0x00511349 }, /* Res_intr_cam_511349 */                      { 0x8767, 0, (ResInitFn)0x0044D086 }, /* Res_item_44D086 */
+    { 0x6A48, 0, (ResInitFn)0x0061E1DD }, /* Res_jeep_srl_create_61E1DD */               { 0xA27E, 0, (ResInitFn)0x0061DDFA }, /* Res_jdrum_create_61DDFA */
+    { 0xB757, 0, (ResInitFn)0x00462532 },                                                { 0x1EF9, 0, (ResInitFn)0x0050C653 }, /* Res_johnny_create_50C653 */
+    { 0x81C7, 0, (ResInitFn)0x0049B678 }, /* Res_TitleStageLoadRelated_49B678 */         { 0x4F02, 0, (ResInitFn)0x005B9F42 },
+    { 0xC6AC, 0, (ResInitFn)0x005E66A1 }, /* Res_key_item_create_5E66A1 */               { 0x52BF, 0, (ResInitFn)0x005A60A2 }, /* Res_kiken_5A60A2 */
+    { 0xA6F6, 0, (ResInitFn)0x004421C2 }, /* Res_Cache_Kmd_4421C2 */                     { 0x8B1A, 0, (ResInitFn)0x0050BF9B }, /* Res_landing_create_50BF9B */
+    { 0x711F, 0, (ResInitFn)0x0061DC48 }, /* Res_life_up_61DC48 */                       { 0x425F, 0, (ResInitFn)0x0061D52C }, /* Res_lift_create_61D52C */
+    { 0x921B, 0, (ResInitFn)0x0061CCCC }, /* Res_lift2_create_61CCCC */                  { 0x7BF2, 0, (ResInitFn)0x005652F4 }, /* Res_liquid_create_5652F4 */
+    { 0xCF72, 0, (ResInitFn)0x0049AD6B }, /* Res_CdSwap_create_49AD6B */                 { 0x53C7, 0, (ResInitFn)0x004606E2 },
+    { 0x9D71, 0, (ResInitFn)0x005C0C8B }, /* Res_m1e1_create_5C0C8B */                   { 0xD5EC, 0, (ResInitFn)0x005BFEA1 }, /* Res_m1e1came_create_5BFEA1 */
+    { 0xE448, 0, (ResInitFn)0x0061B8B9 }, /* Res_doll2_61B8B9 */                         { 0x450F, 0, (ResInitFn)0x0050A2E4 }, /* Res_hair_m_create_50A2E4 */
+    { 0xAF72, 0, (ResInitFn)0x00509679 }, /* Res_mempsy_create_509679 */                 { 0xC755, 0, (ResInitFn)0x00565013 }, /* Res_meryl3_565013 */
+    { 0x5078, 0, (ResInitFn)0x005A53CA }, /* Res_meryl7_create_5A53CA */                 { 0xE271, 0, (ResInitFn)0x005644F4 }, /* Res_meryl72_create_5644F4 */
+    { 0x4754, 0, (ResInitFn)0x005BE3F8 }, /* Res_mgrex_create_5BE3F8 */                  { 0x954B, 0, (ResInitFn)0x0061B32D }, /* Res_mg_demo1_create_61B32D */
+    { 0x1787, 0, (ResInitFn)0x005BD2D4 }, /* Res_hind_create_5BD2D4 */                   { 0xC218, 0, (ResInitFn)0x0061AB21 }, /* Res_mirror_create_61AB21 */
+    { 0xA2B5, 0, (ResInitFn)0x0045692F },                                                { 0x7ACF, 0, (ResInitFn)0x005E61CC }, /* Res_model_dt_create_5E61CC */
+    { 0x6D78, 0, (ResInitFn)0x0061A71C }, /* Res_monitor1_create_61A71C */               { 0x0065, 0, (ResInitFn)0x0061A683 }, /* Res_mosaic_create_61A683 */
+    { 0xD4A5, 0, (ResInitFn)0x005E52D5 }, /* Res_mouse_create_5E52D5 */                  { 0x3453, 0, (ResInitFn)0x00456860 }, /* Res_movie_456860 */
+    { 0x5345, 0, (ResInitFn)0x004561C6 }, /* Res_movie_4561C6 */                         { 0xB98C, 0, (ResInitFn)0x005A4F47 }, /* Res_m_door_5A4F47 */
+    { 0xD3C0, 0, (ResInitFn)0x0050964C },                                                { 0xF002, 0, (ResInitFn)0x00508856 }, /* Res_hair_n_create_508856 */
+    { 0x30BA, 0, (ResInitFn)0x00563A09 }, /* Res_ninja_create_563A0 */                   { 0x4811, 0, (ResInitFn)0x005A473D }, /* Res_object_5A473D */
+    { 0xCF79, 0, (ResInitFn)0x00486BD4 }, /* Res_open_create_486BD4 */                   { 0x3AC3, 0, (ResInitFn)0x00482D1F }, /* Res_opena_create_482D1F */
+    { 0xCFEF, 0, (ResInitFn)0x0047EE6E }, /* Res_openp_47EE6E */                         { 0x976C, 0, (ResInitFn)0x0047A5E5 }, /* Res_opt_create_47A5E5 */
+    { 0x8D31, 0, (ResInitFn)0x004792A6 }, /* Res_opta_create_4792A6 */                   { 0xB916, 0, (ResInitFn)0x00477F58 }, /* Res_optp_create_477F58 */
+    { 0xCBF8, 0, (ResInitFn)0x00456093 }, /* Res_pad_create_456093 */                    { 0x3ED7, 0, (ResInitFn)0x0061A311 }, /* Res_pad_demo_create_61A311 */
+    { 0x720D, 0, (ResInitFn)0x00539051 }, /* Res_paddemo2_539051 */                      { 0xFED1, 0, (ResInitFn)0x00455F32 }, /* Res_vibrate_create_455F32 */
+    { 0x20F2, 0, (ResInitFn)0x00619C50 }, /* Res_panel_create_619C50 */                  { 0xDD95, 0, (ResInitFn)0x006198AB }, /* Res_panel2_create_6198AB */
+    { 0x5F02, 0, (ResInitFn)0x006196C0 }, /* Res_paper_create_6196C0 */                  { 0x30CE, 0, (ResInitFn)0x005E40BB }, /* Res_pato_lmp_5E40BB */
+    { 0xFDB6, 0, (ResInitFn)0x004612E8 }, /* Res_pocket_create_4612E8 */                 { 0x8FDC, 0, (ResInitFn)0x00462529 }, /* Res_pocket_create_1_462529 */
+    { 0x6414, 0, (ResInitFn)0x00462395 }, /* Res_pocket_create_0_462395 */               { 0xAA13, 0, (ResInitFn)0x00460D44 },
+    { 0xCF00, 0, (ResInitFn)0x00460D1C },                                                { 0x10FF, 0, (ResInitFn)0x00508209 }, /* Res_perapict_create_508209 */
+    { 0xEDEB, 0, (ResInitFn)0x00505D37 }, /* Res_photosel_505D37 */                      { 0x8427, 0, (ResInitFn)0x005E3D51 }, /* Res_scn_anim_create_5E3D51 */
+    { 0x17F5, 0, (ResInitFn)0x005E372A }, /* Res_bg_sp_create_5E372A */                  { 0x1FA5, 0, (ResInitFn)0x0043EEFB }, /* Res_bg_stage_43EEFB */
+    { 0xB032, 0, (ResInitFn)0x005E316B }, /* Res_bg_st1_create_5E316B */                 { 0xB033, 0, (ResInitFn)0x005E2B67 }, /* Res_bg_st2_create_5E2B67 */
+    { 0xB7AE, 0, (ResInitFn)0x005E262D }, /* Res_bg_sp_cm_create_5E262D */               { 0xBC76, 0, (ResInitFn)0x005E2053 }, /* Res_bg_sp_st_create_5E2053 */
+    { 0x9C6C, 0, (ResInitFn)0x0061947E }, /* Res_pk_gate_create_61947E */                { 0xB47A, 0, (ResInitFn)0x0061870B }, /* Res_pjeep_create_61870B */
+    { 0x9BC2, 0, (ResInitFn)0x005E1032 }, /* Res_plasma_create_5E1032 */                 { 0xFC0B, 0, (ResInitFn)0x005E0C21 }, /* Res_flr_spa_create_5E0C21 */
+    { 0x3AD2, 0, (ResInitFn)0x00505B87 }, /* Res_Ret0_505B87 */                          { 0xCC89, 0, (ResInitFn)0x005E01D2 }, /* Res_bg_hex_p_5E01D2 */
+    { 0x6D1B, 0, (ResInitFn)0x00476B30 }, /* Res_preope_create_476B30 */                 { 0xD8DD, 0, (ResInitFn)0x005054F4 }, /* Res_ninja_5054F4 */
+    { 0xBF66, 0, (ResInitFn)0x00504B42 }, /* Res_otacom_504B42 */                        { 0xA404, 0, (ResInitFn)0x005045B7 }, /* Res_sne_03c_5045B7 */
+    { 0x27A2, 0, (ResInitFn)0x0050492D }, /* Res_sne_03c_50492D */                       { 0xA76F, 0, (ResInitFn)0x004E8181 }, /* Res_psyco_4E8181 */
     { 0xF4B0, 0, (ResInitFn)0x004FFA7A }, /* Res_meryl07b_create_4FFA7A */               { 0x710D, 0, (ResInitFn)0x004FEEC7 }, /* Res_psyobj_create_4FEEC7 */
-    { 0x91AA, 0, (ResInitFn)0x006183F2 },                                                { 0x169C, 0, (ResInitFn)0x005DF74E },
-    { 0x5147, 0, (ResInitFn)0x00455E18 },                                                { 0x917B, 0, (ResInitFn)0x005DF51B }
+    { 0x91AA, 0, (ResInitFn)0x006183F2 }, /* Res_puthzd_create_6183F2 */                 { 0x169C, 0, (ResInitFn)0x005DF74E }, /* Res_p_lamp_create_5DF74E */
+    { 0x5147, 0, (ResInitFn)0x00455E18 }, /* Res_point_455E18 */                         { 0x917B, 0, (ResInitFn)0x005DF51B }  /* Res_item_dot_create_5DF51B */
 });
 
 // An zeroed array initially as the name suggests it is dynamically populated at run time.
@@ -163,7 +163,7 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x99430C, DWORD, gSleep5000_after_res_funcs_2_dword
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB910, Actor, gLibDGD_1_stru_6BB910, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB930, LibDG_Struct, gLibDG_2_stru_6BB930, {});
 
-MGS_VAR(REDIRECT_LIBDG_DATA, 0x722A40, DWORD, dword_722A40, 0);
+MGS_VAR(REDIRECT_LIBDG_DATA, 0x722A40, DWORD, gBinds_dword_722A40, 0);
 MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {});
 
 MGS_VAR(1, 0x6BC180, struct_gv, gLibGvStruct0_6BC180, {}); // TODO: Probably an array of 3?
@@ -179,7 +179,7 @@ ResInitFn CC Script_tbl_get_res_init_fn_457B9A(BYTE *pScript)
 }
 MGS_FUNC_IMPLEX(0x00457B9A, Script_tbl_get_res_init_fn_457B9A, LIBDG_IMPL);
 
-signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript)
+signed int CC Script_tbl_chara_451AC3(BYTE* pScript)
 {
     BYTE* scriptRet = Script_GetReturnAddress();
     ResInitFn pResFn = Script_tbl_get_res_init_fn_457B9A(scriptRet);
@@ -187,12 +187,12 @@ signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript)
     {
         BYTE* scriptRet2 = Script_GetReturnAddress();
         DWORD scriptUnknown = Script_Unknown8(scriptRet2);
-        pResFn(scriptUnknown, dword_722A40, pScript);
+        pResFn(scriptUnknown, gBinds_dword_722A40, pScript);
         return 0;
     }
     return -1;
 }
-MGS_FUNC_IMPLEX(0x00451AC3, Script_tbl_chara_sub_451AC3, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x00451AC3, Script_tbl_chara_451AC3, LIBDG_IMPL);
 
 signed int CC GV_bin_file_handler_44E9D2(void* pData, int /*fileNameHash*/)
 {

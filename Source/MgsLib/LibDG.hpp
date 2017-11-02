@@ -6,7 +6,7 @@
 
 void LibDGCpp_ForceLink();
 
-using ResInitFn = signed int(CC *)(DWORD, int, BYTE *);
+using ResInitFn = DWORD(CC *)(DWORD scriptData, int scriptBinds, BYTE* pScript);
 
 struct Res_Init_Record
 {
@@ -176,6 +176,6 @@ void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C();
 ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName);
 void CC LibDg_Init_40111A();
 
-signed int CC Script_tbl_chara_sub_451AC3(BYTE* pScript);
+signed int CC Script_tbl_chara_451AC3(BYTE* pScript);
 signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer);
 void CC LibDG_ExecFnPtrs_40171C(int activeBuffer);

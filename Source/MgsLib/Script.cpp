@@ -751,7 +751,7 @@ MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
 {
     { 0x22FF, 0x0, Script_tbl_mesg_sub_451A5E },
     { 0xD4CB, 0x0, Script_tbl_ntrap_removeQ_451688.Ptr() },
-    { 0x9906, 0x0, Script_tbl_chara_sub_451AC3 },
+    { 0x9906, 0x0, Script_tbl_chara_451AC3 },
     { 0xC091, 0x0, Script_tbl_map_sub_45151D.Ptr() },
     { 0x7D50, 0x0, Script_tbl_hzd_related_sub_451673.Ptr() },
     { 0xEEE9, 0x0, script_tbl_camera_sub_4512E5.Ptr() },
