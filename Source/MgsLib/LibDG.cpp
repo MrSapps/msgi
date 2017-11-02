@@ -619,6 +619,7 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
 }
 MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, false); // TODO: Fully implement
 
+MGS_FUNC_NOT_IMPL(0x407122, void CC(struct_gv* pGv, int activeBuffer), LibGV_407122);
 MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
 MGS_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
 MGS_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_4041A5);
@@ -709,6 +710,7 @@ MGS_FUNC_IMPLEX(0x40340A, LibGV_40340A, true); // TODO: Implement me
 
 MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0, 
 {
+    LibGV_407122.Ptr(),
     LibGV_4061E7,
     LibGV_405668.Ptr(),
     LibGV_405180.Ptr(),
