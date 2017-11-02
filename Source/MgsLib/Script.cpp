@@ -908,7 +908,7 @@ int CC Script_Init_sub_409C19(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x00409C19, Script_Init_sub_409C19, SCRIPT_IMPL);
 
-signed int CC GCX_FileHandler_4090CF(void* pScript, int fileNameHashed)
+signed int CC GV_gcx_file_handler_4090CF(void* pScript, int fileNameHashed)
 {
     if (fileNameHashed == gScriptFileNameHashedToLoad_6BFBB4)
     {
@@ -916,7 +916,7 @@ signed int CC GCX_FileHandler_4090CF(void* pScript, int fileNameHashed)
     }
     return 1;
 }
-MGS_FUNC_IMPLEX(0x004090CF, GCX_FileHandler_4090CF, SCRIPT_IMPL);
+MGS_FUNC_IMPLEX(0x004090CF, GV_gcx_file_handler_4090CF, SCRIPT_IMPL);
 
 void CC Script_Set_MainOrDemo_40908E(int bMain)
 {
@@ -931,7 +931,7 @@ void CC ScriptEngineInit_4090A7()
     Script_sub_409A3A(); // Stack setup?
     SaveDataStructuresRelated_4093ED(); // Script vars memory?
     Script_sub_4091FA();
-    LibGV_Set_FileExtHandler_40A68D('g', GCX_FileHandler_4090CF); // .gcx
+    LibGV_Set_FileExtHandler_40A68D('g', GV_gcx_file_handler_4090CF); // .gcx
     gScriptFileNameHashedToLoad_6BFBB4 = 0x6EA54;       // Load only scenerio gcx by default instead of demo gcx
 }
 MGS_FUNC_IMPLEX(0x004090A7, ScriptEngineInit_4090A7, SCRIPT_IMPL);

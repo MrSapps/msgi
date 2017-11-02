@@ -149,7 +149,7 @@ void CC Init_Gamed_Create_44E12B()
     Stage_GetNameHashStack_44EAED();
     LibDG_SetActiveResourceInitFuncPtrs_457B5B();
     Script_BindInits_452610();
-    LibGV_Set_FileExtHandler_40A68D('b', LibDG_CHARA_44E9D2); // Handles loading ".bin" files which sets loadable objects table
+    LibGV_Set_FileExtHandler_40A68D('b', GV_bin_file_handler_44E9D2); // Handles loading ".bin" files which sets loadable objects table
     sub_44E1E0();
     Actor_PushBack(1, &gGameD_stru_722760.mBase, nullptr);
     Actor_Init(&gGameD_stru_722760.mBase, GameD_Update_44E381.Ptr(), nullptr, "C:\\mgs\\source\\Game\\gamed.c");

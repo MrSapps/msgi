@@ -170,7 +170,7 @@ MGS_VAR_EXTERN(struct_gv, gLibGVStruct2_6BC558);
 MGS_ARY_EXTERN(DWORD, 2, dword_6BED18);
 
 
-signed int CC LibDG_CHARA_44E9D2(void* pData, int fileNameHash);
+signed int CC GV_bin_file_handler_44E9D2(void* pData, int fileNameHash);
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B();
 void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C();
 ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName);

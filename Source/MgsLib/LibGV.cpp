@@ -84,7 +84,7 @@ void CC LibGV_40A4B1()
 }
 MGS_FUNC_IMPLEX(0x40A4B1, LibGV_40A4B1, LIBGV_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x40B734, int CC(void*, int), Hzm_load_40B734);
+MGS_FUNC_NOT_IMPL(0x40B734, int CC(void*, int), Gv_hzm_file_handler_40B734);
 
 MGS_FUNC_NOT_IMPL(0x40A618, LibGV_FileRecord* CC(int resHash), LibGV_Find_Item_40A618);
 
@@ -436,7 +436,7 @@ MGS_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, LIBGV_IMPL);
 
 void CC LibGv_Set_Load_HZM_CallBack_40B725()
 {
-    LibGV_Set_FileExtHandler_40A68D('h', Hzm_load_40B734.Ptr()); // .hzm
+    LibGV_Set_FileExtHandler_40A68D('h', Gv_hzm_file_handler_40B734.Ptr());
 }
 MGS_FUNC_IMPLEX(0x40B725, LibGv_Set_Load_HZM_CallBack_40B725, LIBGV_IMPL);
 
