@@ -150,9 +150,9 @@ MGS_ARY(REDIRECT_LIBDG_DATA, 0x994320, Res_Init_Record, 512, gDynamicResFuncs_wo
 
 MGS_ARY(REDIRECT_LIBDG_DATA, 0x650040, Res_Init_Record, 3, gStaticResInitFuncs_stru_650040,
 {
-    { 0x21CA, 0, (ResInitFn)0x004E1701 },
-    { 0x8767, 0, (ResInitFn)0x0044D086 },
-    { 0xB997, 0, (ResInitFn)0x0040BB8B }
+    { 0x21CA, 0, (ResInitFn)0x004E1701 }, // Res_sna_init_create_4E1701
+    { 0x8767, 0, (ResInitFn)0x0044D086 }, // Res_item_44D086
+    { 0xB997, 0, (ResInitFn)0x0040BB8B }  // Res_door_create_40BB8B
 });
 
 MGS_PTR(REDIRECT_LIBDG_DATA, 0x993F44, Res_Init_Record*, gpToDynamicResInitFuncs_dword_993F44, nullptr);

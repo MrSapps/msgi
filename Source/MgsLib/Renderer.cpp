@@ -23,9 +23,21 @@ MGS_VAR_EXTERN(LPDIRECT3DDEVICE7, gD3dDevice_6FC74C); // WinMain.cpp
 EXTERN_MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), Render_Restore_Surfaces_51E086); // WinMain.cpp
 
 MGS_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
-MGS_FUNC_NOT_IMPL(0x51DE0A, void __cdecl(), sub_51DE0A);
+
 MGS_FUNC_NOT_IMPL(0x52078F, const char* __cdecl(), SoundGetName_52078F);
 
+MGS_VAR(RENDERER_IMPL, 0x776858, int, gSurfaceStackIdx_dword_776858, 0);
+MGS_ARY(RENDERER_IMPL, 0x774F48, IDirectDrawSurface7*, 1024, gSurfaceStack_dword_774F48, {});
+
+void CC Render_FreeSurfaceStack_51DE0A()
+{
+    for (int i = 0; i < gSurfaceStackIdx_dword_776858; i++)
+    {
+        gSurfaceStack_dword_774F48[i]->Release();
+    }
+    gSurfaceStackIdx_dword_776858 = 0;
+}
+MGS_FUNC_IMPL(0x51DE0A, Render_FreeSurfaceStack_51DE0A);
 
 MGS_VAR(1, 0x6FC7B0, WORD, gDisp_w_word_6FC7B0, 0);
 MGS_VAR(1, 0x6FC7B2, WORD, gDisp_y_word_6FC7B2, 0);
@@ -1625,7 +1637,7 @@ void CC Render_DrawGeneric(TaggedOrderingTablePointer* a_pStructVert)
     }
     if (gSoftwareRendering == 0)
     {
-        sub_51DE0A();
+        Render_FreeSurfaceStack_51DE0A();
     }
 }
 MGS_FUNC_IMPLEX(0x4103B0, Render_DrawGeneric, RENDERER_IMPL);

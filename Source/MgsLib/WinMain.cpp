@@ -78,7 +78,7 @@ MGS_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
 MGS_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
 MGS_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
 MGS_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
-MGS_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), sub_43C850);
+MGS_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), CheckJoyStickError_43C850);
 MGS_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
 MGS_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
 MGS_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
@@ -1496,7 +1496,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             v34 = gWindowedMode;
         dword_651CF8 = ParseMsgCfg() == 0;
     }
-    sub_43C850();
+    CheckJoyStickError_43C850();
     if (dword_651CF8)
     {
         gSoundFxVol_dword_651D98 = 100;
