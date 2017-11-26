@@ -51,7 +51,16 @@ MGS_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
 
 void LibGVCpp_ForceLink() { }
 
-MGS_FUNC_NOT_IMPL(0x40A6AC, void CC(), LibGV_Init_FileCache_40A6AC);
+void CC LibGV_Init_FileCache_40A6AC()
+{
+    for (auto& rec : g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80)
+    {
+        rec.mFileBuffer = nullptr;
+    }
+    g_lib_gv_stru_6BFEE0.dword_6BFF74_resident_top_alloc = 0;
+    g_lib_gv_stru_6BFEE0.dword_6BFF78_count = 0;
+}
+MGS_FUNC_IMPLEX(0x40A6AC, LibGV_Init_FileCache_40A6AC, LIBGV_IMPL);
 
 MGS_ARY(1, 0x7919C2, WORD, 16, word_7919C2, {});
 
@@ -450,7 +459,23 @@ void CC LibGV_Set_FileExtHandler_40A68D(char id, GV_FnPtr fn)
 }
 MGS_FUNC_IMPLEX(0x40A68D, LibGV_Set_FileExtHandler_40A68D, LIBGV_IMPL);
 
+void Test_LibGV_Init_FileCache_40A6AC()
+{
+    g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[0].mId = 0xdeadbeef;
+    g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[0].mFileBuffer = reinterpret_cast<void*>(0xcafebabe);
+    
+    g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[127].mId = 0xdeadbeef;
+    g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[127].mFileBuffer = reinterpret_cast<void*>(0xcafebabe);
+
+    LibGV_Init_FileCache_40A6AC();
+
+    ASSERT_EQ(0, g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[0].mFileBuffer);
+    ASSERT_EQ(0, g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[127].mFileBuffer);
+
+}
+
 void DoLibGv_Tests()
 {
     Test_mesg();
+    Test_LibGV_Init_FileCache_40A6AC();
 }

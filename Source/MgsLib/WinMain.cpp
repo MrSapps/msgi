@@ -2525,7 +2525,7 @@ void CC Main_sub_401C02()
             {
                 gDispEnv_6BECF0.disp.x1 = static_cast<WORD>(dword_6BED18[gActiveBuffer_dword_791A08]);
                 Render_Scene_DispEnv_40DD00(&gDispEnv_6BECF0);
-                Render_DrawIndex(1 - activeBufferHW);
+                Render_DrawIndex_401619(1 - activeBufferHW);
                 gLastActiveBuffer_dword_650110 = -1;
             }
         }

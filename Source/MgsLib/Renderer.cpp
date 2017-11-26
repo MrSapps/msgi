@@ -1586,7 +1586,7 @@ MGS_FUNC_IMPLEX(0x0044AB80, Renderer_ClearOTag, RENDERER_IMPL);
 
 
 //MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
-void CC Render_DrawGeneric(TaggedOrderingTablePointer* a_pStructVert)
+void CC Render_DrawGeneric_4103B0(TaggedOrderingTablePointer* a_pStructVert)
 {
     if (dword_6FC718 == 1)
     {
@@ -1640,15 +1640,14 @@ void CC Render_DrawGeneric(TaggedOrderingTablePointer* a_pStructVert)
         Render_FreeSurfaceStack_51DE0A();
     }
 }
-MGS_FUNC_IMPLEX(0x4103B0, Render_DrawGeneric, RENDERER_IMPL);
+MGS_FUNC_IMPLEX(0x4103B0, Render_DrawGeneric_4103B0, RENDERER_IMPL);
 
-//MSG_FUNC_NOT_IMPL(0x401619, void __cdecl(uint32_t), Render_DrawIndex);
-void CC Render_DrawIndex(uint32_t activeBuffer)
+void CC Render_DrawIndex_401619(uint32_t activeBuffer)
 {
     TaggedOrderingTablePointer* pStructVert = (TaggedOrderingTablePointer*)&gLibGvStruct0_6BC180.dword_6BC3D8_dst[16 * activeBuffer];
-    Render_DrawGeneric(pStructVert);
+    Render_DrawGeneric_4103B0(pStructVert);
 }
-MGS_FUNC_IMPLEX(0x401619, Render_DrawIndex, RENDERER_IMPL);
+MGS_FUNC_IMPLEX(0x401619, Render_DrawIndex_401619, RENDERER_IMPL);
 
 
 //MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), Render_RestoreAll);

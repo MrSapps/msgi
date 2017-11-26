@@ -82,5 +82,5 @@ void CC Render_Loop_SetWinTitle_422210();
 void CC Render_Scene_DispEnv_40DD00(DISPENV* pRect);
 void CC PrintDDError(const char* errMsg, HRESULT hrErr);
 __int16 CC Render_RestoreAll();
-void CC Render_DrawIndex(uint32_t a_nIndex);
+void CC Render_DrawIndex_401619(uint32_t a_nIndex);
 int CC Renderer_ClearOTag(DWORD* ot, int otSize);
