@@ -448,6 +448,7 @@ void CC Gv3StructsInit_4012F2(int k320)
     memcpy(gLibGVStruct2_6BC558.dword_6BC458, &stru_6BE068, sizeof(gLibGVStruct2_6BC558.dword_6BC458));
     memcpy(gLibGVStruct2_6BC558.dword_6BC498, &pPacked_6BE0A8, sizeof(gLibGVStruct2_6BC558.dword_6BC498));
 }
+MGS_FUNC_IMPLEX(0x4012F2, Gv3StructsInit_4012F2, LIBDG_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x4026E6, void CC(), LibDG_Reset_HashCounts_4026E6);
 MGS_FUNC_NOT_IMPL(0x4020D8, void CC(), sub_4020D8);
