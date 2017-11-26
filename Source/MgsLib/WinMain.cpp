@@ -468,7 +468,7 @@ signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, 
     WORD resNameHashed = 0;
     if (bMp5)
     {
-        resNameHashed = ResourceNameHash("op_back_l");
+        resNameHashed = ResourceNameHash("mpfive");
     }
     else
     {
@@ -2488,7 +2488,7 @@ void CC OT_Related_40162D(int activeBuffer)
             pCurGV->dword_6BC3C8_pStructure_rect = pCurGV->dword_6BC3D0_rect;
 
             // The -32's are picking 2 arrays of 16 before the pointed to array
-            memcpy(pActiveBufArray - 32, activeBuffer ? pCurGV->dword_6BC518_src_offsetted_dr_evn : pCurGV->dword_6BC4D8_src_dr_env1 , 64u);
+            memcpy(pActiveBufArray - 32, activeBuffer ? &pCurGV->dword_6BC518_src_offsetted_dr_evn : &pCurGV->dword_6BC4D8_src_dr_env1 , sizeof(DR_ENV));
             pCurGV->word_6BC37A_0_1EC_size--;
         }
 

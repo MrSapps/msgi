@@ -157,8 +157,8 @@ struct struct_gv
     int dword_6BC418_dst[16];
     int dword_6BC458[16];
     int dword_6BC498[16];
-    int dword_6BC4D8_src_dr_env1[16];
-    int dword_6BC518_src_offsetted_dr_evn[16];
+    DR_ENV dword_6BC4D8_src_dr_env1;
+    DR_ENV dword_6BC518_src_offsetted_dr_evn;
 };
 MGS_ASSERT_SIZEOF(struct_gv, 0x1EC);
 #pragma pack(pop)
