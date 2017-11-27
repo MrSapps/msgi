@@ -87,7 +87,7 @@ FILE* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
         }
 
         // TODO: Die for now - mixing crt funcs will blow up
-        if (hFile)
+        if (hFile && IsMgsi())
         {
             abort();
         }
@@ -102,7 +102,18 @@ size_t CC File_NormalRead_51F0F5(FILE* File, void* dstBuf, DWORD nNumberOfBytesT
 }
 MGS_FUNC_IMPLEX(0x0051F0F5, File_NormalRead_51F0F5, false) // TODO
 
-MGS_FUNC_NOT_IMPL(0x51F09E, __int32 CC(FILE* File, __int32 Offset, int Origin), File_GetPos_51F09E);
+__int32 __cdecl File_GetPos_51F09E(FILE* File, __int32 Offset, int Origin)
+{
+    if (File != (FILE *)-1 && File)
+    {
+        fseek(File, Offset, Origin);
+        return ftell(File);
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x0051F09E, File_GetPos_51F09E, false) // TODO
+
+
 MGS_FUNC_NOT_IMPL(0x51F183, int CC(FILE *File), File_Close_51F183);
 
 MGS_VAR(1, 0x6BFBB0, void*, gFileBuffer_dword_6BFBB0, 0);
