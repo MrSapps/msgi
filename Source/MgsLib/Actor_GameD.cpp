@@ -44,7 +44,7 @@ MGS_FUNC_NOT_IMPL(0x0044E381, void CC(Actor*), GameD_Update_44E381);
 void* CC ResidentTopAllocate_40B379(int size)
 {
     const int alignedSize = RoundUpPowerOf2(size, 4);
-    gResidentTop_dword_78E960 -= alignedSize;
+    gResidentTop_dword_78E960 -= alignedSize; // Moving BACKWARDS into gResidentHeap_81001F
     return gResidentTop_dword_78E960;
 }
 MGS_FUNC_IMPLEX(0x0040B379, ResidentTopAllocate_40B379, ACTOR_GAMED_IMPL);
@@ -109,6 +109,8 @@ void CC LibDG_Clean_Texture_Cache_401110()
 }
 MGS_FUNC_IMPLEX(0x00401110, LibDG_Clean_Texture_Cache_401110, ACTOR_GAMED_IMPL);
 
+MGS_VAR(1, 0x81001F, ResidentHeap, gResidentHeap_81001F, {});
+MGS_ARY(1, 0x8A8E20, BYTE, 438272, gSystem2_memory_unk_8A8E20, {});
 MGS_ARY(1, 0x913E20, BYTE, 192512, gSystem0_memory_unk_913E20, {});
 MGS_ARY(1, 0x942E20, BYTE, 192512, gSystem1_memory_unk_942E20, {});
 
@@ -118,8 +120,6 @@ void CC System_Init_0_And_1_40A465()
     System_init_40AC6C(1, 1, &gSystem1_memory_unk_942E20[0], 192512);
 }
 MGS_FUNC_IMPLEX(0x0040A465, System_Init_0_And_1_40A465, ACTOR_GAMED_IMPL);
-
-MGS_ARY(1, 0x8A8E20, BYTE, 438272, gSystem2_memory_unk_8A8E20, {});
 
 void CC LibGV_40A4BB()
 {

@@ -66,8 +66,8 @@ MGS_ARY(1, 0x7919C2, WORD, 16, word_7919C2, {});
 
 void CC LibGV_Reset_System2_Memory_40B35E()
 {
-    gSavedTop_78E964 = gSystem2_memory_unk_8A8E20;
-    gResidentTop_dword_78E960 = gSystem2_memory_unk_8A8E20;
+    gSavedTop_78E964 = &gResidentHeap_81001F.mHeapEnd;
+    gResidentTop_dword_78E960 = &gResidentHeap_81001F.mHeapEnd;
 }
 MGS_FUNC_IMPLEX(0x40B35E, LibGV_Reset_System2_Memory_40B35E, LIBGV_IMPL);
 
