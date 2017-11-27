@@ -4,14 +4,106 @@
 #include "Actor_Loader.hpp"
 #include "Actor_GameD.hpp"
 
-void Fs_Cpp_ForceLink() { }
+
 
 #define FS_IMPL true
 
-MGS_FUNC_NOT_IMPL(0x51EE8F, FILE* CC(const char* fileName, signed int openMode), File_LoadDirFile_51EE8F);
+
+MGS_FUNC_NOT_IMPL(0x51EFB2, FILE* CC(char *pFileName), OpenArchiveFile_51EFB2);
+
+struct FileToFileMap
+{
+    const char* mFrom;
+    const char* mTo;
+};
+
+static const FileToFileMap gDarResNames_689928[14] =
+{
+    { "stage/init/res_mdl1.dar", "stage/init_ve/res_mdl1.dar" },
+    { "stage/init/res_tex1.dar", "stage/init_ve/res_tex1.dar" },
+    { "stage/init/font.res", nullptr },
+    { "stage/init/rubi.res", nullptr },
+    { "stage/init/num.res", nullptr },
+    { "stage/init/call.res", nullptr },
+    { "stage/init_ve/font.res", nullptr },
+    { "stage/init_ve/rubi.res", nullptr },
+    { "stage/init_ve/num.res", nullptr },
+    { "stage/init_ve/call.res", nullptr },
+    { "stage/init_tux/font.res", nullptr },
+    { "stage/init_tux/rubi.res", nullptr },
+    { "stage/init_tux/num.res", nullptr },
+    { "stage/init_tux/call.res", nullptr }
+};
+
+const char* gOpenModes_689998[] =
+{
+    "rb",
+    "wb",
+    "rb+"
+};
+
+FILE* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
+{
+    LOG_INFO(fileName);
+
+    char remappedFileName[256] = {};
+    strcpy(remappedFileName, fileName);
+    for (const auto& fileRec : gDarResNames_689928)
+    {
+        // If the file name matches
+        if (strcmp(fileName, fileRec.mFrom) == 0)
+        {
+            // Then prevent it being loaded if there is no "to" mapping
+            // else replace to the file to load with the "to" mapping
+            if (fileRec.mTo == nullptr)
+            {
+                LOG_INFO(fileName << " was blocked from loading");
+                return 0;
+            }
+            LOG_INFO(fileName << " was redirected to " << fileRec.mTo);
+            strcpy(remappedFileName, fileRec.mTo);
+            break;
+        }
+    }
+
+    // Open in the MGZ archive
+    FILE* hFile = OpenArchiveFile_51EFB2(remappedFileName);
+    if (!hFile)
+    {
+        // Failed, try opening directly from on disk/extracted MGZ archive
+        char fileToOpen[256] = {};
+        strcpy(fileToOpen, ".");
+        strcat(fileToOpen, "/");
+        strcat(fileToOpen, remappedFileName);
+        const char* strOpenMode = gOpenModes_689998[openMode % 4];
+        hFile = fopen(fileToOpen, strOpenMode);
+        if (!hFile)
+        {
+            // For some reason try again one more time?
+            strcpy(fileToOpen, ".");
+            strcat(fileToOpen, "/");
+            strcat(fileToOpen, remappedFileName);
+            hFile = fopen(fileToOpen, strOpenMode);
+        }
+
+        // TODO: Die for now - mixing crt funcs will blow up
+        if (hFile)
+        {
+            abort();
+        }
+    }
+    return hFile;
+}
+MGS_FUNC_IMPLEX(0x0051EE8F, File_LoadDirFile_51EE8F, FS_IMPL)
+
+size_t CC File_NormalRead_51F0F5(FILE* File, void* dstBuf, DWORD nNumberOfBytesToRead)
+{
+    return fread(dstBuf, 1, nNumberOfBytesToRead, File);
+}
+MGS_FUNC_IMPLEX(0x0051F0F5, File_NormalRead_51F0F5, false) // TODO
+
 MGS_FUNC_NOT_IMPL(0x51F09E, __int32 CC(FILE* File, __int32 Offset, int Origin), File_GetPos_51F09E);
 MGS_FUNC_NOT_IMPL(0x51F183, int CC(FILE *File), File_Close_51F183);
-MGS_FUNC_NOT_IMPL(0x51F0F5, int CC(FILE* File, void* dstBuf, DWORD nNumberOfBytesToRead), File_NormalRead_51F0F5);
 
 MGS_VAR(1, 0x6BFBB0, void*, gFileBuffer_dword_6BFBB0, 0);
 MGS_VAR(1, 0x6BFBA8, FILE*, gFileHandle_dword_6BFBA8, 0);
@@ -24,7 +116,7 @@ void CC ToFullStagePath_408EA0(const char* pFileName, char* pOutFullName)
     strcat(pOutFullName, "/");
     strcat(pOutFullName, pFileName);
 }
-MGS_FUNC_IMPLEX(0x00408EA0, ToFullStagePath_408EA0, true) // TODO: Impl
+MGS_FUNC_IMPLEX(0x00408EA0, ToFullStagePath_408EA0, FS_IMPL)
 
 static const char* FileLoadModeToString(signed int type)
 {
@@ -39,6 +131,29 @@ static const char* FileLoadModeToString(signed int type)
 }
 
 static FILE* const kInvalidFileHandle = reinterpret_cast<FILE*>(-2);
+
+static const char* sDirFileArray_6505C8[] =
+{
+    "stage.dir",
+    "radio.dat",
+    "face.dat",
+    "zmovie.str",
+    "vox.dat",
+    "demo.dat",
+    "brf.dat"
+};
+
+void CC FS_LoadDirFileByIndex_408FE7(int dirFileIndex, int offset, int sizeToRead, void *pFileBuffer)
+{
+    char fileName[64] = {};
+    sprintf(fileName, "%s", sDirFileArray_6505C8[dirFileIndex]);
+    FILE* hFile = File_LoadDirFile_51EE8F(fileName, 0);
+    File_GetPos_51F09E(hFile, offset << 11, 0);
+    gFileSizeToRead_dword_6BFBAC = sizeToRead;
+    gFileHandle_dword_6BFBA8 = hFile;
+    gFileBuffer_dword_6BFBB0 = pFileBuffer;
+}
+MGS_FUNC_IMPLEX(0x00408FE7, FS_LoadDirFileByIndex_408FE7, FS_IMPL)
 
 void CC FS_CloseFile_40907E()
 {
@@ -136,3 +251,8 @@ signed int CC FS_LoadRequest(const char* fileName, void** ppBuffer, signed int t
     return fileSize;
 }
 MGS_FUNC_IMPLEX(0x00408EEF, FS_LoadRequest, FS_IMPL)
+
+void Fs_Cpp_ForceLink()
+{
+
+}
