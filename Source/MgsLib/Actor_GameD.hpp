@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MgsFunction.hpp"
+#include "System.hpp"
 
 void CC Init_Gamed_Create_44E12B();
 
@@ -19,9 +20,11 @@ MGS_VAR_EXTERN(BYTE*, gSavedTop_78E964);
 struct ResidentHeap
 {
     BYTE mHeap[626178]; // This size is just a guess
-    BYTE mPadding1;
-    BYTE mPadding2;
-    BYTE mHeapEnd; // This MUST be aligned to 4 TODO: Find a way to assert this at compile time or early run time
+    BYTE* AlignedEnd()
+    {
+        BYTE* p8BeforeEnd = &mHeap[_countof(mHeap) - 8];
+        return (BYTE*)(RoundUpPowerOf2((DWORD)p8BeforeEnd, 4));
+    }
 };
 MGS_VAR_EXTERN(ResidentHeap, gResidentHeap_81001F);
 
