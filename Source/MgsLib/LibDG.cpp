@@ -453,7 +453,7 @@ MGS_FUNC_IMPLEX(0x4012F2, Gv3StructsInit_4012F2, LIBDG_IMPL);
 MGS_FUNC_NOT_IMPL(0x4026E6, void CC(), LibDG_Reset_HashCounts_4026E6);
 MGS_FUNC_NOT_IMPL(0x4020D8, void CC(), sub_4020D8);
 MGS_FUNC_NOT_IMPL(0x401A31, void CC(), jImageMove_401A31);
-MGS_FUNC_NOT_IMPL(0x40B9FF, void CC(), sub_40B9FF);
+MGS_FUNC_NOT_IMPL(0x40B9FF, void CC(), LibDG_40B9FF);
 MGS_FUNC_NOT_IMPL(0x401931, void CC(char r, char b, char g), LibDG_SetRGB_401931);
 
 void CC OT_Related_40162D(int activeBuffer); // WinMain.cpp
@@ -473,7 +473,7 @@ void CC LibDG_4010A6()
     LibDG_Init_OTs_ExecFnPtrs_401ABE();
     dword_78D32C = 0;
     jImageMove_401A31();
-    sub_40B9FF(); // Just sets var 6C0644 = 0
+    LibDG_40B9FF(); // Just sets var 6C0644 = 0
     LibDG_SetRGB_401931(0, 0, 0);
     printf("Object Queue %d\n", gLibGVStruct1_6BC36C.gObjectQueue_word_6BC3C2_0);
     printf("Primitive Queue %d\n", gLibGVStruct1_6BC36C.g_PrimQueue1_word_6BC3BE_256 - gLibGVStruct1_6BC36C.gPrimQueue2_word_6BC3C0_256);
