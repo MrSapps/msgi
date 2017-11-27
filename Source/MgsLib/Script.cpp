@@ -18,7 +18,7 @@ MGS_VAR(1, 0x6BFBB4, int, gScriptFileNameHashedToLoad_6BFBB4, 0);
 MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 MGS_FUNC_NOT_IMPL(0x409A3A, void CC(), Script_sub_409A3A);
 MGS_FUNC_NOT_IMPL(0x4093ED, void CC(), SaveDataStructuresRelated_4093ED);
-MGS_PTR(1, 0x6BFC68, BYTE**, gScriptMainProc_dword_6BFC68, 0);
+MGS_VAR(1, 0x6BFC68, BYTE*, gScriptMainProc_dword_6BFC68, nullptr);
 MGS_VAR(1, 0x06BFC3C, BYTE**, gScriptStackPos_dword_6BFC3C, 0); // Pointer to an array of 32 BYTE*'s
 MGS_VAR(1, 0x078D7B4, BYTE*, gScriptExecuteRet_dword_78D7B4, 0);
 MGS_VAR(1, 0x06BFBB8, DWORD*, script_args_dword_6BFBB8, 0);
@@ -864,8 +864,8 @@ void CC Script_sub_4091FA()
 }
 MGS_FUNC_IMPLEX(0x004091FA, Script_sub_4091FA, SCRIPT_IMPL);
 
-MGS_PTR(1, 0x006BFC60, GCL_ProcInfo**, gProcInfos, nullptr);
-MGS_PTR(1, 0x006BFC64, BYTE**, dword_6BFC64, 0);
+MGS_PTR(1, 0x006BFC60, GCL_ProcInfo*, gProcInfos, nullptr);
+MGS_PTR(1, 0x006BFC64, BYTE*, dword_6BFC64, nullptr);
 
 BYTE* CC Script_InitProcTables_sub_409C87(BYTE* pScript)
 {
@@ -891,16 +891,16 @@ MGS_FUNC_IMPLEX(0x00409C87, Script_InitProcTables_sub_409C87, SCRIPT_IMPL);
 int CC Script_Init_sub_409C19(BYTE* pScript)
 {
     DWORD offset = ToDWORD(pScript);
-    *gProcInfos = reinterpret_cast<GCL_ProcInfo*>(pScript + 4);
+    gProcInfos = reinterpret_cast<GCL_ProcInfo*>(pScript + 4);
     
     // Swap bytes in the table of script functions so they are the correct ordering
-    *dword_6BFC64 = Script_InitProcTables_sub_409C87(pScript + 4);
+    dword_6BFC64 = Script_InitProcTables_sub_409C87(pScript + 4);
 
     // Get pointer to main script function start
-    *gScriptMainProc_dword_6BFC68 = (pScript + 4 + offset + 4);
+    gScriptMainProc_dword_6BFC68 = (pScript + 4 + offset + 4);
 
-    DWORD mainScriptLen = ToDWORD((*gScriptMainProc_dword_6BFC68)-4);
-    BYTE* pEndOfScriptData = (*gScriptMainProc_dword_6BFC68) + mainScriptLen + 4;
+    DWORD mainScriptLen = ToDWORD(gScriptMainProc_dword_6BFC68-4);
+    BYTE* pEndOfScriptData = gScriptMainProc_dword_6BFC68 + mainScriptLen + 4;
 
     sub_45A6F6(2, pEndOfScriptData);
 
@@ -938,11 +938,11 @@ MGS_FUNC_IMPLEX(0x004090A7, ScriptEngineInit_4090A7, SCRIPT_IMPL);
 
 BYTE* CC Script_FindProc(WORD procId)
 {
-    for (GCL_ProcInfo* pProcInfo = *gProcInfos; pProcInfo->mId; ++pProcInfo)
+    for (GCL_ProcInfo* pProcInfo = gProcInfos; pProcInfo->mId; ++pProcInfo)
     {
         if (pProcInfo->mId == procId)
         {
-            return (*dword_6BFC64) + pProcInfo->mOffset;
+            return dword_6BFC64 + pProcInfo->mOffset;
         }
     }
     printf("PROC %X NOT FOUND\n", procId);
