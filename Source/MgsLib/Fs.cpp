@@ -102,7 +102,7 @@ size_t CC File_NormalRead_51F0F5(FILE* File, void* dstBuf, DWORD nNumberOfBytesT
 }
 MGS_FUNC_IMPLEX(0x0051F0F5, File_NormalRead_51F0F5, false) // TODO
 
-__int32 __cdecl File_GetPos_51F09E(FILE* File, __int32 Offset, int Origin)
+__int32 CC File_GetPos_51F09E(FILE* File, __int32 Offset, int Origin)
 {
     if (File != (FILE *)-1 && File)
     {
@@ -113,8 +113,16 @@ __int32 __cdecl File_GetPos_51F09E(FILE* File, __int32 Offset, int Origin)
 }
 MGS_FUNC_IMPLEX(0x0051F09E, File_GetPos_51F09E, false) // TODO
 
+int CC File_Close_51F183(FILE *File)
+{
+    if (File == (FILE *)-1 || !File)
+    {
+        return 0;
+    }
 
-MGS_FUNC_NOT_IMPL(0x51F183, int CC(FILE *File), File_Close_51F183);
+    return fclose(File);
+}
+MGS_FUNC_IMPLEX(0x0051F183, File_Close_51F183, false) // TODO
 
 MGS_VAR(1, 0x6BFBB0, void*, gFileBuffer_dword_6BFBB0, 0);
 MGS_VAR(1, 0x6BFBA8, FILE*, gFileHandle_dword_6BFBA8, 0);
