@@ -28,8 +28,8 @@ struct LibGv_Struct
     GV_FnPtr dword_6BFF0C_fn_ptrs[26];
     LibGV_FileRecord* dword_6BFF74_resident_top_alloc;
     LibGV_FileRecord* dword_6BFF78_count;
-    LibGV_FileRecord mStruct8_128Array_06BFF80[128];
-    DWORD mDWORD_Pad1;
+    DWORD mField_9C; // Padding?
+    LibGV_FileRecord mFileCache_A0_06BFF80[128];
     DWORD gGv_dword_6C0380;
     DWORD gGv_dword_6C0384;
     DWORD gGv_dword_6C0388[6];
@@ -50,17 +50,6 @@ MGS_FUNC_NOT_IMPL(0x40A72A, LibGV_FileRecord* CC(), LibGV_RestoreFileCacheFromRe
 MGS_FUNC_NOT_IMPL(0x40A6CD, char* CC(), LibGvd_sub_40A6CD);
 
 void LibGVCpp_ForceLink() { }
-
-void CC LibGV_Init_FileCache_40A6AC()
-{
-    for (auto& rec : g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80)
-    {
-        rec.mFileBuffer = nullptr;
-    }
-    g_lib_gv_stru_6BFEE0.dword_6BFF74_resident_top_alloc = 0;
-    g_lib_gv_stru_6BFEE0.dword_6BFF78_count = 0;
-}
-MGS_FUNC_IMPLEX(0x40A6AC, LibGV_Init_FileCache_40A6AC, LIBGV_IMPL);
 
 MGS_ARY(1, 0x7919C2, WORD, 16, word_7919C2, {});
 
@@ -95,7 +84,64 @@ MGS_FUNC_IMPLEX(0x40A4B1, LibGV_40A4B1, LIBGV_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x40B734, int CC(void*, int), Gv_hzm_file_handler_40B734);
 
-MGS_FUNC_NOT_IMPL(0x40A618, LibGV_FileRecord* CC(int resHash), LibGV_Find_Item_40A618);
+void CC LibGV_Init_FileCache_40A6AC()
+{
+    for (auto& rec : g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80)
+    {
+        rec.mId = 0;
+    }
+    g_lib_gv_stru_6BFEE0.dword_6BFF74_resident_top_alloc = 0;
+    g_lib_gv_stru_6BFEE0.dword_6BFF78_count = 0;
+}
+MGS_FUNC_IMPLEX(0x40A6AC, LibGV_Init_FileCache_40A6AC, LIBGV_IMPL);
+
+LibGV_FileRecord* CC LibGV_Find_Item_40A618(DWORD resHash)
+{
+    signed int totalCount = 128;
+    const int startIndex = resHash % 128;
+    int remainderCount = 128 - startIndex;
+    LibGV_FileRecord* pFileRecord = &g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80[startIndex];
+    
+    while (pFileRecord->mId & 0xFFFFFF) // File hashes are 3 bytes / 24bits
+    {
+        if ((pFileRecord->mId & 0xFFFFFF) == resHash)
+        {
+            return pFileRecord;
+        }
+
+        pFileRecord++;
+
+        // When we go past the end loop back to the first item
+        if (!--remainderCount)
+        {
+            pFileRecord = g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80;
+        }
+
+        // Max out at the total number of records
+        if (--totalCount <= 0)
+        {
+            pFileRecord = nullptr;
+            break;
+        }
+    }
+
+    g_lib_gv_stru_6BFEE0.dword_6BFF08_last_free_ptr = pFileRecord;
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x40A618, LibGV_Find_Item_40A618, LIBGV_IMPL);
+
+signed int CC LibGV_AddFileDataToCache_40A662(int fileNameHash, void* fileBuffer)
+{
+    if (!LibGV_Find_Item_40A618(fileNameHash) && (g_lib_gv_stru_6BFEE0.dword_6BFF08_last_free_ptr != 0))
+    {
+        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_free_ptr->mId = fileNameHash;
+        g_lib_gv_stru_6BFEE0.dword_6BFF08_last_free_ptr->mFileBuffer = fileBuffer;
+        return 0;
+    }
+    return -1;
+}
+MGS_FUNC_IMPLEX(0x40A662, LibGV_AddFileDataToCache_40A662, LIBGV_IMPL);
+
 
 MGS_VAR(REDIRECT_LIBGV_DATA, 0x791A04, DWORD, dword_791A04, 0);
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
@@ -461,16 +507,16 @@ MGS_FUNC_IMPLEX(0x40A68D, LibGV_Set_FileExtHandler_40A68D, LIBGV_IMPL);
 
 void Test_LibGV_Init_FileCache_40A6AC()
 {
-    g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[0].mId = 0xdeadbeef;
-    g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[0].mFileBuffer = reinterpret_cast<void*>(0xcafebabe);
+    g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80[0].mId = 0xdeadbeef;
+    g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80[0].mFileBuffer = reinterpret_cast<void*>(0xcafebabe);
     
-    g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[127].mId = 0xdeadbeef;
-    g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[127].mFileBuffer = reinterpret_cast<void*>(0xcafebabe);
+    g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80[127].mId = 0xdeadbeef;
+    g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80[127].mFileBuffer = reinterpret_cast<void*>(0xcafebabe);
 
     LibGV_Init_FileCache_40A6AC();
 
-    ASSERT_EQ(0, g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[0].mFileBuffer);
-    ASSERT_EQ(0, g_lib_gv_stru_6BFEE0.mStruct8_128Array_06BFF80[127].mFileBuffer);
+    ASSERT_EQ(0, g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80[0].mId);
+    ASSERT_EQ(0, g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80[127].mId);
 
 }
 
