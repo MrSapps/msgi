@@ -18,8 +18,10 @@ MGS_VAR_EXTERN(BYTE*, gSavedTop_78E964);
 // so we have an end marker to allocate backwards
 struct ResidentHeap
 {
-    BYTE mHeap[626177]; // This size is just a guess
-    BYTE mHeapEnd;
+    BYTE mHeap[626178]; // This size is just a guess
+    BYTE mPadding1;
+    BYTE mPadding2;
+    BYTE mHeapEnd; // This MUST be aligned to 4 TODO: Find a way to assert this at compile time or early run time
 };
 MGS_VAR_EXTERN(ResidentHeap, gResidentHeap_81001F);
 
