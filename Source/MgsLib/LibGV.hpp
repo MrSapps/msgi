@@ -31,8 +31,6 @@ struct LibGV_FileRecord
 };
 MGS_ASSERT_SIZEOF(LibGV_FileRecord, 0x8);
 
-EXTERN_MGS_FUNC_NOT_IMPL(0x40A72A, LibGV_FileRecord* CC(), LibGV_RestoreFileCacheFromResident_40A72A);
-
 int CC LibGV_mesg_write_40B3ED(const LibGV_Msg* pSrcMsg);
 
 void LibGv_Init_sub_40A4F6();
@@ -41,3 +39,5 @@ void CC LibGv_ClearFunctionPointers_40A69D();
 void CC LibGv_Set_Load_HZM_CallBack_40B725();
 __int64 CC TimeGetElapsed_4455A0();
 int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocType);
+void CC LibGV_CopyFileRecordsToResidentMemory_40A6CD();
+void CC LibGV_RestoreFileCacheFromResident_40A72A();
