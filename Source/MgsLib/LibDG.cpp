@@ -499,19 +499,61 @@ void CC LibGvInitDispEnv_401A4F(int ClipX1, __int16 clipY1, __int16 clipX2, __in
 }
 MGS_FUNC_IMPLEX(0x401A4F, LibGvInitDispEnv_401A4F, LIBDG_IMPL);
 
-signed int CC GV_l_file_handler_402B1D(void*, int)
+signed int CC GV_lit_file_handler_402B1D(void*, int)
 {
     return 1;
 }
-MGS_FUNC_IMPLEX(0x402B1D, GV_l_file_handler_402B1D, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x402B1D, GV_lit_file_handler_402B1D, LIBDG_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x402B25, int CC(void* fileData, int fileNameHash), GV_pcx_file_handler_402B25);
-MGS_FUNC_NOT_IMPL(0x402796, int CC(void* fileData, int fileNameHash), GV_kmd_file_handler_402796);
-MGS_FUNC_NOT_IMPL(0x402A03, int CC(void* fileData, int fileNameHash), GV_n_file_handler_402A03);
-MGS_FUNC_NOT_IMPL(0x402A29, int CC(void* fileData, int fileNameHash), GV_oar_file_handler_402A29);
-MGS_FUNC_NOT_IMPL(0x403290, int CC(void* fileData, int fileNameHash), GV_zmd_file_handler_403290);
-MGS_FUNC_NOT_IMPL(0x402A5F, int CC(void* fileData, int fileNameHash), GV_img_file_handler_402A5F);
-MGS_FUNC_NOT_IMPL(0x402AA9, int CC(void* fileData, int fileNameHash), GV_sgt_file_handler_402AA9);
+// TODO: These are not implemented - just here to return 1 for running standalone
+int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
+{
+    LOG_WARNING("PCX loader not impl");
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x402B25, GV_pcx_file_handler_402B25, false); // TODO
+
+int CC GV_kmd_file_handler_402796(void* fileData, int fileNameHash)
+{
+    LOG_WARNING("KMD loader not impl");
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x402796, GV_kmd_file_handler_402796, false); // TODO
+
+int CC GV_n_file_handler_402A03(void* fileData, int fileNameHash)
+{
+    LOG_WARNING("N loader not impl");
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x402A03, GV_n_file_handler_402A03, false); // TODO
+
+int CC GV_oar_file_handler_402A29(void* fileData, int fileNameHash)
+{
+    LOG_WARNING("OAR loader not impl");
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x402A29, GV_oar_file_handler_402A29, false); // TODO
+
+int CC GV_zmd_file_handler_403290(void* fileData, int fileNameHash)
+{
+    LOG_WARNING("ZMD loader not impl");
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x403290, GV_zmd_file_handler_403290, false); // TODO
+
+int CC GV_img_file_handler_402A5F(void* fileData, int fileNameHash)
+{
+    LOG_WARNING("IMG loader not impl");
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x402A5F, GV_img_file_handler_402A5F, false); // TODO
+
+int CC GV_sgt_file_handler_402AA9(void* fileData, int fileNameHash)
+{
+    LOG_WARNING("SGT loader not impl");
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x402AA9, GV_sgt_file_handler_402AA9, false); // TODO
 
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BB908, DWORD, dword_6BB908, 0);
 
@@ -806,14 +848,14 @@ void CC LibDg_Init_40111A()
     Gv3StructsInit_4012F2(320);
     LibDG_Reset_HashCounts_4026E6();
     LibDG_4010A6();
-    LibGV_Set_FileExtHandler_40A68D('p', GV_pcx_file_handler_402B25.Ptr()); // .pcc/.pcx
-    LibGV_Set_FileExtHandler_40A68D('k', GV_kmd_file_handler_402796.Ptr()); // .kmd
-    LibGV_Set_FileExtHandler_40A68D('l', GV_l_file_handler_402B1D);          // ??
-    LibGV_Set_FileExtHandler_40A68D('n', GV_n_file_handler_402A03.Ptr());
-    LibGV_Set_FileExtHandler_40A68D('o', GV_oar_file_handler_402A29.Ptr());
-    LibGV_Set_FileExtHandler_40A68D('z', GV_zmd_file_handler_403290.Ptr());
-    LibGV_Set_FileExtHandler_40A68D('i', GV_img_file_handler_402A5F.Ptr());
-    LibGV_Set_FileExtHandler_40A68D('s', GV_sgt_file_handler_402AA9.Ptr());
+    LibGV_Set_FileExtHandler_40A68D('p', GV_pcx_file_handler_402B25); // .pcc/.pcx
+    LibGV_Set_FileExtHandler_40A68D('k', GV_kmd_file_handler_402796);
+    LibGV_Set_FileExtHandler_40A68D('l', GV_lit_file_handler_402B1D);
+    LibGV_Set_FileExtHandler_40A68D('n', GV_n_file_handler_402A03);
+    LibGV_Set_FileExtHandler_40A68D('o', GV_oar_file_handler_402A29);
+    LibGV_Set_FileExtHandler_40A68D('z', GV_zmd_file_handler_403290);
+    LibGV_Set_FileExtHandler_40A68D('i', GV_img_file_handler_402A5F);
+    LibGV_Set_FileExtHandler_40A68D('s', GV_sgt_file_handler_402AA9);
     Actor_PushBack(0, &gLibDG_2_stru_6BB930.mBase, 0);// Handles 2D rendering?
     Actor_Init(&gLibDG_2_stru_6BB930.mBase, LibDG_Update2_401234, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
     Actor_PushBack(8, &gLibDGD_1_stru_6BB910, 0); // Handles 3D rendering?
