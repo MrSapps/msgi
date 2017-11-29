@@ -569,7 +569,40 @@ MGS_FUNC_IMPLEX(0x4026E6, LibDG_Clear_Resident_Texture_Cache_Copy_4026E6, LIBDG_
 MGS_FUNC_NOT_IMPL(0x4020D8, void CC(), sub_4020D8);
 MGS_FUNC_NOT_IMPL(0x401A31, void CC(), jImageMove_401A31);
 MGS_FUNC_NOT_IMPL(0x40B9FF, void CC(), LibDG_40B9FF);
-MGS_FUNC_NOT_IMPL(0x401931, void CC(char r, char b, char g), LibDG_SetRGB_401931);
+
+void CC SetRGB_40195A(char r, char g, char b)
+{
+    DRAWENV drawEnv = {};
+    Renderer_DRAWENV_Init_401888(&drawEnv, 0, 0, 320, 224);
+    drawEnv.r0 = r;
+    drawEnv.g0 = g;
+    drawEnv.b0 = b;
+    drawEnv.isbg = 1;
+    sub_401570(&gLibGvStruct0_6BC180, &drawEnv, 1);
+    gLibGvStruct0_6BC180.word_6BC37A_0_1EC_size = 2;
+}
+MGS_FUNC_IMPLEX(0x40195A, SetRGB_40195A, LIBDG_IMPL);
+
+void SetRGB000_4019AB()
+{
+    SetRGB_40195A(0, 0, 0);
+}
+MGS_FUNC_IMPLEX(0x4019AB, SetRGB000_4019AB, LIBDG_IMPL);
+
+void CC LibDG_Set_RGB_FromDG_Actor_4019B9()
+{
+    SetRGB_40195A(gLibDG_2_stru_6BB930.gR_byte_6BB95A, gLibDG_2_stru_6BB930.gB_byte_6BB959, gLibDG_2_stru_6BB930.gG_byte_6BB958);
+}
+MGS_FUNC_IMPLEX(0x4019B9, LibDG_Set_RGB_FromDG_Actor_4019B9, LIBDG_IMPL);
+
+void CC LibDG_SetRGB_401931(char r, char b, char g)
+{
+    gLibDG_2_stru_6BB930.gR_byte_6BB95A = r;
+    gLibDG_2_stru_6BB930.gG_byte_6BB958 = g;
+    gLibDG_2_stru_6BB930.gB_byte_6BB959 = b;
+    SetRGB_40195A(r, b, g);
+}
+MGS_FUNC_IMPLEX(0x401931, LibDG_SetRGB_401931, LIBDG_IMPL);
 
 void CC OT_Related_40162D(int activeBuffer); // WinMain.cpp
 
