@@ -98,14 +98,10 @@ void CC Create_loader_44E226()
 }
 MGS_FUNC_IMPLEX(0x0044E226, Create_loader_44E226, ACTOR_GAMED_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x402487, void CC(), LibDG_ClearTexturesCache_402487);
-MGS_FUNC_NOT_IMPL(0x40274C, void CC(), LibDG_Compact_Texture_Records_40274C);
-
-
 void CC LibDG_Clean_Texture_Cache_401110()
 {
     LibDG_ClearTexturesCache_402487();
-    LibDG_Compact_Texture_Records_40274C();
+    LibDG_Restore_Textures_From_Resident_Memory_40274C();
 }
 MGS_FUNC_IMPLEX(0x00401110, LibDG_Clean_Texture_Cache_401110, ACTOR_GAMED_IMPL);
 
@@ -123,7 +119,7 @@ MGS_FUNC_IMPLEX(0x0040A465, System_Init_0_And_1_40A465, ACTOR_GAMED_IMPL);
 
 void CC LibGV_40A4BB()
 {
-    LibGV_RestoreFileCacheFromResident_40A72A();
+    LibGV_Restore_File_Cache_Records_From_Resident_Memory_40A72A();
     System_DeInit_Systems_0_to_2_sub_40AC52();
     System_Init_0_And_1_40A465();
     System_init_40AC6C(2, 0, &gSystem2_memory_unk_8A8E20[0], 438272);

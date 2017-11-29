@@ -450,7 +450,122 @@ void CC Gv3StructsInit_4012F2(int k320)
 }
 MGS_FUNC_IMPLEX(0x4012F2, Gv3StructsInit_4012F2, LIBDG_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x4026E6, void CC(), LibDG_Reset_HashCounts_4026E6);
+struct Texture_Record
+{
+    WORD mHashedName;
+    BYTE mUsed;
+    BYTE mPadding;
+    WORD mTPage;
+    WORD mClut;
+    BYTE u0;
+    BYTE v0;
+    BYTE u1;
+    BYTE v1;
+};
+MGS_ASSERT_SIZEOF(Texture_Record, 0xC);
+
+MGS_VAR(LIBDG_IMPL, 0x78D320, DWORD, gNumTexturesCopiedToResidentMemory_78D320, 0);
+MGS_VAR(LIBDG_IMPL, 0x78BB08, Texture_Record*, gResidentTextureCacheCopy_78BB08, nullptr);
+MGS_ARY(LIBDG_IMPL, 0x78BB20, Texture_Record, 512, g512Textures_unk_78BB20, {});
+
+signed int CC LibDG_SearchForTextureRecord_4024D2(signed int hashCode, Texture_Record** ppFreeItem)
+{
+    const int kStartEndIdx = hashCode % 512;
+    int idx = kStartEndIdx;
+    do
+    {
+        // Not found case
+        if (!g512Textures_unk_78BB20[idx].mHashedName)
+        {
+            *ppFreeItem = &g512Textures_unk_78BB20[idx];
+            return 0;
+        }
+
+        // Found case
+        if (g512Textures_unk_78BB20[idx].mHashedName == hashCode)
+        {
+            *ppFreeItem = &g512Textures_unk_78BB20[idx];
+            return 1;
+        }
+
+        // Loop back around to the starting item
+        if (++idx == 512)
+        {
+            idx = 0;
+        }
+
+    } while (idx != kStartEndIdx);
+
+    *ppFreeItem = nullptr;
+
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x4024D2, LibDG_SearchForTextureRecord_4024D2, LIBDG_IMPL);
+
+void CC LibDG_ClearTexturesCache_402487()
+{
+    for (int i=0; i<512; i++)
+    {
+        g512Textures_unk_78BB20[i].mHashedName = 0;
+        g512Textures_unk_78BB20[i].mUsed = FALSE;
+    }
+}
+MGS_FUNC_IMPLEX(0x402487, LibDG_ClearTexturesCache_402487, LIBDG_IMPL);
+
+void CC LibDG_Restore_Textures_From_Resident_Memory_40274C()
+{
+    if (gResidentTextureCacheCopy_78BB08 && gNumTexturesCopiedToResidentMemory_78D320 > 0)
+    {
+        for (DWORD i = 0; i < gNumTexturesCopiedToResidentMemory_78D320; i++)
+        {
+            // Record will not exist therefore pFree will be set to a pointer to the next free entry
+            Texture_Record* pFree = nullptr;
+            LibDG_SearchForTextureRecord_4024D2(gResidentTextureCacheCopy_78BB08[i].mHashedName, &pFree);
+
+            // Which we then populate
+            *pFree = gResidentTextureCacheCopy_78BB08[i];
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x40274C, LibDG_Restore_Textures_From_Resident_Memory_40274C, LIBDG_IMPL);
+
+void CC LibDG_Save_Texture_Hashes_To_Resident_Memory_4026F5()
+{
+    int usedCount = 0;
+    for (int i = 0; i < 512; i++)
+    {
+        if (g512Textures_unk_78BB20[i].mHashedName)
+        {
+            usedCount++;
+        }
+    }
+
+    if (usedCount > 0)
+    {
+        gNumTexturesCopiedToResidentMemory_78D320 = usedCount;
+        Texture_Record* pResidentAllocated = (Texture_Record *)ResidentTopAllocate_40B379(sizeof(Texture_Record) * usedCount);
+        gResidentTextureCacheCopy_78BB08 = pResidentAllocated;
+
+        for (int i = 0; i < 512; i++)
+        {
+            if (g512Textures_unk_78BB20[i].mHashedName)
+            {
+                *pResidentAllocated = g512Textures_unk_78BB20[i];
+                ++pResidentAllocated;
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x4026F5, LibDG_Save_Texture_Hashes_To_Resident_Memory_4026F5, LIBDG_IMPL);
+
+void CC LibDG_Clear_Resident_Texture_Cache_Copy_4026E6()
+{
+    gNumTexturesCopiedToResidentMemory_78D320 = 0;
+    gResidentTextureCacheCopy_78BB08 = nullptr;
+}
+MGS_FUNC_IMPLEX(0x4026E6, LibDG_Clear_Resident_Texture_Cache_Copy_4026E6, LIBDG_IMPL);
+
+
 MGS_FUNC_NOT_IMPL(0x4020D8, void CC(), sub_4020D8);
 MGS_FUNC_NOT_IMPL(0x401A31, void CC(), jImageMove_401A31);
 MGS_FUNC_NOT_IMPL(0x40B9FF, void CC(), LibDG_40B9FF);
@@ -846,7 +961,7 @@ void CC LibDg_Init_40111A()
     //nullsub_7(DeadCode_4011F8);
     LibGvInitDispEnv_401A4F(0, 0, 320, 240, 320);
     Gv3StructsInit_4012F2(320);
-    LibDG_Reset_HashCounts_4026E6();
+    LibDG_Clear_Resident_Texture_Cache_Copy_4026E6();
     LibDG_4010A6();
     LibGV_Set_FileExtHandler_40A68D('p', GV_pcx_file_handler_402B25); // .pcc/.pcx
     LibGV_Set_FileExtHandler_40A68D('k', GV_kmd_file_handler_402796);

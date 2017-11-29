@@ -202,7 +202,7 @@ int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocT
 }
 MGS_FUNC_IMPLEX(0x0040A77F, LibGV_LoadFile_40A77F, LIBGV_IMPL);
 
-void CC LibGV_CopyFileRecordsToResidentMemory_40A6CD()
+void CC LibGV_Save_File_Cache_Records_To_Resident_Memory_40A6CD()
 {
     int numInUse = 0;
     for (LibGV_FileRecord& rec : g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80)
@@ -229,9 +229,9 @@ void CC LibGV_CopyFileRecordsToResidentMemory_40A6CD()
         }
     }
 }
-MGS_FUNC_IMPLEX(0x0040A6CD, LibGV_CopyFileRecordsToResidentMemory_40A6CD, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x0040A6CD, LibGV_Save_File_Cache_Records_To_Resident_Memory_40A6CD, LIBGV_IMPL);
 
-void CC LibGV_RestoreFileCacheFromResident_40A72A()
+void CC LibGV_Restore_File_Cache_Records_From_Resident_Memory_40A72A()
 {
     // Clear everything
     for (LibGV_FileRecord& rec : g_lib_gv_stru_6BFEE0.mFileCache_A0_06BFF80)
@@ -256,7 +256,7 @@ void CC LibGV_RestoreFileCacheFromResident_40A72A()
         }
     }
 }
-MGS_FUNC_IMPLEX(0x40A72A, LibGV_RestoreFileCacheFromResident_40A72A, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40A72A, LibGV_Restore_File_Cache_Records_From_Resident_Memory_40A72A, LIBGV_IMPL);
 
 void CC LibGV_mesg_init_40B3BC()
 {

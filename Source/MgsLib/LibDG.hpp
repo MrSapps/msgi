@@ -179,3 +179,5 @@ void CC LibDg_Init_40111A();
 signed int CC Script_tbl_chara_451AC3(BYTE* pScript);
 signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer);
 void CC LibDG_ExecFnPtrs_40171C(int activeBuffer);
+void CC LibDG_ClearTexturesCache_402487();
+void CC LibDG_Restore_Textures_From_Resident_Memory_40274C();

@@ -39,5 +39,5 @@ void CC LibGv_ClearFunctionPointers_40A69D();
 void CC LibGv_Set_Load_HZM_CallBack_40B725();
 __int64 CC TimeGetElapsed_4455A0();
 int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocType);
-void CC LibGV_CopyFileRecordsToResidentMemory_40A6CD();
-void CC LibGV_RestoreFileCacheFromResident_40A72A();
+void CC LibGV_Save_File_Cache_Records_To_Resident_Memory_40A6CD();
+void CC LibGV_Restore_File_Cache_Records_From_Resident_Memory_40A72A();
