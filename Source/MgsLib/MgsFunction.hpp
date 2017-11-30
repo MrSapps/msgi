@@ -139,7 +139,7 @@ public:
         {
             if (!IsMgsi() && !mRealFuncPtr && !mNewAddrOverride)
             {
-                std::cout << "WARNING: Unimpl call: " << mFnName << std::endl;
+                LOG_("WARNING: Unimpl call: " << mFnName);
             }
             mStubCalled = true;
             /*

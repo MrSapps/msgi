@@ -125,6 +125,9 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\3rdParty\EasyLogging++\EasyLogging\EasyLogging.vcxproj">
+      <Project>{9d763ef0-b6b6-4107-a2e1-e511b0eb8cf7}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\DetoursLib\DetoursLib.vcxproj">
       <Project>{849c6cf7-cdee-40c5-a3af-f941a8346adb}</Project>
     </ProjectReference>

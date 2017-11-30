@@ -44,6 +44,11 @@
 #include "Timer.hpp"
 #include "Fs.hpp"
 
+#define _ELPP_THREAD_SAFE
+#include "easylogging++.h"
+
+INITIALIZE_EASYLOGGINGPP
+
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "ddraw.lib")
@@ -2749,6 +2754,26 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     int argCount = 0;
     ::testing::InitGoogleMock(&argCount, &lpCmdLine);
    
+    el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
+    el::Configurations conf;
+    conf.setToDefault();
+    conf.parseFromText(R"(
+-- default 
+* GLOBAL:
+   FORMAT               =  "%msg"
+   FILENAME             =  "msgi_log.log"
+   ENABLED              =  true
+   TO_FILE              =  true
+   TO_STANDARD_OUTPUT   =  true
+* WARNING:
+    TO_STANDARD_OUTPUT   =  true
+* ERROR:
+    TO_STANDARD_OUTPUT   =  true
+* FATAL:
+    TO_STANDARD_OUTPUT   =  true
+)");
+
+    el::Loggers::reconfigureAllLoggers(conf);
 
     int result; // eax@2
     void(__stdcall *pSetProcessAffinityMask)(HANDLE, signed int); // [sp+8h] [bp-464h]@13

@@ -11,7 +11,7 @@
       <Path>$(SolutionDir)..\Output\$(Configuration)\$(ProjectName)\Build.log</Path>
     </BuildLog>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdParty\Detours\include;$(SolutionDir)..\3rdParty\gmock-1.7.0\include;$(SolutionDir)..\3rdParty\gmock-1.7.0\gtest\include;$(SolutionDir)..\3rdParty\gmock-1.7.0\gtest;$(SolutionDir)..\3rdParty\gmock-1.7.0;$(SolutionDir)MgsDll;$(SolutionDir)MgsExe;$(SolutionDir)MgsLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdParty\Detours\include;$(SolutionDir)..\3rdParty\gmock-1.7.0\include;$(SolutionDir)..\3rdParty\gmock-1.7.0\gtest\include;$(SolutionDir)..\3rdParty\gmock-1.7.0\gtest;$(SolutionDir)..\3rdParty\gmock-1.7.0;$(SolutionDir)MgsDll;$(SolutionDir)MgsExe;$(SolutionDir)MgsLib;$(SolutionDir)..\3rdParty\EasyLogging++\EasyLogging\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
     </ClCompile>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DetoursLib", "DetoursLib\DetoursLib.vcxproj", "{849C6CF7-CDEE-40C5-A3AF-F941A8346ADB}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{85F8859D-EE56-4093-A469-30D0B2D86089}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GCLASM", "GCLASM\GCLASM.vcxproj", "{D7F01A56-1CE9-4C38-A76F-B002F5A88629}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EasyLogging", "..\3rdParty\EasyLogging++\EasyLogging\EasyLogging.vcxproj", "{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,14 @@ Global
 		{D7F01A56-1CE9-4C38-A76F-B002F5A88629}.Release|Win32.Build.0 = Release|Win32
 		{D7F01A56-1CE9-4C38-A76F-B002F5A88629}.Release|x64.ActiveCfg = Release|x64
 		{D7F01A56-1CE9-4C38-A76F-B002F5A88629}.Release|x64.Build.0 = Release|x64
+		{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7}.Debug|Win32.Build.0 = Debug|Win32
+		{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7}.Debug|x64.ActiveCfg = Debug|x64
+		{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7}.Debug|x64.Build.0 = Debug|x64
+		{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7}.Release|Win32.ActiveCfg = Release|Win32
+		{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7}.Release|Win32.Build.0 = Release|Win32
+		{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7}.Release|x64.ActiveCfg = Release|x64
+		{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,5 +88,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{849C6CF7-CDEE-40C5-A3AF-F941A8346ADB} = {BA8F6519-6E86-4396-AB07-8EC640C1D73C}
 		{C4F72BA1-FA06-48BB-80C7-CFB655B970D7} = {BA8F6519-6E86-4396-AB07-8EC640C1D73C}
+		{9D763EF0-B6B6-4107-A2E1-E511B0EB8CF7} = {BA8F6519-6E86-4396-AB07-8EC640C1D73C}
 	EndGlobalSection
 EndGlobal
