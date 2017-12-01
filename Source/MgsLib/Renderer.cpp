@@ -4,8 +4,6 @@
 #include "Script.hpp"
 #include "Timer.hpp"
 #include <time.h>
-#define DIRECT3D_VERSION 0x700
-#include "d3d.h"
 
 #define RENDERER_IMPL true
 
@@ -431,7 +429,6 @@ MGS_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint3
 MGS_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 MGS_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct TaggedOrderingTablePointer* a_pStructVert, int a_nSize), Render_Software);
 MGS_FUNC_NOT_IMPL(0x422BC0, HRESULT __cdecl (unsigned int, signed int, int), Render_InitTextureStages_422BC0);
-MGS_FUNC_NOT_IMPL(0x422A90, HRESULT __cdecl(signed int, int), Render_SetRenderState_422A90);
 MGS_FUNC_NOT_IMPL(0x421280, void __cdecl(MGSVertex *pVert, int idx), Render_sub_421280);
 MGS_FUNC_NOT_IMPL(0x424020, void __cdecl(IDirectDrawSurface7 *pSurface, MGSVertex* pVert), Render_DrawTextBeginScene_424020);
 MGS_FUNC_NOT_IMPL(0x420840, void __cdecl (DWORD *a1, DWORD *arg4), Render_sub_420840);;
@@ -441,6 +438,37 @@ MGS_FUNC_NOT_IMPL(0x421800, void __cdecl(int mode, const MGSVertex *pVerts, sign
 MGS_VAR_EXTERN(LPDIRECTDRAWSURFACE7, g_pDDSurface_6FC740);
 MGS_VAR_EXTERN(DWORD, gNoFilter);
 MGS_VAR_EXTERN(DWORD, gNoEffects);
+
+MGS_ARY(RENDERER_IMPL, 0x6DEF98, DWORD, 153, gRenderStates_6DEF98, {});
+
+HRESULT CC Render_SetRenderState_422A90(D3DRENDERSTATETYPE renderState, DWORD value)
+{
+    static bool sbNotDone_650D50 = true;
+    if (sbNotDone_650D50)
+    {
+        gD3dDevice_6FC74C->SetRenderState(D3DRENDERSTATE_LIGHTING, 0);
+        gD3dDevice_6FC74C->SetRenderState(D3DRENDERSTATE_LOCALVIEWER, 0);
+        gD3dDevice_6FC74C->SetRenderState(D3DRENDERSTATE_CLIPPING, 1);
+        for (int i = 0; i < 153; ++i)
+        {
+            gD3dDevice_6FC74C->GetRenderState(static_cast<D3DRENDERSTATETYPE>(i), &gRenderStates_6DEF98[i]);
+        }
+        sbNotDone_650D50 = 0;
+    }
+
+    HRESULT ret = S_OK;
+    if (renderState >= 153)
+    {
+        ret = gD3dDevice_6FC74C->SetRenderState(renderState, value);
+    }
+    else if (gRenderStates_6DEF98[renderState] != value)
+    {
+        ret = gD3dDevice_6FC74C->SetRenderState(renderState, value);
+        gD3dDevice_6FC74C->GetRenderState(renderState, &gRenderStates_6DEF98[renderState]);
+    }
+    return ret;
+}
+MGS_FUNC_IMPLEX(0x422A90, Render_SetRenderState_422A90, RENDERER_IMPL);
 
 bool CC ClearDDSurfaceWhite_41E990()
 {
@@ -455,7 +483,6 @@ bool CC ClearDDSurfaceWhite_41E990()
     return hr == S_OK;
 }
 MGS_FUNC_IMPLEX(0x41E990, ClearDDSurfaceWhite_41E990, RENDERER_IMPL);
-
 
 HRESULT CC Render_SetTexture_41E9E0()
 {
@@ -601,7 +628,7 @@ void CC Render_DrawHardware_421C00()
                 Render_InitTextureStages_422BC0(0, 17, 2);
             }
 
-            Render_SetRenderState_422A90(24, 127);
+            Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHAREF, 127);
 
             int textureIdx = gPrimBuffer_dword_6C0EFC[primSubIdx].nTextureIndex;
             if (textureIdx >= gNumTextures_word_6FC78C || gTextures_6C0F00[textureIdx].mSurfaceType != 5)
@@ -659,7 +686,7 @@ void CC Render_DrawHardware_421C00()
                 }
                 
 
-                Render_SetRenderState_422A90(9, gPrimBuffer_dword_6C0EFC[primSubIdx].mShadeMode);// D3DRS_SHADEMODE 
+                Render_SetRenderState_422A90(D3DRENDERSTATE_SHADEMODE, gPrimBuffer_dword_6C0EFC[primSubIdx].mShadeMode);
                 
                 if (textureIdx == 0xFFFD)
                 {
@@ -681,7 +708,7 @@ void CC Render_DrawHardware_421C00()
                         PrintDDError("Can't render primitives", hResult);
                     }
 
-                    Render_SetRenderState_422A90(27, 0);
+                    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 0);
                 }
             }
             else

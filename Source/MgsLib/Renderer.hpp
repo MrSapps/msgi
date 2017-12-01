@@ -5,6 +5,8 @@
 
 #define DIRECTDRAW_VERSION 0x700
 #include <ddraw.h>
+#define DIRECT3D_VERSION 0x700
+#include "d3d.h"
 
 #define OT_END_TAG 0xFFFFFF
 
@@ -85,6 +87,6 @@ __int16 CC Render_RestoreAll();
 void CC Render_DrawIndex_401619(uint32_t a_nIndex);
 int CC Renderer_ClearOTag(DWORD* ot, int otSize);
 bool CC ClearDDSurfaceWhite_41E990();
+HRESULT CC Render_SetRenderState_422A90(D3DRENDERSTATETYPE renderState, DWORD bEnable);
 
 EXTERN_MGS_FUNC_NOT_IMPL(0x422BC0, HRESULT __cdecl (unsigned int, signed int, int), Render_InitTextureStages_422BC0);
-EXTERN_MGS_FUNC_NOT_IMPL(0x422A90, HRESULT __cdecl(signed int, int), Render_SetRenderState_422A90);

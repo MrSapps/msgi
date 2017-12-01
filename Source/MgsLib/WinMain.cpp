@@ -1898,8 +1898,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
-            Render_SetRenderState_422A90(22, 1);
-            Render_SetRenderState_422A90(26, 0);
+            Render_SetRenderState_422A90(D3DRENDERSTATE_CULLMODE, D3DCULL_NONE);
+            Render_SetRenderState_422A90(D3DRENDERSTATE_DITHERENABLE, 0);
             if (!gSoftwareRendering)
             {
 
@@ -1950,20 +1950,24 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 gColourKey = Render_sub_41E730();
                 mgs_fprintf(gFile, "ColorKey = %i\n", gColourKey);
                 Render_InitTextureStages_422BC0(0, 12, 3);
+                
                 if (gModX2 == 2)
-                    gModX2 =  Render_sub_41D420();
+                {
+                    gModX2 = Render_sub_41D420();
+                }
+
                 mgs_fprintf(gFile, "MODULATE2X = %i \n", gModX2);
                 if (gColourKey)
                 {
-                    Render_SetRenderState_422A90(41, 1);
+                    Render_SetRenderState_422A90(D3DRENDERSTATE_COLORKEYENABLE, 1);
                 }
                 else
                 {
-                    Render_SetRenderState_422A90(15, 1);
-                    Render_SetRenderState_422A90(24, 127);
-                    Render_SetRenderState_422A90(25, 7);
+                    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHATESTENABLE, 1);
+                    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHAREF, 127);
+                    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATEREQUAL);
                 }
-                Render_SetRenderState_422A90(26, 1);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_DITHERENABLE, 1);
                 if (dword_651CF8)
                 {
                     if (gLowRes != gLowRes) // FIX ME: This can't be right
@@ -2200,8 +2204,8 @@ signed int Render_sub_41E3C0()
     gD3dDevice_6FC74C->GetCaps(&caps);
     const DWORD srcBlendCaps = caps.dpcTriCaps.dwSrcBlendCaps;
     const DWORD dstBlendCaps = caps.dpcTriCaps.dwDestBlendCaps;
-    Render_SetRenderState_422A90(9, 1);
-    Render_SetRenderState_422A90(27, 1);
+    Render_SetRenderState_422A90(D3DRENDERSTATE_SHADEMODE, 1);
+    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
 
     if (SUCCEEDED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
     {
@@ -2220,8 +2224,8 @@ signed int Render_sub_41E3C0()
         {
             if (dstBlendCaps & 0x10)
             {
-                Render_SetRenderState_422A90(19, 5);
-                Render_SetRenderState_422A90(20, 5);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 5);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 5);
                 if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
@@ -2239,8 +2243,8 @@ signed int Render_sub_41E3C0()
         {
             if (dstBlendCaps & 2)
             {
-                Render_SetRenderState_422A90(19, 5);
-                Render_SetRenderState_422A90(20, 2);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 5);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 2);
                 if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
@@ -2261,8 +2265,8 @@ signed int Render_sub_41E3C0()
             {
                 if (dstBlendCaps & 8)
                 {
-                    Render_SetRenderState_422A90(19, 1);
-                    Render_SetRenderState_422A90(20, 4);
+                    Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 1);
+                    Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 4);
                     ClearBackBuffer(0xFFA0FFA0, 0xFF400040, &firstPixel, pPrim);
 
                     if ((unsigned __int8)firstPixel < 0x79u && (unsigned __int8)firstPixel > 0x6Fu)
