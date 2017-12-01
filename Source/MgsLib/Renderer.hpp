@@ -70,8 +70,8 @@ MGS_VAR_EXTERN(LPDIRECTDRAWSURFACE7, gPrimarySurface_6FC734);
 MGS_VAR_EXTERN(LPDIRECTDRAWSURFACE7, g_pBackBuffer_6FC738);
 MGS_VAR_EXTERN(DWORD, gModX2);
 MGS_ARY_EXTERN(texture_struct, 1500, gTextures_6C0F00);
-MGS_VAR_EXTERN(prim_struct*, gPrimStructArray);
-MGS_VAR_EXTERN(MGSVertex*, g_pMGSVertices);
+MGS_VAR_EXTERN(prim_struct*, gPrimBuffer_dword_6C0EFC);
+MGS_VAR_EXTERN(MGSVertex*, g_pMGSVertices_6FC780);
 MGS_VAR_EXTERN(WORD*, g_pwTextureIndices);
 MGS_VAR_EXTERN(DWORD, dword_6FC774);
 MGS_VAR_EXTERN(WORD, gNumTextures_word_6FC78C);
@@ -84,3 +84,6 @@ void CC PrintDDError(const char* errMsg, HRESULT hrErr);
 __int16 CC Render_RestoreAll();
 void CC Render_DrawIndex_401619(uint32_t a_nIndex);
 int CC Renderer_ClearOTag(DWORD* ot, int otSize);
+
+EXTERN_MGS_FUNC_NOT_IMPL(0x422BC0, HRESULT __cdecl (unsigned int, signed int, int), Render_InitTextureStages_422BC0);
+EXTERN_MGS_FUNC_NOT_IMPL(0x422A90, HRESULT __cdecl(signed int, int), Render_SetRenderState_422A90);

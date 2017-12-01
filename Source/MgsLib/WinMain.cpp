@@ -94,8 +94,6 @@ MGS_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
 MGS_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
 MGS_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
 MGS_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
-MGS_FUNC_NOT_IMPL(0x00422A90, int __cdecl(signed int, int), Render_SetRenderState);
-MGS_FUNC_NOT_IMPL(0x00422BC0, int __cdecl (unsigned int, signed int, int), Render_InitTextureStages);
 MGS_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MGS_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
@@ -1913,8 +1911,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         {
             mgs_fputs(" . done\n", gFile);
             mgs_fflush(gFile);
-            Render_SetRenderState(22, 1);
-            Render_SetRenderState(26, 0);
+            Render_SetRenderState_422A90(22, 1);
+            Render_SetRenderState_422A90(26, 0);
             if (!gSoftwareRendering)
             {
 
@@ -1951,12 +1949,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 }
             }
 
-            Render_InitTextureStages(0, 2, 2);
-            Render_InitTextureStages(0, 1, 4);
-            Render_InitTextureStages(0, 3, 0);
-            Render_InitTextureStages(0, 5, 2);
-            Render_InitTextureStages(0, 4, 4);
-            Render_InitTextureStages(0, 6, 0);
+            Render_InitTextureStages_422BC0(0, 2, 2);
+            Render_InitTextureStages_422BC0(0, 1, 4);
+            Render_InitTextureStages_422BC0(0, 3, 0);
+            Render_InitTextureStages_422BC0(0, 5, 2);
+            Render_InitTextureStages_422BC0(0, 4, 4);
+            Render_InitTextureStages_422BC0(0, 6, 0);
 
             if (Render_sub_41E3C0())
             {
@@ -1964,21 +1962,21 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 mgs_fprintf(gFile, "Alpha modulate = %i \n", gAlphaModulate_dword_6FC798);
                 gColourKey = Render_sub_41E730();
                 mgs_fprintf(gFile, "ColorKey = %i\n", gColourKey);
-                Render_InitTextureStages(0, 12, 3);
+                Render_InitTextureStages_422BC0(0, 12, 3);
                 if (gModX2 == 2)
                     gModX2 =  Render_sub_41D420();
                 mgs_fprintf(gFile, "MODULATE2X = %i \n", gModX2);
                 if (gColourKey)
                 {
-                    Render_SetRenderState(41, 1);
+                    Render_SetRenderState_422A90(41, 1);
                 }
                 else
                 {
-                    Render_SetRenderState(15, 1);
-                    Render_SetRenderState(24, 127);
-                    Render_SetRenderState(25, 7);
+                    Render_SetRenderState_422A90(15, 1);
+                    Render_SetRenderState_422A90(24, 127);
+                    Render_SetRenderState_422A90(25, 7);
                 }
-                Render_SetRenderState(26, 1);
+                Render_SetRenderState_422A90(26, 1);
                 if (dword_651CF8)
                 {
                     if (gLowRes != gLowRes) // FIX ME: This can't be right
@@ -2108,12 +2106,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     MissionLog_Related2();
     if (!gSoftwareRendering)
     {
-        gPrimStructArray = (prim_struct*)mgs_malloc(150000 * sizeof(prim_struct));
+        gPrimBuffer_dword_6C0EFC = (prim_struct*)mgs_malloc(150000 * sizeof(prim_struct));
         for (i = 0; i < 15000; ++i)
         {
-            gPrimStructArray[i].field_0 = 0;
+            gPrimBuffer_dword_6C0EFC[i].field_0 = 0;
         }
-        g_pMGSVertices = (MGSVertex*)mgs_malloc(sizeof(MGSVertex) * 150000);
+        g_pMGSVertices_6FC780 = (MGSVertex*)mgs_malloc(sizeof(MGSVertex) * 150000);
     }
     gImageBufer_dword_6FC728 = (DWORD*)mgs_malloc(0x100000u);
     if (gImageBufer_dword_6FC728)
@@ -2215,13 +2213,13 @@ signed int Render_sub_41E3C0()
     gD3dDevice_6FC74C->GetCaps(&caps);
     const DWORD srcBlendCaps = caps.dpcTriCaps.dwSrcBlendCaps;
     const DWORD dstBlendCaps = caps.dpcTriCaps.dwDestBlendCaps;
-    Render_SetRenderState(9, 1);
-    Render_SetRenderState(27, 1);
+    Render_SetRenderState_422A90(9, 1);
+    Render_SetRenderState_422A90(27, 1);
 
     if (SUCCEEDED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
     {
         gAlphaModulate_dword_6FC798 = 0;
-        Render_InitTextureStages(0, 4, 2);
+        Render_InitTextureStages_422BC0(0, 4, 2);
     }
     else
     {
@@ -2235,8 +2233,8 @@ signed int Render_sub_41E3C0()
         {
             if (dstBlendCaps & 0x10)
             {
-                Render_SetRenderState(19, 5);
-                Render_SetRenderState(20, 5);
+                Render_SetRenderState_422A90(19, 5);
+                Render_SetRenderState_422A90(20, 5);
                 if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
@@ -2254,8 +2252,8 @@ signed int Render_sub_41E3C0()
         {
             if (dstBlendCaps & 2)
             {
-                Render_SetRenderState(19, 5);
-                Render_SetRenderState(20, 2);
+                Render_SetRenderState_422A90(19, 5);
+                Render_SetRenderState_422A90(20, 2);
                 if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
                 {
                     if (gAlphaModulate_dword_6FC798)
@@ -2276,8 +2274,8 @@ signed int Render_sub_41E3C0()
             {
                 if (dstBlendCaps & 8)
                 {
-                    Render_SetRenderState(19, 1);
-                    Render_SetRenderState(20, 4);
+                    Render_SetRenderState_422A90(19, 1);
+                    Render_SetRenderState_422A90(20, 4);
                     ClearBackBuffer(0xFFA0FFA0, 0xFF400040, &firstPixel, pPrim);
 
                     if ((unsigned __int8)firstPixel < 0x79u && (unsigned __int8)firstPixel > 0x6Fu)
@@ -2689,16 +2687,16 @@ void __cdecl ClearAll()
         g_pDDSurface = nullptr;
     }
 
-    if (g_pMGSVertices)
+    if (g_pMGSVertices_6FC780)
     {
-        mgs_free(g_pMGSVertices);
-        g_pMGSVertices = nullptr;
+        mgs_free(g_pMGSVertices_6FC780);
+        g_pMGSVertices_6FC780 = nullptr;
     }
 
-    if (gPrimStructArray)
+    if (gPrimBuffer_dword_6C0EFC)
     {
-        mgs_free(gPrimStructArray);
-        gPrimStructArray = nullptr;
+        mgs_free(gPrimBuffer_dword_6C0EFC);
+        gPrimBuffer_dword_6C0EFC = nullptr;
     }
 
     if (dword_6DEF7C)

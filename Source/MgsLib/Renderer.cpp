@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "Renderer.hpp"
-#define DIRECT3D_VERSION 0x700
-#include "d3d.h"
 #include "LibDG.hpp"
 #include "Script.hpp"
 #include "Timer.hpp"
 #include <time.h>
+#define DIRECT3D_VERSION 0x700
+#include "d3d.h"
 
 #define RENDERER_IMPL true
 
@@ -63,8 +63,8 @@ void CC Render_Scene_DispEnv_40DD00(DISPENV* pRect)
 }
 MGS_FUNC_IMPLEX(0x40DD00, Render_Scene_DispEnv_40DD00, RENDERER_IMPL);
 
-MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices, 0);
-MGS_VAR(1, 0x6FC784, DWORD, g_nVertexOffset, 0);
+MGS_VAR(1, 0x6FC780, MGSVertex*, g_pMGSVertices_6FC780, 0);
+MGS_VAR(1, 0x6FC784, DWORD, g_nVertexOffset_6FC784, 0);
 MGS_VAR(1, 0x791C80, float, g_fXOffset, 0);
 MGS_VAR(1, 0x791C84, float, g_fYOffset, 0);
 MGS_VAR(1, 0x00650D30, DWORD, gModX2, 0);
@@ -92,10 +92,15 @@ MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices, 0);
 MGS_VAR(1, 0x6FC78C, WORD, gNumTextures_word_6FC78C, 0);
 MGS_VAR(1, 0x00650D28, float, gXRes, 0.0f);
 
-MGS_VAR(1, 0x6C0EFC, prim_struct*, gPrimStructArray, nullptr); // Dynamically allocated array of 15000 items
+MGS_VAR(1, 0x6C0EFC, prim_struct*, gPrimBuffer_dword_6C0EFC, nullptr); // Dynamically allocated array of 15000 items
 
 MGS_VAR(1, 0x6FC788, DWORD, gPrimIdx_dword_6FC788, 0);
 MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
+MGS_VAR(1, 0x6FC744, DWORD, dword_6FC744, 0);
+MGS_VAR(1, 0x650D10, DWORD, dword_650D10, 0);
+MGS_VAR(1, 0x6FC778, DWORD, dword_6FC778, 0);
+
+
 
 MGS_VAR(1, 0x6C0EAE, WORD, word_6C0EAE, 0);
 MGS_VAR(1, 0x6C0E9A, WORD, word_6C0E9A, 0);
@@ -424,7 +429,194 @@ MGS_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint3
 MGS_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
 MGS_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 MGS_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct TaggedOrderingTablePointer* a_pStructVert, int a_nSize), Render_Software);
-MGS_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware);
+MGS_FUNC_NOT_IMPL(0x4233C0, uint32_t __cdecl(), Render_DrawHardware_helper_4233C0);
+MGS_FUNC_NOT_IMPL(0x422BC0, HRESULT __cdecl (unsigned int, signed int, int), Render_InitTextureStages_422BC0);
+MGS_FUNC_NOT_IMPL(0x422A90, HRESULT __cdecl(signed int, int), Render_SetRenderState_422A90);
+MGS_FUNC_NOT_IMPL(0x421280, void __cdecl(MGSVertex *pVert, int idx), Render_sub_421280);
+MGS_FUNC_NOT_IMPL(0x424020, void __cdecl(IDirectDrawSurface7 *pSurface, MGSVertex* pVert), Render_DrawTextBeginScene_424020);
+MGS_FUNC_NOT_IMPL(0x420840, void __cdecl (DWORD *a1, DWORD *arg4), Render_sub_420840);
+MGS_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl (), Render_SetTexture_41E9E0);
+MGS_FUNC_NOT_IMPL(0x421800, void __cdecl(int mode, const MGSVertex *pVerts, signed int vertexCount, int primIdx), Render_BlendMode_sub_421800);
+
+
+
+
+
+MGS_VAR_EXTERN(DWORD, gNoFilter);
+MGS_VAR_EXTERN(DWORD, gNoEffects);
+
+//MGS_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware_421C00);
+
+void CC Render_DrawHardware_421C00()
+{
+    for (DWORD i = 0u; i < g_nVertexOffset_6FC784; ++i)
+    {
+        g_pMGSVertices_6FC780[i].x = (g_pMGSVertices_6FC780[i].x - (float)gDisp_w_word_6FC7B0) * gXRes;
+        g_pMGSVertices_6FC780[i].y = (g_pMGSVertices_6FC780[i].y - (float)gDisp_y_word_6FC7B2) * gXRes;
+    }
+
+  
+    Render_DrawHardware_helper_4233C0();
+
+    DWORD primSubIdx = 0;
+    DWORD pPrimStartIdx = 0;
+
+    while (primSubIdx < gPrimIdx_dword_6FC788)
+    {
+        if (gPrimBuffer_dword_6C0EFC[primSubIdx].mPrimTypeQ == 2000)
+        {
+           
+            D3DVIEWPORT7 viewPort = {};
+
+            if (g_pMGSVertices_6FC780[pPrimStartIdx].x < 0.0f)
+            {
+                g_pMGSVertices_6FC780[pPrimStartIdx].x = 0.0f;
+            }
+
+            if (g_pMGSVertices_6FC780[pPrimStartIdx].y < 0.0f)
+            {
+                g_pMGSVertices_6FC780[pPrimStartIdx].y = 0.0f;
+            }
+
+            if (gXRes * 320.0f - 1.0f <= g_pMGSVertices_6FC780[pPrimStartIdx].x)
+            {
+                g_pMGSVertices_6FC780[pPrimStartIdx].x = 0.0f;
+            }
+            if (gXRes * 224.0f - 1.0f <= g_pMGSVertices_6FC780[pPrimStartIdx].y)
+            {
+                g_pMGSVertices_6FC780[pPrimStartIdx].y = 0.0f;
+            }
+
+           
+            viewPort.dwX = static_cast<DWORD>(g_pMGSVertices_6FC780[pPrimStartIdx].x);
+
+            viewPort.dwY = static_cast<DWORD>(g_pMGSVertices_6FC780[pPrimStartIdx].y);
+            viewPort.dwWidth = static_cast<DWORD>(gXRes * g_pMGSVertices_6FC780[pPrimStartIdx].u);
+            viewPort.dwHeight = static_cast<DWORD>(gXRes * g_pMGSVertices_6FC780[pPrimStartIdx].v);
+
+            viewPort.dvMinZ = 1.0f;
+            viewPort.dvMaxZ = 1.0f;
+
+            // TODO: Real func has dead branches here?
+         
+            const HRESULT hResult = gD3dDevice_6FC74C->SetViewport(&viewPort);
+            if (FAILED(hResult))
+            {
+                PrintDDError("Can't set viewport", hResult);
+            }
+        }
+        else
+        {
+            
+            if (gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode & 0x8000)
+            {
+                gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode &= 0x7FFFu;
+                Render_InitTextureStages_422BC0(0, 16, 1);
+                Render_InitTextureStages_422BC0(0, 17, 1);
+            }
+            else if (gNoFilter)
+            {
+                Render_InitTextureStages_422BC0(0, 16, 2);
+                Render_InitTextureStages_422BC0(0, 17, 2);
+            }
+
+            Render_SetRenderState_422A90(24, 127);
+
+            int textureIdx = gPrimBuffer_dword_6C0EFC[primSubIdx].nTextureIndex;
+            if (textureIdx >= gNumTextures_word_6FC78C || gTextures_6C0F00[textureIdx].mSurfaceType != 5)
+            {
+                if (textureIdx == 0xFFFE)
+                {
+                    if (gNoEffects)
+                    {
+                        textureIdx = 0;
+                        Render_sub_421280(&g_pMGSVertices_6FC780[pPrimStartIdx], primSubIdx);
+                    }
+                    else
+                    {
+                        gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode = 4;
+                    }
+                }
+                else if (!dword_6FC778)
+                {
+                    dword_650D44 = 1;
+                }
+
+                if (textureIdx < gNumTextures_word_6FC78C && gTextures_6C0F00[textureIdx].mSurface)
+                {
+                    Render_BlendMode_sub_421800(
+                        gTextures_6C0F00[textureIdx].field_28 & gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode,
+                        &g_pMGSVertices_6FC780[pPrimStartIdx],
+                        gPrimBuffer_dword_6C0EFC[primSubIdx].dwVertexCount,
+                        primSubIdx);
+                }
+                else
+                {
+                    Render_BlendMode_sub_421800(
+                        gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode,
+                        &g_pMGSVertices_6FC780[pPrimStartIdx],
+                        gPrimBuffer_dword_6C0EFC[primSubIdx].dwVertexCount,
+                        primSubIdx);
+                }
+
+                if (textureIdx >= gNumTextures_word_6FC78C)
+                {
+                    Render_InitTextureStages_422BC0(0, 1, 4);
+                    Render_SetTexture_41E9E0();
+                }
+                else
+                {
+                    gD3dDevice_6FC74C->SetTexture(0, gTextures_6C0F00[textureIdx].mSurface);
+                    if (gModX2)
+                    {
+                        Render_InitTextureStages_422BC0(0, 1, 5);
+                    }
+                    else
+                    {
+                        Render_InitTextureStages_422BC0(0, 1, 4);
+                    }
+                }
+                
+
+                Render_SetRenderState_422A90(9, gPrimBuffer_dword_6C0EFC[primSubIdx].mShadeMode);// D3DRS_SHADEMODE 
+                
+                if (textureIdx == 0xFFFD)
+                {
+                    Render_sub_420840(&primSubIdx, &pPrimStartIdx);
+                    gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode = 5;
+                }
+
+                if (dword_650D10)
+                {
+                    const HRESULT hResult = gD3dDevice_6FC74C->DrawPrimitive(
+                        (D3DPRIMITIVETYPE)gPrimBuffer_dword_6C0EFC[primSubIdx].mPrimTypeQ,
+                        0x1C4,                              // vertex type desc
+                        &g_pMGSVertices_6FC780[pPrimStartIdx],// lpvVertices
+                        gPrimBuffer_dword_6C0EFC[primSubIdx].dwVertexCount,
+                        0);                                 // flags
+
+                    if (FAILED(hResult))
+                    {
+                        PrintDDError("Can't render primitives", hResult);
+                    }
+
+                    Render_SetRenderState_422A90(27, 0);
+                }
+            }
+            else
+            {
+                Render_DrawTextBeginScene_424020(gTextures_6C0F00[textureIdx].mSurface, &g_pMGSVertices_6FC780[pPrimStartIdx]);
+            }
+        }
+        pPrimStartIdx += gPrimBuffer_dword_6C0EFC[primSubIdx++].dwVertexCount;
+    }
+
+    gD3dDevice_6FC74C->SetTexture(0, 0);
+    gPrimIdx_dword_6FC788 = 0;
+    g_nVertexOffset_6FC784 = 0;
+    dword_6FC744 = 0;
+}
+MGS_FUNC_IMPLEX(0x421C00, Render_DrawHardware_421C00, RENDERER_IMPL);
 
 // TODO: Assert sizes
 struct MGSSmallVert
@@ -558,27 +750,27 @@ static void convertVertexType0(StructVertType0* pStructVert, uint32_t nIndex)
     int32_t signedX, signedY;
     signedX = pStructVert->Vtxs[nIndex].x << 20;
     signedX >>= 20;
-    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = (float)signedX + g_fXOffset;
 
     signedY = pStructVert->Vtxs[nIndex].y << 20;
     signedY >>= 20;
-    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = (float)signedY + g_fYOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = 0.0f;
 
     uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = diffuseColor;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = 1.0f;
+    g_nVertexOffset_6FC784++;
 }
 
 static void convertColorWZType0(StructVertType0* pStructVert)
 {
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = 0.0f;
 
     uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = diffuseColor;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = 1.0f;
+    g_nVertexOffset_6FC784++;
 }
 
 static void convertVertexType1(StructVertType1* pStructVert, uint32_t nIndex, float u, float v)
@@ -586,14 +778,14 @@ static void convertVertexType1(StructVertType1* pStructVert, uint32_t nIndex, fl
     int32_t signedX, signedY;
     signedX = pStructVert->TexVtx[nIndex].Vtx.x << 20;
     signedX >>= 20;
-    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = (float)signedX + g_fXOffset;
 
     signedY = pStructVert->TexVtx[nIndex].Vtx.y << 20;
     signedY >>= 20;
-    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-    g_pMGSVertices[g_nVertexOffset].u = u;
-    g_pMGSVertices[g_nVertexOffset].v = v;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = (float)signedY + g_fYOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = 0.0f;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = u;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = v;
 
     uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
     if (gModX2 == 0)
@@ -607,16 +799,16 @@ static void convertVertexType1(StructVertType1* pStructVert, uint32_t nIndex, fl
         diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
     }
 
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = diffuseColor;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = 1.0f;
+    g_nVertexOffset_6FC784++;
 }
 
 static void convertExceptPosType1(StructVertType1* pStructVert, float u, float v)
 {
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-    g_pMGSVertices[g_nVertexOffset].u = u;
-    g_pMGSVertices[g_nVertexOffset].v = v;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = 0.0f;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = u;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = v;
 
     uint32_t diffuseColor = 0xFF000000 | (pStructVert->diffuseR << 16) | (pStructVert->diffuseG << 8) | (pStructVert->diffuseB);
     if (gModX2 == 0)
@@ -630,9 +822,9 @@ static void convertExceptPosType1(StructVertType1* pStructVert, float u, float v
         diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
     }
 
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = diffuseColor;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = 1.0f;
+    g_nVertexOffset_6FC784++;
 }
 
 static void convertVertexType2(StructVertType2* pStructVert, uint32_t nIndex)
@@ -640,17 +832,17 @@ static void convertVertexType2(StructVertType2* pStructVert, uint32_t nIndex)
     int32_t signedX, signedY;
     signedX = pStructVert->DifVtx[nIndex].Vtx.x << 20;
     signedX >>= 20;
-    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = (float)signedX + g_fXOffset;
 
     signedY = pStructVert->DifVtx[nIndex].Vtx.y << 20;
     signedY >>= 20;
-    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = (float)signedY + g_fYOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = 0.0f;
 
     uint32_t diffuseColor = 0xFF000000 | (pStructVert->DifVtx[nIndex].diffuseR << 16) | (pStructVert->DifVtx[nIndex].diffuseG << 8) | (pStructVert->DifVtx[nIndex].diffuseB);
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = diffuseColor;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = 1.0f;
+    g_nVertexOffset_6FC784++;
 }
 
 static void convertVertexType3(StructVertType3* pStructVert, uint32_t nIndex, float u, float v)
@@ -658,14 +850,14 @@ static void convertVertexType3(StructVertType3* pStructVert, uint32_t nIndex, fl
     int32_t signedX, signedY;
     signedX = pStructVert->DifVtx[nIndex].Vtx.x << 20;
     signedX >>= 20;
-    g_pMGSVertices[g_nVertexOffset].x = (float)signedX + g_fXOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = (float)signedX + g_fXOffset;
 
     signedY = pStructVert->DifVtx[nIndex].Vtx.y << 20;
     signedY >>= 20;
-    g_pMGSVertices[g_nVertexOffset].y = (float)signedY + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-    g_pMGSVertices[g_nVertexOffset].u = u;
-    g_pMGSVertices[g_nVertexOffset].v = v;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = (float)signedY + g_fYOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = 0.0f;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = u;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = v;
 
     uint32_t diffuseColor = 0xFF000000 | (pStructVert->DifVtx[nIndex].diffuseR << 16) | (pStructVert->DifVtx[nIndex].diffuseG << 8) | (pStructVert->DifVtx[nIndex].diffuseB);
     if (gModX2 == 0)
@@ -679,9 +871,9 @@ static void convertVertexType3(StructVertType3* pStructVert, uint32_t nIndex, fl
         diffuseColor = 0xFF000000 | (R << 16) | (G << 8) | (B);
     }
 
-    g_pMGSVertices[g_nVertexOffset].diffuse = diffuseColor;
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = diffuseColor;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = 1.0f;
+    g_nVertexOffset_6FC784++;
 }
 
 static float convertPositionFloat(WORD n)
@@ -714,11 +906,11 @@ static void handleBlendMode(uint16_t nBlend)
 {
     if ((otItemType_dword_791C54 & 2) != 0)
     {
-        gPrimStructArray[gPrimIdx_dword_6FC788].nBlendMode = 1 + ((nBlend >> 5) & 3);
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nBlendMode = 1 + ((nBlend >> 5) & 3);
     }
     else
     {
-        gPrimStructArray[gPrimIdx_dword_6FC788].nBlendMode = 0;
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nBlendMode = 0;
     }
 }
 
@@ -726,24 +918,24 @@ static void handleBlendMode(uint16_t nBlend, uint16_t offset)
 {
     if ((otItemType_dword_791C54 & 2) != 0)
     {
-        gPrimStructArray[gPrimIdx_dword_6FC788].nBlendMode = 1 + offset + ((nBlend >> 5) & 3);
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nBlendMode = 1 + offset + ((nBlend >> 5) & 3);
     }
     else
     {
-        gPrimStructArray[gPrimIdx_dword_6FC788].nBlendMode = offset;
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nBlendMode = offset;
     }
 }
 
 static void convertVertexType4(StructVertType4* pStructVert, uint32_t nIndex, float u, float v)
 {
-    g_pMGSVertices[g_nVertexOffset].x = pStructVert->Vtx[nIndex].Vtx.x + g_fXOffset;
-    g_pMGSVertices[g_nVertexOffset].y = pStructVert->Vtx[nIndex].Vtx.y + g_fYOffset;
-    g_pMGSVertices[g_nVertexOffset].z = 0.0f;
-    g_pMGSVertices[g_nVertexOffset].u = u;
-    g_pMGSVertices[g_nVertexOffset].v = v;
-    g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->diffuseR, pStructVert->diffuseG, pStructVert->diffuseB);
-    g_pMGSVertices[g_nVertexOffset].w = 1.0f;
-    g_nVertexOffset++;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = pStructVert->Vtx[nIndex].Vtx.x + g_fXOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = pStructVert->Vtx[nIndex].Vtx.y + g_fYOffset;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = 0.0f;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = u;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = v;
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = calculateModX2Diffuse(pStructVert->diffuseR, pStructVert->diffuseG, pStructVert->diffuseB);
+    g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = 1.0f;
+    g_nVertexOffset_6FC784++;
 }
 
 // Untested for the moment
@@ -765,8 +957,8 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
         g_fV3 = g_fV2 = g_fV1 = g_fV0 = 0;
         g_fU3 = g_fU2 = g_fU1 = g_fU0 = 0;
 
-        gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 0;
-        gPrimStructArray[gPrimIdx_dword_6FC788].nBlendMode = 0;
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 0;
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nBlendMode = 0;
 
         // 100-103 case has an issue, causes corrupted text
         //LOG_INFO("VTX type: " << dword_791C54);
@@ -792,10 +984,10 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType0(pStructVert, 1);
             convertVertexType0(pStructVert, 2);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 3;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLELIST;
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 3;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLELIST;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
 
             size_dword_791C58 = 4;
             break;
@@ -816,10 +1008,10 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType0(pStructVert, 2);
             convertVertexType0(pStructVert, 3);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
             size_dword_791C58 = 5;
             break;
@@ -836,12 +1028,12 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             TextureIdx0 &= 0xFFFF;
             TextureIdx1 &= 0xFFFF;
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-            g_nTextureIndex = gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+            g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
             if (g_nTextureIndex >= gNumTextures_word_6FC78C)
             {
-                gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0;
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0;
             }
             else
             {
@@ -861,9 +1053,9 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType1(pStructVert, 2, g_fU2, g_fV2);
             convertVertexType1(pStructVert, 3, g_fU3, g_fV3);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
             size_dword_791C58 = 9;
             break;
@@ -883,10 +1075,10 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType2(pStructVert, 1);
             convertVertexType2(pStructVert, 2);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 3;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLELIST;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 3;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLELIST;
 
             size_dword_791C58 = 6;
             break;
@@ -904,12 +1096,12 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             TextureIdx0 &= 0xFFFF;
             TextureIdx1 &= 0xFFFF;
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-            g_nTextureIndex = gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+            g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
             if (g_nTextureIndex >= gNumTextures_word_6FC78C)
             {
-                gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0;
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0;
             }
             else
             {
@@ -927,9 +1119,9 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType3(pStructVert, 1, g_fU1, g_fV1);
             convertVertexType3(pStructVert, 2, g_fU2, g_fV2);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 3;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLELIST;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 3;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLELIST;
 
             size_dword_791C58 = 9;
         }
@@ -944,7 +1136,7 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             g_fYOffset = g_wYOffset;
             handleBlendMode(word_6C0EAC);
 
-            if (gPrimStructArray[gPrimIdx_dword_6FC788].nBlendMode == 3)
+            if (gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nBlendMode == 3)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -959,19 +1151,19 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType2(pStructVert, 2);
             convertVertexType2(pStructVert, 3);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
-            if (gPrimStructArray[gPrimIdx_dword_6FC788].nBlendMode == 3 && dword_6FC774 != 0)
+            if (gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nBlendMode == 3 && dword_6FC774 != 0)
             {
                 convertVertexType2(pStructVert, 0);
                 convertVertexType2(pStructVert, 1);
                 convertVertexType2(pStructVert, 2);
                 convertVertexType2(pStructVert, 3);
 
-                gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount += 4;
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount += 4;
             }
 
             size_dword_791C58 = 8;
@@ -1033,7 +1225,7 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             uint32_t TextureIdx0, TextureIdx1;
             if (Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
             {
-                gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFE;
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFE;
                 g_fU0 = (float)(TextureIdx0 & 0xFFFF);
                 g_fV0 = (float)(TextureIdx1 & 0xFFFF);
 
@@ -1054,12 +1246,12 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
                 TextureIdx0 &= 0xFFFF;
                 TextureIdx1 &= 0xFFFF;
 
-                gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-                g_nTextureIndex = gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex;
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+                g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
                 if (g_nTextureIndex >= gNumTextures_word_6FC78C)
                 {
-                    gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0;
+                    gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0;
                 }
                 else
                 {
@@ -1072,7 +1264,7 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
                     uint16_t* pIndex = (uint16_t*)(0x6FC728 + ((pStructVert->DifVtx[0].textureIdx >> 6) << 11) + ((pStructVert->DifVtx[0].textureIdx & 0x3F) << 5));
                     if (*pIndex == 0xEDED)
                     {
-                        gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFF0;
+                        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFF0;
                         otItemType_dword_791C54 &= 0xFFFFFFFD;
                     }
                 }
@@ -1082,45 +1274,45 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             g_fYOffset = g_wYOffset;
             handleBlendMode(pStructVert->DifVtx[1].textureIdx);
 
-            g_pMGSVertices[g_nVertexOffset].x = position[3] + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = position[7] + g_fYOffset;
-            g_pMGSVertices[g_nVertexOffset].z = position[11];
-            g_pMGSVertices[g_nVertexOffset].w = position[15];
-            g_pMGSVertices[g_nVertexOffset].u = g_fU0;
-            g_pMGSVertices[g_nVertexOffset].v = g_fV0;
-            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[0].diffuseR, pStructVert->DifVtx[0].diffuseG, pStructVert->DifVtx[0].diffuseB);
-            g_nVertexOffset++;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = position[3] + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = position[7] + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = position[11];
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = position[15];
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = g_fU0;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = g_fV0;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[0].diffuseR, pStructVert->DifVtx[0].diffuseG, pStructVert->DifVtx[0].diffuseB);
+            g_nVertexOffset_6FC784++;
 
-            g_pMGSVertices[g_nVertexOffset].x = position[2] + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = position[6] + g_fYOffset;
-            g_pMGSVertices[g_nVertexOffset].z = position[10];
-            g_pMGSVertices[g_nVertexOffset].w = position[14];
-            g_pMGSVertices[g_nVertexOffset].u = g_fU1;
-            g_pMGSVertices[g_nVertexOffset].v = g_fV1;
-            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[1].diffuseR, pStructVert->DifVtx[1].diffuseG, pStructVert->DifVtx[1].diffuseB);
-            g_nVertexOffset++;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = position[2] + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = position[6] + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = position[10];
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = position[14];
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = g_fU1;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = g_fV1;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[1].diffuseR, pStructVert->DifVtx[1].diffuseG, pStructVert->DifVtx[1].diffuseB);
+            g_nVertexOffset_6FC784++;
 
-            g_pMGSVertices[g_nVertexOffset].x = position[1] + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = position[5] + g_fYOffset;
-            g_pMGSVertices[g_nVertexOffset].z = position[9];
-            g_pMGSVertices[g_nVertexOffset].w = position[13];
-            g_pMGSVertices[g_nVertexOffset].u = g_fU2;
-            g_pMGSVertices[g_nVertexOffset].v = g_fV2;
-            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[2].diffuseR, pStructVert->DifVtx[2].diffuseG, pStructVert->DifVtx[2].diffuseB);
-            g_nVertexOffset++;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = position[1] + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = position[5] + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = position[9];
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = position[13];
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = g_fU2;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = g_fV2;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[2].diffuseR, pStructVert->DifVtx[2].diffuseG, pStructVert->DifVtx[2].diffuseB);
+            g_nVertexOffset_6FC784++;
 
-            g_pMGSVertices[g_nVertexOffset].x = position[0] + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = position[4] + g_fYOffset;
-            g_pMGSVertices[g_nVertexOffset].z = position[8];
-            g_pMGSVertices[g_nVertexOffset].w = position[12];
-            g_pMGSVertices[g_nVertexOffset].u = g_fU3;
-            g_pMGSVertices[g_nVertexOffset].v = g_fV3;
-            g_pMGSVertices[g_nVertexOffset].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[3].diffuseR, pStructVert->DifVtx[3].diffuseG, pStructVert->DifVtx[3].diffuseB);
-            g_nVertexOffset++;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = position[0] + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = position[4] + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].z = position[8];
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].w = position[12];
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = g_fU3;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = g_fV3;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].diffuse = calculateModX2Diffuse(pStructVert->DifVtx[3].diffuseR, pStructVert->DifVtx[3].diffuseG, pStructVert->DifVtx[3].diffuseB);
+            g_nVertexOffset_6FC784++;
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
             size_dword_791C58 = 0xC;
             break;
@@ -1140,17 +1332,17 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
 
             convertVertexType0(pStructVert, 0);
             convertVertexType0(pStructVert, 0);
-            g_pMGSVertices[g_nVertexOffset - 1].x += fXSize;
-            g_pMGSVertices[g_nVertexOffset - 1].y += fYSize;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 - 1].x += fXSize;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 - 1].y += fYSize;
             convertVertexType0(pStructVert, 1);
             convertVertexType0(pStructVert, 1);
-            g_pMGSVertices[g_nVertexOffset - 1].x += fXSize;
-            g_pMGSVertices[g_nVertexOffset - 1].y += fYSize;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 - 1].x += fXSize;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 - 1].y += fYSize;
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
 
             size_dword_791C58 = 3;
             break;
@@ -1170,10 +1362,10 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType0(pStructVert, 1);
             convertVertexType0(pStructVert, 2);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 3;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_LINESTRIP;
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 3;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_LINESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
 
             size_dword_791C58 = 5;
             break;
@@ -1194,10 +1386,10 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType0(pStructVert, 2);
             convertVertexType0(pStructVert, 3);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_LINESTRIP;
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_LINESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
 
             size_dword_791C58 = 6;
             break;
@@ -1216,10 +1408,10 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType2(pStructVert, 0);
             convertVertexType2(pStructVert, 1);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 2;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_LINELIST;
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 2;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_GOURAUD;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_LINELIST;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
 
             size_dword_791C58 = 4;
             break;
@@ -1239,20 +1431,20 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
 
             handleBlendMode(word_6C0EAC);
             convertVertexType0(pStructVert, 0);
-            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = convertPositionFloat(pStructVert->Vtxs[0].y) + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = fSecondX + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = convertPositionFloat(pStructVert->Vtxs[0].y) + g_fYOffset;
             convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = convertPositionFloat(pStructVert->Vtxs[0].x) + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = convertPositionFloat(pStructVert->Vtxs[0].x) + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = fSecondY + g_fYOffset;
             convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = fSecondX + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = fSecondY + g_fYOffset;
             convertColorWZType0(pStructVert);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
 
             size_dword_791C58 = 3;
             break;
@@ -1274,7 +1466,7 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             uint32_t TextureIdx0, TextureIdx1;
             if (Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
             {
-                gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFD;
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFD;
                 g_fU0 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
                 g_fV0 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
 
@@ -1294,8 +1486,8 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             {
                 if (pStructVert->TexVtx[0].textureIdx & 0x8000)
                 {
-                    gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 1 + (pStructVert->TexVtx[0].textureIdx & 0xF);
-                    g_nTextureIndex = gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex;
+                    gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 1 + (pStructVert->TexVtx[0].textureIdx & 0xF);
+                    g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
                     pStructVert->TexVtx[0].u = 0;
                     pStructVert->TexVtx[0].v = 0;
                 }
@@ -1303,12 +1495,12 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
                 {
                     TextureIdx0 &= 0xFFFF;
                     TextureIdx1 &= 0xFFFF;
-                    gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-                    g_nTextureIndex = gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex;
+                    gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+                    g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
                 }
                 if (g_nTextureIndex >= gNumTextures_word_6FC78C)
                 {
-                    gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0;
+                    gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0;
                 }
                 else
                 {
@@ -1325,19 +1517,19 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             handleBlendMode(word_6C0EAC, 0x8000);
 
             convertVertexType1(pStructVert, 0, g_fU0, g_fV0);
-            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = convertPositionFloat(pStructVert->TexVtx[0].Vtx.y) + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = fSecondX + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = convertPositionFloat(pStructVert->TexVtx[0].Vtx.y) + g_fYOffset;
             convertExceptPosType1(pStructVert, g_fU1, g_fV1);
-            g_pMGSVertices[g_nVertexOffset].x = convertPositionFloat(pStructVert->TexVtx[0].Vtx.x) + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = convertPositionFloat(pStructVert->TexVtx[0].Vtx.x) + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = fSecondY + g_fYOffset;
             convertExceptPosType1(pStructVert, g_fU2, g_fV2);
-            g_pMGSVertices[g_nVertexOffset].x = fSecondX + g_fXOffset;
-            g_pMGSVertices[g_nVertexOffset].y = fSecondY + g_fYOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = fSecondX + g_fXOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = fSecondY + g_fYOffset;
             convertExceptPosType1(pStructVert, g_fU3, g_fV3);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
             size_dword_791C58 = 4;
             break;
@@ -1357,23 +1549,23 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
 
             float centerX = convertPositionFloat(pStructVert->Vtxs[0].x);
             float centerY = convertPositionFloat(pStructVert->Vtxs[0].y);
-            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset - fHalfOffset;
-            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset - fHalfOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = centerX + g_fXOffset - fHalfOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = centerY + g_fYOffset - fHalfOffset;
             convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset + fHalfOffset;
-            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset - fHalfOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = centerX + g_fXOffset + fHalfOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = centerY + g_fYOffset - fHalfOffset;
             convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset - fHalfOffset;
-            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset + fHalfOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = centerX + g_fXOffset - fHalfOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = centerY + g_fYOffset + fHalfOffset;
             convertColorWZType0(pStructVert);
-            g_pMGSVertices[g_nVertexOffset].x = centerX + g_fXOffset + fHalfOffset;
-            g_pMGSVertices[g_nVertexOffset].y = centerY + g_fYOffset + fHalfOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = centerX + g_fXOffset + fHalfOffset;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = centerY + g_fYOffset + fHalfOffset;
             convertColorWZType0(pStructVert);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
 
             size_dword_791C58 = 2;
             break;
@@ -1411,7 +1603,7 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             StructVertType4* pStructVert = (StructVertType4*)otItem;
             if ((pStructVert->Vtx[0].textureIdx & 0x8000) != 0)
             {
-                gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFF0;
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFF0;
             }
             else
             {
@@ -1419,12 +1611,12 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
                 Render_ComputeTextureIdx(pStructVert->Vtx[1].textureIdx, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &TextureIdx0, &TextureIdx1);
                 TextureIdx0 &= 0xFFFF;
                 TextureIdx1 &= 0xFFFF;
-                gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
-                g_nTextureIndex = gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex;
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+                g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
                 if (g_nTextureIndex >= gNumTextures_word_6FC78C)
                 {
-                    gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0;
+                    gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0;
                 }
                 else
                 {
@@ -1445,9 +1637,9 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             convertVertexType4(pStructVert, 2, g_fU2, g_fV2);
             convertVertexType4(pStructVert, 3, g_fU3, g_fV3);
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 4;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 4;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = D3DPT_TRIANGLESTRIP;
 
             size_dword_791C58 = 0xD;
             break;
@@ -1488,16 +1680,16 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             word_6C0E9C = (pStructVert->field0 & 0x3FF) - gDrawEnv_6C0E98.clip.x1 + 1;
             word_6C0E9E = ((pStructVert->field0 >> 10) & 0x3FF) - word_6C0E9A + 1;
 
-            g_pMGSVertices[g_nVertexOffset].x = (float)gDrawEnv_6C0E98.clip.x1;
-            g_pMGSVertices[g_nVertexOffset].y = (float)word_6C0E9A;
-            g_pMGSVertices[g_nVertexOffset].u = (float)word_6C0E9C;
-            g_pMGSVertices[g_nVertexOffset].v = (float)word_6C0E9E;
-            g_nVertexOffset++;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = (float)gDrawEnv_6C0E98.clip.x1;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = (float)word_6C0E9A;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = (float)word_6C0E9C;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = (float)word_6C0E9E;
+            g_nVertexOffset_6FC784++;
 
-            gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount = 1;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
-            gPrimStructArray[gPrimIdx_dword_6FC788].mPrimTypeQ = 0x7D0; // ?
-            gPrimStructArray[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 1;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = D3DSHADE_FLAT;
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = 0x7D0; // ?
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFF;
 
             size_dword_791C58 = 1;
             break;
@@ -1524,7 +1716,7 @@ int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItem
             break;
         }
 
-        if (gPrimStructArray[gPrimIdx_dword_6FC788].dwVertexCount != 0)
+        if (gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount != 0)
         {
             gPrimIdx_dword_6FC788++;
         }
@@ -1632,7 +1824,7 @@ void CC Render_DrawGeneric_4103B0(TaggedOrderingTablePointer* a_pStructVert)
         }
         if (gSoftwareRendering == 0)
         {
-            Render_DrawHardware();
+            Render_DrawHardware_421C00();
         }
     }
     if (gSoftwareRendering == 0)
