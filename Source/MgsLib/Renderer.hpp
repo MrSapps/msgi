@@ -84,6 +84,7 @@ void CC PrintDDError(const char* errMsg, HRESULT hrErr);
 __int16 CC Render_RestoreAll();
 void CC Render_DrawIndex_401619(uint32_t a_nIndex);
 int CC Renderer_ClearOTag(DWORD* ot, int otSize);
+bool CC ClearDDSurfaceWhite_41E990();
 
 EXTERN_MGS_FUNC_NOT_IMPL(0x422BC0, HRESULT __cdecl (unsigned int, signed int, int), Render_InitTextureStages_422BC0);
 EXTERN_MGS_FUNC_NOT_IMPL(0x422A90, HRESULT __cdecl(signed int, int), Render_SetRenderState_422A90);

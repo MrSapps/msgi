@@ -434,13 +434,42 @@ MGS_FUNC_NOT_IMPL(0x422BC0, HRESULT __cdecl (unsigned int, signed int, int), Ren
 MGS_FUNC_NOT_IMPL(0x422A90, HRESULT __cdecl(signed int, int), Render_SetRenderState_422A90);
 MGS_FUNC_NOT_IMPL(0x421280, void __cdecl(MGSVertex *pVert, int idx), Render_sub_421280);
 MGS_FUNC_NOT_IMPL(0x424020, void __cdecl(IDirectDrawSurface7 *pSurface, MGSVertex* pVert), Render_DrawTextBeginScene_424020);
-MGS_FUNC_NOT_IMPL(0x420840, void __cdecl (DWORD *a1, DWORD *arg4), Render_sub_420840);
-MGS_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl (), Render_SetTexture_41E9E0);
+MGS_FUNC_NOT_IMPL(0x420840, void __cdecl (DWORD *a1, DWORD *arg4), Render_sub_420840);;
 MGS_FUNC_NOT_IMPL(0x421800, void __cdecl(int mode, const MGSVertex *pVerts, signed int vertexCount, int primIdx), Render_BlendMode_sub_421800);
 
-
+// WinMain.cpp
+MGS_VAR_EXTERN(LPDIRECTDRAWSURFACE7, g_pDDSurface_6FC740);
 MGS_VAR_EXTERN(DWORD, gNoFilter);
 MGS_VAR_EXTERN(DWORD, gNoEffects);
+
+bool CC ClearDDSurfaceWhite_41E990()
+{
+    DDBLTFX bltFX = {};
+    bltFX.dwSize = sizeof(DDBLTFX);
+    bltFX.dwFillColor = 0xFFFF;
+    HRESULT hr;
+    do
+    {
+        hr = g_pDDSurface_6FC740->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
+    } while (hr == DDERR_WASSTILLDRAWING);
+    return hr == S_OK;
+}
+MGS_FUNC_IMPLEX(0x41E990, ClearDDSurfaceWhite_41E990, RENDERER_IMPL);
+
+
+HRESULT CC Render_SetTexture_41E9E0()
+{
+    if (g_pDDSurface_6FC740)
+    {
+        if (g_pDDSurface_6FC740->IsLost() == DDERR_SURFACELOST)
+        {
+            g_pDDSurface_6FC740->Restore();
+            ClearDDSurfaceWhite_41E990();
+        }
+        return gD3dDevice_6FC74C->SetTexture(0, g_pDDSurface_6FC740);
+    }
+    return gD3dDevice_6FC74C->SetTexture(0, nullptr);
+}
 
 void CC Render_DrawHardware_helper_4233C0()
 {

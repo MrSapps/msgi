@@ -140,7 +140,7 @@ MGS_VAR(1, 0x6DF1FC, DWORD, g_dwDisplayHeight, 0);
 MGS_VAR(1, 0x6FC750, LPDIRECTDRAWCLIPPER, g_pClipper, nullptr);
 
 MGS_VAR(1, 0x6FC74C, LPDIRECT3DDEVICE7, gD3dDevice_6FC74C, nullptr);
-MGS_VAR(1, 0x6FC740, LPDIRECTDRAWSURFACE7, g_pDDSurface, nullptr);
+MGS_VAR(1, 0x6FC740, LPDIRECTDRAWSURFACE7, g_pDDSurface_6FC740, nullptr);
 
 MGS_VAR(1, 0x006DEF78, FILE *, gFile, nullptr);
 MGS_VAR(1, 0x71D414, FILE *, gLogFile, nullptr);
@@ -1358,21 +1358,6 @@ int __cdecl jim_enumerate_devices()
     return 0;
 }
 
-//MSG_FUNC_NOT_IMPL(0x41E990, int __cdecl(), ClearDDSurfaceWhite);
-bool __cdecl ClearDDSurfaceWhite()
-{
-    DDBLTFX bltFX = {};
-    bltFX.dwSize = sizeof(DDBLTFX);
-    bltFX.dwFillColor = 0xFFFF;
-    HRESULT hr;
-    do 
-    {
-        hr = g_pDDSurface->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
-    } while (hr == DDERR_WASSTILLDRAWING);
-    return hr == S_OK;
-}
-MGS_FUNC_IMPLEX(0x41E990, ClearDDSurfaceWhite, WINMAIN_IMPL);
-
 #define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
 
 
@@ -1934,17 +1919,17 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 dxSurfaceDesc3.ddsCaps.dwCaps = DDSCAPS_TEXTURE;
                 dxSurfaceDesc3.ddsCaps.dwCaps2 = DDSCAPS2_TEXTUREMANAGE;
 
-                hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc3, &g_pDDSurface, 0);
+                hr = g_pDirectDraw->CreateSurface(&dxSurfaceDesc3, &g_pDDSurface_6FC740, 0);
                 if (FAILED(hr))
                 {
-                    g_pDDSurface = 0;
+                    g_pDDSurface_6FC740 = 0;
                 }
                 else 
                 {
-                    if (!ClearDDSurfaceWhite())
+                    if (!ClearDDSurfaceWhite_41E990())
                     {
-                        g_pDDSurface->Release();
-                        g_pDDSurface = 0;
+                        g_pDDSurface_6FC740->Release();
+                        g_pDDSurface_6FC740 = 0;
                     }
                 }
             }
@@ -2157,14 +2142,14 @@ HRESULT __cdecl SetDDSurfaceTexture()
 {
     HRESULT hr;
 
-    if (g_pDDSurface != 0)
+    if (g_pDDSurface_6FC740 != 0)
     {
-        if (g_pDDSurface->IsLost() == DDERR_SURFACELOST)
+        if (g_pDDSurface_6FC740->IsLost() == DDERR_SURFACELOST)
         {
-            g_pDDSurface->Restore();
-            ClearDDSurfaceWhite();
+            g_pDDSurface_6FC740->Restore();
+            ClearDDSurfaceWhite_41E990();
         }
-        hr = gD3dDevice_6FC74C->SetTexture(0, g_pDDSurface);
+        hr = gD3dDevice_6FC74C->SetTexture(0, g_pDDSurface_6FC740);
     }
     else
     {
@@ -2681,10 +2666,10 @@ void __cdecl ClearAll()
         g_pDirectDraw = nullptr;
     }
 
-    if (g_pDDSurface)
+    if (g_pDDSurface_6FC740)
     {
-        g_pDDSurface->Release();
-        g_pDDSurface = nullptr;
+        g_pDDSurface_6FC740->Release();
+        g_pDDSurface_6FC740 = nullptr;
     }
 
     if (g_pMGSVertices_6FC780)
