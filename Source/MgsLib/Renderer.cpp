@@ -99,6 +99,7 @@ MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
 MGS_VAR(1, 0x6FC744, DWORD, dword_6FC744, 0);
 MGS_VAR(1, 0x650D10, DWORD, dword_650D10, 0);
 MGS_VAR(1, 0x6FC778, DWORD, dword_6FC778, 0);
+MGS_VAR(1, 0x6FC760, DWORD, dword_6FC760, 0);
 
 
 
@@ -429,7 +430,6 @@ MGS_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint3
 MGS_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
 MGS_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 MGS_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct TaggedOrderingTablePointer* a_pStructVert, int a_nSize), Render_Software);
-MGS_FUNC_NOT_IMPL(0x4233C0, uint32_t __cdecl(), Render_DrawHardware_helper_4233C0);
 MGS_FUNC_NOT_IMPL(0x422BC0, HRESULT __cdecl (unsigned int, signed int, int), Render_InitTextureStages_422BC0);
 MGS_FUNC_NOT_IMPL(0x422A90, HRESULT __cdecl(signed int, int), Render_SetRenderState_422A90);
 MGS_FUNC_NOT_IMPL(0x421280, void __cdecl(MGSVertex *pVert, int idx), Render_sub_421280);
@@ -439,13 +439,66 @@ MGS_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl (), Render_SetTexture_41E9E0);
 MGS_FUNC_NOT_IMPL(0x421800, void __cdecl(int mode, const MGSVertex *pVerts, signed int vertexCount, int primIdx), Render_BlendMode_sub_421800);
 
 
-
-
-
 MGS_VAR_EXTERN(DWORD, gNoFilter);
 MGS_VAR_EXTERN(DWORD, gNoEffects);
 
-//MGS_FUNC_NOT_IMPL(0x421C00, void __cdecl(), Render_DrawHardware_421C00);
+void CC Render_DrawHardware_helper_4233C0()
+{
+    if (dword_6FC760)
+    {
+        memset(&g_pMGSVertices_6FC780[g_nVertexOffset_6FC784], 0, sizeof(MGSVertex) * 6);
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 5].w = 1.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 4].w = 1.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 3].w = 1.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 2].w = 1.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 1].w = 1.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 0].w = 1.0f;
+
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 5].diffuse = 0xFFFFFF;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 4].diffuse = 0xFFFFFF;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 3].diffuse = 0xFFFFFF;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 2].diffuse = 0xFFFFFF;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 1].diffuse = 0xFFFFFF;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 0].diffuse = 0xFFFFFF;
+
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 0].x = 0.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 0].y = 0.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 0].u = 0.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 0].v = 0.0f;
+
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 1].x = (float)gTextures_6C0F00[word_6FC764].field_10_x;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 1].y = 0.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 1].u = 1.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 1].v = 0.0f;
+
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 2].x = 0.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 2].y = (float)gTextures_6C0F00[word_6FC764].field_12_y;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 2].u = 1.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 2].v = 0x3F800000;
+
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 3].x = (float)gTextures_6C0F00[word_6FC764].field_10_x;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 3].y = 0.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 3].u = 1.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 3].v = 0.0f;
+
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 4].x = (float)gTextures_6C0F00[word_6FC764].field_10_x;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 4].y = (float)gTextures_6C0F00[word_6FC764].field_12_y;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 4].u = 1.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 4].v = 1.0f;
+
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 5].x = 0.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 5].y = (float)gTextures_6C0F00[word_6FC764].field_12_y;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 5].u = 0.0f;
+        g_pMGSVertices_6FC780[g_nVertexOffset_6FC784 + 5].v = 1.0f;
+
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 6;
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mShadeMode = 1;
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].mPrimTypeQ = 4;
+        gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788++].nTextureIndex = word_6FC764;
+        g_nVertexOffset_6FC784 += 6;
+    }
+}
+MGS_FUNC_IMPLEX(0x4233C0, Render_DrawHardware_helper_4233C0, RENDERER_IMPL);
 
 void CC Render_DrawHardware_421C00()
 {
@@ -455,7 +508,6 @@ void CC Render_DrawHardware_421C00()
         g_pMGSVertices_6FC780[i].y = (g_pMGSVertices_6FC780[i].y - (float)gDisp_y_word_6FC7B2) * gXRes;
     }
 
-  
     Render_DrawHardware_helper_4233C0();
 
     DWORD primSubIdx = 0;

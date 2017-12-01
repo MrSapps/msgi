@@ -30,8 +30,8 @@ struct texture_struct
     WORD field_A;
     WORD field_C;
     WORD field_E;
-    WORD field_10;
-    WORD field_12;
+    WORD field_10_x;
+    WORD field_12_y;
     DWORD float_field_14;
     DWORD float_field_18;
     DWORD mSurfaceType;
