@@ -27,6 +27,8 @@ EXTERN_MGS_STDLIB(fputs, 0x0053C970);
 EXTERN_MGS_STDLIB(fflush, 0x0053C6C0);
 EXTERN_MGS_STDLIB(fclose, 0x0053C4A0);
 EXTERN_MGS_STDLIB(fwrite, 0x0053F550);
+EXTERN_MGS_STDLIB(fread, 0x0053CEE0);
+EXTERN_MGS_STDLIB(fseek, 0x0053CD00);
 
 int mgs_open(const char* filename, int openFlag);
 int mgs_open(const char* filename, int openFlag, DWORD mode);

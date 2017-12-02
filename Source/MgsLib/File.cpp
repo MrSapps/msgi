@@ -63,6 +63,8 @@ MGS_STDLIB(fwrite, 0x0053F550);
 MGS_STDLIB(close, 0x0053D680);
 MGS_STDLIB(lseek, 0x0053E180);
 MGS_STDLIB(read, 0x0053D1A0);
+MGS_STDLIB(fread, 0x0053CEE0);
+MGS_STDLIB(fseek, 0x0053CD00);
 
 // 0x00520157
 void DebugLog(const char *Format, ...)

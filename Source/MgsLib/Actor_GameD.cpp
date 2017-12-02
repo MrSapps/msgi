@@ -120,7 +120,8 @@ static void GameD_Update_helper(DWORD buttons)
     }
     if (game_state_dword_72279C & 0x80000000)
     {
-        abort();
+        LOG_WARNING("Not implemented");
+        //abort();
         /* TODO
         if (gArrayPtr_dword_995324[2].field_2 & 0x840)
         {

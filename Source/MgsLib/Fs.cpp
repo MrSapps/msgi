@@ -3,7 +3,7 @@
 #include "System.hpp"
 #include "Actor_Loader.hpp"
 #include "Actor_GameD.hpp"
-
+#include "File.hpp"
 
 
 #define FS_IMPL true
@@ -76,20 +76,14 @@ FILE* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
         strcat(fileToOpen, "/");
         strcat(fileToOpen, remappedFileName);
         const char* strOpenMode = gOpenModes_689998[openMode % 4];
-        hFile = fopen(fileToOpen, strOpenMode);
+        hFile = mgs_fopen(fileToOpen, strOpenMode);
         if (!hFile)
         {
             // For some reason try again one more time?
             strcpy(fileToOpen, ".");
             strcat(fileToOpen, "/");
             strcat(fileToOpen, remappedFileName);
-            hFile = fopen(fileToOpen, strOpenMode);
-        }
-
-        // TODO: Die for now - mixing crt funcs will blow up
-        if (hFile && IsMgsi())
-        {
-            abort();
+            hFile = mgs_fopen(fileToOpen, strOpenMode);
         }
     }
     return hFile;
@@ -98,7 +92,7 @@ MGS_FUNC_IMPLEX(0x0051EE8F, File_LoadDirFile_51EE8F, FS_IMPL)
 
 size_t CC File_NormalRead_51F0F5(FILE* File, void* dstBuf, DWORD nNumberOfBytesToRead)
 {
-    return fread(dstBuf, 1, nNumberOfBytesToRead, File);
+    return mgs_fread(dstBuf, 1, nNumberOfBytesToRead, File);
 }
 MGS_FUNC_IMPLEX(0x0051F0F5, File_NormalRead_51F0F5, false) // TODO
 
@@ -106,7 +100,7 @@ __int32 CC File_GetPos_51F09E(FILE* File, __int32 Offset, int Origin)
 {
     if (File != (FILE *)-1 && File)
     {
-        fseek(File, Offset, Origin);
+        mgs_fseek(File, Offset, Origin);
         return ftell(File);
     }
     return 0;
@@ -120,7 +114,7 @@ int CC File_Close_51F183(FILE *File)
         return 0;
     }
 
-    return fclose(File);
+    return mgs_fclose(File);
 }
 MGS_FUNC_IMPLEX(0x0051F183, File_Close_51F183, false) // TODO
 
