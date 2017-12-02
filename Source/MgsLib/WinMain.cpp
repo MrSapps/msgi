@@ -1936,12 +1936,12 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 }
             }
 
-            Render_InitTextureStages_422BC0(0, 2, 2);
-            Render_InitTextureStages_422BC0(0, 1, 4);
-            Render_InitTextureStages_422BC0(0, 3, 0);
-            Render_InitTextureStages_422BC0(0, 5, 2);
-            Render_InitTextureStages_422BC0(0, 4, 4);
-            Render_InitTextureStages_422BC0(0, 6, 0);
+            Render_InitTextureStages_422BC0(0, D3DTSS_COLORARG1, 2);
+            Render_InitTextureStages_422BC0(0, D3DTSS_COLOROP, 4);
+            Render_InitTextureStages_422BC0(0, D3DTSS_COLORARG2, 0);
+            Render_InitTextureStages_422BC0(0, D3DTSS_ALPHAARG1, 2);
+            Render_InitTextureStages_422BC0(0, D3DTSS_ALPHAOP, 4);
+            Render_InitTextureStages_422BC0(0, D3DTSS_ALPHAARG2, 0);
 
             if (Render_sub_41E3C0())
             {
@@ -1949,7 +1949,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 mgs_fprintf(gFile, "Alpha modulate = %i \n", gAlphaModulate_dword_6FC798);
                 gColourKey = Render_sub_41E730();
                 mgs_fprintf(gFile, "ColorKey = %i\n", gColourKey);
-                Render_InitTextureStages_422BC0(0, 12, 3);
+                Render_InitTextureStages_422BC0(0, D3DTSS_ADDRESS, 3);
                 
                 if (gModX2 == 2)
                 {
@@ -2210,7 +2210,7 @@ signed int Render_sub_41E3C0()
     if (SUCCEEDED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
     {
         gAlphaModulate_dword_6FC798 = 0;
-        Render_InitTextureStages_422BC0(0, 4, 2);
+        Render_InitTextureStages_422BC0(0, D3DTSS_ALPHAOP, 2);
     }
     else
     {

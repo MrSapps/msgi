@@ -428,10 +428,9 @@ MGS_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint3
 MGS_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
 MGS_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 MGS_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct TaggedOrderingTablePointer* a_pStructVert, int a_nSize), Render_Software);
-MGS_FUNC_NOT_IMPL(0x422BC0, HRESULT __cdecl (unsigned int, signed int, int), Render_InitTextureStages_422BC0);
 MGS_FUNC_NOT_IMPL(0x421280, void __cdecl(MGSVertex *pVert, int idx), Render_sub_421280);
 MGS_FUNC_NOT_IMPL(0x424020, void __cdecl(IDirectDrawSurface7 *pSurface, MGSVertex* pVert), Render_DrawTextBeginScene_424020);
-MGS_FUNC_NOT_IMPL(0x420840, void __cdecl (DWORD *a1, DWORD *arg4), Render_sub_420840);;
+MGS_FUNC_NOT_IMPL(0x420840, void __cdecl (DWORD *a1, DWORD *arg4), Render_sub_420840);
 MGS_FUNC_NOT_IMPL(0x421800, void __cdecl(int mode, const MGSVertex *pVerts, signed int vertexCount, int primIdx), Render_BlendMode_sub_421800);
 
 // WinMain.cpp
@@ -439,7 +438,7 @@ MGS_VAR_EXTERN(LPDIRECTDRAWSURFACE7, g_pDDSurface_6FC740);
 MGS_VAR_EXTERN(DWORD, gNoFilter);
 MGS_VAR_EXTERN(DWORD, gNoEffects);
 
-MGS_ARY(RENDERER_IMPL, 0x6DEF98, DWORD, 153, gRenderStates_6DEF98, {});
+MGS_ARY(RENDERER_IMPL, 0x6DEF98, DWORD, 153, sRenderStates_6DEF98, {});
 
 HRESULT CC Render_SetRenderState_422A90(D3DRENDERSTATETYPE renderState, DWORD value)
 {
@@ -451,7 +450,7 @@ HRESULT CC Render_SetRenderState_422A90(D3DRENDERSTATETYPE renderState, DWORD va
         gD3dDevice_6FC74C->SetRenderState(D3DRENDERSTATE_CLIPPING, 1);
         for (int i = 0; i < 153; ++i)
         {
-            gD3dDevice_6FC74C->GetRenderState(static_cast<D3DRENDERSTATETYPE>(i), &gRenderStates_6DEF98[i]);
+            gD3dDevice_6FC74C->GetRenderState(static_cast<D3DRENDERSTATETYPE>(i), &sRenderStates_6DEF98[i]);
         }
         sbNotDone_650D50 = 0;
     }
@@ -461,14 +460,53 @@ HRESULT CC Render_SetRenderState_422A90(D3DRENDERSTATETYPE renderState, DWORD va
     {
         ret = gD3dDevice_6FC74C->SetRenderState(renderState, value);
     }
-    else if (gRenderStates_6DEF98[renderState] != value)
+    else if (sRenderStates_6DEF98[renderState] != value)
     {
         ret = gD3dDevice_6FC74C->SetRenderState(renderState, value);
-        gD3dDevice_6FC74C->GetRenderState(renderState, &gRenderStates_6DEF98[renderState]);
+        gD3dDevice_6FC74C->GetRenderState(renderState, &sRenderStates_6DEF98[renderState]);
     }
     return ret;
 }
 MGS_FUNC_IMPLEX(0x422A90, Render_SetRenderState_422A90, RENDERER_IMPL);
+
+HRESULT CC Render_InitTextureStages_422BC0(unsigned int stage, D3DTEXTURESTAGESTATETYPE type2, DWORD v)
+{
+    static bool sTexturesStagesNotInited_650D54 = true;
+    static DWORD sTextureStageStates_dword_6C0B78[8][25] = {};
+
+    if (sTexturesStagesNotInited_650D54)
+    {
+        for (DWORD stageNum = 0; stageNum < 8; ++stageNum)
+        {
+            gD3dDevice_6FC74C->SetTextureStageState(stageNum, D3DTSS_COLOROP, 1);
+            gD3dDevice_6FC74C->SetTextureStageState(stageNum, D3DTSS_ALPHAOP, 1);
+        }
+
+        for (DWORD type1 = 0; type1 < 25; ++type1)
+        {
+            for (DWORD stageNum2 = 0; stageNum2 < 8; ++stageNum2)
+            {
+                gD3dDevice_6FC74C->GetTextureStageState(stageNum2, static_cast<D3DTEXTURESTAGESTATETYPE>(type1), &sTextureStageStates_dword_6C0B78[stageNum2][type1]);
+            }
+        }
+
+        sTexturesStagesNotInited_650D54 = false;
+    }
+
+    HRESULT hr = S_OK;
+
+    if (type2 >= 25 || stage >= 8)
+    {
+        hr = gD3dDevice_6FC74C->SetTextureStageState(stage, type2, v);
+    }
+    else if (sTextureStageStates_dword_6C0B78[stage][type2] != v)
+    {
+        hr = gD3dDevice_6FC74C->SetTextureStageState(stage, type2, v);
+        gD3dDevice_6FC74C->GetTextureStageState(stage, type2, &sTextureStageStates_dword_6C0B78[stage][type2]);
+    }
+    return hr;
+}
+MGS_FUNC_IMPLEX(0x422BC0, Render_InitTextureStages_422BC0, RENDERER_IMPL);
 
 bool CC ClearDDSurfaceWhite_41E990()
 {
@@ -619,13 +657,13 @@ void CC Render_DrawHardware_421C00()
             if (gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode & 0x8000)
             {
                 gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode &= 0x7FFFu;
-                Render_InitTextureStages_422BC0(0, 16, 1);
-                Render_InitTextureStages_422BC0(0, 17, 1);
+                Render_InitTextureStages_422BC0(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+                Render_InitTextureStages_422BC0(0, D3DTSS_MINFILTER, D3DTFG_POINT);
             }
             else if (gNoFilter)
             {
-                Render_InitTextureStages_422BC0(0, 16, 2);
-                Render_InitTextureStages_422BC0(0, 17, 2);
+                Render_InitTextureStages_422BC0(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+                Render_InitTextureStages_422BC0(0, D3DTSS_MINFILTER, D3DTFG_LINEAR);
             }
 
             Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHAREF, 127);
@@ -669,7 +707,7 @@ void CC Render_DrawHardware_421C00()
 
                 if (textureIdx >= gNumTextures_word_6FC78C)
                 {
-                    Render_InitTextureStages_422BC0(0, 1, 4);
+                    Render_InitTextureStages_422BC0(0, D3DTSS_COLOROP, 4);
                     Render_SetTexture_41E9E0();
                 }
                 else
@@ -677,11 +715,11 @@ void CC Render_DrawHardware_421C00()
                     gD3dDevice_6FC74C->SetTexture(0, gTextures_6C0F00[textureIdx].mSurface);
                     if (gModX2)
                     {
-                        Render_InitTextureStages_422BC0(0, 1, 5);
+                        Render_InitTextureStages_422BC0(0, D3DTSS_COLOROP, 5);
                     }
                     else
                     {
-                        Render_InitTextureStages_422BC0(0, 1, 4);
+                        Render_InitTextureStages_422BC0(0, D3DTSS_COLOROP, 4);
                     }
                 }
                 
