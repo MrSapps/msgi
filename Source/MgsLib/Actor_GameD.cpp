@@ -88,22 +88,69 @@ void CC Reset_GV_DG_44E212()
 }
 MGS_FUNC_IMPLEX(0x0044E212, Reset_GV_DG_44E212, ACTOR_GAMED_IMPL);
 
+static void GameD_Update_helper(DWORD buttons)
+{
+    if ((buttons & 0x90F) != 0x90F || dword_7227C4)
+    {
+        dword_722794 = 90;
+    }
+    else if (--dword_722794 < 0)
+    {
+        static char sPsxBinaryName_byte_722740[32] = {};
+        //sprintf(sPsxBinaryName_byte_722740, "cdrom:\\MGS\\%s;1", (&gBinaries_off_650068)[4 * gBinaryIndex_dword_78D7B0]);
+        SetDispMask(0);
+        //nullsub_70();
+        //nullsub_69();
+        //Ret0_44AC80();
+        //RetInput_6465B0(0);
+        //nullsub_11(v6);
+        //CloseEvents_40842A();
+        Resetgraph_AndPrintPsxStructureSizes(3);
+        //Ret0_6465E0();
+        //Ret0_44D000();
+        //Re0_6465D0();
+        //Ret0_6465E0();
+        //nullsub_18();
+        //nullsub_17();
+        for (;;)
+        {
+            printf("load %s\n", sPsxBinaryName_byte_722740);
+            //Ret0_44CFD0();
+        }
+    }
+    if (game_state_dword_72279C & 0x80000000)
+    {
+        abort();
+        /* TODO
+        if (gArrayPtr_dword_995324[2].field_2 & 0x840)
+        {
+        StreamActorStop_4583BB();
+        }*/
+    }
+    if (GameD_Input_445610() & 0x20)
+    {
+        //nullsub_68();
+        int v10 = 0;
+        char v11[24];
+        for (int i = 0; i < 24; ++i)
+        {
+            v10 = v11[i] & 1 | 2 * v10;
+        }
+    }
+
+    if (!gActorPauseFlags_dword_791A0C)
+    {
+        sub_44E8F1();
+    }
+}
+
 void CC GameD_update_44E381(GameD_Struct* pGameD)
 {
-    const DWORD v1 = GameD_Input_445610();
-    const DWORD v15 = v1;
+    const DWORD buttons = GameD_Input_445610();
 
-    /*
-    if (Ret0_445560() == 1)
-    {
-        gFlags_dword_78E7E4 &= 0xFBFFu;
-    }
-    else*/
-    {
-        gFlags_dword_78E7E4 |= 0x400u;
-    }
+    gFlags_dword_78E7E4 |= 0x400u;
 
-    if (!(gFlags_dword_78E7E4 & 0x2400))
+    if (!(gFlags_dword_78E7E4 & 0x2400)) // Dead code
     {
         //nullsub_10();
         int v14 = dword_99533C;
@@ -113,6 +160,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
         }
         //nullsub_12();
     }
+
     dword_99533C = 0;
     dword_9942A4 = 0;
 
@@ -168,11 +216,11 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
             }
 
             printf("exec scenario\n");
-            const int v12 = script_cancel_non_zero_dword_7227A0;
+            const int scriptDataCopy = script_cancel_non_zero_dword_7227A0;
             script_cancel_non_zero_dword_7227A0 = 0;
-            if (v12 & 0x20)
+            if (scriptDataCopy & 0x20)
             {
-                Script_ProcCancelOrRun(HIWORD(v12), 0);
+                Script_ProcCancelOrRun(HIWORD(scriptDataCopy), 0);
             }
             else
             {
@@ -187,6 +235,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
         }
         return;
     }
+
     if (gamed_unk_722780 != 1)
     {
         return;
@@ -234,88 +283,33 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
         }
         return;
     }
-    if (gGameOverTimer_dword_7227A4)
+
+    if (gGameOverTimer_dword_7227A4 > 0)
     {
-        if (gGameOverTimer_dword_7227A4 > 0)
+        if (gGameOverTimer_dword_7227A4 == 1)
         {
-            if (gGameOverTimer_dword_7227A4 == 1)
+            if (File_GetStreamState_45837C() == -1)
             {
-                if (File_GetStreamState_45837C() == -1)
+                if (Res_over_create_4502CD(1))
                 {
-                    if (Res_over_create_4502CD(1))
-                    {
-                        gGameOverTimer_dword_7227A4 = -1;
-                    }
-                    else
-                    {
-                        Actor_KillActorsAtLevel(4);
-                    }
+                    gGameOverTimer_dword_7227A4 = -1;
                 }
-                else if (File_GetStreamState_45837C() == 1)
+                else
                 {
-                    StreamActorStop_4583BB();
+                    Actor_KillActorsAtLevel(4);
                 }
             }
-            else
-            {
-                --gGameOverTimer_dword_7227A4;
-            }
-        }
-
-    LABEL_62:
-
-        if ((v15 & 0x90F) != 0x90F || dword_7227C4)
-        {
-            dword_722794 = 90;
-        }
-        else if (--dword_722794 < 0)
-        {
-            static char sPsxBinaryName_byte_722740[32] = {};
-            //sprintf(sPsxBinaryName_byte_722740, "cdrom:\\MGS\\%s;1", (&gBinaries_off_650068)[4 * gBinaryIndex_dword_78D7B0]);
-            SetDispMask(0);
-            //nullsub_70();
-            //nullsub_69();
-            //Ret0_44AC80();
-            //RetInput_6465B0(0);
-            //nullsub_11(v6);
-            //CloseEvents_40842A();
-            Resetgraph_AndPrintPsxStructureSizes(3);
-            //Ret0_6465E0();
-            //Ret0_44D000();
-            //Re0_6465D0();
-            //Ret0_6465E0();
-            //nullsub_18();
-            //nullsub_17();
-            for (;;)
-            {
-                printf("load %s\n", sPsxBinaryName_byte_722740);
-                //Ret0_44CFD0();
-            }
-        }
-        if (game_state_dword_72279C & 0x80000000)
-        {
-            abort();
-            /* TODO
-            if (gArrayPtr_dword_995324[2].field_2 & 0x840)
+            else if (File_GetStreamState_45837C() == 1)
             {
                 StreamActorStop_4583BB();
-            }*/
-        }
-        if (GameD_Input_445610() & 0x20)
-        {
-            //nullsub_68();
-            int v10 = 0;
-            char v11[24];
-            for (int i = 0; i < 24; ++i)
-            {
-                v10 = v11[i] & 1 | 2 * v10;
             }
         }
-
-        if (!gActorPauseFlags_dword_791A0C)
+        else
         {
-            sub_44E8F1();
+            --gGameOverTimer_dword_7227A4;
         }
+
+        GameD_Update_helper(buttons);
         return;
     }
 
@@ -348,7 +342,8 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
             }
         }
         GameD_update_helper_44F28B();
-        goto LABEL_62; // ???
+        GameD_Update_helper(buttons);
+        return;
     }
     
     if (script_cancel_non_zero_dword_7227A0 & 0x80)
