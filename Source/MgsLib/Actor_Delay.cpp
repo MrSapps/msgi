@@ -19,7 +19,7 @@ MGS_ASSERT_SIZEOF(Actor_Delay, 0x54);
 
 void CC Actor_Delay_Update_455451(Actor_Delay* pDelay)
 {
-    if (pDelay->mActive || !dword_7227A4)
+    if (pDelay->mActive || !gGameOverTimer_dword_7227A4)
     {
         if (--pDelay->mDelayCounter > 0)
         {

@@ -30,3 +30,5 @@ void CC Res_loader_EnableHiTex_51D1DB(const char* pcxName);
 const char* CC Res_loader_GetLine_408E1B(const char* pInput, char* pOutputLine);
 
 MGS_ARY_EXTERN(char, 256, gStage_Name_byte_6504C8);
+MGS_VAR_EXTERN(DWORD, dword_99533C);
+MGS_VAR_EXTERN(DWORD, gFixupLibDg_Allocs_And_Hahses_dword_78D7AC);

@@ -10,7 +10,7 @@
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
-MGS_VAR(1, 0x7227A4, DWORD, dword_7227A4, 0);
+MGS_VAR(1, 0x7227A4, int, gGameOverTimer_dword_7227A4, 0);
 MGS_VAR(1, 0x6BFBB4, int, gScriptFileNameHashedToLoad_6BFBB4, 0);
 
 #define SCRIPT_IMPL true
@@ -1042,6 +1042,20 @@ int CC Script_Operator_Evaluate(int operation, int v1, int v2)
     return result;
 }
 MGS_FUNC_IMPLEX(0x00409E7C, Script_Operator_Evaluate, SCRIPT_IMPL);
+
+void CC Script_RunMainProc_409D49()
+{
+    static GCL_Proc_Arguments sMainProcArgs_6BFC70 = {};
+    if (gScriptMainProc_dword_6BFC68)
+    {
+        if (*gScriptMainProc_dword_6BFC68 != 0x40)
+        {
+            printf("NOT SCRIPT DATA !!\n");
+        }
+        Script_Run(gScriptMainProc_dword_6BFC68 + 3, &sMainProcArgs_6BFC70);
+    }
+}
+MGS_FUNC_IMPLEX(0x00409D49, Script_RunMainProc_409D49, SCRIPT_IMPL);
 
 void CC Script_Push(BYTE *arg)
 {

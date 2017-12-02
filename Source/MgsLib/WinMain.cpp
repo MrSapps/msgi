@@ -99,7 +99,7 @@ MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, vo
 MGS_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
 MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
-MGS_FUNC_NOT_IMPL(0x4583BB, int __cdecl(), sub_4583BB);
+EXTERN_MGS_FUNC_NOT_IMPL(0x004583BB, void CC(), StreamActorStop_4583BB);
 MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), Render_Restore_Surfaces_51E086);
 MGS_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
 
@@ -263,7 +263,7 @@ int CC HandleExclusiveMode()
     }
 
     Sound_StopSample();
-    sub_4583BB();
+    StreamActorStop_4583BB();
     Task_Pause();
 
     do
@@ -381,7 +381,7 @@ MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
 MGS_VAR(1, 0x787778, DWORD, dword_787778, 0);
-MGS_VAR(1, 0x78E7E4, WORD, dword_78E7E4, 0);
+MGS_VAR(1, 0x78E7E4, DWORD, gFlags_dword_78E7E4, 0);
 MGS_VAR(1, 0x006DEF94, DWORD, gCrashCheck, 0);
 MGS_VAR(1, 0x0071687C, DWORD, gCheatsEnabled, 0);
 MGS_VAR(1, 0x006FD1F8, DWORD, gNoCdEnabled, 0);
@@ -2828,8 +2828,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
             }
             CheckForMmf(dword_787774, dword_787778);
             
-            dword_78E7E4 |= 0x4000u;
-            dword_78E7E4 |= 0x100u;
+            gFlags_dword_78E7E4 |= 0x4000u;
+            gFlags_dword_78E7E4 |= 0x100u;
 
             _strlwr(lpCmdLine);
             _chdir(".");

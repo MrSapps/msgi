@@ -139,7 +139,7 @@ signed int CC LibGV_AddFileDataToCache_40A662(int fileNameHash, void* fileBuffer
 MGS_FUNC_IMPLEX(0x40A662, LibGV_AddFileDataToCache_40A662, LIBGV_IMPL);
 
 
-MGS_VAR(REDIRECT_LIBGV_DATA, 0x791A04, DWORD, dword_791A04, 0);
+MGS_VAR(REDIRECT_LIBGV_DATA, 0x791A04, DWORD, gFrameTime_dword_791A04, 0);
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
 void* CC LibGV_FindFile_40A603(int hash)
@@ -493,7 +493,7 @@ void CC LibGV_Update_40A54E(Actor* pActor)
     int currentTime = TimeGetElapsed_4455A0(); // TODO: Truncation?
     int timeDiff = currentTime - g_lib_gv_stru_6BFEE0.dword_6BFF04_time_related;
     g_lib_gv_stru_6BFEE0.dword_6BFF04_time_related = currentTime;
-    dword_791A04 = timeDiff;
+    gFrameTime_dword_791A04 = timeDiff;
 
     if (!gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers)
     {

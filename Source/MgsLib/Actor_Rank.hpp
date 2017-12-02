@@ -156,3 +156,5 @@ void CC TextSetXYFlags_459B0B(int x, int y, int flags);
 int CC TextSetRGB_459B27(int r, int g, int b);
 
 EXTERN_MGS_FUNC_NOT_IMPL(0x405050, Prim_unknown* CC(int maybeFlags, int numItems, __int16 rQ, int gQ, int bQ), PrimAlloc_405050);
+MGS_VAR_EXTERN(WORD, gGameTime_word_78E896);
+MGS_VAR_EXTERN(WORD, gGameTime_word_78E898);

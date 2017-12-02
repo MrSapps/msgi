@@ -431,6 +431,8 @@ MGS_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct TaggedOrderingTablePointer* a_pSt
 MGS_FUNC_NOT_IMPL(0x421280, void __cdecl(MGSVertex *pVert, int idx), Render_sub_421280);
 MGS_FUNC_NOT_IMPL(0x424020, void __cdecl(IDirectDrawSurface7 *pSurface, MGSVertex* pVert), Render_DrawTextBeginScene_424020);
 MGS_FUNC_NOT_IMPL(0x420840, void __cdecl (DWORD *a1, DWORD *arg4), Render_sub_420840);
+
+
 MGS_FUNC_NOT_IMPL(0x421800, void __cdecl(int mode, const MGSVertex *pVerts, signed int vertexCount, int primIdx), Render_BlendMode_sub_421800);
 
 // WinMain.cpp
@@ -1084,9 +1086,7 @@ static void convertVertexType4(StructVertType4* pStructVert, uint32_t nIndex, fl
     g_nVertexOffset_6FC784++;
 }
 
-// Untested for the moment
-//MSG_FUNC_NOT_IMPL(0x410560, int __cdecl(StructVert* a_pStructVert, int a_nSize), ConvertPolys_Hardware);
-int __cdecl ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
+int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
 {
     uint32_t var14 = dword_688CD4;
     uint32_t var1C = dword_688CD0;
@@ -1922,8 +1922,6 @@ int CC Renderer_ClearOTag(DWORD* ot, int otSize)
 }
 MGS_FUNC_IMPLEX(0x0044AB80, Renderer_ClearOTag, RENDERER_IMPL);
 
-
-//MSG_FUNC_NOT_IMPL(0x4103B0, void __cdecl(StructVert*), Render_DrawGeneric);
 void CC Render_DrawGeneric_4103B0(TaggedOrderingTablePointer* a_pStructVert)
 {
     if (dword_6FC718 == 1)
@@ -1987,8 +1985,6 @@ void CC Render_DrawIndex_401619(uint32_t activeBuffer)
 }
 MGS_FUNC_IMPLEX(0x401619, Render_DrawIndex_401619, RENDERER_IMPL);
 
-
-//MSG_FUNC_NOT_IMPL(0x0041CC30, __int16 __cdecl(), Render_RestoreAll);
 __int16 CC Render_RestoreAll()
 {
     if (gPrimarySurface_6FC734->IsLost() == DDERR_SURFACELOST)
@@ -2028,8 +2024,6 @@ __int16 CC Render_RestoreAll()
 }
 MGS_FUNC_IMPLEX(0x0041CC30, Render_RestoreAll, RENDERER_IMPL);
 
-
-//MSG_FUNC_NOT_IMPL(0x00422D40, char *__cdecl(char*, HRESULT), PrintDDError);
 void CC PrintDDError(const char* errMsg, HRESULT hrErr)
 {
     char* pStrErr = nullptr;
