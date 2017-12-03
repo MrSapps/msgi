@@ -13,6 +13,31 @@ void LibDGCpp_ForceLink() { }
 
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
+struct Actor_Logo
+{
+    Actor mBase;
+};
+
+Actor_Logo* CC Res_met_logo_create_4B54AB(DWORD a1)
+{
+    return nullptr;
+}
+MGS_FUNC_IMPLEX(0x4B54AB, Res_met_logo_create_4B54AB, false); // TODO
+
+MGS_FUNC_NOT_IMPL(0x62130E, Actor *__cdecl(int a1, signed int a2), Res_env_test_create_62130E);
+
+struct Actor_Open
+{
+    Actor mBase;
+};
+
+Actor_Open* CC Res_open_create_486BD4(int a2, int a3) // DWORD scriptData, int scriptBinds, BYTE* pScript
+{
+    return (Actor_Open*)Res_env_test_create_62130E(a2, a3);
+}
+MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, true); // TODO
+
+
 MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0,
 {
     { 0x002A, 0, (ResInitFn)0x00519A61 }, /* Res_anime_pre_create_519A61 */              { 0x002F, 0, (ResInitFn)0x00519A9D }, /* Res_anime_pre_create_519A9D */
@@ -120,7 +145,7 @@ MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_
     { 0x5345, 0, (ResInitFn)0x004561C6 }, /* Res_movie_4561C6 */                         { 0xB98C, 0, (ResInitFn)0x005A4F47 }, /* Res_m_door_5A4F47 */
     { 0xD3C0, 0, (ResInitFn)0x0050964C },                                                { 0xF002, 0, (ResInitFn)0x00508856 }, /* Res_hair_n_create_508856 */
     { 0x30BA, 0, (ResInitFn)0x00563A09 }, /* Res_ninja_create_563A0 */                   { 0x4811, 0, (ResInitFn)0x005A473D }, /* Res_object_5A473D */
-    { 0xCF79, 0, (ResInitFn)0x00486BD4 }, /* Res_open_create_486BD4 */                   { 0x3AC3, 0, (ResInitFn)0x00482D1F }, /* Res_opena_create_482D1F */
+    { 0xCF79, 0, (ResInitFn)Res_open_create_486BD4 },                                    { 0x3AC3, 0, (ResInitFn)0x00482D1F }, /* Res_opena_create_482D1F */
     { 0xCFEF, 0, (ResInitFn)0x0047EE6E }, /* Res_openp_47EE6E */                         { 0x976C, 0, (ResInitFn)0x0047A5E5 }, /* Res_opt_create_47A5E5 */
     { 0x8D31, 0, (ResInitFn)0x004792A6 }, /* Res_opta_create_4792A6 */                   { 0xB916, 0, (ResInitFn)0x00477F58 }, /* Res_optp_create_477F58 */
     { 0xCBF8, 0, (ResInitFn)0x00456093 }, /* Res_pad_create_456093 */                    { 0x3ED7, 0, (ResInitFn)0x0061A311 }, /* Res_pad_demo_create_61A311 */
@@ -501,6 +526,20 @@ signed int CC LibDG_SearchForTextureRecord_4024D2(signed int hashCode, Texture_R
     return 0;
 }
 MGS_FUNC_IMPLEX(0x4024D2, LibDG_SearchForTextureRecord_4024D2, LIBDG_IMPL);
+
+Texture_Record* CC LibDG_FindTexture_4024A0(WORD hashCode)
+{
+    Texture_Record* pFound = nullptr;
+    if (!LibDG_SearchForTextureRecord_4024D2(hashCode, &pFound))
+    {
+        // Not found case
+        static Texture_Record sLastFoundTexture_6BEE78 = {};
+        LOG_ERROR("Texture " << hashCode << " was not found");
+        return &sLastFoundTexture_6BEE78;
+    }
+    return pFound;
+}
+MGS_FUNC_IMPLEX(0x4024A0, LibDG_FindTexture_4024A0, LIBDG_IMPL);
 
 void CC LibDG_ClearTexturesCache_402487()
 {
