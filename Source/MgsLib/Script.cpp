@@ -7,6 +7,8 @@
 #include "LibDG.hpp"
 #include "LibGV.hpp"
 #include "ResourceNameHash.hpp"
+#include "Actor_GameD.hpp"
+#include "LibGV.hpp"
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
@@ -701,19 +703,113 @@ int CC Script_tbl_mesg_sub_451A5E(BYTE* /*pScript*/)
 }
 MGS_FUNC_IMPLEX(0x451A5E, Script_tbl_mesg_sub_451A5E, SCRIPT_IMPL);
 
-BYTE* CC Script_read_string_arg_40997B(BYTE* pScript)
+char* CC Script_read_string_arg_40997B(BYTE* pScript)
 {
     DWORD ret = 0;
     DWORD cmd = 0;
     gScriptExecuteRet_dword_78D7B4 = Script_GCL_Execute(pScript, &cmd, &ret);
-    BYTE* pStr = gScriptExecuteRet_dword_78D7B4 != 0 ? reinterpret_cast<BYTE*>(ret) : 0;
-    LOG_INFO("Str= " << reinterpret_cast<const char*>(pStr));
+    char* pStr = gScriptExecuteRet_dword_78D7B4 != nullptr ? reinterpret_cast<char*>(ret) : nullptr;
+    LOG_INFO("Str= " << pStr);
     return pStr;
 }
 MGS_FUNC_IMPLEX(0x40997B, Script_read_string_arg_40997B, SCRIPT_IMPL);
 
+int CC Script_Read3Words_409945(BYTE* pScript, WORD* pOut)
+{
+    DWORD ret = 0;
+    DWORD cmd = 0;
+    for (int i=0; i<3; i++)
+    {
+        pScript = Script_GCL_Execute(pScript, &cmd, &ret);
+        *pOut = (unsigned __int16)ret;
+        ++pOut;
+    }
+    gScriptExecuteRet_dword_78D7B4 = pScript;
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x409945, Script_Read3Words_409945, SCRIPT_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x00451BBF, int __cdecl(BYTE*), Script_tbl_load_451BBF);
+
+MGS_VAR(1, 0x78E7EE, DWORD, gScript_loader_param_m_78E7EE, 0);
+MGS_ARY(1, 0x78E7F0, WORD, 3, gScript_loader_param_p_78E7F0, {});
+MGS_VAR(1, 0x723650, DWORD, gKillResOpen_723650, 0);
+MGS_VAR(1, 0x66AFF0, DWORD, gResOpenCreated_dword_66AFF0, 1);
+MGS_VAR(1, 0x78E874, WORD, word_78E874, 0);
+
+
+int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
+{
+    const char* scriptStringData = Script_read_string_arg_40997B(Script_GetReturnAddress());
+
+    if (*scriptStringData)
+    {
+        if (!strcmp("dummy", scriptStringData) && !gResOpenCreated_dword_66AFF0)
+        {
+            gKillResOpen_723650 = 1;
+        }
+
+        // restart?
+        if (Script_ParamExists('r'))
+        {
+            static char sLastStageName[8] = {};
+            if (Script_get_int())
+            {
+                Stage_LoadRelated_44EB27(stage_name_hash_word_78E7EC, sLastStageName);
+            }
+            else
+            {
+                strcpy(sLastStageName, File_StageName_44EB83());
+                LibGV_Reset_System2_Memory_40B35E();
+                LibGV_Init_FileCache_40A6AC();
+                LibDG_Clear_Resident_Texture_Cache_Copy_4026E6();
+                Stage_LoadRelated_44EB27(ResourceNameHash(scriptStringData), scriptStringData);
+            }
+            script_cancel_non_zero_dword_7227A0 = 1;
+        }
+        else
+        {
+            word_78E874 = stage_name_hash_word_78E7EC;
+            stage_name_hash_word_78E7EC = ResourceNameHash(scriptStringData);
+            Stage_LoadRelated_44EB27(stage_name_hash_word_78E7EC, scriptStringData);
+
+            if (Script_ParamExists('m'))
+            {
+                gScript_loader_param_m_78E7EE = Script_get_int();
+            }
+
+            if (Script_ParamExists('p'))
+            {
+                WORD pWordArray3[3] = {};
+                Script_Read3Words_409945(Script_GetReturnAddress(), pWordArray3);
+                gScript_loader_param_p_78E7F0[0] = pWordArray3[0];
+                gScript_loader_param_p_78E7F0[1] = pWordArray3[1];
+                gScript_loader_param_p_78E7F0[2] = pWordArray3[2];
+            }
+            if (Script_ParamExists('s'))
+            {
+                script_cancel_non_zero_dword_7227A0 = Script_get_int();
+                if (script_cancel_non_zero_dword_7227A0)
+                {
+                    script_cancel_non_zero_dword_7227A0 |= 0x80;
+                }
+            }
+            else
+            {
+                script_cancel_non_zero_dword_7227A0 = 1;
+            }
+            if (!Script_ParamExists('n'))
+            {
+                script_cancel_non_zero_dword_7227A0 |= 0x10;
+            }
+        }
+    }
+    else
+    {
+        script_cancel_non_zero_dword_7227A0 = 1;
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x451BBF, Script_tbl_load_451BBF, SCRIPT_IMPL);
 
 
 MGS_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
@@ -777,7 +873,7 @@ MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
     { 0xEEE9, 0x0, script_tbl_camera_sub_4512E5.Ptr() },
     { 0x306A, 0x0, Script_tbl_light_sub_451239.Ptr() },
     { 0x9A1F, 0x0, Script_tbl_start_sub_451B0E.Ptr() },
-    { 0xC8BB, 0x0, Script_tbl_load_451BBF.Ptr() },
+    { 0xC8BB, 0x0, Script_tbl_load_451BBF },
     { 0x24E1, 0x0, Script_tbl_radio_sub_451D5C.Ptr() },
     { 0xE43C, 0x0, Script_tbl_str_status_sub_451F22.Ptr() },
     { 0xA242, 0x0, Script_tbl_demo_sub_452064.Ptr() },

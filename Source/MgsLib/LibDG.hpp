@@ -182,3 +182,4 @@ void CC LibDG_ExecFnPtrs_40171C(int activeBuffer);
 void CC LibDG_ClearTexturesCache_402487();
 void CC LibDG_Restore_Textures_From_Resident_Memory_40274C();
 void CC LibDG_Save_Texture_Hashes_To_Resident_Memory_4026F5();
+void CC LibDG_Clear_Resident_Texture_Cache_Copy_4026E6();
