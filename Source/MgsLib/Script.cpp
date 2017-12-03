@@ -267,9 +267,10 @@ MGS_FUNC_IMPLEX(0x004094DC, Script_VarRead_4094DC, false); // TODO: Implement me
 
 BYTE* CC Script_VarWrite_409615(BYTE* pScript)
 {
+    LOG_INFO("TODO: Write");
     return pScript + 4;
 }
-MGS_FUNC_IMPLEX(0x00409615, Script_VarWrite_409615, true); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x00409615, Script_VarWrite_409615, false); // TODO: Implement me
 
 /*
 // Is var read          data type
@@ -700,6 +701,20 @@ int CC Script_tbl_mesg_sub_451A5E(BYTE* /*pScript*/)
 }
 MGS_FUNC_IMPLEX(0x451A5E, Script_tbl_mesg_sub_451A5E, SCRIPT_IMPL);
 
+BYTE* CC Script_read_string_arg_40997B(BYTE* pScript)
+{
+    DWORD ret = 0;
+    DWORD cmd = 0;
+    gScriptExecuteRet_dword_78D7B4 = Script_GCL_Execute(pScript, &cmd, &ret);
+    BYTE* pStr = gScriptExecuteRet_dword_78D7B4 != 0 ? reinterpret_cast<BYTE*>(ret) : 0;
+    LOG_INFO("Str= " << reinterpret_cast<const char*>(pStr));
+    return pStr;
+}
+MGS_FUNC_IMPLEX(0x40997B, Script_read_string_arg_40997B, SCRIPT_IMPL);
+
+
+MGS_FUNC_NOT_IMPL(0x00451BBF, int __cdecl(BYTE*), Script_tbl_load_451BBF);
+
 
 MGS_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
 MGS_FUNC_NOT_IMPL(0x0045151D, int __cdecl(BYTE*), Script_tbl_map_sub_45151D);
@@ -707,7 +722,6 @@ MGS_FUNC_NOT_IMPL(0x00451673, int __cdecl(BYTE*), Script_tbl_hzd_related_sub_451
 MGS_FUNC_NOT_IMPL(0x004512E5, int __cdecl(BYTE*), script_tbl_camera_sub_4512E5);
 MGS_FUNC_NOT_IMPL(0x00451239, int __cdecl(BYTE*), Script_tbl_light_sub_451239);
 MGS_FUNC_NOT_IMPL(0x00451B0E, int __cdecl(BYTE*), Script_tbl_start_sub_451B0E);
-MGS_FUNC_NOT_IMPL(0x00451BBF, int __cdecl(BYTE*), Script_tbl_load_451BBF);
 MGS_FUNC_NOT_IMPL(0x00451D5C, int __cdecl(BYTE*), Script_tbl_radio_sub_451D5C);
 MGS_FUNC_NOT_IMPL(0x00451F22, int __cdecl(BYTE*), Script_tbl_str_status_sub_451F22);
 MGS_FUNC_NOT_IMPL(0x00452064, int __cdecl(BYTE*), Script_tbl_demo_sub_452064);
@@ -810,10 +824,8 @@ int CC Script_tbl_if_sub_4090EA(BYTE* pScript)
 
     DWORD cmdRet = 0;
     pScriptCopy = pScript;
-execute_again:
-    
-    pScriptCopy = Script_GCL_Execute(pScriptCopy, &cmdRet, &exec1);
 
+    pScriptCopy = Script_GCL_Execute(pScriptCopy, &cmdRet, &exec1);
     for(;;)
     {
         execRet = Script_GCL_Execute(pScriptCopy, &cmdRet, &pScriptBytes);
@@ -836,7 +848,8 @@ execute_again:
                 return 0;
             }
 
-            goto execute_again;
+            pScriptCopy = Script_GCL_Execute(pScriptCopy, &cmdRet, &exec1);
+            continue;
         }
         exec1 = 1;
     }
@@ -926,7 +939,7 @@ MGS_FUNC_IMPLEX(0x004090CF, GV_gcx_file_handler_4090CF, SCRIPT_IMPL);
 
 void CC Script_Set_MainOrDemo_40908E(int bMain)
 {
-    gScriptFileNameHashedToLoad_6BFBB4 = bMain != 1  ? 
+    gScriptFileNameHashedToLoad_6BFBB4 = bMain != 1 ?
         0x6EA54 :  // scenerio 
         0x6A242;   // demo
 }
@@ -938,9 +951,9 @@ void CC ScriptEngineInit_4090A7()
     SaveDataStructuresRelated_4093ED(); // Script vars memory?
     Script_sub_4091FA();
     LibGV_Set_FileExtHandler_40A68D('g', GV_gcx_file_handler_4090CF); // .gcx
-    gScriptFileNameHashedToLoad_6BFBB4 = 0x6EA54;       // Load only scenerio gcx by default instead of demo gcx
+    Script_Set_MainOrDemo_40908E(0);
 }
-MGS_FUNC_IMPLEX(0x004090A7, ScriptEngineInit_4090A7, SCRIPT_IMPL);
+MGS_FUNC_IMPLEX(0x004090A7, ScriptEngineInit_4090A7, SCRIPT_IMPL); // TODO
 
 BYTE* CC Script_FindProc(WORD procId)
 {
@@ -1086,6 +1099,7 @@ int CC Script_CommandExecute(BYTE* pScript)
 {
     const WORD cmdId = ToWORD(pScript);
     proc_struct_sub* pScriptCmd = Script_GetCommand(cmdId);
+    LOG_INFO("Exec: " << cmdId);
     Script_Push(&pScript[pScript[2] + 2]);
     Script_SetReturnAddress(pScript + 3);
     const int cmdRet = pScriptCmd->mCommandFunction(pScript + 3);

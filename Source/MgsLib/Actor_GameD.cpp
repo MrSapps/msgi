@@ -24,7 +24,11 @@ MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
 MGS_VAR(1, 0x9942B8, int, gLoaderState_dword_9942B8, 0);
 // TODO: Is a global that inherits from Actor
 MGS_VAR(1, 0x725FC0, Actor, gMenuMan_stru_725FC0, {});
-MGS_ARY(1, 0x7227C8, WORD, 5, word_7227C8, {}); // TODO: Struct?
+
+MGS_ARY(1, 0x7227C8, WORD, 8, gStageHashStack_7227C8, {});
+MGS_VAR(1, 0x7227D8, WORD, gCurrentStageNameHashed_7227D8, 0);
+MGS_ARY(1, 0x7227DC, char, 12, gStageName_7227DC, {});
+
 MGS_VAR(1, 0x78E7FE, short, word_78E7FE, 0);
 MGS_VAR(1, 0x78E7FC, short, gLoadItemFuncIdx_word_78E7FC, 0);
 
@@ -376,11 +380,70 @@ void CC Res_MenuMan_create_459A9A()
 }
 MGS_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, ACTOR_GAMED_IMPL);
 
-void* CC Stage_GetNameHashStack_44EAED()
+void CC Stage_GetNameHashStack_44EAED()
 {
-    return memset(word_7227C8, 0, 0x10u);
+    memset(gStageHashStack_7227C8, 0, 0x10u);
 }
 MGS_FUNC_IMPLEX(0x0044EAED, Stage_GetNameHashStack_44EAED, ACTOR_GAMED_IMPL);
+
+void CC Stage_CopyNameHashStack_44EAFF(void* pDst)
+{
+    memcpy(pDst, gStageHashStack_7227C8, 0x10u);
+}
+MGS_FUNC_IMPLEX(0x44EAFF, Stage_CopyNameHashStack_44EAFF, ACTOR_GAMED_IMPL);
+
+void CC Stage_SetNameHashStack_44EB13(const void* pSrc)
+{
+    memcpy(gStageHashStack_7227C8, pSrc, 0x10u);
+}
+MGS_FUNC_IMPLEX(0x44EB13, Stage_SetNameHashStack_44EB13, ACTOR_GAMED_IMPL);
+
+signed int CC Stage_NameHashIndex_44EB66(int toFind)
+{
+    signed int i = 0;
+    for (i = 1; i < 8; i++)
+    {
+        if (gStageHashStack_7227C8[i] == toFind)
+        {
+            return i;
+        }
+    }
+    return i;
+}
+MGS_FUNC_IMPLEX(0x0044EB66, Stage_NameHashIndex_44EB66, ACTOR_GAMED_IMPL);
+
+WORD CC GetStageNameHashed_44EAE5()
+{
+    return gCurrentStageNameHashed_7227D8;
+}
+MGS_FUNC_IMPLEX(0x44EAE5, GetStageNameHashed_44EAE5, ACTOR_GAMED_IMPL);
+
+const char* CC File_StageName_44EB83()
+{
+    return &gStageName_7227DC[0];
+}
+MGS_FUNC_IMPLEX(0x44EB83, File_StageName_44EB83, ACTOR_GAMED_IMPL);
+
+void CC Stage_LoadRelated_44EB27(WORD stageNameHashed, const char* pStageName)
+{
+    LOG_INFO("Set stage name: " << pStageName);
+
+    gCurrentStageNameHashed_7227D8 = stageNameHashed;
+    strcpy(&gStageName_7227DC[0], pStageName);
+    // Move everything "back" by 1 element
+    
+    WORD* pLastItem = &gStageHashStack_7227C8[7];
+    do
+    {
+        *pLastItem = *(pLastItem - 1);
+        --pLastItem;
+    } while (pLastItem > &gStageHashStack_7227C8[0]);
+    
+
+    // Now overwrite the first element with the current stage hash
+    gStageHashStack_7227C8[0] = gCurrentStageNameHashed_7227D8;
+}
+MGS_FUNC_IMPLEX(0x0044EB27, Stage_LoadRelated_44EB27, ACTOR_GAMED_IMPL);
 
 void CC sub_44E1E0()
 {
@@ -395,10 +458,9 @@ void CC SaveResidentTop()
 }
 MGS_FUNC_IMPLEX(0x0040B36E, SaveResidentTop, ACTOR_GAMED_IMPL);
 
+
 MGS_VAR(1, 0x78E7EC, WORD, stage_name_hash_word_78E7EC, 0);
 MGS_VAR(1, 0x6893D4, DWORD, dword_6893D4, 0);
-
-MGS_FUNC_NOT_IMPL(0x0044EB83, char* CC(), File_StageName_44EB83);
 
 void CC Create_loader_44E226()
 {

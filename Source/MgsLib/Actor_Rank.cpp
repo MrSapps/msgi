@@ -1024,7 +1024,6 @@ MGS_VAR(1, 0x78E896, WORD, gGameTime_word_78E896, 0);
 MGS_VAR(1, 0x78E898, WORD, gGameTime_word_78E898, 0);
 
 MGS_FUNC_NOT_IMPL(0x475BCE, __int16 __cdecl(Actor_Rank *pRank), Rank_RankCalcs_475BCE);
-MGS_FUNC_NOT_IMPL(0x40997B, BYTE* CC (BYTE* pScript), Script_read_string_arg_sub_40997B);
 MGS_FUNC_NOT_IMPL(0x47589A, int __cdecl(Actor_Rank *pRank, int index), Rank_47589A);
 MGS_FUNC_NOT_IMPL(0x475A4A, int __cdecl(Actor_Rank *a2, int idx), Rank_475A4A);
 MGS_FUNC_NOT_IMPL(0x4742E1, int __cdecl(Actor_Rank *a1, int a2, signed int a3), Rank_4742E1);
@@ -1206,7 +1205,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     for (int i = 0; i < 1; ++i)
     {
         BYTE* v44 = Script_GetReturnAddress();
-        auto scriptVar = Script_read_string_arg_sub_40997B(v44);
+        auto scriptVar = Script_read_string_arg_40997B(v44);
         *(&pRank->field_5C8 + 56 * i) = (int)scriptVar;
         *((WORD *)&pRank->field_5CC + 112 * i) = 0;
         Rank_47589A(pRank, i);

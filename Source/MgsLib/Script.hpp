@@ -32,6 +32,7 @@ void CC ScriptEngineInit_4090A7();
 void CC ScriptSetArgs_409893(DWORD* pArgs);
 int CC Script_Operator_Evaluate(int operation, int v1, int v2);
 void CC Script_RunMainProc_409D49();
+BYTE* CC Script_read_string_arg_40997B(BYTE* pScript);
 
 
 EXTERN_MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);

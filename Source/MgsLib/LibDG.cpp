@@ -13,16 +13,6 @@ void LibDGCpp_ForceLink() { }
 
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
-struct Actor_Logo
-{
-    Actor mBase;
-};
-
-Actor_Logo* CC Res_met_logo_create_4B54AB(DWORD a1)
-{
-    return nullptr;
-}
-MGS_FUNC_IMPLEX(0x4B54AB, Res_met_logo_create_4B54AB, false); // TODO
 
 MGS_FUNC_NOT_IMPL(0x62130E, Actor *__cdecl(int a1, signed int a2), Res_env_test_create_62130E);
 
@@ -35,7 +25,7 @@ Actor_Open* CC Res_open_create_486BD4(int a2, int a3) // DWORD scriptData, int s
 {
     return (Actor_Open*)Res_env_test_create_62130E(a2, a3);
 }
-MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, true); // TODO
+MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, false); // TODO
 
 
 MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0,

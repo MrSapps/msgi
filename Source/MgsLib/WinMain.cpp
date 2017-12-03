@@ -2368,8 +2368,6 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
 }
 MGS_FUNC_IMPLEX(0x41E130, ClearBackBuffer, WINMAIN_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x44EAE5, uint32_t __cdecl(), sub_44EAE5);
-
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
