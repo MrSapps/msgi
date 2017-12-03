@@ -16,12 +16,14 @@ MGS_VAR(1, 0x6BFBB4, int, gScriptFileNameHashedToLoad_6BFBB4, 0);
 #define SCRIPT_IMPL true
 
 MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
-MGS_FUNC_NOT_IMPL(0x409A3A, void CC(), Script_sub_409A3A);
 MGS_FUNC_NOT_IMPL(0x4093ED, void CC(), SaveDataStructuresRelated_4093ED);
 MGS_VAR(1, 0x6BFC68, BYTE*, gScriptMainProc_dword_6BFC68, nullptr);
 MGS_VAR(1, 0x06BFC3C, BYTE**, gScriptStackPos_dword_6BFC3C, 0); // Pointer to an array of 32 BYTE*'s
 MGS_VAR(1, 0x078D7B4, BYTE*, gScriptExecuteRet_dword_78D7B4, 0);
 MGS_VAR(1, 0x06BFBB8, DWORD*, script_args_dword_6BFBB8, 0);
+
+MGS_ARY(1, 0x6BFBBC, DWORD, 32, gScript_args_stack_32_dword_6BFBBC, {});
+MGS_ARY(1, 0x6BFC40, BYTE*, 8, gScript_stack_8_dword_6BFC40, {});
 
 
 MGS_FUNC_NOT_IMPL(0x45A6F6, int __cdecl(int a1, void* a2), sub_45A6F6);
@@ -50,6 +52,13 @@ struct proc_struct_sub
 };
 
 MGS_PTR(1, 0x6BFC6C, proc_struct*, gScriptCmdTable_dword_6BFC6C, nullptr);
+
+void CC Script_sub_409A3A()
+{
+    script_args_dword_6BFBB8 = gScript_args_stack_32_dword_6BFBBC;
+    gScriptStackPos_dword_6BFC3C = gScript_stack_8_dword_6BFC40;
+}
+MGS_FUNC_IMPLEX(0x00409A3A, Script_sub_409A3A, SCRIPT_IMPL);
 
 proc_struct_sub* CC Script_GetCommand(WORD cmdToFind)
 {
@@ -222,15 +231,15 @@ BYTE* CC Script_VarRead_4094DC(BYTE* pScript, DWORD* ppScript, DWORD* ret)
 
     WORD idx = ((unsigned __int16)scriptDWORD);
     const __int16* pDataBankEntry = (const __int16 *)((char *)pDataBank + idx);
-
-    if (topNibble <= 1)
+    
+    if (topNibble == 1)
     {
+        *ret = (__int16)*pDataBankEntry;
         return pScript + 4;
     }
 
-    if (topNibble == 1)
+    if (topNibble <= 1)
     {
-        *ret = *pDataBankEntry;
         return pScript + 4;
     }
 
@@ -260,7 +269,7 @@ BYTE* CC Script_VarWrite_409615(BYTE* pScript)
 {
     return pScript + 4;
 }
-MGS_FUNC_IMPLEX(0x00409615, Script_VarWrite_409615, false); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x00409615, Script_VarWrite_409615, true); // TODO: Implement me
 
 /*
 // Is var read          data type
@@ -286,16 +295,16 @@ static void Test_Script_Read_s16_Bank1()
     memset(save_data_192_word_78E7E0, 0, 192);
     memset(save_data_2048_unk_78D7C0, 0, 2048);
 
-    save_data_192_word_78E7E0[(0x1234 / 2)] = (__int16)0xAABB;
-    save_data_192_word_78E7E0[(0x1234 / 2) + 1] = (__int16)0xCCDD;
+    save_data_192_word_78E7E0[(0x1234 / 2)] = (WORD)0xAABB;
+    save_data_192_word_78E7E0[(0x1234 / 2) + 1] = (WORD)0xCCDD;
 
     DWORD ppScript = 0;
     DWORD ret = 0;
 
-    BYTE script[] = { 0xA1, 0x0C, 0x12, 0x34, 0xE };
-    BYTE* pExeRet = Script_VarRead_4094DC(script, &ppScript, &ret);
+    BYTE script[] = { 0xA1, 0x8C, 0x12, 0x34, 0xE };
+    BYTE* pExeRet = Script_VarRead_4094DC(script, &ppScript, &ret); // 0x a1 0c 12 34 &  0xF0 00 00
 
-    ASSERT_EQ(ret, 0xffffccdd); // read var
+    ASSERT_EQ(ret, 0xffffaabb); // read var
     ASSERT_EQ(0x0e, *pExeRet);
     ASSERT_EQ(0x01, ppScript); // top nibble
 }
@@ -305,9 +314,6 @@ static void Test_Script_Read_s16_Bank2()
     memset(save_data_192_word_78E7E0, 0, 192);
     memset(save_data_2048_unk_78D7C0, 0, 2048);
 
-    //save_data_192_word_78E7E0[(0x1234 / 2)] = (__int16)0xAABB;
-    //save_data_192_word_78E7E0[(0x1234 / 2) + 1] = (__int16)0xCCDD;
-
     save_data_2048_unk_78D7C0[0x1234 / 4] = 0xAABBCCDD;
 
     DWORD ppScript = 0;
@@ -316,16 +322,16 @@ static void Test_Script_Read_s16_Bank2()
     BYTE script[] = { 0xA1, 0x8C, 0x12, 0x34, 0xE };
     BYTE* pExeRet = Script_VarRead_4094DC(script, &ppScript, &ret);
 
-    ASSERT_EQ(ret, 0xffffccdd); // read var
+    ASSERT_EQ(ret, 0xffffaabb); // read var
     ASSERT_EQ(0x0e, *pExeRet);
-    ASSERT_EQ(0x04, ppScript); // top nibble
+    ASSERT_EQ(0x01, ppScript); // top nibble
 
 }
 
 static void Test_Script_VarRead_4094DC()
 {
-    //Test_Script_Read_s16_Bank1();
-    //Test_Script_Read_s16_Bank2();
+    Test_Script_Read_s16_Bank1();
+    Test_Script_Read_s16_Bank2();
     //Sleep(2000);
     //ExitProcess(0);
 }
@@ -1059,8 +1065,8 @@ MGS_FUNC_IMPLEX(0x00409D49, Script_RunMainProc_409D49, SCRIPT_IMPL);
 
 void CC Script_Push(BYTE *arg)
 {
-    *gScriptStackPos_dword_6BFC3C = arg;
-    ++(gScriptStackPos_dword_6BFC3C);
+    (*gScriptStackPos_dword_6BFC3C) = arg;
+    ++gScriptStackPos_dword_6BFC3C;
 }
 MGS_FUNC_IMPLEX(0x004098B7, Script_Push, SCRIPT_IMPL);
 
