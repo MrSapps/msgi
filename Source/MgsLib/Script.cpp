@@ -721,8 +721,7 @@ int CC Script_Read3Words_409945(BYTE* pScript, WORD* pOut)
     for (int i=0; i<3; i++)
     {
         pScript = Script_GCL_Execute(pScript, &cmd, &ret);
-        *pOut = (unsigned __int16)ret;
-        ++pOut;
+        pOut[i] = static_cast<WORD>(ret);
     }
     gScriptExecuteRet_dword_78D7B4 = pScript;
     return 0;
@@ -730,12 +729,14 @@ int CC Script_Read3Words_409945(BYTE* pScript, WORD* pOut)
 MGS_FUNC_IMPLEX(0x409945, Script_Read3Words_409945, SCRIPT_IMPL);
 
 
-MGS_VAR(1, 0x78E7EE, DWORD, gScript_loader_param_m_78E7EE, 0);
+MGS_VAR(1, 0x78E7EE, WORD, gScript_loader_param_m_78E7EE, 0);
 MGS_ARY(1, 0x78E7F0, WORD, 3, gScript_loader_param_p_78E7F0, {});
 MGS_VAR(1, 0x723650, DWORD, gKillResOpen_723650, 0);
 MGS_VAR(1, 0x66AFF0, DWORD, gResOpenCreated_dword_66AFF0, 1);
 MGS_VAR(1, 0x78E874, WORD, word_78E874, 0);
 
+
+MGS_ARY(1, 0x722A44, char, 8, sLastStageName_722A44, {});
 
 int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
 {
@@ -748,17 +749,18 @@ int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
             gKillResOpen_723650 = 1;
         }
 
-        // restart?
         if (Script_ParamExists('r'))
         {
-            static char sLastStageName[8] = {};
+            // Restart map
             if (Script_get_int())
             {
-                Stage_LoadRelated_44EB27(stage_name_hash_word_78E7EC, sLastStageName);
+                // Soft restart?
+                Stage_LoadRelated_44EB27(stage_name_hash_word_78E7EC, sLastStageName_722A44);
             }
             else
             {
-                strcpy(sLastStageName, File_StageName_44EB83());
+                // Hard restart?
+                strcpy(sLastStageName_722A44, File_StageName_44EB83());
                 LibGV_Reset_System2_Memory_40B35E();
                 LibGV_Init_FileCache_40A6AC();
                 LibDG_Clear_Resident_Texture_Cache_Copy_4026E6();
@@ -774,19 +776,23 @@ int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
 
             if (Script_ParamExists('m'))
             {
-                gScript_loader_param_m_78E7EE = Script_get_int();
+                // ?
+                gScript_loader_param_m_78E7EE = static_cast<WORD>(Script_get_int());
             }
 
             if (Script_ParamExists('p'))
             {
+                // Snakes starting position in the map?
                 WORD pWordArray3[3] = {};
                 Script_Read3Words_409945(Script_GetReturnAddress(), pWordArray3);
                 gScript_loader_param_p_78E7F0[0] = pWordArray3[0];
                 gScript_loader_param_p_78E7F0[1] = pWordArray3[1];
                 gScript_loader_param_p_78E7F0[2] = pWordArray3[2];
             }
+
             if (Script_ParamExists('s'))
             {
+                // ?
                 script_cancel_non_zero_dword_7227A0 = Script_get_int();
                 if (script_cancel_non_zero_dword_7227A0)
                 {
@@ -797,8 +803,10 @@ int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
             {
                 script_cancel_non_zero_dword_7227A0 = 1;
             }
+
             if (!Script_ParamExists('n'))
             {
+                // ?
                 script_cancel_non_zero_dword_7227A0 |= 0x10;
             }
         }
