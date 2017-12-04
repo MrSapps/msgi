@@ -7,6 +7,7 @@
 #include "Actor_Loader.hpp"
 #include "System.hpp"
 #include "Actor_Rank.hpp" // gGameTime_word_78E896
+#include "Fs.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
@@ -61,7 +62,6 @@ MGS_FUNC_NOT_IMPL(0x0040945D, void CC(), sub_40945D);
 MGS_FUNC_NOT_IMPL(0x00459A95, void CC(), sub_459A95);
 MGS_FUNC_NOT_IMPL(0x004553C5, void CC(), sub_4553C5);
 MGS_FUNC_NOT_IMPL(0x00455017, void CC(), GM_SoundStart_455017);
-MGS_FUNC_NOT_IMPL(0x0045837C, signed int CC(), File_GetStreamState_45837C);
 MGS_FUNC_NOT_IMPL(0x0044E8F1, void CC(), sub_44E8F1);
 MGS_FUNC_NOT_IMPL(0x0044F38D, void CC(), Map_FreeHzdItems_44F38D);
 MGS_FUNC_NOT_IMPL(0x0044F3B5, void CC(), Map_FreeKmds_44F3B5);

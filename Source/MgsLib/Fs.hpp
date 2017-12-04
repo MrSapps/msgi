@@ -11,3 +11,4 @@ int CC File_Close_51F183(FILE *File);
 signed int CC FS_LoadRequest(const char* fileName, void** buffer, signed int type);
 void CC j_FS_CloseFile_40907E();
 int Res_loader_load_file_to_mem_408FAE();
+signed int CC File_GetStreamState_45837C();

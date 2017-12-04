@@ -1175,7 +1175,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     if (Script_ParamExists('x'))
     {
         BYTE* script_x = Script_GetReturnAddress();
-        pRank->field_5F8_script_x = Script_Unknown8(script_x);
+        pRank->field_5F8_script_x =  Script_Unknown8_409924(script_x);
     }
     else
     {
@@ -1185,7 +1185,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     if (Script_ParamExists('e'))
     {
         BYTE* script_e = Script_GetReturnAddress();
-        pRank->field_414_script_e = Script_Unknown8(script_e);
+        pRank->field_414_script_e =  Script_Unknown8_409924(script_e);
     }
     else
     {
@@ -1195,7 +1195,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     if (Script_ParamExists('t'))
     {
         BYTE* script_t = Script_GetReturnAddress();
-        pRank->field_418_script_t = (DWORD *)Script_Unknown8(script_t);
+        pRank->field_418_script_t = (DWORD *) Script_Unknown8_409924(script_t);
     }
     else
     {

@@ -189,7 +189,8 @@ MGS_VAR(1, 0x78D32C, DWORD, dword_78D32C, 0);
 
 ResInitFn CC Script_tbl_get_res_init_fn_457B9A(BYTE *pScript)
 {
-    const WORD hashedName = static_cast<WORD>(Script_Unknown8(pScript));
+    const WORD hashedName = static_cast<WORD>( Script_Unknown8_409924(pScript));
+    LOG_INFO("Looking for " << hashedName << " chara function");
     return LibDG_GetResourceInitFuncPtr_457BAC(hashedName);
 }
 MGS_FUNC_IMPLEX(0x00457B9A, Script_tbl_get_res_init_fn_457B9A, LIBDG_IMPL);
@@ -201,7 +202,8 @@ signed int CC Script_tbl_chara_451AC3(BYTE* pScript)
     if (pResFn)
     {
         BYTE* scriptRet2 = Script_GetReturnAddress();
-        DWORD scriptUnknown = Script_Unknown8(scriptRet2);
+        DWORD scriptUnknown =  Script_Unknown8_409924(scriptRet2);
+        LOG_INFO("Exec chara fn: " << pResFn);
         pResFn(scriptUnknown, gBinds_dword_722A40, pScript);
         return 0;
     }

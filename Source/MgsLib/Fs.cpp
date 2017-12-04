@@ -265,6 +265,25 @@ signed int CC FS_LoadRequest(const char* fileName, void** ppBuffer, signed int t
 }
 MGS_FUNC_IMPLEX(0x00408EEF, FS_LoadRequest, FS_IMPL)
 
+MGS_VAR(1, 0x724AE0, WORD, gStream_state_word_724AE0, 0);
+MGS_VAR(1, 0x9B0A10, DWORD, fs_busy_dword_9B0A10, 0);
+
+int CC FS_StreamIsBusy_521122()
+{
+    return fs_busy_dword_9B0A10;
+}
+MGS_FUNC_IMPLEX(0x00521122, FS_StreamIsBusy_521122, FS_IMPL)
+
+signed int CC File_GetStreamState_45837C()
+{
+    if (gStream_state_word_724AE0 || !FS_StreamIsBusy_521122())
+    {
+        return gStream_state_word_724AE0 - 1;
+    }
+    return 2;
+}
+MGS_FUNC_IMPLEX(0x0045837C, File_GetStreamState_45837C, FS_IMPL)
+
 void Fs_Cpp_ForceLink()
 {
 

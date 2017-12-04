@@ -17,7 +17,6 @@ MGS_VAR(1, 0x6BFBB4, int, gScriptFileNameHashedToLoad_6BFBB4, 0);
 
 #define SCRIPT_IMPL true
 
-MGS_FUNC_NOT_IMPL(0x409924, DWORD CC(BYTE *pScript), Script_Unknown8);
 MGS_FUNC_NOT_IMPL(0x4093ED, void CC(), SaveDataStructuresRelated_4093ED);
 MGS_VAR(1, 0x6BFC68, BYTE*, gScriptMainProc_dword_6BFC68, nullptr);
 MGS_VAR(1, 0x06BFC3C, BYTE**, gScriptStackPos_dword_6BFC3C, 0); // Pointer to an array of 32 BYTE*'s
@@ -689,7 +688,7 @@ int CC Script_tbl_mesg_sub_451A5E(BYTE* /*pScript*/)
         {
             break;
         }
-        DWORD scriptData = Script_Unknown8(scriptRet);
+        DWORD scriptData =  Script_Unknown8_409924(scriptRet);
         *pMsgField = static_cast<WORD>(scriptData);
         ++pMsgField;
         count++;
@@ -728,6 +727,14 @@ int CC Script_Read3Words_409945(BYTE* pScript, WORD* pOut)
 }
 MGS_FUNC_IMPLEX(0x409945, Script_Read3Words_409945, SCRIPT_IMPL);
 
+DWORD CC Script_Unknown8_409924(BYTE* pScript)
+{
+    DWORD ret = 0;
+    DWORD cmd = 0;
+    gScriptExecuteRet_dword_78D7B4 = Script_GCL_Execute(pScript, &cmd, &ret);
+    return ret;
+}
+MGS_FUNC_IMPLEX(0x409924, Script_Unknown8_409924, SCRIPT_IMPL);
 
 MGS_VAR(1, 0x78E7EE, WORD, gScript_loader_param_m_78E7EE, 0);
 MGS_ARY(1, 0x78E7F0, WORD, 3, gScript_loader_param_p_78E7F0, {});
