@@ -684,6 +684,31 @@ signed int CC GV_lit_file_handler_402B1D(void*, int)
 }
 MGS_FUNC_IMPLEX(0x402B1D, GV_lit_file_handler_402B1D, LIBDG_IMPL);
 
+const BYTE* CC GV_pcx_file_RLE_decompress_4bit_402F30(const BYTE* pInput, BYTE* pOutput, int count)
+{
+    do
+    {
+        BYTE inByte = *pInput++;
+        if ((inByte & 0xC0) == 0xC0)
+        {
+            int runLength = inByte & 0x3F;
+            BYTE runValue = *pInput++;
+            count -= runLength;
+            while (--runLength >= 0)
+            {
+                *pOutput++ = runValue;
+            }
+        }
+        else
+        {
+            --count;
+            *pOutput++ = inByte;
+        }
+    } while (count > 0);
+    return pInput;
+}
+MGS_FUNC_IMPLEX(0x402F30, GV_pcx_file_RLE_decompress_4bit_402F30, LIBDG_IMPL);
+
 // TODO: These are not implemented - just here to return 1 for running standalone
 int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
 {
