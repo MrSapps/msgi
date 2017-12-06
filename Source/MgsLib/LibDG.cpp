@@ -709,6 +709,34 @@ const BYTE* CC GV_pcx_file_RLE_decompress_4bit_402F30(const BYTE* pInput, BYTE* 
 }
 MGS_FUNC_IMPLEX(0x402F30, GV_pcx_file_RLE_decompress_4bit_402F30, LIBDG_IMPL);
 
+void CC GV_pcx_file_pallete_convert_4031B9(BYTE* pPal, WORD* pOutPal, int colourCount)
+{
+    for(;;)
+    {
+        colourCount--;
+        if (colourCount < 0)
+        {
+            break;
+        }
+
+        BYTE r = pPal[0];
+        BYTE g = pPal[1];
+        BYTE b = pPal[2];
+        WORD pixel16 = ((b | g | r) & 7) != 0 ? 0x20 : 0; // Top 3 bits = transparency
+        if (r || g || b)
+        {
+            pixel16 = ((signed int)(unsigned __int8)r >> 3)
+               | 32 * (((signed int)(unsigned __int8)g >> 3)
+               | 32 * (((signed int)(unsigned __int8)b >> 3) | pixel16));
+        }
+        *pOutPal = pixel16;
+        ++pOutPal;
+        pPal += 3;
+    }
+}
+MGS_FUNC_IMPLEX(0x4031B9, GV_pcx_file_pallete_convert_4031B9, LIBDG_IMPL);
+
+
 // TODO: These are not implemented - just here to return 1 for running standalone
 int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
 {
