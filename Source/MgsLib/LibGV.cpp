@@ -520,13 +520,13 @@ MGS_FUNC_IMPLEX(0x40A54E, LibGV_Update_40A54E, LIBGV_IMPL);
 
 void LibGv_Init_sub_40A4F6()
 {
-    ActorList_Init();
+    ActorList_Init_40A006();
     LibGV_Reset_System2_Memory_40B35E();
     LibGv_ClearFunctionPointers_40A69D();
     LibGV_Init_FileCache_40A6AC();
     LibGV_40A4B1();
-    Actor_PushBack(0, &g_lib_gv_stru_6BFEE0.mBase, nullptr);
-    Actor_Init(&g_lib_gv_stru_6BFEE0.mBase, LibGV_Update_40A54E, nullptr, "C:\\mgs\\source\\LibGV\\gvd.c");
+    Actor_PushBack_40A2AF(0, &g_lib_gv_stru_6BFEE0.mBase, nullptr);
+    Actor_Init_40A347(&g_lib_gv_stru_6BFEE0.mBase, LibGV_Update_40A54E, nullptr, "C:\\mgs\\source\\LibGV\\gvd.c");
     gActiveBuffer_dword_791A08 = 0;
     g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00 = 0;
     //nullsub_6(nullsub_4);

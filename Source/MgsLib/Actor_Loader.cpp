@@ -109,7 +109,7 @@ Actor_Loader_Impl* CC Stage_LoadRelated_DataCnf_Q2(const char* strStageNameParam
 
     if (FS_LoadRequest("data.cnf", (void**)&pAllocated->field_1C_c_str_data_cnf_sys_allocd, 1) >= 0)
     {
-        File_HITEXT_INIT();
+        File_HITEXT_INIT_51D2ED();
 
         char strFullStageName[256] = {};
         sprintf(strFullStageName, "stage/%s", strStageName);
@@ -430,7 +430,7 @@ void CC Res_loader_48_Tick_457C4B(Actor_Loader* pLoader)
     }
     else
     {
-        Actor_DestroyOnNextUpdate(&pLoader->mBase);
+        Actor_DestroyOnNextUpdate_40A3ED(&pLoader->mBase);
     }
 }
 MGS_FUNC_IMPLEX(0x457C4B, Res_loader_48_Tick_457C4B, ACTOR_LOADER_IMPL);
@@ -449,7 +449,7 @@ void CC Res_loader_Create_457BDD(const char* strStageName)
         printf("NOT FOUND STAGE %s\n", strStageName);
     }
 
-    Actor_Init(
+    Actor_Init_40A347(
         &pLoader->mBase,
         reinterpret_cast<TActorFunction>(Res_loader_48_Tick_457C4B),
         reinterpret_cast<TActorFunction>(Res_loader_48_end_457C95),
@@ -473,7 +473,7 @@ MGS_ASSERT_SIZEOF(HiTexRecord, 0xC);
 MGS_VAR(1, 0x734A30, DWORD, gNum_HiTexs_dword_734A30, 0);
 MGS_ARY(1, 0x9956A0, HiTexRecord, 8192, gHiText_recs_9956A0, {});
 
-void CC File_HITEXT_INIT()
+void CC File_HITEXT_INIT_51D2ED()
 {
     // Free existing HiTex entries
     for (DWORD i = 0; i < gNum_HiTexs_dword_734A30; i++)
@@ -543,9 +543,9 @@ void CC File_HITEXT_INIT()
 
     fclose(hFile);
 }
-MGS_FUNC_IMPLEX(0x0051D2ED, File_HITEXT_INIT, ACTOR_LOADER_IMPL);
+MGS_FUNC_IMPLEX(0x0051D2ED, File_HITEXT_INIT_51D2ED, ACTOR_LOADER_IMPL);
 
-const char* CC HITEX_NAME(DWORD id)
+const char* CC HITEX_NAME_51D4BC(DWORD id)
 {
     for (DWORD i = 0; i < gNum_HiTexs_dword_734A30; i++)
     {
@@ -557,7 +557,7 @@ const char* CC HITEX_NAME(DWORD id)
     }
     return nullptr;
 }
-MGS_FUNC_IMPLEX(0x0051D4BC, HITEX_NAME, ACTOR_LOADER_IMPL);
+MGS_FUNC_IMPLEX(0x0051D4BC, HITEX_NAME_51D4BC, ACTOR_LOADER_IMPL);
 
 void CC Res_loader_EnableHiTex_51D1DB(const char* pcxName)
 {

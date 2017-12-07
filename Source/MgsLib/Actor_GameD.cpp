@@ -301,7 +301,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
                 }
                 else
                 {
-                    Actor_KillActorsAtLevel(4);
+                    Actor_KillActorsAtLevel_40A23D(4);
                 }
             }
             else if (File_GetStreamState_45837C() == 1)
@@ -356,7 +356,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
         counter_dword_6BED20 = 0x7FFF0000;
     }
 
-    Actor_KillActorsAtLevel(4);
+    Actor_KillActorsAtLevel_40A23D(4);
     gActorPauseFlags_dword_791A0C = gActorPauseFlags_dword_791A0C & 0xF7;
     Map_FreeKmds_44F3B5();
     StreamActorStop_4583BB();
@@ -375,8 +375,8 @@ MGS_FUNC_IMPLEX(0x0040B379, ResidentTopAllocate_40B379, ACTOR_GAMED_IMPL);
 
 void CC Res_MenuMan_create_459A9A()
 {
-    Actor_PushBack(1, &gMenuMan_stru_725FC0, nullptr);
-    Actor_Init(&gMenuMan_stru_725FC0, nullptr, nullptr, "C:\\mgs\\source\\Menu\\menuman.c");
+    Actor_PushBack_40A2AF(1, &gMenuMan_stru_725FC0, nullptr);
+    Actor_Init_40A347(&gMenuMan_stru_725FC0, nullptr, nullptr, "C:\\mgs\\source\\Menu\\menuman.c");
 }
 MGS_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, ACTOR_GAMED_IMPL);
 
@@ -452,11 +452,11 @@ void CC sub_44E1E0()
 }
 MGS_FUNC_IMPLEX(0x0044E1E0, sub_44E1E0, ACTOR_GAMED_IMPL);
 
-void CC SaveResidentTop()
+void CC SaveResidentTop_40B36E()
 {
     gSavedTop_78E964 = gResidentTop_dword_78E960;
 }
-MGS_FUNC_IMPLEX(0x0040B36E, SaveResidentTop, ACTOR_GAMED_IMPL);
+MGS_FUNC_IMPLEX(0x0040B36E, SaveResidentTop_40B36E, ACTOR_GAMED_IMPL);
 
 
 MGS_VAR(1, 0x78E7EC, WORD, stage_name_hash_word_78E7EC, 0);
@@ -521,15 +521,15 @@ void CC Init_Gamed_Create_44E12B()
     Script_BindInits_452610();
     LibGV_Set_FileExtHandler_40A68D('b', GV_bin_file_handler_44E9D2); // Handles loading ".bin" files which sets loadable objects table
     sub_44E1E0();
-    Actor_PushBack(1, &gGameD_stru_722760.mBase, nullptr);
-    Actor_Init(&gGameD_stru_722760.mBase, reinterpret_cast<TActorFunction>(GameD_update_44E381), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
+    Actor_PushBack_40A2AF(1, &gGameD_stru_722760.mBase, nullptr);
+    Actor_Init_40A347(&gGameD_stru_722760.mBase, reinterpret_cast<TActorFunction>(GameD_update_44E381), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
 
     sub_44E1F9();
     sub_44E287();
     Reset_GV_DG_44E212();
     word_78E7E8 = (WORD)(dword_78D7B0 + 1);
     dword_995324 = (int)&dword_7919C0;
-    SaveResidentTop();
+    SaveResidentTop_40B36E();
     gGameD_stru_722760.gamed_unk_722780 = 0;
     gGameD_stru_722760.gamed_unk_722784 = 0;
 

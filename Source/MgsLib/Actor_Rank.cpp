@@ -959,7 +959,7 @@ MGS_FUNC_IMPLEX(0x474315, Rank_SaveAfterGameCompleteQ, false); // TODO
 void CC Rank_End_474CE8(Actor_Rank* pRank)
 {
     Script_ProcCancelOrRun((WORD)pRank->field_418_script_t, nullptr);
-    Actor_DestroyOnNextUpdate(&pRank->mBase);
+    Actor_DestroyOnNextUpdate_40A3ED(&pRank->mBase);
 }
 MGS_FUNC_IMPLEX(0x474CE8, Rank_End_474CE8, ACTOR_RANK_IMPL);
 
@@ -1264,14 +1264,14 @@ signed int CC Res_rank_Create_46EC0E(DWORD scriptUnknown, int a_dword_722A40, BY
     Actor_Rank* pRank = Actor_ResourceAllocT<Actor_Rank>(1);
     if (pRank)
     {
-        Actor_Init(&pRank->mBase,
+        Actor_Init_40A347(&pRank->mBase,
             reinterpret_cast<TActorFunction>(Rank_update_46EC75),
             reinterpret_cast<TActorFunction>(Res_rank_shutdown_474D08), 
             "C:\\mgs\\source\\Onoda\\rank\\rank.c");
 
         if (Res_rank_loader(pRank, a_dword_722A40) < 0)
         {
-            Actor_DestroyOnNextUpdate(&pRank->mBase);
+            Actor_DestroyOnNextUpdate_40A3ED(&pRank->mBase);
             return 0;
         }
     }
