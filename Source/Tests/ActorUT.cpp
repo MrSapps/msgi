@@ -4,23 +4,23 @@
 
 #include "Actor.hpp"
 
-TEST(Actor, ActorList_Init)
+TEST(Actor, ActorList_Init_40A006)
 {
-    ActorList_Init();
+    ActorList_Init_40A006();
 }
 
-TEST(Actor, Actor_PushBack)
+TEST(Actor, Actor_PushBack_40A2AF)
 {
     Actor actor = {};
     actor.mName = "Test actor";
     // Actor_Init
 
-    ActorList_Init();
-    Actor_PushBack(0, &actor, nullptr);
+    ActorList_Init_40A006();
+    Actor_PushBack_40A2AF(0, &actor, nullptr);
 
-    Actor_DestroyOnNextUpdate(&actor);
+    Actor_DestroyOnNextUpdate_40A3ED(&actor);
 
-    Actor_UpdateActors();
+    Actor_UpdateActors_40A1BF();
 
     //Actor_Remove(&pActor);
     //Actor_KillActorsAtLevel(2);

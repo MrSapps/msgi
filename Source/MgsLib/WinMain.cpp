@@ -495,10 +495,10 @@ weapon_famas* CC Res_Weapon_famas_96_sub_640C24(ActorList* a1, ActorList *a2, vo
     weapon_famas* pFamas = Actor_ResourceAllocT<weapon_famas>(6);
     if (pFamas)
     {
-        Actor_Init(&pFamas->mBase, (TActorFunction)Res_famas_update_640CDC.Ptr(), (TActorFunction)Res_famas_shutdown_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
+        Actor_Init_40A347(&pFamas->mBase, (TActorFunction)Res_famas_update_640CDC.Ptr(), (TActorFunction)Res_famas_shutdown_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
         if (Res_Weapon_famas_loader_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
         {
-            Actor_DestroyOnNextUpdate(&pFamas->mBase);
+            Actor_DestroyOnNextUpdate_40A3ED(&pFamas->mBase);
             return 0;
         }
         pFamas->field_58 = 0;
@@ -621,7 +621,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
         if ((unsigned __int16)gVirtualKeyCode == VK_F10)
         {
             gF10Pressed = 0;
-            Actor_DumpActorSystem();
+            Actor_DumpActorSystem_40A0D4();
             return 0;
         }
         break;
@@ -2586,7 +2586,7 @@ signed int __cdecl Main()
         // HACK: Sometimes the game crashes somewhere deep in here, not calling this seems to prevent the game
         // state from progressing.
         // In software rendering mode when game over it will crash, but this is an existing bug of the game.
-        Actor_UpdateActors();
+        Actor_UpdateActors_40A1BF();
 
         //PsxGpuDebug_44A4D0();
     }

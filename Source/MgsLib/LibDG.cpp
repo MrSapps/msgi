@@ -1282,10 +1282,10 @@ void CC LibDg_Init_40111A()
     LibGV_Set_FileExtHandler_40A68D('z', GV_zmd_file_handler_403290);
     LibGV_Set_FileExtHandler_40A68D('i', GV_img_file_handler_402A5F);
     LibGV_Set_FileExtHandler_40A68D('s', GV_sgt_file_handler_402AA9);
-    Actor_PushBack(0, &gLibDG_2_stru_6BB930.mBase, 0);// Handles 2D rendering?
-    Actor_Init(&gLibDG_2_stru_6BB930.mBase, LibDG_Update2_401234, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
-    Actor_PushBack(8, &gLibDGD_1_stru_6BB910, 0); // Handles 3D rendering?
-    Actor_Init(&gLibDGD_1_stru_6BB910, LibDG_Update1_4012ED, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
+    Actor_PushBack_40A2AF(0, &gLibDG_2_stru_6BB930.mBase, 0);// Handles 2D rendering?
+    Actor_Init_40A347(&gLibDG_2_stru_6BB930.mBase, LibDG_Update2_401234, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
+    Actor_PushBack_40A2AF(8, &gLibDGD_1_stru_6BB910, 0); // Handles 3D rendering?
+    Actor_Init_40A347(&gLibDGD_1_stru_6BB910, LibDG_Update1_4012ED, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
 }
 MGS_FUNC_IMPLEX(0x40111A, LibDg_Init_40111A, LIBDG_IMPL);
 

@@ -37,7 +37,7 @@ void CC Actor_Delay_Update_455451(Actor_Delay* pDelay)
             Script_Run(reinterpret_cast<BYTE*>(pDelay->mProcIdOrScriptPtr), &pDelay->mGclProcArgs);
         }
     }
-    Actor_DestroyOnNextUpdate(&pDelay->mBase);
+    Actor_DestroyOnNextUpdate_40A3ED(&pDelay->mBase);
 }
 MGS_FUNC_IMPLEX(0x00455451, Actor_Delay_Update_455451, ACTOR_DELAY_IMPL);
 
@@ -72,7 +72,7 @@ void CC Res_delay_84_sub_4553D1(DWORD scriptVar_p, GCL_Proc_Arguments* pArgs, in
         }
         pDelay->mDelayCounter = scriptVar_t2;
         pDelay->mProcIdOrScriptPtr = scriptVar_p;
-        Actor_Init(&pDelay->mBase, reinterpret_cast<TActorFunction>(Actor_Delay_Update_455451), nullptr, "C:\\mgs\\source\\Game\\delay.c");
+        Actor_Init_40A347(&pDelay->mBase, reinterpret_cast<TActorFunction>(Actor_Delay_Update_455451), nullptr, "C:\\mgs\\source\\Game\\delay.c");
     }
 }
 MGS_FUNC_IMPLEX(0x004553D1, Res_delay_84_sub_4553D1, ACTOR_DELAY_IMPL);

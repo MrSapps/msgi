@@ -69,14 +69,14 @@ Actor_Debug* AddDebugActor()
     Actor_Debug* pDebug = Actor_ResourceAllocT<Actor_Debug>(1);
     if (pDebug)
     {
-        Actor_Init(&pDebug->mBase,
+        Actor_Init_40A347(&pDebug->mBase,
             reinterpret_cast<TActorFunction>(Debug_Update),
             reinterpret_cast<TActorFunction>(Debug_Shutdown),
             __FILE__);
 
         if (Debug_Loader(pDebug) < 0)
         {
-            Actor_DestroyOnNextUpdate(&pDebug->mBase);
+            Actor_DestroyOnNextUpdate_40A3ED(&pDebug->mBase);
         }
     }
     return pDebug;

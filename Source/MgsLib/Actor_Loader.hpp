@@ -25,7 +25,7 @@ struct Actor_Loader
 MGS_ASSERT_SIZEOF(Actor_Loader, 0x30);
 
 void CC Res_loader_Create_457BDD(const char* strStageName);
-void CC File_HITEXT_INIT();
+void CC File_HITEXT_INIT_51D2ED();
 void CC Res_loader_EnableHiTex_51D1DB(const char* pcxName);
 const char* CC Res_loader_GetLine_408E1B(const char* pInput, char* pOutputLine);
 
