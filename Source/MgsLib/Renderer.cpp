@@ -96,7 +96,7 @@ MGS_VAR(1, 0x6FC788, DWORD, gPrimIdx_dword_6FC788, 0);
 MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
 MGS_VAR(1, 0x6FC744, DWORD, dword_6FC744, 0);
 MGS_VAR(1, 0x650D10, DWORD, dword_650D10, 0);
-MGS_VAR(1, 0x6FC778, DWORD, dword_6FC778, 0);
+MGS_VAR(1, 0x6FC778, DWORD, gStageIs_s11e_6FC778, 0);
 MGS_VAR(1, 0x6FC760, DWORD, dword_6FC760, 0);
 
 
@@ -685,7 +685,7 @@ void CC Render_DrawHardware_421C00()
                         gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode = 4;
                     }
                 }
-                else if (!dword_6FC778)
+                else if (!gStageIs_s11e_6FC778)
                 {
                     dword_650D44 = 1;
                 }

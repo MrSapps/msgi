@@ -77,6 +77,7 @@ MGS_VAR_EXTERN(MGSVertex*, g_pMGSVertices_6FC780);
 MGS_VAR_EXTERN(WORD*, g_pwTextureIndices);
 MGS_VAR_EXTERN(DWORD, dword_6FC774);
 MGS_VAR_EXTERN(WORD, gNumTextures_word_6FC78C);
+MGS_VAR_EXTERN(DWORD, gStageIs_s11e_6FC778);
 
 void RendererCpp_ForceLink();
 

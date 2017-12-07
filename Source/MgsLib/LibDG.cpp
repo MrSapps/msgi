@@ -4,6 +4,7 @@
 #include "LibGV.hpp"
 #include "Actor_GameD.hpp"
 #include <assert.h>
+#include "Renderer.hpp"
 
 #define LIBDG_IMPL true
 
@@ -823,6 +824,16 @@ Texture_Record* CC sub_40252B(WORD hashedName, int bpp, __int16 bppShift0x30, PS
 }
 MGS_FUNC_IMPLEX(0x40252B, sub_40252B, LIBDG_IMPL);
 
+MGS_FUNC_NOT_IMPL(0x41C6B0, void __cdecl(PSX_RECT *pRect, BYTE *pPixelData), Render_sub_41C6B0);
+MGS_FUNC_NOT_IMPL(0x41C640, WORD __cdecl(PSX_RECT *pRect, WORD *pallete, BYTE *pixelData, int surfaceType, int pTga, unsigned __int16 tga6, unsigned __int16 tga7), Render_sub_41C640);
+MGS_FUNC_NOT_IMPL(0x402FB4, void __cdecl(const BYTE *pIn, BYTE *pOut, int bytesPerScanLine, signed int w, int h), GV_pcx_file_RLE_decompress_8bit_402FB4);
+MGS_FUNC_NOT_IMPL(0x42B6A6, char *__cdecl (int fileNameHash, WORD *pWidth, WORD *pHeight, DWORD **ppAllocated), jimGetTargetBuffer_42B6A6);
+
+
+
+MGS_VAR(1, 0x650D1A, WORD, word_650D1A, 0);
+
+
 // TODO: These are not implemented - just here to return 1 for running standalone
 int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
 {
@@ -863,13 +874,12 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
     }
     else                                        // 8 bit?
     {
-        /*
         GV_pcx_file_RLE_decompress_8bit_402FB4(
-            &pPcxFileData[1].field_0_magic,
-            (char *)&pRect[1],
+            (const BYTE*)&pPcxFileData[1].field_0_magic,
+            (unsigned __int8 *)&pRect[1],
             pPcxFileData->field_42_bytesPerPlaneLine,
             maxW,
-            maxH);*/
+            maxH);
         pPal = pPcxFileData->field_10_palette;
     }
     GV_pcx_file_pallete_convert_4031B9(pPal, pAllocated->field_8_256_pal, pAllocated->field_4_num_colours);
@@ -880,31 +890,33 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
     {
         *v8 = 0;
     }
+    */
 
-    pStageName = File_StageName_44EB83();
-    gStageIs_s11e_6FC778 = strcmp(pStageName, "s11e") == 0;
-    tgaBuffer = 0;
+    gStageIs_s11e_6FC778 = strcmp(File_StageName_44EB83(), "s11e") == 0;
 
     // TODO: Software rendering branch has been pruned here
+    
 
-    p_tga = (int)jimGetTargetBuffer((unsigned __int16)fileNameHash, tga_6, tga_7, &tgaBuffer);
-
+    WORD tga_6 = 0;
+    WORD tga_7 = 0;
+    DWORD* tgaBuffer = nullptr;
+    const char* p_tga = jimGetTargetBuffer_42B6A6(fileNameHash, &tga_6, &tga_7, &tgaBuffer);
+ 
     word_650D1A = Render_sub_41C640(
         &pRect->field_0_vram_rect,
-        (int)pAllocated->field_8_256_pal,
-        (int)&pRect[1],
+        pAllocated->field_8_256_pal,
+       (BYTE*)&pRect[1],
         mgs_bpp & 1,
-        p_tga,
-        tga_6[0],
-        tga_7[0]);
+        (int)p_tga,
+        tga_6,
+        tga_7);
 
     if (p_tga)
     {
         free(tgaBuffer);
     }
-    */
 
-    //Render_sub_41C6B0(&pRect->field_0_vram_rect, (BYTE*)&pRect[1]);
+    Render_sub_41C6B0(&pRect->field_0_vram_rect, (BYTE*)&pRect[1]);
 
     /*
     if (v8)
@@ -916,14 +928,13 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
     System_VoidAllocation_40B187(gActiveBuffer_dword_791A08, (void**)&pAllocated);
     if (fileNameHash)
     {
-        /*
         sub_40252B(
-            (Texture_Record *)(unsigned __int16)fileNameHash,
+            fileNameHash,
             mgs_bpp & 1,
             (mgs_bpp & 0x30) >> 4,
             &pRect->field_0_vram_rect,
-            (int)pAllocatedCopy,
-            pAllocatedCopy->field_4_num_colours);*/
+            pAllocated,
+            pAllocated->field_4_num_colours);
     }
 
     return 1;
