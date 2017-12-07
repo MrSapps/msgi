@@ -5,6 +5,7 @@
 #include "Actor_GameD.hpp"
 #include <assert.h>
 #include "Renderer.hpp"
+#include "Actor_Loader.hpp"
 
 #define LIBDG_IMPL true
 
@@ -884,18 +885,16 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
     }
     GV_pcx_file_pallete_convert_4031B9(pPal, pAllocated->field_8_256_pal, pAllocated->field_4_num_colours);
 
-    /*
-    v8 = strstr(Str1_6BFBA0, ".");
+    // Remove file extension from name of file being loaded
+    char* v8 = strstr(Str1_6BFBA0, "."); // Used only in dead software rendering branch
     if (v8)
     {
         *v8 = 0;
     }
-    */
-
+    
     gStageIs_s11e_6FC778 = strcmp(File_StageName_44EB83(), "s11e") == 0;
 
     // TODO: Software rendering branch has been pruned here
-    
 
     WORD tga_6 = 0;
     WORD tga_7 = 0;
@@ -918,13 +917,12 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
 
     Render_sub_41C6B0(&pRect->field_0_vram_rect, (BYTE*)&pRect[1]);
 
-    /*
+    // Put the file extension back
     if (v8)
     {
         v8 = ".";
     }
-    */
-
+    
     System_VoidAllocation_40B187(gActiveBuffer_dword_791A08, (void**)&pAllocated);
     if (fileNameHash)
     {
