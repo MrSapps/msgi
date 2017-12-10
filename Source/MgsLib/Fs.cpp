@@ -76,14 +76,14 @@ FILE* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
         strcat(fileToOpen, "/");
         strcat(fileToOpen, remappedFileName);
         const char* strOpenMode = gOpenModes_689998[openMode % 4];
-        hFile = mgs_fopen(fileToOpen, strOpenMode);
+        hFile = fopen(fileToOpen, strOpenMode);
         if (!hFile)
         {
             // For some reason try again one more time?
             strcpy(fileToOpen, ".");
             strcat(fileToOpen, "/");
             strcat(fileToOpen, remappedFileName);
-            hFile = mgs_fopen(fileToOpen, strOpenMode);
+            hFile = fopen(fileToOpen, strOpenMode);
         }
     }
     return hFile;
@@ -92,7 +92,7 @@ MGS_FUNC_IMPLEX(0x0051EE8F, File_LoadDirFile_51EE8F, FS_IMPL)
 
 size_t CC File_NormalRead_51F0F5(FILE* File, void* dstBuf, DWORD nNumberOfBytesToRead)
 {
-    return mgs_fread(dstBuf, 1, nNumberOfBytesToRead, File);
+    return fread(dstBuf, 1, nNumberOfBytesToRead, File);
 }
 MGS_FUNC_IMPLEX(0x0051F0F5, File_NormalRead_51F0F5, false) // TODO
 
@@ -100,7 +100,7 @@ __int32 CC File_GetPos_51F09E(FILE* File, __int32 Offset, int Origin)
 {
     if (File != (FILE *)-1 && File)
     {
-        mgs_fseek(File, Offset, Origin);
+        fseek(File, Offset, Origin);
         return ftell(File);
     }
     return 0;
@@ -114,7 +114,7 @@ int CC File_Close_51F183(FILE *File)
         return 0;
     }
 
-    return mgs_fclose(File);
+    return fclose(File);
 }
 MGS_FUNC_IMPLEX(0x0051F183, File_Close_51F183, false) // TODO
 

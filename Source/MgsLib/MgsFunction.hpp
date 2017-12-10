@@ -17,6 +17,7 @@
 #define ENABLE_LOGGING 0
 
 bool IsMgsi();
+void DoDetour(DWORD addr, DWORD func);
 
 inline std::ostream& operator<<(std::ostream& out, IID id)
 {
@@ -357,6 +358,8 @@ extern TypeName* VarName ;
 
 #define MGS_STDLIB(func, addr) MgsFunction<addr, (void*)addr, false, true, decltype(func)> mgs_##func(#func, (void*)func)
 #define EXTERN_MGS_STDLIB(func, addr) extern MgsFunction<addr, (void*)addr, false, true, decltype(func)> mgs_##func;
+
+#define MGS_REDIRECT(addr, func) DoDetour(addr, (DWORD)func)
 
 #define MGS_ASSERT_SIZEOF(structureName, expectedSize) static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize)
 

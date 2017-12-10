@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "Renderer.hpp"
 #include "Actor_Loader.hpp"
+#include "Fs.hpp"
 
 #define LIBDG_IMPL true
 
@@ -785,7 +786,7 @@ struct pcx_mgs
 };
 MGS_ASSERT_SIZEOF(pcx_mgs, 0x210);
 
-Texture_Record* CC sub_40252B(WORD hashedName, int bpp, __int16 bppShift0x30, PSX_RECT *pVramRect, pcx_mgs* pMgsPcx, char numColours)
+Texture_Record* CC sub_40252B(WORD hashedName, int bpp, __int16 bppShift0x30, PSX_RECT* pVramRect, pcx_mgs* pMgsPcx, char numColours)
 {
     Texture_Record* pTexture = nullptr;
     if (LibDG_SearchForTextureRecord_4024D2(hashedName, &pTexture))
@@ -828,14 +829,90 @@ MGS_FUNC_IMPLEX(0x40252B, sub_40252B, LIBDG_IMPL);
 MGS_FUNC_NOT_IMPL(0x41C6B0, void __cdecl(PSX_RECT *pRect, BYTE *pPixelData), Render_sub_41C6B0);
 MGS_FUNC_NOT_IMPL(0x41C640, WORD __cdecl(PSX_RECT *pRect, WORD *pallete, BYTE *pixelData, int surfaceType, int pTga, unsigned __int16 tga6, unsigned __int16 tga7), Render_sub_41C640);
 MGS_FUNC_NOT_IMPL(0x402FB4, void __cdecl(const BYTE *pIn, BYTE *pOut, int bytesPerScanLine, signed int w, int h), GV_pcx_file_RLE_decompress_8bit_402FB4);
-MGS_FUNC_NOT_IMPL(0x42B6A6, char *__cdecl (int fileNameHash, WORD *pWidth, WORD *pHeight, DWORD **ppAllocated), jimGetTargetBuffer_42B6A6);
 
+#pragma pack(push)
+#pragma pack(1)
+struct Tga_header
+{
+    BYTE field_0_idlength;
+    BYTE field_1_colourmaptype;
+    BYTE field_2_datatypecode;
+    WORD field_3_colourmaporigin;
+    WORD field_5_colourmaplength;
+    BYTE field_7_colourmapdepth;
+    WORD field_8_x_origin;
+    WORD field_A_y_origin;
+    WORD field_C_width;
+    WORD field_E_height;
+    BYTE field_10_bitsperpixel;
+    BYTE field_11_imagedescriptor;
+};
+#pragma pack(pop)
+MGS_ASSERT_SIZEOF(Tga_header, 0x12);
+
+BYTE* CC jimGetTargetBuffer_42B6A6(WORD fileNameHash, WORD *pWidth, WORD *pHeight, DWORD** ppAllocated)
+{
+    const char* pHiTexName = HITEX_NAME_51D4BC(fileNameHash);
+    if (!pHiTexName)
+    {
+        return nullptr;
+    }
+
+    FILE* hReplacementTexture = File_LoadDirFile_51EE8F(pHiTexName, 0);
+    if (!hReplacementTexture)
+    {
+        printf("*** $jim *** Error reading file %s.\n", pHiTexName);
+        return nullptr;
+    }
+
+    const __int32 sizeToRead = File_GetPos_51F09E(hReplacementTexture, 0, 2);
+
+    Tga_header* tgaBuffer = reinterpret_cast<Tga_header*>(malloc(sizeToRead));
+
+    if (!tgaBuffer)
+    {
+        printf("*** $jim *** Error allocating mempry in jimGetTargetBuffer\n");
+        File_Close_51F183(hReplacementTexture);
+        return nullptr;
+    }
+    
+    File_GetPos_51F09E(hReplacementTexture, 0, 0);
+
+    if (File_NormalRead_51F0F5(hReplacementTexture, tgaBuffer, sizeToRead) != sizeToRead)
+    {
+        free(tgaBuffer);
+        printf("*** $jim *** Error reading file %s.\n", pHiTexName);
+        File_Close_51F183(hReplacementTexture);
+        return nullptr;
+    }
+
+    File_Close_51F183(hReplacementTexture);
+
+    if ((tgaBuffer->field_1_colourmaptype & 0xFF) > 1u       // Only 0 or 1 colour map type supported
+        || tgaBuffer->field_2_datatypecode != 2              // Uncompressed, RGB images.
+        || tgaBuffer->field_10_bitsperpixel != 16)          // 16 Bits per pixel
+    {
+        free(tgaBuffer);
+        printf("*** $jim *** Error in Targa file %s or unsupported Targa format\n", pHiTexName);
+        return 0;
+    }
+
+    DWORD colourMapSize = 0;
+    if ((tgaBuffer->field_1_colourmaptype & 0xFF) == 1) // has colour map?
+    {
+        colourMapSize = (tgaBuffer->field_1_colourmaptype & 0xFF) * tgaBuffer->field_7_colourmapdepth / 8;
+    }
+
+    *ppAllocated = reinterpret_cast<DWORD*>(tgaBuffer);
+    *pWidth = tgaBuffer->field_C_width;
+    *pHeight = tgaBuffer->field_E_height;
+    return reinterpret_cast<BYTE*>(tgaBuffer) + sizeof(Tga_header) + (colourMapSize + tgaBuffer->field_0_idlength);
+}
+MGS_FUNC_IMPLEX(0x42B6A6, jimGetTargetBuffer_42B6A6, LIBDG_IMPL);
 
 
 MGS_VAR(1, 0x650D1A, WORD, word_650D1A, 0);
 
-
-// TODO: These are not implemented - just here to return 1 for running standalone
 int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
 {
     pcx_header* pPcxFileData = reinterpret_cast<pcx_header*>(fileData);
@@ -865,7 +942,7 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
     pRect->field_0_vram_rect.y2 = maxH;
 
     const BYTE* pPal = nullptr;
-    if (mgs_bpp & 1)                          // 4 bit?
+    if (mgs_bpp & 1)
     {
         const BYTE* pRet = GV_pcx_file_RLE_decompress_4bit_402F30(
             (const BYTE*)&pPcxFileData[1].field_0_magic,
@@ -873,7 +950,7 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
             maxH * maxW);
         pPal = pRet + 1;
     }
-    else                                        // 8 bit?
+    else
     {
         GV_pcx_file_RLE_decompress_8bit_402FB4(
             (const BYTE*)&pPcxFileData[1].field_0_magic,
@@ -885,44 +962,31 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
     }
     GV_pcx_file_pallete_convert_4031B9(pPal, pAllocated->field_8_256_pal, pAllocated->field_4_num_colours);
 
-    // Remove file extension from name of file being loaded
-    char* v8 = strstr(Str1_6BFBA0, "."); // Used only in dead software rendering branch
-    if (v8)
-    {
-        *v8 = 0;
-    }
-    
     gStageIs_s11e_6FC778 = strcmp(File_StageName_44EB83(), "s11e") == 0;
 
-    // TODO: Software rendering branch has been pruned here
+    // NOTE: Software rendering branch has been pruned here
 
-    WORD tga_6 = 0;
-    WORD tga_7 = 0;
-    DWORD* tgaBuffer = nullptr;
-    const char* p_tga = jimGetTargetBuffer_42B6A6(fileNameHash, &tga_6, &tga_7, &tgaBuffer);
+    WORD tgaWidth = 0;
+    WORD tgaHeight = 0;
+    DWORD* tgaBackingBuffer = nullptr;
+    const BYTE* pTga16BitPixels = jimGetTargetBuffer_42B6A6(fileNameHash, &tgaWidth, &tgaHeight, &tgaBackingBuffer);
  
     word_650D1A = Render_sub_41C640(
         &pRect->field_0_vram_rect,
         pAllocated->field_8_256_pal,
        (BYTE*)&pRect[1],
         mgs_bpp & 1,
-        (int)p_tga,
-        tga_6,
-        tga_7);
+        (int)pTga16BitPixels,
+        tgaWidth,
+        tgaHeight);
 
-    if (p_tga)
+    if (pTga16BitPixels)
     {
-        free(tgaBuffer);
+        free(tgaBackingBuffer);
     }
 
     Render_sub_41C6B0(&pRect->field_0_vram_rect, (BYTE*)&pRect[1]);
 
-    // Put the file extension back
-    if (v8)
-    {
-        v8 = ".";
-    }
-    
     System_VoidAllocation_40B187(gActiveBuffer_dword_791A08, (void**)&pAllocated);
     if (fileNameHash)
     {
@@ -937,8 +1001,9 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
 
     return 1;
 }
-MGS_FUNC_IMPLEX(0x402B25, GV_pcx_file_handler_402B25, false); // TODO
+MGS_FUNC_IMPLEX(0x402B25, GV_pcx_file_handler_402B25, LIBDG_IMPL);
 
+// TODO: These are not implemented - just here to return 1 for running standalone
 int CC GV_kmd_file_handler_402796(void* fileData, int fileNameHash)
 {
     LOG_WARNING("KMD loader not impl");
