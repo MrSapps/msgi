@@ -44,6 +44,7 @@
 #include "Actor_Movie.hpp"
 #include "Timer.hpp"
 #include "Fs.hpp"
+#include "Imports.hpp"
 
 #define _ELPP_THREAD_SAFE
 #include "easylogging++.h"
@@ -2739,6 +2740,8 @@ static void RunTests()
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
+    //DisableImports();
+
     ::testing::GTEST_FLAG(throw_on_failure) = true;
     int argCount = 0;
     ::testing::InitGoogleMock(&argCount, &lpCmdLine);

@@ -108,6 +108,7 @@
     <ClCompile Include="Actor_Rank.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="Fs.cpp" />
+    <ClCompile Include="Imports.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="LibDG.cpp" />
     <ClCompile Include="LibGV.cpp" />
