@@ -41,6 +41,7 @@
 #include "Actor_Delay.hpp"
 #include "Actor_GameD.hpp"
 #include "Actor_Loader.hpp"
+#include "Actor_Movie.hpp"
 #include "Timer.hpp"
 #include "Fs.hpp"
 
@@ -2733,6 +2734,7 @@ static void RunTests()
     DoResourceNameHashTest();
     DoActor_RankTests();
     DoLibGv_Tests();
+    DoMovie_Tests();
 }
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
@@ -2787,7 +2789,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     Actor_DelayCpp_ForceLink();
     Actor_LoaderCpp_ForceLink();
     Fs_Cpp_ForceLink();
-
+    Force_Actor_Movie_Cpp_Link();
 
     InstallVaradicCFunctionHooks();
     

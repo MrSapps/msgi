@@ -78,6 +78,7 @@
     <ClInclude Include="Actor_Delay.hpp" />
     <ClInclude Include="Actor_GameD.hpp" />
     <ClInclude Include="Actor_Loader.hpp" />
+    <ClInclude Include="Actor_Movie.hpp" />
     <ClInclude Include="Actor_Rank.hpp" />
     <ClInclude Include="File.hpp" />
     <ClInclude Include="Fs.hpp" />
@@ -103,6 +104,7 @@
     <ClCompile Include="Actor_Delay.cpp" />
     <ClCompile Include="Actor_GameD.cpp" />
     <ClCompile Include="Actor_Loader.cpp" />
+    <ClCompile Include="Actor_Movie.cpp" />
     <ClCompile Include="Actor_Rank.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="Fs.cpp" />

@@ -84,6 +84,9 @@
     <ClInclude Include="Fs.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Actor_Movie.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -150,6 +153,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Fs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor_Movie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
