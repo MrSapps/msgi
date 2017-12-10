@@ -114,6 +114,7 @@ public:
         if (it != std::end(GetMgsFunctionTable()))
         {
             // duplicated function
+            LOG_ERROR("Function " << std::hex << "0x" << it->first << " is duplicated");
             abort();
         }
         else
@@ -124,11 +125,12 @@ public:
 
     virtual ~MgsFunctionImpl()
     {
+        /* TODO:  Can crash due to static init order
         auto it = GetMgsFunctionTable().find(kOldAddr);
         if (it != std::end(GetMgsFunctionTable()))
         {
             GetMgsFunctionTable().erase(it);
-        }
+        }*/
     }
 
     bool mStubCalled = false;
@@ -141,7 +143,7 @@ public:
             {
                 LOG_("WARNING: Unimpl call: " << mFnName);
             }
-            mStubCalled = true;
+            //mStubCalled = true;
             /*
             std::cout << mFnName << " (";
             doPrint(std::cout, args...);
@@ -262,6 +264,7 @@ private:
     {
         //TRACE_ENTRYEXIT;
 
+
         std::cout << "old addr " << funcToHook << " new addr " << replacement << std::endl;
 
         mRealFuncPtr = (TFuncType)funcToHook;
@@ -369,4 +372,4 @@ extern TypeName* VarName ;
 #define BYTE3(x)   BYTEn(x,  3)
 #define HIWORD(l)           ((WORD)((((DWORD_PTR)(l)) >> 16) & 0xffff))
 
-#define MGS_FATAL(x)  ::MessageBox(NULL, "ERROR", x, MB_ICONERROR | MB_OK); __debugbreak(); abort();
+#define MGS_FATAL(x)  ::MessageBox(NULL, x, "ERROR", MB_ICONERROR | MB_OK); __debugbreak(); abort();

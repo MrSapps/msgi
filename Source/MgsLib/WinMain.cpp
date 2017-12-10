@@ -94,7 +94,7 @@ MGS_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
 MGS_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
 MGS_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
 MGS_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
-MGS_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
+MGS_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts_431865);
 MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MGS_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
 MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
@@ -1709,7 +1709,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         mgs_fputs(" . done\n", gFile);
         mgs_fflush(gFile);
 
-        MakeFonts();
+        MakeFonts_431865();
         if (dword_651CF8)
         {
             Render_sub_41CD70();
@@ -2368,9 +2368,12 @@ int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint
 }
 MGS_FUNC_IMPLEX(0x41E130, ClearBackBuffer, WINMAIN_IMPL);
 
+void LoadImports();
+
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
+    LoadImports();
     const auto ret = InitD3d_ProfileGfxHardwareQ();
     MessageBox_Error(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
     return ret;
@@ -2735,6 +2738,12 @@ static void RunTests()
     DoLibGv_Tests();
 }
 
+
+
+MGS_FUNC_NOT_IMPL(0x42B7DE, signed int __cdecl(int a1, signed int a2), load_dir_42B7DE);
+
+
+
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
     ::testing::GTEST_FLAG(throw_on_failure) = true;
@@ -2788,9 +2797,16 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     Actor_LoaderCpp_ForceLink();
     Fs_Cpp_ForceLink();
 
+    LoadImports();
+
+    char b1[256] = {};
+    char b2[256] = {};
+    //load_dir_42B7DE((int)b1, (int)b2);
+    MakeFonts_431865();
 
     InstallVaradicCFunctionHooks();
     
+
 
     RunTests();
 
@@ -2857,10 +2873,10 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
             if (RegisterClassA(&WndClass))
             {
                 gWindowedMode = 0;
-                if (strstr(lpCmdLine, off_688DB8))
+                //if (strstr(lpCmdLine, off_688DB8))
                     dword_6FC7A0 = 58; // "Normal" path, in real game setting this to zero seems to be impossible
-                else
-                    dword_6FC7A0 = 0;
+                //else
+                    //dword_6FC7A0 = 0;
                 if (strstr(lpCmdLine, "-noeffects"))
                     gNoEffects = 0;
                 if (strstr(lpCmdLine, "-320"))
@@ -2889,8 +2905,8 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
                 }
                 if (strstr(lpCmdLine, "-lowres"))
                     gLowRes = 1;
-                if (strstr(lpCmdLine, off_688D40))
-                    gWindowedMode = 0;
+               // if (strstr(lpCmdLine, off_688D40))
+                //    gWindowedMode = 0;
                 if (strstr(lpCmdLine, "-w"))
                     gWindowedMode = 1;
                 if (strstr(lpCmdLine, "-soft"))
