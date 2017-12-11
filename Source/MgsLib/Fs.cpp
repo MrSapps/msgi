@@ -4,12 +4,107 @@
 #include "Actor_Loader.hpp"
 #include "Actor_GameD.hpp"
 #include "File.hpp"
+#include <gmock/gmock.h>
 
 
 #define FS_IMPL true
 
+struct MgzMapping
+{
+    const char* field_0_path;
+    const char* field_4_mgz;
+    FILE* field_8_file_handle;
+    DWORD field_C_padding;
+};
+MGS_ASSERT_SIZEOF(MgzMapping, 0x10);
 
-MGS_FUNC_NOT_IMPL(0x51EFB2, FILE* CC(char *pFileName), OpenArchiveFile_51EFB2);
+MgzMapping gMgzTable_6898E8[4] =
+{
+    { "stage/",     "stage.mgz",    nullptr, 0 },
+    { "stagevr/",   "stagevr.mgz",  nullptr, 0 },
+    { "efx/",       "efx.mgz",      nullptr, 0 },
+    { "tga/",       "tga.mgz",      nullptr, 0 }
+};
+
+
+char* CC ReplaceBackWithFowardSlashes_51EC38(char* pInput, char* pOutput)
+{
+    // TODO
+    return nullptr;
+}
+MGS_FUNC_IMPLEX(0x0051EC38, ReplaceBackWithFowardSlashes_51EC38, false)
+
+void CC CloseCachedMgzFiles_51EE23()
+{
+    // TODO: Close open handles to items in the zip itself
+
+    for (MgzMapping& mapping : gMgzTable_6898E8)
+    {
+        if (mapping.field_8_file_handle)
+        {
+            fclose(mapping.field_8_file_handle);
+            mapping.field_8_file_handle = nullptr;
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x0051EE23, CloseCachedMgzFiles_51EE23, false)
+
+FILE* CC OpenMGZ_051ED67(const char* pFileName)
+{
+    static bool sSetCleanup_776B60 = false;
+    if (!sSetCleanup_776B60)
+    {
+        sSetCleanup_776B60 = true;
+        // TODO: Use a direct call at the end of winmain instead
+        atexit(CloseCachedMgzFiles_51EE23);
+    }
+
+    MgzMapping* pMapping = nullptr;
+    for (MgzMapping& mapping : gMgzTable_6898E8)
+    {
+        if (strncmp(mapping.field_0_path, pFileName, strlen(mapping.field_0_path)) == 0)
+        {
+            break;
+        }
+    }
+
+    if (!pMapping)
+    {
+        return nullptr;
+    }
+
+    if (!pMapping->field_8_file_handle)
+    {
+        char buffer[256] = {};
+        strcpy(buffer, ".");
+        strcat(buffer, "/");
+        strcat(buffer, pMapping->field_4_mgz);
+
+        pMapping->field_8_file_handle = fopen(buffer, "rb");
+    }
+
+    return pMapping->field_8_file_handle;
+}
+MGS_FUNC_IMPLEX(0x00051ED67, OpenMGZ_051ED67, false)
+
+AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
+{
+    char normalizedFileName[256] = {};
+    ReplaceBackWithFowardSlashes_51EC38(pFileName, normalizedFileName);
+    FILE* mgzHandle = OpenMGZ_051ED67(normalizedFileName);
+    if (!mgzHandle)
+    {
+        return nullptr;
+    }
+
+
+
+    // TODO: Find free entry in gmmf_dword_776960 - only allows for 32 handles
+
+    return nullptr;
+}
+MGS_FUNC_IMPLEX(0x0051EFB2, OpenArchiveFile_51EFB2, FS_IMPL)
+
 
 struct FileToFileMap
 {
@@ -42,7 +137,7 @@ const char* gOpenModes_689998[] =
     "rb+"
 };
 
-FILE* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
+AbstractedFileHandle* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
 {
     LOG_INFO(fileName);
 
@@ -67,7 +162,9 @@ FILE* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
     }
 
     // Open in the MGZ archive
-    FILE* hFile = OpenArchiveFile_51EFB2(remappedFileName);
+    AbstractedFileHandle* hFile = OpenArchiveFile_51EFB2(remappedFileName);
+
+
     if (!hFile)
     {
         // Failed, try opening directly from on disk/extracted MGZ archive
@@ -76,50 +173,61 @@ FILE* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
         strcat(fileToOpen, "/");
         strcat(fileToOpen, remappedFileName);
         const char* strOpenMode = gOpenModes_689998[openMode % 4];
-        hFile = fopen(fileToOpen, strOpenMode);
-        if (!hFile)
+        FILE* hRealFile = fopen(fileToOpen, strOpenMode);
+        if (!hRealFile)
         {
             // For some reason try again one more time?
             strcpy(fileToOpen, ".");
             strcat(fileToOpen, "/");
             strcat(fileToOpen, remappedFileName);
-            hFile = fopen(fileToOpen, strOpenMode);
+            hRealFile = fopen(fileToOpen, strOpenMode);
+        }
+
+        if (hRealFile)
+        {
+            hFile = new AbstractedFileHandle(hRealFile);
         }
     }
     return hFile;
 }
 MGS_FUNC_IMPLEX(0x0051EE8F, File_LoadDirFile_51EE8F, FS_IMPL)
 
-size_t CC File_NormalRead_51F0F5(FILE* File, void* dstBuf, DWORD nNumberOfBytesToRead)
+size_t CC File_NormalRead_51F0F5(AbstractedFileHandle* File, void* dstBuf, DWORD nNumberOfBytesToRead)
 {
-    return fread(dstBuf, 1, nNumberOfBytesToRead, File);
-}
-MGS_FUNC_IMPLEX(0x0051F0F5, File_NormalRead_51F0F5, false) // TODO
-
-__int32 CC File_GetPos_51F09E(FILE* File, __int32 Offset, int Origin)
-{
-    if (File != (FILE *)-1 && File)
+    if (File && File->mFile != (FILE *)-1 && File->mFile)
     {
-        fseek(File, Offset, Origin);
-        return ftell(File);
+        return fread(dstBuf, 1, nNumberOfBytesToRead, File->mFile);
     }
     return 0;
 }
-MGS_FUNC_IMPLEX(0x0051F09E, File_GetPos_51F09E, false) // TODO
+MGS_FUNC_IMPLEX(0x0051F0F5, File_NormalRead_51F0F5, FS_IMPL) // TODO
 
-int CC File_Close_51F183(FILE *File)
+__int32 CC File_GetPos_51F09E(AbstractedFileHandle* File, __int32 Offset, int Origin)
 {
-    if (File == (FILE *)-1 || !File)
+    if (File && File->mFile != (FILE *)-1 && File->mFile)
+    {
+        fseek(File->mFile, Offset, Origin);
+        return ftell(File->mFile);
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x0051F09E, File_GetPos_51F09E, FS_IMPL) // TODO
+
+int CC File_Close_51F183(AbstractedFileHandle *File)
+{
+    if (!File || File->mFile == (FILE *)-1 || !File->mFile)
     {
         return 0;
     }
 
-    return fclose(File);
+    const int ret = fclose(File->mFile);
+    delete File;
+    return ret;
 }
-MGS_FUNC_IMPLEX(0x0051F183, File_Close_51F183, false) // TODO
+MGS_FUNC_IMPLEX(0x0051F183, File_Close_51F183, FS_IMPL) // TODO
 
 MGS_VAR(1, 0x6BFBB0, void*, gFileBuffer_dword_6BFBB0, 0);
-MGS_VAR(1, 0x6BFBA8, FILE*, gFileHandle_dword_6BFBA8, 0);
+MGS_VAR(1, 0x6BFBA8, AbstractedFileHandle*, gFileHandle_dword_6BFBA8, 0);
 MGS_VAR(1, 0x6BFBAC, DWORD, gFileSizeToRead_dword_6BFBAC, 0);
 
 // Given data.cnf then returns stage/init/data.cnf for example
@@ -143,7 +251,7 @@ static const char* FileLoadModeToString(signed int type)
     }
 }
 
-static FILE* const kInvalidFileHandle = reinterpret_cast<FILE*>(-2);
+static AbstractedFileHandle* const kInvalidFileHandle = reinterpret_cast<AbstractedFileHandle*>(-2);
 
 static const char* sDirFileArray_6505C8[] =
 {
@@ -160,7 +268,7 @@ void CC FS_LoadDirFileByIndex_408FE7(int dirFileIndex, int offset, int sizeToRea
 {
     char fileName[64] = {};
     sprintf(fileName, "%s", sDirFileArray_6505C8[dirFileIndex]);
-    FILE* hFile = File_LoadDirFile_51EE8F(fileName, 0);
+    AbstractedFileHandle* hFile = File_LoadDirFile_51EE8F(fileName, 0);
     File_GetPos_51F09E(hFile, offset << 11, 0);
     gFileSizeToRead_dword_6BFBAC = sizeToRead;
     gFileHandle_dword_6BFBA8 = hFile;
@@ -204,7 +312,7 @@ int Res_loader_load_file_to_mem_408FAE()
 }
 MGS_FUNC_IMPLEX(0x00408FAE, Res_loader_load_file_to_mem_408FAE, FS_IMPL)
 
-static void SetLoadedFileInfo(FILE* hFile, void** ppBuffer, int fileSize)
+static void SetLoadedFileInfo(AbstractedFileHandle* hFile, void** ppBuffer, int fileSize)
 {
     gFileBuffer_dword_6BFBB0 = *ppBuffer;
     gFileHandle_dword_6BFBA8 = hFile;
@@ -223,7 +331,7 @@ signed int CC FS_LoadRequest(const char* fileName, void** ppBuffer, signed int t
     char fileToLoad[64] = {};
     ToFullStagePath_408EA0(fileNameWithoutAsterix, fileToLoad);
 
-    FILE* hFile = File_LoadDirFile_51EE8F(fileToLoad, 0);
+    AbstractedFileHandle* hFile = File_LoadDirFile_51EE8F(fileToLoad, 0);
     const DWORD fileSize = File_GetPos_51F09E(hFile, 0, 2);
     File_GetPos_51F09E(hFile, 0, 0);
 
@@ -287,4 +395,15 @@ MGS_FUNC_IMPLEX(0x0045837C, File_GetStreamState_45837C, FS_IMPL)
 void Fs_Cpp_ForceLink()
 {
 
+}
+
+void DoFsTests()
+{
+    char str[256] = {};
+    ASSERT_STREQ("blah", ReplaceBackWithFowardSlashes_51EC38("blah", str));
+    ASSERT_STREQ("blah/", ReplaceBackWithFowardSlashes_51EC38("blah/", str));
+    ASSERT_STREQ("blah/", ReplaceBackWithFowardSlashes_51EC38("blah\\", str));
+    ASSERT_STREQ("blah/asdf.exe", ReplaceBackWithFowardSlashes_51EC38("blah\\asdf.exe", str));
+    ASSERT_STREQ("blah/asdf.exe", ReplaceBackWithFowardSlashes_51EC38("blah/asdf.exe", str));
+    ASSERT_STREQ("/", ReplaceBackWithFowardSlashes_51EC38("\\\\\\", str));
 }

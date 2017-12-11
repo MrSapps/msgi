@@ -858,7 +858,7 @@ BYTE* CC jimGetTargetBuffer_42B6A6(WORD fileNameHash, WORD *pWidth, WORD *pHeigh
         return nullptr;
     }
 
-    FILE* hReplacementTexture = File_LoadDirFile_51EE8F(pHiTexName, 0);
+    AbstractedFileHandle* hReplacementTexture = File_LoadDirFile_51EE8F(pHiTexName, 0);
     if (!hReplacementTexture)
     {
         printf("*** $jim *** Error reading file %s.\n", pHiTexName);

@@ -2715,6 +2715,7 @@ static void RunTests()
     DoActor_RankTests();
     DoLibGv_Tests();
     DoMovie_Tests();
+    DoFsTests();
 }
 
 void ReplaceStdLib()

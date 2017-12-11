@@ -664,7 +664,7 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
     bufferDesc.dwSize = 36;
     bufferDesc.dwFlags = 0x100C8;
     bufferDesc.lpwfxFormat = &waveFormat;
-    FILE* File = File_LoadDirFile_51EE8F(fileName, 0);
+    AbstractedFileHandle* File = File_LoadDirFile_51EE8F(fileName, 0);
     if (File
         && (File_NormalRead_51F0F5(File, v4, 20u), File_NormalRead_51F0F5(File, &waveFormat, 18u) == 18)
         && (File_NormalRead_51F0F5(File, v4, 2u), File_NormalRead_51F0F5(File, &sizeToRead, 4u) == 4))
