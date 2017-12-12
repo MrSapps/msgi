@@ -98,7 +98,6 @@ MGS_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
 MGS_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
 MGS_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
-MGS_FUNC_NOT_IMPL(0x0051ED67, int __cdecl(const char*), Stage_MGZ_RelatedLoad);
 MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 EXTERN_MGS_FUNC_NOT_IMPL(0x004583BB, void CC(), StreamActorStop_4583BB);

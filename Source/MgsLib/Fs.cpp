@@ -85,7 +85,7 @@ FILE* CC OpenMGZ_051ED67(const char* pFileName)
 
     return pMapping->field_8_file_handle;
 }
-MGS_FUNC_IMPLEX(0x00051ED67, OpenMGZ_051ED67, false)
+MGS_FUNC_IMPLEX(0x0051ED67, OpenMGZ_051ED67, false)
 
 AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
 {
