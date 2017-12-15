@@ -2739,7 +2739,7 @@ void ReplaceStdLib()
     MGS_REDIRECT(0x0053CEE0, fread);
     MGS_REDIRECT(0x0053D680, close);
     MGS_REDIRECT(0x0053DBE0, open);
-    MGS_REDIRECT(0x0053E180, lseek);
+    //MGS_REDIRECT(0x0053E180, lseek);
     MGS_REDIRECT(0x0053F3D0, fgets);
     MGS_REDIRECT(0x0053F510, fwrite); // LockedFileWrite
     MGS_REDIRECT(0x0053F550, fwrite);
@@ -2755,7 +2755,7 @@ void ReplaceStdLib()
     */
 
     MGS_REDIRECT(0x0053D680, close);
-    MGS_REDIRECT(0x0053D1A0, read);
+   // MGS_REDIRECT(0x0053D1A0, read);
 
     // Not std lib - just varadic
     MGS_REDIRECT(0x00520157, DebugLog);

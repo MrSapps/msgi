@@ -5,15 +5,99 @@
 #include "Actor_GameD.hpp"
 #include "File.hpp"
 #include <gmock/gmock.h>
+#include <fcntl.h>
 
 
 #define FS_IMPL true
+
+#pragma pack(push)
+#pragma pack(1)
+struct Zip_Mgs_File_Record
+{
+    DWORD field_0_uncompressed_size;
+    DWORD field_4_compressed_size;
+    DWORD field_8_crc;
+    DWORD field_C_offset_to_local_header;
+    WORD field_10_record_size;
+    WORD field_12_file_name_length;
+    char field_14_compression_method;
+    char field_15_file_name_buffer[1]; // Var length
+};
+MGS_ASSERT_SIZEOF(Zip_Mgs_File_Record, 0x16);
+#pragma pack(pop)
+
+struct ZipContext
+{
+    int field_0_hMgzFile;
+    DWORD field_4_last_err;
+    DWORD field_8_flags_or_counter;
+    void* field_C_84_byte_ptr;
+    void* field_10_ptr;
+    Zip_Mgs_File_Record* field_14_local_file_headers_ptr;
+    void* field_18_pTo_field_14_local_file_headers; // Non owned pointer
+    DWORD field_1C_zstream;
+    DWORD field_20;
+    DWORD field_24;
+    DWORD field_28;
+    DWORD field_2C;
+    DWORD field_30;
+    DWORD field_34;
+};
+MGS_ASSERT_SIZEOF(ZipContext, 0x38);
+
+#pragma pack(push)
+#pragma pack(1)
+struct Zip_Central_Directory_Record
+{
+    DWORD field_0_magic;
+    WORD field_4_mCreatedByVersion;
+    WORD field_6_ExtractVersion;
+    WORD field_8_flags;
+    WORD field_a_compression_method;
+    DWORD field_C_dos_time;
+    DWORD field_10_crc;
+    DWORD field_14_compressed_size;
+    DWORD field_18_uncompressed_size;
+    WORD field_1c_filename_length;
+    WORD field_1E_extra_field_length;
+    WORD field_20_file_comment_length;
+    DWORD field_22_disk_number;
+    DWORD field_26_file_attributes;
+    DWORD field_2A_offset_to_local_header;
+};
+MGS_ASSERT_SIZEOF(Zip_Central_Directory_Record, 0x2E);
+#pragma pack(pop)
+
+struct Zip_Open_File_Handle
+{
+    DWORD field_0_p84_bytes_or_zip_ctx;
+    DWORD field_4_zip_file_handle;
+    DWORD field_8_file_pos;
+    DWORD field_C;
+};
+MGS_ASSERT_SIZEOF(Zip_Open_File_Handle, 0x10);
+
+#pragma pack(push)
+#pragma pack(1)
+struct Zip_End_Of_Central_Directory
+{
+    DWORD field_0_magic;
+    WORD field_4_mThisDiskNumber;
+    WORD field_6_mStartCentralDirectoryDiskNumber;
+    WORD field_8_mNumEntriesInCentaralDirectoryOnThisDisk;
+    WORD field_A_mNumEntriesInCentaralDirectory;
+    DWORD field_C_mCentralDirectorySize;
+    DWORD field_10_mCentralDirectoryStartOffset;
+    WORD field_14_mCommentSize;
+};
+MGS_ASSERT_SIZEOF(Zip_End_Of_Central_Directory, 0x16);
+#pragma pack(pop)
 
 struct MgzMapping
 {
     const char* field_0_path;
     const char* field_4_mgz;
-    FILE* field_8_file_handle;
+    ZipContext* field_8_file_handle;
     DWORD field_C_padding;
 };
 MGS_ASSERT_SIZEOF(MgzMapping, 0x10);
@@ -29,10 +113,32 @@ MgzMapping gMgzTable_6898E8[4] =
 
 char* CC ReplaceBackWithFowardSlashes_51EC38(char* pInput, char* pOutput)
 {
-    // TODO
-    return nullptr;
+    char* pRet = pOutput;
+    bool wroteSlash = false;
+    while (*pInput)
+    {
+        if (*pInput == '\\' || *pInput == '/')
+        {
+            if (!wroteSlash)
+            {
+                *pOutput = '/';
+                pOutput++;
+            }
+            wroteSlash = true;
+        }
+        else
+        {
+            *pOutput = *pInput;
+            pOutput++;
+            wroteSlash = false;
+        }
+        pInput++;
+    }
+    *pOutput = 0;
+
+    return pRet;
 }
-MGS_FUNC_IMPLEX(0x0051EC38, ReplaceBackWithFowardSlashes_51EC38, false)
+MGS_FUNC_IMPLEX(0x0051EC38, ReplaceBackWithFowardSlashes_51EC38, FS_IMPL)
 
 void CC CloseCachedMgzFiles_51EE23()
 {
@@ -42,14 +148,325 @@ void CC CloseCachedMgzFiles_51EE23()
     {
         if (mapping.field_8_file_handle)
         {
-            fclose(mapping.field_8_file_handle);
+            // TODO
+            //fclose(mapping.field_8_file_handle);
             mapping.field_8_file_handle = nullptr;
         }
     }
 }
 MGS_FUNC_IMPLEX(0x0051EE23, CloseCachedMgzFiles_51EE23, false)
 
-FILE* CC OpenMGZ_051ED67(const char* pFileName)
+int CC Zip_Try_Open_With_Other_Extensions_642870(const char* pFileName, int openMode)
+{
+    char fileNameBuffer[512] = {};
+    const size_t fileNameLen = strlen(pFileName) + 1;
+    if ((fileNameLen - 1 + 4) < 512)
+    {
+        memcpy(fileNameBuffer, pFileName, fileNameLen);
+        char* pStrEnd = &fileNameBuffer[fileNameLen -1];
+        strcpy(pStrEnd, ".zip");
+        int hFile = _open(fileNameBuffer, openMode);
+        if (hFile == -1)
+        {
+            strcpy(pStrEnd, ".ZIP");
+            hFile = _open(fileNameBuffer, openMode);
+        }
+    }
+    return -1;
+}
+MGS_FUNC_IMPLEX(0x00642870, Zip_Try_Open_With_Other_Extensions_642870, FS_IMPL)
+
+void CC Zip_free_642740(ZipContext* pZip)
+{
+    if (pZip->field_0_hMgzFile >= 0)
+    {
+        _close(pZip->field_0_hMgzFile);
+    }
+
+    if (pZip->field_14_local_file_headers_ptr)
+    {
+        free(pZip->field_14_local_file_headers_ptr);
+    }
+
+    if (pZip->field_C_84_byte_ptr)
+    {
+        free(pZip->field_C_84_byte_ptr);
+    }
+
+    if (pZip->field_10_ptr)
+    {
+        free(pZip->field_10_ptr);
+    }
+
+    free(pZip);
+}
+MGS_FUNC_IMPLEX(0x00642740, Zip_free_642740, FS_IMPL)
+
+int Zip_get_file_size_642840(int hMgzFile)
+{
+    return _filelength(hMgzFile);
+}
+MGS_FUNC_IMPLEX(0x00642840, Zip_get_file_size_642840, FS_IMPL)
+
+int CC Zip_locate_end_of_central_directory_record_6423D0(int hMgzFile, unsigned int fileSize, Zip_End_Of_Central_Directory* pEndOfCentralDir)
+{
+    if (!pEndOfCentralDir)
+    {
+        return 22;
+    }
+
+    if (fileSize < 22)
+    {
+        return -4121;
+    }
+
+    char buffer[512];
+    LONG readPos = fileSize - sizeof(Zip_End_Of_Central_Directory);
+    Zip_End_Of_Central_Directory* pDir = nullptr;
+    for (;;)
+    {
+        // On first pass read just the size of a record from the end of the file, else reading 512 blocks
+        if (_lseek(hMgzFile, readPos, 0) < 0)
+        {
+            return -4119;
+        }
+
+        if (_read(hMgzFile, buffer, sizeof(Zip_End_Of_Central_Directory)) < sizeof(Zip_End_Of_Central_Directory))
+        {
+            return -4120;
+        }
+
+        // Original game bug - checked if buffer was null, can never happen
+        
+        pDir = reinterpret_cast<Zip_End_Of_Central_Directory*>(buffer);
+        if (pDir->field_0_magic == 0x06054b50)
+        {
+            break;
+        }
+
+        // Simple case of it being right at the end of the file has failed, now we need to search backwards in blocks
+
+        // TODO: Implement me
+        /*
+        for (;;)
+        {
+            if (_lseek(hMgzFile, readPos, 0) < 0)
+            {
+                return -4119;
+            }
+
+            if (_read(hMgzFile, buffer, sizeof(buffer)) < sizeof(buffer))
+            {
+                return -4120;
+            }
+
+            readPos -= 512;
+            //remainingSize += 512;
+            if (remainingSize <= 65536)
+            {
+
+            }
+        }*/
+        return -4122;
+    }
+
+    memcpy(pEndOfCentralDir, pDir, sizeof(Zip_End_Of_Central_Directory));
+
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x006423D0, Zip_locate_end_of_central_directory_record_6423D0, FS_IMPL)
+
+WORD CC Zip_ByteSwap_Word_6423C0(WORD* pData)
+{
+    // VC6 fail
+    return *pData;
+}
+MGS_FUNC_IMPLEX(0x006423C0, Zip_ByteSwap_Word_6423C0, FS_IMPL)
+
+DWORD CC Zip_ByteSwap_DWord_642390(DWORD* pData)
+{
+    // VC6 fail
+    return *pData;
+}
+MGS_FUNC_IMPLEX(0x00642390, Zip_ByteSwap_DWord_642390, FS_IMPL)
+
+int CC Zip_load_central_directory_642540(int hMgzFile, Zip_End_Of_Central_Directory* pEndOfCentralDir, Zip_Mgs_File_Record** pField_14)
+{
+    Zip_Mgs_File_Record* pCentralDirSizeBuffer = (Zip_Mgs_File_Record*)calloc(1, pEndOfCentralDir->field_C_mCentralDirectorySize); // Original game bug- didn't zero out
+    if (!pCentralDirSizeBuffer)
+    {
+        return -4123;
+    }
+
+    Zip_Mgs_File_Record* pOutputBufferIter = pCentralDirSizeBuffer;
+    DWORD recordOffset = 0;
+    for (DWORD i = 0; i < pEndOfCentralDir->field_A_mNumEntriesInCentaralDirectory; i++)
+    {
+        // Seek to current record
+        if (_lseek(hMgzFile, pEndOfCentralDir->field_10_mCentralDirectoryStartOffset + recordOffset, SEEK_SET) < 0)
+        {
+            free(pCentralDirSizeBuffer); // Original game bug- didn't free
+            return -4119;
+        }
+
+        // Read it
+        Zip_Central_Directory_Record dirRecord = {};
+        if (_read(hMgzFile, &dirRecord, sizeof(Zip_Central_Directory_Record)) < sizeof(Zip_Central_Directory_Record))
+        {
+            free(pCentralDirSizeBuffer); // Original game bug- didn't free
+            return -4120;
+        }
+
+        pOutputBufferIter->field_8_crc = Zip_ByteSwap_DWord_642390(&dirRecord.field_10_crc);
+        pOutputBufferIter->field_4_compressed_size = Zip_ByteSwap_DWord_642390(&dirRecord.field_14_compressed_size);
+        pOutputBufferIter->field_0_uncompressed_size = Zip_ByteSwap_DWord_642390(&dirRecord.field_18_uncompressed_size);
+        pOutputBufferIter->field_C_offset_to_local_header = Zip_ByteSwap_DWord_642390(&dirRecord.field_2A_offset_to_local_header);
+        pOutputBufferIter->field_12_file_name_length = dirRecord.field_1c_filename_length;
+
+        if (dirRecord.field_a_compression_method > 255)
+        {
+            pOutputBufferIter->field_14_compression_method = -1;
+        }
+        else
+        {
+            pOutputBufferIter->field_14_compression_method = static_cast<char>(dirRecord.field_a_compression_method);
+        }
+
+        _read(hMgzFile, &pOutputBufferIter->field_15_file_name_buffer[0], pOutputBufferIter->field_12_file_name_length);
+     
+        // Null terminate - although should already be a null at the end of the buffer
+        pOutputBufferIter->field_15_file_name_buffer[pOutputBufferIter->field_12_file_name_length] = 0;
+
+        recordOffset += 
+            dirRecord.field_1c_filename_length + 
+            dirRecord.field_20_file_comment_length + 
+            dirRecord.field_1E_extra_field_length + 
+            sizeof(Zip_Central_Directory_Record);
+
+        if (recordOffset > pEndOfCentralDir->field_C_mCentralDirectorySize)
+        {
+            break;
+        }
+
+        pOutputBufferIter->field_10_record_size = static_cast<WORD>(RoundUpPowerOf2(sizeof(Zip_Mgs_File_Record) + pOutputBufferIter->field_12_file_name_length + 3, 2));
+        pOutputBufferIter = reinterpret_cast<Zip_Mgs_File_Record*>(reinterpret_cast<BYTE*>(pOutputBufferIter) + pOutputBufferIter->field_10_record_size);
+    }
+
+    if (pField_14)
+    {
+        *pField_14 = pCentralDirSizeBuffer;
+    }
+    else
+    {
+        free(pCentralDirSizeBuffer); // Original game bug- didn't free
+    }
+
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x00642540, Zip_load_central_directory_642540, FS_IMPL)
+
+static void DumpZipRecords(Zip_Mgs_File_Record* pRec)
+{
+    BYTE* pIter = reinterpret_cast<BYTE*>(pRec);
+    while (pRec->field_10_record_size)
+    {
+        char* pName = &pRec->field_15_file_name_buffer[0];
+        LOG_INFO(pName);
+        pIter += pRec->field_10_record_size;
+        pRec = reinterpret_cast<Zip_Mgs_File_Record*>(pIter);
+    }
+}
+
+ZipContext* CC Zip_alloc_642790(int hMgzFile, int* pRet)
+{
+    int errCode = 0;
+    Zip_End_Of_Central_Directory zipEndOfCentralDir = {};
+
+    ZipContext* pZip = (ZipContext *)calloc(1u, sizeof(ZipContext));
+    if (!pZip)
+    {
+        errCode = -4116;
+        if (pRet)
+        {
+            *pRet = errCode;
+        }
+        return 0;
+    }
+    
+    pZip->field_0_hMgzFile = hMgzFile;
+    const int fileSize = Zip_get_file_size_642840(hMgzFile);
+
+    if (fileSize < 0)
+    {
+        errCode = -4118;
+        Zip_free_642740(pZip);
+
+        if (pRet)
+        {
+            *pRet = errCode;
+        }
+        return 0;
+    }
+    
+    errCode = Zip_locate_end_of_central_directory_record_6423D0(pZip->field_0_hMgzFile, fileSize, &zipEndOfCentralDir);
+
+    if (errCode)
+    {
+        Zip_free_642740(pZip);
+
+        if (pRet)
+        {
+            *pRet = errCode;
+        }
+        return 0;
+    }
+
+    errCode = Zip_load_central_directory_642540(pZip->field_0_hMgzFile, &zipEndOfCentralDir, &pZip->field_14_local_file_headers_ptr);
+    DumpZipRecords(pZip->field_14_local_file_headers_ptr);
+
+    if (errCode)
+    {
+        Zip_free_642740(pZip);
+
+        if (pRet)
+        {
+            *pRet = errCode;
+        }
+        return 0;
+    }
+
+    pZip->field_18_pTo_field_14_local_file_headers = pZip->field_14_local_file_headers_ptr;
+    pZip->field_8_flags_or_counter |= 0x10000000u;
+    
+    if (pRet)
+    {
+        *pRet = 0;
+    }
+
+    return pZip;
+}
+MGS_FUNC_IMPLEX(0x00642790, Zip_alloc_642790, FS_IMPL)
+
+ZipContext* CC Zip_Open_642920(const char* pFileName, int* pRet)
+{
+    int hFile = _open(pFileName, O_BINARY);
+    if (hFile == -1)
+    {
+        hFile = Zip_Try_Open_With_Other_Extensions_642870(pFileName, O_BINARY);
+        if (hFile == -1)
+        {
+            if (pRet)
+            {
+                *pRet = -4117;
+            }
+            return nullptr;
+        }
+    }
+    return Zip_alloc_642790(hFile, pRet);
+}
+MGS_FUNC_IMPLEX(0x00642920, Zip_Open_642920, FS_IMPL)
+
+ZipContext* CC OpenMGZ_051ED67(const char* pFileName)
 {
     static bool sSetCleanup_776B60 = false;
     if (!sSetCleanup_776B60)
@@ -64,6 +481,7 @@ FILE* CC OpenMGZ_051ED67(const char* pFileName)
     {
         if (strncmp(mapping.field_0_path, pFileName, strlen(mapping.field_0_path)) == 0)
         {
+            pMapping = &mapping;
             break;
         }
     }
@@ -80,24 +498,25 @@ FILE* CC OpenMGZ_051ED67(const char* pFileName)
         strcat(buffer, "/");
         strcat(buffer, pMapping->field_4_mgz);
 
-        pMapping->field_8_file_handle = fopen(buffer, "rb");
+        int openRet = 0;
+        pMapping->field_8_file_handle = Zip_Open_642920(buffer, &openRet);
     }
 
     return pMapping->field_8_file_handle;
 }
-MGS_FUNC_IMPLEX(0x0051ED67, OpenMGZ_051ED67, false)
+MGS_FUNC_IMPLEX(0x0051ED67, OpenMGZ_051ED67, FS_IMPL)
 
 AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
 {
     char normalizedFileName[256] = {};
     ReplaceBackWithFowardSlashes_51EC38(pFileName, normalizedFileName);
-    FILE* mgzHandle = OpenMGZ_051ED67(normalizedFileName);
+    ZipContext* mgzHandle = OpenMGZ_051ED67(normalizedFileName);
     if (!mgzHandle)
     {
         return nullptr;
     }
 
-
+    abort();
 
     // TODO: Find free entry in gmmf_dword_776960 - only allows for 32 handles
 
@@ -163,7 +582,6 @@ AbstractedFileHandle* CC File_LoadDirFile_51EE8F(const char* fileName, signed in
 
     // Open in the MGZ archive
     AbstractedFileHandle* hFile = OpenArchiveFile_51EFB2(remappedFileName);
-
 
     if (!hFile)
     {

@@ -5,7 +5,7 @@
 void Fs_Cpp_ForceLink();
 void DoFsTests();
 
-class AbstractedFileHandle
+class AbstractedFileHandle // TODO: Replace with check that checks if FILE* address is within the 32 handles array range or not
 {
 public:
     AbstractedFileHandle() = default;
