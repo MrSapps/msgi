@@ -71,7 +71,7 @@ MGS_ASSERT_SIZEOF(Zip_Central_Directory_Record, 0x2E);
 struct Zip_Open_File_Handle
 {
     DWORD field_0_p84_bytes_or_zip_ctx;
-    DWORD field_4_zip_file_handle;
+    ZipContext* field_4_zip_file_handle;
     DWORD field_8_file_pos;
     DWORD field_C;
 };
@@ -212,10 +212,10 @@ int CC Zip_locate_end_of_central_directory_record_6423D0(int hMgzFile, unsigned 
 {
     if (!pEndOfCentralDir)
     {
-        return 22;
+        return sizeof(Zip_End_Of_Central_Directory);
     }
 
-    if (fileSize < 22)
+    if (fileSize < sizeof(Zip_End_Of_Central_Directory))
     {
         return -4121;
     }
@@ -226,7 +226,7 @@ int CC Zip_locate_end_of_central_directory_record_6423D0(int hMgzFile, unsigned 
     for (;;)
     {
         // On first pass read just the size of a record from the end of the file, else reading 512 blocks
-        if (_lseek(hMgzFile, readPos, 0) < 0)
+        if (_lseek(hMgzFile, readPos, SEEK_SET) < 0)
         {
             return -4119;
         }
@@ -250,7 +250,7 @@ int CC Zip_locate_end_of_central_directory_record_6423D0(int hMgzFile, unsigned 
         /*
         for (;;)
         {
-            if (_lseek(hMgzFile, readPos, 0) < 0)
+            if (_lseek(hMgzFile, readPos, SEEK_SET) < 0)
             {
                 return -4119;
             }
@@ -506,6 +506,15 @@ ZipContext* CC OpenMGZ_051ED67(const char* pFileName)
 }
 MGS_FUNC_IMPLEX(0x0051ED67, OpenMGZ_051ED67, FS_IMPL)
 
+MGS_ARY(1, 0x776960, Zip_Open_File_Handle, 32, gZipFiles_dword_776960, {});
+
+// TODO: Probably isn't returning a ZipContext*
+ZipContext* CC OpenFileInMGZ_642BB0(ZipContext* pZip, char* pFileName, int flags)
+{
+    return nullptr;
+}
+MGS_FUNC_IMPLEX(0x00642BB0, OpenFileInMGZ_642BB0, false) // TODO
+
 AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
 {
     char normalizedFileName[256] = {};
@@ -516,9 +525,32 @@ AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
         return nullptr;
     }
 
-    abort();
+    Zip_Open_File_Handle* pOpenFile = nullptr;
+    for (int i = 0; i < 32; i++)
+    {
+        if (gZipFiles_dword_776960[i].field_0_p84_bytes_or_zip_ctx)
+        {
+            pOpenFile = &gZipFiles_dword_776960[i];
+            break;
+        }
+    }
 
-    // TODO: Find free entry in gmmf_dword_776960 - only allows for 32 handles
+    if (!pOpenFile)
+    {
+        return nullptr;
+    }
+
+    //mgzFileHandle = OpenFileInMGZ_642BB0(mgzHandle, normalizedFileName, 8);
+    //pOpenFile->field_0_p84_bytes_or_zip_ctx = mgzFileHandle;
+    //if (mgzFileHandle)
+    {
+        //sub_643230(mgzHandle, normalizedFileName, (int)&outBufferUnknown, 8);
+        //v7 = v10;
+        //pOpenFile->field_8_file_pos = v7;
+        pOpenFile->field_4_zip_file_handle = mgzHandle;
+        return reinterpret_cast<AbstractedFileHandle*>(pOpenFile); // Original game bug - this was an index casted to FILE*, but its possible for FILE* to be <= 32
+    }
+
 
     return nullptr;
 }
