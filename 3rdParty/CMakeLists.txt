@@ -55,6 +55,7 @@ set_property(TARGET gmock PROPERTY FOLDER "3rdParty")
 
 # zlib
 add_library(zlib
+    zlib-old-1.1.3/trees.c
     zlib-old-1.1.3/adler32.c
     zlib-old-1.1.3/inffast.c
     zlib-old-1.1.3/infcodes.c
