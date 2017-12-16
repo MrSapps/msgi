@@ -660,6 +660,46 @@ static Zip_Mgs_File_Record* ZipFindRecord(ZipContext* pZip, const char* pToFind,
     return nullptr;
 }
 
+signed int CC Zip_Stream_Seek_642DE0(Zip_Zlib_Wrapper* pZipStream)
+{
+    if (pZipStream)
+    {
+        const int seek_ret = _lseek(pZipStream->field_0_zip_context->field_0_hMgzFile, 0, 1u);
+        if (seek_ret < 0)
+        {
+            return -1;
+        }
+        pZipStream->field_18_seeked_pos = seek_ret;
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x00642DE0, Zip_Stream_Seek_642DE0, FS_IMPL)
+
+int CC Zip_zlib_create_642E10(Zip_Zlib_Wrapper* pZipStream, Zip_Mgs_File_Record* pFileRecord)
+{
+    pZipStream->field_8_compression_method = pFileRecord->field_14_compression_method;
+    pZipStream->field_C_remaining_size = pFileRecord->field_0_uncompressed_size;
+    if (!pZipStream->field_8_compression_method)
+    {
+        return 0;
+    }
+
+    int bFailed = deflateInit(&pZipStream->field_1C_zstream, -15);
+    if (!bFailed)
+    {
+        pZipStream->field_10_32k_buffer_pos = pFileRecord->field_4_compressed_size;
+        return 0;
+    }
+
+    if (pZipStream)
+    {
+        Zip_Stream_free_642B30(pZipStream);
+    }
+
+    return bFailed;
+}
+MGS_FUNC_IMPLEX(0x00642E10, Zip_zlib_create_642E10, FS_IMPL)
+
 Zip_Zlib_Wrapper* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileName, int flags)
 {
     Zip_Mgs_File_Record* pRecord = ZipFindRecord(pZip, pFileName, flags);
@@ -675,49 +715,50 @@ Zip_Zlib_Wrapper* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileNam
         return nullptr;
     }
 
-    if (pZip->field_C_free_zip_stream)
+    // Take the free zip stream if we have one
+    Zip_Zlib_Wrapper* field_C_84_byte_ptr = pZip->field_C_free_zip_stream;
+    if (field_C_84_byte_ptr)
     {
         pZip->field_C_free_zip_stream = nullptr;
     }
     else
     {
-        pZip->field_C_free_zip_stream = (Zip_Zlib_Wrapper *)calloc(1u, 0x54u);
-        if (!pZip->field_C_free_zip_stream)
+        // Else we need to allocate a new one
+        field_C_84_byte_ptr = (Zip_Zlib_Wrapper *)calloc(1u, sizeof(Zip_Zlib_Wrapper));
+        if (!field_C_84_byte_ptr)
         {
             pZip->field_4_last_err = -4116;
             return nullptr;
         }
     }
 
-    pZip->field_C_free_zip_stream->field_0_zip_context = pZip;
+    field_C_84_byte_ptr->field_0_zip_context = pZip;
     ++pZip->field_8_flags_or_counter;
 
+    // Take the saved stream buffer if we have one
     if (pZip->field_10_saved_stream_buffer)
     {
-        pZip->field_C_free_zip_stream->field_14_32k_stream_buffer = pZip->field_10_saved_stream_buffer;
+        field_C_84_byte_ptr->field_14_32k_stream_buffer = pZip->field_10_saved_stream_buffer;
         pZip->field_10_saved_stream_buffer = nullptr;
     }
     else
     {
-        pZip->field_C_free_zip_stream->field_14_32k_stream_buffer = malloc(0x8000u);
+        // Else allocate a new one
+        field_C_84_byte_ptr->field_14_32k_stream_buffer = malloc(0x8000u);
     }
 
     int err = 0;
-    if (pZip->field_C_free_zip_stream->field_14_32k_stream_buffer)
+    if (field_C_84_byte_ptr->field_14_32k_stream_buffer)
     {
-
-        inflate(0, 0);
-
-        /*
-        if (DoFileSeek_642DE0(pZip->field_1C_zstream) >= 0)
+        if (Zip_Stream_Seek_642DE0(pZip->field_1C_zip_stream_last_opened) >= 0)
         {
-            pZip->field_C_84_byte_ptr->field_18_seeked_pos = pRecord->field_C_offset_to_local_header;
-            pZip->field_1C_zstream = pZip->field_C_84_byte_ptr;
+            field_C_84_byte_ptr->field_18_seeked_pos = pRecord->field_C_offset_to_local_header;
+            pZip->field_1C_zip_stream_last_opened = field_C_84_byte_ptr;
             if (_lseek(pZip->field_0_hMgzFile, pRecord->field_C_offset_to_local_header, 0) >= 0)
             {
-                if (_read(pZip->field_0_hMgzFile, pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc, 0x1Eu) >= 0x1E)
+                if (_read(pZip->field_0_hMgzFile, field_C_84_byte_ptr->field_14_32k_stream_buffer, sizeof(Zip_Local_File_Header)) >= sizeof(Zip_Local_File_Header))
                 {
-                    pFileData = reinterpret_cast<Zip_Local_File_Header*>(pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc);
+                    Zip_Local_File_Header* pFileData = (Zip_Local_File_Header *)field_C_84_byte_ptr->field_14_32k_stream_buffer;
 
                     if (pFileData->field_0_magic != 0x04034b50)
                     {
@@ -725,16 +766,14 @@ Zip_Zlib_Wrapper* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileNam
                     }
                     else
                     {
-                        extra_field_length = Zip_ByteSwap_Word_6423C0(&pFileData->field_1C_extra_field_length);
-                        filename_length = Zip_ByteSwap_Word_6423C0(&pFileData->field_1A_filename_length);
-
-                        // Seek to file data starting offset
+                        const WORD extra_field_length = Zip_ByteSwap_Word_6423C0(&pFileData->field_1C_extra_field_length);
+                        const WORD filename_length = Zip_ByteSwap_Word_6423C0(&pFileData->field_1A_filename_length);
                         if (_lseek(pZip->field_0_hMgzFile, filename_length + extra_field_length, 1u) >= 0)
                         {
-                            err = Zip_zlib_create_642E10(pZip->field_C_84_byte_ptr, pRecord);
+                            err = Zip_zlib_create_642E10(field_C_84_byte_ptr, pRecord);
                             if (!err)
                             {
-                                return pZip->field_C_84_byte_ptr;
+                                return field_C_84_byte_ptr;
                             }
                         }
                         else
@@ -756,22 +795,22 @@ Zip_Zlib_Wrapper* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileNam
         else
         {
             err = -4119;
-        }*/
+        }
     }
     else
     {
         err = -4116;
     }
 
-    if (pZip->field_C_free_zip_stream)
+    if (field_C_84_byte_ptr)
     {
-        //Zip_File_Close_642B30(pZip->field_C_84_byte_ptr);
+        Zip_Stream_free_642B30(field_C_84_byte_ptr);
     }
 
     pZip->field_4_last_err = err;
     return nullptr;
 }
-MGS_FUNC_IMPLEX(0x00642BB0, OpenFileInMGZ_642BB0, false) // TODO
+MGS_FUNC_IMPLEX(0x00642BB0, OpenFileInMGZ_642BB0, FS_IMPL)
 
 AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
 {
@@ -783,28 +822,28 @@ AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
         return nullptr;
     }
 
-    Zip_Open_File_Handle* pZipStream = nullptr;
+    Zip_Open_File_Handle* pFreeZipStream = nullptr;
     for (int i = 0; i < 32; i++)
     {
-        if (gZipStreams_dword_776960[i].field_0_pZipStream)
+        if (!gZipStreams_dword_776960[i].field_0_pZipStream)
         {
-            pZipStream = &gZipStreams_dword_776960[i];
+            pFreeZipStream = &gZipStreams_dword_776960[i];
             break;
         }
     }
 
-    if (!pZipStream)
+    if (!pFreeZipStream)
     {
         return nullptr;
     }
 
-    pZipStream->field_0_pZipStream = OpenFileInMGZ_642BB0(pZipCtx, normalizedFileName, 8);
-    if (pZipStream->field_0_pZipStream)
+    pFreeZipStream->field_0_pZipStream = OpenFileInMGZ_642BB0(pZipCtx, normalizedFileName, 8);
+    if (pFreeZipStream->field_0_pZipStream)
     {
         // Real game has a helper that returns more info, but our helper avoids having to reimpl 0x643230 and avoids duplication in 0x642BB0
-        pZipStream->field_8_file_size = ZipFindRecord(pZipCtx, pFileName, 8)->field_0_uncompressed_size;
-        pZipStream->field_4_zip_file_handle = pZipCtx;
-        return reinterpret_cast<AbstractedFileHandle*>(pZipStream); // Original game bug - this was an index casted to FILE*, but its possible for FILE* to be <= 32
+        pFreeZipStream->field_8_file_size = ZipFindRecord(pZipCtx, pFileName, 8)->field_0_uncompressed_size;
+        pFreeZipStream->field_4_zip_file_handle = pZipCtx;
+        return reinterpret_cast<AbstractedFileHandle*>(pFreeZipStream); // Original game bug - this was an index casted to FILE*, but its possible for FILE* to be <= 32
     }
 
     return nullptr;
