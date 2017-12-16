@@ -75,7 +75,7 @@ MGS_ASSERT_SIZEOF(Zip_Central_Directory_Record, 0x2E);
 
 struct Zip_Open_File_Handle
 {
-    Zip_Open_File_Handle* field_0_pZipStream;
+    Zip_Zlib_Wrapper* field_0_pZipStream;
     ZipContext* field_4_zip_file_handle;
     DWORD field_8_file_size;
     DWORD field_C;
@@ -101,22 +101,39 @@ MGS_ASSERT_SIZEOF(Zip_End_Of_Central_Directory, 0x16);
 struct Zip_Zlib_Wrapper
 {
     ZipContext* field_0_zip_context;
+    DWORD field_4;
+    DWORD field_8_compression_method;
+    DWORD field_C_remaining_size;
+    DWORD field_10_32k_buffer_pos;
+    void* field_14_32k_stream_buffer;
+    DWORD field_18_seeked_pos;
+    z_stream field_1C_zstream;
+};
+MGS_ASSERT_SIZEOF(Zip_Zlib_Wrapper, 0x54);
 
-    void* field_14_zip_ctx_field10_ptr_or32k_malloc;
-}; // TODO
-
-
+#pragma pack(push)
+#pragma pack(1)
 struct Zip_Local_File_Header
 {
-
-}; // TODO
-
+    DWORD field_0_magic;
+    WORD field_4_version_to_extract;
+    WORD field_6_flags;
+    WORD field_8_compression_method;
+    DWORD field_A_timestamp;
+    DWORD field_E_crc;
+    DWORD field_12_compressed_size;
+    DWORD field_16_uncompressed_size;
+    WORD field_1A_filename_length;
+    WORD field_1C_extra_field_length;
+};
+MGS_ASSERT_SIZEOF(Zip_Local_File_Header, 0x1E);
+#pragma pack(pop)
 
 struct MgzMapping
 {
     const char* field_0_path;
     const char* field_4_mgz;
-    ZipContext* field_8_file_handle;
+    ZipContext* field_8_zip_context;
     DWORD field_C_padding;
 };
 MGS_ASSERT_SIZEOF(MgzMapping, 0x10);
@@ -129,6 +146,7 @@ MgzMapping gMgzTable_6898E8[4] =
     { "tga/",       "tga.mgz",      nullptr, 0 }
 };
 
+MGS_ARY(1, 0x776960, Zip_Open_File_Handle, 32, gZipStreams_dword_776960, {});
 
 char* CC ReplaceBackWithFowardSlashes_51EC38(char* pInput, char* pOutput)
 {
@@ -159,42 +177,6 @@ char* CC ReplaceBackWithFowardSlashes_51EC38(char* pInput, char* pOutput)
 }
 MGS_FUNC_IMPLEX(0x0051EC38, ReplaceBackWithFowardSlashes_51EC38, FS_IMPL)
 
-void CC CloseCachedMgzFiles_51EE23()
-{
-    // TODO: Close open handles to items in the zip itself
-
-    for (MgzMapping& mapping : gMgzTable_6898E8)
-    {
-        if (mapping.field_8_file_handle)
-        {
-            // TODO
-            //fclose(mapping.field_8_file_handle);
-            mapping.field_8_file_handle = nullptr;
-        }
-    }
-}
-MGS_FUNC_IMPLEX(0x0051EE23, CloseCachedMgzFiles_51EE23, false)
-
-int CC Zip_Try_Open_With_Other_Extensions_642870(const char* pFileName, int openMode)
-{
-    char fileNameBuffer[512] = {};
-    const size_t fileNameLen = strlen(pFileName) + 1;
-    if ((fileNameLen - 1 + 4) < 512)
-    {
-        memcpy(fileNameBuffer, pFileName, fileNameLen);
-        char* pStrEnd = &fileNameBuffer[fileNameLen -1];
-        strcpy(pStrEnd, ".zip");
-        int hFile = _open(fileNameBuffer, openMode);
-        if (hFile == -1)
-        {
-            strcpy(pStrEnd, ".ZIP");
-            hFile = _open(fileNameBuffer, openMode);
-        }
-    }
-    return -1;
-}
-MGS_FUNC_IMPLEX(0x00642870, Zip_Try_Open_With_Other_Extensions_642870, FS_IMPL)
-
 void CC Zip_free_642740(ZipContext* pZip)
 {
     if (pZip->field_0_hMgzFile >= 0)
@@ -220,6 +202,109 @@ void CC Zip_free_642740(ZipContext* pZip)
     free(pZip);
 }
 MGS_FUNC_IMPLEX(0x00642740, Zip_free_642740, FS_IMPL)
+
+void CC Zip_Close_642720(ZipContext* pZip)
+{
+    const bool bFree = (pZip->field_8_flags_or_counter & 0xEFFFFFFF) == 0;
+    pZip->field_8_flags_or_counter &= 0xEFFFFFFF;
+    if (bFree)
+    {
+        Zip_free_642740(pZip);
+    }
+}
+MGS_FUNC_IMPLEX(0x00642720, Zip_Close_642720, FS_IMPL)
+
+void CC Zip_Stream_free_642B30(Zip_Zlib_Wrapper* pZipStream)
+{
+    ZipContext* pZipContext = pZipStream->field_0_zip_context;
+    if (pZipStream->field_8_compression_method)
+    {
+        deflateEnd(&pZipStream->field_1C_zstream);
+    }
+
+    if (pZipStream->field_14_32k_stream_buffer)
+    {
+        // Does the zip have a cached stream?
+        if (pZipContext->field_10_saved_stream_buffer)
+        {
+            // Yes so free the current stream
+            free(pZipStream->field_14_32k_stream_buffer);
+        }
+        else
+        {
+            // No so save the current stream in the zip for re-use
+            pZipContext->field_10_saved_stream_buffer = pZipStream->field_14_32k_stream_buffer;
+        }
+    }
+
+    if (pZipContext->field_1C_zip_stream_last_opened == pZipStream)
+    {
+        pZipContext->field_1C_zip_stream_last_opened = nullptr;
+    }
+
+    --pZipContext->field_8_flags_or_counter;
+
+    memset(pZipStream, 0, sizeof(Zip_Zlib_Wrapper));
+
+    // Do we have a cached stream?
+    if (pZipContext->field_C_free_zip_stream)
+    {
+        // Yes so free this one
+        free(pZipStream);
+    }
+    else
+    {
+        // Else use it as the cached stream
+        pZipContext->field_C_free_zip_stream = pZipStream;
+    }
+
+    // See if we need the free the zip archive itself
+    if (!pZipContext->field_8_flags_or_counter)
+    {
+        Zip_Close_642720(pZipContext);
+    }
+}
+MGS_FUNC_IMPLEX(0x00642B30, Zip_Stream_free_642B30, FS_IMPL);
+
+void CC CloseCachedMgzFiles_51EE23()
+{
+    for (int i = 0; i < 32; i++)
+    {
+        if (gZipStreams_dword_776960[i].field_0_pZipStream)
+        {
+            Zip_Stream_free_642B30(gZipStreams_dword_776960[i].field_0_pZipStream);
+        }
+    }
+
+    for (MgzMapping& mapping : gMgzTable_6898E8)
+    {
+        if (mapping.field_8_zip_context)
+        {
+            Zip_Close_642720(mapping.field_8_zip_context);
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x0051EE23, CloseCachedMgzFiles_51EE23, FS_IMPL);
+
+int CC Zip_Try_Open_With_Other_Extensions_642870(const char* pFileName, int openMode)
+{
+    char fileNameBuffer[512] = {};
+    const size_t fileNameLen = strlen(pFileName) + 1;
+    if ((fileNameLen - 1 + 4) < 512)
+    {
+        memcpy(fileNameBuffer, pFileName, fileNameLen);
+        char* pStrEnd = &fileNameBuffer[fileNameLen -1];
+        strcpy(pStrEnd, ".zip");
+        int hFile = _open(fileNameBuffer, openMode);
+        if (hFile == -1)
+        {
+            strcpy(pStrEnd, ".ZIP");
+            hFile = _open(fileNameBuffer, openMode);
+        }
+    }
+    return -1;
+}
+MGS_FUNC_IMPLEX(0x00642870, Zip_Try_Open_With_Other_Extensions_642870, FS_IMPL)
 
 int Zip_get_file_size_642840(int hMgzFile)
 {
@@ -510,7 +595,7 @@ ZipContext* CC OpenMGZ_051ED67(const char* pFileName)
         return nullptr;
     }
 
-    if (!pMapping->field_8_file_handle)
+    if (!pMapping->field_8_zip_context)
     {
         char buffer[256] = {};
         strcpy(buffer, ".");
@@ -518,14 +603,12 @@ ZipContext* CC OpenMGZ_051ED67(const char* pFileName)
         strcat(buffer, pMapping->field_4_mgz);
 
         int openRet = 0;
-        pMapping->field_8_file_handle = Zip_Open_642920(buffer, &openRet);
+        pMapping->field_8_zip_context = Zip_Open_642920(buffer, &openRet);
     }
 
-    return pMapping->field_8_file_handle;
+    return pMapping->field_8_zip_context;
 }
 MGS_FUNC_IMPLEX(0x0051ED67, OpenMGZ_051ED67, FS_IMPL)
-
-MGS_ARY(1, 0x776960, Zip_Open_File_Handle, 32, gZipStreams_dword_776960, {});
 
 static Zip_Mgs_File_Record* ZipFindRecord(ZipContext* pZip, const char* pToFind, int flags)
 {
@@ -577,7 +660,7 @@ static Zip_Mgs_File_Record* ZipFindRecord(ZipContext* pZip, const char* pToFind,
     return nullptr;
 }
 
-Zip_Open_File_Handle* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileName, int flags)
+Zip_Zlib_Wrapper* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileName, int flags)
 {
     Zip_Mgs_File_Record* pRecord = ZipFindRecord(pZip, pFileName, flags);
     if (!pRecord)
@@ -611,16 +694,16 @@ Zip_Open_File_Handle* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFil
 
     if (pZip->field_10_saved_stream_buffer)
     {
-        pZip->field_C_free_zip_stream->field_14_zip_ctx_field10_ptr_or32k_malloc = pZip->field_10_saved_stream_buffer;
+        pZip->field_C_free_zip_stream->field_14_32k_stream_buffer = pZip->field_10_saved_stream_buffer;
         pZip->field_10_saved_stream_buffer = nullptr;
     }
     else
     {
-        pZip->field_C_free_zip_stream->field_14_zip_ctx_field10_ptr_or32k_malloc = malloc(0x8000u);
+        pZip->field_C_free_zip_stream->field_14_32k_stream_buffer = malloc(0x8000u);
     }
 
     int err = 0;
-    if (pZip->field_C_free_zip_stream->field_14_zip_ctx_field10_ptr_or32k_malloc)
+    if (pZip->field_C_free_zip_stream->field_14_32k_stream_buffer)
     {
 
         inflate(0, 0);
