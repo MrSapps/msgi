@@ -16,5 +16,6 @@
 #include <iostream>
 #include <memory>
 #include <map>
+#include <gmock/gmock.h>
 
 #include "MgsFunction.hpp"

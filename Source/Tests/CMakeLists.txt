@@ -1,14 +1,16 @@
 add_executable(Tests 
-	ActorUT.cpp
-	Main.cpp
-	ResourceNameHashUT.cpp
-	ScriptUT.cpp
-	stdafx.cpp
-	stdafx.h
-	SystemUT.cpp
-	targetver.h
-	TaskUT.cpp
+    ActorUT.cpp
+    Main.cpp
+    ResourceNameHashUT.cpp
+    ScriptUT.cpp
+    stdafx.cpp
+    stdafx.h
+    SystemUT.cpp
+    targetver.h
+    TaskUT.cpp
 )
+
+SET_TARGET_PRECOMPILED_HEADER(Tests stdafx.h stdafx.cpp)
 
 target_include_directories(Tests PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

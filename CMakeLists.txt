@@ -3,6 +3,13 @@ project(msgi VERSION 0.1 LANGUAGES C CXX)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+function(SET_TARGET_PRECOMPILED_HEADER Target PrecompiledHeader PrecompiledSource)
+  if(MSVC)
+     SET_TARGET_PROPERTIES(${Target} PROPERTIES COMPILE_FLAGS "/Yu${PrecompiledHeader}")
+     set_source_files_properties(${PrecompiledSource} PROPERTIES COMPILE_FLAGS "/Yc${PrecompiledHeader}")
+  endif(MSVC)
+endfunction(SET_TARGET_PRECOMPILED_HEADER)
+
 enable_testing()
 add_subdirectory(3rdParty)
 add_subdirectory(Source/MgsLib)

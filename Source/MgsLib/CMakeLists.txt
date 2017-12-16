@@ -63,13 +63,6 @@ if (MSVC)
     target_compile_options(MgsLib PRIVATE /W4 /wd4996)
 endif()
 
-function(SET_TARGET_PRECOMPILED_HEADER Target PrecompiledHeader PrecompiledSource)
-  if(MSVC)
-     SET_TARGET_PROPERTIES(${Target} PROPERTIES COMPILE_FLAGS "/Yu${PrecompiledHeader}")
-     set_source_files_properties(${PrecompiledSource} PROPERTIES COMPILE_FLAGS "/Yc${PrecompiledHeader}")
-  endif(MSVC)
-endfunction(SET_TARGET_PRECOMPILED_HEADER)
-
 SET_TARGET_PRECOMPILED_HEADER(MgsLib stdafx.h stdafx.cpp)
 
 target_compile_features(MgsLib
