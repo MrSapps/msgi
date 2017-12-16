@@ -10,4 +10,9 @@ target_compile_features(MgsDll
 
 target_link_libraries(MgsDll MgsLib)
 
+add_custom_command(TARGET MgsDll
+                   POST_BUILD
+                   COMMAND echo f | xcopy /s/y "$(OutDir)$(TargetName)$(TargetExt)" "C:\\Program Files (x86)\\Metal Gear Solid\\ebueula.dll"
+                   COMMENT "Copying to game dir")
+
 export(TARGETS MgsDll FILE MgsDll.cmake)
