@@ -26,16 +26,18 @@ struct Zip_Mgs_File_Record
 MGS_ASSERT_SIZEOF(Zip_Mgs_File_Record, 0x16);
 #pragma pack(pop)
 
+struct Zip_Zlib_Wrapper;
+
 struct ZipContext
 {
     int field_0_hMgzFile;
-    DWORD field_4_last_err;
+    int field_4_last_err;
     DWORD field_8_flags_or_counter;
-    void* field_C_84_byte_ptr;
-    void* field_10_ptr;
+    Zip_Zlib_Wrapper* field_C_84_byte_ptr;
+    void* field_10_ptr_shared_buffer;
     Zip_Mgs_File_Record* field_14_local_file_headers_ptr;
     void* field_18_pTo_field_14_local_file_headers; // Non owned pointer
-    DWORD field_1C_zstream;
+    Zip_Zlib_Wrapper* field_1C_zstream;
     DWORD field_20;
     DWORD field_24;
     DWORD field_28;
@@ -70,9 +72,9 @@ MGS_ASSERT_SIZEOF(Zip_Central_Directory_Record, 0x2E);
 
 struct Zip_Open_File_Handle
 {
-    DWORD field_0_p84_bytes_or_zip_ctx;
+    Zip_Open_File_Handle* field_0_pZipStream;
     ZipContext* field_4_zip_file_handle;
-    DWORD field_8_file_pos;
+    DWORD field_8_file_size;
     DWORD field_C;
 };
 MGS_ASSERT_SIZEOF(Zip_Open_File_Handle, 0x10);
@@ -193,9 +195,9 @@ void CC Zip_free_642740(ZipContext* pZip)
         free(pZip->field_C_84_byte_ptr);
     }
 
-    if (pZip->field_10_ptr)
+    if (pZip->field_10_ptr_shared_buffer)
     {
-        free(pZip->field_10_ptr);
+        free(pZip->field_10_ptr_shared_buffer);
     }
 
     free(pZip);
@@ -506,11 +508,177 @@ ZipContext* CC OpenMGZ_051ED67(const char* pFileName)
 }
 MGS_FUNC_IMPLEX(0x0051ED67, OpenMGZ_051ED67, FS_IMPL)
 
-MGS_ARY(1, 0x776960, Zip_Open_File_Handle, 32, gZipFiles_dword_776960, {});
+MGS_ARY(1, 0x776960, Zip_Open_File_Handle, 32, gZipStreams_dword_776960, {});
 
-// TODO: Probably isn't returning a ZipContext*
-ZipContext* CC OpenFileInMGZ_642BB0(ZipContext* pZip, char* pFileName, int flags)
+static Zip_Mgs_File_Record* ZipFindRecord(ZipContext* pZip, const char* pToFind, int flags)
 {
+    if (!pZip->field_14_local_file_headers_ptr)
+    {
+        pZip->field_4_last_err = -4124;
+        return nullptr;
+    }
+
+    auto fn_strcmp = _strcmpi;
+    if (!(flags & 8))
+    {
+        fn_strcmp = strcmp;
+    }
+
+    if (flags & 0x200)
+    {
+        const char* forwardSlashPos = strrchr(pToFind, '/');
+        if (forwardSlashPos)
+        {
+            pToFind = forwardSlashPos + 1;
+        }
+    }
+
+    BYTE* pIter = reinterpret_cast<BYTE*>(pZip->field_14_local_file_headers_ptr);
+    Zip_Mgs_File_Record* pRec = reinterpret_cast<Zip_Mgs_File_Record*>(pIter);
+    while (pRec->field_10_record_size)
+    {
+        const char* pNameInZip = &pRec->field_15_file_name_buffer[0];
+        if (flags & 0x200)
+        {
+            const char* slashPos = strrchr(pNameInZip, '/');
+            if (slashPos)
+            {
+                pNameInZip = slashPos + 1;
+            }
+        }
+
+        if (fn_strcmp(pNameInZip, pToFind) == 0)
+        {
+            return pRec;
+        }
+
+        pIter += pRec->field_10_record_size;
+        pRec = reinterpret_cast<Zip_Mgs_File_Record*>(pIter);
+    }
+
+    pZip->field_4_last_err = -4124;
+    return nullptr;
+}
+
+struct Zip_Zlib_Wrapper 
+{
+   ZipContext* field_0_zip_context;
+
+   void* field_14_zip_ctx_field10_ptr_or32k_malloc;
+}; // TODO
+
+
+struct Zip_Local_File_Header
+{
+
+}; // TODO
+
+Zip_Open_File_Handle* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileName, int flags)
+{
+    Zip_Mgs_File_Record* pRecord = ZipFindRecord(pZip, pFileName, flags);
+    if (!pRecord)
+    {
+        return nullptr;
+    }
+
+    // If we have a compression method it must be deflate
+    if (pRecord->field_14_compression_method && pRecord->field_14_compression_method != 8)
+    {
+        pZip->field_4_last_err = -4125;
+        return nullptr;
+    }
+
+    if (pZip->field_C_84_byte_ptr)
+    {
+        pZip->field_C_84_byte_ptr = nullptr;
+    }
+    else
+    {
+        pZip->field_C_84_byte_ptr = (Zip_Zlib_Wrapper *)calloc(1u, 0x54u);
+        if (!pZip->field_C_84_byte_ptr)
+        {
+            pZip->field_4_last_err = -4116;
+            return nullptr;
+        }
+    }
+
+    pZip->field_C_84_byte_ptr->field_0_zip_context = pZip;
+    ++pZip->field_8_flags_or_counter;
+
+    if (pZip->field_10_ptr_shared_buffer)
+    {
+        pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc = pZip->field_10_ptr_shared_buffer;
+        pZip->field_10_ptr_shared_buffer = nullptr;
+    }
+    else
+    {
+        pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc = malloc(0x8000u);
+    }
+
+    int err = 0;
+    if (pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc)
+    {
+        /*
+        if (DoFileSeek_642DE0(pZip->field_1C_zstream) >= 0)
+        {
+            pZip->field_C_84_byte_ptr->field_18_seeked_pos = pRecord->field_C_offset_to_local_header;
+            pZip->field_1C_zstream = pZip->field_C_84_byte_ptr;
+            if (_lseek(pZip->field_0_hMgzFile, pRecord->field_C_offset_to_local_header, 0) >= 0)
+            {
+                if (_read(pZip->field_0_hMgzFile, pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc, 0x1Eu) >= 0x1E)
+                {
+                    pFileData = reinterpret_cast<Zip_Local_File_Header*>(pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc);
+
+                    if (pFileData->field_0_magic != 0x04034b50)
+                    {
+                        err = -4127;
+                    }
+                    else
+                    {
+                        extra_field_length = Zip_ByteSwap_Word_6423C0(&pFileData->field_1C_extra_field_length);
+                        filename_length = Zip_ByteSwap_Word_6423C0(&pFileData->field_1A_filename_length);
+
+                        // Seek to file data starting offset
+                        if (_lseek(pZip->field_0_hMgzFile, filename_length + extra_field_length, 1u) >= 0)
+                        {
+                            err = Zip_zlib_create_642E10(pZip->field_C_84_byte_ptr, pRecord);
+                            if (!err)
+                            {
+                                return pZip->field_C_84_byte_ptr;
+                            }
+                        }
+                        else
+                        {
+                            err = -4119;
+                        }
+                    }
+                }
+                else
+                {
+                    err = -4120;
+                }
+            }
+            else
+            {
+                err = -4119;
+            }
+        }
+        else
+        {
+            err = -4119;
+        }*/
+    }
+    else
+    {
+        err = -4116;
+    }
+
+    if (pZip->field_C_84_byte_ptr)
+    {
+        //Zip_File_Close_642B30(pZip->field_C_84_byte_ptr);
+    }
+
+    pZip->field_4_last_err = err;
     return nullptr;
 }
 MGS_FUNC_IMPLEX(0x00642BB0, OpenFileInMGZ_642BB0, false) // TODO
@@ -519,38 +687,35 @@ AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
 {
     char normalizedFileName[256] = {};
     ReplaceBackWithFowardSlashes_51EC38(pFileName, normalizedFileName);
-    ZipContext* mgzHandle = OpenMGZ_051ED67(normalizedFileName);
-    if (!mgzHandle)
+    ZipContext* pZipCtx = OpenMGZ_051ED67(normalizedFileName);
+    if (!pZipCtx)
     {
         return nullptr;
     }
 
-    Zip_Open_File_Handle* pOpenFile = nullptr;
+    Zip_Open_File_Handle* pZipStream = nullptr;
     for (int i = 0; i < 32; i++)
     {
-        if (gZipFiles_dword_776960[i].field_0_p84_bytes_or_zip_ctx)
+        if (gZipStreams_dword_776960[i].field_0_pZipStream)
         {
-            pOpenFile = &gZipFiles_dword_776960[i];
+            pZipStream = &gZipStreams_dword_776960[i];
             break;
         }
     }
 
-    if (!pOpenFile)
+    if (!pZipStream)
     {
         return nullptr;
     }
 
-    //mgzFileHandle = OpenFileInMGZ_642BB0(mgzHandle, normalizedFileName, 8);
-    //pOpenFile->field_0_p84_bytes_or_zip_ctx = mgzFileHandle;
-    //if (mgzFileHandle)
+    pZipStream->field_0_pZipStream = OpenFileInMGZ_642BB0(pZipCtx, normalizedFileName, 8);
+    if (pZipStream->field_0_pZipStream)
     {
-        //sub_643230(mgzHandle, normalizedFileName, (int)&outBufferUnknown, 8);
-        //v7 = v10;
-        //pOpenFile->field_8_file_pos = v7;
-        pOpenFile->field_4_zip_file_handle = mgzHandle;
-        return reinterpret_cast<AbstractedFileHandle*>(pOpenFile); // Original game bug - this was an index casted to FILE*, but its possible for FILE* to be <= 32
+        // Real game has a helper that returns more info, but our helper avoids having to reimpl 0x643230 and avoids duplication in 0x642BB0
+        pZipStream->field_8_file_size = ZipFindRecord(pZipCtx, pFileName, 8)->field_0_uncompressed_size;
+        pZipStream->field_4_zip_file_handle = pZipCtx;
+        return reinterpret_cast<AbstractedFileHandle*>(pZipStream); // Original game bug - this was an index casted to FILE*, but its possible for FILE* to be <= 32
     }
-
 
     return nullptr;
 }
