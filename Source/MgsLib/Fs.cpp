@@ -219,7 +219,7 @@ void CC Zip_Stream_free_642B30(Zip_Zlib_Wrapper* pZipStream)
     ZipContext* pZipContext = pZipStream->field_0_zip_context;
     if (pZipStream->field_8_compression_method)
     {
-        deflateEnd(&pZipStream->field_1C_zstream);
+        inflateEnd(&pZipStream->field_1C_zstream);
     }
 
     if (pZipStream->field_14_32k_stream_buffer)
@@ -684,8 +684,8 @@ int CC Zip_zlib_create_642E10(Zip_Zlib_Wrapper* pZipStream, Zip_Mgs_File_Record*
         return 0;
     }
 
-    int bFailed = deflateInit(&pZipStream->field_1C_zstream, -15);
-    if (!bFailed)
+    const int initRet = inflateInit(&pZipStream->field_1C_zstream);
+    if (initRet == Z_OK)
     {
         pZipStream->field_10_32k_buffer_pos = pFileRecord->field_4_compressed_size;
         return 0;
@@ -696,7 +696,7 @@ int CC Zip_zlib_create_642E10(Zip_Zlib_Wrapper* pZipStream, Zip_Mgs_File_Record*
         Zip_Stream_free_642B30(pZipStream);
     }
 
-    return bFailed;
+    return initRet;
 }
 MGS_FUNC_IMPLEX(0x00642E10, Zip_zlib_create_642E10, FS_IMPL)
 
