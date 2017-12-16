@@ -13,8 +13,11 @@ before_build:
  - call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %platform%
 
 build_script:
- - msbuild Source\MSGI.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
- - .\Output\%configuration%\Tests.exe
+ - mkdir build
+ - cd build
+ - cmake ..
+ - msbuild Source\build\MSGI.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+ - Source\Tests\%configuration%\Tests.exe
  
 install:
  - git submodule update --init --recursive

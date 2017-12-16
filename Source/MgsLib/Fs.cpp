@@ -7,6 +7,7 @@
 #include <gmock/gmock.h>
 #include <fcntl.h>
 
+#include <zlib.h>
 
 #define FS_IMPL true
 
@@ -28,16 +29,18 @@ MGS_ASSERT_SIZEOF(Zip_Mgs_File_Record, 0x16);
 
 struct Zip_Zlib_Wrapper;
 
+MGS_ASSERT_SIZEOF(z_stream, 0x38);
+
 struct ZipContext
 {
     int field_0_hMgzFile;
     int field_4_last_err;
     DWORD field_8_flags_or_counter;
-    Zip_Zlib_Wrapper* field_C_84_byte_ptr;
-    void* field_10_ptr_shared_buffer;
+    Zip_Zlib_Wrapper* field_C_free_zip_stream;
+    void* field_10_saved_stream_buffer;
     Zip_Mgs_File_Record* field_14_local_file_headers_ptr;
     void* field_18_pTo_field_14_local_file_headers; // Non owned pointer
-    Zip_Zlib_Wrapper* field_1C_zstream;
+    Zip_Zlib_Wrapper* field_1C_zip_stream_last_opened;
     DWORD field_20;
     DWORD field_24;
     DWORD field_28;
@@ -94,6 +97,20 @@ struct Zip_End_Of_Central_Directory
 };
 MGS_ASSERT_SIZEOF(Zip_End_Of_Central_Directory, 0x16);
 #pragma pack(pop)
+
+struct Zip_Zlib_Wrapper
+{
+    ZipContext* field_0_zip_context;
+
+    void* field_14_zip_ctx_field10_ptr_or32k_malloc;
+}; // TODO
+
+
+struct Zip_Local_File_Header
+{
+
+}; // TODO
+
 
 struct MgzMapping
 {
@@ -190,14 +207,14 @@ void CC Zip_free_642740(ZipContext* pZip)
         free(pZip->field_14_local_file_headers_ptr);
     }
 
-    if (pZip->field_C_84_byte_ptr)
+    if (pZip->field_C_free_zip_stream)
     {
-        free(pZip->field_C_84_byte_ptr);
+        free(pZip->field_C_free_zip_stream);
     }
 
-    if (pZip->field_10_ptr_shared_buffer)
+    if (pZip->field_10_saved_stream_buffer)
     {
-        free(pZip->field_10_ptr_shared_buffer);
+        free(pZip->field_10_saved_stream_buffer);
     }
 
     free(pZip);
@@ -560,19 +577,6 @@ static Zip_Mgs_File_Record* ZipFindRecord(ZipContext* pZip, const char* pToFind,
     return nullptr;
 }
 
-struct Zip_Zlib_Wrapper 
-{
-   ZipContext* field_0_zip_context;
-
-   void* field_14_zip_ctx_field10_ptr_or32k_malloc;
-}; // TODO
-
-
-struct Zip_Local_File_Header
-{
-
-}; // TODO
-
 Zip_Open_File_Handle* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileName, int flags)
 {
     Zip_Mgs_File_Record* pRecord = ZipFindRecord(pZip, pFileName, flags);
@@ -588,36 +592,39 @@ Zip_Open_File_Handle* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFil
         return nullptr;
     }
 
-    if (pZip->field_C_84_byte_ptr)
+    if (pZip->field_C_free_zip_stream)
     {
-        pZip->field_C_84_byte_ptr = nullptr;
+        pZip->field_C_free_zip_stream = nullptr;
     }
     else
     {
-        pZip->field_C_84_byte_ptr = (Zip_Zlib_Wrapper *)calloc(1u, 0x54u);
-        if (!pZip->field_C_84_byte_ptr)
+        pZip->field_C_free_zip_stream = (Zip_Zlib_Wrapper *)calloc(1u, 0x54u);
+        if (!pZip->field_C_free_zip_stream)
         {
             pZip->field_4_last_err = -4116;
             return nullptr;
         }
     }
 
-    pZip->field_C_84_byte_ptr->field_0_zip_context = pZip;
+    pZip->field_C_free_zip_stream->field_0_zip_context = pZip;
     ++pZip->field_8_flags_or_counter;
 
-    if (pZip->field_10_ptr_shared_buffer)
+    if (pZip->field_10_saved_stream_buffer)
     {
-        pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc = pZip->field_10_ptr_shared_buffer;
-        pZip->field_10_ptr_shared_buffer = nullptr;
+        pZip->field_C_free_zip_stream->field_14_zip_ctx_field10_ptr_or32k_malloc = pZip->field_10_saved_stream_buffer;
+        pZip->field_10_saved_stream_buffer = nullptr;
     }
     else
     {
-        pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc = malloc(0x8000u);
+        pZip->field_C_free_zip_stream->field_14_zip_ctx_field10_ptr_or32k_malloc = malloc(0x8000u);
     }
 
     int err = 0;
-    if (pZip->field_C_84_byte_ptr->field_14_zip_ctx_field10_ptr_or32k_malloc)
+    if (pZip->field_C_free_zip_stream->field_14_zip_ctx_field10_ptr_or32k_malloc)
     {
+
+        inflate(0, 0);
+
         /*
         if (DoFileSeek_642DE0(pZip->field_1C_zstream) >= 0)
         {
@@ -673,7 +680,7 @@ Zip_Open_File_Handle* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFil
         err = -4116;
     }
 
-    if (pZip->field_C_84_byte_ptr)
+    if (pZip->field_C_free_zip_stream)
     {
         //Zip_File_Close_642B30(pZip->field_C_84_byte_ptr);
     }
