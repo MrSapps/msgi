@@ -12,6 +12,7 @@ target_include_directories(Detours PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Detours/src>
     $<INSTALL_INTERFACE:Detours/src>)
 
+set_property(TARGET Detours PROPERTY FOLDER "3rdParty")
 export(TARGETS Detours FILE Detours.cmake)
 
 # EasyLogging++ lib
@@ -24,6 +25,7 @@ target_include_directories(EasyLogging++ PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/EasyLogging++/EasyLogging/src>
     $<INSTALL_INTERFACE:EasyLogging++/EasyLogging/src>)
 
+set_property(TARGET EasyLogging++ PROPERTY FOLDER "3rdParty")
 export(TARGETS EasyLogging++ FILE EasyLogging++.cmake)
 
 # DxOld lib
@@ -49,3 +51,4 @@ target_include_directories(gmock PUBLIC
 	)
 
 export(TARGETS gmock FILE gmock.cmake)
+set_property(TARGET gmock PROPERTY FOLDER "3rdParty")

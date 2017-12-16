@@ -786,7 +786,7 @@ struct pcx_mgs
 };
 MGS_ASSERT_SIZEOF(pcx_mgs, 0x210);
 
-Texture_Record* CC sub_40252B(WORD hashedName, int bpp, __int16 bppShift0x30, PSX_RECT* pVramRect, pcx_mgs* pMgsPcx, char numColours)
+Texture_Record* CC sub_40252B(WORD hashedName, int bpp, __int16 bppShift0x30, PSX_RECT* pVramRect, pcx_mgs* pMgsPcx, BYTE numColours)
 {
     Texture_Record* pTexture = nullptr;
     if (LibDG_SearchForTextureRecord_4024D2(hashedName, &pTexture))
@@ -917,8 +917,8 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
 {
     pcx_header* pPcxFileData = reinterpret_cast<pcx_header*>(fileData);
     const WORD mgs_bpp = pPcxFileData->field_4C_bpp_mgs;
-    DWORD maxW = pPcxFileData->field_8_Xmax + 1 - pPcxFileData->field_4_Xmin;
-    const DWORD maxH = pPcxFileData->field_A_Ymax + 1 - pPcxFileData->field_6_Ymin;
+    WORD maxW = pPcxFileData->field_8_Xmax + 1 - pPcxFileData->field_4_Xmin;
+    const WORD maxH = pPcxFileData->field_A_Ymax + 1 - pPcxFileData->field_6_Ymin;
     if (!(mgs_bpp & 1))
     {
         maxW /= 2;
@@ -996,7 +996,7 @@ int CC GV_pcx_file_handler_402B25(void* fileData, int fileNameHash)
             (mgs_bpp & 0x30) >> 4,
             &pRect->field_0_vram_rect,
             pAllocated,
-            pAllocated->field_4_num_colours);
+            static_cast<BYTE>(pAllocated->field_4_num_colours));
     }
 
     return 1;
@@ -1280,7 +1280,7 @@ void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
         }
     }
 
-    unsigned __int16 v9 = dword_78D32C;
+    DWORD v9 = dword_78D32C & 0xFFFF;
     
     const int primCount = pGv->g_PrimQueue1_word_6BC3BE_256 - pGv->gPrimQueue2_word_6BC3C0_256;
     for (int i = 0; i < primCount; i++)

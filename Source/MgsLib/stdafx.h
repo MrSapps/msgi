@@ -12,3 +12,9 @@
 
 
 // TODO: reference additional headers your program requires here
+#include <windows.h>
+#include <iostream>
+#include <memory>
+#include <map>
+
+#include "MgsFunction.hpp"

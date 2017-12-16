@@ -861,6 +861,7 @@ static void TestCommonHashes()
     //ASSERT_EQ(0x7D50, ResourceNameHash("hzd"));
     ASSERT_EQ(0xEEE9, ResourceNameHash("camera"));
     ASSERT_EQ(0x306A, ResourceNameHash("light"));
+    ASSERT_EQ(0xC8BB, ResourceNameHash("load"));
     ASSERT_EQ(0x9A1F, ResourceNameHash("start"));
     ASSERT_EQ(0x24E1, ResourceNameHash("radio"));
     ASSERT_EQ(0xE43C, ResourceNameHash("str_status"));

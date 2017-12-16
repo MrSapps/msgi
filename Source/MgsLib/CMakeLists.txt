@@ -59,7 +59,26 @@ target_include_directories(MgsLib PUBLIC
 
 target_compile_definitions(MgsLib PRIVATE "_CRT_SECURE_NO_WARNINGS")
 
+if (MSVC)
+	target_compile_options(MgsLib PRIVATE /W4 /wd4996)
+endif()
+
+function(SET_TARGET_PRECOMPILED_HEADER Target PrecompiledHeader PrecompiledSource)
+  if(MSVC)
+     SET_TARGET_PROPERTIES(${Target} PROPERTIES COMPILE_FLAGS "/Yu${PrecompiledHeader}")
+     set_source_files_properties(${PrecompiledSource} PROPERTIES COMPILE_FLAGS "/Yc${PrecompiledHeader}")
+  endif(MSVC)
+endfunction(SET_TARGET_PRECOMPILED_HEADER)
+
+SET_TARGET_PRECOMPILED_HEADER(MgsLib stdafx.h stdafx.cpp)
+
 target_compile_features(MgsLib
+	PRIVATE cxx_strong_enums
+	PRIVATE cxx_static_assert
+	PRIVATE cxx_lambdas
+	PRIVATE cxx_nullptr
+	PRIVATE cxx_range_for
+	PRIVATE cxx_decltype
     PRIVATE cxx_auto_type
     PRIVATE cxx_variadic_templates)
 
