@@ -8,6 +8,11 @@ target_compile_features(MgsDll
     PRIVATE cxx_auto_type
     PRIVATE cxx_variadic_templates)
 
+if (MSVC)
+    set_target_properties(MgsDll PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
+    set_target_properties(MgsDll PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
+endif()
+
 target_link_libraries(MgsDll MgsLib)
 
 add_custom_command(TARGET MgsDll

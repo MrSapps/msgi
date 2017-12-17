@@ -484,18 +484,6 @@ int CC Zip_load_central_directory_642540(int hMgzFile, Zip_End_Of_Central_Direct
 }
 MGS_FUNC_IMPLEX(0x00642540, Zip_load_central_directory_642540, FS_IMPL)
 
-static void DumpZipRecords(Zip_Mgs_File_Record* pRec)
-{
-    BYTE* pIter = reinterpret_cast<BYTE*>(pRec);
-    while (pRec->field_10_record_size)
-    {
-        char* pName = &pRec->field_15_file_name_buffer[0];
-        LOG_INFO(pName);
-        pIter += pRec->field_10_record_size;
-        pRec = reinterpret_cast<Zip_Mgs_File_Record*>(pIter);
-    }
-}
-
 ZipContext* CC Zip_alloc_642790(int hMgzFile, int* pRet)
 {
     int errCode = 0;
@@ -541,7 +529,6 @@ ZipContext* CC Zip_alloc_642790(int hMgzFile, int* pRet)
     }
 
     errCode = Zip_load_central_directory_642540(pZip->field_0_hMgzFile, &zipEndOfCentralDir, &pZip->field_14_local_file_headers_ptr);
-    DumpZipRecords(pZip->field_14_local_file_headers_ptr);
 
     if (errCode)
     {
