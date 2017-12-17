@@ -148,6 +148,14 @@ MgzMapping gMgzTable_6898E8[4] =
 
 MGS_ARY(1, 0x776960, Zip_Open_File_Handle, 32, gZipStreams_dword_776960, {});
 
+
+static FILE* const kInvalidFileHandle = reinterpret_cast<FILE*>(-2);
+
+static inline bool IsValidFILE(FILE* f)
+{
+    return f && f != kInvalidFileHandle && f != reinterpret_cast<FILE*>(-1);
+}
+
 char* CC ReplaceBackWithFowardSlashes_51EC38(char* pInput, char* pOutput)
 {
     char* pRet = pOutput;
@@ -684,7 +692,7 @@ int CC Zip_zlib_create_642E10(Zip_Zlib_Wrapper* pZipStream, Zip_Mgs_File_Record*
         return 0;
     }
 
-    const int initRet = inflateInit(&pZipStream->field_1C_zstream);
+    const int initRet = inflateInit2(&pZipStream->field_1C_zstream, -MAX_WBITS); // The -max bits craziness is to prevent zlib looking for gzip or zlib headers
     if (initRet == Z_OK)
     {
         pZipStream->field_10_compressed_size_avail = pFileRecord->field_4_compressed_size;
@@ -812,7 +820,7 @@ Zip_Zlib_Wrapper* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileNam
 }
 MGS_FUNC_IMPLEX(0x00642BB0, OpenFileInMGZ_642BB0, FS_IMPL)
 
-AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
+FILE* CC OpenArchiveFile_51EFB2(char* pFileName)
 {
     char normalizedFileName[256] = {};
     ReplaceBackWithFowardSlashes_51EC38(pFileName, normalizedFileName);
@@ -843,7 +851,7 @@ AbstractedFileHandle* CC OpenArchiveFile_51EFB2(char* pFileName)
         // Real game has a helper that returns more info, but our helper avoids having to reimpl 0x643230 and avoids duplication in 0x642BB0
         pFreeZipStream->field_8_file_size = ZipFindRecord(pZipCtx, pFileName, 8)->field_0_uncompressed_size;
         pFreeZipStream->field_4_zip_file_handle = pZipCtx;
-        return reinterpret_cast<AbstractedFileHandle*>(pFreeZipStream); // Original game bug - this was an index casted to FILE*, but its possible for FILE* to be <= 32
+        return reinterpret_cast<FILE*>(pFreeZipStream); // Original game bug - this was an index casted to FILE*, but its possible for FILE* to be <= 32
     }
 
     return nullptr;
@@ -882,7 +890,7 @@ const char* gOpenModes_689998[] =
     "rb+"
 };
 
-AbstractedFileHandle* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
+FILE* CC File_LoadDirFile_51EE8F(const char* fileName, signed int openMode)
 {
     LOG_INFO(fileName);
 
@@ -907,7 +915,7 @@ AbstractedFileHandle* CC File_LoadDirFile_51EE8F(const char* fileName, signed in
     }
 
     // Open in the MGZ archive
-    AbstractedFileHandle* hFile = OpenArchiveFile_51EFB2(remappedFileName);
+    FILE* hFile = OpenArchiveFile_51EFB2(remappedFileName);
 
     if (!hFile)
     {
@@ -917,19 +925,14 @@ AbstractedFileHandle* CC File_LoadDirFile_51EE8F(const char* fileName, signed in
         strcat(fileToOpen, "/");
         strcat(fileToOpen, remappedFileName);
         const char* strOpenMode = gOpenModes_689998[openMode % 4];
-        FILE* hRealFile = fopen(fileToOpen, strOpenMode);
-        if (!hRealFile)
+        hFile = fopen(fileToOpen, strOpenMode);
+        if (!hFile)
         {
             // For some reason try again one more time?
             strcpy(fileToOpen, ".");
             strcat(fileToOpen, "/");
             strcat(fileToOpen, remappedFileName);
-            hRealFile = fopen(fileToOpen, strOpenMode);
-        }
-
-        if (hRealFile)
-        {
-            hFile = new AbstractedFileHandle(hRealFile);
+            hFile = fopen(fileToOpen, strOpenMode);
         }
     }
     return hFile;
@@ -1048,50 +1051,79 @@ int CC Zip_Read_File_642EA0(Zip_Zlib_Wrapper* pFileRecord, void* dstBuf, signed 
 }
 MGS_FUNC_IMPLEX(0x00642EA0, Zip_Read_File_642EA0, FS_IMPL)
 
-size_t CC File_NormalRead_51F0F5(AbstractedFileHandle* File, void* dstBuf, DWORD nNumberOfBytesToRead)
+static inline Zip_Open_File_Handle* AsZipFile(FILE* file)
 {
-    Zip_Open_File_Handle* h = reinterpret_cast<Zip_Open_File_Handle*>(File); // TODO: Fix this up
-    if (h >= &gZipStreams_dword_776960[0] && h <= &gZipStreams_dword_776960[31])
+    auto pZip = reinterpret_cast<Zip_Open_File_Handle*>(file);
+    if (pZip >= &gZipStreams_dword_776960[0] && pZip <= &gZipStreams_dword_776960[31])
     {
-        return Zip_Read_File_642EA0(h->field_0_pZipStream, dstBuf, nNumberOfBytesToRead);
+        return pZip;
     }
-    else
+    return nullptr;
+}
+
+size_t CC File_NormalRead_51F0F5(FILE* File, void* dstBuf, DWORD nNumberOfBytesToRead)
+{
+    if (AsZipFile(File))
     {
-        if (File && File->mFile != (FILE *)-1 && File->mFile)
+        return Zip_Read_File_642EA0(AsZipFile(File)->field_0_pZipStream, dstBuf, nNumberOfBytesToRead);
+    }
+    else if (IsValidFILE(File))
+    {
+        return fread(dstBuf, 1, nNumberOfBytesToRead, File);
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x0051F0F5, File_NormalRead_51F0F5, FS_IMPL)
+
+__int32 CC File_GetPos_51F09E(FILE* File, __int32 Offset, int Origin)
+{
+    if (AsZipFile(File))
+    {
+        if (Origin == SEEK_END)
         {
-            return fread(dstBuf, 1, nNumberOfBytesToRead, File->mFile);
+            return AsZipFile(File)->field_8_file_size;
         }
-    }
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x0051F0F5, File_NormalRead_51F0F5, FS_IMPL) // TODO
-
-__int32 CC File_GetPos_51F09E(AbstractedFileHandle* File, __int32 Offset, int Origin)
-{
-    if (File && File->mFile != (FILE *)-1 && File->mFile)
-    {
-        fseek(File->mFile, Offset, Origin);
-        return ftell(File->mFile);
-    }
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x0051F09E, File_GetPos_51F09E, FS_IMPL) // TODO
-
-int CC File_Close_51F183(AbstractedFileHandle *File)
-{
-    if (!File || File->mFile == (FILE *)-1 || !File->mFile)
-    {
+        else
+        {
+            LOG_ERROR("Origin " << Origin << " not supported for ZIP streams");
+        }
         return 0;
     }
-
-    const int ret = fclose(File->mFile);
-    delete File;
-    return ret;
+    else if (IsValidFILE(File))
+    {
+        fseek(File, Offset, Origin);
+        return ftell(File);
+    }
+    return 0;
 }
-MGS_FUNC_IMPLEX(0x0051F183, File_Close_51F183, FS_IMPL) // TODO
+MGS_FUNC_IMPLEX(0x0051F09E, File_GetPos_51F09E, FS_IMPL)
+
+void CC Zip_Stream_Close_51F1AD(Zip_Open_File_Handle* pZipItem)
+{
+    Zip_Stream_free_642B30(pZipItem->field_0_pZipStream);
+    pZipItem->field_0_pZipStream = nullptr;
+    pZipItem->field_4_zip_file_handle = nullptr;
+    pZipItem->field_8_file_size = 0;
+}
+MGS_FUNC_IMPLEX(0x0051F1AD, Zip_Stream_Close_51F1AD, FS_IMPL)
+
+int CC File_Close_51F183(FILE* File)
+{
+    if (AsZipFile(File))
+    {
+        Zip_Stream_Close_51F1AD(AsZipFile(File));
+        return 0;
+    }
+    else if (IsValidFILE(File))
+    {
+        return fclose(File);
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x0051F183, File_Close_51F183, FS_IMPL)
 
 MGS_VAR(1, 0x6BFBB0, void*, gFileBuffer_dword_6BFBB0, 0);
-MGS_VAR(1, 0x6BFBA8, AbstractedFileHandle*, gFileHandle_dword_6BFBA8, 0);
+MGS_VAR(1, 0x6BFBA8, FILE*, gFileHandle_dword_6BFBA8, 0);
 MGS_VAR(1, 0x6BFBAC, DWORD, gFileSizeToRead_dword_6BFBAC, 0);
 
 // Given data.cnf then returns stage/init/data.cnf for example
@@ -1115,8 +1147,6 @@ static const char* FileLoadModeToString(signed int type)
     }
 }
 
-static AbstractedFileHandle* const kInvalidFileHandle = reinterpret_cast<AbstractedFileHandle*>(-2);
-
 static const char* sDirFileArray_6505C8[] =
 {
     "stage.dir",
@@ -1132,7 +1162,7 @@ void CC FS_LoadDirFileByIndex_408FE7(int dirFileIndex, int offset, int sizeToRea
 {
     char fileName[64] = {};
     sprintf(fileName, "%s", sDirFileArray_6505C8[dirFileIndex]);
-    AbstractedFileHandle* hFile = File_LoadDirFile_51EE8F(fileName, 0);
+    FILE* hFile = File_LoadDirFile_51EE8F(fileName, 0);
     File_GetPos_51F09E(hFile, offset << 11, 0);
     gFileSizeToRead_dword_6BFBAC = sizeToRead;
     gFileHandle_dword_6BFBA8 = hFile;
@@ -1176,7 +1206,7 @@ int Res_loader_load_file_to_mem_408FAE()
 }
 MGS_FUNC_IMPLEX(0x00408FAE, Res_loader_load_file_to_mem_408FAE, FS_IMPL)
 
-static void SetLoadedFileInfo(AbstractedFileHandle* hFile, void** ppBuffer, int fileSize)
+static void SetLoadedFileInfo(FILE* hFile, void** ppBuffer, int fileSize)
 {
     gFileBuffer_dword_6BFBB0 = *ppBuffer;
     gFileHandle_dword_6BFBA8 = hFile;
@@ -1195,7 +1225,7 @@ signed int CC FS_LoadRequest(const char* fileName, void** ppBuffer, signed int t
     char fileToLoad[64] = {};
     ToFullStagePath_408EA0(fileNameWithoutAsterix, fileToLoad);
 
-    AbstractedFileHandle* hFile = File_LoadDirFile_51EE8F(fileToLoad, 0);
+    FILE* hFile = File_LoadDirFile_51EE8F(fileToLoad, 0);
     const DWORD fileSize = File_GetPos_51F09E(hFile, 0, 2);
     File_GetPos_51F09E(hFile, 0, 0);
 
