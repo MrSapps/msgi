@@ -332,59 +332,66 @@ int CC Zip_locate_end_of_central_directory_record_6423D0(int hMgzFile, unsigned 
         return -4121;
     }
 
-    char buffer[512];
     LONG readPos = fileSize - sizeof(Zip_End_Of_Central_Directory);
-    Zip_End_Of_Central_Directory* pDir = nullptr;
-    for (;;)
+    Zip_End_Of_Central_Directory record = {};
+
+    // On first pass read just the size of a record from the end of the file, else reading 512 blocks
+    if (_lseek(hMgzFile, readPos, SEEK_SET) < 0)
     {
-        // On first pass read just the size of a record from the end of the file, else reading 512 blocks
-        if (_lseek(hMgzFile, readPos, SEEK_SET) < 0)
-        {
-            return -4119;
-        }
-
-        if (_read(hMgzFile, buffer, sizeof(Zip_End_Of_Central_Directory)) < sizeof(Zip_End_Of_Central_Directory))
-        {
-            return -4120;
-        }
-
-        // Original game bug - checked if buffer was null, can never happen
-        
-        pDir = reinterpret_cast<Zip_End_Of_Central_Directory*>(buffer);
-        if (pDir->field_0_magic == 0x06054b50)
-        {
-            break;
-        }
-
-        // Simple case of it being right at the end of the file has failed, now we need to search backwards in blocks
-
-        // TODO: Implement me
-        /*
-        for (;;)
-        {
-            if (_lseek(hMgzFile, readPos, SEEK_SET) < 0)
-            {
-                return -4119;
-            }
-
-            if (_read(hMgzFile, buffer, sizeof(buffer)) < sizeof(buffer))
-            {
-                return -4120;
-            }
-
-            readPos -= 512;
-            //remainingSize += 512;
-            if (remainingSize <= 65536)
-            {
-
-            }
-        }*/
-        return -4122;
+        return -4119;
     }
 
-    memcpy(pEndOfCentralDir, pDir, sizeof(Zip_End_Of_Central_Directory));
+    if (_read(hMgzFile, &record, sizeof(Zip_End_Of_Central_Directory)) < sizeof(Zip_End_Of_Central_Directory))
+    {
+        return -4120;
+    }
 
-    return 0;
+    // Original game bug - checked if buffer was null, can never happen
+
+    if (record.field_0_magic == 0x06054b50)
+    {
+        memcpy(pEndOfCentralDir, &record, sizeof(Zip_End_Of_Central_Directory));
+        return 0;
+    }
+
+    // Simple case of it being right at the end of the file has failed, load up to 64k to try to find it
+    char buffer[(1024 * 64) + sizeof(Zip_End_Of_Central_Directory)] = {}; // 64k comment + header size
+    int readSize = 0;
+    if (sizeof(buffer) > fileSize)
+    {
+        // File is smaller than 64k so read all of it
+        readPos = 0;
+        readSize = fileSize;
+    }
+    else
+    {
+        // File is bigger than 64k, just read last 64k
+        readPos = fileSize - sizeof(buffer);
+        readSize = sizeof(buffer);
+    }
+
+    if (_lseek(hMgzFile, readPos, SEEK_SET) < 0)
+    {
+        return -4119;
+    }
+
+    if (_read(hMgzFile, buffer, readSize) < readSize)
+    {
+        return -4120;
+    }
+
+    char* pBufferIter = buffer;
+    while (pBufferIter < (buffer + sizeof(buffer) - sizeof(Zip_End_Of_Central_Directory)))
+    {
+        Zip_End_Of_Central_Directory* pDir = reinterpret_cast<Zip_End_Of_Central_Directory*>(pBufferIter);
+        if (pDir->field_0_magic == 0x06054b50)
+        {
+            memcpy(pEndOfCentralDir, pDir, sizeof(Zip_End_Of_Central_Directory));
+            return 0;
+        }
+        pBufferIter++;
+    }
+    return -4122;
 }
 MGS_FUNC_IMPLEX(0x006423D0, Zip_locate_end_of_central_directory_record_6423D0, FS_IMPL)
 
