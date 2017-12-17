@@ -40,7 +40,7 @@ struct ZipContext
     void* field_10_saved_stream_buffer;
     Zip_Mgs_File_Record* field_14_local_file_headers_ptr;
     void* field_18_pTo_field_14_local_file_headers; // Non owned pointer
-    Zip_Zlib_Wrapper* field_1C_zip_stream_last_opened;
+    Zip_Zlib_Wrapper* field_1C_zip_stream_last_seeked;
     DWORD field_20;
     DWORD field_24;
     DWORD field_28;
@@ -103,8 +103,8 @@ struct Zip_Zlib_Wrapper
     ZipContext* field_0_zip_context;
     DWORD field_4;
     DWORD field_8_compression_method;
-    DWORD field_C_remaining_size;
-    DWORD field_10_32k_buffer_pos;
+    DWORD field_C_uncompressed_size;
+    DWORD field_10_compressed_size_avail;
     void* field_14_32k_stream_buffer;
     DWORD field_18_seeked_pos;
     z_stream field_1C_zstream;
@@ -237,9 +237,9 @@ void CC Zip_Stream_free_642B30(Zip_Zlib_Wrapper* pZipStream)
         }
     }
 
-    if (pZipContext->field_1C_zip_stream_last_opened == pZipStream)
+    if (pZipContext->field_1C_zip_stream_last_seeked == pZipStream)
     {
-        pZipContext->field_1C_zip_stream_last_opened = nullptr;
+        pZipContext->field_1C_zip_stream_last_seeked = nullptr;
     }
 
     --pZipContext->field_8_flags_or_counter;
@@ -678,7 +678,7 @@ MGS_FUNC_IMPLEX(0x00642DE0, Zip_Stream_Seek_642DE0, FS_IMPL)
 int CC Zip_zlib_create_642E10(Zip_Zlib_Wrapper* pZipStream, Zip_Mgs_File_Record* pFileRecord)
 {
     pZipStream->field_8_compression_method = pFileRecord->field_14_compression_method;
-    pZipStream->field_C_remaining_size = pFileRecord->field_0_uncompressed_size;
+    pZipStream->field_C_uncompressed_size = pFileRecord->field_0_uncompressed_size;
     if (!pZipStream->field_8_compression_method)
     {
         return 0;
@@ -687,7 +687,7 @@ int CC Zip_zlib_create_642E10(Zip_Zlib_Wrapper* pZipStream, Zip_Mgs_File_Record*
     const int initRet = inflateInit(&pZipStream->field_1C_zstream);
     if (initRet == Z_OK)
     {
-        pZipStream->field_10_32k_buffer_pos = pFileRecord->field_4_compressed_size;
+        pZipStream->field_10_compressed_size_avail = pFileRecord->field_4_compressed_size;
         return 0;
     }
 
@@ -750,10 +750,10 @@ Zip_Zlib_Wrapper* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileNam
     int err = 0;
     if (field_C_84_byte_ptr->field_14_32k_stream_buffer)
     {
-        if (Zip_Stream_Seek_642DE0(pZip->field_1C_zip_stream_last_opened) >= 0)
+        if (Zip_Stream_Seek_642DE0(pZip->field_1C_zip_stream_last_seeked) >= 0)
         {
             field_C_84_byte_ptr->field_18_seeked_pos = pRecord->field_C_offset_to_local_header;
-            pZip->field_1C_zip_stream_last_opened = field_C_84_byte_ptr;
+            pZip->field_1C_zip_stream_last_seeked = field_C_84_byte_ptr;
             if (_lseek(pZip->field_0_hMgzFile, pRecord->field_C_offset_to_local_header, 0) >= 0)
             {
                 if (_read(pZip->field_0_hMgzFile, field_C_84_byte_ptr->field_14_32k_stream_buffer, sizeof(Zip_Local_File_Header)) >= sizeof(Zip_Local_File_Header))
@@ -768,7 +768,7 @@ Zip_Zlib_Wrapper* CC OpenFileInMGZ_642BB0(ZipContext* pZip, const char* pFileNam
                     {
                         const WORD extra_field_length = Zip_ByteSwap_Word_6423C0(&pFileData->field_1C_extra_field_length);
                         const WORD filename_length = Zip_ByteSwap_Word_6423C0(&pFileData->field_1A_filename_length);
-                        if (_lseek(pZip->field_0_hMgzFile, filename_length + extra_field_length, 1u) >= 0)
+                        if (_lseek(pZip->field_0_hMgzFile, filename_length + extra_field_length, SEEK_CUR) >= 0)
                         {
                             err = Zip_zlib_create_642E10(field_C_84_byte_ptr, pRecord);
                             if (!err)
@@ -936,11 +936,131 @@ AbstractedFileHandle* CC File_LoadDirFile_51EE8F(const char* fileName, signed in
 }
 MGS_FUNC_IMPLEX(0x0051EE8F, File_LoadDirFile_51EE8F, FS_IMPL)
 
+int CC Zip_Read_File_642EA0(Zip_Zlib_Wrapper* pFileRecord, void* dstBuf, signed int nNumberOfBytesToRead)
+{
+    if (!pFileRecord || !pFileRecord->field_0_zip_context)
+    {
+        return 0;
+    }
+
+    const int remainderSize = pFileRecord->field_C_uncompressed_size;
+    int remainder = 0;
+    int actualSizeToRead = 0;
+    if (remainderSize <= nNumberOfBytesToRead)
+    {
+        // Trying to read more than is left in the file so cap to that
+        remainder = pFileRecord->field_C_uncompressed_size;
+        actualSizeToRead = remainderSize;
+    }
+    else
+    {
+        // Trying to read less than what is left in the file
+        actualSizeToRead = nNumberOfBytesToRead;
+        remainder = nNumberOfBytesToRead;
+    }
+
+    if (remainderSize)
+    {
+        // If the last used stream isn't this one then seek the zip file to the correct location as the 
+        // file handle is shared between all open zip streams.
+        if (pFileRecord->field_0_zip_context->field_1C_zip_stream_last_seeked != pFileRecord)
+        {
+            if (Zip_Stream_Seek_642DE0(pFileRecord->field_0_zip_context->field_1C_zip_stream_last_seeked) < 0
+                || _lseek(pFileRecord->field_0_zip_context->field_0_hMgzFile, pFileRecord->field_18_seeked_pos, 0) < 0)
+            {
+                pFileRecord->field_0_zip_context->field_4_last_err = -4119;
+                return -1;
+            }
+            pFileRecord->field_0_zip_context->field_1C_zip_stream_last_seeked = pFileRecord;
+        }
+
+        // Only attempt to decompress if the file is actually compressed
+        if (pFileRecord->field_8_compression_method)
+        {
+            // Set up zlib output size/buffer
+            pFileRecord->field_1C_zstream.avail_out = actualSizeToRead;
+            pFileRecord->field_1C_zstream.next_out = (Bytef*)dstBuf;
+
+            // Decompression loop
+            for(;;)
+            {
+                int sizeToRead = pFileRecord->field_10_compressed_size_avail;
+                if (sizeToRead > 0 && !pFileRecord->field_1C_zstream.avail_in)
+                {
+                    if (sizeToRead > 32768)
+                    {
+                        sizeToRead = 32768;
+                    }
+
+                    const int sizeRead = _read(pFileRecord->field_0_zip_context->field_0_hMgzFile, pFileRecord->field_14_32k_stream_buffer, sizeToRead);
+                    if (sizeRead <= 0)
+                    {
+                        pFileRecord->field_0_zip_context->field_4_last_err = -4120;
+                        return -1;
+                    }
+
+                    pFileRecord->field_10_compressed_size_avail -= sizeRead;
+                    pFileRecord->field_1C_zstream.avail_in = sizeRead;
+                    pFileRecord->field_1C_zstream.next_in = (Bytef*)pFileRecord->field_14_32k_stream_buffer;
+                }
+
+                const int prev_total_out = pFileRecord->field_1C_zstream.total_out;
+                const int infateRet = inflate(&pFileRecord->field_1C_zstream, Z_NO_FLUSH);
+                if (infateRet == Z_STREAM_END)
+                {
+                    pFileRecord->field_C_uncompressed_size = 0;
+                }
+                else
+                {
+                    if (infateRet) // Can only be Z_NEED_DICT?
+                    {
+                        pFileRecord->field_0_zip_context->field_4_last_err = infateRet;
+                        return -1;
+                    }
+                    pFileRecord->field_C_uncompressed_size += prev_total_out - pFileRecord->field_1C_zstream.total_out;
+                }
+
+                if (!pFileRecord->field_C_uncompressed_size || !pFileRecord->field_1C_zstream.avail_out)
+                {
+                    return remainder - pFileRecord->field_1C_zstream.avail_out;
+                }
+            }
+        }
+        else
+        {
+            // Uncompressed read
+            const int result = _read(pFileRecord->field_0_zip_context->field_0_hMgzFile, dstBuf, actualSizeToRead);
+            if (result <= 0)
+            {
+                if (result < 0)
+                {
+                    pFileRecord->field_0_zip_context->field_4_last_err = -4120;
+                }
+            }
+            else
+            {
+                pFileRecord->field_C_uncompressed_size -= result;
+            }
+            return result;
+        }
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x00642EA0, Zip_Read_File_642EA0, FS_IMPL)
+
 size_t CC File_NormalRead_51F0F5(AbstractedFileHandle* File, void* dstBuf, DWORD nNumberOfBytesToRead)
 {
-    if (File && File->mFile != (FILE *)-1 && File->mFile)
+    Zip_Open_File_Handle* h = reinterpret_cast<Zip_Open_File_Handle*>(File); // TODO: Fix this up
+    if (h >= &gZipStreams_dword_776960[0] && h <= &gZipStreams_dword_776960[31])
     {
-        return fread(dstBuf, 1, nNumberOfBytesToRead, File->mFile);
+        return Zip_Read_File_642EA0(h->field_0_pZipStream, dstBuf, nNumberOfBytesToRead);
+    }
+    else
+    {
+        if (File && File->mFile != (FILE *)-1 && File->mFile)
+        {
+            return fread(dstBuf, 1, nNumberOfBytesToRead, File->mFile);
+        }
     }
     return 0;
 }
