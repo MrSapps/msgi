@@ -13,12 +13,23 @@
 
 #undef ERROR
 
+#define LOGGING 1
+
+#ifdef LOGGING
 #define TRACE_ENTRYEXIT Logging::AutoLog __funcTrace(FNAME)
-#define LOG_TRACE(msg)LOG(INFO) << FNAME << " [T] " << msg
+#define LOG_TRACE(msg) LOG(INFO) << FNAME << " [T] " << msg
 #define LOG_INFO(msg) LOG(INFO) << FNAME << " [I] " << msg
 #define LOG_WARNING(msg) LOG(WARNING) << FNAME << " [W] " << msg
 #define LOG_ERROR(msg) LOG(ERROR) << FNAME << " [E] " << msg
 #define LOG_(msg) LOG(INFO) << msg;
+#else
+#define TRACE_ENTRYEXIT
+#define LOG_TRACE(msg)
+#define LOG_INFO(msg)
+#define LOG_WARNING(msg)
+#define LOG_ERROR(msg)
+#define LOG_(msg)
+#endif
 
 namespace Logging
 {

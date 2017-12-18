@@ -253,7 +253,7 @@ static void CreateImportStubs()
 }
 
 template <>
-static void CreateImportStubs<0>()
+void CreateImportStubs<0>()
 {
     MakeImportStub<0>();
 }
