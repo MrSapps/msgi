@@ -177,7 +177,7 @@ struct jimDeviceDDId
     DWORD field430;
     DWORD field434;
 };
-static_assert(sizeof(jimDeviceDDId) == 0x438, "jimUnk0x438 should be of size 0x438");
+MGS_ASSERT_SIZEOF(jimDeviceDDId, 0x438);
 
 struct jimDeviceIdentifier
 {
@@ -921,7 +921,7 @@ void CC Create_Arial_Font_423F1B(int cWidth, int cHeight)
 MGS_FUNC_IMPLEX(0x423F1B, Create_Arial_Font_423F1B, WINMAIN_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x00642382, int __stdcall(LPDDENUMCALLBACKEXA, LPVOID, DWORD), DirectDrawEnumerateExA_MGS);
-MGS_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write);
+MGS_FUNC_NOT_IMPL(0x51E382, int __cdecl(void*, int), File_msgvideocfg_Write_51E382);
 MGS_FUNC_NOT_IMPL(0x51E586, int __cdecl(void*, int), file_msgvideocfg_Write2);
 
 MGS_VAR(1, 0x68C3B8, DWORD, dword_68C3B8, 0);
@@ -930,7 +930,48 @@ MGS_ARY(1, 0x774B48, char, 1024, gErrStr_774B48, {});
 MGS_ARY(1, 0x776450, char, 1024, byte_776450, {});
 
 
-MGS_FUNC_NOT_IMPL(0x51E29B, int __cdecl(DDDEVICEIDENTIFIER2*, jimDeviceDDId*, int), File_msgvideocfg_Read);
+signed int CC File_msgvideocfg_Has_Device_51E29B(LPDDDEVICEIDENTIFIER2 pDeviceToFind, jimDeviceDDId* pReadDevice, int devIdx)
+{
+    if (pReadDevice && pDeviceToFind)
+    {
+        FILE* hFile = fopen("mgsvideo.cfg", "rb");
+        if (!hFile)
+        {
+            return 0;
+        }
+
+        if (devIdx >= 4)
+        {
+            fseek(hFile, sizeof(jimDeviceDDId) * 4, 0);
+            if (ftell(hFile) == sizeof(jimDeviceDDId) * 4)
+            {
+                while (fread(pReadDevice, 1u, sizeof(jimDeviceDDId), hFile) == sizeof(jimDeviceDDId))
+                {
+                    if (!memcmp(pDeviceToFind, pReadDevice, 0x430u))
+                    {
+                        fclose(hFile);
+                        return 1;
+                    }
+                }
+            }
+        }
+        else
+        {
+            fseek(hFile, sizeof(jimDeviceDDId) * devIdx, 0);
+            if (ftell(hFile) == static_cast<int>(sizeof(jimDeviceDDId) * devIdx)
+                && fread(pReadDevice, 1u, sizeof(jimDeviceDDId), hFile) == sizeof(jimDeviceDDId)
+                && !memcmp(pDeviceToFind, pReadDevice, 0x430u))
+            {
+                fclose(hFile);
+                return 1;
+            }
+        }
+
+        fclose(hFile);
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x51E29B, File_msgvideocfg_Has_Device_51E29B, WINMAIN_IMPL);
 
 
 //MSG_FUNC_NOT_IMPL(0x51E7FC, int __cdecl(LPD3DDEVICEDESC7, LPSTR, LPSTR, jimDeviceIdentifier*), validateDeviceCaps);
@@ -1208,7 +1249,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR /*lp
     strncpy(identifier.pDriverDescription, lpDriverDescription, 0x27);
     pDirectDraw->GetDeviceIdentifier(&identifier.ddIdentifier.identifier, 0);
 
-    int result = File_msgvideocfg_Read(&identifier.ddIdentifier.identifier, &Buf2, -1);
+    int result = File_msgvideocfg_Has_Device_51E29B(&identifier.ddIdentifier.identifier, &Buf2, -1);
     if (result != 0)
     {
         identifier.ddIdentifier.field430 = Buf2.field430;
@@ -1217,7 +1258,7 @@ BOOL WINAPI DDEnumCallbackEx(GUID *lpGUID, LPSTR lpDriverDescription, LPSTR /*lp
     {
         for (int i = 0; i < 4; i++)
         {
-            result = File_msgvideocfg_Read(&identifier.ddIdentifier.identifier, &Buf2, i);
+            result = File_msgvideocfg_Has_Device_51E29B(&identifier.ddIdentifier.identifier, &Buf2, i);
             if (result != 0)
             {
                 identifier.ddIdentifier.field430 = Buf2.field430;
@@ -1283,7 +1324,7 @@ int __cdecl jim_enumerate_devices()
         {
             memset(&Dst, 0, 0x438);
             memcpy(&Dst, &(g_pDeviceIdentifiers_776B68+varC)->ddIdentifier, 0x434);    // Copy of var18 is included by memcpying 4 bytes more
-            if (File_msgvideocfg_Write(&Dst, -1) == 0)
+            if (File_msgvideocfg_Write_51E382(&Dst, -1) == 0)
                 var8++;
 
             memset(g_pDeviceIdentifiers_776B68+varC, 0, 0x488);
@@ -1322,7 +1363,7 @@ int __cdecl jim_enumerate_devices()
                 var8++;
             }
         }
-        if (File_msgvideocfg_Write(&Buf1, varC) == 0)
+        if (File_msgvideocfg_Write_51E382(&Buf1, varC) == 0)
         {
             var8++;
         }
@@ -2725,6 +2766,7 @@ void ReplaceStdLib()
     MGS_REDIRECT(0x00539E20, realloc);
     MGS_REDIRECT(0x0053A400, free);
 
+    /*
     MGS_REDIRECT(0x0053C170, srand);
     MGS_REDIRECT(0x0053C180, rand);
     MGS_REDIRECT(0x0053C1C0, puts);
@@ -2739,26 +2781,30 @@ void ReplaceStdLib()
     MGS_REDIRECT(0x0053CEE0, fread);
     MGS_REDIRECT(0x0053D680, close);
     MGS_REDIRECT(0x0053DBE0, open);
-    //MGS_REDIRECT(0x0053E180, lseek);
+    MGS_REDIRECT(0x0053E180, lseek);
     MGS_REDIRECT(0x0053F3D0, fgets);
     MGS_REDIRECT(0x0053F510, fwrite); // LockedFileWrite
     MGS_REDIRECT(0x0053F550, fwrite);
     MGS_REDIRECT(0x0053F820, ftell);
-  /*
+  
     MGS_REDIRECT(0x0053FB30, _findfirst);
     MGS_REDIRECT(0x0053FC70, _findnext);
     MGS_REDIRECT(0x0053FDA0, _findclose);
+    */
 
+
+
+    //MGS_REDIRECT(0x0053D680, close);
+    //MGS_REDIRECT(0x0053D1A0, read);
+
+    // Not std lib - just varadic
+    MGS_REDIRECT(0x00520157, DebugLog);
+
+    /*
     MGS_REDIRECT(0x00540040, vsprintf);
     MGS_REDIRECT(0x00549920, _snprintf);
     MGS_REDIRECT(0x00549A20, _vsnprintf);
     */
-
-    MGS_REDIRECT(0x0053D680, close);
-   // MGS_REDIRECT(0x0053D1A0, read);
-
-    // Not std lib - just varadic
-    MGS_REDIRECT(0x00520157, DebugLog);
 }
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
