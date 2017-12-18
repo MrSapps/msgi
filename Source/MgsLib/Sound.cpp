@@ -39,7 +39,7 @@ MGS_VAR(REDIRECT_SOUND, 0x77E2F0, DWORD, dword_77E2F0, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2D8, DWORD, dword_77E2D8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2C0, IDirectSound*, gDSound_dword_77E2C0, nullptr);
 MGS_VAR(REDIRECT_SOUND, 0x77E1B0, IDirectSoundBuffer*, gSoundBuffer_dword_77E1B0, nullptr);
-MGS_VAR(REDIRECT_SOUND, 0x77E1B4, DWORD, dword_77E1B4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1B4, DWORD, gSoundBufferSize_77E1B4, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1C4, DWORD, dword_77E1C4, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D87C, DWORD, dword_77D87C, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1DC, DWORD, gBlockAlign_dword_77E1DC, 0);
@@ -281,7 +281,7 @@ MGS_VAR(REDIRECT_SOUND, 0x77E1B8, DWORD, dword_77E1B8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1CC, DWORD, dword_77E1CC, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1D8, DWORD, dword_77E1D8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D890, DWORD, gSndTime_dword_77D890, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1D4, DWORD, dword_77E1D4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D4, DWORD, gOffsetToLock_77E1D4, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2E4, DWORD, dword_77E2E4, 0);
 MGS_PTR(1, 0x68E2D0, float*, byte_68E2D0, nullptr); // XA K0 TODO: Figure out array size and dump it
 MGS_VAR(REDIRECT_SOUND, 0x77E300, double, dbl_77E300, 0);
@@ -449,7 +449,7 @@ signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample
     WAVEFORMATEX waveFormat;
 
     int blockAlign = bitsPerSample / 8 * numChannels;
-    dword_77E1B4 = (a5 + 4) * blockAlign * a4;
+    gSoundBufferSize_77E1B4 = (a5 + 4) * blockAlign * a4;
 
     if (gDSound_dword_77E2C0)
     {
@@ -463,7 +463,7 @@ signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample
         memset(&bufferDesc, 0, 36u);
         bufferDesc.dwSize = 36;
         bufferDesc.dwFlags = 0x100C8;
-        bufferDesc.dwBufferBytes = dword_77E1B4;
+        bufferDesc.dwBufferBytes = gSoundBufferSize_77E1B4;
         bufferDesc.lpwfxFormat = &waveFormat;
         gDSound_dword_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndBuffer_dword_77E0A0, 0);
     }
@@ -1232,7 +1232,7 @@ signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BY
         gSndBuffer_dword_77E0A0->Unlock(v7, v9, v6, v8);
     }
 
-    dword_77E1D4 = dword_77E1C4 * Size;
+    gOffsetToLock_77E1D4 = dword_77E1C4 * Size;
     dword_77D880 = dword_77E1C4 * Size;
     dword_77E1CC = 0;
     dword_77E1B8 = 0;
@@ -1783,24 +1783,24 @@ bool __cdecl Sound_Unknown4()
         v4 = gBlockAlign_dword_77E1DC * dword_77D87C;
         dword_77D880 += gBlockAlign_dword_77E1DC * dword_77D87C;
         gSndBuffer_dword_77E0A0->GetCurrentPosition(&pos, 0);
-        if (dword_77E1B8 - pos > dword_77E1B4 / 2)
+        if (dword_77E1B8 - pos > gSoundBufferSize_77E1B4 / 2)
         {
             ++dword_77E1CC;
         }
         dword_77E1B8 = pos;
-        v2 = dword_77E1C4 * v4 + pos + dword_77E1B4 * dword_77E1CC;
+        v2 = dword_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * dword_77E1CC;
         ret = dword_77D880 < v2 || dword_77D880 > v4 + v2;
         while (dword_77D880 >= v2 && dword_77D880 <= v4 + v2)
         {
             gSndBuffer_dword_77E0A0->GetCurrentPosition(&pos, 0);
-            if (dword_77E1B8 - pos > dword_77E1B4 / 2)
+            if (dword_77E1B8 - pos > gSoundBufferSize_77E1B4 / 2)
             {
                 ++dword_77E1CC;
             }
             dword_77E1B8 = pos;
 
             // dead statement?
-            v2 = dword_77E1C4 * v4 + pos + dword_77E1B4 * dword_77E1CC;
+            v2 = dword_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * dword_77E1CC;
         }
     }
     else
@@ -1822,18 +1822,16 @@ int __cdecl Sound_Unknown5(int a1, int /*a2*/, BYTE*(__cdecl* fnRead)(DWORD))
     DWORD sndBufSize;
     void *Dst;
     DWORD Size;
-    int v8;
-    BYTE *Src;
 
-    Src = fnRead(a1);
+    BYTE* Src = fnRead(a1);
     if (Src)
     {
-        v8 = gBlockAlign_dword_77E1DC * dword_77D87C;
+        const int numBytesToLock = gBlockAlign_dword_77E1DC * dword_77D87C;
         if (gSndBuffer_dword_77E0A0)
         {
             if (gSndBuffer_dword_77E0A0->Lock(
-                dword_77E1D4,
-                v8,
+                gOffsetToLock_77E1D4,
+                numBytesToLock,
                 &Dst,
                 &Size,
                 &sndPtr,
@@ -1842,8 +1840,8 @@ int __cdecl Sound_Unknown5(int a1, int /*a2*/, BYTE*(__cdecl* fnRead)(DWORD))
             {
                 gSndBuffer_dword_77E0A0->Restore();
                 gSndBuffer_dword_77E0A0->Lock(
-                    dword_77E1D4,
-                    v8,
+                    gOffsetToLock_77E1D4,
+                    numBytesToLock,
                     &Dst,
                     &Size,
                     &sndPtr,
@@ -1863,11 +1861,11 @@ int __cdecl Sound_Unknown5(int a1, int /*a2*/, BYTE*(__cdecl* fnRead)(DWORD))
             gSndBuffer_dword_77E0A0->Unlock(Dst, Size, sndPtr, sndBufSize);
         }
         
-        dword_77E1D4 += v8;
+        gOffsetToLock_77E1D4 += numBytesToLock;
 
-        if (dword_77E1D4 >= dword_77E1B4)
+        if (gOffsetToLock_77E1D4 >= gSoundBufferSize_77E1B4)
         {
-            dword_77E1D4 = 0;
+            gOffsetToLock_77E1D4 = 0;
         }
     }
     return dword_77E1D8++ + 1;

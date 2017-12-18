@@ -83,7 +83,7 @@ MGS_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
 
 
 MGS_FUNC_NOT_IMPL(0x0042B6A0, signed int __stdcall (GUID*, LPVOID*, const IID *const, IUnknown*), DirectDrawCreateExMGS);
-MGS_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg);
+MGS_FUNC_NOT_IMPL(0x004331D4, signed int __cdecl(), ParseMsgCfg_4331D4);
 MGS_FUNC_NOT_IMPL(0x00433801, signed int __cdecl(), sub_433801);
 MGS_FUNC_NOT_IMPL(0x0043C850, unsigned int __cdecl(), CheckJoyStickError_43C850);
 MGS_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
@@ -1470,7 +1470,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         v34 = 1;
     fputs("jim_read_config_from_file\n", gFile);
     fflush(gFile);
-    if (ParseMsgCfg())
+    if (ParseMsgCfg_4331D4())
     {
         dword_651CF8 = 0;
         fputs(" . done\n", gFile);
@@ -1526,7 +1526,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             gWindowedMode = 0;
             sub_433801();
             v34 = gWindowedMode;
-        dword_651CF8 = ParseMsgCfg() == 0;
+        dword_651CF8 = ParseMsgCfg_4331D4() == 0;
     }
     CheckJoyStickError_43C850();
     if (dword_651CF8)
@@ -2758,6 +2758,11 @@ static void RunTests()
     DoFsTests();
 }
 
+int Sink()
+{
+    return 0;
+}
+
 void ReplaceStdLib()
 {
     if (!IsMgsi())
@@ -2765,12 +2770,13 @@ void ReplaceStdLib()
         return;
     }
 
-    MGS_REDIRECT(0x005398F0, printf);
+   // MGS_REDIRECT(0x005398F0, printf);
     MGS_REDIRECT(0x00539990, malloc);
     MGS_REDIRECT(0x00539DA0, calloc);
     MGS_REDIRECT(0x00539E20, realloc);
     MGS_REDIRECT(0x0053A400, free);
 
+   // MGS_REDIRECT(0x0053DBE0, Sink);
     /*
     MGS_REDIRECT(0x0053C170, srand);
     MGS_REDIRECT(0x0053C180, rand);
@@ -2803,7 +2809,7 @@ void ReplaceStdLib()
     //MGS_REDIRECT(0x0053D1A0, read);
 
     // Not std lib - just varadic
-    MGS_REDIRECT(0x00520157, DebugLog);
+   // MGS_REDIRECT(0x00520157, DebugLog);
 
     /*
     MGS_REDIRECT(0x00540040, vsprintf);

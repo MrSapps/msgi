@@ -758,7 +758,7 @@ HRESULT CC Input_Init(HWND hWnd)
 MGS_FUNC_IMPLEX(0x0043B1D1, Input_Init, INPUT_IMPL);
 
 
-void CC Input_Start()
+void CC Input_Start_42D69E()
 {
     dword_717348 = 0;
     const HRESULT hr = Input_Init(gHwnd);
@@ -767,7 +767,7 @@ void CC Input_Start()
         printf("$jim failed to init direct input");
     }
 }
-MGS_FUNC_IMPLEX(0x0042D69E, Input_Start, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x0042D69E, Input_Start_42D69E, INPUT_IMPL);
 
 void __cdecl Input_AcquireOrUnAcquire()
 {
