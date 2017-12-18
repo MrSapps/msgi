@@ -78,7 +78,7 @@ void CC LibGV_40A4B1()
 }
 MGS_FUNC_IMPLEX(0x40A4B1, LibGV_40A4B1, LIBGV_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x40B734, int CC(void*, int), Gv_hzm_file_handler_40B734);
+MGS_FUNC_NOT_IMPL(0x40B734, int CC(void*, WORD), Gv_hzm_file_handler_40B734);
 
 void CC LibGV_Init_FileCache_40A6AC()
 {

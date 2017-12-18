@@ -13,7 +13,7 @@
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
 MGS_VAR(1, 0x7227A4, int, gGameOverTimer_dword_7227A4, 0);
-MGS_VAR(1, 0x6BFBB4, int, gScriptFileNameHashedToLoad_6BFBB4, 0);
+MGS_VAR(1, 0x6BFBB4, WORD, gScriptFileNameHashedToLoad_6BFBB4, 0);
 
 #define SCRIPT_IMPL true
 
@@ -1039,7 +1039,7 @@ int CC Script_Init_sub_409C19(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x00409C19, Script_Init_sub_409C19, SCRIPT_IMPL);
 
-signed int CC GV_gcx_file_handler_4090CF(void* pScript, int fileNameHashed)
+signed int CC GV_gcx_file_handler_4090CF(void* pScript, WORD fileNameHashed)
 {
     if (fileNameHashed == gScriptFileNameHashedToLoad_6BFBB4)
     {

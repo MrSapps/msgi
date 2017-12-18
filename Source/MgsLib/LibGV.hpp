@@ -6,7 +6,7 @@
 void DoLibGv_Tests();
 void LibGVCpp_ForceLink();
 
-using GV_FnPtr = int(__cdecl*)(void*, int);
+using GV_FnPtr = int(__cdecl*)(void*, WORD);
 
 struct LibGV_Msg
 {

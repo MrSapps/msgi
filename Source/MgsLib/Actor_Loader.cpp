@@ -10,6 +10,7 @@
 #include "Fs.hpp"
 #include "Psx.hpp"
 #include "Renderer.hpp"
+#include "pcx.hpp"
 #include <gmock/gmock.h>
 
 #define ACTOR_LOADER_IMPL true
@@ -461,128 +462,6 @@ void CC Res_loader_Create_457BDD(const char* strStageName)
     gLoaderState_dword_9942B8 = 0;
 }
 MGS_FUNC_IMPLEX(0x457BDD, Res_loader_Create_457BDD, ACTOR_LOADER_IMPL);
-
-struct HiTexRecord
-{
-    DWORD field_0_id;
-    DWORD field_4_is_in_use;
-    char* field_8_name;
-};
-MGS_ASSERT_SIZEOF(HiTexRecord, 0xC);
-
-MGS_VAR(1, 0x734A30, DWORD, gNum_HiTexs_dword_734A30, 0);
-MGS_ARY(1, 0x9956A0, HiTexRecord, 8192, gHiText_recs_9956A0, {});
-
-void CC File_HITEXT_INIT_51D2ED()
-{
-    // Free existing HiTex entries
-    for (DWORD i = 0; i < gNum_HiTexs_dword_734A30; i++)
-    {
-        free(gHiText_recs_9956A0[i].field_8_name);
-        gHiText_recs_9956A0[i].field_0_id = 0;
-        const bool dword_6893D4_is_zero = dword_6893D4 == 0;
-        if (!dword_6893D4_is_zero)
-        {
-            gHiText_recs_9956A0[i].field_4_is_in_use = 0;
-        }
-    }
-
-    dword_6893D4 = 0;
-    gNum_HiTexs_dword_734A30 = 0;
-
-    FILE* hFile = fopen("hitex.dir", "rt");
-    if (!hFile)
-    {
-        return;
-    }
-
-    char fileBuffer[256];
-    for (;;)
-    {
-        memset(fileBuffer, 0, sizeof(fileBuffer));
-        fgets(fileBuffer, 256, hFile);
-
-        // Remove any trailing line feed
-        char* newLinePos = strchr(fileBuffer, '\r');
-        if (newLinePos)
-        {
-            *newLinePos = 0;
-        }
-
-        // Remove any trailing new line
-        newLinePos = strchr(fileBuffer, '\n');
-        if (newLinePos)
-        {
-            *newLinePos = 0;
-        }
-
-        // Bail if no more data
-        if (!*fileBuffer)
-        {
-            break;
-        }
-
-        // Replace \\ with /
-        char* tmp = fileBuffer;
-        while (*tmp)
-        {
-            if (*tmp == '\\')
-            {
-                *tmp = '/';
-            }
-            tmp++;
-        }
-
-        gHiText_recs_9956A0[gNum_HiTexs_dword_734A30].field_8_name = _strdup(fileBuffer);
-        const DWORD id = HiTexHash_51D47A(fileBuffer);
-        const DWORD idx = gNum_HiTexs_dword_734A30;
-        gHiText_recs_9956A0[idx].field_0_id = id;
-        printf("HITEX_INIT: Id: %-5d Name: %s\n", id, gHiText_recs_9956A0[idx].field_8_name);
-        gNum_HiTexs_dword_734A30++;
-    }
-
-    fclose(hFile);
-}
-MGS_FUNC_IMPLEX(0x0051D2ED, File_HITEXT_INIT_51D2ED, ACTOR_LOADER_IMPL);
-
-const char* CC HITEX_NAME_51D4BC(DWORD id)
-{
-    for (DWORD i = 0; i < gNum_HiTexs_dword_734A30; i++)
-    {
-        if (gHiText_recs_9956A0[i].field_4_is_in_use && gHiText_recs_9956A0[i].field_0_id == id)
-        {
-            printf("HITEX_NAME: Id: %-5d Name: %s\n", id, gHiText_recs_9956A0[i].field_8_name);
-            return gHiText_recs_9956A0[i].field_8_name;
-        }
-    }
-    return nullptr;
-}
-MGS_FUNC_IMPLEX(0x0051D4BC, HITEX_NAME_51D4BC, ACTOR_LOADER_IMPL);
-
-void CC Res_loader_EnableHiTex_51D1DB(const char* pcxName)
-{
-    for (DWORD i = 0; i < gNum_HiTexs_dword_734A30; i++)
-    {
-        const char* tgaName = strchr(gHiText_recs_9956A0[i].field_8_name, '/');
-        if (tgaName)
-        {
-            // Consume the /
-            tgaName++;
-        }
-        if (*tgaName)
-        {
-            if (strlen(tgaName) == strlen(pcxName))
-            {
-                if (strncmp(tgaName, pcxName, strlen(tgaName) - 3) == 0)
-                {
-                    gHiText_recs_9956A0[i].field_4_is_in_use = 1;
-                    return;
-                }
-            }
-        }
-    }
-}
-MGS_FUNC_IMPLEX(0x51D1DB, Res_loader_EnableHiTex_51D1DB, ACTOR_LOADER_IMPL);
 
 static void Res_loader_Is_Extension_4088F2_Test()
 {

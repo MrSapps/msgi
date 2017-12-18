@@ -2760,6 +2760,11 @@ static void RunTests()
 
 void ReplaceStdLib()
 {
+    if (!IsMgsi())
+    {
+        return;
+    }
+
     MGS_REDIRECT(0x005398F0, printf);
     MGS_REDIRECT(0x00539990, malloc);
     MGS_REDIRECT(0x00539DA0, calloc);

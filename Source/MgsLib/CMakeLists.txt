@@ -50,6 +50,8 @@ add_library(MgsLib
     Timer.cpp
     Timer.hpp
     types.hpp
+    pcx.cpp
+    pcx.hpp
     WinMain.cpp)
 
 target_include_directories(MgsLib PUBLIC

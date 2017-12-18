@@ -16,6 +16,20 @@ struct Res_Init_Record
 };
 MGS_ASSERT_SIZEOF(Res_Init_Record, 0x8);
 
+struct Texture_Record
+{
+    WORD mHashedName;
+    BYTE mUsed;
+    BYTE mNumColours;
+    WORD mTPage;
+    WORD mClut;
+    BYTE u0;
+    BYTE v0;
+    BYTE u1;
+    BYTE v1;
+};
+MGS_ASSERT_SIZEOF(Texture_Record, 0xC);
+
 struct LibDG_Struct
 {
     Actor mBase;
@@ -170,7 +184,7 @@ MGS_VAR_EXTERN(struct_gv, gLibGVStruct2_6BC558);
 MGS_ARY_EXTERN(DWORD, 2, dword_6BED18);
 
 
-signed int CC GV_bin_file_handler_44E9D2(void* pData, int fileNameHash);
+signed int CC GV_bin_file_handler_44E9D2(void* pData, WORD fileNameHash);
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B();
 void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C();
 ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName);
@@ -183,3 +197,4 @@ void CC LibDG_ClearTexturesCache_402487();
 void CC LibDG_Restore_Textures_From_Resident_Memory_40274C();
 void CC LibDG_Save_Texture_Hashes_To_Resident_Memory_4026F5();
 void CC LibDG_Clear_Resident_Texture_Cache_Copy_4026E6();
+signed int CC LibDG_SearchForTextureRecord_4024D2(signed int hashCode, Texture_Record** ppFreeItem);
