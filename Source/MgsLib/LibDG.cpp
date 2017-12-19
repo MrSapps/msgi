@@ -790,13 +790,13 @@ void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
     
     sub_40A857(); // Probably input related as input no longer works if not called?
 
-    dword_995324 = (int)&dword_7919C0;
+    gArrayPtr_dword_995324 = (int)&dword_7919C0;
 
     if (byte_9942AB & 0x10)
     {
         if (word_7919C2[7] | word_7919C2[9])
         {
-            dword_995324 = (int)&word_7919C2[7];
+            gArrayPtr_dword_995324 = (int)&word_7919C2[7];
         }
     }
 

@@ -37,7 +37,7 @@ MGS_VAR(1, 0x78E7FC, short, gLoadItemFuncIdx_word_78E7FC, 0);
 
 MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
 MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
-MGS_VAR(1, 0x995324, DWORD, dword_995324, 0);
+MGS_VAR(1, 0x995324, DWORD, gArrayPtr_dword_995324, 0);
 MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
 MGS_VAR(1, 0x78E960, BYTE*, gResidentTop_dword_78E960, 0);
 MGS_VAR(1, 0x78E964, BYTE*, gSavedTop_78E964, 0);
@@ -124,13 +124,10 @@ static void GameD_Update_helper(DWORD buttons)
     }
     if (game_state_dword_72279C & 0x80000000)
     {
-        LOG_WARNING("Not implemented");
-        //abort();
-        /* TODO
-        if (gArrayPtr_dword_995324[2].field_2 & 0x840)
+        if ( *(WORD *)(gArrayPtr_dword_995324 + 34) & 0x840 )
         {
-        StreamActorStop_4583BB();
-        }*/
+            StreamActorStop_4583BB();
+        }
     }
     if (GameD_Input_445610() & 0x20)
     {
@@ -336,14 +333,10 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
         {
             if (!(gActorPauseFlags_dword_791A0C & 0xFD))
             {
-                LOG_WARNING("Not implemented");
-                //abort();
-                // TODO
-                /*
-                if (gArrayPtr_dword_995324->field_2 & 0x800)
+                if ( *(WORD *)(gArrayPtr_dword_995324 + 2) & 0x800 )
                 {
                     sub_44E969();
-                }*/
+                }
             }
         }
         GameD_update_helper_44F28B();
@@ -528,7 +521,7 @@ void CC Init_Gamed_Create_44E12B()
     sub_44E287();
     Reset_GV_DG_44E212();
     word_78E7E8 = (WORD)(dword_78D7B0 + 1);
-    dword_995324 = (int)&dword_7919C0;
+    gArrayPtr_dword_995324 = (int)&dword_7919C0;
     SaveResidentTop_40B36E();
     gGameD_stru_722760.gamed_unk_722780 = 0;
     gGameD_stru_722760.gamed_unk_722784 = 0;

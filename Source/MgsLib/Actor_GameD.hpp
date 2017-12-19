@@ -10,7 +10,7 @@ void CC Stage_LoadRelated_44EB27(WORD stageNameHashed, const char* pStageName);
 const char* CC File_StageName_44EB83();
 
 MGS_VAR_EXTERN(int, dword_78D7B0);
-MGS_VAR_EXTERN(DWORD, dword_995324);
+MGS_VAR_EXTERN(DWORD, gArrayPtr_dword_995324);
 MGS_VAR_EXTERN(DWORD, dword_7919C0);
 MGS_VAR_EXTERN(int, gLoaderState_dword_9942B8);
 MGS_VAR_EXTERN(BYTE*, gResidentTop_dword_78E960);
