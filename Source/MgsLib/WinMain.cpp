@@ -2820,13 +2820,13 @@ void ReplaceStdLib()
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
-   // DisableImports();
+    // DisableImports();
     ReplaceStdLib();
 
     ::testing::GTEST_FLAG(throw_on_failure) = true;
     int argCount = 0;
     ::testing::InitGoogleMock(&argCount, &lpCmdLine);
-   
+
     el::Loggers::addFlag(el::LoggingFlag::ColoredTerminalOutput);
     el::Configurations conf;
     conf.setToDefault();
@@ -2876,202 +2876,188 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     Force_Actor_Movie_Cpp_Link();
 
     InstallVaradicCFunctionHooks();
-    
+
 
     RunTests();
 
-    if (!FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
-    {
-        gCmdLine = lpCmdLine;
-        bRestart = strstr(gCmdLine, "-restart");
-        if (bRestart)
-            *bRestart = 0;
-        Buffer.dwLength = 32;
-        GlobalMemoryStatus(&Buffer);
-        if (Buffer.dwAvailPageFile >= 0x4000000)// 50mb hard disk space check
-        {
-            hKernel32 = LoadLibraryA("KERNEL32.DLL");
-            if (hKernel32)
-            {
-                pSetProcessAffinityMask = (void(__stdcall *)(HANDLE, signed int))GetProcAddress(
-                    hKernel32,
-                    "SetProcessAffinityMask");
-                pSetThreadExecutionState = (void(__stdcall *)(unsigned int))GetProcAddress(
-                    hKernel32,
-                    "SetThreadExecutionState");
-                if (pSetProcessAffinityMask)
-                {
-                    // Only execute on the first CPU
-                    pSetProcessAffinityMask(GetCurrentProcess(), 1);
-                }
-                if (pSetThreadExecutionState)
-                {
-                    pSetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
-                }
-                FreeLibrary(hKernel32);
-            }
-            CheckForMmf(dword_787774, dword_787778);
-            
-            gFlags_dword_78E7E4 |= 0x4000u;
-            gFlags_dword_78E7E4 |= 0x100u;
-
-            _strlwr(lpCmdLine);
-            _chdir(".");
-            dword_78D7B0 = -1;
-            if (strstr(lpCmdLine, "-nocrashcheck"))
-                gCrashCheck = 0;
-            else
-                gCrashCheck = 1;
-            if (strstr(lpCmdLine, "-cheatenable"))
-                gCheatsEnabled = 1;
-            else
-                gCheatsEnabled = 0;
-            if (strstr(lpCmdLine, "-nocd"))
-                gNoCdEnabled = 1;
-            else
-                gNoCdEnabled = 0;
-            WndClass.style = 3;
-            WndClass.lpfnWndProc = MainWindowProc;
-            WndClass.cbClsExtra = 0;
-            WndClass.cbWndExtra = 0;
-            WndClass.hInstance = hInstance;
-            WndClass.hIcon = LoadIconA(hInstance, (LPCSTR)0x65);
-            WndClass.hCursor = 0;
-            WndClass.hbrBackground = (HBRUSH)GetStockObject(4);
-            WndClass.lpszMenuName = 0;
-            WndClass.lpszClassName = "Metal Gear Solid PC";
-            if (RegisterClassA(&WndClass))
-            {
-                gWindowedMode = 0;
-                if (strstr(lpCmdLine, off_688DB8))
-                    dword_6FC7A0 = 58; // "Normal" path, in real game setting this to zero seems to be impossible
-                else
-                    dword_6FC7A0 = 0;
-                if (strstr(lpCmdLine, "-noeffects"))
-                    gNoEffects = 0;
-                if (strstr(lpCmdLine, "-320"))
-                    gXRes = 1.0;
-                if (strstr(lpCmdLine, "-800"))
-                    gXRes = 2.5;
-                if (strstr(lpCmdLine, "-nofilter"))
-                    gNoFilter = 0;
-                if (strstr(lpCmdLine, "-nomod2x"))
-                    gModX2 = 0;
-                if (strstr(lpCmdLine, "-mod2x"))
-                    gModX2 = 1;
-                if (strstr(lpCmdLine, "-notruetype"))
-                    gNoTrueType = 0;
-                if (strstr(lpCmdLine, "-1024"))
-                    gXRes = 3.200000047683716;
-                if (strstr(lpCmdLine, "-fps"))
-                    gFps = 1;
-                if (strstr(lpCmdLine, "-colorkey"))
-                    gColourKey = 1;
-                v11 = strstr(lpCmdLine, "-blend");
-                if (v11)
-                {
-                    v11 += 6;
-                    gBlendMode = atoi(v11);
-                }
-                if (strstr(lpCmdLine, "-lowres"))
-                    gLowRes = 1;
-                if (strstr(lpCmdLine, off_688D40))
-                    gWindowedMode = 0;
-                if (strstr(lpCmdLine, "-w"))
-                    gWindowedMode = 1;
-                if (strstr(lpCmdLine, "-soft"))
-                    gSoftwareRendering = 1;
-                else
-                    gSoftwareRendering = 0;
-
-                // HACK: Set some options that allow the game to actually start for now
-                gCheatsEnabled = 1;
-                gCrashCheck = 0;
-                gSoftwareRendering = 0;
-                gNoCdEnabled = 1;
-                gFps = 1;
-                
-                gWindowedMode = 1;
-                gModX2 = 1;
-                gLowRes = 1;
-              
-
-                gHwnd = CreateWindowExA(
-                    0,
-                    WndClass.lpszClassName,
-                    "Metal Gear Solid PC",
-                    WS_POPUP | WS_CAPTION | WS_SYSMENU,
-                    CW_USEDEFAULT, // x
-                    CW_USEDEFAULT, // y
-                    CW_USEDEFAULT, // w
-                    CW_USEDEFAULT, // h
-                    0,
-                    0,
-                    hInstance,
-                    0);
-                if (gHwnd)
-                {
-                    CentreWindow(gHwnd, 640, 480);
-                    ShowWindow(gHwnd, SW_SHOW);
-                    UpdateWindow(gHwnd);
-                    gHInstance = hInstance;
-                    if (DoInitAll())
-                    {
-                        if (Sound_Init(gHwnd) || AskUserToContinueIfNoSoundCard())
-                        {
-                            Sound_SetSoundVolume(gSoundFxVol_dword_651D98);
-                            Sound_SetSoundMusicVolume(gMusicVol_dword_716F68);
-                            Timer_30_1();
-
-                            /* HACK: Leave cursor showing while developing
-                            for (i = 1024; i && ShowCursor(0) >= 0; --i)// some hack to hide the cursor
-                            {
-
-                            }
-                            */
-
-                            DoMain();
-                            result = 0;
-                        }
-                        else
-                        {
-                            DoClearAll();
-                            result = 0;
-                        }
-                    }
-                    else
-                    {
-                        DoClearAll();
-                        result = 0;
-                    }
-                }
-                else
-                {
-                    result = 1;
-                }
-            }
-            else
-            {
-                result = 1;
-            }
-        }
-        else
-        {
-            sprintf(
-                Dest,
-                "Metal Gear Solid requires over 50mb of hard disk space as Virtual Memory before the game can function correctly. This system currently only has %dmb available.  Please close all open applications not in use,  and refer to the Metal Gear Solid readme for more information on this issue.",
-                (Buffer.dwAvailPageFile - Buffer.dwAvailPhys) >> 20);
-            MessageBoxA(0, Dest, "Metal Gear Solid PC", MB_OK);
-            result = 0;
-        }
-    }
-    else
+    if (FindWindowA("Metal Gear Solid PC", "Metal Gear Solid PC") || strstr(lpCmdLine, "-restart"))
     {
         MessageBoxA(
             0,
             "Another copy of Metal Gear Solid Integral or VR missions is running, please exit first.",
             "Metal Gear Solid PC",
             MB_OK);
+        return 0;
+    }
+
+    gCmdLine = lpCmdLine;
+    bRestart = strstr(gCmdLine, "-restart");
+    if (bRestart)
+    {
+        *bRestart = 0;
+    }
+
+    Buffer.dwLength = 32;
+    GlobalMemoryStatus(&Buffer);
+    if (Buffer.dwAvailPageFile < 0x4000000)// 50mb hard disk space check
+    {
+        sprintf(
+            Dest,
+            "Metal Gear Solid requires over 50mb of hard disk space as Virtual Memory before the game can function correctly. This system currently only has %dmb available.  Please close all open applications not in use,  and refer to the Metal Gear Solid readme for more information on this issue.",
+            (Buffer.dwAvailPageFile - Buffer.dwAvailPhys) >> 20);
+        MessageBoxA(0, Dest, "Metal Gear Solid PC", MB_OK);
+        return 0;
+    }
+
+    hKernel32 = LoadLibraryA("KERNEL32.DLL");
+    if (hKernel32)
+    {
+        pSetProcessAffinityMask = (decltype(pSetProcessAffinityMask))GetProcAddress(hKernel32, "SetProcessAffinityMask");
+        pSetThreadExecutionState = (decltype(pSetThreadExecutionState))GetProcAddress(hKernel32, "SetThreadExecutionState");
+        if (pSetProcessAffinityMask)
+        {
+            // Only execute on the first CPU
+            pSetProcessAffinityMask(GetCurrentProcess(), 1);
+        }
+        if (pSetThreadExecutionState)
+        {
+            pSetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
+        }
+        FreeLibrary(hKernel32);
+    }
+    CheckForMmf(dword_787774, dword_787778);
+
+    gFlags_dword_78E7E4 |= 0x4000u;
+    gFlags_dword_78E7E4 |= 0x100u;
+
+    _strlwr(lpCmdLine);
+    _chdir(".");
+    dword_78D7B0 = -1;
+
+    gCrashCheck = strstr(lpCmdLine, "-nocrashcheck") != nullptr;
+    gCheatsEnabled = strstr(lpCmdLine, "-cheatenable") != nullptr;
+    gNoCdEnabled = strstr(lpCmdLine, "-nocd") != nullptr;
+
+
+    WndClass.style = 3;
+    WndClass.lpfnWndProc = MainWindowProc;
+    WndClass.cbClsExtra = 0;
+    WndClass.cbWndExtra = 0;
+    WndClass.hInstance = hInstance;
+    WndClass.hIcon = LoadIconA(hInstance, (LPCSTR)0x65);
+    WndClass.hCursor = 0;
+    WndClass.hbrBackground = (HBRUSH)GetStockObject(4);
+    WndClass.lpszMenuName = 0;
+    WndClass.lpszClassName = "Metal Gear Solid PC";
+    if (!RegisterClassA(&WndClass))
+    {
+        return 1;
+    }
+
+    gWindowedMode = 0;
+    if (strstr(lpCmdLine, off_688DB8))
+        dword_6FC7A0 = 58; // "Normal" path, in real game setting this to zero seems to be impossible
+    else
+        dword_6FC7A0 = 0;
+    if (strstr(lpCmdLine, "-noeffects"))
+        gNoEffects = 0;
+    if (strstr(lpCmdLine, "-320"))
+        gXRes = 1.0;
+    if (strstr(lpCmdLine, "-800"))
+        gXRes = 2.5;
+    if (strstr(lpCmdLine, "-nofilter"))
+        gNoFilter = 0;
+    if (strstr(lpCmdLine, "-nomod2x"))
+        gModX2 = 0;
+    if (strstr(lpCmdLine, "-mod2x"))
+        gModX2 = 1;
+    if (strstr(lpCmdLine, "-notruetype"))
+        gNoTrueType = 0;
+    if (strstr(lpCmdLine, "-1024"))
+        gXRes = 3.200000047683716;
+    if (strstr(lpCmdLine, "-fps"))
+        gFps = 1;
+    if (strstr(lpCmdLine, "-colorkey"))
+        gColourKey = 1;
+    v11 = strstr(lpCmdLine, "-blend");
+    if (v11)
+    {
+        v11 += 6;
+        gBlendMode = atoi(v11);
+    }
+    if (strstr(lpCmdLine, "-lowres"))
+        gLowRes = 1;
+    if (strstr(lpCmdLine, off_688D40))
+        gWindowedMode = 0;
+    if (strstr(lpCmdLine, "-w"))
+        gWindowedMode = 1;
+    if (strstr(lpCmdLine, "-soft"))
+        gSoftwareRendering = 1;
+    else
+        gSoftwareRendering = 0;
+
+    // HACK: Set some options that allow the game to actually start for now
+    gCheatsEnabled = 1;
+    gCrashCheck = 0;
+    gSoftwareRendering = 0;
+    gNoCdEnabled = 1;
+    gFps = 1;
+
+    gWindowedMode = 1;
+    gModX2 = 1;
+    gLowRes = 1;
+
+
+    gHwnd = CreateWindowExA(
+        0,
+        WndClass.lpszClassName,
+        "Metal Gear Solid PC",
+        WS_POPUP | WS_CAPTION | WS_SYSMENU,
+        CW_USEDEFAULT, // x
+        CW_USEDEFAULT, // y
+        CW_USEDEFAULT, // w
+        CW_USEDEFAULT, // h
+        0,
+        0,
+        hInstance,
+        0);
+
+    if (!gHwnd)
+    {
+        return 1;
+    }
+
+    CentreWindow(gHwnd, 640, 480);
+    ShowWindow(gHwnd, SW_SHOW);
+    UpdateWindow(gHwnd);
+    gHInstance = hInstance;
+    if (DoInitAll())
+    {
+        if (Sound_Init(gHwnd) || AskUserToContinueIfNoSoundCard())
+        {
+            Sound_SetSoundVolume(gSoundFxVol_dword_651D98);
+            Sound_SetSoundMusicVolume(gMusicVol_dword_716F68);
+            Timer_30_1();
+
+            /* HACK: Leave cursor showing while developing
+            for (i = 1024; i && ShowCursor(0) >= 0; --i)// some hack to hide the cursor
+            {
+
+            }
+            */
+
+            DoMain();
+            result = 0;
+        }
+        else
+        {
+            DoClearAll();
+            result = 0;
+        }
+    }
+    else
+    {
+        DoClearAll();
         result = 0;
     }
 
