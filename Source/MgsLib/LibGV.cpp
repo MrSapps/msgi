@@ -7,6 +7,7 @@
 #include "Actor_Loader.hpp"
 #include "ResourceNameHash.hpp"
 #include "Actor_GameD.hpp"
+#include "WinMain.hpp"
 #include <gmock/gmock.h>
 
 #define REDIRECT_LIBGV_DATA 1
@@ -140,7 +141,6 @@ MGS_FUNC_IMPLEX(0x40A662, LibGV_AddFileDataToCache_40A662, LIBGV_IMPL);
 
 
 MGS_VAR(REDIRECT_LIBGV_DATA, 0x791A04, DWORD, gFrameTime_dword_791A04, 0);
-MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
 void* CC LibGV_FindFile_40A603(int hash)
 {

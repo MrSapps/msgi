@@ -3,22 +3,13 @@
 #include "LibDG.hpp"
 #include "Script.hpp"
 #include "Timer.hpp"
+#include "WinMain.hpp"
 #include <time.h>
 
 #define RENDERER_IMPL true
 
 void RendererCpp_ForceLink() { }
 
-extern HWND& gHwnd; // WinMain.cpp
-extern DWORD& gWindowedMode; // WinMain.cpp
-MGS_VAR_EXTERN(DWORD, counter_dword_6BED20); // WinMain.cpp
-MGS_VAR_EXTERN(DWORD, gInfiniteAmmoCheat_650D4C); // WinMain.cpp
-MGS_VAR_EXTERN(DWORD, g_dwDisplayWidth); // WinMain.cpp
-MGS_VAR_EXTERN(DWORD, g_dwDisplayHeight); // WinMain.cpp
-MGS_VAR_EXTERN(DWORD, gFps);  // WinMain.cpp
-MGS_VAR_EXTERN(DWORD, game_state_dword_72279C);  // WinMain.cpp
-MGS_VAR_EXTERN(LPDIRECT3DDEVICE7, gD3dDevice_6FC74C); // WinMain.cpp
-EXTERN_MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), Render_Restore_Surfaces_51E086); // WinMain.cpp
 
 MGS_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
 
@@ -2023,6 +2014,232 @@ __int16 CC Render_RestoreAll()
     return gNumTextures_word_6FC78C;
 }
 MGS_FUNC_IMPLEX(0x0041CC30, Render_RestoreAll, RENDERER_IMPL);
+
+HRESULT CC SetDDSurfaceTexture_41E9E0()
+{
+    HRESULT hr;
+
+    if (g_pDDSurface_6FC740 != 0)
+    {
+        if (g_pDDSurface_6FC740->IsLost() == DDERR_SURFACELOST)
+        {
+            g_pDDSurface_6FC740->Restore();
+            ClearDDSurfaceWhite_41E990();
+        }
+        hr = gD3dDevice_6FC74C->SetTexture(0, g_pDDSurface_6FC740);
+    }
+    else
+    {
+        hr = gD3dDevice_6FC74C->SetTexture(0, NULL);
+    }
+
+    return hr;
+}
+MGS_FUNC_IMPLEX(0x0041E9E0, SetDDSurfaceTexture_41E9E0, RENDERER_IMPL);
+
+
+#define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
+
+int CC Render_ClearBackBuffer_41E130(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
+{
+    HRESULT hr;
+    Sleep(500);
+
+    if (g_surface565Mode != 0)
+    {
+        a_ClearColor = ((a_ClearColor & 0xF8) >> 3) | ((a_ClearColor & 0xFC00) >> 5) | ((a_ClearColor & 0xF80000) >> 8);
+    }
+    else
+    {
+        a_ClearColor = ((a_ClearColor & 0xF8) >> 3) | ((a_ClearColor & 0xF800) >> 6) | ((a_ClearColor & 0xF80000) >> 9) | ((a_ClearColor & 0x80000000) >> 16);
+    }
+
+    DDBLTFX bltFX;
+    bltFX.dwSize = sizeof(DDBLTFX);
+    bltFX.dwFillColor = a_ClearColor;
+
+    do {
+        hr = g_pBackBuffer_6FC738->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
+    } while (hr == DDERR_WASSTILLDRAWING);
+    if (hr != 0)
+        return 0;
+
+    a_pVertices[2].diffuse = a_DiffuseColor;
+    a_pVertices[1].diffuse = a_DiffuseColor;
+    a_pVertices[0].diffuse = a_DiffuseColor;
+
+    // result stored but not used
+    // happens a few times in this function, I keep it
+    hr = SetDDSurfaceTexture_41E9E0();
+
+    hr = gD3dDevice_6FC74C->BeginScene();
+    if (hr != 0)
+        return 0;
+
+    hr = gD3dDevice_6FC74C->DrawPrimitive(D3DPT_TRIANGLELIST, MGSVERTEX_DEF, a_pVertices, 3, 0);
+    hr = gD3dDevice_6FC74C->SetTexture(0, NULL);
+    if (hr != 0)
+        return 0;
+
+    hr = gD3dDevice_6FC74C->EndScene();
+    if (hr != 0)
+        return 0;
+
+    DDSURFACEDESC2 ddDesc;
+    memset(&ddDesc, 0, sizeof(DDSURFACEDESC2));
+    ddDesc.dwSize = sizeof(DDSURFACEDESC2);
+
+    do {
+        hr = g_pBackBuffer_6FC738->Lock(NULL, &ddDesc, 0, 0);
+    } while (hr == DDERR_WASSTILLDRAWING);
+    if (hr != 0)
+        return 0;
+
+    WORD wFirstPixel = ((WORD*)ddDesc.lpSurface)[0];
+    g_pBackBuffer_6FC738->Unlock(NULL);
+
+    *pFirstPixel = 0;
+    if (g_surface565Mode != 0)
+    {
+        *pFirstPixel = ((wFirstPixel & 0xF800) << 8) | ((wFirstPixel & 0x07E0) << 5) | ((wFirstPixel & 0x001F) << 3);
+    }
+    else
+    {
+        *pFirstPixel = ((wFirstPixel & 0x7C00) << 9) | ((wFirstPixel & 0x03E0) << 6) | ((wFirstPixel & 0x001F) << 3);
+    }
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x41E130, Render_ClearBackBuffer_41E130, RENDERER_IMPL);
+
+
+signed int Render_sub_41E3C0()
+{
+    signed int result;
+
+    D3DDEVICEDESC7 caps = {};
+    MGSVertex pPrim[3];
+    uint32_t firstPixel;
+
+    DWORD dwNumPasses = 1;
+    pPrim[0].x = 1.0f;
+    pPrim[1].x = static_cast<float>(g_dwDisplayWidth - 1);
+    pPrim[2].x = 1.0f;
+
+    pPrim[0].y = 1.0f;
+    pPrim[1].y = 1.0f;
+    pPrim[2].y = static_cast<float>(g_dwDisplayHeight - 1);
+
+    pPrim[0].z = 1.0f;
+    pPrim[1].z = 1.0f;
+    pPrim[2].z = 1.0f;
+
+    pPrim[0].u = 1.0f;
+    pPrim[1].u = 1.0f;
+    pPrim[2].u = 1.0f;
+
+    pPrim[0].v = 1.0f;
+    pPrim[1].v = 1.0f;
+    pPrim[2].v = 1.0f;
+
+    pPrim[0].w = 0.99999899f;
+    pPrim[1].w = 0.99999899f;
+    pPrim[2].w = 0.99999899f;
+
+    gD3dDevice_6FC74C->GetCaps(&caps);
+    const DWORD srcBlendCaps = caps.dpcTriCaps.dwSrcBlendCaps;
+    const DWORD dstBlendCaps = caps.dpcTriCaps.dwDestBlendCaps;
+    Render_SetRenderState_422A90(D3DRENDERSTATE_SHADEMODE, 1);
+    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
+
+    if (SUCCEEDED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
+    {
+        gAlphaModulate_dword_6FC798 = 0;
+        Render_InitTextureStages_422BC0(0, D3DTSS_ALPHAOP, 2);
+    }
+    else
+    {
+        gAlphaModulate_dword_6FC798 = 1;
+    }
+
+    if (gBlendMode < 0)
+    {
+        gBlendMode = 0;
+        if (srcBlendCaps & 0x10)
+        {
+            if (dstBlendCaps & 0x10)
+            {
+                Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 5);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 5);
+                if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
+                {
+                    if (gAlphaModulate_dword_6FC798)
+                    {
+                        Render_ClearBackBuffer_41E130(0xFF707070, 0x7F404040u, &firstPixel, pPrim);
+                        if ((unsigned __int8)firstPixel < 0x5Bu && (unsigned __int8)firstPixel > 0x55u)
+                        {
+                            gBlendMode |= 1u;
+                        }
+                    }
+                }
+            }
+        }
+        if (srcBlendCaps & 0x10)
+        {
+            if (dstBlendCaps & 2)
+            {
+                Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 5);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 2);
+                if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
+                {
+                    if (gAlphaModulate_dword_6FC798)
+                    {
+                        Render_ClearBackBuffer_41E130(0xFF101010, 0x3F404040u, &firstPixel, pPrim);
+                        if ((unsigned __int8)firstPixel < 0x25u && (unsigned __int8)firstPixel > 0x1Bu)
+                        {
+                            gBlendMode |= 8u;
+                        }
+                    }
+                }
+            }
+        }
+        if (srcBlendCaps & 2 && dstBlendCaps & 2)
+        {
+            gBlendMode |= 2u;
+            if (srcBlendCaps & 1)
+            {
+                if (dstBlendCaps & 8)
+                {
+                    Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 1);
+                    Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 4);
+                    Render_ClearBackBuffer_41E130(0xFFA0FFA0, 0xFF400040, &firstPixel, pPrim);
+
+                    if ((unsigned __int8)firstPixel < 0x79u && (unsigned __int8)firstPixel > 0x6Fu)
+                    {
+                        gBlendMode |= 4u;
+                    }
+
+                    if ((firstPixel & 0xFF00) <= 0xFF00 && (firstPixel & 0xFF00) > 0xFB00)
+                    {
+                        dword_6FC774 = 1;
+                    }
+                }
+            }
+            result = 1;
+        }
+        else
+        {
+            result = 0;
+        }
+    }
+    else
+    {
+        result = 1;
+    }
+    return result;
+}
+
+MGS_FUNC_IMPLEX(0x41E3C0, Render_sub_41E3C0, RENDERER_IMPL);
+
 
 void CC PrintDDError(const char* errMsg, HRESULT hrErr)
 {

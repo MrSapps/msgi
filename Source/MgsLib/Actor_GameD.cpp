@@ -8,6 +8,7 @@
 #include "System.hpp"
 #include "Actor_Rank.hpp" // gGameTime_word_78E896
 #include "Fs.hpp"
+#include "WinMain.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
@@ -74,13 +75,6 @@ MGS_FUNC_NOT_IMPL(0x0044E932, void CC(), sub_44E932);
 
 
 void CC Create_loader_44E226();
-
-// WinMain.cpp
-MGS_VAR_EXTERN(DWORD, gFlags_dword_78E7E4);
-MGS_VAR_EXTERN(DWORD, counter_dword_6BED20);
-MGS_VAR_EXTERN(DWORD, game_state_dword_72279C);
-
-
 void CC LibDG_Clean_Texture_Cache_401110();
 void CC LibGV_40A4BB();
 
@@ -94,6 +88,15 @@ MGS_FUNC_IMPLEX(0x0044E212, Reset_GV_DG_44E212, ACTOR_GAMED_IMPL);
 
 static void GameD_Update_helper(DWORD buttons)
 {
+    //if (stateTest)
+    {
+        // 0x8000000 = disable input?
+        // 0x80000000 = kill fmv?
+        //game_state_dword_72279C = 0x10800000; // 0x10800000 no input, jamming
+       // game_state_dword_72279C = 0x800000; // input, jamming
+        //game_state_dword_72279C = 0xa46000;
+    }
+
     if ((buttons & 0x90F) != 0x90F || dword_7227C4)
     {
         dword_722794 = 90;

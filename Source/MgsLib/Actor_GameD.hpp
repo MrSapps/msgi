@@ -16,6 +16,7 @@ MGS_VAR_EXTERN(int, gLoaderState_dword_9942B8);
 MGS_VAR_EXTERN(BYTE*, gResidentTop_dword_78E960);
 MGS_VAR_EXTERN(BYTE*, gSavedTop_78E964);
 MGS_VAR_EXTERN(WORD, stage_name_hash_word_78E7EC);
+MGS_VAR_EXTERN(DWORD, dword_6893D4);
 
 // Not really like this in the real game, but we need something like this
 // so we have an end marker to allocate backwards

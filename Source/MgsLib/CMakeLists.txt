@@ -52,7 +52,8 @@ add_library(MgsLib
     types.hpp
     pcx.cpp
     pcx.hpp
-    WinMain.cpp)
+    WinMain.cpp
+    WinMain.hpp)
 
 target_include_directories(MgsLib PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

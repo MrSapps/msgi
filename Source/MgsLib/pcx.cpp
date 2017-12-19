@@ -7,11 +7,10 @@
 #include "System.hpp"
 #include "Actor_GameD.hpp"
 #include "LibDG.hpp"
+#include "WinMain.hpp"
 
 #define PCX_IMPL true
 
-MGS_VAR_EXTERN(DWORD, dword_6893D4);
-MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 MGS_VAR_EXTERN(DWORD, gStageIs_s11e_6FC778);
 
 // TODO

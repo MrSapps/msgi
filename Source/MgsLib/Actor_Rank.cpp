@@ -5,13 +5,11 @@
 #include <array>
 #include "LibDG.hpp"
 #include "ResourceNameHash.hpp"
+#include "WinMain.hpp"
 
 #define ACTOR_RANK_IMPL true
 
 void Actor_RankCPP_ForceLink() {}
-
-MGS_VAR_EXTERN(DWORD, game_state_dword_72279C); // WinMain.cpp
-MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 
 BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, POLY_FT4* pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type)
 {

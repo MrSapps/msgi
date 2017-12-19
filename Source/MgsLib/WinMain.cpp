@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "WinMain.hpp"
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,13 +16,6 @@
 // When changing this, delete the cfg files the game creates else it will get into a bad state and probably crash
 #define HARDWARE_RENDERING_FORCE 1
 
-
-#define DIRECTINPUT_VERSION 0x700
-#include <dinput.h>
-#define DIRECTDRAW_VERSION 0x700
-#include <ddraw.h>
-#define DIRECT3D_VERSION 0x700
-#include "d3d.h"
 
 #include "logger.hpp"
 #include "MgsFunction.hpp"
@@ -1400,8 +1394,6 @@ int __cdecl jim_enumerate_devices()
     return 0;
 }
 
-#define MGSVERTEX_DEF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1)
-
 
 //MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
 signed int Render_sub_41E3C0();
@@ -2182,231 +2174,6 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
 }
 MGS_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
 
-
-//MSG_FUNC_NOT_IMPL(0x41E9E0, HRESULT __cdecl(), SetDDSurfaceTexture);
-HRESULT __cdecl SetDDSurfaceTexture()
-{
-    HRESULT hr;
-
-    if (g_pDDSurface_6FC740 != 0)
-    {
-        if (g_pDDSurface_6FC740->IsLost() == DDERR_SURFACELOST)
-        {
-            g_pDDSurface_6FC740->Restore();
-            ClearDDSurfaceWhite_41E990();
-        }
-        hr = gD3dDevice_6FC74C->SetTexture(0, g_pDDSurface_6FC740);
-    }
-    else
-    {
-        hr = gD3dDevice_6FC74C->SetTexture(0, NULL);
-    }
-
-    return hr;
-}
-
-int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices);
-
-
-signed int Render_sub_41E3C0()
-{
-    signed int result;
-    
-    D3DDEVICEDESC7 caps = {};
-    MGSVertex pPrim[3];
-    uint32_t firstPixel;
-
-    DWORD dwNumPasses = 1;
-    pPrim[0].x = 1.0f;
-    pPrim[1].x = static_cast<float>(g_dwDisplayWidth - 1);
-    pPrim[2].x = 1.0f;
-
-    pPrim[0].y = 1.0f;
-    pPrim[1].y = 1.0f;
-    pPrim[2].y = static_cast<float>(g_dwDisplayHeight - 1);
-
-    pPrim[0].z = 1.0f;
-    pPrim[1].z = 1.0f;
-    pPrim[2].z = 1.0f;
-
-    pPrim[0].u = 1.0f;
-    pPrim[1].u = 1.0f;
-    pPrim[2].u = 1.0f;
-
-    pPrim[0].v = 1.0f;
-    pPrim[1].v = 1.0f;
-    pPrim[2].v = 1.0f;
-
-    pPrim[0].w = 0.99999899f;
-    pPrim[1].w = 0.99999899f;
-    pPrim[2].w = 0.99999899f;
-
-    gD3dDevice_6FC74C->GetCaps(&caps);
-    const DWORD srcBlendCaps = caps.dpcTriCaps.dwSrcBlendCaps;
-    const DWORD dstBlendCaps = caps.dpcTriCaps.dwDestBlendCaps;
-    Render_SetRenderState_422A90(D3DRENDERSTATE_SHADEMODE, 1);
-    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
-
-    if (SUCCEEDED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
-    {
-        gAlphaModulate_dword_6FC798 = 0;
-        Render_InitTextureStages_422BC0(0, D3DTSS_ALPHAOP, 2);
-    }
-    else
-    {
-        gAlphaModulate_dword_6FC798 = 1;
-    }
-
-    if (gBlendMode < 0)
-    {
-        gBlendMode = 0;
-        if (srcBlendCaps & 0x10)
-        {
-            if (dstBlendCaps & 0x10)
-            {
-                Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 5);
-                Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 5);
-                if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
-                {
-                    if (gAlphaModulate_dword_6FC798)
-                    {
-                        ClearBackBuffer(0xFF707070, 0x7F404040u, &firstPixel, pPrim);
-                        if ((unsigned __int8)firstPixel < 0x5Bu && (unsigned __int8)firstPixel > 0x55u)
-                        {
-                            gBlendMode |= 1u;
-                        }
-                    }
-                }
-            }
-        }
-        if (srcBlendCaps & 0x10)
-        {
-            if (dstBlendCaps & 2)
-            {
-                Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 5);
-                Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 2);
-                if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
-                {
-                    if (gAlphaModulate_dword_6FC798)
-                    {
-                        ClearBackBuffer(0xFF101010, 0x3F404040u, &firstPixel, pPrim);
-                        if ((unsigned __int8)firstPixel < 0x25u && (unsigned __int8)firstPixel > 0x1Bu)
-                        {
-                            gBlendMode |= 8u;
-                        }
-                    }
-                }
-            }
-        }
-        if (srcBlendCaps & 2 && dstBlendCaps & 2)
-        {
-            gBlendMode |= 2u;
-            if (srcBlendCaps & 1)
-            {
-                if (dstBlendCaps & 8)
-                {
-                    Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 1);
-                    Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 4);
-                    ClearBackBuffer(0xFFA0FFA0, 0xFF400040, &firstPixel, pPrim);
-
-                    if ((unsigned __int8)firstPixel < 0x79u && (unsigned __int8)firstPixel > 0x6Fu)
-                    {
-                        gBlendMode |= 4u;
-                    }
-
-                    if ((firstPixel & 0xFF00) <= 0xFF00 && (firstPixel & 0xFF00) > 0xFB00)
-                    {
-                        dword_6FC774 = 1;
-                    }
-                }
-            }
-            result = 1;
-        }
-        else
-        {
-            result = 0;
-        }
-    }
-    else
-    {
-        result = 1;
-    }
-    return result;
-}
-
-MGS_FUNC_IMPLEX(0x41E3C0, Render_sub_41E3C0, WINMAIN_IMPL);
-
-//MSG_FUNC_NOT_IMPL(0x41E130, int __cdecl(uint32_t, uint32_t, uint32_t*, MGSVertex*), ClearBackBuffer);
-int __cdecl ClearBackBuffer(uint32_t a_ClearColor, uint32_t a_DiffuseColor, uint32_t* pFirstPixel, MGSVertex* a_pVertices)
-{
-    HRESULT hr;
-    Sleep(500);
-
-    if (g_surface565Mode != 0)
-    {
-        a_ClearColor = ((a_ClearColor & 0xF8) >> 3) | ((a_ClearColor & 0xFC00) >> 5) | ((a_ClearColor & 0xF80000) >> 8);
-    }
-    else
-    {
-        a_ClearColor = ((a_ClearColor & 0xF8) >> 3) | ((a_ClearColor & 0xF800) >> 6) | ((a_ClearColor & 0xF80000) >> 9) | ((a_ClearColor & 0x80000000) >> 16);
-    }
-
-    DDBLTFX bltFX;
-    bltFX.dwSize = sizeof(DDBLTFX);
-    bltFX.dwFillColor = a_ClearColor;
-    
-    do {
-        hr = g_pBackBuffer_6FC738->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &bltFX);
-    } while (hr == DDERR_WASSTILLDRAWING);
-    if (hr != 0)
-        return 0;
-
-    a_pVertices[2].diffuse = a_DiffuseColor;
-    a_pVertices[1].diffuse = a_DiffuseColor;
-    a_pVertices[0].diffuse = a_DiffuseColor;
-
-    // result stored but not used
-    // happens a few times in this function, I keep it
-    hr = SetDDSurfaceTexture();
-
-    hr = gD3dDevice_6FC74C->BeginScene();
-    if (hr != 0)
-        return 0;
-
-    hr = gD3dDevice_6FC74C->DrawPrimitive(D3DPT_TRIANGLELIST, MGSVERTEX_DEF, a_pVertices, 3, 0);
-    hr = gD3dDevice_6FC74C->SetTexture(0, NULL);
-    if (hr != 0)
-        return 0;
-
-    hr = gD3dDevice_6FC74C->EndScene();
-    if (hr != 0)
-        return 0;
-
-    DDSURFACEDESC2 ddDesc;
-    memset(&ddDesc, 0, sizeof(DDSURFACEDESC2));
-    ddDesc.dwSize = sizeof(DDSURFACEDESC2);
-
-    do {
-        hr = g_pBackBuffer_6FC738->Lock(NULL, &ddDesc, 0, 0);
-    } while (hr == DDERR_WASSTILLDRAWING);
-    if (hr != 0)
-        return 0;
-
-    WORD wFirstPixel = ((WORD*)ddDesc.lpSurface)[0];
-    g_pBackBuffer_6FC738->Unlock(NULL);
-
-    *pFirstPixel = 0;
-    if (g_surface565Mode != 0)
-    {
-        *pFirstPixel = ((wFirstPixel & 0xF800) << 8) | ((wFirstPixel & 0x07E0) << 5) | ((wFirstPixel & 0x001F) << 3);
-    }
-    else
-    {
-        *pFirstPixel = ((wFirstPixel & 0x7C00) << 9) | ((wFirstPixel & 0x03E0) << 6) | ((wFirstPixel & 0x001F) << 3);
-    }
-    return 1;
-}
-MGS_FUNC_IMPLEX(0x41E130, ClearBackBuffer, WINMAIN_IMPL);
 
 // 0x00420810
 signed int __cdecl DoInitAll()

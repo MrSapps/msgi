@@ -7,15 +7,13 @@
 #include "Renderer.hpp"
 #include "Fs.hpp"
 #include "pcx.hpp"
+#include "WinMain.hpp"
 
 #define LIBDG_IMPL true
 
 void LibDGCpp_ForceLink() { }
 
 #define REDIRECT_LIBDG_DATA 1
-
-MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
-
 
 MGS_FUNC_NOT_IMPL(0x62130E, Actor *__cdecl(int a1, signed int a2), Res_env_test_create_62130E);
 
@@ -727,10 +725,7 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x9942AB, BYTE, byte_9942AB, 0);
 
 
 
-MGS_VAR_EXTERN(DWORD, game_state_dword_72279C);
 MGS_FUNC_NOT_IMPL(0x40A857, void CC(), sub_40A857);
-void CC Main_sub_401C02();
-
 MGS_FUNC_NOT_IMPL(0x5200D2, signed __int64 CC(), sub_5200D2);
 
 signed __int64 CC WaitFor_445580(int totalCount)

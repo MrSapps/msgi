@@ -4,10 +4,6 @@
 #include "LibDG.hpp"
 #include "Actor_Rank.hpp"
 
-
-
-MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
-
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
     TextSetXYFlags_459B0B(181, 47, 0);
