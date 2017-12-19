@@ -387,7 +387,6 @@ MGS_VAR(1, 0x006DEF94, DWORD, gCrashCheck, 0);
 MGS_VAR(1, 0x0071687C, DWORD, gCheatsEnabled, 0);
 MGS_VAR(1, 0x006FD1F8, DWORD, gNoCdEnabled, 0);
 MGS_VAR(1, 0x00650D14, DWORD, gWindowedMode, 0);
-MGS_VAR(1, 0x00688DB8, char*, off_688DB8, "");
 MGS_VAR(1, 0x6FC7A0, DWORD, dword_6FC7A0, 0);
 MGS_VAR(1, 0x00650D24, DWORD, gNoEffects, 0);
 
@@ -397,7 +396,6 @@ MGS_VAR(1, 0x006FC76C, DWORD, gFps, 0);
 MGS_VAR(1, 0x006FC7A4, DWORD, gColourKey, 0);
 MGS_VAR(1, 0x00650D38, int, gBlendMode, 0);
 MGS_VAR(1, 0x00650D20, DWORD, gLowRes, 0);
-MGS_VAR(1, 0x688D40, char*, off_688D40, "");
 
 MGS_VAR(1, 0x0071D1D0, HINSTANCE, gHInstance, 0);
 MGS_VAR(1, 0x651D98, DWORD, gSoundFxVol_dword_651D98, 0);
@@ -2955,10 +2953,11 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     }
 
     gWindowedMode = 0;
-    if (strstr(lpCmdLine, off_688DB8))
-        dword_6FC7A0 = 58; // "Normal" path, in real game setting this to zero seems to be impossible
+    if (strstr(lpCmdLine, "-st"))
+        dword_6FC7A0 = 58;
     else
         dword_6FC7A0 = 0;
+
     if (strstr(lpCmdLine, "-noeffects"))
         gNoEffects = 0;
     if (strstr(lpCmdLine, "-320"))
@@ -2987,7 +2986,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     }
     if (strstr(lpCmdLine, "-lowres"))
         gLowRes = 1;
-    if (strstr(lpCmdLine, off_688D40))
+    if (strstr(lpCmdLine, "-fs"))
         gWindowedMode = 0;
     if (strstr(lpCmdLine, "-w"))
         gWindowedMode = 1;
