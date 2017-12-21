@@ -4,7 +4,12 @@
 #include "Fs.hpp"
 
 // TODO: Fix funcs using SKIP
+#ifdef _DEBUG
 #define SOUND_IMPL true
+#else
+// TODO: Extra fix me, in release sound seems to get out of sync and eventually make codec calls etc hang
+#define SOUND_IMPL false
+#endif
 
 using QWORD = __int64;
 
