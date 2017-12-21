@@ -837,6 +837,8 @@ MGS_FUNC_NOT_IMPL(0x401DA8, int CC(PSX_RECT* pRect, int a2), sub_401DA8);
 
 void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+
     /*
     sub_401DA8((PSX_RECT*)&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
 

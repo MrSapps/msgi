@@ -58,6 +58,8 @@ void doPrint(std::ostream& out, T t, U u, Args... args)
     doPrint(out, u, args...);
 }
 
+#define MGS_FATAL(x)  ::MessageBox(NULL, x, "ERROR", MB_ICONERROR | MB_OK); __debugbreak(); abort();
+
 class MgsFunctionBase
 {
 public:
@@ -70,14 +72,14 @@ public:
         
         if (err != NO_ERROR)
         {
-            abort();
+            MGS_FATAL("DetourTransactionBegin failed");
         }
         
         err = DetourUpdateThread(GetCurrentThread());
         
         if (err != NO_ERROR)
         {
-            abort();
+            MGS_FATAL("DetourUpdateThread failed");
         }
 
         auto& funcs = GetMgsFunctionTable();
@@ -88,7 +90,7 @@ public:
         err = DetourTransactionCommit();
         if (err != NO_ERROR)
         {
-            abort();
+            MGS_FATAL("DetourTransactionCommit failed");
         }
     }
 protected:
@@ -115,7 +117,9 @@ public:
         if (it != std::end(GetMgsFunctionTable()))
         {
             // duplicated function
-            abort();
+            std::stringstream ss;
+            ss << "Duplicated function 0x" << std::hex << kOldAddr << " name " << fnName;
+            MGS_FATAL(ss.str().c_str());
         }
         else
         {
@@ -202,7 +206,7 @@ public:
             }
             else
             {
-                abort();
+                MGS_FATAL("Not __cdecl or __stdcall");
             }
         }
 #pragma warning(pop)
@@ -216,7 +220,7 @@ protected:
         if (it == std::end(GetMgsFunctionTable()))
         {
             // Impossible situation
-            abort();
+            MGS_FATAL("No function table??");
         }
 
         auto baseFunc = it->second;
@@ -229,7 +233,7 @@ protected:
         if (it == std::end(GetMgsFunctionTable()))
         {
             // Impossible situation
-            abort();
+            MGS_FATAL("No function table??");
         }
 
         auto baseFunc = it->second;
@@ -280,12 +284,14 @@ private:
         }
         else
         {
-            abort();
+            MGS_FATAL("Not __cdecl or __stdcall");
         }
 #pragma warning(pop)
         if (err != NO_ERROR)
         {
-            abort();
+            std::stringstream ss;
+            ss << "DetourAttach failed with " << err << " for " << std::hex << " 0x" << funcToHook;
+            MGS_FATAL(ss.str().c_str());
         }
     }
 
@@ -371,5 +377,4 @@ extern TypeName* VarName ;
 #define BYTE2(x)   BYTEn(x,  2)
 #define BYTE3(x)   BYTEn(x,  3)
 #define HIWORD(l)           ((WORD)((((DWORD_PTR)(l)) >> 16) & 0xffff))
-
-#define MGS_FATAL(x)  ::MessageBox(NULL, x, "ERROR", MB_ICONERROR | MB_OK); __debugbreak(); abort();
+#define MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR __asm { __asm nop __asm nop __asm nop __asm nop __asm nop }

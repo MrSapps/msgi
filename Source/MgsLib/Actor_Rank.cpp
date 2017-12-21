@@ -13,6 +13,7 @@ void Actor_RankCPP_ForceLink() {}
 
 BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, POLY_FT4* pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return nullptr;
 }
 MGS_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, false); // TODO
@@ -90,6 +91,7 @@ MGS_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
 
 int CC Menu_DrawText(const char* Format, int a2, int a3, int a4, int a5)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return 0;
 }
 MGS_FUNC_IMPLEX(0x459B63, Menu_DrawText, false);  // TODO
@@ -100,11 +102,14 @@ void CC TextSetXYFlags_459B0B(int x, int y, int flags)
     // 0x2 = center align
     // 0x10 = larger font size
     // other bits = left align/do nothing
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+
 }
 MGS_FUNC_IMPLEX(0x459B0B, TextSetXYFlags_459B0B, false);  // TODO
 
 int CC TextSetRGB_459B27(int r, int g, int b)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return 0;
 }
 MGS_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, false);  // TODO
@@ -938,19 +943,19 @@ MGS_FUNC_IMPLEX(0x473E69, Rank_ToState2If_473E69, ACTOR_RANK_IMPL);
 
 void CC Rank_473E9C(Actor_Rank* pRank)
 {
-
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x473E9C, Rank_473E9C, false); // TODO
 
 void CC Rank_GameCompletionRelatedQ(Actor_Rank* pRank)
 {
-
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x470AE6, Rank_GameCompletionRelatedQ, false); // TODO
 
 void CC Rank_SaveAfterGameCompleteQ(Actor_Rank* pRank)
 {
-
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x474315, Rank_SaveAfterGameCompleteQ, false); // TODO
 
@@ -963,7 +968,7 @@ MGS_FUNC_IMPLEX(0x474CE8, Rank_End_474CE8, ACTOR_RANK_IMPL);
 
 void CC Rank_Animate_472832(Actor_Rank* pRank)
 {
-
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x472832, Rank_Animate_472832, false);  // TODO
 
@@ -1009,7 +1014,7 @@ MGS_FUNC_IMPLEX(0x46EC75, Rank_update_46EC75, ACTOR_RANK_IMPL);
 
 void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 {
-
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
 
