@@ -2112,7 +2112,7 @@ int CC Render_ClearBackBuffer_41E130(uint32_t a_ClearColor, uint32_t a_DiffuseCo
 MGS_FUNC_IMPLEX(0x41E130, Render_ClearBackBuffer_41E130, RENDERER_IMPL);
 
 
-signed int Render_sub_41E3C0()
+signed int CC Render_sub_41E3C0()
 {
     signed int result;
 

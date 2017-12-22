@@ -48,8 +48,6 @@ MGS_VAR(REDIRECT_LIBGV_DATA, 0x6BFEE0, LibGv_Struct, g_lib_gv_stru_6BFEE0, {});
 
 void LibGVCpp_ForceLink() { }
 
-MGS_ARY(1, 0x7919C2, WORD, 16, word_7919C2, {});
-
 void CC LibGV_Reset_System2_Memory_40B35E()
 {
     gSavedTop_78E964 = gResidentHeap_81001F.AlignedEnd();
@@ -62,17 +60,13 @@ void CC LibGV_mesg_init_40B3BC();
 void CC LibGV_40A4B1()
 {
     LibGV_mesg_init_40B3BC();
-    WORD* ptr = &word_7919C2[0];                    // 0x5000
-    int counter = 2;
-    do
+    for (int i=0; i < 2; i++)
     {
-        ptr[3] = -1;
-        ptr[1] = 0;
-        *ptr = 0;
-        *(ptr - 1) = 0;
-        ptr += 8;
-        --counter;
-    } while (counter);
+        gArray4_7919C0[i].field_4_array[0] = -1;
+        gArray4_7919C0[i].field_4_array[2] = 0;
+        gArray4_7919C0[i].field_2 = 0;
+        gArray4_7919C0[i].field_0 = 0;
+    }
     g_lib_gv_stru_6BFEE0.gGv_dword_6C0380 = 0;
     g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4 = 0;
     memset(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388, 0, sizeof(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388));

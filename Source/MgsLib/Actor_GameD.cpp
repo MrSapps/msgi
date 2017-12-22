@@ -38,8 +38,10 @@ MGS_VAR(1, 0x78E7FC, short, gLoadItemFuncIdx_word_78E7FC, 0);
 
 MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
 MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
-MGS_VAR(1, 0x995324, DWORD, gArrayPtr_dword_995324, 0);
-MGS_VAR(1, 0x7919C0, DWORD, dword_7919C0, 0);
+
+MGS_VAR(1, 0x995324, struct_unk_7919C0*, gpUnk_7919C0_995324, 0);
+MGS_ARY(1, 0x7919C0, struct_unk_7919C0, 4, gArray4_7919C0, {});
+
 MGS_VAR(1, 0x78E960, BYTE*, gResidentTop_dword_78E960, 0);
 MGS_VAR(1, 0x78E964, BYTE*, gSavedTop_78E964, 0);
 
@@ -127,7 +129,7 @@ static void GameD_Update_helper(DWORD buttons)
     }
     if (game_state_dword_72279C & 0x80000000)
     {
-        if ( *(WORD *)(gArrayPtr_dword_995324 + 34) & 0x840 )
+        if (gpUnk_7919C0_995324[2].field_2 & 0x840)
         {
             StreamActorStop_4583BB();
         }
@@ -149,11 +151,13 @@ static void GameD_Update_helper(DWORD buttons)
     }
 }
 
+
 void CC GameD_update_44E381(GameD_Struct* pGameD)
 {
     const DWORD buttons = GameD_Input_445610();
 
     gFlags_dword_78E7E4 |= 0x400u;
+
 
     if (!(gFlags_dword_78E7E4 & 0x2400)) // Dead code
     {
@@ -336,7 +340,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
         {
             if (!(gActorPauseFlags_dword_791A0C & 0xFD))
             {
-                if ( *(WORD *)(gArrayPtr_dword_995324 + 2) & 0x800 )
+                if (gpUnk_7919C0_995324->field_2 & 0x800)
                 {
                     sub_44E969();
                 }
@@ -524,7 +528,7 @@ void CC Init_Gamed_Create_44E12B()
     sub_44E287();
     Reset_GV_DG_44E212();
     word_78E7E8 = (WORD)(dword_78D7B0 + 1);
-    gArrayPtr_dword_995324 = (int)&dword_7919C0;
+    gpUnk_7919C0_995324 = &gArray4_7919C0[0];
     SaveResidentTop_40B36E();
     gGameD_stru_722760.gamed_unk_722780 = 0;
     gGameD_stru_722760.gamed_unk_722784 = 0;

@@ -9,9 +9,22 @@ void* CC ResidentTopAllocate_40B379(int size);
 void CC Stage_LoadRelated_44EB27(WORD stageNameHashed, const char* pStageName);
 const char* CC File_StageName_44EB83();
 
+
+#pragma pack(push)
+#pragma pack(push, 1)
+struct struct_unk_7919C0
+{
+    WORD field_0;
+    WORD field_2;
+    WORD field_4_array[6];
+};
+MGS_ASSERT_SIZEOF(struct_unk_7919C0, 0x10);
+#pragma pack(pop)
+
 MGS_VAR_EXTERN(int, dword_78D7B0);
-MGS_VAR_EXTERN(DWORD, gArrayPtr_dword_995324);
-MGS_VAR_EXTERN(DWORD, dword_7919C0);
+MGS_VAR_EXTERN(struct_unk_7919C0*, gpUnk_7919C0_995324);
+MGS_ARY_EXTERN(struct_unk_7919C0, 4, gArray4_7919C0);
+
 MGS_VAR_EXTERN(int, gLoaderState_dword_9942B8);
 MGS_VAR_EXTERN(BYTE*, gResidentTop_dword_78E960);
 MGS_VAR_EXTERN(BYTE*, gSavedTop_78E964);
