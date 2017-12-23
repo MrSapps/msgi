@@ -852,8 +852,8 @@ static void TestCommonHashes()
 {
     ASSERT_EQ(0x0d86, ResourceNameHash("if"));
     ASSERT_EQ(0x64C0, ResourceNameHash("eval"));
-    //ASSERT_EQ(0xCD3A, ResourceNameHash("nop"));
-    //ASSERT_EQ(0x7636, ResourceNameHash("loop"));
+    ASSERT_EQ(0xCD3A, ResourceNameHash("return"));
+    ASSERT_EQ(0x7636, ResourceNameHash("foreach"));
     ASSERT_EQ(0x22FF, ResourceNameHash("mesg"));
     ASSERT_EQ(0xD4CB, ResourceNameHash("trap"));
     ASSERT_EQ(0x9906, ResourceNameHash("chara"));
