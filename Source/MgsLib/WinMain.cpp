@@ -2697,7 +2697,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
 
     _strlwr(lpCmdLine);
     _chdir(".");
-    dword_78D7B0 = -1;
+    gCdId_78D7B0 = -1;
 
     gCrashCheck = strstr(lpCmdLine, "-nocrashcheck") != nullptr;
     gCheatsEnabled = strstr(lpCmdLine, "-cheatenable") != nullptr;

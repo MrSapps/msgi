@@ -21,7 +21,7 @@ struct ButtonStates
 MGS_ASSERT_SIZEOF(ButtonStates, 0x10);
 #pragma pack(pop)
 
-MGS_VAR_EXTERN(int, dword_78D7B0);
+MGS_VAR_EXTERN(int, gCdId_78D7B0);
 MGS_VAR_EXTERN(ButtonStates*, gpActiveButtons_995324);
 MGS_ARY_EXTERN(ButtonStates, 4, gButtonsArray4_7919C0);
 

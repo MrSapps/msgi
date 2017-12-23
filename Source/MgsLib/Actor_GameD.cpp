@@ -36,8 +36,8 @@ MGS_VAR(1, 0x78E7FC, short, gLoadItemFuncIdx_word_78E7FC, 0);
 
 
 
-MGS_VAR(1, 0x78E7E8, WORD, word_78E7E8, 0);
-MGS_VAR(1, 0x78D7B0, int, dword_78D7B0, 0);
+MGS_VAR(1, 0x78E7E8, WORD, gStartingCdId_78E7E8, 0);
+MGS_VAR(1, 0x78D7B0, int, gCdId_78D7B0, 0);
 
 MGS_VAR(1, 0x995324, ButtonStates*, gpActiveButtons_995324, 0);
 MGS_ARY(1, 0x7919C0, ButtonStates, 4, gButtonsArray4_7919C0, {});
@@ -527,7 +527,7 @@ void CC Init_Gamed_Create_44E12B()
     sub_44E1F9();
     sub_44E287();
     Reset_GV_DG_44E212();
-    word_78E7E8 = (WORD)(dword_78D7B0 + 1);
+    gStartingCdId_78E7E8 = gCdId_78D7B0 + 1;
     gpActiveButtons_995324 = &gButtonsArray4_7919C0[0];
     SaveResidentTop_40B36E();
     gGameD_stru_722760.gamed_unk_722780 = 0;
