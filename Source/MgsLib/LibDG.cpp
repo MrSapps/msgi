@@ -785,34 +785,48 @@ void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
     
     sub_40A857(); // Probably input related as input no longer works if not called?
 
-    gpUnk_7919C0_995324 = gArray4_7919C0;
+    gpActiveButtons_995324 = gButtonsArray4_7919C0;
     if (byte_9942AB & 0x10)
     {
-        if (gArray4_7919C0[1].field_0 | gArray4_7919C0[1].field_4_array[0])
-            gpUnk_7919C0_995324 = &gArray4_7919C0[1];
+        if (gButtonsArray4_7919C0[1].field_0_buttons_down | gButtonsArray4_7919C0[1].field_4_array[0])
+        {
+            gpActiveButtons_995324 = &gButtonsArray4_7919C0[1];
+        }
     }
 
+    // gArray4_7919C0[0].field_2
+    // 0x8000 = left 15
+    // 0x4000 = down 14
+    // 0x2000 = right 13
+    // 0x1000 = up 12
+    // 0x800 = pause 11
+    // bit 10?
+    // bit 9?
+    // 0x100 = codec 8
+    // 0x80 = control 7
+    // 0x40 = escape 6
+    // 0x20 = space/enter 5
+    // 0x10 = first person view mode 4
+    // 0x8 = right menu toggle 3
+    // 0x4 = left menu toggle 2
+    // 0x2 = right menu 1
+    // 0x1 = left menu 0
 
-    //p[0] |= 0xffff; // Shift / X held
-    //p[1] |= 0xffff; // Tri/first person held
-   // p[3] |= 0xffff; // 3rd person cam force ?
-    //p[4] |= 0xffff; // can't dpad
-   // p[6] |= 0xffff;
-
-   // p[4] = 0x800; // Up 
-    //p[4] = 0x400; // Right
-   // p[4] = 0x1000; // Down
-    //p[4] = 0x2000; // Down
-    //p[4] = 0x4000; // Down
-    //p[4] = 0x8000; // Nothing
-    //p[4] = 0x1; // Down
-    //p[4] = 0x2;  // Down
-   // p[4] = 0x4;
-   // p[4] = 0x8;
-   // p[4] = 0x10;
-   // p[4] = 0x20;
-   // p[4] = 0x80; // down and right
-   // p[4] = 0x100;
+    // [2] is very near the same as [0] - prev button states?
+    // [1] never seems to get used, same for [3]?
+    /*
+    if (gButtonsArray4_7919C0[0].field_0_buttons_down
+        || gButtonsArray4_7919C0[0].field_2_button_pressed
+        || gButtonsArray4_7919C0[2].field_0_buttons_down
+        || gButtonsArray4_7919C0[2].field_2_button_pressed)
+    {
+        printf("0[0x%X][0x%X] 2[0x%X][0x%X]\n", 
+            gButtonsArray4_7919C0[0].field_0_buttons_down,
+            gButtonsArray4_7919C0[0].field_2_button_pressed,
+            gButtonsArray4_7919C0[2].field_0_buttons_down,
+            gButtonsArray4_7919C0[2].field_2_button_pressed);
+    }
+    */
 }
 MGS_FUNC_IMPLEX(0x401234, LibDG_Update2_401234, LIBDG_IMPL);
 

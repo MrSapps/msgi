@@ -12,18 +12,18 @@ const char* CC File_StageName_44EB83();
 
 #pragma pack(push)
 #pragma pack(push, 1)
-struct struct_unk_7919C0
+struct ButtonStates
 {
-    WORD field_0;
-    WORD field_2;
+    WORD field_0_buttons_down;
+    WORD field_2_button_pressed;
     WORD field_4_array[6];
 };
-MGS_ASSERT_SIZEOF(struct_unk_7919C0, 0x10);
+MGS_ASSERT_SIZEOF(ButtonStates, 0x10);
 #pragma pack(pop)
 
 MGS_VAR_EXTERN(int, dword_78D7B0);
-MGS_VAR_EXTERN(struct_unk_7919C0*, gpUnk_7919C0_995324);
-MGS_ARY_EXTERN(struct_unk_7919C0, 4, gArray4_7919C0);
+MGS_VAR_EXTERN(ButtonStates*, gpActiveButtons_995324);
+MGS_ARY_EXTERN(ButtonStates, 4, gButtonsArray4_7919C0);
 
 MGS_VAR_EXTERN(int, gLoaderState_dword_9942B8);
 MGS_VAR_EXTERN(BYTE*, gResidentTop_dword_78E960);
