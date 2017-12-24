@@ -23,7 +23,7 @@ install:
 # - set SDL2DIR=C:\msg\SDL2-2.0.4
 
 artifacts:
- - path: c:\msg\build\*.zip
+ - path: build\*.zip
    name: MGS-$(configuration)-$(APPVEYOR_REPO_COMMIT)
 
 test: off
