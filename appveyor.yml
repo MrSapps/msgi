@@ -24,6 +24,6 @@ install:
 
 artifacts:
  - path: c:\msg\build\*.zip
- - name: MGS-$(configuration)-$(APPVEYOR_REPO_COMMIT)
+   name: MGS-$(configuration)-$(APPVEYOR_REPO_COMMIT)
 
 test: off
