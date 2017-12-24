@@ -11,3 +11,4 @@ target_compile_features(MgsExe
 target_link_libraries(MgsExe MgsLib)
 
 export(TARGETS MgsExe FILE MgsExe.cmake)
+install(TARGETS MgsExe DESTINATION .)

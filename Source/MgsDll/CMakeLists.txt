@@ -21,3 +21,4 @@ add_custom_command(TARGET MgsDll
                    COMMENT "Copying to game dir")
 
 export(TARGETS MgsDll FILE MgsDll.cmake)
+install(TARGETS MgsDll DESTINATION .)

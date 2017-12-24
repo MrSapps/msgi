@@ -17,3 +17,9 @@ add_subdirectory(Source/MgsExe)
 add_subdirectory(Source/MgsDll)
 add_subdirectory(Source/GCLASM)
 add_subdirectory(Source/Tests)
+
+if(WIN32)
+    # On Windows generate ZIP packages
+    SET(CPACK_GENERATOR "ZIP")
+endif()
+INCLUDE(CPack)

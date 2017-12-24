@@ -15,3 +15,4 @@ endif()
 target_link_libraries(GCLASM MgsLib)
 
 export(TARGETS GCLASM FILE GCLASM.cmake)
+install(TARGETS GCLASM DESTINATION .)
