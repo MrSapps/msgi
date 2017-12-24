@@ -15,7 +15,8 @@ build_script:
  - cmake ..
  - msbuild MSGI.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
  - Source\Tests\%configuration%\Tests.exe
- 
+ - call "C:\Program Files (x86)\cmake\bin\cpack" -G ZIP -C %configuration%
+
 install:
  - git submodule update --init --recursive
 # - ps: Start-FileDownload 'https://www.libsdl.org/release/SDL2-devel-2.0.4-VC.zip'
