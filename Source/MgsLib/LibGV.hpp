@@ -6,7 +6,8 @@
 void DoLibGv_Tests();
 void LibGVCpp_ForceLink();
 
-using GV_FnPtr = int(__cdecl*)(void*, WORD);
+using TFileNameHash = DWORD; // only 24 bits are used
+using GV_FnPtr = int(__cdecl*)(void*, TFileNameHash);
 
 struct LibGV_Msg
 {

@@ -14,7 +14,7 @@
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
 MGS_VAR(1, 0x7227A4, int, gGameOverTimer_dword_7227A4, 0);
-MGS_VAR(1, 0x6BFBB4, WORD, gScriptFileNameHashedToLoad_6BFBB4, 0);
+MGS_VAR(1, 0x6BFBB4, TFileNameHash, gScriptFileNameHashedToLoad_6BFBB4, 0);
 
 #define SCRIPT_IMPL true
 
@@ -1039,7 +1039,7 @@ int CC Script_Init_sub_409C19(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x00409C19, Script_Init_sub_409C19, SCRIPT_IMPL);
 
-signed int CC GV_gcx_file_handler_4090CF(void* pScript, WORD fileNameHashed)
+signed int CC GV_gcx_file_handler_4090CF(void* pScript, TFileNameHash fileNameHashed)
 {
     if (fileNameHashed == gScriptFileNameHashedToLoad_6BFBB4)
     {
@@ -1049,12 +1049,11 @@ signed int CC GV_gcx_file_handler_4090CF(void* pScript, WORD fileNameHashed)
 }
 MGS_FUNC_IMPLEX(0x004090CF, GV_gcx_file_handler_4090CF, SCRIPT_IMPL);
 
-void CC Script_Set_MainOrDemo_40908E(int bMain)
+void CC Script_Set_MainOrDemo_40908E(DWORD bMain)
 {
-    // TODO: Hashed names are bigger than a WORD.. how can this work? :)
     gScriptFileNameHashedToLoad_6BFBB4 = bMain != 1 ?
-        0x6EA54 :  // scenerio 
-        0x6A242;   // demo
+        Hash_40A58B(ResourceNameHash("scenerio"), 'g') :
+        Hash_40A58B(ResourceNameHash("demo"), 'g');
 }
 MGS_FUNC_IMPLEX(0x0040908E, Script_Set_MainOrDemo_40908E, SCRIPT_IMPL);
 

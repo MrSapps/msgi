@@ -3,6 +3,7 @@
 #include "MgsFunction.hpp"
 #include "Actor.hpp"
 #include "Psx.hpp"
+#include "LibGV.hpp"
 
 void LibDGCpp_ForceLink();
 
@@ -186,7 +187,7 @@ MGS_VAR_EXTERN(struct_gv, gLibGVStruct2_6BC558);
 MGS_ARY_EXTERN(DWORD, 2, dword_6BED18);
 
 
-signed int CC GV_bin_file_handler_44E9D2(void* pData, WORD fileNameHash);
+signed int CC GV_bin_file_handler_44E9D2(void* pData, TFileNameHash fileNameHash);
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B();
 void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C();
 ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName);

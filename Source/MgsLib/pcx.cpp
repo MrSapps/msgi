@@ -365,7 +365,7 @@ Texture_Record* CC sub_40252B(WORD hashedName, int bpp, __int16 bppShift0x30, PS
 }
 MGS_FUNC_IMPLEX(0x40252B, sub_40252B, PCX_IMPL);
 
-int CC GV_pcx_file_handler_402B25(void* fileData, WORD fileNameHash)
+int CC GV_pcx_file_handler_402B25(void* fileData, TFileNameHash fileNameHash)
 {
     pcx_header* pPcxFileData = reinterpret_cast<pcx_header*>(fileData);
     const WORD mgs_bpp = pPcxFileData->field_4C_bpp_mgs;

@@ -212,7 +212,7 @@ signed int CC Script_tbl_chara_451AC3(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x00451AC3, Script_tbl_chara_451AC3, LIBDG_IMPL);
 
-signed int CC GV_bin_file_handler_44E9D2(void* pData, WORD /*fileNameHash*/)
+signed int CC GV_bin_file_handler_44E9D2(void* pData, TFileNameHash /*fileNameHash*/)
 {
     Res_Init_Record* pStartingRecord = reinterpret_cast<Res_Init_Record*>(pData);
     int dst_idx = 0;
@@ -665,49 +665,49 @@ void CC LibGvInitDispEnv_401A4F(int ClipX1, __int16 clipY1, __int16 clipX2, __in
 }
 MGS_FUNC_IMPLEX(0x401A4F, LibGvInitDispEnv_401A4F, LIBDG_IMPL);
 
-signed int CC GV_lit_file_handler_402B1D(void*, WORD)
+signed int CC GV_lit_file_handler_402B1D(void*, TFileNameHash)
 {
     return 1;
 }
 MGS_FUNC_IMPLEX(0x402B1D, GV_lit_file_handler_402B1D, LIBDG_IMPL);
 
 // TODO: These are not implemented - just here to return 1 for running standalone
-int CC GV_kmd_file_handler_402796(void* fileData, WORD fileNameHash)
+int CC GV_kmd_file_handler_402796(void* fileData, TFileNameHash fileNameHash)
 {
     LOG_WARNING("KMD loader not impl");
     return 1;
 }
 MGS_FUNC_IMPLEX(0x402796, GV_kmd_file_handler_402796, false); // TODO
 
-int CC GV_n_file_handler_402A03(void* fileData, WORD fileNameHash)
+int CC GV_n_file_handler_402A03(void* fileData, TFileNameHash fileNameHash)
 {
     LOG_WARNING("N loader not impl");
     return 1;
 }
 MGS_FUNC_IMPLEX(0x402A03, GV_n_file_handler_402A03, false); // TODO
 
-int CC GV_oar_file_handler_402A29(void* fileData, WORD fileNameHash)
+int CC GV_oar_file_handler_402A29(void* fileData, TFileNameHash fileNameHash)
 {
     LOG_WARNING("OAR loader not impl");
     return 1;
 }
 MGS_FUNC_IMPLEX(0x402A29, GV_oar_file_handler_402A29, false); // TODO
 
-int CC GV_zmd_file_handler_403290(void* fileData, WORD fileNameHash)
+int CC GV_zmd_file_handler_403290(void* fileData, TFileNameHash fileNameHash)
 {
     LOG_WARNING("ZMD loader not impl");
     return 1;
 }
 MGS_FUNC_IMPLEX(0x403290, GV_zmd_file_handler_403290, false); // TODO
 
-int CC GV_img_file_handler_402A5F(void* fileData, WORD fileNameHash)
+int CC GV_img_file_handler_402A5F(void* fileData, TFileNameHash fileNameHash)
 {
     LOG_WARNING("IMG loader not impl");
     return 1;
 }
 MGS_FUNC_IMPLEX(0x402A5F, GV_img_file_handler_402A5F, false); // TODO
 
-int CC GV_sgt_file_handler_402AA9(void* fileData, WORD fileNameHash)
+int CC GV_sgt_file_handler_402AA9(void* fileData, TFileNameHash fileNameHash)
 {
     LOG_WARNING("SGT loader not impl");
     return 1;
