@@ -26,7 +26,14 @@ void CC Render_FreeSurfaceStack_51DE0A()
     }
     gSurfaceStackIdx_dword_776858 = 0;
 }
-MGS_FUNC_IMPL(0x51DE0A, Render_FreeSurfaceStack_51DE0A);
+MGS_FUNC_IMPLEX(0x51DE0A, Render_FreeSurfaceStack_51DE0A, RENDERER_IMPL);
+
+void CC Render_PushSurface_51DDF2(IDirectDrawSurface7* pSurface)
+{
+    gSurfaceStack_dword_774F48[gSurfaceStackIdx_dword_776858] = pSurface;
+    gSurfaceStackIdx_dword_776858++;
+}
+MGS_FUNC_IMPLEX(0x51DDF2, Render_PushSurface_51DDF2, RENDERER_IMPL);
 
 MGS_VAR(1, 0x6FC7B0, WORD, gDisp_w_word_6FC7B0, 0);
 MGS_VAR(1, 0x6FC7B2, WORD, gDisp_y_word_6FC7B2, 0);
