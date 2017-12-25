@@ -613,7 +613,7 @@ void CC LibDG_Set_RGB_FromDG_Actor_4019B9()
 }
 MGS_FUNC_IMPLEX(0x4019B9, LibDG_Set_RGB_FromDG_Actor_4019B9, LIBDG_IMPL);
 
-void CC LibDG_SetRGB_401931(char r, char b, char g)
+void CC LibDG_SetRGB_401931(BYTE r, BYTE b, BYTE g)
 {
     gLibDG_2_stru_6BB930.gR_byte_6BB95A = r;
     gLibDG_2_stru_6BB930.gG_byte_6BB958 = g;

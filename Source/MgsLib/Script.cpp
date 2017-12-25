@@ -9,6 +9,7 @@
 #include "ResourceNameHash.hpp"
 #include "Actor_GameD.hpp"
 #include "LibGV.hpp"
+#include "Map.hpp"
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
@@ -828,7 +829,6 @@ MGS_FUNC_IMPLEX(0x451BBF, Script_tbl_load_451BBF, SCRIPT_IMPL);
 
 
 MGS_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
-MGS_FUNC_NOT_IMPL(0x0045151D, int __cdecl(BYTE*), Script_tbl_map_sub_45151D);
 MGS_FUNC_NOT_IMPL(0x00451673, int __cdecl(BYTE*), Script_tbl_hzd_related_sub_451673);
 MGS_FUNC_NOT_IMPL(0x004512E5, int __cdecl(BYTE*), script_tbl_camera_sub_4512E5);
 MGS_FUNC_NOT_IMPL(0x00451239, int __cdecl(BYTE*), Script_tbl_light_sub_451239);
@@ -884,7 +884,7 @@ MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
     { 0x22FF, 0x0, Script_tbl_mesg_sub_451A5E },
     { 0xD4CB, 0x0, Script_tbl_ntrap_removeQ_451688.Ptr() },
     { 0x9906, 0x0, Script_tbl_chara_451AC3 },
-    { 0xC091, 0x0, Script_tbl_map_sub_45151D.Ptr() },
+    { 0xC091, 0x0, Script_tbl_map_45151D },
     { 0x7D50, 0x0, Script_tbl_hzd_related_sub_451673.Ptr() },
     { 0xEEE9, 0x0, script_tbl_camera_sub_4512E5.Ptr() },
     { 0x306A, 0x0, Script_tbl_light_sub_451239.Ptr() },
@@ -1051,6 +1051,7 @@ MGS_FUNC_IMPLEX(0x004090CF, GV_gcx_file_handler_4090CF, SCRIPT_IMPL);
 
 void CC Script_Set_MainOrDemo_40908E(int bMain)
 {
+    // TODO: Hashed names are bigger than a WORD.. how can this work? :)
     gScriptFileNameHashedToLoad_6BFBB4 = bMain != 1 ?
         0x6EA54 :  // scenerio 
         0x6A242;   // demo

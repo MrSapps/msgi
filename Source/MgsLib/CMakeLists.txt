@@ -52,6 +52,8 @@ add_library(MgsLib
     types.hpp
     pcx.cpp
     pcx.hpp
+    Map.cpp
+    Map.hpp
     WinMain.cpp
     WinMain.hpp)
 

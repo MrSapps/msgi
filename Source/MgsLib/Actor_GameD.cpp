@@ -9,6 +9,7 @@
 #include "Actor_Rank.hpp" // gGameTime_word_78E896
 #include "Fs.hpp"
 #include "WinMain.hpp"
+#include "Map.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
@@ -66,7 +67,6 @@ MGS_FUNC_NOT_IMPL(0x00459A95, void CC(), sub_459A95);
 MGS_FUNC_NOT_IMPL(0x004553C5, void CC(), sub_4553C5);
 MGS_FUNC_NOT_IMPL(0x00455017, void CC(), GM_SoundStart_455017);
 MGS_FUNC_NOT_IMPL(0x0044E8F1, void CC(), sub_44E8F1);
-MGS_FUNC_NOT_IMPL(0x0044F38D, void CC(), Map_FreeHzdItems_44F38D);
 MGS_FUNC_NOT_IMPL(0x0044F3B5, void CC(), Map_FreeKmds_44F3B5);
 MGS_FUNC_NOT_IMPL(0x0044E969, void CC(), sub_44E969);
 MGS_FUNC_NOT_IMPL(0x004583BB, void CC(), StreamActorStop_4583BB);
@@ -527,7 +527,7 @@ void CC Init_Gamed_Create_44E12B()
     sub_44E1F9();
     sub_44E287();
     Reset_GV_DG_44E212();
-    gStartingCdId_78E7E8 = gCdId_78D7B0 + 1;
+    gStartingCdId_78E7E8 = static_cast<WORD>(gCdId_78D7B0 + 1);
     gpActiveButtons_995324 = &gButtonsArray4_7919C0[0];
     SaveResidentTop_40B36E();
     gGameD_stru_722760.gamed_unk_722780 = 0;

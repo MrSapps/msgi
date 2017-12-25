@@ -34,6 +34,7 @@ int CC Script_Operator_Evaluate(int operation, int v1, int v2);
 void CC Script_RunMainProc_409D49();
 char* CC Script_read_string_arg_40997B(BYTE* pScript);
 DWORD CC Script_Unknown8_409924(BYTE* pScript);
+int CC Script_Read3Words_409945(BYTE* pScript, WORD* pOut);
 
 
 MGS_VAR_EXTERN(int, gGameOverTimer_dword_7227A4);
