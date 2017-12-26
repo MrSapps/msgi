@@ -585,3 +585,24 @@ void CC PsxGpuDebug_44A4D0()
     printf("%-21s %14d\n", "gte_nop_count:", gGteData_722688.gte_nop_count_722688);
 }
 MGS_FUNC_IMPLEX(0x44A4D0, PsxGpuDebug_44A4D0, IMPL_PSX);
+
+struct Vec3Ints
+{
+    int field_0_x;
+    int field_4_y;
+    int field_8_z;
+};
+MGS_ASSERT_SIZEOF(Vec3Ints, 0xC);
+
+void CC Vector_Calc_UnitVec_44CAE0(const Vec3Ints* pVec, Vec3Ints* pUnitVec)
+{
+    const long double value = 4096.0 / sqrt((double)(
+        pVec->field_0_x * pVec->field_0_x + 
+        pVec->field_4_y * pVec->field_4_y + 
+        pVec->field_8_z * pVec->field_8_z));
+
+    pUnitVec->field_0_x = (signed int)((double)pVec->field_0_x * value);
+    pUnitVec->field_4_y = (signed int)((double)pVec->field_4_y * value);
+    pUnitVec->field_8_z = (signed int)((double)pVec->field_8_z * value);
+}
+MGS_FUNC_IMPLEX(0x44CAE0, Vector_Calc_UnitVec_44CAE0, IMPL_PSX);
