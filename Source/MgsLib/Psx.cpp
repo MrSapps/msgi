@@ -46,14 +46,6 @@ struct RECT32
 };
 MGS_ASSERT_SIZEOF(RECT32, 16);
 
-struct P_TAG
-{
-    unsigned addr : 24;
-    unsigned len : 8; // Tagged pointer bits?
-    BYTE r0, g0, b0, code;
-};
-MGS_ASSERT_SIZEOF(P_TAG, 8);
-
 struct P_CODE
 {
     BYTE r0, g0, b0, code;

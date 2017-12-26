@@ -56,9 +56,9 @@ void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
 }
 MGS_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, true); // TODO
 
-void CC POLYFT4_code_2_40E0D0(POLY_FT4* pPoly, BOOL bSetOrUnSetCode2)
+void CC POLYFT4_SetTransparency_40E0D0(POLY_FT4* pPoly, BOOL bIsSemiTransparent)
 {
-    if (bSetOrUnSetCode2)
+    if (bIsSemiTransparent)
     {
         pPoly->code |= 2u;
     }
@@ -67,15 +67,12 @@ void CC POLYFT4_code_2_40E0D0(POLY_FT4* pPoly, BOOL bSetOrUnSetCode2)
         pPoly->code &= ~2u;
     }
 }
-MGS_FUNC_IMPLEX(0x40E0D0, POLYFT4_code_2_40E0D0, ACTOR_RANK_IMPL);
+MGS_FUNC_IMPLEX(0x40E0D0, POLYFT4_SetTransparency_40E0D0, ACTOR_RANK_IMPL);
 
-void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16 x0, __int16 y0, __int16 x1, __int16 y2, int bSetCode2)
+void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16 x0, __int16 y0, __int16 x1, __int16 y2, int bIsSemiTransparent)
 {
-    pPoly->tag = pPoly->tag & 0xFFFFFF | 0x9000000;
-    pPoly->code = 44;
-    pPoly->r0 = 64;
-    pPoly->g0 = 64;
-    pPoly->b0 = 64;
+    setPolyFT4(pPoly);
+    setRGB0(pPoly, 64, 64, 64);
     pPoly->x0 = x0;
     pPoly->y0 = y0;
     pPoly->x1 = x1;
@@ -84,7 +81,7 @@ void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16
     pPoly->y2 = y2;
     pPoly->x3 = x1;
     pPoly->y3 = y2;
-    POLYFT4_code_2_40E0D0(pPoly, bSetCode2);
+    POLYFT4_SetTransparency_40E0D0(pPoly, bIsSemiTransparent);
 }
 MGS_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
 
@@ -1288,12 +1285,12 @@ static void Test_Rank_Set_POLYFT4_code_40E0D0()
 {
     // Turn bit 1 on
     POLY_FT4 poly = {};
-    POLYFT4_code_2_40E0D0(&poly, TRUE);
+    POLYFT4_SetTransparency_40E0D0(&poly, TRUE);
     ASSERT_EQ(poly.code, 2);
 
     // Turn bit 1 off
     poly.code = 0xFF;
-    POLYFT4_code_2_40E0D0(&poly, FALSE);
+    POLYFT4_SetTransparency_40E0D0(&poly, FALSE);
     ASSERT_EQ(poly.code, 0xFD);
 }
 

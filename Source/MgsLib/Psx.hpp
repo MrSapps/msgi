@@ -5,6 +5,22 @@
 
 void PsxCpp_ForceLink();
 
+struct P_TAG
+{
+    unsigned addr : 24;
+    unsigned len : 8; // Tagged pointer bits?
+    BYTE r0, g0, b0, code;
+};
+MGS_ASSERT_SIZEOF(P_TAG, 8);
+
+
+#define setlen( p, _len) (((P_TAG *)(p))->len  = (u_char)(_len))
+#define setaddr(p, _addr) (((P_TAG *)(p))->addr = (u_long)(_addr))
+#define setcode(p, _code) (((P_TAG *)(p))->code = (u_char)(_code))
+
+#define setRGB0(p,_r0,_g0,_b0) (p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
+#define setPolyFT4(p) setlen(p, 9), setcode(p, 0x2c)
+
 struct PSX_RECT // Should be called RECT but will clash with windows.h for now
 {
     s16 x1, y1, x2, y2;
