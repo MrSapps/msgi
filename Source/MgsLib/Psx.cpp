@@ -578,23 +578,59 @@ void CC PsxGpuDebug_44A4D0()
 }
 MGS_FUNC_IMPLEX(0x44A4D0, PsxGpuDebug_44A4D0, IMPL_PSX);
 
-struct Vec3Ints
+struct VECTOR
 {
     int field_0_x;
     int field_4_y;
     int field_8_z;
+    int padding;
 };
-MGS_ASSERT_SIZEOF(Vec3Ints, 0xC);
+MGS_ASSERT_SIZEOF(VECTOR, 0x10);
 
-void CC Vector_Calc_UnitVec_44CAE0(const Vec3Ints* pVec, Vec3Ints* pUnitVec)
+struct SVECTOR
 {
-    const long double value = 4096.0 / sqrt((double)(
-        pVec->field_0_x * pVec->field_0_x + 
-        pVec->field_4_y * pVec->field_4_y + 
-        pVec->field_8_z * pVec->field_8_z));
+    short int field_0_x;
+    short int field_2_y;
+    short int field_4_z;
+    short int padding;
+};
+MGS_ASSERT_SIZEOF(SVECTOR, 0x8);
+
+void CC VectorNormal_44CAE0(const VECTOR* pVec, VECTOR* pUnitVec)
+{
+    const long double value = 4096.0 / sqrt((double)
+        pVec->field_0_x * pVec->field_0_x +
+        pVec->field_4_y * pVec->field_4_y +
+        pVec->field_8_z * pVec->field_8_z);
 
     pUnitVec->field_0_x = (signed int)((double)pVec->field_0_x * value);
     pUnitVec->field_4_y = (signed int)((double)pVec->field_4_y * value);
     pUnitVec->field_8_z = (signed int)((double)pVec->field_8_z * value);
 }
-MGS_FUNC_IMPLEX(0x44CAE0, Vector_Calc_UnitVec_44CAE0, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x44CAE0, VectorNormal_44CAE0, IMPL_PSX);
+
+void CC VectorNormalS_44CB70(const VECTOR* pVec, SVECTOR* pUnitVec)
+{
+    const long double value = 4096.0 / sqrt((double)
+        pVec->field_0_x * pVec->field_0_x +
+        pVec->field_4_y * pVec->field_4_y +
+        pVec->field_8_z * pVec->field_8_z);
+
+    pUnitVec->field_0_x = (short signed int)((double)pVec->field_0_x * value);
+    pUnitVec->field_2_y = (short signed int)((double)pVec->field_4_y * value);
+    pUnitVec->field_4_z = (short signed int)((double)pVec->field_8_z * value);
+}
+MGS_FUNC_IMPLEX(0x44CB70, VectorNormalS_44CB70, IMPL_PSX);
+
+void CC VectorNormalSS_44CC00(const SVECTOR* pVec, SVECTOR* pUnitVec)
+{
+    const long double value = 4096.0 / sqrt((double)
+        (signed int)pVec->field_0_x * (signed int)pVec->field_0_x +
+        (signed int)pVec->field_2_y * (signed int)pVec->field_2_y +
+        (signed int)pVec->field_4_z * (signed int)pVec->field_4_z);
+
+    pUnitVec->field_0_x = (short signed int)((double)pVec->field_0_x * value);
+    pUnitVec->field_2_y = (short signed int)((double)pVec->field_2_y * value);
+    pUnitVec->field_4_z = (short signed int)((double)pVec->field_4_z * value);
+}
+MGS_FUNC_IMPLEX(0x44CC00, VectorNormalSS_44CC00, IMPL_PSX);
