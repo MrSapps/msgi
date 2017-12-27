@@ -997,6 +997,22 @@ Prim_unknown* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index
 }
 MGS_FUNC_IMPLEX(0x405050, PrimAlloc_405050, LIBDG_IMPL);
 
+signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
+{
+    struct_gv* pGv = &gLibGVStruct1_6BC36C;
+    assert(pPrimBuffer->field_2C_index == 0);
+    pGv = pGv + pPrimBuffer->field_2C_index; // Always 0?
+    if (pGv->gPrimQueue2_word_6BC3C0_256 > pGv->gObjectQueue_word_6BC3C2_0)
+    {
+        const s16 newCount = pGv->gPrimQueue2_word_6BC3C0_256 - 1;
+        pGv->gObjects_dword_6BC3C4[newCount] = pPrimBuffer; // PrimObject = Prim_unknown + extra ??
+        pGv->gPrimQueue2_word_6BC3C0_256 = newCount;
+        return 0;
+    }
+    return -1;
+}
+MGS_FUNC_IMPLEX(0x401805, PrimAdd_401805, LIBDG_IMPL);
+
 void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
 {
     memcpy(dword_991E40, &pGv->dword_6BC37C_32byte_size, 32/*sizeof(dword_991E40)*/); // sizeof returns 4 since dword_991E40 is a pointer to an array
@@ -1143,22 +1159,6 @@ void CC LibDg_Init_40111A()
     Actor_Init_40A347(&gLibDGD_1_stru_6BB910, LibDG_Update1_4012ED, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
 }
 MGS_FUNC_IMPLEX(0x40111A, LibDg_Init_40111A, LIBDG_IMPL);
-
-signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
-{
-    struct_gv* pGv = &gLibGVStruct1_6BC36C;
-    assert(pPrimBuffer->field_2C_index == 0);
-    pGv = pGv + pPrimBuffer->field_2C_index; // Always 0?
-    if (pGv->gPrimQueue2_word_6BC3C0_256 > pGv->gObjectQueue_word_6BC3C2_0)
-    {
-        const s16 newCount = pGv->gPrimQueue2_word_6BC3C0_256 - 1;
-        pGv->gObjects_dword_6BC3C4[newCount] = pPrimBuffer; // PrimObject = Prim_unknown + extra ??
-        pGv->gPrimQueue2_word_6BC3C0_256 = newCount;
-        return 0;
-    }
-    return -1;
-}
-MGS_FUNC_IMPLEX(0x401805, PrimAdd_401805, LIBDG_IMPL);
 
 void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
 {
