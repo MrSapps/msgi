@@ -309,9 +309,9 @@ MGS_ARY(1, 0x6BDC5C, DWORD, 259, ot_gv2_1_6BDC5C, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE068, DR_ENV, stru_6BE068, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE0A8, DR_ENV, pPacked_6BE0A8, {});
 
-MGS_ARY(1, 0x6BBD60, DWORD, 256, dg_dword_6BBD60_prim_ptrs, {});
+MGS_ARY(1, 0x6BBD60, Prim_unknown*, 256, dg_dword_6BBD60_prim_ptrs, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BBD5C, DWORD, dg_dword_6BBD5C_k320, 0);
-MGS_ARY(1, 0x6BB95C, DWORD, 256, dg_dword_6BB95C_prim_ptrs, {});
+MGS_ARY(1, 0x6BB95C, Prim_unknown*, 256, dg_dword_6BB95C_prim_ptrs, {});
 
 void CC Pack_DRAWENV_40DDE0(DR_ENV* pPacked, DRAWENV* drawEnv)
 {
@@ -384,7 +384,7 @@ void CC Gv3StructsInit_4012F2(int k320)
     gLibGvStruct0_6BC180.gPrimQueue2_word_6BC3C0_256 = 8;
     gLibGvStruct0_6BC180.g_PrimQueue1_word_6BC3BE_256 = 8;
     gLibGvStruct0_6BC180.gObjectQueue_word_6BC3C2_0 = 0;
-    gLibGvStruct0_6BC180.gObjects_dword_6BC3C4 = (Prim_unknown **)dg_dword_6BBD60_prim_ptrs;// Might be 8 instead of 256?
+    gLibGvStruct0_6BC180.gObjects_dword_6BC3C4 = dg_dword_6BBD60_prim_ptrs;// Might be 8 instead of 256?
     gLibGvStruct0_6BC180.word_6BC374_8 = 5;
     gLibGvStruct0_6BC180.word_6BC378_1 = 1;
     gLibGvStruct0_6BC180.word_6BC37A_0_1EC_size = 0;// used in other func
@@ -411,7 +411,7 @@ void CC Gv3StructsInit_4012F2(int k320)
     gLibGVStruct1_6BC36C.gPrimQueue2_word_6BC3C0_256 = 256;
     gLibGVStruct1_6BC36C.g_PrimQueue1_word_6BC3BE_256 = 256;
     gLibGVStruct1_6BC36C.gObjectQueue_word_6BC3C2_0 = 0;
-    gLibGVStruct1_6BC36C.gObjects_dword_6BC3C4 = (Prim_unknown **)dg_dword_6BB95C_prim_ptrs;
+    gLibGVStruct1_6BC36C.gObjects_dword_6BC3C4 = dg_dword_6BB95C_prim_ptrs;
     gLibGVStruct1_6BC36C.word_6BC374_8 = 8;
     gLibGVStruct1_6BC36C.word_6BC376_16 = 16;
     gLibGVStruct1_6BC36C.word_6BC378_1 = 1;
