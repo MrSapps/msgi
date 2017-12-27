@@ -95,6 +95,24 @@ struct DISPENV
 };
 MGS_ASSERT_SIZEOF(DISPENV, 20);
 
+struct VECTOR
+{
+    int field_0_x;
+    int field_4_y;
+    int field_8_z;
+    int padding;
+};
+MGS_ASSERT_SIZEOF(VECTOR, 0x10);
+
+struct SVECTOR
+{
+    short int field_0_x;
+    short int field_2_y;
+    short int field_4_z;
+    short int padding;
+};
+MGS_ASSERT_SIZEOF(SVECTOR, 0x8);
+
 MGS_VAR_EXTERN(DISPENV, gDispEnv_6BECF0);
 MGS_VAR_EXTERN(DRAWENV, gDrawEnv_6C0E98);
 

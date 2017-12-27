@@ -64,7 +64,7 @@ MGS_ASSERT_SIZEOF(Prim_base, 0x20);
 struct Prim_unknown
 {
     Prim_base mBase;
-    DWORD field_20;
+    void* field_20;
     DWORD field_24_maybe_flags;
     WORD field_28_dword_9942A0;
     WORD field_2A_num_items;
@@ -77,9 +77,10 @@ struct Prim_unknown
     DWORD field_38_size24b;
     DWORD field_3C;
     BYTE* field_40_pDataStart[2];
-    DWORD field_48;
+    DWORD field_48; // Prim_unknown** ?
     DWORD field_4C;
-    DWORD field_50;
+    DWORD field_50; // field_68 == ?? // 0x54-0x68=0x14 20 bytes into first prim ?? 
+    // field_84
 };
 MGS_ASSERT_SIZEOF(Prim_unknown, 0x54);
 

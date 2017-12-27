@@ -578,24 +578,6 @@ void CC PsxGpuDebug_44A4D0()
 }
 MGS_FUNC_IMPLEX(0x44A4D0, PsxGpuDebug_44A4D0, IMPL_PSX);
 
-struct VECTOR
-{
-    int field_0_x;
-    int field_4_y;
-    int field_8_z;
-    int padding;
-};
-MGS_ASSERT_SIZEOF(VECTOR, 0x10);
-
-struct SVECTOR
-{
-    short int field_0_x;
-    short int field_2_y;
-    short int field_4_z;
-    short int padding;
-};
-MGS_ASSERT_SIZEOF(SVECTOR, 0x8);
-
 void CC VectorNormal_44CAE0(const VECTOR* pVec, VECTOR* pUnitVec)
 {
     const long double value = 4096.0 / sqrt((double)

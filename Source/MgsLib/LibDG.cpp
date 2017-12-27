@@ -889,14 +889,45 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
 MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, false); // TODO: Fully implement
 MGS_FUNC_NOT_IMPL(0x401D64, void __cdecl(int a1), sub_401D64);
 
+MGS_VAR(1, 0x991E60, VECTOR, pVec_991E60, {});
 
-void __cdecl sub_4066ED(Prim_Object* pObj);
-MGS_FUNC_IMPLEX(0x4066ED, sub_4066ED, true);
+MGS_FUNC_NOT_IMPL(0x40674E, void __cdecl(int a1, int count), sub_40674E);
+MGS_FUNC_NOT_IMPL(0x406B97, void __cdecl(int a1, int count), sub_406B97);
+MGS_FUNC_NOT_IMPL(0x406A78, void __cdecl(int a1, int count), sub_406A78);
+MGS_FUNC_NOT_IMPL(0x406906, void __cdecl(int a1, int count), sub_406906);
 
-void __cdecl sub_4066ED(Prim_Object* pObj)
+void CC sub_4066ED(Prim_unknown* pObj)
 {
-    sub_4066ED_.Ptr()(pObj);
+    void* field_20 = pObj->field_20;
+    int count = pObj->field_2E_w_or_h;
+    if (field_20)
+    {
+        memcpy(pObj, field_20, 32u);
+    }
+
+    memcpy(&pVec_991E60, pObj, 32u);
+
+    if (pObj->field_28_dword_9942A0 & 0x40)
+    {
+        // Seems to mostly handle "static" level geometry?
+        sub_40674E((int)pObj, count);
+    }
+    else
+    {
+        if (pObj->field_38_size24b)
+        {
+            // Seems to handle players/map objects?
+            sub_406B97((int)pObj, count);
+        }
+        else if (pObj->field_40_pDataStart[1])
+        {
+            // Seems to mostly render doors?
+            sub_406A78((int)pObj, count);
+        }
+        sub_406906((int)pObj, count);
+    }
 }
+MGS_FUNC_IMPLEX(0x4066ED, sub_4066ED, true);
 
 //MGS_FUNC_NOT_IMPL(0x407122, void CC(struct_gv* pGv, int activeBuffer), LibGV_407122);
 MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
@@ -1021,7 +1052,7 @@ void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
     for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
     {
         Prim_unknown* pObj = pGv->gObjects_dword_6BC3C4[i];
-        sub_4066ED((Prim_Object*)pObj);
+        sub_4066ED(pObj);
     }
 }
 MGS_FUNC_IMPLEX(0x407122, LibGV_407122, true); // TODO: Implement me
