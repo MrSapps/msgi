@@ -22,9 +22,9 @@ struct Actor_Open
     Actor mBase;
 };
 
-Actor_Open* CC Res_open_create_486BD4(int a2, int a3) // DWORD scriptData, int scriptBinds, BYTE* pScript
+Actor_Open* CC Res_open_create_486BD4(DWORD scriptData, int scriptBinds, BYTE* pScript)
 {
-    return (Actor_Open*)Res_env_test_create_62130E(a2, a3);
+    return (Actor_Open*)Res_env_test_create_62130E(scriptData, scriptBinds);
 }
 MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, false); // TODO
 
@@ -905,7 +905,97 @@ MGS_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_404
 MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
 //MGS_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_40340A);
 
-MGS_ARY(1, 0x991E40, int, 8, dword_991E40, {});
+MGS_ARY(1, 0x991E40, int, 8, dword_991E40, 
+{
+    // TODO: Rip this data
+});
+
+MGS_ARY(1, 0x6501F8, int, 8, dword_6501F8, 
+{
+    // TODO: Rip this data
+});
+
+struct PrimUnknownData
+{
+    char field_0;
+    char field_1;
+    char field_2;
+    char field_3;
+};
+MGS_ASSERT_SIZEOF(PrimUnknownData, 0x4);
+
+// Data maybe related to Resetgraph_AndPrintPsxStructureSizes() ?
+MGS_ARY(1, 0x650194, PrimUnknownData, 25, byte_650194,
+{
+    { 16,   2,   8,   4 },
+    { 24,   3,   8,   4 },
+    { 28,   4,   8,   4 },
+    { 20,   2,   8,   8 },
+    { 32,   3,   8,   8 },
+    { 40,   4,   8,   8 },
+    { 20,   1,   8,   0 },
+    { 16,   1,   8,   0 },
+    { 16,   1,   8,   0 },
+    { 16,   1,   8,   0 },
+    { 12,   1,   8,   0 },
+    { 12,   1,   8,   0 },
+    { 12,   1,   8,   0 },
+    { 20,   3,   8,   4 },
+    { 24,   4,   8,   4 },
+    { 28,   3,   8,   8 },
+    { 36,   4,   8,   8 },
+    { 32,   3,   8,   8 },
+    { 40,   4,   8,   8 },
+    { 40,   3,   8,  12 },
+    { 52,   4,   8,  12 },
+    { 40,   2,   8,   8 },
+    { 52,   2,   8,  12 },
+    { 12,   1,   8,   0 },
+    { 0,    0,   0,   0 }
+});
+
+// Dynamically sets the last item of byte_650194
+void CC sub_40514F(char a1, char a2, char a3, char a4)
+{
+    byte_650194[23].field_0 = a1;
+    byte_650194[23].field_1 = a2;
+    byte_650194[23].field_2 = a3;
+    byte_650194[23].field_3 = a4;
+}
+MGS_FUNC_IMPLEX(0x40514F, sub_40514F, LIBDG_IMPL);
+
+Prim_unknown* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C)
+{
+    const int idx = (maybeFlags & 31);
+    assert(idx < 25);
+
+    const PrimUnknownData* pData = &byte_650194[idx];
+    const int baseSize2 = numItems * pData->field_0;
+
+    // allocate double amount for active buffer switching?
+    Prim_unknown* pMem = (Prim_unknown *)System_2_zerod_allocate_memory_40B296(2 * baseSize2 + sizeof(Prim_unknown));
+    if (pMem)
+    {
+        MemClearUnknown_40B231(pMem, sizeof(Prim_unknown));
+        memcpy(pMem, dword_6501F8, 32u);
+        pMem->field_24_maybe_flags = maybeFlags;
+        pMem->field_2A_num_items = numItems;
+        pMem->field_2C_index = gv_index;
+        pMem->field_38_size24b = size;
+        pMem->field_3C = field_3C;
+        pMem->field_30_size = pData->field_0;
+        pMem->field_32 = pData->field_1;
+        pMem->field_34 = pData->field_2;
+        pMem->field_36 = pData->field_3;
+
+        // Point into the extra allocated space after the structure
+        BYTE* endPtr = reinterpret_cast<BYTE*>(&pMem[1]);
+        pMem->field_40_pDataStart[0] = endPtr;
+        pMem->field_40_pDataStart[1] = endPtr + baseSize2;
+    }
+    return pMem;
+}
+MGS_FUNC_IMPLEX(0x405050, PrimAlloc_405050, LIBDG_IMPL);
 
 void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
 {
@@ -1057,8 +1147,8 @@ MGS_FUNC_IMPLEX(0x40111A, LibDg_Init_40111A, LIBDG_IMPL);
 signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
 {
     struct_gv* pGv = &gLibGVStruct1_6BC36C;
-    assert(pPrimBuffer->field_2C_r_index == 0);
-    pGv = pGv + pPrimBuffer->field_2C_r_index; // Always 0?
+    assert(pPrimBuffer->field_2C_index == 0);
+    pGv = pGv + pPrimBuffer->field_2C_index; // Always 0?
     if (pGv->gPrimQueue2_word_6BC3C0_256 > pGv->gObjectQueue_word_6BC3C2_0)
     {
         const s16 newCount = pGv->gPrimQueue2_word_6BC3C0_256 - 1;

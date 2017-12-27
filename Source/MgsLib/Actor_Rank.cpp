@@ -1015,8 +1015,6 @@ void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 }
 MGS_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
 
-MGS_FUNC_NOT_IMPL(0x405050, Prim_unknown* CC(int maybeFlags, int numItems, __int16 rQ, int gQ, int bQ), PrimAlloc_405050);
-
 MGS_VAR_EXTERN(u32, dword_9942A0); // From Actor
 
 MGS_VAR(1, 0x7919E0, char*, dword_7919E0, 0);
