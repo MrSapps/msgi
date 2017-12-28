@@ -483,6 +483,22 @@ union Reg_SXY2
     int SXY2;
 };
 
+union Reg_VXY0
+{
+    struct Regs
+    {
+        short int VY0;
+        short int VX0;
+        short int VZ0;
+        short int Zero;
+    } regs;
+    __int64 VXY0;
+};
+
+
+MGS_VAR(1, 0x993EC0, Reg_VXY0, gGte_VXY0_993EC0, {});
+
+
 // Maybe more regs?
 MGS_VAR(1, 0x993EE4, int, gGte_in1_dword_993EE4, 0);
 MGS_VAR(1, 0x993EE8, int, gGte_in2_dword_993EE8, 0);
@@ -652,6 +668,42 @@ void CC Psx_gte_RT1_rtir_447480()
 }
 MGS_FUNC_IMPLEX(0x447480, Psx_gte_RT1_rtir_447480, true);
 
+void CC Psx_gte_RT1_rtv0_447180()
+{
+    ++gGteData_722688.gte_RT1_count_7226AC;
+    ++gGteData_722688.gte_rtv0_count_722694;
+
+    gGte_out1_dword_993F24 = 
+         (gGte_VXY0_993EC0.regs.VY0 * gte_matrix_993E40.m[0][0]
+        + gGte_VXY0_993EC0.regs.VX0 * gte_matrix_993E40.m[0][1]
+        + gGte_VXY0_993EC0.regs.VZ0 * gte_matrix_993E40.m[0][2]) >> 12;
+
+    gGte_out2_dword_993F28 =
+        (gGte_VXY0_993EC0.regs.VY0 * gte_matrix_993E40.m[1][0]
+       + gGte_VXY0_993EC0.regs.VX0 * gte_matrix_993E40.m[1][1]
+       + gGte_VXY0_993EC0.regs.VZ0 * gte_matrix_993E40.m[1][2]) >> 12;
+
+    gGte_out3_dword_993F2C =
+        (gGte_VXY0_993EC0.regs.VY0 * gte_matrix_993E40.m[2][0]
+       + gGte_VXY0_993EC0.regs.VX0 * gte_matrix_993E40.m[2][1]
+       + gGte_VXY0_993EC0.regs.VZ0 * gte_matrix_993E40.m[2][2]) >> 12;
+
+    gGte_in1_dword_993EE4 = 
+         (gGte_VXY0_993EC0.regs.VY0 * gte_matrix_993E40.m[0][0]
+        + gGte_VXY0_993EC0.regs.VX0 * gte_matrix_993E40.m[0][1]
+        + gGte_VXY0_993EC0.regs.VZ0 * gte_matrix_993E40.m[0][2]) >> 12;
+
+    gGte_in2_dword_993EE8 = 
+         (gGte_VXY0_993EC0.regs.VY0 * gte_matrix_993E40.m[1][0]
+        + gGte_VXY0_993EC0.regs.VX0 * gte_matrix_993E40.m[1][1]
+        + gGte_VXY0_993EC0.regs.VZ0 * gte_matrix_993E40.m[1][2]) >> 12;
+
+    gGte_in3_dword_993EEC = 
+         (gGte_VXY0_993EC0.regs.VY0 * gte_matrix_993E40.m[2][0]
+        + gGte_VXY0_993EC0.regs.VX0 * gte_matrix_993E40.m[2][1]
+        + gGte_VXY0_993EC0.regs.VZ0 * gte_matrix_993E40.m[2][2]) >> 12;
+}
+MGS_FUNC_IMPLEX(0x447180, Psx_gte_RT1_rtv0_447180, true);
 
 void Test_Psx_gte_RT1_rtir_447480()
 {
