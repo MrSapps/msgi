@@ -626,25 +626,29 @@ void CC Psx_gte_RT1_rtir_447480()
     ++gGteData_722688.gte_RT1_count_7226AC;
     ++gGteData_722688.gte_rtir_count_7226E0;
 
-    const int v0 = 
-          (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[1][0]
-        + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[1][1]
-        + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[1][2];
+    const int v0 =
+     (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[0][0]
+    + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[0][1]
+    + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[0][2];
 
-    const int v2 = (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[2][0];
-    const int v1 = (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[2][1];
-    const int v3 = (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[2][2];
+    const int v1 = 
+      (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[1][0]
+    + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[1][1]
+    + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[1][2];
 
-    gGte_in1_dword_993EE4 = 
-        ( (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[0][0]
-        + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[0][1]
-        + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[0][2]) >> 12;
+    const int v3 = 
+      (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[2][0]
+    + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[2][1]
+    + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[2][2];
 
-    gGte_out1_dword_993F24 = gGte_in1_dword_993EE4;
-    gGte_out2_dword_993F28 = v0 >> 12;
-    gGte_in2_dword_993EE8 = v0 >> 12;
-    gGte_in3_dword_993EEC = (v2 + v1 + (v3 >> 12));
-    gGte_out3_dword_993F2C = gGte_in3_dword_993EEC;
+    gGte_in1_dword_993EE4 = v0 >> 12;
+    gGte_out1_dword_993F24 = v0 >> 12;
+
+    gGte_in2_dword_993EE8 = v1 >> 12;
+    gGte_out2_dword_993F28 = v1 >> 12;
+
+    gGte_in3_dword_993EEC = v3 >> 12;
+    gGte_out3_dword_993F2C = v3 >> 12;
 }
 MGS_FUNC_IMPLEX(0x447480, Psx_gte_RT1_rtir_447480, true);
 
