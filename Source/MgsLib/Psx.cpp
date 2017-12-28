@@ -483,6 +483,10 @@ union Reg_SXY2
     int SXY2;
 };
 
+// Maybe more regs?
+MGS_VAR(1, 0x993EE4, int, gGte_in1_dword_993EE4, 0);
+MGS_VAR(1, 0x993EE8, int, gGte_in2_dword_993EE8, 0);
+MGS_VAR(1, 0x993EEC, int, gGte_in3_dword_993EEC, 0);
 
 MGS_VAR(1, 0x993EF0, Reg_SXY1, gGte_SXY1_993EF0, {});
 MGS_VAR(1, 0x993EF4, Reg_SXY0, gGte_SXY0_993EF4, {});
@@ -490,6 +494,11 @@ MGS_VAR(1, 0x993EF8, Reg_SXY2, gGte_SXY2_993EF8, {});
 
 
 MGS_VAR(1, 0x993F20, int, gGte_MAC0_993F20, 0);
+
+// Could be MAC1-3?
+MGS_VAR(1, 0x993F24, int, gGte_out1_dword_993F24, 0);
+MGS_VAR(1, 0x993F28, int, gGte_out2_dword_993F28, 0);
+MGS_VAR(1, 0x993F2C, int, gGte_out3_dword_993F2C, 0);
 
 
 MGS_VAR(1, 0x722688, GTE_Data, gGteData_722688, {});
@@ -602,14 +611,65 @@ void CC VectorNormalSS_44CC00(const SVECTOR* pVec, SVECTOR* pUnitVec)
 }
 MGS_FUNC_IMPLEX(0x44CC00, VectorNormalSS_44CC00, IMPL_PSX);
 
+struct Mtx
+{
+    short int m[3][3];
+    char pad[14];
+};
+MGS_ASSERT_SIZEOF(Mtx, 32);
+
+MGS_VAR(1, 0x993E40, Mtx, gte_matrix_993E40, {});
+MGS_VAR(1, 0x993F34, DWORD, gGte_square_of_ir_dword_993F34, 0);
 
 void CC Psx_gte_RT1_rtir_447480()
 {
+    ++gGteData_722688.gte_RT1_count_7226AC;
+    ++gGteData_722688.gte_rtir_count_7226E0;
 
+    const int v0 = 
+          (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[1][0]
+        + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[1][1]
+        + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[1][2];
+
+    const int v2 = (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[2][0];
+    const int v1 = (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[2][1];
+    const int v3 = (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[2][2];
+
+    gGte_in1_dword_993EE4 = 
+        ( (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[0][0]
+        + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[0][1]
+        + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[0][2]) >> 12;
+
+    gGte_out1_dword_993F24 = gGte_in1_dword_993EE4;
+    gGte_out2_dword_993F28 = v0 >> 12;
+    gGte_in2_dword_993EE8 = v0 >> 12;
+    gGte_in3_dword_993EEC = (v2 + v1 + (v3 >> 12));
+    gGte_out3_dword_993F2C = gGte_in3_dword_993EEC;
 }
-MGS_FUNC_IMPLEX(0x447480, Psx_gte_RT1_rtir_447480, false);
+MGS_FUNC_IMPLEX(0x447480, Psx_gte_RT1_rtir_447480, true);
+
 
 void Test_Psx_gte_RT1_rtir_447480()
+{
+    gGte_in1_dword_993EE4 = 4096;
+    gGte_in2_dword_993EE8 = 4096;
+    gGte_in3_dword_993EEC = 4096;
+
+    gte_matrix_993E40.m[0][0] = 4096;
+    gte_matrix_993E40.m[1][1] = 4096;
+    gte_matrix_993E40.m[2][2] = 4096;
+
+
+    Psx_gte_RT1_rtir_447480();
+
+    ASSERT_EQ(4096, gGte_out1_dword_993F24);
+    ASSERT_EQ(4096, gGte_out2_dword_993F28);
+    ASSERT_EQ(4096, gGte_out3_dword_993F2C);
+
+    ASSERT_EQ(0, gGte_square_of_ir_dword_993F34);
+}
+
+void Test_Psx_gte_rtpt_445990()
 {
 
 }
@@ -617,4 +677,5 @@ void Test_Psx_gte_RT1_rtir_447480()
 void DoPsxTests()
 {
     Test_Psx_gte_RT1_rtir_447480();
+    Test_Psx_gte_rtpt_445990();
 }
