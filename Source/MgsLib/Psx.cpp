@@ -641,14 +641,15 @@ void CC VectorNormalSS_44CC00(const SVECTOR* pVec, SVECTOR* pUnitVec)
 }
 MGS_FUNC_IMPLEX(0x44CC00, VectorNormalSS_44CC00, IMPL_PSX);
 
-struct Mtx
+struct MATRIX
 {
     short int m[3][3];
-    char pad[14];
+    char pad[2];
+    int t[3];
 };
-MGS_ASSERT_SIZEOF(Mtx, 32);
+MGS_ASSERT_SIZEOF(MATRIX, 32);
 
-MGS_VAR(1, 0x993E40, Mtx, gte_matrix_993E40, {});
+MGS_VAR(1, 0x993E40, MATRIX, gte_matrix_993E40, {});
 MGS_VAR(1, 0x993F34, DWORD, gGte_square_of_ir_dword_993F34, 0);
 
 void CC Psx_gte_RT1_rtir_447480()
@@ -730,9 +731,54 @@ void CC Psx_gte_RT1_rtv2_447380()
 {
     ++gGteData_722688.gte_RT1_count_7226AC;
     ++gGteData_722688.gte_rtv2_count_7226E8;
+
     Psx_gte_RT1_rtvX_Impl(gGte_VXY2_993ED0.regs);
 }
 MGS_FUNC_IMPLEX(0x447380, Psx_gte_RT1_rtv2_447380, true);
+
+static inline void Psx_gte_RT1TR_X_Impl()
+{
+    const int v0 = gte_matrix_993E40.t[0]
+        + ((gGte_VXY0_993EC0.regs.VY * gte_matrix_993E40.m[0][0]
+          + gGte_VXY0_993EC0.regs.VX * gte_matrix_993E40.m[0][1]
+          + gGte_VXY0_993EC0.regs.VZ * gte_matrix_993E40.m[0][2]) >> 12);
+
+    const int v1 = gte_matrix_993E40.t[1]
+        + ((gGte_VXY0_993EC0.regs.VY * gte_matrix_993E40.m[1][0]
+          + gGte_VXY0_993EC0.regs.VX * gte_matrix_993E40.m[1][1]
+          + gGte_VXY0_993EC0.regs.VZ * gte_matrix_993E40.m[1][2]) >> 12);
+
+    const int v2 = gte_matrix_993E40.t[2]
+        + ((gGte_VXY0_993EC0.regs.VY * gte_matrix_993E40.m[2][0]
+          + gGte_VXY0_993EC0.regs.VX * gte_matrix_993E40.m[2][1]
+          + gGte_VXY0_993EC0.regs.VZ * gte_matrix_993E40.m[2][2]) >> 12);
+
+    gGte_out1_dword_993F24 = v0;
+    gGte_out2_dword_993F28 = v1;
+    gGte_out3_dword_993F2C = v2;
+
+    gGte_in1_dword_993EE4 = v0;
+    gGte_in2_dword_993EE8 = v1;
+    gGte_in3_dword_993EEC = v2;
+}
+
+void CC Psx_gte_RT1TR_rt_4477A0()
+{
+    ++gGteData_722688.gte_RT1TR_count_7226D4;
+    ++gGteData_722688.gte_rt_count_7226B0;
+
+    Psx_gte_RT1TR_X_Impl();
+}
+MGS_FUNC_IMPLEX(0x4477A0, Psx_gte_RT1TR_rt_4477A0, true);
+
+void CC Psx_gte_RT1TR_rtv0tr_4478C0()
+{
+    ++gGteData_722688.gte_RT1TR_count_7226D4;
+    ++gGteData_722688.gte_rtv0tr_count_7226FC;
+
+    Psx_gte_RT1TR_X_Impl();
+}
+MGS_FUNC_IMPLEX(0x4478C0, Psx_gte_RT1TR_rtv0tr_4478C0, true);
 
 void Test_Psx_gte_RT1_rtir_447480()
 {
