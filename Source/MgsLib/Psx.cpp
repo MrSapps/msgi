@@ -495,8 +495,33 @@ union Reg_VXY0
     __int64 VXY0;
 };
 
+union Reg_VXY1
+{
+    struct Regs
+    {
+        short int VY1;
+        short int VX1;
+        short int VZ1;
+        short int Zero;
+    } regs;
+    __int64 VXY1;
+};
+
+union Reg_VXY2
+{
+    struct Regs
+    {
+        short int VY2;
+        short int VX2;
+        short int VZ2;
+        short int Zero;
+    } regs;
+    __int64 VXY2;
+};
 
 MGS_VAR(1, 0x993EC0, Reg_VXY0, gGte_VXY0_993EC0, {});
+MGS_VAR(1, 0x993EC8, Reg_VXY1, gGte_VXY1_993EC8, {});
+MGS_VAR(1, 0x993ED0, Reg_VXY2, gGte_VXY2_993ED0, {});
 
 
 // Maybe more regs?
@@ -704,6 +729,81 @@ void CC Psx_gte_RT1_rtv0_447180()
         + gGte_VXY0_993EC0.regs.VZ0 * gte_matrix_993E40.m[2][2]) >> 12;
 }
 MGS_FUNC_IMPLEX(0x447180, Psx_gte_RT1_rtv0_447180, true);
+
+void CC Psx_gte_RT1_rtv1_447280()
+{
+    ++gGteData_722688.gte_RT1_count_7226AC;
+    ++gGteData_722688.gte_rtv1_count_7226B8;
+
+    gGte_out1_dword_993F24 =
+        (gGte_VXY1_993EC8.regs.VY1 * gte_matrix_993E40.m[0][0]
+       + gGte_VXY1_993EC8.regs.VX1 * gte_matrix_993E40.m[0][1]
+       + gGte_VXY1_993EC8.regs.VZ1 * gte_matrix_993E40.m[0][2]) >> 12;
+
+    gGte_out2_dword_993F28 = 
+         (gGte_VXY1_993EC8.regs.VY1 * gte_matrix_993E40.m[1][0]
+        + gGte_VXY1_993EC8.regs.VX1 * gte_matrix_993E40.m[1][1]
+        + gGte_VXY1_993EC8.regs.VZ1 * gte_matrix_993E40.m[1][2]) >> 12;
+
+    gGte_out3_dword_993F2C =
+         (gGte_VXY1_993EC8.regs.VY1 * gte_matrix_993E40.m[2][0]
+       + gGte_VXY1_993EC8.regs.VX1 * gte_matrix_993E40.m[2][1]
+       + gGte_VXY1_993EC8.regs.VZ1 * gte_matrix_993E40.m[2][2]) >> 12;
+
+    gGte_in1_dword_993EE4 =
+        (gGte_VXY1_993EC8.regs.VY1 * gte_matrix_993E40.m[0][0]
+       + gGte_VXY1_993EC8.regs.VX1 * gte_matrix_993E40.m[0][1]
+        + gGte_VXY1_993EC8.regs.VZ1 * gte_matrix_993E40.m[0][2]) >> 12;
+
+    gGte_in2_dword_993EE8 =
+         (gGte_VXY1_993EC8.regs.VY1 * gte_matrix_993E40.m[1][0]
+        + gGte_VXY1_993EC8.regs.VX1 * gte_matrix_993E40.m[1][1]
+        + gGte_VXY1_993EC8.regs.VZ1 * gte_matrix_993E40.m[1][2]) >> 12;
+
+    gGte_in3_dword_993EEC = 
+        (gGte_VXY1_993EC8.regs.VY1 * gte_matrix_993E40.m[2][0] 
+       + gGte_VXY1_993EC8.regs.VX1 * gte_matrix_993E40.m[2][1] 
+       + gGte_VXY1_993EC8.regs.VZ1 * gte_matrix_993E40.m[2][2]) >> 12;
+
+}
+MGS_FUNC_IMPLEX(0x447280, Psx_gte_RT1_rtv1_447280, true);
+
+void CC Psx_gte_RT1_rtv2_447380()
+{
+    ++gGteData_722688.gte_RT1_count_7226AC;
+    ++gGteData_722688.gte_rtv2_count_7226E8;
+
+    gGte_out1_dword_993F24 = 
+         (gGte_VXY2_993ED0.regs.VY2 * gte_matrix_993E40.m[0][0]
+        + gGte_VXY2_993ED0.regs.VX2 * gte_matrix_993E40.m[0][1]
+        + gGte_VXY2_993ED0.regs.VZ2 * gte_matrix_993E40.m[0][2]) >> 12;
+
+    gGte_out2_dword_993F28 =
+         (gGte_VXY2_993ED0.regs.VY2 * gte_matrix_993E40.m[1][0]
+        + gGte_VXY2_993ED0.regs.VX2 * gte_matrix_993E40.m[1][1]
+        + gGte_VXY2_993ED0.regs.VZ2 * gte_matrix_993E40.m[1][2]) >> 12;
+
+    gGte_out3_dword_993F2C =
+        (gGte_VXY2_993ED0.regs.VY2 * gte_matrix_993E40.m[2][0]
+       + gGte_VXY2_993ED0.regs.VX2 * gte_matrix_993E40.m[2][1]
+       + gGte_VXY2_993ED0.regs.VZ2 * gte_matrix_993E40.m[2][2]) >> 12;
+
+    gGte_in1_dword_993EE4 =
+        (gGte_VXY2_993ED0.regs.VY2 * gte_matrix_993E40.m[0][0]
+       + gGte_VXY2_993ED0.regs.VX2 * gte_matrix_993E40.m[0][1]
+       + gGte_VXY2_993ED0.regs.VZ2 * gte_matrix_993E40.m[0][2]) >> 12;
+
+    gGte_in2_dword_993EE8 = 
+         (gGte_VXY2_993ED0.regs.VY2 * gte_matrix_993E40.m[1][0]
+        + gGte_VXY2_993ED0.regs.VX2 * gte_matrix_993E40.m[1][1]
+        + gGte_VXY2_993ED0.regs.VZ2 * gte_matrix_993E40.m[1][2]) >> 12;
+
+    gGte_in3_dword_993EEC = 
+         (gGte_VXY2_993ED0.regs.VY2 * gte_matrix_993E40.m[2][0]
+        + gGte_VXY2_993ED0.regs.VX2 * gte_matrix_993E40.m[2][1]
+        + gGte_VXY2_993ED0.regs.VZ2 * gte_matrix_993E40.m[2][2]) >> 12;
+}
+MGS_FUNC_IMPLEX(0x447380, Psx_gte_RT1_rtv2_447380, true);
 
 void Test_Psx_gte_RT1_rtir_447480()
 {
