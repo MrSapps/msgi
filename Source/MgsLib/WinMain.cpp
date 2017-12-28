@@ -2521,6 +2521,7 @@ static void RunTests()
     DoLibGv_Tests();
     DoMovie_Tests();
     DoFsTests();
+    DoPsxTests();
 }
 
 int Sink()
