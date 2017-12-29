@@ -375,7 +375,7 @@ int CC ClearImage(PSX_RECT* pRect, BYTE r, BYTE g, BYTE b)
 }
 MGS_FUNC_IMPLEX(0x0044ABE0, ClearImage, IMPL_PSX);
 
-int CC Psx_OpenEvent(int desc, int spec, int mode, int func)
+int CC Psx_OpenEvent(void* desc, int spec, int mode, void* func)
 {
     printf("OpenEvent(%p,%d,%d,%p)\n", desc, spec, mode, func);
     return 0;
@@ -389,7 +389,7 @@ int CC EnableEvent(int pEvent)
 }
 MGS_FUNC_IMPLEX(0x0044CF10, EnableEvent, IMPL_PSX);
 
-int CC CloseEvent(int pEvent)
+int CC CloseEvent(void* pEvent)
 {
     printf(".CloseEvent(%p)\n", pEvent);
     return 0;
@@ -452,118 +452,8 @@ DRAWENV* Renderer_Init_DRAWENV_40200D()
 }
 MGS_FUNC_IMPLEX(0x40200D, Renderer_Init_DRAWENV_40200D, IMPL_PSX);
 
-union Reg_SXY0
-{
-    struct Regs
-    {
-        short int SY0;
-        short int SX0;
-    } regs;
-    int SXY0;
-};
-
-union Reg_SXY1
-{
-    struct Regs
-    {
-        short int SY1;
-        short int SX1;
-    } regs;
-    int SXY1;
-};
-
-union Reg_SXY2
-{
-    struct Regs
-    {
-        short int SY2;
-        short int SX2;
-    } regs;
-    int SXY2;
-};
-
-struct XYZ0Regs
-{
-    short int VY;
-    short int VX;
-    short int VZ;
-    short int Zero;
-};
-
-union Reg_VXY0
-{
-    XYZ0Regs regs;
-    __int64 VXY0;
-};
-
-union Reg_VXY1
-{
-    XYZ0Regs regs;
-    __int64 VXY1;
-};
-
-union Reg_VXY2
-{
-    XYZ0Regs regs;
-    __int64 VXY2;
-};
-
-MGS_VAR(1, 0x993EC0, Reg_VXY0, gGte_VXY0_993EC0, {});
-MGS_VAR(1, 0x993EC8, Reg_VXY1, gGte_VXY1_993EC8, {});
-MGS_VAR(1, 0x993ED0, Reg_VXY2, gGte_VXY2_993ED0, {});
-
-
-// Maybe more regs?
-MGS_VAR(1, 0x993EE4, int, gGte_in1_dword_993EE4, 0);
-MGS_VAR(1, 0x993EE8, int, gGte_in2_dword_993EE8, 0);
-MGS_VAR(1, 0x993EEC, int, gGte_in3_dword_993EEC, 0);
-
-MGS_VAR(1, 0x993EF0, Reg_SXY1, gGte_SXY1_993EF0, {});
-MGS_VAR(1, 0x993EF4, Reg_SXY0, gGte_SXY0_993EF4, {});
-MGS_VAR(1, 0x993EF8, Reg_SXY2, gGte_SXY2_993EF8, {});
-
-
-MGS_VAR(1, 0x993F20, int, gGte_MAC0_993F20, 0);
-
-// Could be MAC1-3?
-MGS_VAR(1, 0x993F24, int, gGte_out1_dword_993F24, 0);
-MGS_VAR(1, 0x993F28, int, gGte_out2_dword_993F28, 0);
-MGS_VAR(1, 0x993F2C, int, gGte_out3_dword_993F2C, 0);
-
-
-MGS_VAR(1, 0x722688, GTE_Data, gGteData_722688, {});
-
-void CC Psx_gte_normal_clip_446E90()
-{
-    ++gGteData_722688.gte_nclip_count_7226A4;
-
-    gGte_MAC0_993F20 =
-        (gGte_SXY0_993EF4.regs.SX0 * gGte_SXY1_993EF0.regs.SY1) +
-        (gGte_SXY1_993EF0.regs.SX1 * gGte_SXY2_993EF8.regs.SY2) +
-        (gGte_SXY2_993EF8.regs.SX2 * gGte_SXY0_993EF4.regs.SY0) -
-        (gGte_SXY0_993EF4.regs.SX0 * gGte_SXY2_993EF8.regs.SY2) -
-        (gGte_SXY1_993EF0.regs.SX1 * gGte_SXY0_993EF4.regs.SY0) -
-        (gGte_SXY2_993EF8.regs.SX2 * gGte_SXY1_993EF0.regs.SY1);
-}
-MGS_FUNC_IMPLEX(0x446E90, Psx_gte_normal_clip_446E90, IMPL_PSX);
-
-void CC Psx_gte_nop_44A460()
-{
-    ++gGteData_722688.gte_nop_count_722688;
-}
-MGS_FUNC_IMPLEX(0x44A460, Psx_gte_nop_44A460, IMPL_PSX);
 
 // This is never called by the game, but we can call it for debugging purposes
-
-/*
-Opcodes used by the Actor_Rank screen:
-gte_rtpt_count:                 5640
-gte_ncs_count:                    16
-gte_RT1_count:                  3438
-gte_RT1TR_count:                1146
-gte_rtir_count:                 3438
-gte_rt_count:                   1146
-*/
 void CC PsxGpuDebug_44A4D0()
 {
     printf("%-21s %14d\n", "gte_rtps_count:", gGteData_722688.gte_rtps_count_7226F0);
@@ -641,172 +531,239 @@ void CC VectorNormalSS_44CC00(const SVECTOR* pVec, SVECTOR* pUnitVec)
 }
 MGS_FUNC_IMPLEX(0x44CC00, VectorNormalSS_44CC00, IMPL_PSX);
 
-struct MATRIX
+struct Regs_SYSX
+{
+    short int SY;
+    short int SX;
+};
+MGS_ASSERT_SIZEOF(Regs_SYSX, 4);
+
+union Reg_SXY0
+{
+    Regs_SYSX regs;
+    int SXY0;
+};
+
+union Reg_SXY1
+{
+    Regs_SYSX regs;
+    int SXY1;
+};
+
+union Reg_SXY2
+{
+    Regs_SYSX regs;
+    int SXY2;
+};
+
+struct Regs_VXYZ
+{
+    short int VX;
+    short int VY;
+    short int VZ;
+    short int Zero;
+};
+MGS_ASSERT_SIZEOF(Regs_VXYZ, 8);
+
+union Reg_VXY0
+{
+    Regs_VXYZ regs;
+    __int64 VXY0;
+};
+
+union Reg_VXY1
+{
+    Regs_VXYZ regs;
+    __int64 VXY1;
+};
+
+union Reg_VXY2
+{
+    Regs_VXYZ regs;
+    __int64 VXY2;
+};
+
+struct PSX_MATRIX
 {
     short int m[3][3];
     char pad[2];
     int t[3];
 };
-MGS_ASSERT_SIZEOF(MATRIX, 32);
+MGS_ASSERT_SIZEOF(PSX_MATRIX, 32);
 
-MGS_VAR(1, 0x993E40, MATRIX, gte_matrix_993E40, {});
-MGS_VAR(1, 0x993F34, DWORD, gGte_square_of_ir_dword_993F34, 0);
+struct MATRIX3x3
+{
+    short int m[3][3];
+};
+MGS_ASSERT_SIZEOF(MATRIX3x3, 18);
+
+struct VECTOR3
+{
+    int x, y, z;
+};
+MGS_ASSERT_SIZEOF(VECTOR3, 0xc);
+
+union IR_Reg
+{
+    short int IR_16;
+    int IR_32;
+};
+MGS_ASSERT_SIZEOF(IR_Reg, 4);
+
+union MAC_Reg
+{
+    short int MAC_16;
+    int MAC_32;
+};
+MGS_ASSERT_SIZEOF(MAC_Reg, 4);
+
+struct Reg_RGB
+{
+    char r, g, b, cd;
+};
+MGS_ASSERT_SIZEOF(Reg_RGB, 4);
+
+struct Unk_72270C_Sub
+{
+    float field_0_v;
+    float field_4_prev_8;
+    float field_8_prev_C;
+    float field_C_v;
+};
+MGS_ASSERT_SIZEOF(Unk_72270C_Sub, 0x10);
+
+struct Unk_72270C
+{
+    Unk_72270C_Sub d[3];
+};
+MGS_ASSERT_SIZEOF(Unk_72270C, 0x30);
+
+
+MGS_VAR(1, 0x993E40, MATRIX3x3, gte_rotation_matrix_993E40, {});
+MGS_VAR(1, 0x993E54, VECTOR3, gGte_translation_vector_993E54, {});
+
+MGS_VAR(1, 0x993E60, MATRIX3x3, gGte_light_source_matrix_993E60, {});
+MGS_VAR(1, 0x993E74, VECTOR3, gGte_background_colour_993E74, {});
+MGS_VAR(1, 0x993E80, MATRIX3x3, gGte_light_colour_matrix_source_993E80, {});
+
+MGS_VAR(1, 0x993E94, VECTOR3, gGte_far_colour_993E94, {});
+MGS_VAR(1, 0x993EA0, DWORD, gGte_ScreenOffsetX_993EA0, 0);
+MGS_VAR(1, 0x993EA4, DWORD, gGte_ScreenOffSetY_993EA4, 0);
+MGS_VAR(1, 0x993EA8, DWORD, gGte_project_plane_distance_993EA8, 0);
+MGS_VAR(1, 0x993EBC, DWORD, gGte_FLAG_993EBC, 0);
+
+MGS_VAR(1, 0x993EC0, Reg_VXY0, gGte_VXY0_993EC0, {});
+MGS_VAR(1, 0x993EC8, Reg_VXY1, gGte_VXY1_993EC8, {});
+MGS_VAR(1, 0x993ED0, Reg_VXY2, gGte_VXY2_993ED0, {});
+
+MGS_VAR(1, 0x993ED8, BYTE, gGte_r_993ED8, 0);
+MGS_VAR(1, 0x993ED9, BYTE, gGte_g_993ED9, 0);
+MGS_VAR(1, 0x993EDA, BYTE, gGte_b_993EDA, 0);
+MGS_VAR(1, 0x993EDB, WORD, gGte_OTZ_993EDB, 0);
+
+MGS_VAR(1, 0x993EE0, IR_Reg, gGte_IR0_993EE0, {});
+MGS_VAR(1, 0x993EE4, IR_Reg, gGte_IR1_993EE4, {});
+MGS_VAR(1, 0x993EE8, IR_Reg, gGte_IR2_993EE8, {});
+MGS_VAR(1, 0x993EEC, IR_Reg, gGte_IR3_993EEC, {});
+
+MGS_VAR(1, 0x993EF0, Reg_SXY0, gGte_SXY0_993EF0, {});
+MGS_VAR(1, 0x993EF4, Reg_SXY1, gGte_SXY1_993EF4, {});
+MGS_VAR(1, 0x993EF8, Reg_SXY2, gGte_SXY2_993EF8, {});
+
+MGS_VAR(1, 0x993F00, DWORD, gGte_SZ0_993F00, 0);
+MGS_VAR(1, 0x993F04, DWORD, gGte_SZ1_993F04, 0);
+MGS_VAR(1, 0x993F08, DWORD, gGte_SZ2_993F08, 0);
+MGS_VAR(1, 0x993F0C, DWORD, gGte_SZ3_993F0C, 0);
+
+MGS_VAR(1, 0x993F10, Reg_RGB, gGte_RGB0_993F10, {});
+MGS_VAR(1, 0x993F14, Reg_RGB, gGte_RGB1_993F14, {});
+MGS_VAR(1, 0x993F18, Reg_RGB, gGte_RGB2_993F18, {});
+
+MGS_VAR(1, 0x993F20, MAC_Reg, gGte_MAC0_993F20, {});
+MGS_VAR(1, 0x993F24, MAC_Reg, gGte_MAC1_993F24, {});
+MGS_VAR(1, 0x993F28, MAC_Reg, gGte_MAC2_993F28, {});
+MGS_VAR(1, 0x993F2C, MAC_Reg, gGte_MAC3_993F2C, {});
+
+MGS_VAR(1, 0x722688, GTE_Data, gGteData_722688, {});
+
+/*
+void CC Psx_gte_nclip_446E90()
+{
+
+}
+MGS_FUNC_IMPLEX(0x446E90, Psx_gte_nclip_446E90, IMPL_PSX);
+
+void CC Psx_gte_nop_44A460()
+{
+    ++gGteData_722688.gte_nop_count_722688;
+}
+MGS_FUNC_IMPLEX(0x44A460, Psx_gte_nop_44A460, IMPL_PSX);
 
 void CC Psx_gte_RT1_rtir_447480()
 {
-    ++gGteData_722688.gte_RT1_count_7226AC;
-    ++gGteData_722688.gte_rtir_count_7226E0;
 
-    const int v0 =
-     (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[0][0]
-    + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[0][1]
-    + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[0][2];
-
-    const int v1 = 
-      (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[1][0]
-    + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[1][1]
-    + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[1][2];
-
-    const int v3 = 
-      (signed __int16)gGte_in1_dword_993EE4 * gte_matrix_993E40.m[2][0]
-    + (signed __int16)gGte_in2_dword_993EE8 * gte_matrix_993E40.m[2][1]
-    + (signed __int16)gGte_in3_dword_993EEC * gte_matrix_993E40.m[2][2];
-
-    gGte_in1_dword_993EE4 = v0 >> 12;
-    gGte_out1_dword_993F24 = v0 >> 12;
-
-    gGte_in2_dword_993EE8 = v1 >> 12;
-    gGte_out2_dword_993F28 = v1 >> 12;
-
-    gGte_in3_dword_993EEC = v3 >> 12;
-    gGte_out3_dword_993F2C = v3 >> 12;
 }
 MGS_FUNC_IMPLEX(0x447480, Psx_gte_RT1_rtir_447480, true);
 
-static inline void Psx_gte_RT1_rtvX_Impl(XYZ0Regs& regs)
+static inline void Psx_gte_RT1_rtvX_Impl(Regs_VXYZ& regs)
 {
-    const int v0 = 
-         (regs.VY * gte_matrix_993E40.m[0][0]
-        + regs.VX * gte_matrix_993E40.m[0][1]
-        + regs.VZ * gte_matrix_993E40.m[0][2]) >> 12;
 
-    const int v1 = 
-         (regs.VY * gte_matrix_993E40.m[1][0]
-        + regs.VX * gte_matrix_993E40.m[1][1]
-        + regs.VZ * gte_matrix_993E40.m[1][2]) >> 12;
-
-    const int v2 = 
-         (regs.VY * gte_matrix_993E40.m[2][0]
-        + regs.VX * gte_matrix_993E40.m[2][1]
-        + regs.VZ * gte_matrix_993E40.m[2][2]) >> 12;
-
-    gGte_out1_dword_993F24 = v0;
-    gGte_out2_dword_993F28 = v1;
-    gGte_out3_dword_993F2C = v2;
-
-    gGte_in1_dword_993EE4 = v0;
-    gGte_in2_dword_993EE8 = v1;
-    gGte_in3_dword_993EEC = v2;
 }
 
 void CC Psx_gte_RT1_rtv0_447180()
 {
-    ++gGteData_722688.gte_RT1_count_7226AC;
-    ++gGteData_722688.gte_rtv0_count_722694;
 
-    Psx_gte_RT1_rtvX_Impl(gGte_VXY0_993EC0.regs);
 }
 MGS_FUNC_IMPLEX(0x447180, Psx_gte_RT1_rtv0_447180, true);
 
 void CC Psx_gte_RT1_rtv1_447280()
 {
-    ++gGteData_722688.gte_RT1_count_7226AC;
-    ++gGteData_722688.gte_rtv1_count_7226B8;
 
-    Psx_gte_RT1_rtvX_Impl(gGte_VXY1_993EC8.regs);
 }
 MGS_FUNC_IMPLEX(0x447280, Psx_gte_RT1_rtv1_447280, true);
 
 void CC Psx_gte_RT1_rtv2_447380()
 {
-    ++gGteData_722688.gte_RT1_count_7226AC;
-    ++gGteData_722688.gte_rtv2_count_7226E8;
 
-    Psx_gte_RT1_rtvX_Impl(gGte_VXY2_993ED0.regs);
 }
 MGS_FUNC_IMPLEX(0x447380, Psx_gte_RT1_rtv2_447380, true);
 
 static inline void Psx_gte_RT1TR_X_Impl()
 {
-    const int v0 = gte_matrix_993E40.t[0]
-        + ((gGte_VXY0_993EC0.regs.VY * gte_matrix_993E40.m[0][0]
-          + gGte_VXY0_993EC0.regs.VX * gte_matrix_993E40.m[0][1]
-          + gGte_VXY0_993EC0.regs.VZ * gte_matrix_993E40.m[0][2]) >> 12);
 
-    const int v1 = gte_matrix_993E40.t[1]
-        + ((gGte_VXY0_993EC0.regs.VY * gte_matrix_993E40.m[1][0]
-          + gGte_VXY0_993EC0.regs.VX * gte_matrix_993E40.m[1][1]
-          + gGte_VXY0_993EC0.regs.VZ * gte_matrix_993E40.m[1][2]) >> 12);
-
-    const int v2 = gte_matrix_993E40.t[2]
-        + ((gGte_VXY0_993EC0.regs.VY * gte_matrix_993E40.m[2][0]
-          + gGte_VXY0_993EC0.regs.VX * gte_matrix_993E40.m[2][1]
-          + gGte_VXY0_993EC0.regs.VZ * gte_matrix_993E40.m[2][2]) >> 12);
-
-    gGte_out1_dword_993F24 = v0;
-    gGte_out2_dword_993F28 = v1;
-    gGte_out3_dword_993F2C = v2;
-
-    gGte_in1_dword_993EE4 = v0;
-    gGte_in2_dword_993EE8 = v1;
-    gGte_in3_dword_993EEC = v2;
 }
 
 void CC Psx_gte_RT1TR_rt_4477A0()
 {
-    ++gGteData_722688.gte_RT1TR_count_7226D4;
-    ++gGteData_722688.gte_rt_count_7226B0;
 
-    Psx_gte_RT1TR_X_Impl();
 }
 MGS_FUNC_IMPLEX(0x4477A0, Psx_gte_RT1TR_rt_4477A0, true);
 
 void CC Psx_gte_RT1TR_rtv0tr_4478C0()
 {
-    ++gGteData_722688.gte_RT1TR_count_7226D4;
-    ++gGteData_722688.gte_rtv0tr_count_7226FC;
 
-    Psx_gte_RT1TR_X_Impl();
 }
 MGS_FUNC_IMPLEX(0x4478C0, Psx_gte_RT1TR_rtv0tr_4478C0, true);
 
-void Test_Psx_gte_RT1_rtir_447480()
+static void Test_Psx_gte_RT1_rtir_447480()
 {
-    gGte_in1_dword_993EE4 = 4096;
-    gGte_in2_dword_993EE8 = 4096;
-    gGte_in3_dword_993EEC = 4096;
+    gGte_IR1_993EE4.IR_32 = 4096;
+    gGte_IR1_993EE4.IR_32 = 4096;
+    gGte_IR3_993EEC.IR_32 = 4096;
 
-    gte_matrix_993E40.m[0][0] = 4096;
-    gte_matrix_993E40.m[1][1] = 4096;
-    gte_matrix_993E40.m[2][2] = 4096;
-
+    gte_rotation_matrix_993E40.m[0][0] = 4096;
+    gte_rotation_matrix_993E40.m[1][1] = 4096;
+    gte_rotation_matrix_993E40.m[2][2] = 4096;
 
     Psx_gte_RT1_rtir_447480();
 
-    ASSERT_EQ(4096, gGte_out1_dword_993F24);
-    ASSERT_EQ(4096, gGte_out2_dword_993F28);
-    ASSERT_EQ(4096, gGte_out3_dword_993F2C);
-
-    ASSERT_EQ(0, gGte_square_of_ir_dword_993F34);
+    ASSERT_EQ(4096, gGte_MAC1_993F24.MAC_32);
+    ASSERT_EQ(4096, gGte_MAC2_993F28.MAC_32);
+    ASSERT_EQ(4096, gGte_MAC3_993F2C.MAC_32);
 }
-
-void Test_Psx_gte_rtpt_445990()
-{
-
-}
+*/
 
 void DoPsxTests()
 {
-    Test_Psx_gte_RT1_rtir_447480();
-    Test_Psx_gte_rtpt_445990();
+    //Test_Psx_gte_RT1_rtir_447480();
 }

@@ -150,20 +150,8 @@ struct GTE_Data
     int gte_sqr12_count_722700;
     int gte_dpcs_count_722704;
     int gte_cc_count_722708;
-    int dword_722688;
-    int anonymous_1; // TODO: Name as above
-    int anonymous_2;
-    int anonymous_3;
-    int anonymous_4;
-    int anonymous_5;
-    int anonymous_6;
-    float anonymous_7;
-    int anonymous_8;
-    int anonymous_9;
-    int anonymous_10;
-    float anonymous_11;
 };
-MGS_ASSERT_SIZEOF(GTE_Data, 0xB4);
+MGS_ASSERT_SIZEOF(GTE_Data, 0x84);
 
 MGS_VAR_EXTERN(DISPENV, gDispEnv_6BECF0);
 MGS_VAR_EXTERN(DRAWENV, gDrawEnv_6C0E98);
@@ -173,6 +161,6 @@ signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode);
 int CC SetGraphDebug(int debug);
 void CC SetDispMask(int mask);
 int CC ClearImage(PSX_RECT* pRect, BYTE r, BYTE g, BYTE b);
-int CC Psx_OpenEvent(int desc, int spec, int mode, int func); // Psx_ to avoid windows.h name clash
+int CC Psx_OpenEvent(void* desc, int spec, int mode, void* func); // Psx_ to avoid windows.h name clash
 void CC PsxGpuDebug_44A4D0();
 DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2);
