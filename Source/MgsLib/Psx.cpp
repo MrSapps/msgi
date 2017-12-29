@@ -1096,12 +1096,88 @@ void CC Psx_gte_sqr0_446EE0()
 }
 MGS_FUNC_IMPLEX(0x446EE0, Psx_gte_sqr0_446EE0, IMPL_PSX);
 
+static inline void Psx_gte_RT1_rtvX_Impl(Regs_VXYZ& regs)
+{
+    const int v0 =
+        (regs.VX * gte_rotation_matrix_993E40.m[0][0]
+       + regs.VY * gte_rotation_matrix_993E40.m[0][1]
+       + regs.VZ * gte_rotation_matrix_993E40.m[0][2]) >> 12;
+
+    const int v1 =
+        (regs.VX * gte_rotation_matrix_993E40.m[1][0]
+       + regs.VY * gte_rotation_matrix_993E40.m[1][1]
+       + regs.VZ * gte_rotation_matrix_993E40.m[1][2]) >> 12;
+
+    const int v2 =
+        (regs.VX * gte_rotation_matrix_993E40.m[2][0]
+       + regs.VY * gte_rotation_matrix_993E40.m[2][1]
+       + regs.VZ * gte_rotation_matrix_993E40.m[2][2]) >> 12;
+
+    gGte_MAC1_993F24.MAC_32 = v0;
+    gGte_MAC2_993F28.MAC_32 = v1;
+    gGte_MAC3_993F2C.MAC_32 = v2;
+
+    gGte_IR1_993EE4.IR_32 = v0;
+    gGte_IR2_993EE8.IR_32 = v1;
+    gGte_IR3_993EEC.IR_32 = v2;
+}
+
+void CC Psx_gte_RT1_rtv0_447180()
+{
+    ++gGteData_722688.gte_RT1_count_7226AC;
+    ++gGteData_722688.gte_rtv0_count_722694;
+    
+    Psx_gte_RT1_rtvX_Impl(gGte_VXY0_993EC0.regs);
+}
+MGS_FUNC_IMPLEX(0x447180, Psx_gte_RT1_rtv0_447180, IMPL_PSX);
+
+void CC Psx_gte_RT1_rtv1_447280()
+{
+    ++gGteData_722688.gte_RT1_count_7226AC;
+    ++gGteData_722688.gte_rtv1_count_7226B8;
+
+    Psx_gte_RT1_rtvX_Impl(gGte_VXY1_993EC8.regs);
+}
+MGS_FUNC_IMPLEX(0x447280, Psx_gte_RT1_rtv1_447280, IMPL_PSX);
+
+void CC Psx_gte_RT1_rtv2_447380()
+{
+    ++gGteData_722688.gte_RT1_count_7226AC;
+    ++gGteData_722688.gte_rtv2_count_7226E8;
+
+    Psx_gte_RT1_rtvX_Impl(gGte_VXY2_993ED0.regs);
+}
+MGS_FUNC_IMPLEX(0x447380, Psx_gte_RT1_rtv2_447380, IMPL_PSX);
+
+void CC Psx_gte_RT1_rtir_447480()
+{
+    ++gGteData_722688.gte_RT1_count_7226AC;
+    ++gGteData_722688.gte_rtir_count_7226E0;
+
+    int v0 = gGte_IR1_993EE4.IR_16 * gte_rotation_matrix_993E40.m[1][0]
+        + gGte_IR2_993EE8.IR_16 * gte_rotation_matrix_993E40.m[1][1]
+        + gGte_IR3_993EEC.IR_16 * gte_rotation_matrix_993E40.m[1][2];
+    int v1 = gGte_IR2_993EE8.IR_16 * gte_rotation_matrix_993E40.m[2][1];
+    int v2 = gGte_IR1_993EE4.IR_16 * gte_rotation_matrix_993E40.m[2][0];
+    gGte_IR1_993EE4.IR_32 = (gGte_IR1_993EE4.IR_16 * gte_rotation_matrix_993E40.m[0][0]
+        + gGte_IR2_993EE8.IR_16 * gte_rotation_matrix_993E40.m[0][1]
+        + gGte_IR3_993EEC.IR_16 * gte_rotation_matrix_993E40.m[0][2]) >> 12;
+    gGte_MAC1_993F24.MAC_32 = gGte_IR1_993EE4.IR_32;
+    gGte_MAC2_993F28.MAC_32 = v0 >> 12;
+    gGte_IR2_993EE8.IR_32 = v0 >> 12;
+    gGte_IR3_993EEC.IR_32 = (v2 + v1 + gGte_IR3_993EEC.IR_16 * gte_rotation_matrix_993E40.m[2][2]) >> 12;
+    gGte_MAC3_993F2C.MAC_32 = gGte_IR3_993EEC.IR_32;
+}
+MGS_FUNC_IMPLEX(0x447480, Psx_gte_RT1_rtir_447480, IMPL_PSX);
 
 void CC Psx_gte_nop_44A460()
 {
     ++gGteData_722688.gte_nop_count_722688;
 }
 MGS_FUNC_IMPLEX(0x44A460, Psx_gte_nop_44A460, IMPL_PSX);
+
+
+
 
 /*
 void CC Psx_gte_RT1_rtir_447480()
@@ -1110,10 +1186,6 @@ void CC Psx_gte_RT1_rtir_447480()
 }
 MGS_FUNC_IMPLEX(0x447480, Psx_gte_RT1_rtir_447480, true);
 
-static inline void Psx_gte_RT1_rtvX_Impl(Regs_VXYZ& regs)
-{
-
-}
 
 void CC Psx_gte_RT1_rtv0_447180()
 {
