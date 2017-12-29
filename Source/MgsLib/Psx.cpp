@@ -1054,12 +1054,48 @@ void CC Psx_gte_nccs_445F20()
 }
 MGS_FUNC_IMPLEX(0x445F20, Psx_gte_nccs_445F20, IMPL_PSX);
 
-/*
 void CC Psx_gte_nclip_446E90()
 {
+    ++gGteData_722688.gte_nclip_count_7226A4;
 
+    gGte_MAC0_993F20.MAC_32 =
+          (gGte_SXY1_993EF4.regs.SY - gGte_SXY0_993EF0.regs.SY)
+        * (gGte_SXY2_993EF8.regs.SX - gGte_SXY0_993EF0.regs.SX)
+        - (gGte_SXY2_993EF8.regs.SY - gGte_SXY0_993EF0.regs.SY)
+        * (gGte_SXY1_993EF4.regs.SX - gGte_SXY0_993EF0.regs.SX);
 }
 MGS_FUNC_IMPLEX(0x446E90, Psx_gte_nclip_446E90, IMPL_PSX);
+
+void CC Psx_gte_sqr0_446EE0()
+{
+    // Square of vector IR
+    ++gGteData_722688.gte_sqr0_count_722698;
+
+    gGte_IR1_993EE4.IR_32 = gGte_IR1_993EE4.IR_16 * gGte_IR1_993EE4.IR_16;
+    gGte_IR2_993EE8.IR_32 = gGte_IR2_993EE8.IR_16 * gGte_IR2_993EE8.IR_16;
+    gGte_IR3_993EEC.IR_32 = gGte_IR3_993EEC.IR_16 * gGte_IR3_993EEC.IR_16;
+
+    gGte_MAC1_993F24.MAC_32 = gGte_IR1_993EE4.IR_32;
+    gGte_MAC2_993F28.MAC_32 = gGte_IR2_993EE8.IR_32;
+    gGte_MAC3_993F2C.MAC_32 = gGte_IR3_993EEC.IR_32;
+
+    if (gGte_IR1_993EE4.IR_32 > 32768)
+    {
+        gGte_IR1_993EE4.IR_32 = 32768;
+    }
+
+    if (gGte_IR2_993EE8.IR_32 > 32768)
+    {
+        gGte_IR2_993EE8.IR_32 = 32768;
+    }
+
+    if (gGte_IR3_993EEC.IR_32 > 32768)
+    {
+        gGte_IR3_993EEC.IR_32 = 32768;
+    }
+}
+MGS_FUNC_IMPLEX(0x446EE0, Psx_gte_sqr0_446EE0, IMPL_PSX);
+
 
 void CC Psx_gte_nop_44A460()
 {
@@ -1067,6 +1103,7 @@ void CC Psx_gte_nop_44A460()
 }
 MGS_FUNC_IMPLEX(0x44A460, Psx_gte_nop_44A460, IMPL_PSX);
 
+/*
 void CC Psx_gte_RT1_rtir_447480()
 {
 
