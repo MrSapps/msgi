@@ -685,6 +685,152 @@ MGS_VAR(1, 0x993F28, MAC_Reg, gGte_MAC2_993F28, {});
 MGS_VAR(1, 0x993F2C, MAC_Reg, gGte_MAC3_993F2C, {});
 
 MGS_VAR(1, 0x722688, GTE_Data, gGteData_722688, {});
+MGS_VAR(1, 0x72270C, Unk_72270C, gGte_unknown_72270C, {});
+
+void CC Psx_gte_rtps_445630()
+{
+    // Perspective Transformation single
+    ++gGteData_722688.gte_rtps_count_7226F0;
+
+    const float field_4_1 = gGte_unknown_72270C.d[1].field_4_prev_8;
+    gGte_unknown_72270C.d[1].field_4_prev_8 = gGte_unknown_72270C.d[1].field_8_prev_C;
+    gGte_unknown_72270C.d[1].field_0_v = field_4_1;
+    gGte_unknown_72270C.d[1].field_8_prev_C = gGte_unknown_72270C.d[1].field_C_v;
+
+    const float field_4_2 = gGte_unknown_72270C.d[2].field_4_prev_8;
+    gGte_unknown_72270C.d[2].field_4_prev_8 = gGte_unknown_72270C.d[2].field_8_prev_C;
+    gGte_unknown_72270C.d[2].field_0_v = field_4_2;
+    gGte_unknown_72270C.d[2].field_8_prev_C = gGte_unknown_72270C.d[2].field_C_v;
+
+    const float field_4_0 = gGte_unknown_72270C.d[0].field_4_prev_8;
+    gGte_unknown_72270C.d[0].field_4_prev_8 = gGte_unknown_72270C.d[0].field_8_prev_C;
+    gGte_unknown_72270C.d[0].field_0_v = field_4_0;
+    gGte_unknown_72270C.d[0].field_8_prev_C = gGte_unknown_72270C.d[0].field_C_v;
+
+    const double vx = (double)gGte_VXY0_993EC0.regs.VX / 4096.0;
+    const double vy = (double)gGte_VXY0_993EC0.regs.VY / 4096.0;
+    const double vz = (double)gGte_VXY0_993EC0.regs.VZ / 4096.0;
+
+    const double matrix_2 =
+             ((double)gte_rotation_matrix_993E40.m[2][2] * vz
+            + (double)gte_rotation_matrix_993E40.m[2][1] * vy
+            + (double)gte_rotation_matrix_993E40.m[2][0] * vx
+            + (double)gGte_translation_vector_993E54.z) / 4096.0;
+
+    double scaled_project_plane_distance;
+    if (matrix_2 >= (double)((unsigned __int16)gGte_project_plane_distance_993EA8 >> 1) / 4096.0)
+    {
+        scaled_project_plane_distance = (double)(unsigned __int16)gGte_project_plane_distance_993EA8 / matrix_2;
+    }
+    else
+    {
+        scaled_project_plane_distance = 8192.0;
+    }
+
+    double matrix_0 = scaled_project_plane_distance
+          * (((double)gte_rotation_matrix_993E40.m[0][2] * vz
+            + (double)gte_rotation_matrix_993E40.m[0][1] * vy
+            + (double)gte_rotation_matrix_993E40.m[0][0] * vx
+            + (double)gGte_translation_vector_993E54.x) / 4096.0);
+
+    double matrix_1 = scaled_project_plane_distance
+          * (((double)gte_rotation_matrix_993E40.m[1][2] * vz
+            + (double)gte_rotation_matrix_993E40.m[1][1] * vy
+            + (double)gte_rotation_matrix_993E40.m[1][0] * vx
+            + (double)gGte_translation_vector_993E54.y) / 4096.0);
+
+    // Rotate the SZ fifo
+    gGte_SZ0_993F00 = gGte_SZ1_993F04;
+    gGte_SZ1_993F04 = gGte_SZ2_993F08;
+    gGte_SZ2_993F08 = gGte_SZ3_993F0C;
+    signed int matrix_2_fixed = (signed int)(matrix_2 * 4096.0);
+
+    if (matrix_2_fixed >= 0)
+    {
+        if (matrix_2_fixed > 65535)
+        {
+            matrix_2_fixed = 65535;
+        }
+    }
+    else
+    {
+        matrix_2_fixed = 0;
+    }
+    gGte_SZ3_993F0C = matrix_2_fixed;
+
+    if (matrix_0 < -1024.0)
+    {
+        matrix_0 = -1024.0;
+    }
+
+    if (matrix_1 < -1024.0)
+    {
+        matrix_1 = -1024.0;
+    }
+
+    if (matrix_0 > 1023.0)
+    {
+        matrix_0 = 1023.0;
+    }
+
+    if (matrix_1 > 1023.0)
+    {
+        matrix_1 = 1023.0;
+    }
+
+    const double screen_off_x_matrix_0 = (double)gGte_ScreenOffsetX_993EA0 + matrix_0;
+    const double screen_off_y_matrix_1 = (double)gGte_ScreenOffSetY_993EA4 + matrix_1;
+
+    double clamped_matrix_2;
+    if (matrix_2 <= 0.0)
+    {
+        clamped_matrix_2 = 0.0;
+    }
+    else
+    {
+        clamped_matrix_2 = matrix_2;
+    }
+
+    gGte_unknown_72270C.d[1].field_C_v = (float)screen_off_x_matrix_0;
+    gGte_unknown_72270C.d[2].field_C_v = (float)screen_off_y_matrix_1;
+    gGte_unknown_72270C.d[0].field_C_v = (float)clamped_matrix_2;
+
+    gGte_SXY0_993EF0.regs.SY = gGte_SXY1_993EF4.regs.SY;
+    gGte_SXY1_993EF4.regs.SY = gGte_SXY2_993EF8.regs.SY;
+    
+    signed int screen_off_x_matrix_0_clamped = (signed int)screen_off_x_matrix_0;
+    if ((signed int)screen_off_x_matrix_0 >= -1024)
+    {
+        if (screen_off_x_matrix_0_clamped > 1023)
+        {
+            screen_off_x_matrix_0_clamped = 1023;
+        }
+    }
+    else
+    {
+        screen_off_x_matrix_0_clamped = -1024;
+    }
+
+    gGte_SXY2_993EF8.regs.SY = (short int)screen_off_x_matrix_0_clamped;
+    const short int v11 = gGte_SXY1_993EF4.regs.SX;
+    gGte_SXY1_993EF4.regs.SX = gGte_SXY2_993EF8.regs.SX;
+    gGte_SXY0_993EF0.regs.SX = v11;
+
+    signed int screen_off_y_matrix_1_clamped = (signed int)screen_off_y_matrix_1;
+    if ((signed int)screen_off_y_matrix_1 >= -1024)
+    {
+        if (screen_off_y_matrix_1_clamped > 1023)
+        {
+            screen_off_y_matrix_1_clamped = 1023;
+        }
+        gGte_SXY2_993EF8.regs.SX = (short int)screen_off_y_matrix_1_clamped;
+    }
+    else
+    {
+        gGte_SXY2_993EF8.regs.SX = -1024;
+    }
+}
+MGS_FUNC_IMPLEX(0x445630, Psx_gte_rtps_445630, IMPL_PSX);
 
 /*
 void CC Psx_gte_nclip_446E90()
