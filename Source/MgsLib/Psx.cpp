@@ -832,11 +832,11 @@ void CC Psx_gte_rtps_445630()
 }
 MGS_FUNC_IMPLEX(0x445630, Psx_gte_rtps_445630, IMPL_PSX);
 
-/* - Debug to figure out what the array pointer points to
 void CC Psx_gte_rtpt_445990()
 {
+    // TODO
 }
-*/
+MGS_FUNC_IMPLEX(0x445990, Psx_gte_rtpt_445990, false); // FIX ME
 
 void CC Psx_gte_nccs_445F20()
 {
@@ -1052,7 +1052,24 @@ void CC Psx_gte_nccs_445F20()
     gGte_MAC2_993F28.MAC_32 = (signed int)(light_g * 16.0);
     gGte_MAC3_993F2C.MAC_32 = (signed int)(light_b * 16.0);
 }
-MGS_FUNC_IMPLEX(0x445F20, Psx_gte_nccs_445F20, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x445F20, Psx_gte_nccs_445F20, false); // TODO: FIX ME
+
+void CC Psx_gte_dpcs_446530()
+{
+    // TODO
+}
+MGS_FUNC_IMPLEX(0x446530, Psx_gte_dpcs_446530, false); // FIX ME
+
+void CC Psx_gte_ncs_446930()
+{
+    // TODO
+}
+MGS_FUNC_IMPLEX(0x446930, Psx_gte_ncs_446930, false); // FIX ME
+
+void __cdecl Psx_gte_446E10()
+{
+    // TODO
+}
 
 void CC Psx_gte_nclip_446E90()
 {
@@ -1194,57 +1211,91 @@ void CC Psx_gte_LT1_llv0_447580()
 }
 MGS_FUNC_IMPLEX(0x447580, Psx_gte_LT1_llv0_447580, IMPL_PSX);
 
+void CC Psx_gte_LT1_ll_447680()
+{
+    ++gGteData_722688.gte_LT1_count_7226B4;
+    ++gGteData_722688.gte_ll_count_7226C4;
+
+    int v0 = gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[2][1];
+    int v1 = gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[2][0];
+    gGte_MAC1_993F24.MAC_32 = (gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[0][0]
+        + gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[0][1]
+        + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[0][2]) >> 12;
+    gGte_IR1_993EE4.IR_32 = (gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[0][0]
+        + gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[0][1]
+        + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[0][2]) >> 12;
+    gGte_MAC2_993F28.MAC_32 = (gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[1][0]
+        + gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[1][1]
+        + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[1][2]) >> 12;
+    gGte_IR2_993EE8.IR_32 = (gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[1][0]
+        + gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[1][1]
+        + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[1][2]) >> 12;
+    int v2 = ((gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[0][0]
+        + gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[0][1]
+        + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[0][2]) >> 19) & 0x1F;
+    gGte_MAC3_993F2C.MAC_32 = (v1 + v0 + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[2][2]) >> 12;
+    gGte_IR3_993EEC.IR_32 = (v1 + v0 + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[2][2]) >> 12;
+}
+MGS_FUNC_IMPLEX(0x447680, Psx_gte_LT1_ll_447680, IMPL_PSX);
+
+static inline void Psx_gte_RT1TR_Impl()
+{
+    gGte_MAC1_993F24.MAC_32 = gGte_translation_vector_993E54.x
+        + ((gGte_VXY0_993EC0.regs.VX * gte_rotation_matrix_993E40.m[0][0]
+            + gGte_VXY0_993EC0.regs.VY * gte_rotation_matrix_993E40.m[0][1]
+            + gGte_VXY0_993EC0.regs.VZ * gte_rotation_matrix_993E40.m[0][2]) >> 12);
+    int v0 = gGte_translation_vector_993E54.y
+        + ((gGte_VXY0_993EC0.regs.VX * gte_rotation_matrix_993E40.m[1][0]
+            + gGte_VXY0_993EC0.regs.VY * gte_rotation_matrix_993E40.m[1][1]
+            + gGte_VXY0_993EC0.regs.VZ * gte_rotation_matrix_993E40.m[1][2]) >> 12);
+    gGte_IR1_993EE4.IR_32 = gGte_translation_vector_993E54.x
+        + ((gGte_VXY0_993EC0.regs.VX * gte_rotation_matrix_993E40.m[0][0]
+            + gGte_VXY0_993EC0.regs.VY * gte_rotation_matrix_993E40.m[0][1]
+            + gGte_VXY0_993EC0.regs.VZ * gte_rotation_matrix_993E40.m[0][2]) >> 12);
+    int v1 = gGte_VXY0_993EC0.regs.VY * gte_rotation_matrix_993E40.m[2][1];
+    gGte_MAC2_993F28.MAC_32 = v0;
+    gGte_IR2_993EE8.IR_32 = gGte_translation_vector_993E54.y
+        + ((gGte_VXY0_993EC0.regs.VX * gte_rotation_matrix_993E40.m[1][0]
+            + gGte_VXY0_993EC0.regs.VY * gte_rotation_matrix_993E40.m[1][1]
+            + gGte_VXY0_993EC0.regs.VZ * gte_rotation_matrix_993E40.m[1][2]) >> 12);
+    gGte_MAC3_993F2C.MAC_32 = gGte_translation_vector_993E54.z
+        + ((gGte_VXY0_993EC0.regs.VX * gte_rotation_matrix_993E40.m[2][0]
+            + v1
+            + gGte_VXY0_993EC0.regs.VZ * gte_rotation_matrix_993E40.m[2][2]) >> 12);
+    gGte_IR3_993EEC.IR_32 = gGte_translation_vector_993E54.z
+        + ((gGte_VXY0_993EC0.regs.VX * gte_rotation_matrix_993E40.m[2][0]
+            + v1
+            + gGte_VXY0_993EC0.regs.VZ * gte_rotation_matrix_993E40.m[2][2]) >> 12);
+}
+
+void CC Psx_gte_RT1TR_rt_4477A0()
+{
+    ++gGteData_722688.gte_RT1TR_count_7226D4;
+    ++gGteData_722688.gte_rt_count_7226B0;
+
+    Psx_gte_RT1TR_Impl();
+}
+MGS_FUNC_IMPLEX(0x4477A0, Psx_gte_RT1TR_rt_4477A0, IMPL_PSX);
+
+void CC Psx_gte_RT1TR_rtv0tr_4478C0()
+{
+    ++gGteData_722688.gte_RT1TR_count_7226D4;
+    ++gGteData_722688.gte_rtv0tr_count_7226FC;
+
+    Psx_gte_RT1TR_Impl();
+}
+MGS_FUNC_IMPLEX(0x4478C0, Psx_gte_RT1TR_rtv0tr_4478C0, IMPL_PSX);
+
+void __cdecl Psx_gte_nct_449B30()
+{
+     // TODO
+}
+
 void CC Psx_gte_nop_44A460()
 {
     ++gGteData_722688.gte_nop_count_722688;
 }
 MGS_FUNC_IMPLEX(0x44A460, Psx_gte_nop_44A460, IMPL_PSX);
-
-
-
-
-/*
-void CC Psx_gte_RT1_rtir_447480()
-{
-
-}
-MGS_FUNC_IMPLEX(0x447480, Psx_gte_RT1_rtir_447480, true);
-
-
-void CC Psx_gte_RT1_rtv0_447180()
-{
-
-}
-MGS_FUNC_IMPLEX(0x447180, Psx_gte_RT1_rtv0_447180, true);
-
-void CC Psx_gte_RT1_rtv1_447280()
-{
-
-}
-MGS_FUNC_IMPLEX(0x447280, Psx_gte_RT1_rtv1_447280, true);
-
-void CC Psx_gte_RT1_rtv2_447380()
-{
-
-}
-MGS_FUNC_IMPLEX(0x447380, Psx_gte_RT1_rtv2_447380, true);
-
-static inline void Psx_gte_RT1TR_X_Impl()
-{
-
-}
-
-void CC Psx_gte_RT1TR_rt_4477A0()
-{
-
-}
-MGS_FUNC_IMPLEX(0x4477A0, Psx_gte_RT1TR_rt_4477A0, true);
-
-void CC Psx_gte_RT1TR_rtv0tr_4478C0()
-{
-
-}
-MGS_FUNC_IMPLEX(0x4478C0, Psx_gte_RT1TR_rtv0tr_4478C0, true);
 
 static void Test_Psx_gte_RT1_rtir_447480()
 {
@@ -1262,7 +1313,6 @@ static void Test_Psx_gte_RT1_rtir_447480()
     ASSERT_EQ(4096, gGte_MAC2_993F28.MAC_32);
     ASSERT_EQ(4096, gGte_MAC3_993F2C.MAC_32);
 }
-*/
 
 void DoPsxTests()
 {
