@@ -832,6 +832,228 @@ void CC Psx_gte_rtps_445630()
 }
 MGS_FUNC_IMPLEX(0x445630, Psx_gte_rtps_445630, IMPL_PSX);
 
+/* - Debug to figure out what the array pointer points to
+void CC Psx_gte_rtpt_445990()
+{
+}
+*/
+
+void CC Psx_gte_nccs_445F20()
+{
+    // Normal Color Color single vector
+    ++gGteData_722688.gte_nccs_count_7226DC;
+    
+    const double vx = (double)gGte_VXY0_993EC0.regs.VX / 4096.0;
+    const double vy = (double)gGte_VXY0_993EC0.regs.VY / 4096.0;
+    const double vz = (double)gGte_VXY0_993EC0.regs.VZ / 4096.0;
+
+    double light_source_matrix_0 = 
+         ((double)gGte_light_source_matrix_993E60.m[0][2] * vz
+        + (double)gGte_light_source_matrix_993E60.m[0][1] * vy
+        + (double)gGte_light_source_matrix_993E60.m[0][0] * vx) / 4096.0;
+
+    double light_source_matrix_1 =
+         ((double)gGte_light_source_matrix_993E60.m[1][2] * vz
+        + (double)gGte_light_source_matrix_993E60.m[1][1] * vy
+        + (double)gGte_light_source_matrix_993E60.m[1][0] * vx) / 4096.0;
+
+    double light_source_matrix_2 =
+         ((double)gGte_light_source_matrix_993E60.m[2][2] * vz
+        + (double)gGte_light_source_matrix_993E60.m[2][1] * vy
+        + (double)gGte_light_source_matrix_993E60.m[2][0] * vx) / 4096.0;
+
+    if (light_source_matrix_0 < 0.0)
+    {
+        light_source_matrix_0 = 0.0;
+    }
+
+    if (light_source_matrix_1 < 0.0)
+    {
+        light_source_matrix_1 = 0.0;
+    }
+
+    if (light_source_matrix_2 < 0.0)
+    {
+        light_source_matrix_2 = 0.0;
+    }
+
+    if (light_source_matrix_0 > 7.999)
+    {
+        light_source_matrix_0 = 7.999;
+    }
+
+    if (light_source_matrix_1 > 7.999)
+    {
+        light_source_matrix_1 = 7.999;
+    }
+
+    if (light_source_matrix_2 > 7.999)
+    {
+        light_source_matrix_2 = 7.999;
+    }
+
+    double light_colour_matrix_0 =
+         ((double)gGte_light_colour_matrix_source_993E80.m[0][2] * light_source_matrix_2
+        + (double)gGte_light_colour_matrix_source_993E80.m[0][1] * light_source_matrix_1
+        + (double)gGte_light_colour_matrix_source_993E80.m[0][0] * light_source_matrix_0
+        + (double)gGte_background_colour_993E74.x) / 4096.0;
+
+    double light_colour_matrix_1 =
+         ((double)gGte_light_colour_matrix_source_993E80.m[1][2] * light_source_matrix_2
+        + (double)gGte_light_colour_matrix_source_993E80.m[1][1] * light_source_matrix_1
+        + (double)gGte_light_colour_matrix_source_993E80.m[1][0] * light_source_matrix_0
+        + (double)gGte_background_colour_993E74.y) / 4096.0;
+
+    double light_colour_matrix_2 =
+         ((double)gGte_light_colour_matrix_source_993E80.m[2][2] * light_source_matrix_2
+        + (double)gGte_light_colour_matrix_source_993E80.m[2][1] * light_source_matrix_1
+        + (double)gGte_light_colour_matrix_source_993E80.m[2][0] * light_source_matrix_0
+        + (double)gGte_background_colour_993E74.z) / 4096.0;
+
+    if (light_colour_matrix_0 < 0.0)
+    {
+        light_colour_matrix_0 = 0.0;
+    }
+
+    if (light_colour_matrix_1 < 0.0)
+    {
+        light_colour_matrix_1 = 0.0;
+    }
+
+    if (light_colour_matrix_2 < 0.0)
+    {
+        light_colour_matrix_2 = 0.0;
+    }
+
+    if (light_colour_matrix_0 > 7.999)
+    {
+        light_colour_matrix_0 = 7.999;
+    }
+
+    if (light_colour_matrix_1 > 7.999)
+    {
+        light_colour_matrix_1 = 7.999;
+    }
+
+    if (light_colour_matrix_2 > 7.999)
+    {
+        light_colour_matrix_2 = 7.999;
+    }
+
+    __int16 fixed_one = 4095;
+    double light_r = (double)gGte_r_993ED8 * light_colour_matrix_0 * 0.00390625; // 0.00390625==16 fixed 
+    double light_g = (double)gGte_g_993ED9 * light_colour_matrix_1 * 0.00390625;
+    double light_b = (double)gGte_b_993EDA * light_colour_matrix_2 * 0.00390625;
+    
+    // TODO: Figure out how this fcomp works
+    char v8 = 0; // c0@25
+    char v10 = 0; // c0@30
+    char v12 = 0; // c0@35
+    char v16 = 0; // c0@40
+    char v18 = 0; // c0@45
+    char v21 = 0; // c0@50
+
+    if (v8)
+    {
+        gGte_IR1_993EE4.IR_32 = 0;
+    }
+    else if (light_r * 16.0 <= 4095.0)
+    {
+        gGte_IR1_993EE4.IR_32 = (signed int)(light_r * 16.0);
+    }
+    else
+    {
+        gGte_IR1_993EE4.IR_32 = 4095;
+    }
+
+    if (v10)
+    {
+        gGte_IR2_993EE8.IR_32 = 0;
+    }
+    else if (light_g * 16.0 <= 4095.0)
+    {
+        gGte_IR2_993EE8.IR_32 = (signed int)(light_g * 16.0);
+    }
+    else
+    {
+        gGte_IR2_993EE8.IR_32 = 4095;
+    }
+
+    if (v12)
+    {
+        gGte_IR3_993EEC.IR_32 = 0;
+    }
+    else
+    {
+        if (light_b * 16.0 <= 4095.0)
+        {
+            fixed_one = (signed int)(light_b * 16.0);
+        }
+
+        gGte_IR3_993EEC.IR_32 = fixed_one;
+    }
+
+    const char gGte_RGB2_993F18_cd = gGte_RGB2_993F18.cd;
+    gGte_RGB0_993F10.cd = gGte_RGB1_993F14.cd;
+    gGte_RGB2_993F18.cd = gGte_OTZ_993EDB;
+    gGte_RGB1_993F14.cd = gGte_RGB2_993F18_cd;
+
+    const char gGte_RGB1_993F14_r = gGte_RGB1_993F14.r;
+    gGte_RGB1_993F14.r = gGte_RGB2_993F18.r;
+    gGte_RGB0_993F10.r = gGte_RGB1_993F14_r;
+
+    if (v16)
+    {
+        gGte_RGB2_993F18.r = 0;
+    }
+    else if (light_r * 256.0 <= 255.0)
+    {
+        gGte_RGB2_993F18.r = (signed int)(light_r * 256.0);
+    }
+    else
+    {
+        gGte_RGB2_993F18.r = -1;
+    }
+
+    gGte_RGB0_993F10.g = gGte_RGB1_993F14.g;
+    gGte_RGB1_993F14.g = gGte_RGB2_993F18.g;
+
+    if (v18)
+    {
+        gGte_RGB2_993F18.g = 0;
+    }
+    else if (light_g * 256.0 <= 255.0)
+    {
+        gGte_RGB2_993F18.g = (signed int)(light_g * 256.0);
+    }
+    else
+    {
+        gGte_RGB2_993F18.g = -1;
+    }
+
+    const char gGte_RGB1_993F14_b = gGte_RGB1_993F14.b;
+    gGte_RGB1_993F14.b = gGte_RGB2_993F18.b;
+    gGte_RGB0_993F10.b = gGte_RGB1_993F14_b;
+
+    if (v21)
+    {
+        gGte_RGB2_993F18.b = 0;
+    }
+    else if (light_b * 256.0 <= 255.0)
+    {
+        gGte_RGB2_993F18.b = (signed int)(light_b * 256.0);
+    }
+    else
+    {
+        gGte_RGB2_993F18.b = -1;
+    }
+
+    gGte_MAC1_993F24.MAC_32 = (signed int)(light_r * 16.0);
+    gGte_MAC2_993F28.MAC_32 = (signed int)(light_g * 16.0);
+    gGte_MAC3_993F2C.MAC_32 = (signed int)(light_b * 16.0);
+}
+MGS_FUNC_IMPLEX(0x445F20, Psx_gte_nccs_445F20, IMPL_PSX);
+
 /*
 void CC Psx_gte_nclip_446E90()
 {
