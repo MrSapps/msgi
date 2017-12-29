@@ -1170,6 +1170,30 @@ void CC Psx_gte_RT1_rtir_447480()
 }
 MGS_FUNC_IMPLEX(0x447480, Psx_gte_RT1_rtir_447480, IMPL_PSX);
 
+void CC Psx_gte_LT1_llv0_447580()
+{
+    ++gGteData_722688.gte_LT1_count_7226B4;
+    ++gGteData_722688.gte_llv0_count_7226BC;
+
+    int v0 = gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[2][1];
+    int v1 = gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[2][0];
+    gGte_MAC1_993F24.MAC_32 = (gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[0][0]
+        + gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[0][1]
+        + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[0][2]) >> 12;
+    gGte_IR1_993EE4.IR_32 = (gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[0][0]
+        + gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[0][1]
+        + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[0][2]) >> 12;
+    gGte_MAC2_993F28.MAC_32 = (gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[1][0]
+        + gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[1][1]
+        + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[1][2]) >> 12;
+    gGte_IR2_993EE8.IR_32 = (gGte_VXY0_993EC0.regs.VX * gGte_light_source_matrix_993E60.m[1][0]
+        + gGte_VXY0_993EC0.regs.VY * gGte_light_source_matrix_993E60.m[1][1]
+        + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[1][2]) >> 12;
+    gGte_MAC3_993F2C.MAC_32 = (v1 + v0 + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[2][2]) >> 12;
+    gGte_IR3_993EEC.IR_32 = (v1 + v0 + gGte_VXY0_993EC0.regs.VZ * gGte_light_source_matrix_993E60.m[2][2]) >> 12;
+}
+MGS_FUNC_IMPLEX(0x447580, Psx_gte_LT1_llv0_447580, IMPL_PSX);
+
 void CC Psx_gte_nop_44A460()
 {
     ++gGteData_722688.gte_nop_count_722688;
