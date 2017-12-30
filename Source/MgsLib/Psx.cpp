@@ -1116,22 +1116,22 @@ void CC Psx_gte_nop_44A460()
 }
 MGS_FUNC_IMPLEX(0x44A460, Psx_gte_nop_44A460, IMPL_PSX);
 
-void CC Res_base_rotate_rects_407C59(const PSX_RECT* pIn, PSX_RECT* pOut, int size_or_count)
+void CC Res_base_rotate_vecs_407C59(const SVECTOR* pIn, SVECTOR* pOut, int size_or_count)
 {
     for (int i = 0; i < size_or_count; i++)
     {
-        gGte_VXY0_993EC0.regs.VX = pIn[i].x1;
-        gGte_VXY0_993EC0.regs.VY = pIn[i].y1;
-        gGte_VXY0_993EC0.regs.VZ = pIn[i].x2;
-        gGte_VXY0_993EC0.regs.Zero = pIn[i].y2;
+        gGte_VXY0_993EC0.regs.VX = pIn[i].field_0_x;
+        gGte_VXY0_993EC0.regs.VY = pIn[i].field_2_y;
+        gGte_VXY0_993EC0.regs.VZ = pIn[i].field_4_z;
+        gGte_VXY0_993EC0.regs.Zero = pIn[i].padding;
         Psx_gte_RT1TR_rt_4477A0();
 
-        pOut[i].x1 = gGte_IR1_993EE4.IR_16;
-        pOut[i].y1 = gGte_IR2_993EE8.IR_16;
-        pOut[i].x2 = gGte_IR3_993EEC.IR_16;
+        pOut[i].field_0_x = gGte_IR1_993EE4.IR_16;
+        pOut[i].field_2_y = gGte_IR2_993EE8.IR_16;
+        pOut[i].field_4_z = gGte_IR3_993EEC.IR_16;
     }
 }
-MGS_FUNC_IMPLEX(0x407C59, Res_base_rotate_rects_407C59, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x407C59, Res_base_rotate_vecs_407C59, IMPL_PSX);
 
 void CC Res_base_rot_vecs_407CAC(const SVECTOR* pIn, SVECTOR* pOut, int count)
 {
