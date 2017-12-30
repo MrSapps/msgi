@@ -920,31 +920,28 @@ void CC Psx_gte_nccs_445F20()
         + (double)gGte_background_colour_993E74.z) / 4096.0;
     clamp(light_colour_matrix_2, 0.0, 7.999);
 
-    double light_r = (double)gGte_r_993ED8 * light_colour_matrix_0 * 16.0; // 0.00390625==16 fixed 
-    double light_g = (double)gGte_g_993ED9 * light_colour_matrix_1 * 16.0;
-    double light_b = (double)gGte_b_993EDA * light_colour_matrix_2 * 16.0;
+    const double light_r = (double)gGte_r_993ED8 * light_colour_matrix_0 * 16.0;
+    const double light_g = (double)gGte_g_993ED9 * light_colour_matrix_1 * 16.0;
+    const double light_b = (double)gGte_b_993EDA * light_colour_matrix_2 * 16.0;
 
     gGte_IR1_993EE4.IR_32 = ToScaledFixedPoint<int>(light_r, 16.0, 4095.0);
     gGte_IR2_993EE8.IR_32 = ToScaledFixedPoint<int>(light_g, 16.0, 4095.0);
     gGte_IR3_993EEC.IR_32 = ToScaledFixedPoint<int>(light_b, 16.0, 4095.0);
 
-    const char gGte_RGB2_993F18_cd = gGte_RGB2_993F18.cd;
     gGte_RGB0_993F10.cd = gGte_RGB1_993F14.cd;
+    gGte_RGB1_993F14.cd = gGte_RGB2_993F18.cd;
     gGte_RGB2_993F18.cd = static_cast<unsigned char>(gGte_OTZ_993EDB);
-    gGte_RGB1_993F14.cd = gGte_RGB2_993F18_cd;
 
-    const char gGte_RGB1_993F14_r = gGte_RGB1_993F14.r;
+    gGte_RGB0_993F10.r = gGte_RGB1_993F14.r;
     gGte_RGB1_993F14.r = gGte_RGB2_993F18.r;
-    gGte_RGB0_993F10.r = gGte_RGB1_993F14_r;
     gGte_RGB2_993F18.r = ToScaledFixedPoint<unsigned char>(light_r, 256.0, 255.0);
 
     gGte_RGB0_993F10.g = gGte_RGB1_993F14.g;
     gGte_RGB1_993F14.g = gGte_RGB2_993F18.g;
     gGte_RGB2_993F18.g = ToScaledFixedPoint<unsigned char>(light_g, 256.0, 255.0);
 
-    const char gGte_RGB1_993F14_b = gGte_RGB1_993F14.b;
+    gGte_RGB0_993F10.b = gGte_RGB1_993F14.b;
     gGte_RGB1_993F14.b = gGte_RGB2_993F18.b;
-    gGte_RGB0_993F10.b = gGte_RGB1_993F14_b;
     gGte_RGB2_993F18.b = ToScaledFixedPoint<unsigned char>(light_b, 256.0, 255.0);
 
     gGte_MAC1_993F24.MAC_32 = (signed int)(light_r * 16.0);
