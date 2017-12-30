@@ -687,6 +687,22 @@ MGS_VAR(1, 0x993F2C, MAC_Reg, gGte_MAC3_993F2C, {});
 MGS_VAR(1, 0x722688, GTE_Data, gGteData_722688, {});
 MGS_VAR(1, 0x72270C, Unk_72270C, gGte_unknown_72270C, {});
 
+template<class T>
+static inline const T& clamp(const T& v, const T& lo, const T& hi)
+{
+    if (v < lo)
+    {
+        return lo;
+    }
+
+    if (v > hi)
+    {
+        return hi;
+    }
+
+    return v;
+}
+
 void CC Psx_gte_rtps_445630()
 {
     // Perspective Transformation single
@@ -745,38 +761,12 @@ void CC Psx_gte_rtps_445630()
     gGte_SZ2_993F08 = gGte_SZ3_993F0C;
     signed int matrix_2_fixed = (signed int)(matrix_2 * 4096.0);
 
-    if (matrix_2_fixed >= 0)
-    {
-        if (matrix_2_fixed > 65535)
-        {
-            matrix_2_fixed = 65535;
-        }
-    }
-    else
-    {
-        matrix_2_fixed = 0;
-    }
+    matrix_2_fixed = clamp(matrix_2_fixed, 0, 65535);
+
     gGte_SZ3_993F0C = matrix_2_fixed;
 
-    if (matrix_0 < -1024.0)
-    {
-        matrix_0 = -1024.0;
-    }
-
-    if (matrix_1 < -1024.0)
-    {
-        matrix_1 = -1024.0;
-    }
-
-    if (matrix_0 > 1023.0)
-    {
-        matrix_0 = 1023.0;
-    }
-
-    if (matrix_1 > 1023.0)
-    {
-        matrix_1 = 1023.0;
-    }
+    matrix_0 = clamp(matrix_0, -1024.0, 1023.0);
+    matrix_1 = clamp(matrix_1, -1024.0, 1023.0);
 
     const double screen_off_x_matrix_0 = (double)gGte_ScreenOffsetX_993EA0 + matrix_0;
     const double screen_off_y_matrix_1 = (double)gGte_ScreenOffSetY_993EA4 + matrix_1;
@@ -811,11 +801,11 @@ void CC Psx_gte_rtps_445630()
         screen_off_x_matrix_0_clamped = -1024;
     }
 
-    gGte_SXY2_993EF8.regs.SY = (short int)screen_off_x_matrix_0_clamped;
-    const short int v11 = gGte_SXY1_993EF4.regs.SX;
+    gGte_SXY0_993EF0.regs.SX = gGte_SXY1_993EF4.regs.SX;
     gGte_SXY1_993EF4.regs.SX = gGte_SXY2_993EF8.regs.SX;
-    gGte_SXY0_993EF0.regs.SX = v11;
+    gGte_SXY2_993EF8.regs.SY = (short int)screen_off_x_matrix_0_clamped;
 
+  
     signed int screen_off_y_matrix_1_clamped = (signed int)screen_off_y_matrix_1;
     if ((signed int)screen_off_y_matrix_1 >= -1024)
     {
@@ -838,21 +828,6 @@ void CC Psx_gte_rtpt_445990()
 }
 MGS_FUNC_IMPLEX(0x445990, Psx_gte_rtpt_445990, false); // FIX ME
 
-template<class T>
-static inline const T& clamp(const T& v, const T& lo, const T& hi)
-{
-    if (v < lo)
-    {
-        return lo;
-    }
-
-    if (v > hi)
-    {
-        return hi;
-    }
-
-    return v;
-}
 
 template<class T>
 static inline T ToScaledFixedPoint(double value, double scale, double max)
