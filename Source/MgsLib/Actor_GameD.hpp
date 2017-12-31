@@ -43,5 +43,5 @@ struct ResidentHeap
     }
 };
 MGS_VAR_EXTERN(ResidentHeap, gResidentHeap_81001F);
-
 MGS_ARY_EXTERN(BYTE, 438272, gSystem2_memory_unk_8A8E20);
+MGS_VAR_EXTERN(DWORD, gTotalFrameTime_dword_995344);

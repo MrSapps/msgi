@@ -10,6 +10,7 @@
 #include "Fs.hpp"
 #include "WinMain.hpp"
 #include "Map.hpp"
+#include "Menu.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
@@ -25,8 +26,6 @@ MGS_VAR(1, 0x722760, GameD_Struct, gGameD_stru_722760, {});
 MGS_VAR(1, 0x995344, DWORD, gTotalFrameTime_dword_995344, 0);
 MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
 MGS_VAR(1, 0x9942B8, int, gLoaderState_dword_9942B8, 0);
-// TODO: Is a global that inherits from Actor
-MGS_VAR(1, 0x725FC0, Actor, gMenuMan_stru_725FC0, {});
 
 MGS_ARY(1, 0x7227C8, WORD, 8, gStageHashStack_7227C8, {});
 MGS_VAR(1, 0x7227D8, WORD, gCurrentStageNameHashed_7227D8, 0);
@@ -373,13 +372,6 @@ void* CC ResidentTopAllocate_40B379(int size)
 }
 MGS_FUNC_IMPLEX(0x0040B379, ResidentTopAllocate_40B379, ACTOR_GAMED_IMPL);
 
-void CC Res_MenuMan_create_459A9A()
-{
-    Actor_PushBack_40A2AF(1, &gMenuMan_stru_725FC0, nullptr);
-    Actor_Init_40A347(&gMenuMan_stru_725FC0, nullptr, nullptr, "C:\\mgs\\source\\Menu\\menuman.c");
-}
-MGS_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, ACTOR_GAMED_IMPL);
-
 void CC Stage_GetNameHashStack_44EAED()
 {
     memset(gStageHashStack_7227C8, 0, 0x10u);
@@ -523,7 +515,6 @@ void CC Init_Gamed_Create_44E12B()
     sub_44E1E0();
     Actor_PushBack_40A2AF(1, &gGameD_stru_722760.mBase, nullptr);
     Actor_Init_40A347(&gGameD_stru_722760.mBase, reinterpret_cast<TActorFunction>(GameD_update_44E381), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
-
     sub_44E1F9();
     sub_44E287();
     Reset_GV_DG_44E212();

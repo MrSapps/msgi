@@ -10,6 +10,7 @@
 #include "Actor_GameD.hpp"
 #include "LibGV.hpp"
 #include "Map.hpp"
+#include "Menu.hpp"
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
@@ -827,12 +828,63 @@ int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
 }
 MGS_FUNC_IMPLEX(0x451BBF, Script_tbl_load_451BBF, SCRIPT_IMPL);
 
+void CC Script_Set_MainOrDemo_40908E(DWORD bMain)
+{
+    gScriptFileNameHashedToLoad_6BFBB4 = bMain != 1 ?
+        Hash_40A58B(ResourceNameHash("scenerio"), 'g') :
+        Hash_40A58B(ResourceNameHash("demo"), 'g');
+}
+MGS_FUNC_IMPLEX(0x0040908E, Script_Set_MainOrDemo_40908E, SCRIPT_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x45A5AF, void __cdecl(), Script_tbl_start_load_other_files_45A5AF);
+MGS_FUNC_NOT_IMPL(0x45A497, void __cdecl(), Script_Clear_Named_Vars_45A497);
+MGS_FUNC_NOT_IMPL(0x409433, void __cdecl(), sub_409433);
+
+int CC Script_tbl_start_sub_451B0E(BYTE* /*pScript*/)
+{
+    if (Script_ParamExists('s'))
+    {
+        MenuTextureLoad_44DEB3();
+    }
+
+    if (Script_ParamExists('m'))
+    {
+        Menu_create_459891();
+        printf("MENU INIT END\n");
+    }
+
+    if (Script_ParamExists('f'))
+    {
+        Script_tbl_start_load_other_files_45A5AF();
+    }
+
+    if (Script_ParamExists('v'))
+    {
+        SaveDataStructuresRelated_4093ED();
+        Script_Clear_Named_Vars_45A497();
+        gTotalFrameTime_dword_995344 = 0;
+    }
+
+    if (Script_ParamExists('d'))
+    {
+        Script_Set_MainOrDemo_40908E(Script_get_int());
+    }
+
+    if (Script_ParamExists('c'))
+    {
+        // Clear a save data bank and stage name stack?
+        sub_409433();
+        Script_Clear_Named_Vars_45A497();
+        gTotalFrameTime_dword_995344 = 0;
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x451B0E, Script_tbl_start_sub_451B0E, SCRIPT_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
 MGS_FUNC_NOT_IMPL(0x00451673, int __cdecl(BYTE*), Script_tbl_hzd_related_sub_451673);
 MGS_FUNC_NOT_IMPL(0x004512E5, int __cdecl(BYTE*), script_tbl_camera_sub_4512E5);
 MGS_FUNC_NOT_IMPL(0x00451239, int __cdecl(BYTE*), Script_tbl_light_sub_451239);
-MGS_FUNC_NOT_IMPL(0x00451B0E, int __cdecl(BYTE*), Script_tbl_start_sub_451B0E);
 MGS_FUNC_NOT_IMPL(0x00451D5C, int __cdecl(BYTE*), Script_tbl_radio_sub_451D5C);
 MGS_FUNC_NOT_IMPL(0x00451F22, int __cdecl(BYTE*), Script_tbl_str_status_sub_451F22);
 MGS_FUNC_NOT_IMPL(0x00452064, int __cdecl(BYTE*), Script_tbl_demo_sub_452064);
@@ -888,7 +940,7 @@ MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
     { 0x7D50, 0x0, Script_tbl_hzd_related_sub_451673.Ptr() },
     { 0xEEE9, 0x0, script_tbl_camera_sub_4512E5.Ptr() },
     { 0x306A, 0x0, Script_tbl_light_sub_451239.Ptr() },
-    { 0x9A1F, 0x0, Script_tbl_start_sub_451B0E.Ptr() },
+    { 0x9A1F, 0x0, Script_tbl_start_sub_451B0E },
     { 0xC8BB, 0x0, Script_tbl_load_451BBF },
     { 0x24E1, 0x0, Script_tbl_radio_sub_451D5C.Ptr() },
     { 0xE43C, 0x0, Script_tbl_str_status_sub_451F22.Ptr() },
@@ -1048,14 +1100,6 @@ signed int CC GV_gcx_file_handler_4090CF(void* pScript, TFileNameHash fileNameHa
     return 1;
 }
 MGS_FUNC_IMPLEX(0x004090CF, GV_gcx_file_handler_4090CF, SCRIPT_IMPL);
-
-void CC Script_Set_MainOrDemo_40908E(DWORD bMain)
-{
-    gScriptFileNameHashedToLoad_6BFBB4 = bMain != 1 ?
-        Hash_40A58B(ResourceNameHash("scenerio"), 'g') :
-        Hash_40A58B(ResourceNameHash("demo"), 'g');
-}
-MGS_FUNC_IMPLEX(0x0040908E, Script_Set_MainOrDemo_40908E, SCRIPT_IMPL);
 
 void CC ScriptEngineInit_4090A7()
 {
