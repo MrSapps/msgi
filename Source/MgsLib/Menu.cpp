@@ -17,7 +17,7 @@ using TMenuUpdateFn = void(CC*)(MenuMan*, int*);
 struct MenuMan
 {
     Actor mBase;
-    DWORD field_20_gTextDraws;
+    DWORD* field_20_gTextDraws;
     ButtonStates* field_24_input;
     BYTE field_28_flags;
     BYTE field_29;
@@ -86,7 +86,8 @@ MGS_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, MENU_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x462A3D, void __cdecl(MenuMan* pMenu, int* ot), Menu_update_helper_462A3D);
 MGS_FUNC_NOT_IMPL(0x459971, void __cdecl(MenuMan* pMenu), Menu_shutdown_459971);
-MGS_FUNC_NOT_IMPL(0x459991, void __cdecl(MenuMan* pMenu), Menu_create_helper_459991);
+MGS_FUNC_NOT_IMPL(0x46B8CA, void __cdecl(char *pFileName), Menu_create_helper_item_file_46B8CA);
+
 
 struct MenuPrimBuffer
 {
@@ -99,9 +100,7 @@ TILE* CC Menu_render_rect_46B79F(MenuPrimBuffer* pPrimBuffer, __int16 x, __int16
     TILE* pTile = reinterpret_cast<TILE*>(pPrimBuffer->mFreeLocation);
     pPrimBuffer->mFreeLocation += sizeof(TILE);
 
-    pTile->r0 = BYTE0(rgb);
-    pTile->g0 = BYTE1(rgb);
-    pTile->b0 = BYTE2(rgb);
+    setRGB0(pTile, BYTE0(rgb), BYTE1(rgb), BYTE2(rgb));
 
     pTile->x0 = x;
     pTile->y0 = y;
@@ -152,6 +151,68 @@ MGS_FUNC_IMPLEX(0x00462E8D, sub_462E8D, MENU_IMPL);
 
 MGS_VAR(1, 0x995348, WORD, word_995348, 0);
 
+MGS_VAR(1, 0x7265E0, DWORD, gTextOt_Start_7265E0, 0);
+MGS_ARY(1, 0x7269F4, DWORD, 2048, gTextDraws_1_unk_7269F4, {});
+MGS_ARY(1, 0x7289F4, DWORD, 2048, gTextDraws_2_unk_7289F4, {});
+MGS_ARY(1, 0x7265EC, DWORD*, 2, gDebugDraws_dword_7265EC, {});
+
+using TMenuInitFn = void(CC*)(MenuMan*);
+
+MGS_FUNC_NOT_IMPL(0x46AD91, void __cdecl(MenuMan*), Menu_init_fn0_46AD91);
+MGS_FUNC_NOT_IMPL(0x468358, void __cdecl(MenuMan*), Menu_init_fn1_468358);
+MGS_FUNC_NOT_IMPL(0x463746, void __cdecl(MenuMan*), Menu_init_fn2_463746);
+MGS_FUNC_NOT_IMPL(0x469E77, void __cdecl(MenuMan*), Menu_init_fn3_469E77);
+MGS_FUNC_NOT_IMPL(0x4694E4, void __cdecl(MenuMan*), Menu_init_fn4_4694E4);
+MGS_FUNC_NOT_IMPL(0x4691CE, void __cdecl(MenuMan*), Menu_init_fn5_4691CE);
+MGS_FUNC_NOT_IMPL(0x468406, void __cdecl(MenuMan*), Menu_init_fn6_468406);
+MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
+
+
+MGS_ARY(1, 0x66C480, TMenuInitFn, 9, gMenuFuncs_inits_66C480,
+{
+    Menu_init_fn0_46AD91.Ptr(),
+    Menu_init_fn1_468358.Ptr(),
+    Menu_init_fn2_463746.Ptr(),
+    Menu_init_fn3_469E77.Ptr(),
+    Menu_init_fn4_4694E4.Ptr(),
+    Menu_init_fn5_4691CE.Ptr(),
+    Menu_init_fn6_468406.Ptr(),
+    Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC.Ptr(),
+    nullptr
+});
+
+void CC Menu_create_helper_459991(MenuMan* pMenu)
+{
+    pMenu->field_2A = 0;
+    pMenu->field_29 = 0;
+    pMenu->field_28_flags = 0;
+    pMenu->field_20_gTextDraws = &gTextOt_Start_7265E0; // Points into one of gDebugDraws_dword_7265EC
+
+    gDebugDraws_dword_7265EC[0] = &gTextDraws_1_unk_7269F4[0];
+    gDebugDraws_dword_7265EC[1] = &gTextDraws_2_unk_7289F4[0];
+
+    DRAWENV drEnv = {};
+    Renderer_DRAWENV_Init_401888(&drEnv, 0, 0, 320, 224);
+    drEnv.isbg = 0;
+    drEnv.texturePage = 31;
+    Pack_DRAWENV_40DDE0(&pMenu->mDR_ENV_field_48, &drEnv);
+    
+    Renderer_DRAWENV_Init_401888(&drEnv, 320, 0, 320, 224);
+    drEnv.isbg = 0;
+    drEnv.texturePage = 31;
+    Pack_DRAWENV_40DDE0(&pMenu->mDR_ENV_field_88, &drEnv);
+
+    Menu_create_helper_item_file_46B8CA("item");
+
+    TMenuInitFn* fnPtr = &gMenuFuncs_inits_66C480[0];
+    while (*fnPtr)
+    {
+        (*fnPtr)(pMenu);
+        ++fnPtr;
+    }
+}
+MGS_FUNC_IMPLEX(0x00459991, Menu_create_helper_459991, MENU_IMPL);
+
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {
     int* pOtText1 = gTextCurrentOt_7265E4;
@@ -168,7 +229,7 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
         const int field_28_flags = pMenu->field_28_flags;
         for (int i = 0; i < 7; i++)
         {
-            if ((1 << i) & field_28_flags)
+            if ((1 << (i+1)) & field_28_flags)
             {
                 // 0 = life bars
                 // 1 = right side inventory
@@ -181,14 +242,15 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
         }
     }
 
-    /* TODO: This is probably a TILE prim? 
-       Check if this causes the codec rect to appear at the ninja fight or not
+    // TODO: This is probably a TILE prim? 
+     //  Check if this causes the codec rect to appear at the ninja fight or not
+    /*
     *(&pMenu->mDR_ENV_field_48.tag + 16 * gActiveBuffer_dword_791A08) ^= (*(&pMenu->mDR_ENV_field_48.tag
         + 16 * gActiveBuffer_dword_791A08) ^ *pOtText1) & 0xFFFFFF;
     *pOtText1 ^= (*pOtText1 ^ (unsigned int)(&pMenu->mDR_ENV_field_48 + gActiveBuffer_dword_791A08)) & 0xFFFFFF;
     */
 }
-MGS_FUNC_IMPLEX(0x004598BC, Menu_update_4598BC, MENU_IMPL);
+MGS_FUNC_IMPLEX(0x004598BC, Menu_update_4598BC, false);
 
 void CC Menu_create_459891()
 {
