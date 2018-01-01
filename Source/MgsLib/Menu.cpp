@@ -6,6 +6,7 @@
 #include "Actor_GameD.hpp"
 #include "Script.hpp"
 #include "WinMain.hpp"
+#include "Psx.hpp"
 
 #define MENU_IMPL true
 
@@ -87,6 +88,45 @@ MGS_FUNC_NOT_IMPL(0x462A3D, void __cdecl(MenuMan* pMenu, int* ot), Menu_update_h
 MGS_FUNC_NOT_IMPL(0x459971, void __cdecl(MenuMan* pMenu), Menu_shutdown_459971);
 MGS_FUNC_NOT_IMPL(0x459991, void __cdecl(MenuMan* pMenu), Menu_create_helper_459991);
 
+TILE* CC Menu_render_rect_46B79F(BYTE **ot, __int16 x, __int16 y, __int16 w, __int16 h, int rgb)
+{
+    TILE* pTile = reinterpret_cast<TILE*>(*ot);
+    *ot += sizeof(TILE);
+
+    pTile->r0 = BYTE0(rgb);
+    pTile->g0 = BYTE1(rgb);
+    pTile->b0 = BYTE2(rgb);
+
+    pTile->x0 = x;
+    pTile->y0 = y;
+    pTile->w = w;
+    pTile->h = h;
+    
+    setTile(pTile);
+    addPrim(ot[1], pTile);
+
+    return pTile;
+}
+MGS_FUNC_IMPLEX(0x0046B79F, Menu_render_rect_46B79F, MENU_IMPL);
+
+struct BarConfig
+{
+    const char* mText;
+    BYTE mLeftRGB[3];
+    BYTE mRightRGB[3];
+    WORD mBarHeight;
+};
+MGS_ASSERT_SIZEOF(BarConfig, 0xC);
+
+void __cdecl Menu_draw_bar_468DA6(int* ot, int xpos, int ypos, int redFillLength, int normalFillLength, int barLength, BarConfig *pBar);
+MGS_FUNC_IMPLEX(0x00468DA6, Menu_draw_bar_468DA6, true);
+void __cdecl Menu_draw_bar_468DA6(int* ot, int xpos, int ypos, int redFillLength, int normalFillLength, int barLength, BarConfig* pBar)
+{
+
+    // Setting bit 0x40000000 in pBar enables the red text/damage display
+    Menu_draw_bar_468DA6_.Ptr()(ot, xpos , ypos, redFillLength, normalFillLength, barLength, pBar);
+}
+
 MGS_ARY(1, 0x733868, DWORD, 16, dword_733868, {});
 MGS_ARY(1, 0x7338A8, DWORD, 16, dword_7338A8, {});
 MGS_VAR(1, 0x7265E4, int*, gTextCurrentOt_7265E4, nullptr);
@@ -103,6 +143,8 @@ void CC sub_462E8D()
     } while (idx < 16);
 }
 MGS_FUNC_IMPLEX(0x00462E8D, sub_462E8D, MENU_IMPL);
+
+MGS_VAR(1, 0x995348, WORD, word_995348, 0);
 
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {
@@ -133,7 +175,8 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
         }
     }
 
-    /* TODO: This is probably a TILE prim? not adding to OT hasn't appeared to break anything.. yet
+    /* TODO: This is probably a TILE prim? 
+       Check if this causes the codec rect to appear at the ninja fight or not
     *(&pMenu->mDR_ENV_field_48.tag + 16 * gActiveBuffer_dword_791A08) ^= (*(&pMenu->mDR_ENV_field_48.tag
         + 16 * gActiveBuffer_dword_791A08) ^ *pOtText1) & 0xFFFFFF;
     *pOtText1 ^= (*pOtText1 ^ (unsigned int)(&pMenu->mDR_ENV_field_48 + gActiveBuffer_dword_791A08)) & 0xFFFFFF;

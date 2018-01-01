@@ -373,6 +373,7 @@ extern TypeName* VarName ;
 #define MGS_COUNTOF(x) _countof(x)
 
 #define BYTEn(x, n)   (*((BYTE*)&(x)+n))
+#define BYTE0(x)   BYTEn(x,  0)
 #define BYTE1(x)   BYTEn(x,  1)
 #define BYTE2(x)   BYTEn(x,  2)
 #define BYTE3(x)   BYTEn(x,  3)

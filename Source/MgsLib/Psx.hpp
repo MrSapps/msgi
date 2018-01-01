@@ -14,13 +14,30 @@ struct P_TAG
 };
 MGS_ASSERT_SIZEOF(P_TAG, 8);
 
+struct P_CODE
+{
+    BYTE r0, g0, b0, code;
+};
+MGS_ASSERT_SIZEOF(P_CODE, 4);
+
+struct TILE
+{
+    DWORD tag;
+    BYTE r0, g0, b0, code;
+    short x0, y0;
+    short w, h;
+};
+MGS_ASSERT_SIZEOF(TILE, 16);
 
 #define setlen( p, _len) (((P_TAG *)(p))->len  = (u_char)(_len))
 #define setaddr(p, _addr) (((P_TAG *)(p))->addr = (u_long)(_addr))
+#define getaddr(p)   (u_long)(((P_TAG *)(p))->addr)
 #define setcode(p, _code) (((P_TAG *)(p))->code = (u_char)(_code))
+#define addPrim(ot, p) setaddr(p, getaddr(ot)), setaddr(ot, p)
 
 #define setRGB0(p,_r0,_g0,_b0) (p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
 #define setPolyFT4(p) setlen(p, 9), setcode(p, 0x2c)
+#define setTile(p) setlen(p, 3),  setcode(p, 0x60)
 
 struct PSX_RECT // Should be called RECT but will clash with windows.h for now
 {

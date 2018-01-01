@@ -46,12 +46,6 @@ struct RECT32
 };
 MGS_ASSERT_SIZEOF(RECT32, 16);
 
-struct P_CODE
-{
-    BYTE r0, g0, b0, code;
-};
-MGS_ASSERT_SIZEOF(P_CODE, 4);
-
 struct DR_STP 
 {
     DWORD* tag;     // Pointer to the next primitive in primitive list(reserved)
@@ -131,15 +125,6 @@ struct SPRT_8  // 8x8 sprite
     WORD clut;
 };
 MGS_ASSERT_SIZEOF(SPRT_8, 16);
-
-struct TILE
-{
-    DWORD* tag;
-    BYTE r0, g0, b0, code;
-    short x0, y0;
-    short w, h;
-};
-MGS_ASSERT_SIZEOF(TILE, 16);
 
 struct TILE_16
 {
