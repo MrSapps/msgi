@@ -85,7 +85,6 @@ void CC Res_MenuMan_create_459A9A()
 MGS_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, MENU_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x462A3D, void __cdecl(MenuMan* pMenu, int* ot), Menu_update_helper_462A3D);
-MGS_FUNC_NOT_IMPL(0x459971, void __cdecl(MenuMan* pMenu), Menu_shutdown_459971);
 MGS_FUNC_NOT_IMPL(0x46B8CA, void __cdecl(char *pFileName), Menu_create_helper_item_file_46B8CA);
 
 
@@ -156,10 +155,35 @@ MGS_ARY(1, 0x7269F4, DWORD, 2048, gTextDraws_1_unk_7269F4, {});
 MGS_ARY(1, 0x7289F4, DWORD, 2048, gTextDraws_2_unk_7289F4, {});
 MGS_ARY(1, 0x7265EC, DWORD*, 2, gDebugDraws_dword_7265EC, {});
 
-using TMenuInitFn = void(CC*)(MenuMan*);
+MGS_FUNC_NOT_IMPL(0x468158, void __cdecl(MenuMan*, int*), Menu_radar_update_468158);
+MGS_FUNC_NOT_IMPL(0x465B38, void __cdecl(), Menu_init_radar_helper_465B38);
+MGS_FUNC_NOT_IMPL(0x468264, void __cdecl(MenuMan*, int), Menu_radar_468264);
+MGS_FUNC_NOT_IMPL(0x465A01, void* __cdecl(int), sub_465A01);
+
+
+
+MGS_VAR(1, 0x733950, DWORD, gFn_radar_dword_733950, 0);
+
+void CC Menu_init_radar_468358(MenuMan* pMenu)
+{
+    pMenu->m7FnPtrs_field_2C[3] = Menu_radar_update_468158.Ptr();
+    pMenu->field_28_flags |= 8;
+    pMenu->field_1D4 = 1;
+    pMenu->field_1D0 = 0;
+    pMenu->field_1D2 = 0;
+    Menu_radar_468264(pMenu, 0);
+    Menu_radar_468264(pMenu, 1);
+    memcpy(&pMenu->mDrEnvDst_field_150, &pMenu->mDR_ENV_field_48, sizeof(pMenu->mDrEnvDst_field_150));
+    memcpy(&pMenu->mDrEnvDst_field_190, &pMenu->mDR_ENV_field_88, sizeof(pMenu->mDrEnvDst_field_190));
+    Menu_init_radar_helper_465B38();
+    gFn_radar_dword_733950 = 0;
+    sub_465A01(4096);
+}
+MGS_FUNC_IMPLEX(0x00468358, Menu_init_radar_468358, MENU_IMPL);
+
+using TMenuFn = void(CC*)(MenuMan*);
 
 MGS_FUNC_NOT_IMPL(0x46AD91, void __cdecl(MenuMan*), Menu_init_fn0_46AD91);
-MGS_FUNC_NOT_IMPL(0x468358, void __cdecl(MenuMan*), Menu_init_fn1_468358);
 MGS_FUNC_NOT_IMPL(0x463746, void __cdecl(MenuMan*), Menu_init_fn2_463746);
 MGS_FUNC_NOT_IMPL(0x469E77, void __cdecl(MenuMan*), Menu_init_fn3_469E77);
 MGS_FUNC_NOT_IMPL(0x4694E4, void __cdecl(MenuMan*), Menu_init_fn4_4694E4);
@@ -168,10 +192,10 @@ MGS_FUNC_NOT_IMPL(0x468406, void __cdecl(MenuMan*), Menu_init_fn6_468406);
 MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
 
 
-MGS_ARY(1, 0x66C480, TMenuInitFn, 9, gMenuFuncs_inits_66C480,
+MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
 {
     Menu_init_fn0_46AD91.Ptr(),
-    Menu_init_fn1_468358.Ptr(),
+    Menu_init_radar_468358,
     Menu_init_fn2_463746.Ptr(),
     Menu_init_fn3_469E77.Ptr(),
     Menu_init_fn4_4694E4.Ptr(),
@@ -204,7 +228,7 @@ void CC Menu_create_helper_459991(MenuMan* pMenu)
 
     Menu_create_helper_item_file_46B8CA("item");
 
-    TMenuInitFn* fnPtr = &gMenuFuncs_inits_66C480[0];
+    TMenuFn* fnPtr = &gMenuFuncs_inits_66C480[0];
     while (*fnPtr)
     {
         (*fnPtr)(pMenu);
@@ -227,9 +251,10 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
         && game_state_dword_72279C >= 0)
     {
         const int field_28_flags = pMenu->field_28_flags;
+        int flags = 1;
         for (int i = 0; i < 7; i++)
         {
-            if ((1 << (i+1)) & field_28_flags)
+            if (flags & field_28_flags)
             {
                 // 0 = life bars
                 // 1 = right side inventory
@@ -239,24 +264,57 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
                 // 5/6 = not set by default
                 pMenu->m7FnPtrs_field_2C[i](pMenu, pOtText1);
             }
+            flags *= 2; // To the next bit
         }
     }
 
     // TODO: This is probably a TILE prim? 
      //  Check if this causes the codec rect to appear at the ninja fight or not
-    /*
     *(&pMenu->mDR_ENV_field_48.tag + 16 * gActiveBuffer_dword_791A08) ^= (*(&pMenu->mDR_ENV_field_48.tag
         + 16 * gActiveBuffer_dword_791A08) ^ *pOtText1) & 0xFFFFFF;
+    
     *pOtText1 ^= (*pOtText1 ^ (unsigned int)(&pMenu->mDR_ENV_field_48 + gActiveBuffer_dword_791A08)) & 0xFFFFFF;
-    */
+    
 }
-MGS_FUNC_IMPLEX(0x004598BC, Menu_update_4598BC, false);
+MGS_FUNC_IMPLEX(0x004598BC, Menu_update_4598BC, MENU_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x4683F3, void __cdecl(MenuMan*), Menu_shutdown_fn1_4683F3);
+MGS_FUNC_NOT_IMPL(0x4657E6, void __cdecl(MenuMan*), Menu_shutdown_fn2_4657E6);
+MGS_FUNC_NOT_IMPL(0x46AD80, void __cdecl(MenuMan*), Menu_shutdown_fn3_46AD80);
+MGS_FUNC_NOT_IMPL(0x469E26, void __cdecl(MenuMan*), Menu_shutdown_fn4_469E26);
+MGS_FUNC_NOT_IMPL(0x469476, void __cdecl(MenuMan*), Menu_shutdown_fn5_469476);
+
+void Menu_shutdown_fn6_nullsub_131(MenuMan*)
+{
+
+}
+
+MGS_ARY(1, 0x66C4A4, TMenuFn, 7, gMenuFuncs_shutdown_66C4A4,
+{
+    Menu_shutdown_fn1_4683F3.Ptr(),
+    Menu_shutdown_fn2_4657E6.Ptr(),
+    Menu_shutdown_fn3_46AD80.Ptr(),
+    Menu_shutdown_fn4_469E26.Ptr(),
+    Menu_shutdown_fn5_469476.Ptr(),
+    Menu_shutdown_fn6_nullsub_131,
+    nullptr
+});
+
+void Menu_shutdown_459971(MenuMan* pMenu)
+{
+    TMenuFn* fnPtr = &gMenuFuncs_shutdown_66C4A4[0];
+    while (*fnPtr)
+    {
+        (*fnPtr)(pMenu);
+    }
+}
+MGS_FUNC_IMPLEX(0x00459971, Menu_shutdown_459971, MENU_IMPL);
 
 void CC Menu_create_459891()
 {
     Actor_Init_40A347(&gMenuMan_stru_725FC0.mBase,
         (TActorFunction)Menu_update_4598BC,
-        (TActorFunction)Menu_shutdown_459971.Ptr(),
+        (TActorFunction)Menu_shutdown_459971,
         "C:\\mgs\\source\\Menu\\menuman.c");
 
     Menu_create_helper_459991(&gMenuMan_stru_725FC0);
