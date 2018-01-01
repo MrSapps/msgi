@@ -88,10 +88,16 @@ MGS_FUNC_NOT_IMPL(0x462A3D, void __cdecl(MenuMan* pMenu, int* ot), Menu_update_h
 MGS_FUNC_NOT_IMPL(0x459971, void __cdecl(MenuMan* pMenu), Menu_shutdown_459971);
 MGS_FUNC_NOT_IMPL(0x459991, void __cdecl(MenuMan* pMenu), Menu_create_helper_459991);
 
-TILE* CC Menu_render_rect_46B79F(BYTE **ot, __int16 x, __int16 y, __int16 w, __int16 h, int rgb)
+struct MenuPrimBuffer
 {
-    TILE* pTile = reinterpret_cast<TILE*>(*ot);
-    *ot += sizeof(TILE);
+    BYTE* mFreeLocation;
+    BYTE* mOt;
+};
+
+TILE* CC Menu_render_rect_46B79F(MenuPrimBuffer* pPrimBuffer, __int16 x, __int16 y, __int16 w, __int16 h, int rgb)
+{
+    TILE* pTile = reinterpret_cast<TILE*>(pPrimBuffer->mFreeLocation);
+    pPrimBuffer->mFreeLocation += sizeof(TILE);
 
     pTile->r0 = BYTE0(rgb);
     pTile->g0 = BYTE1(rgb);
@@ -103,7 +109,7 @@ TILE* CC Menu_render_rect_46B79F(BYTE **ot, __int16 x, __int16 y, __int16 w, __i
     pTile->h = h;
     
     setTile(pTile);
-    addPrim(ot[1], pTile);
+    addPrim(pPrimBuffer->mOt, pTile);
 
     return pTile;
 }
