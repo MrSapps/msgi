@@ -156,6 +156,9 @@ MGS_ARY(1, 0x7289F4, DWORD, 2048, gTextDraws_2_unk_7289F4, {});
 MGS_ARY(1, 0x7265EC, DWORD*, 2, gDebugDraws_dword_7265EC, {});
 
 MGS_FUNC_NOT_IMPL(0x468158, void __cdecl(MenuMan*, int*), Menu_radar_update_468158);
+MGS_FUNC_NOT_IMPL(0x463763, void __cdecl(MenuMan*, int*), Menu_codec_update_463763);
+
+
 MGS_FUNC_NOT_IMPL(0x465B38, void __cdecl(), Menu_init_radar_helper_465B38);
 MGS_FUNC_NOT_IMPL(0x468264, void __cdecl(MenuMan*, int), Menu_radar_468264);
 MGS_FUNC_NOT_IMPL(0x465A01, void* __cdecl(int), sub_465A01);
@@ -181,13 +184,19 @@ void CC Menu_init_radar_468358(MenuMan* pMenu)
 }
 MGS_FUNC_IMPLEX(0x00468358, Menu_init_radar_468358, MENU_IMPL);
 
+void CC Menu_init_codec_463746(MenuMan* pMenu)
+{
+    pMenu->m7FnPtrs_field_2C[4] = Menu_codec_update_463763.Ptr();
+    pMenu->field_28_flags |= 0x10u;
+}
+MGS_FUNC_IMPLEX(0x00463746, Menu_init_codec_463746, MENU_IMPL);
+
 using TMenuFn = void(CC*)(MenuMan*);
 
 MGS_FUNC_NOT_IMPL(0x46AD91, void __cdecl(MenuMan*), Menu_init_fn0_46AD91);
-MGS_FUNC_NOT_IMPL(0x463746, void __cdecl(MenuMan*), Menu_init_fn2_463746);
-MGS_FUNC_NOT_IMPL(0x469E77, void __cdecl(MenuMan*), Menu_init_fn3_469E77);
-MGS_FUNC_NOT_IMPL(0x4694E4, void __cdecl(MenuMan*), Menu_init_fn4_4694E4);
-MGS_FUNC_NOT_IMPL(0x4691CE, void __cdecl(MenuMan*), Menu_init_fn5_4691CE);
+MGS_FUNC_NOT_IMPL(0x469E77, void __cdecl(MenuMan*), Menu_init_inventory_left_469E77);
+MGS_FUNC_NOT_IMPL(0x4694E4, void __cdecl(MenuMan*), Menu_init_inventory_right_4694E4);
+MGS_FUNC_NOT_IMPL(0x4691CE, void __cdecl(MenuMan*), Menu_init_menu_bars_4691CE);
 MGS_FUNC_NOT_IMPL(0x468406, void __cdecl(MenuMan*), Menu_init_fn6_468406);
 MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
 
@@ -196,10 +205,10 @@ MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
 {
     Menu_init_fn0_46AD91.Ptr(),
     Menu_init_radar_468358,
-    Menu_init_fn2_463746.Ptr(),
-    Menu_init_fn3_469E77.Ptr(),
-    Menu_init_fn4_4694E4.Ptr(),
-    Menu_init_fn5_4691CE.Ptr(),
+    Menu_init_codec_463746,
+    Menu_init_inventory_left_469E77.Ptr(),
+    Menu_init_inventory_right_4694E4.Ptr(),
+    Menu_init_menu_bars_4691CE.Ptr(),
     Menu_init_fn6_468406.Ptr(),
     Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC.Ptr(),
     nullptr
@@ -278,11 +287,34 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
 }
 MGS_FUNC_IMPLEX(0x004598BC, Menu_update_4598BC, MENU_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x4683F3, void __cdecl(MenuMan*), Menu_shutdown_fn1_4683F3);
-MGS_FUNC_NOT_IMPL(0x4657E6, void __cdecl(MenuMan*), Menu_shutdown_fn2_4657E6);
-MGS_FUNC_NOT_IMPL(0x46AD80, void __cdecl(MenuMan*), Menu_shutdown_fn3_46AD80);
-MGS_FUNC_NOT_IMPL(0x469E26, void __cdecl(MenuMan*), Menu_shutdown_fn4_469E26);
-MGS_FUNC_NOT_IMPL(0x469476, void __cdecl(MenuMan*), Menu_shutdown_fn5_469476);
+void CC Menu_shutdown_fn1_4683F3(MenuMan* pMenu)
+{
+    pMenu->field_28_flags &= 0xF7u;
+}
+
+void CC Menu_shutdown_radar_4657E6(MenuMan *pMenu)
+{
+    pMenu->field_28_flags &= 0xEFu;
+}
+MGS_FUNC_IMPLEX(0x004657E6, Menu_shutdown_radar_4657E6, MENU_IMPL);
+
+void CC Menu_shutdown_codec_46AD80(MenuMan *pMenu)
+{
+    pMenu->field_28_flags &= 0xFBu;
+}
+MGS_FUNC_IMPLEX(0x0046AD80, Menu_shutdown_codec_46AD80, MENU_IMPL);
+
+void CC Menu_shutdown_fn4_469E26(MenuMan* pMenu)
+{
+    pMenu->field_28_flags &= 0xFDu;
+}
+MGS_FUNC_IMPLEX(0x00469E26, Menu_shutdown_fn4_469E26, MENU_IMPL);
+
+void CC Menu_shutdown_fn5_469476(MenuMan* pMenu)
+{
+    pMenu->field_28_flags &= 0xFEu;
+}
+MGS_FUNC_IMPLEX(0x00469476, Menu_shutdown_fn5_469476, MENU_IMPL);
 
 void Menu_shutdown_fn6_nullsub_131(MenuMan*)
 {
@@ -291,11 +323,11 @@ void Menu_shutdown_fn6_nullsub_131(MenuMan*)
 
 MGS_ARY(1, 0x66C4A4, TMenuFn, 7, gMenuFuncs_shutdown_66C4A4,
 {
-    Menu_shutdown_fn1_4683F3.Ptr(),
-    Menu_shutdown_fn2_4657E6.Ptr(),
-    Menu_shutdown_fn3_46AD80.Ptr(),
-    Menu_shutdown_fn4_469E26.Ptr(),
-    Menu_shutdown_fn5_469476.Ptr(),
+    Menu_shutdown_fn1_4683F3,
+    Menu_shutdown_radar_4657E6,
+    Menu_shutdown_codec_46AD80,
+    Menu_shutdown_fn4_469E26,
+    Menu_shutdown_fn5_469476,
     Menu_shutdown_fn6_nullsub_131,
     nullptr
 });
