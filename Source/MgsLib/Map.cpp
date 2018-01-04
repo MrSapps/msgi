@@ -177,7 +177,7 @@ signed int CC Script_tbl_map_45151D(BYTE* /*pScript*/)
     if (Script_ParamExists('s'))
     {
         Map_ScriptReloadMaps_44F75E(1);
-        if (!(game_state_dword_72279C & 0x80000000))
+        if (!(game_state_dword_72279C.flags & 0x80000000))
         {
             counter_dword_6BED20 = 4;
         }
@@ -186,7 +186,7 @@ signed int CC Script_tbl_map_45151D(BYTE* /*pScript*/)
     if (Script_ParamExists('c'))
     {
         Map_ScriptReloadMaps_44F75E(0);
-        if (!(game_state_dword_72279C & 0x80000000))
+        if (!(game_state_dword_72279C.flags & 0x80000000))
         {
             if (Script_ParamExists('u'))
             {

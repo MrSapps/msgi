@@ -13,6 +13,21 @@
 struct MenuMan;
 using TMenuUpdateFn = void(CC*)(MenuMan*, int*);
 
+#pragma pack(push)
+#pragma pack(1)
+struct MenuMan_MenuBars
+{
+    BYTE field_0_state;
+    BYTE field_1_O2_hp;
+    short int field_2_bar_x;
+    short int field_4_bar_y;
+    short int field_6_snake_hp;
+    short int field_8;
+    short int field_A_k10_decrement;
+};
+#pragma pack(pop)
+MGS_ASSERT_SIZEOF(MenuMan_MenuBars, 0xc);
+
 // TODO: Discover true size of structure/other data
 struct MenuMan
 {
@@ -21,11 +36,10 @@ struct MenuMan
     ButtonStates* field_24_input;
     BYTE field_28_flags;
     BYTE field_29;
-    BYTE field_2A;
+    BYTE field_2A_bSkipUpdateHpBars;
     BYTE field_2B;
     TMenuUpdateFn m7FnPtrs_field_2C[7];
-    DR_ENV mDR_ENV_field_48;
-    DR_ENV mDR_ENV_field_88;
+    DR_ENV mDR_ENV_field_48[2];
     DR_ENV DR_ENV_field_C8;
     DWORD field_108;
     DWORD field_10C;
@@ -61,11 +75,7 @@ struct MenuMan
     DWORD field_1F4;
     DWORD field_1F8;
     DWORD field_1FC;
-    BYTE field_200;
-    BYTE field_201;
-    WORD field_202;
-    DWORD field_204;
-    DWORD field_208;
+    MenuMan_MenuBars field_200_hp_bars_info;
     DWORD field_20C;
     DWORD field_210_size_19F2_q;
     DWORD field_214;
@@ -122,6 +132,7 @@ struct BarConfig
 };
 MGS_ASSERT_SIZEOF(BarConfig, 0xC);
 
+/*
 void __cdecl Menu_draw_bar_468DA6(int* ot, int xpos, int ypos, int redFillLength, int normalFillLength, int barLength, BarConfig *pBar);
 MGS_FUNC_IMPLEX(0x00468DA6, Menu_draw_bar_468DA6, true);
 void __cdecl Menu_draw_bar_468DA6(int* ot, int xpos, int ypos, int redFillLength, int normalFillLength, int barLength, BarConfig* pBar)
@@ -130,6 +141,7 @@ void __cdecl Menu_draw_bar_468DA6(int* ot, int xpos, int ypos, int redFillLength
     // Setting bit 0x40000000 in pBar enables the red text/damage display
     Menu_draw_bar_468DA6_.Ptr()(ot, xpos , ypos, redFillLength, normalFillLength, barLength, pBar);
 }
+*/
 
 MGS_ARY(1, 0x733868, DWORD, 16, dword_733868, {});
 MGS_ARY(1, 0x7338A8, DWORD, 16, dword_7338A8, {});
@@ -147,8 +159,6 @@ void CC sub_462E8D()
     } while (idx < 16);
 }
 MGS_FUNC_IMPLEX(0x00462E8D, sub_462E8D, MENU_IMPL);
-
-MGS_VAR(1, 0x995348, WORD, word_995348, 0);
 
 MGS_VAR(1, 0x7265E0, DWORD, gTextOt_Start_7265E0, 0);
 MGS_ARY(1, 0x7269F4, DWORD, 2048, gTextDraws_1_unk_7269F4, {});
@@ -176,8 +186,8 @@ void CC Menu_init_radar_468358(MenuMan* pMenu)
     pMenu->field_1D2 = 0;
     Menu_radar_468264(pMenu, 0);
     Menu_radar_468264(pMenu, 1);
-    memcpy(&pMenu->mDrEnvDst_field_150, &pMenu->mDR_ENV_field_48, sizeof(pMenu->mDrEnvDst_field_150));
-    memcpy(&pMenu->mDrEnvDst_field_190, &pMenu->mDR_ENV_field_88, sizeof(pMenu->mDrEnvDst_field_190));
+    memcpy(&pMenu->mDrEnvDst_field_150, &pMenu->mDR_ENV_field_48[0], sizeof(pMenu->mDrEnvDst_field_150));
+    memcpy(&pMenu->mDrEnvDst_field_190, &pMenu->mDR_ENV_field_48[1], sizeof(pMenu->mDrEnvDst_field_190));
     Menu_init_radar_helper_465B38();
     gFn_radar_dword_733950 = 0;
     sub_465A01(4096);
@@ -196,10 +206,209 @@ using TMenuFn = void(CC*)(MenuMan*);
 MGS_FUNC_NOT_IMPL(0x46AD91, void __cdecl(MenuMan*), Menu_init_fn0_46AD91);
 MGS_FUNC_NOT_IMPL(0x469E77, void __cdecl(MenuMan*), Menu_init_inventory_left_469E77);
 MGS_FUNC_NOT_IMPL(0x4694E4, void __cdecl(MenuMan*), Menu_init_inventory_right_4694E4);
-MGS_FUNC_NOT_IMPL(0x4691CE, void __cdecl(MenuMan*), Menu_init_menu_bars_4691CE);
 MGS_FUNC_NOT_IMPL(0x468406, void __cdecl(MenuMan*), Menu_init_fn6_468406);
 MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
 
+MGS_FUNC_NOT_IMPL(0x468DA6, void __cdecl(int *ot, int xpos, int ypos, int redFillLength, int normalFillLength, int barLength, BarConfig *pTaggedBarConfig), Menu_render_life_bar_468DA6);
+// void __cdecl Menu_render_life_bar_468DA6(int *ot, int xpos, int ypos, int redFillLength, int normalFillLength, int barLength, BarConfig *pTaggedBarConfig);
+
+MGS_VAR(1, 0x78E7F6, WORD, gSnakeCurrentHealth_78E7F6, 0);
+MGS_VAR(1, 0x7339D4, int, gSnakeLifeYPos_7339D4, 0);
+MGS_VAR(1, 0x7339D8, int, gTakeDamageCounter_dword_7339D8, 0);
+MGS_VAR(1, 0x78E7F8, WORD, gSnakeMaxHealth_78E7F8, 0);
+MGS_VAR(1, 0x995348, WORD, gSnakeCurrentO2_995348, 0);
+
+
+
+signed int CC Menu_menu_bars_update_field200_46938A(MenuMan_MenuBars* pMenuBarsUnk)
+{
+    if (pMenuBarsUnk->field_6_snake_hp == gSnakeCurrentHealth_78E7F6)
+    {
+        pMenuBarsUnk->field_A_k10_decrement = 10;
+        return 0;
+    }
+
+    if (pMenuBarsUnk->field_6_snake_hp > gSnakeCurrentHealth_78E7F6)
+    {
+        if (pMenuBarsUnk->field_A_k10_decrement)
+        {
+            pMenuBarsUnk->field_A_k10_decrement -= 1;
+        }
+        else
+        {
+            pMenuBarsUnk->field_6_snake_hp -= 64;
+        }
+    }
+
+    if (pMenuBarsUnk->field_6_snake_hp < gSnakeCurrentHealth_78E7F6)
+    {
+        pMenuBarsUnk->field_6_snake_hp = gSnakeCurrentHealth_78E7F6;
+    }
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x46938A, Menu_menu_bars_update_field200_46938A, MENU_IMPL);
+
+MGS_VAR(1, 0x6757F0, BarConfig, gSnakeLifeBarConfig_6757F0, {}); // TODO: Populate
+MGS_VAR(1, 0x675800, BarConfig, gSnakeO2BarConfig_675800, {}); // TODO: Populate
+
+template<class T>
+static inline T TagPointer(T ptr)
+{
+    return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) | 0x40000000);
+}
+
+void __cdecl Menu_menu_bars_draw_snake_life_and_O2_4693D5(int *ot, MenuMan_MenuBars *pField200)
+{
+    gSnakeLifeYPos_7339D4 = pField200->field_4_bar_y;
+
+    BarConfig* pLifeBarText = &gSnakeLifeBarConfig_6757F0;
+
+    if (game_state_dword_72279C.flags & 0x2000000)
+    {
+        // Sets hi byte
+        game_state_dword_72279C.mParts.flags3 &= 0xFDu;
+        gTakeDamageCounter_dword_7339D8 = 8;
+    }
+
+    if (gTakeDamageCounter_dword_7339D8 > 0)
+    {
+        --gTakeDamageCounter_dword_7339D8;
+        pLifeBarText = TagPointer(&gSnakeLifeBarConfig_6757F0);
+    }
+
+    Menu_render_life_bar_468DA6(
+        ot,
+        pField200->field_2_bar_x,
+        pField200->field_4_bar_y,
+        pField200->field_6_snake_hp,
+        gSnakeCurrentHealth_78E7F6,
+        gSnakeMaxHealth_78E7F8,
+        pLifeBarText);
+
+    if (pField200->field_1_O2_hp)
+    {
+        Menu_render_life_bar_468DA6(
+            ot,
+            pField200->field_2_bar_x,
+            pField200->field_4_bar_y + 12,
+            gSnakeCurrentO2_995348,
+            gSnakeCurrentO2_995348,
+            1024,
+            &gSnakeO2BarConfig_675800);
+    }
+}
+
+void __cdecl Menu_menu_bars_update_469215(MenuMan* pMenu, int* /*ot*/)
+{
+    MenuMan_MenuBars* pField_200 = &pMenu->field_200_hp_bars_info;
+    signed int bHpChanged = Menu_menu_bars_update_field200_46938A(&pMenu->field_200_hp_bars_info);
+
+    if (gSnakeCurrentO2_995348 < 1024)
+    {
+        pMenu->field_200_hp_bars_info.field_1_O2_hp = 150;
+        bHpChanged = 1;
+    }
+
+    if (!pMenu->field_2A_bSkipUpdateHpBars)
+    {
+        if (game_state_dword_72279C.flags & 0x10000)
+        {
+            pField_200->field_0_state = 3;
+        }
+
+        const char state_copy = pField_200->field_0_state;
+        if ((!pField_200->field_0_state || state_copy == 3)
+            && (bHpChanged || game_state_dword_72279C.flags & 0x8000 || gSnakeCurrentHealth_78E7F6 <= gSnakeMaxHealth_78E7F8 / 2))
+        {
+            if (!state_copy)
+            {
+                pMenu->field_200_hp_bars_info.field_4_bar_y = -48;
+            }
+            pField_200->field_0_state = 1;
+            gTakeDamageCounter_dword_7339D8 = 0;
+        }
+        if (pField_200->field_0_state)
+        {
+            if (pField_200->field_0_state == 1)     // animate in the life bar?
+            {
+                pMenu->field_200_hp_bars_info.field_4_bar_y += 8;
+                if (pMenu->field_200_hp_bars_info.field_4_bar_y >= 16)
+                {
+                    pMenu->field_200_hp_bars_info.field_4_bar_y = 16;
+                    pField_200->field_0_state = 2;
+                    pMenu->field_200_hp_bars_info.field_8 = 150;
+                }
+                Menu_menu_bars_draw_snake_life_and_O2_4693D5((int *)pMenu->field_20_gTextDraws, pField_200);
+                return;
+            }
+
+            if (pField_200->field_0_state == 2)
+            {
+                if (bHpChanged || gSnakeCurrentHealth_78E7F6 <= gSnakeMaxHealth_78E7F8 / 2 || game_state_dword_72279C.flags & 0x8000)
+                {
+                    pMenu->field_200_hp_bars_info.field_8 = 150;
+                    if (pMenu->field_200_hp_bars_info.field_1_O2_hp > 0)
+                    {
+                        pMenu->field_200_hp_bars_info.field_1_O2_hp -= 1;
+                    }
+                }
+                else if (--pMenu->field_200_hp_bars_info.field_8 <= 0)
+                {
+                    pField_200->field_0_state = 3;
+                }
+                Menu_menu_bars_draw_snake_life_and_O2_4693D5((int *)pMenu->field_20_gTextDraws, pField_200);
+                return;
+            }
+
+            if (pField_200->field_0_state != 3)
+            {
+                if (pField_200->field_0_state == 4)
+                {
+                    pField_200->field_0_state = 0;
+                    pMenu->field_200_hp_bars_info.field_4_bar_y = -48;
+                }
+                Menu_menu_bars_draw_snake_life_and_O2_4693D5((int *)pMenu->field_20_gTextDraws, pField_200);
+                return;
+            }
+
+            pMenu->field_200_hp_bars_info.field_4_bar_y -= 8;
+            if (pMenu->field_200_hp_bars_info.field_4_bar_y > -48)
+            {
+                Menu_menu_bars_draw_snake_life_and_O2_4693D5((int *)pMenu->field_20_gTextDraws, pField_200);
+                return;
+            }
+            
+            pField_200->field_0_state = 0;
+            pMenu->field_200_hp_bars_info.field_4_bar_y = -48;
+            
+            if (game_state_dword_72279C.flags & 0x10000)
+            {
+                game_state_dword_72279C.flags = game_state_dword_72279C.flags & 0xFFFEFFFF | 0x20000;
+            }
+
+            if (gSnakeCurrentO2_995348 == 1024)
+            {
+                pMenu->field_200_hp_bars_info.field_1_O2_hp = 0;
+            }
+        }
+    }
+}
+
+void CC Menu_init_menu_bars_4691CE(MenuMan* pMenu)
+{
+    pMenu->field_28_flags |= 1u;
+    pMenu->m7FnPtrs_field_2C[0] = Menu_menu_bars_update_469215;
+
+    pMenu->field_200_hp_bars_info.field_0_state = 0;
+    pMenu->field_200_hp_bars_info.field_1_O2_hp = 0;
+    pMenu->field_200_hp_bars_info.field_6_snake_hp = gSnakeCurrentHealth_78E7F6;
+    pMenu->field_200_hp_bars_info.field_A_k10_decrement = 10;
+    pMenu->field_200_hp_bars_info.field_2_bar_x = 16;
+    pMenu->field_200_hp_bars_info.field_4_bar_y = -48;
+
+    gSnakeLifeYPos_7339D4 = -48;
+}
+MGS_FUNC_IMPLEX(0x4691CE, Menu_init_menu_bars_4691CE, MENU_IMPL);
 
 MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
 {
@@ -208,7 +417,7 @@ MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
     Menu_init_codec_463746,
     Menu_init_inventory_left_469E77.Ptr(),
     Menu_init_inventory_right_4694E4.Ptr(),
-    Menu_init_menu_bars_4691CE.Ptr(),
+    Menu_init_menu_bars_4691CE,
     Menu_init_fn6_468406.Ptr(),
     Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC.Ptr(),
     nullptr
@@ -216,7 +425,7 @@ MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
 
 void CC Menu_create_helper_459991(MenuMan* pMenu)
 {
-    pMenu->field_2A = 0;
+    pMenu->field_2A_bSkipUpdateHpBars = 0;
     pMenu->field_29 = 0;
     pMenu->field_28_flags = 0;
     pMenu->field_20_gTextDraws = &gTextOt_Start_7265E0; // Points into one of gDebugDraws_dword_7265EC
@@ -228,12 +437,12 @@ void CC Menu_create_helper_459991(MenuMan* pMenu)
     Renderer_DRAWENV_Init_401888(&drEnv, 0, 0, 320, 224);
     drEnv.isbg = 0;
     drEnv.texturePage = 31;
-    Pack_DRAWENV_40DDE0(&pMenu->mDR_ENV_field_48, &drEnv);
+    Pack_DRAWENV_40DDE0(&pMenu->mDR_ENV_field_48[0], &drEnv);
     
     Renderer_DRAWENV_Init_401888(&drEnv, 320, 0, 320, 224);
     drEnv.isbg = 0;
     drEnv.texturePage = 31;
-    Pack_DRAWENV_40DDE0(&pMenu->mDR_ENV_field_88, &drEnv);
+    Pack_DRAWENV_40DDE0(&pMenu->mDR_ENV_field_48[1], &drEnv);
 
     Menu_create_helper_item_file_46B8CA("item");
 
@@ -257,7 +466,7 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
     if (!(gActorPauseFlags_dword_791A0C & 2)
         && gLoaderState_dword_9942B8 > 0
         && !script_cancel_non_zero_dword_7227A0
-        && game_state_dword_72279C >= 0)
+        && game_state_dword_72279C.flags >= 0)
     {
         const int field_28_flags = pMenu->field_28_flags;
         int flags = 1;
@@ -279,11 +488,10 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
 
     // TODO: This is probably a TILE prim? 
      //  Check if this causes the codec rect to appear at the ninja fight or not
-    *(&pMenu->mDR_ENV_field_48.tag + 16 * gActiveBuffer_dword_791A08) ^= (*(&pMenu->mDR_ENV_field_48.tag
-        + 16 * gActiveBuffer_dword_791A08) ^ *pOtText1) & 0xFFFFFF;
+    pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08].tag ^= (pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08].tag ^ *pOtText1) & 0xFFFFFF;
     
-    *pOtText1 ^= (*pOtText1 ^ (unsigned int)(&pMenu->mDR_ENV_field_48 + gActiveBuffer_dword_791A08)) & 0xFFFFFF;
-    
+    *pOtText1 ^= (*pOtText1 ^ (unsigned int)&pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]) & 0xFFFFFF;
+
 }
 MGS_FUNC_IMPLEX(0x004598BC, Menu_update_4598BC, MENU_IMPL);
 
@@ -291,6 +499,7 @@ void CC Menu_shutdown_fn1_4683F3(MenuMan* pMenu)
 {
     pMenu->field_28_flags &= 0xF7u;
 }
+MGS_FUNC_IMPLEX(0x004683F3, Menu_shutdown_fn1_4683F3, MENU_IMPL);
 
 void CC Menu_shutdown_radar_4657E6(MenuMan *pMenu)
 {

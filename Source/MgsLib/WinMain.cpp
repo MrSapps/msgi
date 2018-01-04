@@ -39,6 +39,8 @@
 #include "Timer.hpp"
 #include "Fs.hpp"
 #include "Imports.hpp"
+#include "Menu.hpp"
+
 
 #define _ELPP_THREAD_SAFE
 #include "easylogging++.h"
@@ -118,8 +120,6 @@ void CC CentreWindow(HWND hWnd, int nWidth, int nHeight)
 }
 MGS_FUNC_IMPLEX(0x0051D09D, CentreWindow, WINMAIN_IMPL);
 
-MGS_VAR(1, 0x78E7F8, WORD, word_78E7F8, 0);
-MGS_VAR(1, 0x78E7F6, WORD, word_78E7F6, 0);
 MGS_VAR(1, 0x717354, DWORD, dword_717354, 0);
 MGS_VAR(1, 0x717348, DWORD, dword_717348, 0);
 MGS_VAR(1, 0x7348FC, DWORD, gRestoreHealthCheat_7348FC, 0);
@@ -198,7 +198,7 @@ MGS_ARY(1, 0x689B68, struct jimUnk0x204, 2, array_689B68, {}); // TODO: Also 2?
 MGS_ARY(1, 0x6C0778, char, 0x400, unk_6C0778, {}); // TODO: Struct?
 MGS_VAR(1, 0x006FC7E8, HFONT, gFont_6FC7E8, nullptr);
 MGS_VAR(1, 0x009ADDA0, HWND, gHwnd, nullptr);
-MGS_VAR(1, 0x72279C, DWORD, game_state_dword_72279C, 0);
+MGS_VAR(1, 0x72279C, UGameStates, game_state_dword_72279C, {});
 
 int CC sub_51F1E1(GUID** ppOtherGuid, GUID** ppDeviceGuid)
 {
@@ -331,7 +331,7 @@ int CC MainLoop()
     }
     if (gRestoreHealthCheat_7348FC != 0)
     {
-        word_78E7F6 = word_78E7F8 = 0x400;
+        gSnakeCurrentHealth_78E7F6 = gSnakeMaxHealth_78E7F8 = 1024;
     }
     
     HandleExclusiveMode();
@@ -709,7 +709,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
         case VK_F7:  // Restart level with collected items
             if (gCheatsEnabled)
             {
-                game_state_dword_72279C = 0;
+                game_state_dword_72279C.flags = 0;
                 sub_521210();
                 sub_452E6E();
                 result = 0;
@@ -770,7 +770,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
 
         case VK_ESCAPE:
             dword_791DE4 = 1;
-            if (game_state_dword_72279C != 0x20000000 || !strstr(gDest, "s19a"))
+            if (game_state_dword_72279C.flags != 0x20000000 || !strstr(gDest, "s19a"))
             {
                 if (!dword_717354 && !dword_717348 && !byte_9AD888 && !dword_733E34 && !dword_721E78)
                 {

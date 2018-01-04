@@ -11,7 +11,22 @@
 
 MGS_VAR_EXTERN(DWORD, gFlags_dword_78E7E4);
 MGS_VAR_EXTERN(DWORD, counter_dword_6BED20);
-MGS_VAR_EXTERN(DWORD, game_state_dword_72279C);
+
+union UGameStates
+{
+    struct Parts
+    {
+        BYTE flags0;
+        BYTE flags1;
+        BYTE flags2;
+        BYTE flags3;
+    };
+    Parts mParts;
+    DWORD flags;
+};
+MGS_ASSERT_SIZEOF(UGameStates, 0x4);
+
+MGS_VAR_EXTERN(UGameStates, game_state_dword_72279C);
 MGS_VAR_EXTERN(int, gActiveBuffer_dword_791A08);
 MGS_VAR_EXTERN(DWORD, gAlphaModulate_dword_6FC798);
 MGS_VAR_EXTERN(DWORD, g_surface565Mode);

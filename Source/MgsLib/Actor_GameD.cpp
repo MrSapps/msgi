@@ -126,7 +126,7 @@ static void GameD_Update_helper(DWORD buttons)
             //Ret0_44CFD0();
         }
     }
-    if (game_state_dword_72279C & 0x80000000)
+    if (game_state_dword_72279C.flags & 0x80000000)
     {
         if (gpActiveButtons_995324[2].field_2_button_pressed & 0x840)
         {
@@ -328,7 +328,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
             GameD_Sound_4552CB();
         }
 
-        if (game_state_dword_72279C & 0xD8004020)
+        if (game_state_dword_72279C.flags & 0xD8004020)
         {
             if (gActorPauseFlags_dword_791A0C & 2)
             {
@@ -360,7 +360,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
     Map_FreeKmds_44F3B5();
     StreamActorStop_4583BB();
     pGameD->gamed_unk_722784 = 3;
-    game_state_dword_72279C |= 0x104A6000u;
+    game_state_dword_72279C.flags |= 0x104A6000u;
 }
 MGS_FUNC_IMPLEX(0x0044E381, GameD_update_44E381, ACTOR_GAMED_IMPL);
 

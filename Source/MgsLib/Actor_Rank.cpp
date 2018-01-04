@@ -1257,7 +1257,7 @@ MGS_FUNC_IMPLEX(0x474D98, Res_rank_loader, ACTOR_RANK_IMPL)
 
 signed int CC Res_rank_Create_46EC0E(DWORD scriptUnknown, int a_dword_722A40, BYTE* pScript)
 {
-    game_state_dword_72279C |= 0x4A6000u; // TODO: Could be a code loc?
+    game_state_dword_72279C.flags |= 0x4A6000u; // TODO: Could be a code loc?
 
     Actor_Rank* pRank = Actor_ResourceAllocT<Actor_Rank>(1);
     if (pRank)
