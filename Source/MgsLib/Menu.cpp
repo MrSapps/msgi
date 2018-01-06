@@ -325,7 +325,7 @@ void CC Menu_render_life_bar_468DA6(MenuPrimBuffer* pPrimBuffer, short int xpos,
 MGS_FUNC_IMPLEX(0x468DA6, Menu_render_life_bar_468DA6, MENU_IMPL);
 
 MGS_VAR(1, 0x78E7F6, WORD, gSnakeCurrentHealth_78E7F6, 0);
-MGS_VAR(1, 0x7339D4, int, gSnakeLifeYPos_7339D4, 0);
+
 MGS_VAR(1, 0x7339D8, int, gTakeDamageCounter_dword_7339D8, 0);
 MGS_VAR(1, 0x78E7F8, WORD, gSnakeMaxHealth_78E7F8, 0);
 MGS_VAR(1, 0x995348, WORD, gSnakeCurrentO2_995348, 0);
@@ -363,12 +363,60 @@ MGS_FUNC_IMPLEX(0x46938A, Menu_menu_bars_update_field200_46938A, MENU_IMPL);
 // void __cdecl Menu_init_fn6_468406(MenuMan *pMenu)
 MGS_VAR(1, 0x6757F0, BarConfig, gSnakeLifeBarConfig_6757F0, {}); // TODO: Populate
 MGS_VAR(1, 0x675800, BarConfig, gSnakeO2BarConfig_675800, {}); // TODO: Populate
+MGS_VAR(1, 0x7339D4, int, gSnakeLifeYPos_7339D4, 0);
 
 template<class T>
 static inline T SetPointerFlag(T ptr)
 {
     return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) | 0x40000000);
 }
+
+void CC Menu_render_auto_stacked_menu_bar_469160(MenuPrimBuffer* pPrimBuffer, short xpos, short ypos, short redFillLength, short normalFillLength, short barLength, BarConfig *pBarConfig)
+{
+    game_state_dword_72279C.mParts.flags1 |= 0x80u;
+    Menu_render_life_bar_468DA6(
+        pPrimBuffer,
+        xpos,
+        static_cast<short>(gSnakeLifeYPos_7339D4 + ypos - 16),
+        redFillLength,
+        normalFillLength,
+        barLength,
+        pBarConfig);
+}
+MGS_FUNC_IMPLEX(0x469160, Menu_render_auto_stacked_menu_bar_469160, MENU_IMPL);
+
+void CC Menu_render_snake_life_bar_469194(MenuPrimBuffer* ot, short xpos, short ypos)
+{
+    game_state_dword_72279C.mParts.flags1 |= 0x80u;
+    Menu_render_life_bar_468DA6(
+        ot,
+        xpos,
+        ypos,
+        gSnakeCurrentHealth_78E7F6,
+        gSnakeCurrentHealth_78E7F6,
+        gSnakeMaxHealth_78E7F8,
+        &gSnakeLifeBarConfig_6757F0);
+}
+MGS_FUNC_IMPLEX(0x469194, Menu_render_snake_life_bar_469194, MENU_IMPL);
+
+void CC Menu_render_fixedx_auto_stacked_menu_bar_impl_46912D(MenuPrimBuffer* pPrimBuffer, short ypos, short redFill, short normalFill, short maxFill, BarConfig* pBarConfig)
+{
+    game_state_dword_72279C.mParts.flags1 |= 0x80u;
+    Menu_render_life_bar_468DA6(pPrimBuffer, 16, static_cast<short>(gSnakeLifeYPos_7339D4 + ypos - 16), redFill, normalFill, maxFill, pBarConfig);
+}
+MGS_FUNC_IMPLEX(0x46912D, Menu_render_fixedx_auto_stacked_menu_bar_impl_46912D, MENU_IMPL);
+
+void CC Menu_render_fixed_xpos_auto_stacked_menu_bar_459C9D(short ypos, short redFillLength, short normalFillLength, short barLength, BarConfig *pBarConfig)
+{
+    Menu_render_fixedx_auto_stacked_menu_bar_impl_46912D(
+        &gMenuPrimBuffer_7265E0,
+        ypos,
+        redFillLength,
+        normalFillLength,
+        barLength,
+        pBarConfig);
+}
+MGS_FUNC_IMPLEX(0x459C9D, Menu_render_fixed_xpos_auto_stacked_menu_bar_459C9D, MENU_IMPL);
 
 void CC Menu_menu_bars_draw_snake_life_and_O2_4693D5(MenuPrimBuffer* ot, MenuMan_MenuBars *pField200)
 {
@@ -622,9 +670,6 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
             flags *= 2; // To the next bit
         }
     }
-
-    TextSetXYFlags_459B0B(40, 50, 0);
-    Menu_DrawText_459B63("Testing the test");
 
     // drawing environment change primitive
     addPrim(pOtText2, &pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]);
