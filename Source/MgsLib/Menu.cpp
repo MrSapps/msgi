@@ -8,7 +8,7 @@
 #include "LibDG.hpp"
 #include "LibGV.hpp"
 #include "Script.hpp"
-
+#include "Actor_Rank.hpp" // TODO: Temp for text funcs
 
 #define MENU_IMPL true
 
@@ -219,18 +219,18 @@ MGS_FUNC_NOT_IMPL(0x468AAF, int __cdecl(int *ot, TextConfig* pTextSettings, char
 MGS_FUNC_NOT_IMPL(0x468642, int __cdecl(MenuPrimBuffer* ot, TextConfig* pTextSettings, const char *pText), Render_Text_NotFlag0x10_468642);
 
 template<class T>
-static inline T UnTagPointer(T ptr, bool& bWasTagged)
+static inline T UnSetPointerFlag(T ptr, bool& bWasFlagged)
 {
-    bWasTagged = (reinterpret_cast<unsigned int>(ptr) & 0x40000000) ? true : false;
+    bWasFlagged = (reinterpret_cast<unsigned int>(ptr) & 0x40000000) ? true : false;
     return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) & 0xBFFFFFFF);
 }
 
-void CC Menu_render_life_bar_468DA6(MenuPrimBuffer* pPrimBuffer, short int xpos, short int ypos, short int redFillLength, short int normalFillLength, short int barLength, BarConfig* pMaybeTaggedBarConfig)
+void CC Menu_render_life_bar_468DA6(MenuPrimBuffer* pPrimBuffer, short int xpos, short int ypos, short int redFillLength, short int normalFillLength, short int barLength, BarConfig* pMaybeFlaggedBarConfig)
 {
     if (!(game_state_dword_72279C.flags & 0x80020400))
     {
         bool bDrawTextRed = false;
-        BarConfig* pBarConfig = UnTagPointer(pMaybeTaggedBarConfig, bDrawTextRed);
+        BarConfig* pBarConfig = UnSetPointerFlag(pMaybeFlaggedBarConfig, bDrawTextRed);
 
         const short int barHeight = 5 - pBarConfig->mBarHeight;
         const short int scaledBarWidth = (barLength << 7) / 1024;
@@ -365,7 +365,7 @@ MGS_VAR(1, 0x6757F0, BarConfig, gSnakeLifeBarConfig_6757F0, {}); // TODO: Popula
 MGS_VAR(1, 0x675800, BarConfig, gSnakeO2BarConfig_675800, {}); // TODO: Populate
 
 template<class T>
-static inline T TagPointer(T ptr)
+static inline T SetPointerFlag(T ptr)
 {
     return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) | 0x40000000);
 }
@@ -386,8 +386,8 @@ void CC Menu_menu_bars_draw_snake_life_and_O2_4693D5(MenuPrimBuffer* ot, MenuMan
     if (gTakeDamageCounter_dword_7339D8 > 0)
     {
         --gTakeDamageCounter_dword_7339D8;
-        // Tagged causes MenuBar text to render in red
-        pLifeBarText = TagPointer(&gSnakeLifeBarConfig_6757F0);
+        // Flag causes MenuBar text to render in red
+        pLifeBarText = SetPointerFlag(&gSnakeLifeBarConfig_6757F0);
     }
 
     Menu_render_life_bar_468DA6(
@@ -546,7 +546,7 @@ void CC Menu_TextReset_459ACE()
     gTextConfig_66C4C0.gTextFlags_dword_66C4C8 = 0;
     gTextConfig_66C4C0.gTextRGB_dword_66C4CC = 0x64808080;
     gMenuPrimBuffer_7265E0.mFreeLocation = gMenuPrimBufferArrays_7265EC[gActiveBuffer_dword_791A08];
-    gMenuPrimBuffer_7265E0.mOtEnd = gMenuPrimBuffer_7265E0.mFreeLocation + 8192;// 1024 items, so 512 per buffer?
+    gMenuPrimBuffer_7265E0.mOtEnd = gMenuPrimBuffer_7265E0.mFreeLocation + 8192; // sizeof gMenuPrimArray1_7269F4/gMenuPrimArray2_7289F4
     gMenuPrimBuffer_7265E0.mOt = gLibGvStruct2_6BC558.mOrderingTables[gActiveBuffer_dword_791A08];
 }
 MGS_FUNC_IMPLEX(0x00459ACE, Menu_TextReset_459ACE, MENU_IMPL);
@@ -583,6 +583,15 @@ void CC Menu_create_helper_459991(MenuMan* pMenu)
 }
 MGS_FUNC_IMPLEX(0x00459991, Menu_create_helper_459991, MENU_IMPL);
 
+void CC Menu_Set_Text_BlendMode_459BE0()
+{
+    DR_TPAGE* pDrTPage = PrimAlloc<DR_TPAGE>(&gMenuPrimBuffer_7265E0);
+    int abr = ((gTextConfig_66C4C0.gTextFlags_dword_66C4C8 >> 8) & 3);
+    setDrawTPage(pDrTPage, 1, 1, getTPage(0, abr, 960, 256));
+    addPrim(gMenuPrimBuffer_7265E0.mOt, pDrTPage);
+}
+MGS_FUNC_IMPLEX(0x00459BE0, Menu_Set_Text_BlendMode_459BE0, MENU_IMPL);
+
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {
     int* pOtText1 = (int*)gMenuPrimBuffer_7265E0.mOt;
@@ -613,6 +622,9 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
             flags *= 2; // To the next bit
         }
     }
+
+    TextSetXYFlags_459B0B(40, 50, 0);
+    Menu_DrawText_459B63("Testing the test");
 
     // drawing environment change primitive
     addPrim(pOtText2, &pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]);

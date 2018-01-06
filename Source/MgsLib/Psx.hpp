@@ -59,6 +59,16 @@ MGS_ASSERT_SIZEOF(TILE, 16);
         ((0xe1000000)|((dtd)?0x0200:0)| \
         ((dfe)?0x0400:0)|((tpage)&0x9ff))
 
+#define getTPage(tp, abr, x, y) \
+ ((((tp)&0x3)<<7)|(((abr)&0x3)<<5)|(((y)&0x100)>>4)|(((x)&0x3ff)>>6)| \
+ (((y)&0x200)<<2))
+
+#define dumpTPage(tpage) \
+    printf("tpage: (%d,%d,%d,%d)\n", \
+       ((tpage)>>7)&0x003,((tpage)>>5)&0x003, \
+       ((tpage)<<6)&0x3C0, \
+       (((tpage)<<4)&0x100)+(((tpage)>>2)&0x200))
+
 #define setDrawTPage(p, dfe, dtd, tpage) \
     setlen(p, 1), \
     ((unsigned int *)(p))[1] = _get_mode(dfe, dtd, tpage)
