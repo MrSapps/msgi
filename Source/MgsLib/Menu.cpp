@@ -28,11 +28,17 @@ struct MenuMan_MenuBars
 #pragma pack(pop)
 MGS_ASSERT_SIZEOF(MenuMan_MenuBars, 0xc);
 
+struct MenuPrimBuffer
+{
+    BYTE* mFreeLocation;
+    BYTE* mOt;
+};
+
 // TODO: Discover true size of structure/other data
 struct MenuMan
 {
     Actor mBase;
-    DWORD* field_20_gTextDraws;
+    MenuPrimBuffer* field_20_gTextDraws;
     ButtonStates* field_24_input;
     BYTE field_28_flags;
     BYTE field_29;
@@ -97,18 +103,12 @@ MGS_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, MENU_IMPL);
 MGS_FUNC_NOT_IMPL(0x462A3D, void __cdecl(MenuMan* pMenu, int* ot), Menu_update_helper_462A3D);
 MGS_FUNC_NOT_IMPL(0x46B8CA, void __cdecl(char *pFileName), Menu_create_helper_item_file_46B8CA);
 
-
-struct MenuPrimBuffer
-{
-    BYTE* mFreeLocation;
-    BYTE* mOt;
-};
-
 TILE* CC Menu_render_rect_46B79F(MenuPrimBuffer* pPrimBuffer, __int16 x, __int16 y, __int16 w, __int16 h, int rgb)
 {
     TILE* pTile = reinterpret_cast<TILE*>(pPrimBuffer->mFreeLocation);
     pPrimBuffer->mFreeLocation += sizeof(TILE);
 
+    setTile(pTile);
     setRGB0(pTile, BYTE0(rgb), BYTE1(rgb), BYTE2(rgb));
 
     pTile->x0 = x;
@@ -116,7 +116,7 @@ TILE* CC Menu_render_rect_46B79F(MenuPrimBuffer* pPrimBuffer, __int16 x, __int16
     pTile->w = w;
     pTile->h = h;
     
-    setTile(pTile);
+   
     addPrim(pPrimBuffer->mOt, pTile);
 
     return pTile;
@@ -209,8 +209,126 @@ MGS_FUNC_NOT_IMPL(0x4694E4, void __cdecl(MenuMan*), Menu_init_inventory_right_46
 MGS_FUNC_NOT_IMPL(0x468406, void __cdecl(MenuMan*), Menu_init_fn6_468406);
 MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
 
-MGS_FUNC_NOT_IMPL(0x468DA6, void __cdecl(int *ot, int xpos, int ypos, int redFillLength, int normalFillLength, int barLength, BarConfig *pTaggedBarConfig), Menu_render_life_bar_468DA6);
-// void __cdecl Menu_render_life_bar_468DA6(int *ot, int xpos, int ypos, int redFillLength, int normalFillLength, int barLength, BarConfig *pTaggedBarConfig);
+struct TextConfig
+{
+    DWORD gTextX_dword_66C4C0;
+    DWORD gTextY_dword_66C4C4;
+    DWORD gTextFlags_dword_66C4C8;
+    DWORD gTextRGB_dword_66C4CC;
+};
+MGS_ASSERT_SIZEOF(TextConfig, 0x10);
+
+MGS_FUNC_NOT_IMPL(0x468AAF, int __cdecl(int *ot, TextConfig* pTextSettings, char *pString), Render_Text_Flag0x10_468AAF);
+MGS_FUNC_NOT_IMPL(0x468642, int __cdecl(MenuPrimBuffer* ot, TextConfig* pTextSettings, const char *pText), Render_Text_NotFlag0x10_468642);
+
+template<class T>
+static inline T UnTagPointer(T ptr, bool& bWasTagged)
+{
+    bWasTagged = (reinterpret_cast<unsigned int>(ptr) & 0x40000000) ? true : false;
+    return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) & 0xBFFFFFFF);
+}
+
+void CC Menu_render_life_bar_468DA6(MenuPrimBuffer* pPrimBuffer, int xpos, int ypos, int redFillLength, int normalFillLength, int barLength, BarConfig* pMaybeTaggedBarConfig)
+{
+    if (!(game_state_dword_72279C.flags & 0x80020400))
+    {
+        bool bDrawTextRed = false;
+        BarConfig* pBarConfig = UnTagPointer(pMaybeTaggedBarConfig, bDrawTextRed);
+
+        const int barHeightM5 = 5 - pBarConfig->mBarHeight;
+        const int w = (barLength << 7) / 1024;
+
+        TextConfig textConfig = {};
+        textConfig.gTextFlags_dword_66C4C8 = 0;
+        textConfig.gTextX_dword_66C4C0 = xpos + 4;
+        textConfig.gTextY_dword_66C4C4 = ypos + 4;
+        textConfig.gTextRGB_dword_66C4CC = bDrawTextRed ? 0x643030FF : 0x64FFFFFF;
+
+        Render_Text_NotFlag0x10_468642(pPrimBuffer, &textConfig, pBarConfig->mText);
+        TILE* pBarRectPrim = Menu_render_rect_46B79F(
+            pPrimBuffer,
+            xpos + 3,
+            LOWORD(textConfig.gTextY_dword_66C4C4) - 1,
+            LOWORD(textConfig.gTextX_dword_66C4C0) - (xpos + 4) + 2,
+            7,
+            0);
+
+        // Rect is semi trans
+        pBarRectPrim->code |= 2u;
+
+        // "Damage" fill can't overflow the max bar length
+        if (redFillLength > barLength)
+        {
+            redFillLength = barLength;
+        }
+
+        if (redFillLength > normalFillLength)
+        {
+            TILE* pTile = (TILE *)pPrimBuffer->mFreeLocation;
+            pPrimBuffer->mFreeLocation += sizeof(TILE);
+            setTile(pTile);
+            setRGB0(pTile, 200, 0, 0);
+            pTile->x0 = xpos + (normalFillLength << 7) / 1024;
+            pTile->y0 = ypos + 1;
+            pTile->w = ((redFillLength - normalFillLength) << 7) / 1024;
+            pTile->h = barHeightM5;
+            addPrim(pPrimBuffer->mOt, pTile);
+        }
+
+        POLY_G4* pPolyG4 = (POLY_G4 *)pPrimBuffer->mFreeLocation;
+        pPrimBuffer->mFreeLocation += sizeof(POLY_G4);
+        setPolyG4(pPolyG4);
+
+        pPolyG4->x0 = xpos;
+        pPolyG4->y0 = ypos + 1;
+
+        pPolyG4->x2 = xpos;
+        const __int16 x1 = ((normalFillLength + 7) << 7) / 1024 + xpos;
+        pPolyG4->y1 = ypos + 1;
+
+        const __int16 barBottom = barHeightM5 + ypos + 1;
+        pPolyG4->x1 = x1;
+        pPolyG4->y2 = barBottom;
+
+        pPolyG4->x3 = x1;
+        pPolyG4->y3 = barBottom;
+        
+        setRGB0(pPolyG4, pBarConfig->mLeftRGB[0], pBarConfig->mLeftRGB[1], pBarConfig->mLeftRGB[2]);
+
+        const int x1_m_xpos_1 = x1 - (signed __int16)xpos;
+        
+        pPolyG4->r1 = pBarConfig->mLeftRGB[0] + x1_m_xpos_1 * (pBarConfig->mRightRGB[0] - pBarConfig->mLeftRGB[0]) / 128;
+        pPolyG4->g1 = pBarConfig->mLeftRGB[1] + x1_m_xpos_1 * (pBarConfig->mRightRGB[1] - pBarConfig->mLeftRGB[1]) / 128;
+        pPolyG4->b1 = pBarConfig->mLeftRGB[2] + x1_m_xpos_1 * (pBarConfig->mRightRGB[2] - pBarConfig->mLeftRGB[2]) / 128;
+
+        pPolyG4->r2 = pBarConfig->mLeftRGB[0];
+        pPolyG4->g2 = pBarConfig->mLeftRGB[1];
+        pPolyG4->b2 = pBarConfig->mLeftRGB[2];
+
+        const int x1_m_xpos_2 = x1 - (signed __int16)xpos;
+
+        pPolyG4->r3 = pBarConfig->mLeftRGB[0] + x1_m_xpos_2 * (pBarConfig->mRightRGB[0] - pBarConfig->mLeftRGB[0]) / 128;
+        pPolyG4->g3 = pBarConfig->mLeftRGB[1] + x1_m_xpos_2 * (pBarConfig->mRightRGB[1] - pBarConfig->mLeftRGB[1]) / 128;
+        pPolyG4->b3 = pBarConfig->mLeftRGB[2] + x1_m_xpos_2 * (pBarConfig->mRightRGB[2] - pBarConfig->mLeftRGB[2]) / 128;
+
+        addPrim(pPrimBuffer->mOt, pPolyG4);
+
+        TILE* pMenuBarBackgroundRect = Menu_render_rect_46B79F(pPrimBuffer, xpos, ypos + 1, w, barHeightM5, 0x181800);
+        // Set semi trans
+        pMenuBarBackgroundRect->code |= 2u;
+
+        Menu_render_rect_46B79F(pPrimBuffer, xpos - 1, ypos, 1, barHeightM5 + 2, 0);
+        Menu_render_rect_46B79F(pPrimBuffer, xpos, ypos, w, 1, 0);
+        Menu_render_rect_46B79F(pPrimBuffer, xpos, barHeightM5 + ypos + 1, w, 1, 0);
+        Menu_render_rect_46B79F(pPrimBuffer, xpos + w, ypos, 1, barHeightM5 + 2, 0);
+        
+        DR_TPAGE* drTPage = (DR_TPAGE*)pPrimBuffer->mFreeLocation;
+        pPrimBuffer->mFreeLocation += sizeof(DR_TPAGE);
+        setDrawTPage(drTPage, 1, 1, 31);
+        addPrim(pPrimBuffer->mOt, drTPage);
+    }
+}
+MGS_FUNC_IMPLEX(0x468DA6, Menu_render_life_bar_468DA6, MENU_IMPL);
 
 MGS_VAR(1, 0x78E7F6, WORD, gSnakeCurrentHealth_78E7F6, 0);
 MGS_VAR(1, 0x7339D4, int, gSnakeLifeYPos_7339D4, 0);
@@ -258,7 +376,9 @@ static inline T TagPointer(T ptr)
     return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) | 0x40000000);
 }
 
-void __cdecl Menu_menu_bars_draw_snake_life_and_O2_4693D5(int *ot, MenuMan_MenuBars *pField200)
+
+
+void __cdecl Menu_menu_bars_draw_snake_life_and_O2_4693D5(MenuPrimBuffer* ot, MenuMan_MenuBars *pField200)
 {
     gSnakeLifeYPos_7339D4 = pField200->field_4_bar_y;
 
@@ -340,7 +460,7 @@ void __cdecl Menu_menu_bars_update_469215(MenuMan* pMenu, int* /*ot*/)
                     pField_200->field_0_state = 2;
                     pMenu->field_200_hp_bars_info.field_8 = 150;
                 }
-                Menu_menu_bars_draw_snake_life_and_O2_4693D5((int *)pMenu->field_20_gTextDraws, pField_200);
+                Menu_menu_bars_draw_snake_life_and_O2_4693D5(pMenu->field_20_gTextDraws, pField_200);
                 return;
             }
 
@@ -358,7 +478,7 @@ void __cdecl Menu_menu_bars_update_469215(MenuMan* pMenu, int* /*ot*/)
                 {
                     pField_200->field_0_state = 3;
                 }
-                Menu_menu_bars_draw_snake_life_and_O2_4693D5((int *)pMenu->field_20_gTextDraws, pField_200);
+                Menu_menu_bars_draw_snake_life_and_O2_4693D5(pMenu->field_20_gTextDraws, pField_200);
                 return;
             }
 
@@ -369,14 +489,14 @@ void __cdecl Menu_menu_bars_update_469215(MenuMan* pMenu, int* /*ot*/)
                     pField_200->field_0_state = 0;
                     pMenu->field_200_hp_bars_info.field_4_bar_y = -48;
                 }
-                Menu_menu_bars_draw_snake_life_and_O2_4693D5((int *)pMenu->field_20_gTextDraws, pField_200);
+                Menu_menu_bars_draw_snake_life_and_O2_4693D5(pMenu->field_20_gTextDraws, pField_200);
                 return;
             }
 
             pMenu->field_200_hp_bars_info.field_4_bar_y -= 8;
             if (pMenu->field_200_hp_bars_info.field_4_bar_y > -48)
             {
-                Menu_menu_bars_draw_snake_life_and_O2_4693D5((int *)pMenu->field_20_gTextDraws, pField_200);
+                Menu_menu_bars_draw_snake_life_and_O2_4693D5(pMenu->field_20_gTextDraws, pField_200);
                 return;
             }
             
@@ -430,7 +550,7 @@ void CC Menu_create_helper_459991(MenuMan* pMenu)
     pMenu->field_2A_bSkipUpdateHpBars = 0;
     pMenu->field_29 = 0;
     pMenu->field_28_flags = 0;
-    pMenu->field_20_gTextDraws = &gTextOt_Start_7265E0; // Points into one of gDebugDraws_dword_7265EC
+    pMenu->field_20_gTextDraws = (MenuPrimBuffer*)&gTextOt_Start_7265E0; // Points into one of gDebugDraws_dword_7265EC
 
     gDebugDraws_dword_7265EC[0] = &gTextDraws_1_unk_7269F4[0];
     gDebugDraws_dword_7265EC[1] = &gTextDraws_2_unk_7289F4[0];

@@ -20,6 +20,20 @@ struct P_CODE
 };
 MGS_ASSERT_SIZEOF(P_CODE, 4);
 
+struct DR_MODE
+{
+    DWORD tag;     // Pointer to the next primitive in primitive list
+    DWORD code[2];  // New drawing environment information as specified by SetDrawMode()
+};
+MGS_ASSERT_SIZEOF(DR_MODE, 12);
+
+struct DR_TPAGE
+{
+    DWORD tag;     // Pointer to the next primitive in primitive list(reserved)
+    DWORD code;  // New texture page information specified by SetDrawTPage()
+};
+MGS_ASSERT_SIZEOF(DR_TPAGE, 8);
+
 struct TILE
 {
     DWORD tag;
@@ -37,8 +51,17 @@ MGS_ASSERT_SIZEOF(TILE, 16);
 #define termPrim(p) setaddr(p, 0xffffffff)
 
 #define setRGB0(p,_r0,_g0,_b0) (p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
-#define setPolyFT4(p) setlen(p, 9), setcode(p, 0x2c)
-#define setTile(p) setlen(p, 3),  setcode(p, 0x60)
+#define setPolyFT4(p) setlen(p, 9),  setcode(p, 0x2c)
+#define setPolyG4(p)  setlen(p, 8),  setcode(p, 0x38)
+#define setTile(p)    setlen(p, 3),  setcode(p, 0x60)
+
+#define _get_mode(dfe, dtd, tpage) \
+        ((0xe1000000)|((dtd)?0x0200:0)| \
+        ((dfe)?0x0400:0)|((tpage)&0x9ff))
+
+#define setDrawTPage(p, dfe, dtd, tpage) \
+    setlen(p, 1), \
+    ((unsigned int *)(p))[1] = _get_mode(dfe, dtd, tpage)
 
 struct PSX_RECT // Should be called RECT but will clash with windows.h for now
 {
@@ -101,6 +124,20 @@ struct POLY_F4
 };
 MGS_ASSERT_SIZEOF(POLY_F4, 0x18);
 
+
+struct POLY_G4
+{
+    DWORD   tag;
+    BYTE    r0, g0, b0, code;
+    short   x0, y0;
+    BYTE    r1, g1, b1, pad1;
+    short   x1, y1;
+    BYTE    r2, g2, b2, pad2;
+    short   x2, y2;
+    BYTE    r3, g3, b3, pad3;
+    short   x3, y3;
+};
+MGS_ASSERT_SIZEOF(POLY_G4, 36);
 
 struct DISPENV
 {

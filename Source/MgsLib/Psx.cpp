@@ -53,20 +53,6 @@ struct DR_STP
 };
 MGS_ASSERT_SIZEOF(DR_STP, 12);
 
-struct DR_TPAGE
-{
-    DWORD* tag;     // Pointer to the next primitive in primitive list(reserved)
-    DWORD code[2];  // New texture page information specified by SetDrawTPage()
-};
-MGS_ASSERT_SIZEOF(DR_TPAGE, 12);
-
-struct DR_MODE
-{
-    DWORD* tag;     // Pointer to the next primitive in primitive list
-    DWORD code[2];  // New drawing environment information as specified by SetDrawMode()
-};
-MGS_ASSERT_SIZEOF(DR_MODE, 12);
-
 struct DR_TWIN
 {
     DWORD* tag;     // Pointer to the next primitive in primitive list
@@ -239,20 +225,6 @@ struct POLY_G3
     short   x2, y2;
 };
 MGS_ASSERT_SIZEOF(POLY_G3, 28);
-
-struct POLY_G4
-{
-    DWORD*  tag;
-    BYTE    r0, g0, b0, code;
-    short   x0, y0;
-    BYTE    r1, g1, b1, pad1;
-    short   x1, y1;
-    BYTE    r2, g2, b2, pad2;
-    short   x2, y2;
-    BYTE    r3, g3, b3, pad3;
-    short   x3, y3;
-};
-MGS_ASSERT_SIZEOF(POLY_G4, 36);
 
 struct POLY_GT3 
 {
