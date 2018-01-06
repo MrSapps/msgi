@@ -16,7 +16,7 @@ struct ButtonStates
 {
     WORD field_0_buttons_down;
     WORD field_2_button_pressed;
-    WORD field_4_array[6];
+    WORD field_4_array[6]; // pad type, pad id, state, analog stick states?
 };
 MGS_ASSERT_SIZEOF(ButtonStates, 0x10);
 #pragma pack(pop)

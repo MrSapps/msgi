@@ -227,7 +227,7 @@ BYTE* CC Script_VarRead_4094DC(BYTE* pScript, DWORD* ppScript, DWORD* ret)
     *ppScript = topNibble;
     const __int16* pDataBank = save_data_192_word_78E7E0;
     const DWORD tmpBits = scriptDWORD & 0xF00000;
-    if ((tmpBits) != 0x800000)
+    if ((tmpBits) != 0x800000) // 0x100000 == GCL_VAR_TYPE_LOCAL
     {
         pDataBank = (const __int16 *)save_data_2048_unk_78D7C0;
     }
@@ -344,7 +344,7 @@ BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet)
 {
     const signed __int32 gcl_code = *pScript;
 
-    if ((gcl_code & 0xF0) == 16)
+    if ((gcl_code & 0xF0) == 16) // == GCL_VAR as seen in system.dll of metal gear arcade
     {
         return Script_VarRead_4094DC(pScript, ppScript, pRet);
     }
@@ -357,6 +357,7 @@ BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet)
     // Read stack argument
     case 0x20:
     {
+        // GCL_ARRAY in MGA
         *pRet = script_args_dword_6BFBB8[-*pScriptByte1 - 1];
         *ppScript = 1;
         pScriptByte1 = pScript + 2;

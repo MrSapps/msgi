@@ -313,40 +313,6 @@ MGS_ARY(1, 0x6BBD60, Prim_unknown*, 256, dg_dword_6BBD60_prim_ptrs, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BBD5C, DWORD, dg_dword_6BBD5C_k320, 0);
 MGS_ARY(1, 0x6BB95C, Prim_unknown*, 256, dg_dword_6BB95C_prim_ptrs, {});
 
-void CC Pack_DRAWENV_40DDE0(DR_ENV* pPacked, DRAWENV* drawEnv)
-{
-    pPacked->code[0] =
-        ((drawEnv->clip.y1 & 0x3FF) << 10)
-        | drawEnv->clip.x1 & 0x3FF
-        | 0xE3000000;
-
-    pPacked->code[1] =
-        (((drawEnv->clip.y1 + drawEnv->clip.y2 - 1) & 0x3FF) << 10)
-        | (drawEnv->clip.x1 + drawEnv->clip.x2 - 1) & 0x3FF
-        | 0xE4000000;
-
-    pPacked->code[2] =
-        ((drawEnv->offy & 0x3FF) << 11)
-        | drawEnv->offx & 0x7FF
-        | 0xE5000000;
-
-    pPacked->code[3] =
-        32 * (((256 - drawEnv->textureWindow.y2) >> 3) & 0x1F)
-        | ((256 - drawEnv->textureWindow.x2) >> 3) & 0x1F
-        | (((drawEnv->textureWindow.y1 >> 3) & 0x1F) << 15)
-        | (((drawEnv->textureWindow.x1 >> 3) & 0x1F) << 10)
-        | 0xE2000000;
-
-    pPacked->code[4] =
-        ((drawEnv->dtd != 0) << 9)
-        | ((drawEnv->dfe != 0) << 10)
-        | drawEnv->texturePage & 0x1FF
-        | 0xE1000000;
-
-    pPacked->tag = pPacked->tag & 0xFFFFFF | 0x5000000;// 0x50 = gradated line?
-}
-MGS_FUNC_IMPLEX(0x40DDE0, Pack_DRAWENV_40DDE0, LIBDG_IMPL);
-
 void CC sub_401570(struct_gv* gv, DRAWENV* pDrawEnv, int bNotBg)
 {
     DRAWENV drawEnv = {};
@@ -357,17 +323,17 @@ void CC sub_401570(struct_gv* gv, DRAWENV* pDrawEnv, int bNotBg)
     gv->dword_6BC3D0_rect.y1 = drawEnv.clip.y1 - drawEnv.offy;
     gv->dword_6BC3D0_rect.x2 = drawEnv.clip.x2;
     gv->dword_6BC3D0_rect.y2 = drawEnv.clip.y2;
-    Pack_DRAWENV_40DDE0(&gv->dword_6BC4D8_src_dr_env1, &drawEnv);
+    SetDrawEnv_40DDE0(&gv->dword_6BC4D8_src_dr_env1, &drawEnv);
     drawEnv.clip.x1 += xoff;
     drawEnv.offx += xoff;
-    Pack_DRAWENV_40DDE0(&gv->dword_6BC518_src_offsetted_dr_evn, &drawEnv);
+    SetDrawEnv_40DDE0(&gv->dword_6BC518_src_offsetted_dr_evn, &drawEnv);
     if (bNotBg)
     {
         drawEnv.isbg = 0;
-        Pack_DRAWENV_40DDE0(&pPacked_6BE0A8, &drawEnv);
+        SetDrawEnv_40DDE0(&pPacked_6BE0A8, &drawEnv);
         drawEnv.clip.x1 -= xoff;
         drawEnv.offx -= xoff;
-        Pack_DRAWENV_40DDE0(&stru_6BE068, &drawEnv);
+        SetDrawEnv_40DDE0(&stru_6BE068, &drawEnv);
     }
 }
 MGS_FUNC_IMPLEX(0x401570, sub_401570, LIBDG_IMPL);

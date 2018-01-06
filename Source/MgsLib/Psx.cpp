@@ -424,6 +424,41 @@ DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __in
 }
 MGS_FUNC_IMPLEX(0x401888, Renderer_DRAWENV_Init_401888, IMPL_PSX);
 
+
+void CC SetDrawEnv_40DDE0(DR_ENV* pPacked, DRAWENV* drawEnv)
+{
+    pPacked->code[0] =
+        ((drawEnv->clip.y1 & 0x3FF) << 10)
+        | drawEnv->clip.x1 & 0x3FF
+        | 0xE3000000; // Set Drawing Area top left (X1,Y1)
+
+    pPacked->code[1] =
+        (((drawEnv->clip.y1 + drawEnv->clip.y2 - 1) & 0x3FF) << 10)
+        | (drawEnv->clip.x1 + drawEnv->clip.x2 - 1) & 0x3FF
+        | 0xE4000000; // Set Drawing Area bottom right (X2,Y2)
+
+    pPacked->code[2] =
+        ((drawEnv->offy & 0x3FF) << 11)
+        | drawEnv->offx & 0x7FF
+        | 0xE5000000; // Set Drawing Offset (X,Y)
+
+    pPacked->code[3] =
+        32 * (((256 - drawEnv->textureWindow.y2) >> 3) & 0x1F)
+        | ((256 - drawEnv->textureWindow.x2) >> 3) & 0x1F
+        | (((drawEnv->textureWindow.y1 >> 3) & 0x1F) << 15)
+        | (((drawEnv->textureWindow.x1 >> 3) & 0x1F) << 10)
+        | 0xE2000000; // Texture Window setting
+
+    pPacked->code[4] =
+        ((drawEnv->dtd != 0) << 9)
+        | ((drawEnv->dfe != 0) << 10)
+        | drawEnv->texturePage & 0x1FF
+        | 0xE1000000; // Draw Mode setting (aka "Texpage")
+
+    pPacked->tag = pPacked->tag & 0xFFFFFF | 0x5000000;
+}
+MGS_FUNC_IMPLEX(0x40DDE0, SetDrawEnv_40DDE0, IMPL_PSX);
+
 DRAWENV* Renderer_Init_DRAWENV_40200D()
 {
     DRAWENV drawEnv;

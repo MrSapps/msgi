@@ -34,6 +34,7 @@ MGS_ASSERT_SIZEOF(TILE, 16);
 #define getaddr(p)   (u_long)(((P_TAG *)(p))->addr)
 #define setcode(p, _code) (((P_TAG *)(p))->code = (u_char)(_code))
 #define addPrim(ot, p) setaddr(p, getaddr(ot)), setaddr(ot, p)
+#define termPrim(p) setaddr(p, 0xffffffff)
 
 #define setRGB0(p,_r0,_g0,_b0) (p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
 #define setPolyFT4(p) setlen(p, 9), setcode(p, 0x2c)
@@ -181,3 +182,4 @@ int CC ClearImage(PSX_RECT* pRect, BYTE r, BYTE g, BYTE b);
 int CC Psx_OpenEvent(void* desc, int spec, int mode, void* func); // Psx_ to avoid windows.h name clash
 void CC PsxGpuDebug_44A4D0();
 DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2);
+void CC SetDrawEnv_40DDE0(DR_ENV* pPacked, DRAWENV* drawEnv);;

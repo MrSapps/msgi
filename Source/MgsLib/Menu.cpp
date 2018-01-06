@@ -248,6 +248,7 @@ signed int CC Menu_menu_bars_update_field200_46938A(MenuMan_MenuBars* pMenuBarsU
 }
 MGS_FUNC_IMPLEX(0x46938A, Menu_menu_bars_update_field200_46938A, MENU_IMPL);
 
+// void __cdecl Menu_init_fn6_468406(MenuMan *pMenu)
 MGS_VAR(1, 0x6757F0, BarConfig, gSnakeLifeBarConfig_6757F0, {}); // TODO: Populate
 MGS_VAR(1, 0x675800, BarConfig, gSnakeO2BarConfig_675800, {}); // TODO: Populate
 
@@ -273,6 +274,7 @@ void __cdecl Menu_menu_bars_draw_snake_life_and_O2_4693D5(int *ot, MenuMan_MenuB
     if (gTakeDamageCounter_dword_7339D8 > 0)
     {
         --gTakeDamageCounter_dword_7339D8;
+        // Tagged causes MenuBar text to render in red
         pLifeBarText = TagPointer(&gSnakeLifeBarConfig_6757F0);
     }
 
@@ -437,12 +439,12 @@ void CC Menu_create_helper_459991(MenuMan* pMenu)
     Renderer_DRAWENV_Init_401888(&drEnv, 0, 0, 320, 224);
     drEnv.isbg = 0;
     drEnv.texturePage = 31;
-    Pack_DRAWENV_40DDE0(&pMenu->mDR_ENV_field_48[0], &drEnv);
+    SetDrawEnv_40DDE0(&pMenu->mDR_ENV_field_48[0], &drEnv);
     
     Renderer_DRAWENV_Init_401888(&drEnv, 320, 0, 320, 224);
     drEnv.isbg = 0;
     drEnv.texturePage = 31;
-    Pack_DRAWENV_40DDE0(&pMenu->mDR_ENV_field_48[1], &drEnv);
+    SetDrawEnv_40DDE0(&pMenu->mDR_ENV_field_48[1], &drEnv);
 
     Menu_create_helper_item_file_46B8CA("item");
 
@@ -486,12 +488,8 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
         }
     }
 
-    // TODO: This is probably a TILE prim? 
-     //  Check if this causes the codec rect to appear at the ninja fight or not
-    pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08].tag ^= (pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08].tag ^ *pOtText1) & 0xFFFFFF;
-    
-    *pOtText1 ^= (*pOtText1 ^ (unsigned int)&pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]) & 0xFFFFFF;
-
+    // drawing environment change primitive
+    addPrim(pOtText2, &pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]);
 }
 MGS_FUNC_IMPLEX(0x004598BC, Menu_update_4598BC, MENU_IMPL);
 
