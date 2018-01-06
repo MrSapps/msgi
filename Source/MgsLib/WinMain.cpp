@@ -2229,7 +2229,6 @@ MGS_VAR(1, 0x791A08, int, gActiveBuffer_dword_791A08, 0);
 MGS_VAR(1, 0x650110, int, gLastActiveBuffer_dword_650110, 0);
 MGS_VAR(1, 0x6BED20, DWORD, counter_dword_6BED20, 0);
 
-MGS_FUNC_NOT_IMPL(0x459ACE, int __cdecl(), TextReset_459ACE);
 MGS_FUNC_NOT_IMPL(0x4021F2, int(), sub_4021F2);
 
 //MGS_FUNC_NOT_IMPL(0x40162D, signed int __cdecl(int activeBuffer), OT_Related_40162D);
@@ -2252,7 +2251,7 @@ void CC OT_Related_40162D(int activeBuffer)
         } 
         else if (i == 2)
         {
-            pCurGV = &gLibGVStruct2_6BC558;
+            pCurGV = &gLibGvStruct2_6BC558;
         }
         DWORD** curGVOtPtr = (DWORD**)&pCurGV->mOrderingTables[activeBuffer];// pick ot1 or ot2 ?
         DWORD* pActiveBufArray = activeBuffer ? (DWORD*)pCurGV->dword_6BC498 : (DWORD*)pCurGV->dword_6BC458;
@@ -2317,7 +2316,7 @@ void CC Main_sub_401C02()
         }
         System_HouseKeeping_40ACB2(activeBufferHW);
         System_HouseKeeping_40ACB2(2);
-        TextReset_459ACE();
+        Menu_TextReset_459ACE();
         OT_Related_40162D(activeBufferHW);                 // calls ClearOTag
         sub_4021F2();
     }

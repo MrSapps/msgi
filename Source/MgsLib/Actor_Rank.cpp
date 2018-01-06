@@ -86,12 +86,12 @@ void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16
 MGS_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
 
 
-int CC Menu_DrawText(const char* Format, int a2, int a3, int a4, int a5)
+int CC Menu_DrawText_459B63 (const char* Format, int a2, int a3, int a4, int a5)
 {
     MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return 0;
 }
-MGS_FUNC_IMPLEX(0x459B63, Menu_DrawText, false);  // TODO
+MGS_FUNC_IMPLEX(0x459B63, Menu_DrawText_459B63 , false);  // TODO
 
 void CC TextSetXYFlags_459B0B(int x, int y, int flags)
 {
@@ -138,7 +138,7 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("PLAY TIME /");
+    Menu_DrawText_459B63 ("PLAY TIME /");
 
     DWORD field_488_time = pRank->field_488_time;
     DWORD field_48C_time_mins = pRank->field_48C_time_mins;
@@ -165,7 +165,7 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", field_488_time / 10);
+    Menu_DrawText_459B63 ("%d", field_488_time / 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -183,7 +183,7 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", field_488_time % 10);
+    Menu_DrawText_459B63 ("%d", field_488_time % 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -201,7 +201,7 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText(":", field_488_time % 10);
+    Menu_DrawText_459B63 (":", field_488_time % 10);
  
     switch (pRank->field_498_mc_no)
     {
@@ -219,7 +219,7 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", field_48C_time_mins / 10);
+    Menu_DrawText_459B63 ("%d", field_48C_time_mins / 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -237,7 +237,7 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", field_48C_time_mins % 10);
+    Menu_DrawText_459B63 ("%d", field_48C_time_mins % 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -255,7 +255,7 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText(":", field_48C_time_mins % 10);
+    Menu_DrawText_459B63 (":", field_48C_time_mins % 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -273,7 +273,7 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", field_490_time_secs / 10);
+    Menu_DrawText_459B63 ("%d", field_490_time_secs / 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -291,7 +291,7 @@ static void Rank_RenderPlayTime(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", field_490_time_secs % 10);
+    Menu_DrawText_459B63 ("%d", field_490_time_secs % 10);
 }
 
 static void Rank_RenderNumSaves(Actor_Rank* pRank)
@@ -312,7 +312,7 @@ static void Rank_RenderNumSaves(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("SAVE /");
+    Menu_DrawText_459B63 ("SAVE /");
 
     WORD gNumSaves_word_78E890_copy = gNumSaves_word_78E890;
     if (gNumSaves_word_78E890 >= 1000)
@@ -339,7 +339,7 @@ static void Rank_RenderNumSaves(Actor_Rank* pRank)
             break;
         }
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", savesDiv100);
+        Menu_DrawText_459B63 ("%d", savesDiv100);
     }
 
     if (savesMod100Div10 || savesDiv100)
@@ -360,7 +360,7 @@ static void Rank_RenderNumSaves(Actor_Rank* pRank)
             break;
         }
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", savesMod100Div10);
+        Menu_DrawText_459B63 ("%d", savesMod100Div10);
     }
 
     switch (pRank->field_498_mc_no)
@@ -379,7 +379,7 @@ static void Rank_RenderNumSaves(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", gNumSaves_word_78E890_copy % 10);
+    Menu_DrawText_459B63 ("%d", gNumSaves_word_78E890_copy % 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -397,7 +397,7 @@ static void Rank_RenderNumSaves(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("TIMES");
+    Menu_DrawText_459B63 ("TIMES");
 }
 
 static void Rank_RenderNumContinues(Actor_Rank* pRank)
@@ -418,7 +418,7 @@ static void Rank_RenderNumContinues(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("CONTINUE /");
+    Menu_DrawText_459B63 ("CONTINUE /");
 
     DWORD numContinues = gContinues_word_78E88E;
     if (gContinues_word_78E88E >= 1000)
@@ -445,7 +445,7 @@ static void Rank_RenderNumContinues(Actor_Rank* pRank)
             break;
         }
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", numContinuesDiv100);
+        Menu_DrawText_459B63 ("%d", numContinuesDiv100);
     }
     if (numContinuesMod100Div10 || numContinuesDiv100)
     {
@@ -465,7 +465,7 @@ static void Rank_RenderNumContinues(Actor_Rank* pRank)
             break;
         }
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", numContinuesMod100Div10);
+        Menu_DrawText_459B63 ("%d", numContinuesMod100Div10);
     }
 
     switch (pRank->field_498_mc_no)
@@ -484,7 +484,7 @@ static void Rank_RenderNumContinues(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", numContinues % 10);
+    Menu_DrawText_459B63 ("%d", numContinues % 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -502,7 +502,7 @@ static void Rank_RenderNumContinues(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("TIMES");
+    Menu_DrawText_459B63 ("TIMES");
 }
 
 static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
@@ -524,7 +524,7 @@ static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
     }
 
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("BEING FOUND /");
+    Menu_DrawText_459B63 ("BEING FOUND /");
     DWORD numTimesSpotted = gTimesSpotted_word_78E87C;
     if (gTimesSpotted_word_78E87C >= 1000)
     {
@@ -550,7 +550,7 @@ static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
             break;
         }
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", numTimesSpottedDiv100);
+        Menu_DrawText_459B63 ("%d", numTimesSpottedDiv100);
     }
 
     if (numTimesSpottedMod100Div10 || numTimesSpottedDiv100)
@@ -571,7 +571,7 @@ static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
             break;
         }
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", numTimesSpottedMod100Div10);
+        Menu_DrawText_459B63 ("%d", numTimesSpottedMod100Div10);
     }
 
     switch (pRank->field_498_mc_no)
@@ -590,7 +590,7 @@ static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", numTimesSpotted % 10);
+    Menu_DrawText_459B63 ("%d", numTimesSpotted % 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -608,7 +608,7 @@ static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("TIMES");
+    Menu_DrawText_459B63 ("TIMES");
 }
 
 static void Rank_RenderNumKilled(Actor_Rank* pRank)
@@ -629,7 +629,7 @@ static void Rank_RenderNumKilled(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("ENEMIES /");
+    Menu_DrawText_459B63 ("ENEMIES /");
 
     DWORD numEnemiesKilled = gNumEnemiesKilled_word_78E87E;
     if (gNumEnemiesKilled_word_78E87E >= 1000)
@@ -656,7 +656,7 @@ static void Rank_RenderNumKilled(Actor_Rank* pRank)
             break;
         }
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", numEnemiesKilledDiv100);
+        Menu_DrawText_459B63 ("%d", numEnemiesKilledDiv100);
     }
 
     if (numEnemiesKilledMod100Div10 || numEnemiesKilledDiv100)
@@ -677,7 +677,7 @@ static void Rank_RenderNumKilled(Actor_Rank* pRank)
             break;
         }
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("%d", numEnemiesKilledMod100Div10);
+        Menu_DrawText_459B63 ("%d", numEnemiesKilledMod100Div10);
     }
 
     switch (pRank->field_498_mc_no)
@@ -696,7 +696,7 @@ static void Rank_RenderNumKilled(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(140, 181, 181);
-    Menu_DrawText("%d", numEnemiesKilled % 10);
+    Menu_DrawText_459B63 ("%d", numEnemiesKilled % 10);
 
     switch (pRank->field_498_mc_no)
     {
@@ -714,14 +714,14 @@ static void Rank_RenderNumKilled(Actor_Rank* pRank)
         break;
     }
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("KILLED");
+    Menu_DrawText_459B63 ("KILLED");
 }
 
 static void Rank_RenderText(Actor_Rank* pRank, const char* text, int formatParam, int xpos, std::array<int, 4> yposes, int flags, int r, int g, int b)
 {
     TextSetXYFlags_459B0B(xpos, yposes[pRank->field_498_mc_no], flags);
     TextSetRGB_459B27(r, g, b);
-    Menu_DrawText(text, formatParam);
+    Menu_DrawText_459B63 (text, formatParam);
 }
 
 
@@ -774,26 +774,26 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
         {
             TextSetXYFlags_459B0B(164, 46, 17);
             TextSetRGB_459B27(82, 140, 123);
-            Menu_DrawText("GAME LEVEL /");
+            Menu_DrawText_459B63 ("GAME LEVEL /");
             TextSetXYFlags_459B0B(172, 46, 16);
             TextSetRGB_459B27(140, 181, 181);
 
             switch (gDiffcultyLevel)
             {
             case -1:
-                Menu_DrawText("VERY EASY");
+                Menu_DrawText_459B63 ("VERY EASY");
                 break;
             case 0:
-                Menu_DrawText("EASY");
+                Menu_DrawText_459B63 ("EASY");
                 break;
             case 1:
-                Menu_DrawText("NORMAL");
+                Menu_DrawText_459B63 ("NORMAL");
                 break;
             case 2:
-                Menu_DrawText("HARD");
+                Menu_DrawText_459B63 ("HARD");
                 break;
             case 3:
-                Menu_DrawText("EXTREME");
+                Menu_DrawText_459B63 ("EXTREME");
                 break;
             }
 
@@ -802,19 +802,19 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
         {
             TextSetXYFlags_459B0B(164, 112, 17);
             TextSetRGB_459B27(82, 140, 123);
-            Menu_DrawText("USED ITEM /");
+            Menu_DrawText_459B63 ("USED ITEM /");
             TextSetXYFlags_459B0B(172, 112, 16);
             TextSetRGB_459B27(140, 181, 181);
-            Menu_DrawText("STEALTH");
+            Menu_DrawText_459B63 ("STEALTH");
         }
         else
         {
             TextSetXYFlags_459B0B(164, 112, 17);
             TextSetRGB_459B27(82, 140, 123);
-            Menu_DrawText("USED ITEM /");
+            Menu_DrawText_459B63 ("USED ITEM /");
             TextSetXYFlags_459B0B(172, 112, 16);
             TextSetRGB_459B27(140, 181, 181);
-            Menu_DrawText("BANDANA");
+            Menu_DrawText_459B63 ("BANDANA");
         }
     }
     else if (pRank->field_498_mc_no == 2)
@@ -823,26 +823,26 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
         {
             TextSetXYFlags_459B0B(164, 42, 17);
             TextSetRGB_459B27(82, 140, 123);
-            Menu_DrawText("GAME LEVEL /");
+            Menu_DrawText_459B63 ("GAME LEVEL /");
             TextSetXYFlags_459B0B(172, 42, 16);
             TextSetRGB_459B27(140, 181, 181);
 
             switch (gDiffcultyLevel)
             {
             case -1:
-                Menu_DrawText("VERY EASY");
+                Menu_DrawText_459B63 ("VERY EASY");
                 break;
             case 0:
-                Menu_DrawText("EASY");
+                Menu_DrawText_459B63 ("EASY");
                 break;
             case 1:
-                Menu_DrawText("NORMAL");
+                Menu_DrawText_459B63 ("NORMAL");
                 break;
             case 2:
-                Menu_DrawText("HARD");
+                Menu_DrawText_459B63 ("HARD");
                 break;
             case 3:
-                Menu_DrawText("EXTREME");
+                Menu_DrawText_459B63 ("EXTREME");
                 break;
             }
 
@@ -850,80 +850,80 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
             {
                 TextSetXYFlags_459B0B(164, 119, 17);
                 TextSetRGB_459B27(82, 140, 123);
-                Menu_DrawText("USED ITEM /");
+                Menu_DrawText_459B63 ("USED ITEM /");
                 TextSetXYFlags_459B0B(172, 119, 16);
                 TextSetRGB_459B27(140, 181, 181);
-                Menu_DrawText("STEALTH");
+                Menu_DrawText_459B63 ("STEALTH");
             }
             else
             {
                 TextSetXYFlags_459B0B(164, 119, 17);
                 TextSetRGB_459B27(82, 140, 123);
-                Menu_DrawText("USED ITEM /");
+                Menu_DrawText_459B63 ("USED ITEM /");
                 TextSetXYFlags_459B0B(172, 119, 16);
                 TextSetRGB_459B27(140, 181, 181);
-                Menu_DrawText("BANDANA");
+                Menu_DrawText_459B63 ("BANDANA");
             }
         }
         else
         {
             TextSetXYFlags_459B0B(164, 108, 17);
             TextSetRGB_459B27(82, 140, 123);
-            Menu_DrawText("USED ITEMS /");
+            Menu_DrawText_459B63 ("USED ITEMS /");
             TextSetXYFlags_459B0B(172, 108, 16);
             TextSetRGB_459B27(140, 181, 181);
-            Menu_DrawText("STEALTH");
+            Menu_DrawText_459B63 ("STEALTH");
             TextSetXYFlags_459B0B(172, 119, 16);
             TextSetRGB_459B27(140, 181, 181);
-            Menu_DrawText("BANDANA");
+            Menu_DrawText_459B63 ("BANDANA");
         }
     }
     else if (pRank->field_498_mc_no == 3) // Or != 0
     {
         TextSetXYFlags_459B0B(164, 36, 17);
         TextSetRGB_459B27(82, 140, 123);
-        Menu_DrawText("GAME LEVEL /");
+        Menu_DrawText_459B63 ("GAME LEVEL /");
         TextSetXYFlags_459B0B(172, 36, 16);
         TextSetRGB_459B27(140, 181, 181);
 
         switch (gDiffcultyLevel)
         {
         case -1:
-            Menu_DrawText("VERY EASY");
+            Menu_DrawText_459B63 ("VERY EASY");
             break;
         case 0:
-            Menu_DrawText("EASY");
+            Menu_DrawText_459B63 ("EASY");
             break;
         case 1:
-            Menu_DrawText("NORMAL");
+            Menu_DrawText_459B63 ("NORMAL");
             break;
         case 2:
-            Menu_DrawText("HARD");
+            Menu_DrawText_459B63 ("HARD");
             break;
         case 3:
-            Menu_DrawText("EXTREME");
+            Menu_DrawText_459B63 ("EXTREME");
             break;
         }
 
         TextSetXYFlags_459B0B(164, 113, 17);
         TextSetRGB_459B27(82, 140, 123);
-        Menu_DrawText("USED ITEMS /");
+        Menu_DrawText_459B63 ("USED ITEMS /");
         TextSetXYFlags_459B0B(172, 113, 16);
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("STEALTH");
+        Menu_DrawText_459B63 ("STEALTH");
         TextSetXYFlags_459B0B(172, 124, 16);
         TextSetRGB_459B27(140, 181, 181);
-        Menu_DrawText("BANDANA");
+        Menu_DrawText_459B63 ("BANDANA");
     }
 
     TextSetXYFlags_459B0B(115 - gRankXPosTable_byte_67676C[pRank->field_494_ranking], 143, 16);
     TextSetRGB_459B27(82, 140, 123);
-    Menu_DrawText("CODE NAME");
+    Menu_DrawText_459B63 ("CODE NAME");
     if (gDiffcultyLevel != -1)
     {
         TextSetXYFlags_459B0B(107, 163, 16);
         TextSetRGB_459B27(82, 140, 123);
-        Menu_DrawText("SPECIAL ITEMS");
+        Menu_DrawText_459B63 ("SPECIAL ITEMS");
     }
 }
 MGS_FUNC_IMPLEX(0x46EDE8, Rank_RenderGameCompletionScreen, ACTOR_RANK_IMPL);

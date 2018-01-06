@@ -184,7 +184,7 @@ MGS_ARY(1, 0x6BED18, DWORD, 2, dword_6BED18, {});
 
 MGS_VAR(1, 0x6BC180, struct_gv, gLibGvStruct0_6BC180, {}); // TODO: Probably an array of 3?
 MGS_VAR(1, 0x6BC36C, struct_gv, gLibGVStruct1_6BC36C, {});
-MGS_VAR(1, 0x6BC558, struct_gv, gLibGVStruct2_6BC558, {});
+MGS_VAR(1, 0x6BC558, struct_gv, gLibGvStruct2_6BC558, {});
 
 MGS_VAR(1, 0x78D32C, DWORD, dword_78D32C, 0);
 
@@ -345,8 +345,8 @@ void CC Gv3StructsInit_4012F2(int k320)
 
     gLibGvStruct0_6BC180.word_6BC376_16 = -1;
     dg_dword_6BBD5C_k320 = k320;
-    gLibGvStruct0_6BC180.mOrderingTables[0] = (int)ot_gv0_0_6BCB44;// ot start?
-    gLibGvStruct0_6BC180.mOrderingTables[1] = (int)ot_gv0_1_6BCBC8;// also part of ot?
+    gLibGvStruct0_6BC180.mOrderingTables[0] = (BYTE*)ot_gv0_0_6BCB44;// ot start?
+    gLibGvStruct0_6BC180.mOrderingTables[1] = (BYTE*)ot_gv0_1_6BCBC8;// also part of ot?
     gLibGvStruct0_6BC180.gPrimQueue2_word_6BC3C0_256 = 8;
     gLibGvStruct0_6BC180.g_PrimQueue1_word_6BC3BE_256 = 8;
     gLibGvStruct0_6BC180.gObjectQueue_word_6BC3C2_0 = 0;
@@ -372,8 +372,8 @@ void CC Gv3StructsInit_4012F2(int k320)
         &gLibGvStruct0_6BC180.dword_6BC518_src_offsetted_dr_evn,
         sizeof(gLibGvStruct0_6BC180.dword_6BC418_dst));
 
-    gLibGVStruct1_6BC36C.mOrderingTables[0] = (int)&ot_gv1_0_6BD04C[0];
-    gLibGVStruct1_6BC36C.mOrderingTables[1] = (int)&ot_gv1_1_6BD450[0];
+    gLibGVStruct1_6BC36C.mOrderingTables[0] = (BYTE*)&ot_gv1_0_6BD04C[0];
+    gLibGVStruct1_6BC36C.mOrderingTables[1] = (BYTE*)&ot_gv1_1_6BD450[0];
     gLibGVStruct1_6BC36C.gPrimQueue2_word_6BC3C0_256 = 256;
     gLibGVStruct1_6BC36C.g_PrimQueue1_word_6BC3BE_256 = 256;
     gLibGVStruct1_6BC36C.gObjectQueue_word_6BC3C2_0 = 0;
@@ -403,34 +403,34 @@ void CC Gv3StructsInit_4012F2(int k320)
     memcpy(gLibGVStruct1_6BC36C.dword_6BC458, &stru_6BE068, sizeof(gLibGVStruct1_6BC36C.dword_6BC458));
     memcpy(gLibGVStruct1_6BC36C.dword_6BC498, &pPacked_6BE0A8, sizeof(gLibGVStruct1_6BC36C.dword_6BC498));
 
-    gLibGVStruct2_6BC558.mOrderingTables[0] = (int)&ot_gv2_0_6BDC54[0];
-    gLibGVStruct2_6BC558.mOrderingTables[1] = (int)&ot_gv2_1_6BDC5C[0];
-    gLibGVStruct2_6BC558.gPrimQueue2_word_6BC3C0_256 = 0;
-    gLibGVStruct2_6BC558.g_PrimQueue1_word_6BC3BE_256 = 0;
-    gLibGVStruct2_6BC558.gObjectQueue_word_6BC3C2_0 = 0;
-    gLibGVStruct2_6BC558.gObjects_dword_6BC3C4 = 0;
-    gLibGVStruct2_6BC558.word_6BC374_8 = 0;
-    gLibGVStruct2_6BC558.word_6BC376_16 = 8;
-    gLibGVStruct2_6BC558.word_6BC378_1 = 1;
-    gLibGVStruct2_6BC558.word_6BC37A_0_1EC_size = 0;
+    gLibGvStruct2_6BC558.mOrderingTables[0] = (BYTE*)&ot_gv2_0_6BDC54[0];
+    gLibGvStruct2_6BC558.mOrderingTables[1] = (BYTE*)&ot_gv2_1_6BDC5C[0];
+    gLibGvStruct2_6BC558.gPrimQueue2_word_6BC3C0_256 = 0;
+    gLibGvStruct2_6BC558.g_PrimQueue1_word_6BC3BE_256 = 0;
+    gLibGvStruct2_6BC558.gObjectQueue_word_6BC3C2_0 = 0;
+    gLibGvStruct2_6BC558.gObjects_dword_6BC3C4 = 0;
+    gLibGvStruct2_6BC558.word_6BC374_8 = 0;
+    gLibGvStruct2_6BC558.word_6BC376_16 = 8;
+    gLibGvStruct2_6BC558.word_6BC378_1 = 1;
+    gLibGvStruct2_6BC558.word_6BC37A_0_1EC_size = 0;
 
     Renderer_DRAWENV_Init_401888(&drawEnv, 0, 0, 320, 224);
-    sub_401570(&gLibGVStruct2_6BC558, &drawEnv, 0);
+    sub_401570(&gLibGvStruct2_6BC558, &drawEnv, 0);
 
     memcpy(
-        gLibGVStruct2_6BC558.dword_6BC3D8_dst,
-        &gLibGVStruct2_6BC558.dword_6BC4D8_src_dr_env1,
-        sizeof(gLibGVStruct2_6BC558.dword_6BC3D8_dst));
+        gLibGvStruct2_6BC558.dword_6BC3D8_dst,
+        &gLibGvStruct2_6BC558.dword_6BC4D8_src_dr_env1,
+        sizeof(gLibGvStruct2_6BC558.dword_6BC3D8_dst));
 
-    gLibGVStruct2_6BC558.dword_6BC3C8_pStructure_rect = gLibGVStruct2_6BC558.dword_6BC3D0_rect;
+    gLibGvStruct2_6BC558.dword_6BC3C8_pStructure_rect = gLibGvStruct2_6BC558.dword_6BC3D0_rect;
 
     memcpy(
-        gLibGVStruct2_6BC558.dword_6BC418_dst,
-        &gLibGVStruct2_6BC558.dword_6BC518_src_offsetted_dr_evn,
-        sizeof(gLibGVStruct2_6BC558.dword_6BC418_dst));
+        gLibGvStruct2_6BC558.dword_6BC418_dst,
+        &gLibGvStruct2_6BC558.dword_6BC518_src_offsetted_dr_evn,
+        sizeof(gLibGvStruct2_6BC558.dword_6BC418_dst));
 
-    memcpy(gLibGVStruct2_6BC558.dword_6BC458, &stru_6BE068, sizeof(gLibGVStruct2_6BC558.dword_6BC458));
-    memcpy(gLibGVStruct2_6BC558.dword_6BC498, &pPacked_6BE0A8, sizeof(gLibGVStruct2_6BC558.dword_6BC498));
+    memcpy(gLibGvStruct2_6BC558.dword_6BC458, &stru_6BE068, sizeof(gLibGvStruct2_6BC558.dword_6BC458));
+    memcpy(gLibGvStruct2_6BC558.dword_6BC498, &pPacked_6BE0A8, sizeof(gLibGvStruct2_6BC558.dword_6BC498));
 }
 MGS_FUNC_IMPLEX(0x4012F2, Gv3StructsInit_4012F2, LIBDG_IMPL);
 
@@ -1063,7 +1063,7 @@ void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
     int unkByte012Ptr; // edi@3
 
     dword_991E40[0] = (int)gUnkSize_1024_6BE4E8;  // 256 DWORD's
-    int otPtr = *(&pGv->mOrderingTables[activeBuffer]);
+    int otPtr = (int)*(&pGv->mOrderingTables[activeBuffer]);
     dword_991E40[1] = otPtr + 4;
     DWORD** otrPtrNext = (DWORD**)dword_991E40[1];
     for (int i = 0; i < 256; i++)

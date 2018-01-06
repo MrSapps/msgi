@@ -4,6 +4,7 @@
 #include "Actor.hpp"
 #include "Psx.hpp"
 #include "LibGV.hpp"
+#include "types.hpp"
 
 void LibDGCpp_ForceLink();
 
@@ -142,7 +143,7 @@ struct struct_gv
     // These vars are named to match how they look from gLibGVStruct1_6BC36C position, it was later discovered
     // that these are item 1 in an array of 3 struct_gvs
 
-    int mOrderingTables[2]; // 257 pointers? // One for each active buffer
+    BYTE* mOrderingTables[2]; // 257 pointers? // One for each active buffer
     s16 word_6BC374_8;
     s16 word_6BC376_16;
     s16 word_6BC378_1;
@@ -183,7 +184,7 @@ MGS_ASSERT_SIZEOF(struct_gv, 0x1EC);
 
 MGS_VAR_EXTERN(struct_gv, gLibGvStruct0_6BC180);
 MGS_VAR_EXTERN(struct_gv, gLibGVStruct1_6BC36C);
-MGS_VAR_EXTERN(struct_gv, gLibGVStruct2_6BC558);
+MGS_VAR_EXTERN(struct_gv, gLibGvStruct2_6BC558);
 
 MGS_ARY_EXTERN(DWORD, 2, dword_6BED18);
 

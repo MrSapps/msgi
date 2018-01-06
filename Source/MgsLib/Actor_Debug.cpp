@@ -8,7 +8,7 @@ static void CC Debug_Update(Actor_Debug* pDebug)
 {
     TextSetXYFlags_459B0B(181, 47, 0);
     TextSetRGB_459B27(255, 255, 255);
-    Menu_DrawText("A textual test");
+    Menu_DrawText_459B63 ("A textual test");
 
   //  memcpy((pDebug->mPrimData /*+ gActiveBuffer_dword_791A08*/)->field_40_pDataStart, &pDebug->mPolyF4, sizeof(POLY_FT4));
    // pDebug->mPrimData->mBase.field_0_ptr = 3;
