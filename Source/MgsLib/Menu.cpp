@@ -800,6 +800,17 @@ void CC Menu_render_number_as_string_468529(MenuPrimBuffer* pPrimBuffer, TextCon
 }
 MGS_FUNC_IMPLEX(0x00468529, Menu_render_number_as_string_468529, MENU_IMPL);
 
+void CC Menu_render_number_as_string_with_flags_4688DC(MenuMan* pMenu, int /*ot*/, int textX, int textY, signed int number, int textFlags)
+{
+    TextConfig textConfig = {};
+    textConfig.gTextX_dword_66C4C0 = textX;
+    textConfig.gTextY_dword_66C4C4 = textY;
+    textConfig.gTextFlags_dword_66C4C8 = textFlags;
+    textConfig.gTextRGB_dword_66C4CC = 0x64808080;
+    Menu_render_number_as_string_468529(pMenu->field_20_prim_buffer, &textConfig, number);
+}
+MGS_FUNC_IMPLEX(0x004688DC, Menu_render_number_as_string_with_flags_4688DC, MENU_IMPL);
+
 void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed int currentValue, signed int maxValue)
 {
     // Renders as text: "currentValue/maxValue"
@@ -826,7 +837,7 @@ void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed 
     pSprt->y0 = static_cast<short>(textConfig.gTextY_dword_66C4C4);
     pSprt->u0 = 224;
     addPrim(pMenu->field_20_prim_buffer->mOt, pSprt);
-    textConfig.gTextX_dword_66C4C0 += 6;
+    textConfig.gTextX_dword_66C4C0 += kCharWidth;
 
     // Render 2nd number
     Menu_render_number_as_string_468529(pMenu->field_20_prim_buffer, &textConfig, maxValue);
