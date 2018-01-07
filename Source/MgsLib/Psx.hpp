@@ -45,7 +45,7 @@ MGS_ASSERT_SIZEOF(TILE, 16);
 
 struct SPRT
 {
-    DWORD* tag;
+    DWORD tag;
     BYTE r0, g0, b0, code;
     short x0, y0;
     BYTE u0, v0;
@@ -65,6 +65,7 @@ MGS_ASSERT_SIZEOF(SPRT, 20);
 #define setPolyFT4(p) setlen(p, 9),  setcode(p, 0x2c)
 #define setPolyG4(p)  setlen(p, 8),  setcode(p, 0x38)
 #define setTile(p)    setlen(p, 3),  setcode(p, 0x60)
+#define setSprt(p)    setlen(p, 4),  setcode(p, 0x64)
 
 #define _get_mode(dfe, dtd, tpage) \
         ((0xe1000000)|((dtd)?0x0200:0)| \

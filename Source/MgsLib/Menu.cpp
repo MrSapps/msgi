@@ -720,6 +720,39 @@ void CC Menu_inventory_text_4689CB(MenuMan* pMenu, int ot, int xpos, int ypos, c
 }
 MGS_FUNC_IMPLEX(0x004689CB, Menu_inventory_text_4689CB, MENU_IMPL);
 
+MGS_FUNC_NOT_IMPL(0x468529, void __cdecl(MenuPrimBuffer *pPrimBuffer, TextConfig *pTextConfig, signed int number), Menu_render_number_as_string_468529);
+
+MGS_VAR(1, 0x7339C0, SPRT, gMenu_font1_template_sprite_7339C0, {});
+
+void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed int currentValue, signed int maxValue)
+{
+    // Renders as text: "currentValue/maxValue"
+
+    TextConfig textConfig = {};
+    textConfig.gTextFlags_dword_66C4C8 = 0;
+    textConfig.gTextX_dword_66C4C0 = x;
+    textConfig.gTextY_dword_66C4C4 = y;
+    textConfig.gTextRGB_dword_66C4CC = currentValue != 0 ? 0x64575757 : 0x64002080;
+
+    // Render first number
+    Menu_render_number_as_string_468529(pMenu->field_20_prim_buffer, &textConfig, currentValue);
+
+    // Render dividing backslash
+    SPRT* pSprt = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
+    memcpy(pSprt, &gMenu_font1_template_sprite_7339C0, sizeof(SPRT));
+
+    setRGB0(pSprt, BYTE0(textConfig.gTextRGB_dword_66C4CC), BYTE1(textConfig.gTextRGB_dword_66C4CC), BYTE2(textConfig.gTextRGB_dword_66C4CC));
+    pSprt->x0 = textConfig.gTextX_dword_66C4C0;
+    pSprt->y0 = textConfig.gTextY_dword_66C4C4;
+    pSprt->u0 = 224;
+    addPrim(pMenu->field_20_prim_buffer->mOt, pSprt);
+    textConfig.gTextX_dword_66C4C0 += 6;
+
+    // Render 2nd number
+    Menu_render_number_as_string_468529(pMenu->field_20_prim_buffer, &textConfig, maxValue);
+}
+MGS_FUNC_IMPLEX(0x00468915, Menu_render_text_fractional_468915, MENU_IMPL);
+
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {
     int* pOtText1 = (int*)gMenuPrimBuffer_7265E0.mOt;
@@ -750,6 +783,9 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
             flags *= 2; // To the next bit
         }
     }
+
+    // 11 chars
+    Menu_render_text_fractional_468915(pMenu, 40, 50, 50, 800);
 
     // drawing environment change primitive
     addPrim(pOtText2, &pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]);
