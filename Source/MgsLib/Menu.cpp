@@ -709,6 +709,17 @@ void CC TextSetDefaults_459B51()
 }
 MGS_FUNC_IMPLEX(0x00459B51, TextSetDefaults_459B51, MENU_IMPL);
 
+void CC Menu_inventory_text_4689CB(MenuMan* pMenu, int ot, int xpos, int ypos, const char* pText, int textFlags)
+{
+    TextConfig textConfig = {};
+    textConfig.gTextX_dword_66C4C0 = xpos;
+    textConfig.gTextY_dword_66C4C4 = ypos;
+    textConfig.gTextFlags_dword_66C4C8 = textFlags;
+    textConfig.gTextRGB_dword_66C4CC = 0x64808080;
+    Render_Text_NotFlag0x10_468642(pMenu->field_20_prim_buffer, &textConfig, pText);
+}
+MGS_FUNC_IMPLEX(0x004689CB, Menu_inventory_text_4689CB, MENU_IMPL);
+
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {
     int* pOtText1 = (int*)gMenuPrimBuffer_7265E0.mOt;
