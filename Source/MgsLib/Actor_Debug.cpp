@@ -2,7 +2,7 @@
 #include "Actor_Debug.hpp"
 #include "ResourceNameHash.hpp"
 #include "LibDG.hpp"
-#include "Actor_Rank.hpp"
+#include "Menu.hpp"
 
 static void CC Debug_Update(Actor_Debug* pDebug)
 {

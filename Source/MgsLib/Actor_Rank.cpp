@@ -6,6 +6,7 @@
 #include "LibDG.hpp"
 #include "ResourceNameHash.hpp"
 #include "WinMain.hpp"
+#include "Menu.hpp"
 
 #define ACTOR_RANK_IMPL true
 
@@ -84,32 +85,6 @@ void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16
     POLYFT4_SetTransparency_40E0D0(pPoly, bIsSemiTransparent);
 }
 MGS_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
-
-
-int CC Menu_DrawText_459B63 (const char* Format, int a2, int a3, int a4, int a5)
-{
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x459B63, Menu_DrawText_459B63 , false);  // TODO
-
-void CC TextSetXYFlags_459B0B(int x, int y, int flags)
-{
-    // 0x1 = right align
-    // 0x2 = center align
-    // 0x10 = larger font size
-    // other bits = left align/do nothing
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-
-}
-MGS_FUNC_IMPLEX(0x459B0B, TextSetXYFlags_459B0B, false);  // TODO
-
-int CC TextSetRGB_459B27(int r, int g, int b)
-{
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, false);  // TODO
 
 // TODO: Vars
 WORD gNumSaves_word_78E890 = 5;

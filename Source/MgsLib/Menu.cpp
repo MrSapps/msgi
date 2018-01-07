@@ -8,7 +8,6 @@
 #include "LibDG.hpp"
 #include "LibGV.hpp"
 #include "Script.hpp"
-#include "Actor_Rank.hpp" // TODO: Temp for text funcs
 
 #define MENU_IMPL true
 
@@ -371,20 +370,6 @@ static inline T SetPointerFlag(T ptr)
     return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) | 0x40000000);
 }
 
-void CC Menu_render_auto_stacked_menu_bar_469160(MenuPrimBuffer* pPrimBuffer, short xpos, short ypos, short redFillLength, short normalFillLength, short barLength, BarConfig *pBarConfig)
-{
-    game_state_dword_72279C.mParts.flags1 |= 0x80u;
-    Menu_render_life_bar_468DA6(
-        pPrimBuffer,
-        xpos,
-        static_cast<short>(gSnakeLifeYPos_7339D4 + ypos - 16),
-        redFillLength,
-        normalFillLength,
-        barLength,
-        pBarConfig);
-}
-MGS_FUNC_IMPLEX(0x469160, Menu_render_auto_stacked_menu_bar_469160, MENU_IMPL);
-
 void CC Menu_render_snake_life_bar_469194(MenuPrimBuffer* ot, short xpos, short ypos)
 {
     game_state_dword_72279C.mParts.flags1 |= 0x80u;
@@ -398,6 +383,76 @@ void CC Menu_render_snake_life_bar_469194(MenuPrimBuffer* ot, short xpos, short 
         &gSnakeLifeBarConfig_6757F0);
 }
 MGS_FUNC_IMPLEX(0x469194, Menu_render_snake_life_bar_469194, MENU_IMPL);
+
+void CC Menu_render_auto_stacked_any_size_menu_bar_469160(MenuPrimBuffer* pPrimBuffer, short xpos, short ypos, short redFillLength, short normalFillLength, short barLength, BarConfig *pBarConfig)
+{
+    game_state_dword_72279C.mParts.flags1 |= 0x80u;
+    Menu_render_life_bar_468DA6(
+        pPrimBuffer,
+        xpos,
+        static_cast<short>(gSnakeLifeYPos_7339D4 + ypos - 16),
+        redFillLength,
+        normalFillLength,
+        barLength,
+        pBarConfig);
+}
+MGS_FUNC_IMPLEX(0x469160, Menu_render_auto_stacked_any_size_menu_bar_469160, MENU_IMPL);
+
+MGS_VAR(1, 0x66C4C0, TextConfig, gTextConfig_66C4C0, {});
+
+void CC Menu_Set_Text_BlendMode_459BE0()
+{
+    DR_TPAGE* pDrTPage = PrimAlloc<DR_TPAGE>(&gMenuPrimBuffer_7265E0);
+    int abr = ((gTextConfig_66C4C0.gTextFlags_dword_66C4C8 >> 8) & 3);
+    setDrawTPage(pDrTPage, 1, 1, getTPage(0, abr, 960, 256));
+    addPrim(gMenuPrimBuffer_7265E0.mOt, pDrTPage);
+}
+MGS_FUNC_IMPLEX(0x00459BE0, Menu_Set_Text_BlendMode_459BE0, MENU_IMPL);
+
+
+int CC Menu_DrawText_459B63(const char* format, int formatParam1, int formatParam2, int formatParam3, int formatParam4)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x459B63, Menu_DrawText_459B63, false);  // TODO
+
+void CC TextSetXYFlags_459B0B(int x, int y, int flags)
+{
+    // TODO: Create enum and replace call sites with enum flags
+    // 0x1 = right align
+    // 0x2 = center align
+    // 0x10 = larger font size
+    // 0x20 = semi transparent
+
+    // other bits = left align/do nothing
+    gTextConfig_66C4C0.gTextX_dword_66C4C0 = x;
+    gTextConfig_66C4C0.gTextY_dword_66C4C4 = y;
+    gTextConfig_66C4C0.gTextFlags_dword_66C4C8 = flags;
+}
+MGS_FUNC_IMPLEX(0x459B0B, TextSetXYFlags_459B0B, MENU_IMPL);
+
+int CC TextSetRGB_459B27(int r, int g, int b)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, false);  // TODO
+
+void CC Menu_render_auto_stacked_1024_size_menu_bar_459C6B(short xpos, short ypos, short redFillLength, short normalFillLength, BarConfig* pBarConfig)
+{
+    game_state_dword_72279C.mParts.flags1 |= 0x80u;
+    Menu_render_auto_stacked_any_size_menu_bar_469160(
+        &gMenuPrimBuffer_7265E0,
+        xpos,
+        ypos,
+        redFillLength,
+        normalFillLength,
+        static_cast<short>(1024),
+        pBarConfig);
+    Menu_Set_Text_BlendMode_459BE0();
+}
+MGS_FUNC_IMPLEX(0x00459C6B, Menu_render_auto_stacked_1024_size_menu_bar_459C6B, MENU_IMPL);
 
 void CC Menu_render_fixedx_auto_stacked_menu_bar_impl_46912D(MenuPrimBuffer* pPrimBuffer, short ypos, short redFill, short normalFill, short maxFill, BarConfig* pBarConfig)
 {
@@ -587,8 +642,6 @@ MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
     nullptr
 });
 
-MGS_VAR(1, 0x66C4C0, TextConfig, gTextConfig_66C4C0, {});
-
 void CC Menu_TextReset_459ACE()
 {
     gTextConfig_66C4C0.gTextFlags_dword_66C4C8 = 0;
@@ -631,14 +684,12 @@ void CC Menu_create_helper_459991(MenuMan* pMenu)
 }
 MGS_FUNC_IMPLEX(0x00459991, Menu_create_helper_459991, MENU_IMPL);
 
-void CC Menu_Set_Text_BlendMode_459BE0()
+void CC TextSetDefaults_459B51()
 {
-    DR_TPAGE* pDrTPage = PrimAlloc<DR_TPAGE>(&gMenuPrimBuffer_7265E0);
-    int abr = ((gTextConfig_66C4C0.gTextFlags_dword_66C4C8 >> 8) & 3);
-    setDrawTPage(pDrTPage, 1, 1, getTPage(0, abr, 960, 256));
-    addPrim(gMenuPrimBuffer_7265E0.mOt, pDrTPage);
+    gTextConfig_66C4C0.gTextFlags_dword_66C4C8 = 0;
+    gTextConfig_66C4C0.gTextRGB_dword_66C4CC = 0x64808080;
 }
-MGS_FUNC_IMPLEX(0x00459BE0, Menu_Set_Text_BlendMode_459BE0, MENU_IMPL);
+MGS_FUNC_IMPLEX(0x00459B51, TextSetDefaults_459B51, MENU_IMPL);
 
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {
