@@ -223,7 +223,177 @@ static inline T UnSetPointerFlag(T ptr, bool& bWasFlagged)
 
 MGS_VAR(1, 0x66C4C0, TextConfig, gTextConfig_66C4C0, {});
 
-MGS_FUNC_NOT_IMPL(0x468AAF, int __cdecl(MenuPrimBuffer *ot, TextConfig* pTextSettings, const char* pString), Render_Text_Flag0x10_468AAF);
+struct SpecialChar
+{
+    char field_0_char;
+    BYTE field_1_width;
+};
+MGS_ASSERT_SIZEOF(SpecialChar, 0x2);
+
+/*
+0x006757C0  2e 02 40 02 3a 02 5f 04 21 02 3f 06 2b 06 2d 06 2f 06 2a 06  ..@.:._.!.?.+.-./.*.
+0x006757D4  7b 03 7d 03 00 00 00 00 00 00 00 00 c0 03 f2 01 36 00 0c 00  {.}.........À.ò.6...
+*/
+MGS_ARY(1, 0x6757C0, SpecialChar, 16, gSpecialChars_byte_6757C0, {}); // TODO: Populate
+
+MGS_VAR(1, 0x733978, SPRT, gMenu_sprt3_733978, {});
+MGS_FUNC_NOT_IMPL(0x4687E8, int __cdecl (SPRT *prevOSprts, SPRT *pSprts, int xpos, signed int ypos, char flags), Render_Text_SetGlyphPositions_4687E8);
+
+const int kCharHeight = 8;
+
+void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pString)
+{
+    if (!*pString)
+    {
+        return;
+    }
+
+    SPRT* firstSprt = nullptr;
+    short xpos = 0;
+    const char* iterChar = pString;
+    while (*iterChar)
+    {
+        while (*iterChar == '\n')
+        {
+            Render_Text_SetGlyphPositions_4687E8(
+                firstSprt,
+                (SPRT *)pPrimBuffer->mFreeLocation,
+                pTextSettings->gTextX_dword_66C4C0,
+                xpos,
+                pTextSettings->gTextFlags_dword_66C4C8);
+
+            // Start again on the left
+            xpos = 0;
+
+            // Move future text down 1 line height
+            pTextSettings->gTextY_dword_66C4C4 += kCharHeight;
+
+            // Reset the "from" sprite for when we fix up the next line
+            firstSprt = (SPRT *)pPrimBuffer->mFreeLocation;
+            iterChar++;
+            if (!*iterChar)
+            {
+                break;
+            }
+        }
+
+        short charWidth = 9;
+        BYTE char_u0 = 0;
+        BYTE char_v0 = 0;
+        bool valid = true;
+
+        const char curChar = (*iterChar) | 0x20; // 0x20 is used to disable @ and some others?
+        if (curChar >= '0' && curChar <= '9')
+        {
+            // 0-9 handling
+            charWidth = 9;
+            char_u0 = (kCharHeight * curChar) - 384;
+            char_v0 = 248;
+        }
+        else
+        {
+            if ((curChar >= 'a' && curChar <= 'z') || (curChar >= 'A' && curChar <= 'Z'))
+            {
+                if (curChar == 'i')
+                {
+                    xpos++;
+                    charWidth = 4;
+                }
+   
+                char_u0 = (kCharHeight * curChar) - 776;
+                char_v0 = 242;
+            }
+            else
+            {
+                if (curChar == '#')
+                {
+                    // handle hash
+                    iterChar++;
+                    xpos += (*iterChar) - '0';
+                    iterChar++;
+                    char_u0 = (kCharHeight * (*iterChar)) - 384;
+                    char_v0 = 248;
+                }
+                else if (curChar == ' ')
+                {
+                    charWidth = 4;
+                    valid = false;
+                }
+                else
+                {
+                    // Look up curChar in gSpecialChars_byte_6757C0
+                    bool found = false;
+                    for (int i = 0; i < 16; i++)
+                    {
+                        if (gSpecialChars_byte_6757C0[i].field_0_char == curChar)
+                        {
+                            found = true;
+                            char_u0 = (kCharHeight * i) + 80;
+                            char_v0 = 248;
+                            charWidth = gSpecialChars_byte_6757C0[i].field_1_width;
+                            if (charWidth < 3)
+                            {
+                                ++xpos;
+                                ++charWidth;
+                                break;
+                            }
+
+                            if (charWidth != 6)
+                            {
+                                break;
+                            }
+
+                            charWidth = 9;
+                            break;
+                        }
+                    }
+
+                    valid = found;
+                    if (!valid)
+                    {
+                        // If we are not rendering a char then don't advance x pos
+                        charWidth = 0;
+                    }
+                }
+            }
+        }
+
+        if (valid)
+        {
+            SPRT* pTextSprt = PrimAlloc<SPRT>(pPrimBuffer);
+            if (!firstSprt)
+            {
+                firstSprt = pTextSprt;
+            }
+
+            memcpy(pTextSprt, &gMenu_sprt3_733978, sizeof(SPRT));
+            setRGB0(pTextSprt,
+                BYTE0(pTextSettings->gTextRGB_dword_66C4CC),
+                BYTE1(pTextSettings->gTextRGB_dword_66C4CC),
+                BYTE2(pTextSettings->gTextRGB_dword_66C4CC));
+
+            pTextSprt->x0 = xpos;
+            pTextSprt->y0 = static_cast<short>(pTextSettings->gTextY_dword_66C4C4);
+
+            pTextSprt->v0 = char_v0;
+            pTextSprt->u0 = char_u0;
+            addPrim(pPrimBuffer->mOt, pTextSprt);
+        }
+
+        xpos += charWidth;
+        iterChar++;
+    }
+
+    // Position the final line/batch
+    Render_Text_SetGlyphPositions_4687E8(
+        firstSprt,
+        (SPRT *)pPrimBuffer->mFreeLocation,
+        pTextSettings->gTextX_dword_66C4C0,
+        xpos,
+        pTextSettings->gTextFlags_dword_66C4C8);
+}
+MGS_FUNC_IMPLEX(0x468AAF, Render_Text_Flag0x10_468AAF, MENU_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x468642, int __cdecl(MenuPrimBuffer* ot, TextConfig* pTextSettings, const char* pString), Render_Text_NotFlag0x10_468642);
 
 int CC TextSetRGB_459B27(int r, int g, int b)
@@ -844,6 +1014,8 @@ void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed 
 }
 MGS_FUNC_IMPLEX(0x00468915, Menu_render_text_fractional_468915, MENU_IMPL);
 
+MGS_FUNC_NOT_IMPL(0x468C6B, void(), sub_468C6B);
+
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {
     int* pOtText1 = (int*)gMenuPrimBuffer_7265E0.mOt;
@@ -874,6 +1046,13 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
             flags *= 2; // To the next bit
         }
     }
+
+    TextConfig config = {};
+    config.gTextX_dword_66C4C0 = 20;
+    config.gTextY_dword_66C4C4 = 80;
+    config.gTextRGB_dword_66C4CC = 0x64ffffff;
+    config.gTextFlags_dword_66C4C8 = 0;
+    Render_Text_Flag0x10_468AAF(pMenu->field_20_prim_buffer, &config, "i Hello\nwor l d \n1234#9567890\n.@:_!?+-/*{}");
 
     // drawing environment change primitive
     addPrim(pOtText2, &pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]);
