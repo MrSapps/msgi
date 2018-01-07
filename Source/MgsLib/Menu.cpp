@@ -709,7 +709,7 @@ void CC TextSetDefaults_459B51()
 }
 MGS_FUNC_IMPLEX(0x00459B51, TextSetDefaults_459B51, MENU_IMPL);
 
-void CC Menu_inventory_text_4689CB(MenuMan* pMenu, int ot, int xpos, int ypos, const char* pText, int textFlags)
+void CC Menu_inventory_text_4689CB(MenuMan* pMenu, int /*ot*/, int xpos, int ypos, const char* pText, int textFlags)
 {
     TextConfig textConfig = {};
     textConfig.gTextX_dword_66C4C0 = xpos;
@@ -720,9 +720,85 @@ void CC Menu_inventory_text_4689CB(MenuMan* pMenu, int ot, int xpos, int ypos, c
 }
 MGS_FUNC_IMPLEX(0x004689CB, Menu_inventory_text_4689CB, MENU_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x468529, void __cdecl(MenuPrimBuffer *pPrimBuffer, TextConfig *pTextConfig, signed int number), Menu_render_number_as_string_468529);
-
 MGS_VAR(1, 0x7339C0, SPRT, gMenu_font1_template_sprite_7339C0, {});
+
+const short kCharWidth = 6;
+
+void CC Menu_render_number_as_string_468529(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextConfig, signed int numberRemainder)
+{
+    int maxCount = 0;
+    if (pTextConfig->gTextFlags_dword_66C4C8 & 0x40)
+    {
+        maxCount = pTextConfig->gTextFlags_dword_66C4C8 >> 8;
+    }
+    else
+    {
+        maxCount = 0;
+    }
+
+    short int xpos = 0;
+    SPRT* pFirstSprt = nullptr;
+    int numSprts = 0;
+    for (;;)
+    {
+        xpos -= 6;
+        const int currentNum = numberRemainder % 10;
+        SPRT* pSprt = PrimAlloc<SPRT>(pPrimBuffer);
+        numberRemainder /= 10;
+        if (!pFirstSprt)
+        {
+            pFirstSprt = pSprt;
+        }
+        memcpy(pSprt, &gMenu_font1_template_sprite_7339C0, sizeof(SPRT));
+        
+        setRGB0(pSprt,
+            BYTE0(pTextConfig->gTextRGB_dword_66C4CC),
+            BYTE1(pTextConfig->gTextRGB_dword_66C4CC),
+            BYTE2(pTextConfig->gTextRGB_dword_66C4CC));
+
+        pSprt->x0 = xpos;
+        pSprt->y0 = static_cast<short>(pTextConfig->gTextY_dword_66C4C4);
+        pSprt->u0 = static_cast<BYTE>(kCharWidth * (currentNum + 26)); // the numbers are after the alphabet in the sprite sheet, hence + 26
+
+        addPrim(pPrimBuffer->mOt, pSprt);
+        numSprts++;
+
+        --maxCount;
+        if (numberRemainder <= 0 && maxCount <= 0)
+        {
+            break;
+        }
+    }
+
+    if (pFirstSprt)
+    {
+        // Align all of the sprites for each number according to the alignment flags
+        int adjustValue = 0;
+        if ((pTextConfig->gTextFlags_dword_66C4C8 & 0xF) == 1)
+        {
+            // Right aligned
+            adjustValue = pTextConfig->gTextX_dword_66C4C0;
+            pTextConfig->gTextX_dword_66C4C0 += xpos;
+        }
+        else if ((pTextConfig->gTextFlags_dword_66C4C8 & 0xF) == 2)
+        {
+            // Center aligned
+            adjustValue = pTextConfig->gTextX_dword_66C4C0 - xpos / 2;
+        }
+        else
+        {
+            // Left aligned
+            adjustValue = pTextConfig->gTextX_dword_66C4C0 - xpos;
+            pTextConfig->gTextX_dword_66C4C0 = adjustValue;
+        }
+
+        for (int i = 0; i < numSprts; i++)
+        {
+            pFirstSprt[i].x0 += static_cast<short>(adjustValue);
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x00468529, Menu_render_number_as_string_468529, MENU_IMPL);
 
 void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed int currentValue, signed int maxValue)
 {
@@ -741,9 +817,13 @@ void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed 
     SPRT* pSprt = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
     memcpy(pSprt, &gMenu_font1_template_sprite_7339C0, sizeof(SPRT));
 
-    setRGB0(pSprt, BYTE0(textConfig.gTextRGB_dword_66C4CC), BYTE1(textConfig.gTextRGB_dword_66C4CC), BYTE2(textConfig.gTextRGB_dword_66C4CC));
-    pSprt->x0 = textConfig.gTextX_dword_66C4C0;
-    pSprt->y0 = textConfig.gTextY_dword_66C4C4;
+    setRGB0(pSprt,
+        BYTE0(textConfig.gTextRGB_dword_66C4CC),
+        BYTE1(textConfig.gTextRGB_dword_66C4CC),
+        BYTE2(textConfig.gTextRGB_dword_66C4CC));
+
+    pSprt->x0 = static_cast<short>(textConfig.gTextX_dword_66C4C0);
+    pSprt->y0 = static_cast<short>(textConfig.gTextY_dword_66C4C4);
     pSprt->u0 = 224;
     addPrim(pMenu->field_20_prim_buffer->mOt, pSprt);
     textConfig.gTextX_dword_66C4C0 += 6;
@@ -783,9 +863,6 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
             flags *= 2; // To the next bit
         }
     }
-
-    // 11 chars
-    Menu_render_text_fractional_468915(pMenu, 40, 50, 50, 800);
 
     // drawing environment change primitive
     addPrim(pOtText2, &pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]);
