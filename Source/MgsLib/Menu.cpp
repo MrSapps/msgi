@@ -214,15 +214,50 @@ struct TextConfig
 };
 MGS_ASSERT_SIZEOF(TextConfig, 0x10);
 
-MGS_FUNC_NOT_IMPL(0x468AAF, int __cdecl(int *ot, TextConfig* pTextSettings, char *pString), Render_Text_Flag0x10_468AAF);
-MGS_FUNC_NOT_IMPL(0x468642, int __cdecl(MenuPrimBuffer* ot, TextConfig* pTextSettings, const char *pText), Render_Text_NotFlag0x10_468642);
-
 template<class T>
 static inline T UnSetPointerFlag(T ptr, bool& bWasFlagged)
 {
     bWasFlagged = (reinterpret_cast<unsigned int>(ptr) & 0x40000000) ? true : false;
     return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) & 0xBFFFFFFF);
 }
+
+MGS_VAR(1, 0x66C4C0, TextConfig, gTextConfig_66C4C0, {});
+
+MGS_FUNC_NOT_IMPL(0x468AAF, int __cdecl(MenuPrimBuffer *ot, TextConfig* pTextSettings, const char* pString), Render_Text_Flag0x10_468AAF);
+MGS_FUNC_NOT_IMPL(0x468642, int __cdecl(MenuPrimBuffer* ot, TextConfig* pTextSettings, const char* pString), Render_Text_NotFlag0x10_468642);
+
+int CC TextSetRGB_459B27(int r, int g, int b)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, false);  // TODO
+
+void CC Menu_DrawText_459B63(const char* pFormatStr, int formatArg1, int formatArg2, int formatArg3, int formatArg4)
+{
+    char formattedStr[64] = {};
+    if (gMenuPrimBuffer_7265E0.mFreeLocation)
+    {
+        sprintf(formattedStr, pFormatStr, formatArg1, formatArg2, formatArg3, formatArg4);
+        // Check there is enough space in the buffer for a SPRT per char, plus 2 extra
+        if (gMenuPrimBuffer_7265E0.mOtEnd - gMenuPrimBuffer_7265E0.mFreeLocation >=
+            static_cast<signed int>(sizeof(SPRT) * (strlen(formattedStr) + 2)))
+        {
+            if (gTextConfig_66C4C0.gTextFlags_dword_66C4C8 & 0x10)
+            {
+                // Larger font
+                Render_Text_Flag0x10_468AAF(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
+            }
+            else
+            {
+                // Smaller font
+                Render_Text_NotFlag0x10_468642(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
+            }
+            Menu_Set_Text_BlendMode_459BE0();
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x459B63, Menu_DrawText_459B63, MENU_IMPL);
 
 void CC Menu_render_life_bar_468DA6(MenuPrimBuffer* pPrimBuffer, short int xpos, short int ypos, short int redFillLength, short int normalFillLength, short int barLength, BarConfig* pMaybeFlaggedBarConfig)
 {
@@ -398,8 +433,6 @@ void CC Menu_render_auto_stacked_any_size_menu_bar_469160(MenuPrimBuffer* pPrimB
 }
 MGS_FUNC_IMPLEX(0x469160, Menu_render_auto_stacked_any_size_menu_bar_469160, MENU_IMPL);
 
-MGS_VAR(1, 0x66C4C0, TextConfig, gTextConfig_66C4C0, {});
-
 void CC Menu_Set_Text_BlendMode_459BE0()
 {
     DR_TPAGE* pDrTPage = PrimAlloc<DR_TPAGE>(&gMenuPrimBuffer_7265E0);
@@ -408,14 +441,6 @@ void CC Menu_Set_Text_BlendMode_459BE0()
     addPrim(gMenuPrimBuffer_7265E0.mOt, pDrTPage);
 }
 MGS_FUNC_IMPLEX(0x00459BE0, Menu_Set_Text_BlendMode_459BE0, MENU_IMPL);
-
-
-int CC Menu_DrawText_459B63(const char* format, int formatParam1, int formatParam2, int formatParam3, int formatParam4)
-{
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x459B63, Menu_DrawText_459B63, false);  // TODO
 
 void CC TextSetXYFlags_459B0B(int x, int y, int flags)
 {
@@ -431,13 +456,6 @@ void CC TextSetXYFlags_459B0B(int x, int y, int flags)
     gTextConfig_66C4C0.gTextFlags_dword_66C4C8 = flags;
 }
 MGS_FUNC_IMPLEX(0x459B0B, TextSetXYFlags_459B0B, MENU_IMPL);
-
-int CC TextSetRGB_459B27(int r, int g, int b)
-{
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, false);  // TODO
 
 void CC Menu_render_auto_stacked_1024_size_menu_bar_459C6B(short xpos, short ypos, short redFillLength, short normalFillLength, BarConfig* pBarConfig)
 {

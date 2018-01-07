@@ -43,6 +43,17 @@ struct TILE
 };
 MGS_ASSERT_SIZEOF(TILE, 16);
 
+struct SPRT
+{
+    DWORD* tag;
+    BYTE r0, g0, b0, code;
+    short x0, y0;
+    BYTE u0, v0;
+    WORD clut;
+    short w, h; // Custom sized sprite
+};
+MGS_ASSERT_SIZEOF(SPRT, 20);
+
 #define setlen( p, _len) (((P_TAG *)(p))->len  = (u_char)(_len))
 #define setaddr(p, _addr) (((P_TAG *)(p))->addr = (u_long)(_addr))
 #define getaddr(p)   (u_long)(((P_TAG *)(p))->addr)

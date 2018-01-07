@@ -81,16 +81,6 @@ struct DR_MOVE
 };
 MGS_ASSERT_SIZEOF(DR_MOVE, 24);
 
-struct SPRT
-{
-    DWORD* tag;
-    BYTE r0, g0, b0, code;
-    short x0, y0;
-    BYTE u0, v0;
-    WORD clut;
-    short w, h; // Custom sized sprite
-};
-MGS_ASSERT_SIZEOF(SPRT, 20);
 
 struct SPRT_16  // 16x16 sprite
 {
