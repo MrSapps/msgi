@@ -62,6 +62,7 @@ MGS_ASSERT_SIZEOF(SPRT, 20);
 #define termPrim(p) setaddr(p, 0xffffffff)
 
 #define setRGB0(p,_r0,_g0,_b0) (p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
+#define setPolyF4(p)  setlen(p, 5),  setcode(p, 0x28)
 #define setPolyFT4(p) setlen(p, 9),  setcode(p, 0x2c)
 #define setPolyG4(p)  setlen(p, 8),  setcode(p, 0x38)
 #define setTile(p)    setlen(p, 3),  setcode(p, 0x60)
@@ -84,6 +85,10 @@ MGS_ASSERT_SIZEOF(SPRT, 20);
 #define setDrawTPage(p, dfe, dtd, tpage) \
     setlen(p, 1), \
     ((unsigned int *)(p))[1] = _get_mode(dfe, dtd, tpage)
+
+#define getcode(p) (u_char)(((P_TAG *)(p))->code)
+#define setSemiTrans(p, abe) \
+    ((abe)?setcode(p, getcode(p)|0x02):setcode(p, getcode(p)&~0x02))
 
 struct PSX_RECT // Should be called RECT but will clash with windows.h for now
 {

@@ -237,7 +237,7 @@ MGS_ASSERT_SIZEOF(SpecialChar, 0x2);
 MGS_ARY(1, 0x6757C0, SpecialChar, 16, gSpecialChars_byte_6757C0, {}); // TODO: Populate
 
 MGS_VAR(1, 0x733978, SPRT, gMenu_sprt3_733978, {});
-MGS_FUNC_NOT_IMPL(0x4687E8, int __cdecl (SPRT *prevOSprts, SPRT *pSprts, int xpos, signed int ypos, char flags), Render_Text_SetGlyphPositions_4687E8);
+MGS_FUNC_NOT_IMPL(0x4687E8, int __cdecl (SPRT *prevOSprts, SPRT *pSprts, int xpos, signed int ypos, DWORD flags), Render_Text_SetGlyphPositions_4687E8);
 
 const int kCharHeight = 8;
 
@@ -287,7 +287,7 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
         {
             // 0-9 handling
             charWidth = 9;
-            char_u0 = (kCharHeight * curChar) - 384;
+            char_u0 = static_cast<BYTE>((kCharHeight * curChar) - 384);
             char_v0 = 248;
         }
         else
@@ -300,7 +300,7 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
                     charWidth = 4;
                 }
    
-                char_u0 = (kCharHeight * curChar) - 776;
+                char_u0 = static_cast<BYTE>((kCharHeight * curChar) - 776);
                 char_v0 = 242;
             }
             else
@@ -311,7 +311,7 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
                     iterChar++;
                     xpos += (*iterChar) - '0';
                     iterChar++;
-                    char_u0 = (kCharHeight * (*iterChar)) - 384;
+                    char_u0 = static_cast<BYTE>((kCharHeight * (*iterChar)) - 384);
                     char_v0 = 248;
                 }
                 else if (curChar == ' ')
@@ -328,7 +328,7 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
                         if (gSpecialChars_byte_6757C0[i].field_0_char == curChar)
                         {
                             found = true;
-                            char_u0 = (kCharHeight * i) + 80;
+                            char_u0 = static_cast<BYTE>((kCharHeight * i) + 80);
                             char_v0 = 248;
                             charWidth = gSpecialChars_byte_6757C0[i].field_1_width;
                             if (charWidth < 3)
@@ -394,7 +394,7 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
 }
 MGS_FUNC_IMPLEX(0x468AAF, Render_Text_Flag0x10_468AAF, MENU_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x468642, int __cdecl(MenuPrimBuffer* ot, TextConfig* pTextSettings, const char* pString), Render_Text_NotFlag0x10_468642);
+MGS_FUNC_NOT_IMPL(0x468642, void __cdecl(MenuPrimBuffer* ot, TextConfig* pTextSettings, const char* pString), Render_Text_NotFlag0x10_468642);
 
 int CC TextSetRGB_459B27(int r, int g, int b)
 {
@@ -879,7 +879,116 @@ void CC TextSetDefaults_459B51()
 }
 MGS_FUNC_IMPLEX(0x00459B51, TextSetDefaults_459B51, MENU_IMPL);
 
-void CC Menu_inventory_text_4689CB(MenuMan* pMenu, int /*ot*/, int xpos, int ypos, const char* pText, int textFlags)
+MGS_VAR(1, 0x733DD8, SPRT, gMenu_inventory_text_header_background_733DD8, {});
+
+// TODO: Recover structure
+struct Font
+{
+
+};
+MGS_VAR(1, 0x733DF0, Font, gMenuFont_733DF0, {});
+MGS_VAR(1, 0x676530, PSX_RECT, sMenu_rect_676530, {}); // TODO: Populate
+
+MGS_FUNC_NOT_IMPL(0x45A70D, int __cdecl(Font *ptr, PSX_RECT *pRect, __int16 vramX, __int16 vramY), Font_45A70D);
+MGS_FUNC_NOT_IMPL(0x45A796, int __cdecl (Font *pFont, int a2, int a3, int a4, int a5, int a6, int a7), Font_45A796);
+MGS_FUNC_NOT_IMPL(0x45AA45, int __cdecl (Font *pFont), Font_CalcSize_45AA45);
+MGS_FUNC_NOT_IMPL(0x45AAE9, int __cdecl (Font *pFont, void *pAllocated), Font_Set_Buffer_45AAE9);
+MGS_FUNC_NOT_IMPL(0x45A89F, WORD *__cdecl (Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
+MGS_FUNC_NOT_IMPL(0x45C7F2, void *__cdecl (Font *pFont), Font_45C7F2);
+
+struct uv_pair
+{
+    __int16 u;
+    __int16 v;
+};
+MGS_ARY(1, 0x676538, uv_pair, 2, stru_676538, {}); // TODO: Populate
+
+signed int CC Menu_inventory_common_update_helper_46B979(int idx)
+{
+    setSprt(&gMenu_inventory_text_header_background_733DD8);
+
+    gMenu_inventory_text_header_background_733DD8.r0 = 128;
+    gMenu_inventory_text_header_background_733DD8.g0 = 128;
+    gMenu_inventory_text_header_background_733DD8.b0 = 128;
+
+    gMenu_inventory_text_header_background_733DD8.v0 = static_cast<BYTE>(sMenu_rect_676530.y1);
+    gMenu_inventory_text_header_background_733DD8.u0 = 0;
+
+    gMenu_inventory_text_header_background_733DD8.w = 200;
+    gMenu_inventory_text_header_background_733DD8.h = 80;
+
+    const __int16 x0 = stru_676538[idx].u; // TODO: Actually POINT's?
+    const __int16 y0 = stru_676538[idx].v;
+    gMenu_inventory_text_header_background_733DD8.x0 = x0;
+    gMenu_inventory_text_header_background_733DD8.y0 = y0;
+
+    gMenu_inventory_text_header_background_733DD8.clut = 32700;
+    ClearImage(&sMenu_rect_676530, 0, 0, 0);
+    Font_45A70D(&gMenuFont_733DF0, &sMenu_rect_676530, 960, 510);
+    Font_45A796(&gMenuFont_733DF0, -1, -1, 0, 6, 2, 0);
+    const int sizeToAlloc = Font_CalcSize_45AA45(&gMenuFont_733DF0);
+    void* pAllocated = System_2_zerod_allocate_memory_40B296(sizeToAlloc);
+    if (!pAllocated)
+    {
+        return 0;
+    }
+    Font_Set_Buffer_45AAE9(&gMenuFont_733DF0, pAllocated);
+    Font_ColourRelated_45A89F(&gMenuFont_733DF0, 0, 0x6739, 0);
+    Font_45C7F2(&gMenuFont_733DF0);
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x46B979, Menu_inventory_common_update_helper_46B979, true);
+
+void __cdecl Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95(MenuMan* pMenu, int* pOt, const char* pText)
+{
+    pMenu->field_2B |= 2u;
+
+    SPRT* itemTextSprite = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
+    memcpy(itemTextSprite, &gMenu_inventory_text_header_background_733DD8, sizeof(SPRT));
+    addPrim(pMenu->field_20_prim_buffer->mOt, itemTextSprite); // A texture with the item text on it ??
+
+    const int textWidth = Menu_inventory_text_4689CB(
+        pMenu,
+        pOt,
+        gMenu_inventory_text_header_background_733DD8.x0 - 10 + 2,
+        gMenu_inventory_text_header_background_733DD8.y0 - 7,
+        pText,
+        0); // EQUIP or WEAPON/NO ITEM text
+
+    Menu_render_snake_life_bar_469194(pMenu->field_20_prim_buffer, gMenu_inventory_text_header_background_733DD8.x0 - 10, 24); // HP bar
+    
+    const short int width = static_cast<short int>(textWidth + 2);
+    for (int i=0; i<2; i++)
+    {
+        POLY_F4* pPolyFT4 = PrimAlloc<POLY_F4>(pMenu->field_20_prim_buffer); // Sloping header polygon that contains EQUIP/WEAPON text
+        setPolyF4(pPolyFT4);
+        setRGB0(pPolyFT4, 0, 0, 0);
+        setSemiTrans(pPolyFT4, 1);
+        pPolyFT4->x0 = gMenu_inventory_text_header_background_733DD8.x0 - 10;
+        pPolyFT4->y0 = gMenu_inventory_text_header_background_733DD8.y0 - 9;
+        pPolyFT4->x1 = width;
+        pPolyFT4->x2 = gMenu_inventory_text_header_background_733DD8.x0 - 10;
+        pPolyFT4->y1 = gMenu_inventory_text_header_background_733DD8.y0 - 9;
+        pPolyFT4->x3 = width;
+        pPolyFT4->y2 = gMenu_inventory_text_header_background_733DD8.y0;
+        pPolyFT4->x3 = width + 10;
+        pPolyFT4->y3 = gMenu_inventory_text_header_background_733DD8.y0;
+        addPrim(pOt, pPolyFT4);
+
+        TILE* pTile = PrimAlloc<TILE>(pMenu->field_20_prim_buffer); // Big square background for the item/weapon text
+        setTile(pTile);
+        setRGB0(pTile, 0, 0, 0);
+        setSemiTrans(pTile, 1);
+        pTile->x0 = gMenu_inventory_text_header_background_733DD8.x0 - 10;
+        pTile->y0 = gMenu_inventory_text_header_background_733DD8.y0;
+        pTile->w = gMenu_inventory_text_header_background_733DD8.w + 10;
+        pTile->h = gMenu_inventory_text_header_background_733DD8.h;
+        addPrim(pOt, pTile);
+    }
+}
+MGS_FUNC_IMPLEX(0x46BA95, Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95, MENU_IMPL);
+
+int CC Menu_inventory_text_4689CB(MenuMan* pMenu, int* /*ot*/, int xpos, int ypos, const char* pText, int textFlags)
 {
     TextConfig textConfig = {};
     textConfig.gTextX_dword_66C4C0 = xpos;
@@ -887,8 +996,9 @@ void CC Menu_inventory_text_4689CB(MenuMan* pMenu, int /*ot*/, int xpos, int ypo
     textConfig.gTextFlags_dword_66C4C8 = textFlags;
     textConfig.gTextRGB_dword_66C4CC = 0x64808080;
     Render_Text_NotFlag0x10_468642(pMenu->field_20_prim_buffer, &textConfig, pText);
+    return textConfig.gTextX_dword_66C4C0;
 }
-MGS_FUNC_IMPLEX(0x004689CB, Menu_inventory_text_4689CB, MENU_IMPL);
+MGS_FUNC_IMPLEX(0x4689CB, Menu_inventory_text_4689CB, MENU_IMPL);
 
 MGS_VAR(1, 0x7339C0, SPRT, gMenu_font1_template_sprite_7339C0, {});
 
@@ -1046,13 +1156,6 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
             flags *= 2; // To the next bit
         }
     }
-
-    TextConfig config = {};
-    config.gTextX_dword_66C4C0 = 20;
-    config.gTextY_dword_66C4C4 = 80;
-    config.gTextRGB_dword_66C4CC = 0x64ffffff;
-    config.gTextFlags_dword_66C4C8 = 0;
-    Render_Text_Flag0x10_468AAF(pMenu->field_20_prim_buffer, &config, "i Hello\nwor l d \n1234#9567890\n.@:_!?+-/*{}");
 
     // drawing environment change primitive
     addPrim(pOtText2, &pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]);
