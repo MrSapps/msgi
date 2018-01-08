@@ -346,7 +346,43 @@ MGS_ASSERT_SIZEOF(SpecialChar, 0x2);
 */
 MGS_ARY(1, 0x6757C0, SpecialChar, 16, gSpecialChars_byte_6757C0, {}); // TODO: Populate
 
-MGS_FUNC_NOT_IMPL(0x4687E8, int __cdecl (SPRT *prevOSprts, SPRT *pSprts, int xpos, signed int ypos, DWORD flags), Render_Text_SetGlyphPositions_4687E8);
+int CC Render_Text_SetGlyphPositions_4687E8(SPRT* pFirstSprt, SPRT* pLastSprt, int updated_x, int xpos, DWORD flags)
+{
+    int result = updated_x;
+    if (pFirstSprt && pFirstSprt < pLastSprt)
+    {
+        // Align all of the sprites for each number according to the alignment flags
+        int adjustValue = 0;
+        if ((flags & 0xF) == 1)
+        {
+            // Right aligned
+            adjustValue = updated_x - xpos;
+            result = updated_x - xpos;
+        }
+        else if ((flags & 0xF) == 2)
+        {
+            // Center aligned
+            adjustValue = updated_x - xpos / 2;
+            result = xpos;
+        }
+        else
+        {
+            // Left aligned
+            adjustValue = updated_x;
+            result = updated_x + xpos;
+        }
+
+        while(pFirstSprt < pLastSprt)
+        {
+            pFirstSprt->x0 += static_cast<short>(adjustValue);
+            pFirstSprt++;
+        }
+    }
+
+    return result;
+}
+MGS_FUNC_IMPLEX(0x4687E8, Render_Text_SetGlyphPositions_4687E8, MENU_IMPL);
+
 
 const int kCharHeight = 8;
 
@@ -1210,7 +1246,7 @@ void CC Menu_render_number_as_string_468529(MenuPrimBuffer* pPrimBuffer, TextCon
         }
     }
 
-    // TODO: Same as Render_Text_SetGlyphPositions_4687E8
+    // Similar to Render_Text_SetGlyphPositions_4687E8
     if (pFirstSprt)
     {
         // Align all of the sprites for each number according to the alignment flags
