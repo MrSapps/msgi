@@ -54,6 +54,16 @@ struct SPRT
 };
 MGS_ASSERT_SIZEOF(SPRT, 20);
 
+struct POLY_F3
+{
+    DWORD* tag;
+    BYTE r0, g0, b0, code;
+    short x0, y0;
+    short x1, y1;
+    short x2, y2;
+};
+MGS_ASSERT_SIZEOF(POLY_F3, 20);
+
 #define setlen( p, _len) (((P_TAG *)(p))->len  = (u_char)(_len))
 #define setaddr(p, _addr) (((P_TAG *)(p))->addr = (u_long)(_addr))
 #define getaddr(p)   (u_long)(((P_TAG *)(p))->addr)
@@ -62,6 +72,7 @@ MGS_ASSERT_SIZEOF(SPRT, 20);
 #define termPrim(p) setaddr(p, 0xffffffff)
 
 #define setRGB0(p,_r0,_g0,_b0) (p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
+#define setPolyF3(p)  setlen(p, 4),  setcode(p, 0x20)
 #define setPolyF4(p)  setlen(p, 5),  setcode(p, 0x28)
 #define setPolyFT4(p) setlen(p, 9),  setcode(p, 0x2c)
 #define setPolyG4(p)  setlen(p, 8),  setcode(p, 0x38)

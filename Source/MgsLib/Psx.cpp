@@ -30,16 +30,6 @@ struct POLY_FT3
 };
 MGS_ASSERT_SIZEOF(POLY_FT3, 32);
 
-struct POLY_F3 
-{
-    DWORD* tag;
-    BYTE r0, g0, b0, code;
-    short x0, y0;
-    short x1, y1;
-    short x2, y2;
-};
-MGS_ASSERT_SIZEOF(POLY_F3, 20);
-
 struct RECT32
 {
     DWORD x1, y1, x2, y2;

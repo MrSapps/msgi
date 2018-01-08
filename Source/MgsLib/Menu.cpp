@@ -1125,7 +1125,27 @@ void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed 
 }
 MGS_FUNC_IMPLEX(0x00468915, Menu_render_text_fractional_468915, MENU_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x468C6B, void(), sub_468C6B);
+// Used when skipping/scrolling through codec text
+void CC Menu_draw_blinking_arrow_463652(MenuMan* pMenu, BYTE* ot)
+{
+    if (g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00 % 16 >= 4)
+    {
+        POLY_F3* pPoly = PrimAlloc<POLY_F3>(pMenu->field_20_prim_buffer);
+
+        setPolyF3(pPoly);
+        setRGB0(pPoly, 0x80, 0x80, 0x80);
+
+        pPoly->x1 = 288;
+        pPoly->y1 = 210;
+        pPoly->x0 = pPoly->x1 - 4;
+        pPoly->x2 = pPoly->x1 + 4;
+        pPoly->y2 = pPoly->y1 - 4;
+        pPoly->y0 = pPoly->y2;
+
+        addPrim(ot, pPoly);
+    }
+}
+MGS_FUNC_IMPLEX(0x00463652, Menu_draw_blinking_arrow_463652, MENU_IMPL);
 
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {

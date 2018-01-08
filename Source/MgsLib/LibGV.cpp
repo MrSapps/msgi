@@ -13,36 +13,6 @@
 #define REDIRECT_LIBGV_DATA 1
 #define LIBGV_IMPL true
 
-struct LibGv_Msg_Array
-{
-    DWORD mCount;
-    LibGV_Msg mMessages[16];
-};
-MGS_ASSERT_SIZEOF(LibGv_Msg_Array, 0x144);
-
-struct LibGv_Struct
-{
-    Actor mBase;
-    DWORD gRenderedFramesCount_dword_6BFF00;
-    DWORD dword_6BFF04_time_related;
-    LibGV_FileRecord* dword_6BFF08_last_free_ptr; // Seems to point to one of mStruct8_128Array_06BFF80
-    GV_FnPtr dword_6BFF0C_fn_ptrs[26];
-    LibGV_FileRecord* dword_6BFF74_resident_top_alloc;
-    int dword_6BFF78_count;
-    DWORD mField_9C; // Padding?
-    LibGV_FileRecord mFileCache_A0_06BFF80[128];
-    DWORD gGv_dword_6C0380;
-    DWORD gGv_dword_6C0384;
-    DWORD gGv_dword_6C0388[6];
-    DWORD gGv_dword_6C03A0;
-    DWORD gGv_dword_6C03A4;
-    DWORD gGv_dword_6C03A8;
-    DWORD mDWORD_Pad2;
-    LibGv_Msg_Array gGv_dword_6C03B0_mesg_array1;
-    LibGv_Msg_Array gGv_dword_6C04F4_mesg_array2;
-    DWORD gGv_dword_6C0638_active_mesg_array_idx;
-};
-MGS_ASSERT_SIZEOF(LibGv_Struct, 0x75C);
 
 MGS_VAR(REDIRECT_LIBGV_DATA, 0x6BFEE0, LibGv_Struct, g_lib_gv_stru_6BFEE0, {});
 
@@ -480,7 +450,7 @@ __int64 CC TimeGetElapsed_4455A0()
 }
 MGS_FUNC_IMPLEX(0x4455A0, TimeGetElapsed_4455A0, LIBGV_IMPL);
 
-void CC LibGV_Update_40A54E(Actor* pActor)
+void CC LibGV_Update_40A54E(Actor* /*pActor*/)
 {
     ++g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00;
 
