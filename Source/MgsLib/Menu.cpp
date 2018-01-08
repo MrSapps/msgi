@@ -350,7 +350,7 @@ MGS_FUNC_NOT_IMPL(0x4687E8, int __cdecl (SPRT *prevOSprts, SPRT *pSprts, int xpo
 
 const int kCharHeight = 8;
 
-void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pString)
+static void RenderTextHelper(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pString, bool isLargeFont)
 {
     if (!*pString)
     {
@@ -386,7 +386,7 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
             }
         }
 
-        short charWidth = 9;
+        short charWidth = isLargeFont ? 9 : 6;
         BYTE char_u0 = 0;
         BYTE char_v0 = 0;
         bool valid = true;
@@ -395,9 +395,17 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
         if (curChar >= '0' && curChar <= '9')
         {
             // 0-9 handling
-            charWidth = 9;
-            char_u0 = static_cast<BYTE>((kCharHeight * curChar) - 384);
-            char_v0 = 248;
+            charWidth = isLargeFont ? 9 : 6;
+            if (isLargeFont)
+            {
+                char_u0 = static_cast<BYTE>((kCharHeight * curChar) - 384);
+                char_v0 = 248;
+            }
+            else
+            {
+                char_u0 = static_cast<BYTE>(2 * ((3 * curChar) + 112));
+                char_v0 = 232;
+            }
         }
         else
         {
@@ -406,22 +414,38 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
                 if (curChar == 'i')
                 {
                     xpos++;
-                    charWidth = 4;
+                    charWidth = isLargeFont ? 4 : 3;
                 }
-   
-                char_u0 = static_cast<BYTE>((kCharHeight * curChar) - 776);
-                char_v0 = 242;
+
+                if (isLargeFont)
+                {
+                    char_u0 = static_cast<BYTE>((kCharHeight * curChar) - 776);
+                    char_v0 = 242;
+                }
+                else
+                {
+                    char_u0 = static_cast<BYTE>(2 * ((3 * curChar) - 291));
+                    char_v0 = 237;
+                }
             }
             else
             {
                 if (curChar == '#')
                 {
-                    // handle hash
-                    iterChar++;
-                    xpos += (*iterChar) - '0';
-                    iterChar++;
-                    char_u0 = static_cast<BYTE>((kCharHeight * (*iterChar)) - 384);
-                    char_v0 = 248;
+                    if (isLargeFont)
+                    {
+                        // handle hash
+                        iterChar++;
+                        xpos += (*iterChar) - '0';
+                        iterChar++;
+                        char_u0 = static_cast<BYTE>((kCharHeight * (*iterChar)) - 384);
+                        char_v0 = 248;
+                    }
+                    else
+                    {
+                        charWidth = 6;
+                        valid = false;
+                    }
                 }
                 else if (curChar == ' ')
                 {
@@ -437,8 +461,17 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
                         if (gSpecialChars_byte_6757C0[i].field_0_char == curChar)
                         {
                             found = true;
-                            char_u0 = static_cast<BYTE>((kCharHeight * i) + 80);
-                            char_v0 = 248;
+                            if (isLargeFont)
+                            {
+                                char_u0 = static_cast<BYTE>((kCharHeight  * i) + 80);
+                                char_v0 = 248;
+                            }
+                            else
+                            {
+                                char_u0 = static_cast<BYTE>((6 * i) + 60);
+                                char_v0 = 232;
+                            }
+                           
                             charWidth = gSpecialChars_byte_6757C0[i].field_1_width;
                             if (charWidth < 3)
                             {
@@ -447,12 +480,15 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
                                 break;
                             }
 
-                            if (charWidth != 6)
+                            if (isLargeFont)
                             {
-                                break;
-                            }
+                                if (charWidth != 6)
+                                {
+                                    break;
+                                }
 
-                            charWidth = 9;
+                                charWidth = isLargeFont ? 9 : 6;
+                            }
                             break;
                         }
                     }
@@ -475,7 +511,15 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
                 firstSprt = pTextSprt;
             }
 
-            memcpy(pTextSprt, &gMenu_sprt3_733978, sizeof(SPRT));
+            if (isLargeFont)
+            {
+                memcpy(pTextSprt, &gMenu_sprt3_733978, sizeof(SPRT));
+            }
+            else
+            {
+                memcpy(pTextSprt, &gMenu_sprt2_733960, sizeof(SPRT));
+            }
+
             setRGB0(pTextSprt,
                 BYTE0(pTextSettings->gTextRGB_dword_66C4CC),
                 BYTE1(pTextSettings->gTextRGB_dword_66C4CC),
@@ -501,9 +545,18 @@ void CC Render_Text_Flag0x10_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTe
         xpos,
         pTextSettings->gTextFlags_dword_66C4C8);
 }
-MGS_FUNC_IMPLEX(0x468AAF, Render_Text_Flag0x10_468AAF, MENU_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x468642, void __cdecl(MenuPrimBuffer* ot, TextConfig* pTextSettings, const char* pString), Render_Text_NotFlag0x10_468642);
+void CC Render_Text_Large_font_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pString)
+{
+    RenderTextHelper(pPrimBuffer, pTextSettings, pString, true);
+}
+MGS_FUNC_IMPLEX(0x468AAF, Render_Text_Large_font_468AAF, MENU_IMPL);
+
+void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pString)
+{
+    RenderTextHelper(pPrimBuffer, pTextSettings, pString, false);
+}
+MGS_FUNC_IMPLEX(0x468642, Render_Text_Small_font_468642, MENU_IMPL);
 
 int CC TextSetRGB_459B27(int r, int g, int b)
 {
@@ -525,12 +578,12 @@ void CC Menu_DrawText_459B63(const char* pFormatStr, int formatArg1, int formatA
             if (gTextConfig_66C4C0.gTextFlags_dword_66C4C8 & 0x10)
             {
                 // Larger font
-                Render_Text_Flag0x10_468AAF(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
+                Render_Text_Large_font_468AAF(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
             }
             else
             {
                 // Smaller font
-                Render_Text_NotFlag0x10_468642(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
+                Render_Text_Small_font_468642(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
             }
             Menu_Set_Text_BlendMode_459BE0();
         }
@@ -554,7 +607,7 @@ void CC Menu_render_life_bar_468DA6(MenuPrimBuffer* pPrimBuffer, short int xpos,
         textConfig.gTextY_dword_66C4C4 = ypos + 4;
         textConfig.gTextRGB_dword_66C4CC = bDrawTextRed ? 0x643030FF : 0x64FFFFFF;
 
-        Render_Text_NotFlag0x10_468642(pPrimBuffer, &textConfig, pBarConfig->mText);
+        Render_Text_Small_font_468642(pPrimBuffer, &textConfig, pBarConfig->mText);
         TILE* pBarRectPrim = Menu_render_rect_46B79F(
             pPrimBuffer,
             xpos + 3,
@@ -1103,7 +1156,7 @@ int CC Menu_inventory_text_4689CB(MenuMan* pMenu, int* /*ot*/, int xpos, int ypo
     textConfig.gTextY_dword_66C4C4 = ypos;
     textConfig.gTextFlags_dword_66C4C8 = textFlags;
     textConfig.gTextRGB_dword_66C4CC = 0x64808080;
-    Render_Text_NotFlag0x10_468642(pMenu->field_20_prim_buffer, &textConfig, pText);
+    Render_Text_Small_font_468642(pMenu->field_20_prim_buffer, &textConfig, pText);
     return textConfig.gTextX_dword_66C4C0;
 }
 MGS_FUNC_IMPLEX(0x4689CB, Menu_inventory_text_4689CB, MENU_IMPL);
