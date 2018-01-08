@@ -8,6 +8,9 @@
 #include "LibDG.hpp"
 #include "LibGV.hpp"
 #include "Script.hpp"
+#include "ResourceNameHash.hpp"
+#include "Renderer.hpp"
+#include "pcx.hpp"
 
 #define MENU_IMPL true
 
@@ -84,7 +87,8 @@ struct MenuMan
     DWORD field_1F8;
     DWORD field_1FC;
     MenuMan_MenuBars field_200_hp_bars_info;
-    DWORD field_20C;
+    WORD field_20C_codec_state;
+    WORD field_20E;
     DWORD field_210_size_19F2_q;
     DWORD field_214;
     DWORD field_218;
@@ -199,10 +203,116 @@ MGS_FUNC_IMPLEX(0x00463746, Menu_init_codec_463746, MENU_IMPL);
 
 using TMenuFn = void(CC*)(MenuMan*);
 
+struct MenuMan_Inventory_14h_Unk
+{
+    BYTE* field_0_pixels;
+    WORD* field_4_word_ptr_pixels;
+    BYTE field_8_index;
+    BYTE field_9_x;
+    BYTE field_A_y;
+    BYTE field_B;
+    DWORD field_C_colour;
+    WORD field_10_w;
+    WORD field_12_h;
+};
+MGS_ASSERT_SIZEOF(MenuMan_Inventory_14h_Unk, 0x14);
+
+MGS_FUNC_NOT_IMPL(0x46B92E, void __cdecl(MenuMan_Inventory_14h_Unk* pMenuUnk, int width, int height), Menu_get_item_file_item_46B92E);
+
+MGS_VAR(1, 0x733978, SPRT, gMenu_sprt3_733978, {});
+
+void CC Menu_init_num_res_font_helper_468A04()
+{
+    static PSX_RECT local_static_stru_6757E0 = { 960, 498, 0, 0 };
+
+    MenuMan_Inventory_14h_Unk menu_unk = {};
+    Menu_get_item_file_item_46B92E(&menu_unk, 45, 44);
+    local_static_stru_6757E0.x2 = menu_unk.field_10_w / 4;
+    local_static_stru_6757E0.y2 = menu_unk.field_12_h;
+    g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
+        &local_static_stru_6757E0,
+        menu_unk.field_4_word_ptr_pixels,
+        menu_unk.field_0_pixels,
+        0,
+        0,
+        0,
+        0);
+
+    Render_sub_41C6B0(&local_static_stru_6757E0, menu_unk.field_0_pixels);
+
+    setSprt(&gMenu_sprt3_733978);
+    setRGB0(&gMenu_sprt3_733978, 0x80, 0x80, 0x80);
+    gMenu_sprt3_733978.u0 = 0;
+    gMenu_sprt3_733978.v0 = 242;
+    gMenu_sprt3_733978.w = 8;
+    gMenu_sprt3_733978.h = 6;
+    gMenu_sprt3_733978.clut = 32765;
+}
+MGS_FUNC_IMPLEX(0x00468A04, Menu_init_num_res_font_helper_468A04, MENU_IMPL);
+
+struct Psx_Tim_Header
+{
+    DWORD field_0_magic;
+    DWORD field_4_type;
+    DWORD field_8_offset_to_image_data;
+    WORD field_C_pal_xorg;
+    WORD field_E_pal_yorg;
+    WORD field_10_num_pal_colours;
+    WORD field_12_num_pals;
+};
+MGS_ASSERT_SIZEOF(Psx_Tim_Header, 0x14);
+
+MGS_VAR(1, 0x733960, SPRT, gMenu_sprt2_733960, {});
+MGS_VAR(1, 0x7339C0, SPRT, gMenu_font1_template_sprite_7339C0, {});
+
+
+void CC Menu_init_num_res_font_468406(MenuMan* /*pMenu*/)
+{
+    PSX_RECT rect;
+    rect.x1 = 960;
+    rect.y1 = 488;
+    rect.x2 = 64;
+    rect.y2 = 10;
+
+    Psx_Tim_Header* pFileData = (Psx_Tim_Header *)LibGV_FindFile_40A603(HashFileName_40A5A2("num", 'r')); // num.res
+    const unsigned int imageDataOffset = (unsigned int)pFileData->field_8_offset_to_image_data >> 1;
+    BYTE* pImageHeader = (BYTE *)&pFileData[1] + 2 * imageDataOffset;
+    WORD* pPalStart = (WORD*)&pFileData[1].field_0_magic;
+    *pPalStart = 0;       // set first palt pixel to black?
+    
+    g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(&rect, (WORD *)&pFileData[1], pImageHeader, 0, 0, 0, 0);
+    Render_sub_41C6B0(&rect, pImageHeader);
+
+    gMenu_font1_template_sprite_7339C0.tag = gMenu_font1_template_sprite_7339C0.tag & 0xFFFFFF | 0x4000000;
+    gMenu_font1_template_sprite_7339C0.code = 0x64; // setSprt
+    gMenu_font1_template_sprite_7339C0.r0 = 128;
+    gMenu_font1_template_sprite_7339C0.g0 = 128;
+    gMenu_font1_template_sprite_7339C0.b0 = 128;
+    gMenu_font1_template_sprite_7339C0.u0 = 156;
+    gMenu_font1_template_sprite_7339C0.v0 = 232;
+    gMenu_font1_template_sprite_7339C0.w = 6;
+    gMenu_font1_template_sprite_7339C0.h = 7;
+    gMenu_font1_template_sprite_7339C0.clut = 32764;
+
+    gMenu_sprt2_733960.tag = gMenu_sprt2_733960.tag & 0xFFFFFF | 0x4000000;
+    gMenu_sprt2_733960.code = 0x64;
+    gMenu_sprt2_733960.r0 = 128;
+    gMenu_sprt2_733960.g0 = 128;
+    gMenu_sprt2_733960.b0 = 128;
+    gMenu_sprt2_733960.u0 = 0;
+    gMenu_sprt2_733960.v0 = 237;
+    gMenu_sprt2_733960.w = 6;
+    gMenu_sprt2_733960.h = 5;
+    gMenu_sprt2_733960.clut = 32764;
+
+    Menu_init_num_res_font_helper_468A04();
+}
+MGS_FUNC_IMPLEX(0x00468406, Menu_init_num_res_font_468406, MENU_IMPL);
+
+
 MGS_FUNC_NOT_IMPL(0x46AD91, void __cdecl(MenuMan*), Menu_init_fn0_46AD91);
 MGS_FUNC_NOT_IMPL(0x469E77, void __cdecl(MenuMan*), Menu_init_inventory_left_469E77);
 MGS_FUNC_NOT_IMPL(0x4694E4, void __cdecl(MenuMan*), Menu_init_inventory_right_4694E4);
-MGS_FUNC_NOT_IMPL(0x468406, void __cdecl(MenuMan*), Menu_init_fn6_468406);
 MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
 
 struct TextConfig
@@ -236,7 +346,6 @@ MGS_ASSERT_SIZEOF(SpecialChar, 0x2);
 */
 MGS_ARY(1, 0x6757C0, SpecialChar, 16, gSpecialChars_byte_6757C0, {}); // TODO: Populate
 
-MGS_VAR(1, 0x733978, SPRT, gMenu_sprt3_733978, {});
 MGS_FUNC_NOT_IMPL(0x4687E8, int __cdecl (SPRT *prevOSprts, SPRT *pSprts, int xpos, signed int ypos, DWORD flags), Render_Text_SetGlyphPositions_4687E8);
 
 const int kCharHeight = 8;
@@ -564,7 +673,6 @@ signed int CC Menu_menu_bars_update_field200_46938A(MenuMan_MenuBars* pMenuBarsU
 }
 MGS_FUNC_IMPLEX(0x46938A, Menu_menu_bars_update_field200_46938A, MENU_IMPL);
 
-// void __cdecl Menu_init_fn6_468406(MenuMan *pMenu)
 MGS_VAR(1, 0x6757F0, BarConfig, gSnakeLifeBarConfig_6757F0, {}); // TODO: Populate
 MGS_VAR(1, 0x675800, BarConfig, gSnakeO2BarConfig_675800, {}); // TODO: Populate
 MGS_VAR(1, 0x7339D4, int, gSnakeLifeYPos_7339D4, 0);
@@ -825,7 +933,7 @@ MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
     Menu_init_inventory_left_469E77.Ptr(),
     Menu_init_inventory_right_4694E4.Ptr(),
     Menu_init_menu_bars_4691CE,
-    Menu_init_fn6_468406.Ptr(),
+    Menu_init_num_res_font_468406,
     Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC.Ptr(),
     nullptr
 });
@@ -1000,7 +1108,6 @@ int CC Menu_inventory_text_4689CB(MenuMan* pMenu, int* /*ot*/, int xpos, int ypo
 }
 MGS_FUNC_IMPLEX(0x4689CB, Menu_inventory_text_4689CB, MENU_IMPL);
 
-MGS_VAR(1, 0x7339C0, SPRT, gMenu_font1_template_sprite_7339C0, {});
 
 const short kCharWidth = 6;
 

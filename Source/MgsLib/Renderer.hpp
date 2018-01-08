@@ -89,3 +89,6 @@ int CC Renderer_ClearOTag(DWORD* ot, int otSize);
 bool CC ClearDDSurfaceWhite_41E990();
 HRESULT CC Render_SetRenderState_422A90(D3DRENDERSTATETYPE renderState, DWORD bEnable);
 HRESULT CC Render_InitTextureStages_422BC0(unsigned int stage, D3DTEXTURESTAGESTATETYPE type2, DWORD v);
+
+EXTERN_MGS_FUNC_NOT_IMPL(0x41C6B0, void __cdecl(PSX_RECT *pRect, BYTE *pPixelData), Render_sub_41C6B0);
+EXTERN_MGS_FUNC_NOT_IMPL(0x41C640, WORD __cdecl(PSX_RECT *pRect, WORD *pallete, BYTE *pixelData, int surfaceType, int pTga, unsigned __int16 tga6, unsigned __int16 tga7), Render_sub_41C640);

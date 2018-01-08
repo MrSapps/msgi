@@ -8,16 +8,12 @@
 #include "Actor_GameD.hpp"
 #include "LibDG.hpp"
 #include "WinMain.hpp"
+#include "Renderer.hpp"
 
 #define PCX_IMPL true
 
 MGS_VAR_EXTERN(DWORD, gStageIs_s11e_6FC778);
 
-// TODO
-MGS_FUNC_NOT_IMPL(0x41C6B0, void __cdecl(PSX_RECT *pRect, BYTE *pPixelData), Render_sub_41C6B0);
-
-// TODO
-MGS_FUNC_NOT_IMPL(0x41C640, WORD __cdecl(PSX_RECT *pRect, WORD *pallete, BYTE *pixelData, int surfaceType, int pTga, unsigned __int16 tga6, unsigned __int16 tga7), Render_sub_41C640);
 
 // TODO
 MGS_FUNC_NOT_IMPL(0x402FB4, void __cdecl(const BYTE *pIn, BYTE *pOut, int bytesPerScanLine, signed int w, int h), GV_pcx_file_RLE_decompress_8bit_402FB4);
@@ -32,7 +28,7 @@ MGS_ASSERT_SIZEOF(HiTexRecord, 0xC);
 
 MGS_VAR(1, 0x734A30, DWORD, gNum_HiTexs_dword_734A30, 0);
 MGS_ARY(1, 0x9956A0, HiTexRecord, 8192, gHiText_recs_9956A0, {});
-MGS_VAR(1, 0x650D1A, WORD, word_650D1A, 0);
+MGS_VAR(1, 0x650D1A, WORD, g_Render_sub_41C640_ret_650D1A, 0);
 
 void CC File_HITEXT_INIT_51D2ED()
 {
@@ -423,7 +419,7 @@ int CC GV_pcx_file_handler_402B25(void* fileData, TFileNameHash fileNameHash)
     DWORD* tgaBackingBuffer = nullptr;
     const BYTE* pTga16BitPixels = jimGetTargetBuffer_42B6A6(fileNameHash, &tgaWidth, &tgaHeight, &tgaBackingBuffer);
 
-    word_650D1A = Render_sub_41C640(
+    g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
         &pRect->field_0_vram_rect,
         pAllocated->field_8_256_pal,
         (BYTE*)&pRect[1],
