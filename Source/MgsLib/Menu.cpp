@@ -1050,6 +1050,7 @@ void CC Menu_render_number_as_string_468529(MenuPrimBuffer* pPrimBuffer, TextCon
         }
     }
 
+    // TODO: Same as Render_Text_SetGlyphPositions_4687E8
     if (pFirstSprt)
     {
         // Align all of the sprites for each number according to the alignment flags
