@@ -165,27 +165,76 @@ MGS_ARY(1, 0x7269F4, BYTE, 8192, gMenuPrimArray1_7269F4, {});
 MGS_ARY(1, 0x7289F4, BYTE, 8192, gMenuPrimArray2_7289F4, {});
 MGS_ARY(1, 0x7265EC, BYTE*, 2, gMenuPrimBufferArrays_7265EC, {});
 
-MGS_FUNC_NOT_IMPL(0x468158, void __cdecl(MenuMan*, int*), Menu_radar_update_468158);
 MGS_FUNC_NOT_IMPL(0x463763, void __cdecl(MenuMan*, int*), Menu_codec_update_463763);
 
 
 MGS_FUNC_NOT_IMPL(0x465B38, void __cdecl(), Menu_init_radar_helper_465B38);
-MGS_FUNC_NOT_IMPL(0x468264, void __cdecl(MenuMan*, int), Menu_radar_468264);
 MGS_FUNC_NOT_IMPL(0x465A01, void* __cdecl(int), sub_465A01);
 
 
 
 MGS_VAR(1, 0x733950, DWORD, gFn_radar_dword_733950, 0);
 
+
+MGS_FUNC_NOT_IMPL(0x468264, void __cdecl(MenuMan *pMenu, int buffer), Menu_radar_helper_468264);
+MGS_FUNC_NOT_IMPL(0x465B4F, DWORD* __cdecl (MenuMan *pMenu, int *a2), Menu_radar_update_helper_465B4F);
+
+void CC Menu_radar_update_468158(MenuMan* pMenu, int* ot)
+{
+    if (pMenu->field_1D4)
+    {
+        int field_1D2 = 0;
+        if (!pMenu->field_2A_bSkipUpdateHpBars)
+        {
+            if (game_state_dword_72279C.flags & 0x200000)
+            {
+                field_1D2 = pMenu->field_1D2 - 16;
+                if (field_1D2 <= -64)
+                {
+                    field_1D2 = -64;
+                    game_state_dword_72279C.flags |= 0x400000u;
+                    game_state_dword_72279C.flags &= 0xFFDFFFFF;
+                }
+            }
+            else if (game_state_dword_72279C.flags & 0x100000)
+            {
+                field_1D2 = pMenu->field_1D2 + 16;
+                game_state_dword_72279C.flags &= 0xFFBFFFFF;
+                if (field_1D2 >= 0)
+                {
+                    field_1D2 = 0;
+                    game_state_dword_72279C.flags &= 0xFFEFFFFF;
+                }
+            }
+            else
+            {
+                field_1D2 = 0;
+            }
+
+            if (game_state_dword_72279C.flags & 0x400800)
+            {
+                pMenu->field_1D2 = static_cast<WORD>(-64);
+            }
+            else
+            {
+                pMenu->field_1D2 = static_cast<WORD>(field_1D2);
+                Menu_radar_helper_468264(pMenu, gActiveBuffer_dword_791A08);
+                Menu_radar_update_helper_465B4F(pMenu, ot);
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x00468158, Menu_radar_update_468158, MENU_IMPL);
+
 void CC Menu_init_radar_468358(MenuMan* pMenu)
 {
-    pMenu->m7FnPtrs_field_2C[3] = Menu_radar_update_468158.Ptr();
+    pMenu->m7FnPtrs_field_2C[3] = Menu_radar_update_468158;
     pMenu->field_28_flags |= 8;
     pMenu->field_1D4 = 1;
     pMenu->field_1D0 = 0;
     pMenu->field_1D2 = 0;
-    Menu_radar_468264(pMenu, 0);
-    Menu_radar_468264(pMenu, 1);
+    Menu_radar_helper_468264(pMenu, 0);
+    Menu_radar_helper_468264(pMenu, 1);
     memcpy(&pMenu->mDrEnvDst_field_150, &pMenu->mDR_ENV_field_48[0], sizeof(pMenu->mDrEnvDst_field_150));
     memcpy(&pMenu->mDrEnvDst_field_190, &pMenu->mDR_ENV_field_48[1], sizeof(pMenu->mDrEnvDst_field_190));
     Menu_init_radar_helper_465B38();
@@ -592,7 +641,7 @@ void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* p
 {
     RenderTextHelper(pPrimBuffer, pTextSettings, pString, false);
 }
-MGS_FUNC_IMPLEX(0x468642, Render_Text_Small_font_468642, MENU_IMPL);
+MGS_FUNC_IMPLEX(0x468642, Render_Text_Small_font_468642, false); // TODO: Bugged
 
 int CC TextSetRGB_459B27(int r, int g, int b)
 {
@@ -613,12 +662,10 @@ void CC Menu_DrawText_459B63(const char* pFormatStr, int formatArg1, int formatA
         {
             if (gTextConfig_66C4C0.gTextFlags_dword_66C4C8 & 0x10)
             {
-                // Larger font
                 Render_Text_Large_font_468AAF(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
             }
             else
             {
-                // Smaller font
                 Render_Text_Small_font_468642(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
             }
             Menu_Set_Text_BlendMode_459BE0();
@@ -1354,7 +1401,7 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
     if (!(gActorPauseFlags_dword_791A0C & 2)
         && gLoaderState_dword_9942B8 > 0
         && !script_cancel_non_zero_dword_7227A0
-        && game_state_dword_72279C.flags >= 0)
+        && (game_state_dword_72279C.flags & 0x80000000) == 0)
     {
         const int field_28_flags = pMenu->field_28_flags;
         int flags = 1;
