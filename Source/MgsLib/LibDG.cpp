@@ -754,7 +754,7 @@ void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
     gpActiveButtons_995324 = gButtonsArray4_7919C0;
     if (byte_9942AB & 0x10)
     {
-        if (gButtonsArray4_7919C0[1].field_0_buttons_down | gButtonsArray4_7919C0[1].field_4_array[0])
+        if (gButtonsArray4_7919C0[1].field_0_button_status | gButtonsArray4_7919C0[1].field_4_button_release)
         {
             gpActiveButtons_995324 = &gButtonsArray4_7919C0[1];
         }

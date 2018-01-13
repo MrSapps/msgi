@@ -14,9 +14,16 @@ const char* CC File_StageName_44EB83();
 #pragma pack(push, 1)
 struct ButtonStates
 {
-    WORD field_0_buttons_down;
+    WORD field_0_button_status;
     WORD field_2_button_pressed;
-    WORD field_4_array[6]; // pad type, pad id, state, analog stick states?
+    WORD field_4_button_release;
+    WORD field_8_button_quick;
+    short field_8_dir;
+    short field_A_analog;
+    BYTE field_C_right_dx;
+    BYTE field_D_right_dy;
+    BYTE field_E_left_dx;
+    BYTE field_F_left_dy;
 };
 MGS_ASSERT_SIZEOF(ButtonStates, 0x10);
 #pragma pack(pop)

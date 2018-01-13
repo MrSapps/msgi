@@ -35,7 +35,7 @@ void CC LibGV_40A4B1()
         gButtonsArray4_7919C0[i].field_4_array[0] = -1;
         gButtonsArray4_7919C0[i].field_4_array[2] = 0;
         gButtonsArray4_7919C0[i].field_2_button_pressed = 0;
-        gButtonsArray4_7919C0[i].field_0_buttons_down = 0;
+        gButtonsArray4_7919C0[i].field_0_button_status = 0;
     }
     g_lib_gv_stru_6BFEE0.gGv_dword_6C0380 = 0;
     g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4 = 0;
