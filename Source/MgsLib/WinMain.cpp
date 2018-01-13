@@ -40,7 +40,7 @@
 #include "Fs.hpp"
 #include "Imports.hpp"
 #include "Menu.hpp"
-
+#include "Kmd.hpp"
 
 #define _ELPP_THREAD_SAFE
 #include "easylogging++.h"
@@ -2639,6 +2639,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     Actor_LoaderCpp_ForceLink();
     Fs_Cpp_ForceLink();
     Force_Actor_Movie_Cpp_Link();
+    ForceLinkKmdCpp();
 
     InstallVaradicCFunctionHooks();
 
