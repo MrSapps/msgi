@@ -17,7 +17,7 @@ struct ButtonStates
     WORD field_0_button_status;
     WORD field_2_button_pressed;
     WORD field_4_button_release;
-    WORD field_8_button_quick;
+    WORD field_6_button_quick;
     short field_8_dir;
     short field_A_analog;
     BYTE field_C_right_dx;

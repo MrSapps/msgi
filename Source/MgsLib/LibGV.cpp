@@ -32,8 +32,8 @@ void CC LibGV_40A4B1()
     LibGV_mesg_init_40B3BC();
     for (int i=0; i < 2; i++)
     {
-        gButtonsArray4_7919C0[i].field_4_array[0] = -1;
-        gButtonsArray4_7919C0[i].field_4_array[2] = 0;
+        gButtonsArray4_7919C0[i].field_6_button_quick = 0xFFFFu;
+        gButtonsArray4_7919C0[i].field_4_button_release = 0;
         gButtonsArray4_7919C0[i].field_2_button_pressed = 0;
         gButtonsArray4_7919C0[i].field_0_button_status = 0;
     }
