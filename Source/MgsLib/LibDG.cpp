@@ -801,7 +801,11 @@ MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 1);
 MGS_ARY(1, 0x6BE4E8, DWORD*, 512, gUnkSize_1024_6BE4E8, {}); // TODO: Might just be 256?
 
 
-MGS_FUNC_NOT_IMPL(0x40B231, unsigned int CC(void* pMem, int size), MemClearUnknown_40B231);
+void* CC MemClearUnknown_40B231(void* pMem, int size)
+{
+    return memset(pMem, 0, size);
+}
+MGS_FUNC_IMPLEX(0x40B231, MemClearUnknown_40B231, LIBDG_IMPL);
 
 using TDG_FnPtr = void(CC*)(struct_gv* pGv, int activeBuffer);
 
