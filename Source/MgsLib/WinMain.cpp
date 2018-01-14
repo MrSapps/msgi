@@ -86,7 +86,6 @@ MGS_FUNC_NOT_IMPL(0x00431C63, int __cdecl(), sub_431C63);
 MGS_FUNC_NOT_IMPL(0x0042A630, void __cdecl(), _cfltcvt_init); // CRT func?
 MGS_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
 MGS_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
-MGS_FUNC_NOT_IMPL(0x0041CA80, signed int __cdecl(), Render_TextureScratchAlloc);
 MGS_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
 MGS_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
 MGS_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
@@ -106,6 +105,7 @@ MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
 MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
 MGS_VAR(1, 0x73491C, DWORD, dword_73491C, 0);
 MGS_VAR(1, 0x71D164, DWORD, dword_71D164, 0);
+
 
 void CC CentreWindow(HWND hWnd, int nWidth, int nHeight)
 {
@@ -2116,10 +2116,10 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     {
         gTextures_6C0F00[i].mSurface = 0;
         gTextures_6C0F00[i].field_20 = 0;
-        gTextures_6C0F00[i].field_24 = 0;
+        gTextures_6C0F00[i].field_24_flagsQ = 0;
     }
     
-    dword_6FC7C0 = Render_TextureScratchAlloc() == 0;
+    dword_6FC7C0 = Render_TextureScratchAlloc_41CA80() == 0;
     if (dword_6FC7C0)
     {
         gNoEffects = 0;
@@ -2834,3 +2834,4 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
 
     return result;
 }
+

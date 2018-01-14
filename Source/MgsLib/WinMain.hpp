@@ -12,6 +12,7 @@
 MGS_VAR_EXTERN(DWORD, gFlags_dword_78E7E4);
 MGS_VAR_EXTERN(DWORD, counter_dword_6BED20);
 MGS_VAR_EXTERN(DWORD, dword_6FC7A0);
+MGS_VAR_EXTERN(IDirectDraw7*, g_pDirectDraw);
 
 union UGameStates
 {

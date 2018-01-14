@@ -2322,3 +2322,41 @@ void CC Renderer_GetWH_51D50D(DWORD *pWidth, DWORD *pHeight)
     }
 }
 MGS_FUNC_IMPLEX(0x0051D50D, Renderer_GetWH_51D50D, RENDERER_IMPL);
+
+signed int CC Render_TextureScratchAlloc_41CA80()
+{
+    if (gSoftwareRendering)
+    {
+        MGS_FATAL("Software rendering not implemented");
+    }
+    else
+    {
+        DDSURFACEDESC2 surfaceDesc = {};
+        surfaceDesc.dwSize = 124;
+        surfaceDesc.dwFlags = 7;
+        surfaceDesc.dwWidth = 256;
+        surfaceDesc.dwHeight = 256;
+        surfaceDesc.ddsCaps.dwCaps = 4096;
+        surfaceDesc.ddsCaps.dwCaps2 = 16;
+        const HRESULT hr = g_pDirectDraw->CreateSurface(&surfaceDesc, &gTextures_6C0F00[0].mSurface, 0);
+        if (FAILED(hr))
+        {
+            return 0;
+        }
+    }
+    gTextures_6C0F00[0].field_6_x = 0;
+    gTextures_6C0F00[0].field_4_y = 0;
+    gTextures_6C0F00[0].field_8_w = 320;
+    gTextures_6C0F00[0].field_A_h = 240;
+    gTextures_6C0F00[0].field_12_y = 256;
+    gTextures_6C0F00[0].field_10_x = 256;
+    gTextures_6C0F00[0].field_24_flagsQ = 0xFFFF;
+    gTextures_6C0F00[0].float_field_14_uQ = 1.0f;
+    gTextures_6C0F00[0].float_field_18_vQ = 1.0f;
+    gTextures_6C0F00[0].mSurfaceType = 1;
+    gTextures_6C0F00[0].field_28 = 2;
+    gTextures_6C0F00[0].field_2C = 0;
+    ++gNumTextures_word_6FC78C;
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x0041CA80, Render_TextureScratchAlloc_41CA80, RENDERER_IMPL);

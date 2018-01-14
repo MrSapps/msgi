@@ -5,7 +5,7 @@
 
 #define KMD_IMPL true
 
-void ForceLinkKmdCpp();
+void ForceLinkKmdCpp() { }
 
 struct KmdHeader
 {

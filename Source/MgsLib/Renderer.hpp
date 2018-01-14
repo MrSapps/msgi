@@ -26,19 +26,19 @@ MGS_ASSERT_SIZEOF(MGSVertex, 0x20);
 struct texture_struct
 {
     IDirectDrawSurface7* mSurface;
-    WORD field_4;
-    WORD field_6;
-    WORD field_8;
-    WORD field_A;
+    WORD field_4_y;
+    WORD field_6_x;
+    WORD field_8_w;
+    WORD field_A_h;
     WORD field_C;
     WORD field_E;
     WORD field_10_x;
     WORD field_12_y;
-    DWORD float_field_14;
-    DWORD float_field_18;
+    float float_field_14_uQ;
+    float float_field_18_vQ;
     DWORD mSurfaceType;
     DWORD field_20;
-    DWORD field_24;
+    DWORD field_24_flagsQ;
     DWORD field_28;
     DWORD field_2C;
     DWORD field_30;
@@ -89,6 +89,7 @@ int CC Renderer_ClearOTag(DWORD* ot, int otSize);
 bool CC ClearDDSurfaceWhite_41E990();
 HRESULT CC Render_SetRenderState_422A90(D3DRENDERSTATETYPE renderState, DWORD bEnable);
 HRESULT CC Render_InitTextureStages_422BC0(unsigned int stage, D3DTEXTURESTAGESTATETYPE type2, DWORD v);
+signed int CC Render_TextureScratchAlloc_41CA80();
 
 EXTERN_MGS_FUNC_NOT_IMPL(0x41C6B0, void __cdecl(PSX_RECT *pRect, BYTE *pPixelData), Render_sub_41C6B0);
 EXTERN_MGS_FUNC_NOT_IMPL(0x41C640, WORD __cdecl(PSX_RECT *pRect, WORD *pallete, BYTE *pixelData, int surfaceType, int pTga, unsigned __int16 tga6, unsigned __int16 tga7), Render_sub_41C640);
