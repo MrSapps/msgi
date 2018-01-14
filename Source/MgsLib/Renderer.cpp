@@ -2163,7 +2163,7 @@ signed int CC Render_sub_41E3C0()
     Render_SetRenderState_422A90(D3DRENDERSTATE_SHADEMODE, 1);
     Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
 
-    if (SUCCEEDED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
+    if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&dwNumPasses)))
     {
         gAlphaModulate_dword_6FC798 = 0;
         Render_InitTextureStages_422BC0(0, D3DTSS_ALPHAOP, 2);
@@ -2476,7 +2476,7 @@ bool CC Render_sub_41E730()
         return true;
     }
 
-    if (hr)
+    if (FAILED(hr))
     {
         return true;
     }
