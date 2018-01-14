@@ -252,7 +252,7 @@ void CC Render_Loop_SetWinTitle_422210()
         RECT Rect = {};
         Rect.left = 0;
         Rect.top = 0;
-        Rect.right = g_dwDisplayWidth;
+        Rect.right = g_dwDisplayWidth_6DF214;
         Rect.bottom = g_dwDisplayHeight;
 
         if (gWindowedMode)
@@ -265,7 +265,7 @@ void CC Render_Loop_SetWinTitle_422210()
         RECT v22 = {};
         v22.left = 0;
         v22.top = 0;
-        v22.right = g_dwDisplayWidth;
+        v22.right = g_dwDisplayWidth_6DF214;
         v22.bottom = g_dwDisplayHeight;
 
         HRESULT hr = S_OK;
@@ -2134,7 +2134,7 @@ signed int CC Render_sub_41E3C0()
 
     DWORD dwNumPasses = 1;
     pPrim[0].x = 1.0f;
-    pPrim[1].x = static_cast<float>(g_dwDisplayWidth - 1);
+    pPrim[1].x = static_cast<float>(g_dwDisplayWidth_6DF214 - 1);
     pPrim[2].x = 1.0f;
 
     pPrim[0].y = 1.0f;
@@ -2360,3 +2360,174 @@ signed int CC Render_TextureScratchAlloc_41CA80()
     return 1;
 }
 MGS_FUNC_IMPLEX(0x0041CA80, Render_TextureScratchAlloc_41CA80, RENDERER_IMPL);
+
+signed int CC Render_sub_41D1D0()
+{
+    DDPIXELFORMAT pixelFormat = {};
+    pixelFormat.dwSize = 32;
+    gPrimarySurface_6FC734->GetPixelFormat(&pixelFormat);
+    if (pixelFormat.dwGBitMask == 0x3E0)
+    {
+        return 0;
+    }
+    return 4;
+}
+MGS_FUNC_IMPLEX(0x0041D1D0, Render_sub_41D1D0, RENDERER_IMPL);
+
+signed int CC Render_sub_41E130(int fillColour, int diffuseColour, DWORD* pOutMask, MGSVertex* p3TrisVerts)
+{
+    Sleep(500u);
+
+    int convertedFillColour = 0;
+    if (g_surface565Mode)
+    {
+        convertedFillColour = ((fillColour & 0xF80000u) >> 8) | ((fillColour & 0xFC00u) >> 5) | ((fillColour & 0xF8u) >> 3);
+    }
+    else
+    {
+        convertedFillColour = ((fillColour & 0x80000000) >> 16) | ((fillColour & 0xF80000u) >> 9) | ((fillColour & 0xF800u) >> 6) | ((fillColour & 0xF8u) >> 3);
+    }
+
+    DDBLTFX bltFx = {};
+    bltFx.dwSize = 100;
+    bltFx.dwFillColor = convertedFillColour;
+    HRESULT hr = S_OK;
+    do
+    {
+        hr = g_pBackBuffer_6FC738->Blt(0, 0, 0, 16778240, &bltFx);
+    }
+    while (hr == 0x8876021C);
+    
+    if (hr)
+    {
+        return 0;
+    }
+
+    p3TrisVerts[2].diffuse = diffuseColour;
+    p3TrisVerts[1].diffuse = diffuseColour;
+    p3TrisVerts->diffuse = diffuseColour;
+    hr = Render_SetTexture_41E9E0();
+    hr = gD3dDevice_6FC74C->BeginScene();
+    if (hr)
+    {
+        return 0;
+    }
+
+    hr = gD3dDevice_6FC74C->DrawPrimitive(D3DPT_TRIANGLELIST, 0x1C4, p3TrisVerts, 3, 0);
+    hr = gD3dDevice_6FC74C->SetTexture(0, 0);
+    if (hr)
+    {
+        return 0;
+    }
+
+    hr = gD3dDevice_6FC74C->EndScene();
+    if (hr)
+    {
+        return 0;
+    }
+
+    DDSURFACEDESC2 ddSurfaceDesc = {};
+    ddSurfaceDesc.dwSize = 124;
+    do
+    {
+        hr = g_pBackBuffer_6FC738->Lock(0, &ddSurfaceDesc, 0, 0);
+    }
+    while (hr == 0x8876021C);
+    
+    if (hr)
+    {
+        return 0;
+    }
+
+    const WORD firstPixel = *(WORD *)ddSurfaceDesc.lpSurface;
+    g_pBackBuffer_6FC738->Unlock(0);
+    
+    *pOutMask = 0;
+
+    if (g_surface565Mode)
+    {
+        *pOutMask = 8 * (firstPixel & 0x1F) | 32 * (firstPixel & 0x7E0) | ((unsigned __int16)(firstPixel & 0xF800) << 8);
+    }
+    else
+    {
+        *pOutMask = 8 * (firstPixel & 0x1F) | ((firstPixel & 0x3E0) << 6) | ((firstPixel & 0x7C00) << 9);
+    }
+    return 1;
+}
+
+MGS_VAR(1, 0x6FC770, DWORD, gTextureCapFlags_6FC770, 0);
+
+bool CC Render_sub_41E730()
+{
+    gTextureCapFlags_6FC770 = 1;
+
+    if (!gD3dDevice_6FC74C)
+    {
+        return true;
+    }
+
+    D3DDEVICEDESC7 deviceCaps = {};
+    deviceCaps.dpcLineCaps.dwSize = 56;
+    HRESULT hr = gD3dDevice_6FC74C->GetCaps(&deviceCaps);
+    gTextureCapFlags_6FC770 = deviceCaps.dpcTriCaps.dwTextureCaps & 0x20;
+    
+    if (gColourKey)
+    {
+        return true;
+    }
+
+    if (hr)
+    {
+        return true;
+    }
+
+    if (!(deviceCaps.dpcTriCaps.dwAlphaCmpCaps & 0x40))
+    {
+        return 1;
+    }
+
+    if (!gAlphaModulate_dword_6FC798)
+    {
+        return 1;
+    }
+
+    Render_SetRenderState_422A90(D3DRENDERSTATE_SHADEMODE, 1);
+    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 0);
+    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHATESTENABLE, 1);
+    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHAREF, 127);
+    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHAFUNC, 7);
+
+    DWORD numPasses = 1;
+    if (FAILED(gD3dDevice_6FC74C->ValidateDevice(&numPasses)))
+    {
+        return 1;
+    }
+
+    MGSVertex tris[3];
+    tris[0].x = 0.0;
+    tris[1].x = (float)(g_dwDisplayWidth_6DF214 - 1);
+    tris[2].x = 0.0;
+    tris[0].y = 0.0;
+    tris[1].y = 0.0;
+    tris[2].y = (float)(g_dwDisplayHeight - 1);
+    tris[0].z = 0;
+    tris[1].z = 0;
+    tris[2].z = 0;
+    tris[0].u = 0;
+    tris[1].u = 1.0f;
+    tris[2].u = 0;
+    tris[0].v = 0;
+    tris[1].v = 0;
+    tris[2].v = 1.0f;
+    tris[0].w = 0.9f;
+    tris[1].w = 0.9f;
+    tris[2].w = 0.9f;
+
+    DWORD resultingMask = 0;
+    Render_sub_41E130(0xFF707070, 0x40404040, &resultingMask, tris);
+
+    Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHATESTENABLE, 0);
+
+    return (BYTE)resultingMask >= 0x75u || (BYTE)resultingMask <= 0x6Bu;
+}
+MGS_FUNC_IMPLEX(0x0041E730, Render_sub_41E730, RENDERER_IMPL);

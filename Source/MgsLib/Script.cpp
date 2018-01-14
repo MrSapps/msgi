@@ -148,8 +148,12 @@ BYTE* CC Script_GetReturnAddress()
 }
 MGS_FUNC_IMPLEX(0x004099A0, Script_GetReturnAddress, SCRIPT_IMPL);
 
+BYTE* CC Script_VarWrite_40957B(BYTE* pScript, int)
+{
+    return pScript + 4;
+}
+MGS_FUNC_IMPLEX(0x40957B, Script_VarWrite_40957B, false); // TODO
 
-MGS_FUNC_NOT_IMPL(0x40957B, int __cdecl(int, int), Script_VarWrite_40957B);
 
 MGS_VAR(1, 0x992040, DWORD, gScript_dword_992040, 0);
 
@@ -195,7 +199,7 @@ int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
 
         if (scriptByte2 == 0x14)
         {
-            Script_VarWrite_40957B(*(pScriptContext - 3), *(pScriptContext - 2)); // Write var?
+            Script_VarWrite_40957B((BYTE*)*(pScriptContext - 3), *(pScriptContext - 2)); // Write var?
             *(pScriptContext - 4) = *(pScriptContext - 2);
         }
         else

@@ -13,6 +13,8 @@ MGS_VAR_EXTERN(DWORD, gFlags_dword_78E7E4);
 MGS_VAR_EXTERN(DWORD, counter_dword_6BED20);
 MGS_VAR_EXTERN(DWORD, dword_6FC7A0);
 MGS_VAR_EXTERN(IDirectDraw7*, g_pDirectDraw);
+MGS_VAR_EXTERN(DWORD, g_surface565Mode);
+MGS_VAR_EXTERN(DWORD, gColourKey);
 
 union UGameStates
 {
@@ -38,7 +40,7 @@ extern HWND& gHwnd;
 extern DWORD& gWindowedMode;
 
 MGS_VAR_EXTERN(DWORD, gInfiniteAmmoCheat_650D4C);
-MGS_VAR_EXTERN(DWORD, g_dwDisplayWidth);
+MGS_VAR_EXTERN(DWORD, g_dwDisplayWidth_6DF214);
 MGS_VAR_EXTERN(DWORD, g_dwDisplayHeight);
 MGS_VAR_EXTERN(DWORD, gFps);
 MGS_VAR_EXTERN(LPDIRECT3DDEVICE7, gD3dDevice_6FC74C);

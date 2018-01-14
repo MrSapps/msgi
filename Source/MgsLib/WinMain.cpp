@@ -88,9 +88,7 @@ MGS_FUNC_NOT_IMPL(0x0041EA60, signed int __cdecl(), MissionLog_Related2);
 MGS_FUNC_NOT_IMPL(0x0041C820, void __cdecl (float), Render_SetBrightness_sub_41C820);
 MGS_FUNC_NOT_IMPL(0x0041CD70, int __cdecl(), Render_sub_41CD70);
 MGS_FUNC_NOT_IMPL(0x0041CE20, bool __cdecl(), Render_sub_41CE20);
-MGS_FUNC_NOT_IMPL(0x0041D1D0, signed int __cdecl(), Render_sub_41D1D0);
 MGS_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
-MGS_FUNC_NOT_IMPL(0x0041E730, bool __cdecl(), Render_sub_41E730);
 MGS_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
@@ -130,7 +128,7 @@ MGS_VAR(1, 0x732E64, DWORD, dword_732E64, 0);
 //MGS_VAR(1, 0x64BCA8, const GUID, IID_IDirectDrawGammaControl_MGS, {});
 MGS_VAR(1, 0x6FC730, IDirectDraw7 *, g_pDirectDraw, nullptr);
 MGS_VAR(1, 0x6C0EF8, IDirectDrawGammaControl *, g_pGammaControl, nullptr);
-MGS_VAR(1, 0x6DF214, DWORD, g_dwDisplayWidth, 0);
+MGS_VAR(1, 0x6DF214, DWORD, g_dwDisplayWidth_6DF214, 0);
 MGS_VAR(1, 0x6DF1FC, DWORD, g_dwDisplayHeight, 0);
 MGS_VAR(1, 0x6FC750, LPDIRECTDRAWCLIPPER, g_pClipper, nullptr);
 
@@ -1595,7 +1593,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     for (;;)
     {
-        g_dwDisplayWidth = static_cast<DWORD>(320.0 * gXRes);
+        g_dwDisplayWidth_6DF214 = static_cast<DWORD>(320.0 * gXRes);
         g_dwDisplayHeight = static_cast<DWORD>(240.0 * gXRes);
         fputs("Creating DirectDraw7\n", gFile);
         fflush(gFile);
@@ -1634,7 +1632,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 fflush(gFile);
                 gSoftwareRendering = 1;
                 gXRes = 1.0f;
-                g_dwDisplayWidth = static_cast<DWORD>(320.0 * 1.0f);
+                g_dwDisplayWidth_6DF214 = static_cast<DWORD>(320.0 * 1.0f);
                 g_dwDisplayHeight = static_cast<DWORD>(240.0 * 1.0f);
                 MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
             }
@@ -1708,8 +1706,8 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         fflush(gFile);
         if (!v42)
         {
-            hr = g_pDirectDraw->SetDisplayMode(g_dwDisplayWidth, g_dwDisplayHeight, 0x10, 0, 0);
-            fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", g_dwDisplayWidth, g_dwDisplayHeight);
+            hr = g_pDirectDraw->SetDisplayMode(g_dwDisplayWidth_6DF214, g_dwDisplayHeight, 0x10, 0, 0);
+            fprintf(gLogFile, "SetDisplayMode( %d, %d )\n", g_dwDisplayWidth_6DF214, g_dwDisplayHeight);
             if (hr < 0)
                 return 0;
         }
@@ -1810,7 +1808,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                     dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY | DDSCAPS_OFFSCREENPLAIN;
             }
             dxSurfaceDesc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
-            dxSurfaceDesc.dwWidth = g_dwDisplayWidth;
+            dxSurfaceDesc.dwWidth = g_dwDisplayWidth_6DF214;
             dxSurfaceDesc.dwHeight = g_dwDisplayHeight;
 
             fputs("Creating back buffer for software rendering...\n", gFile);
@@ -1835,7 +1833,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
             {
                 dxSurfaceDesc.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH;
                 dxSurfaceDesc.ddsCaps.dwCaps = DDSCAPS_3DDEVICE | DDSCAPS_OFFSCREENPLAIN;
-                dxSurfaceDesc.dwWidth = g_dwDisplayWidth;
+                dxSurfaceDesc.dwWidth = g_dwDisplayWidth_6DF214;
                 dxSurfaceDesc.dwHeight = g_dwDisplayHeight;
                 fputs("Creating back buffer for windowed mode...\n", gFile);
                 fflush(gFile);
@@ -2033,7 +2031,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
                 }
                 dxViewport.dwX = 0;
                 dxViewport.dwY = 0;
-                dxViewport.dwWidth = g_dwDisplayWidth;
+                dxViewport.dwWidth = g_dwDisplayWidth_6DF214;
                 dxViewport.dwHeight = g_dwDisplayHeight;
                 dxViewport.dvMinZ = 0;
                 dxViewport.dvMaxZ = 1.0f;
@@ -2052,9 +2050,9 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
         }
         fputs("D3D:CreateDevice() failed, switching to SOFTWARE MODE\n", gFile);
         fflush(gFile);
-        g_dwDisplayWidth = 320;
+        g_dwDisplayWidth_6DF214 = 320;
         g_dwDisplayHeight = 240;
-        fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", g_dwDisplayWidth, g_dwDisplayHeight);
+        fprintf(gLogFile, "Resetting DisplayMode to ( %d, %d )\n", g_dwDisplayWidth_6DF214, g_dwDisplayHeight);
         MessageBox_Error(0, 4, "Metal Gear Solid PC", MB_OK);
         gSoftwareRendering = 1;
         dword_716F5C = 1.0f;
