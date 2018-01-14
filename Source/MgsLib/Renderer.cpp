@@ -13,10 +13,49 @@ void RendererCpp_ForceLink() { }
 // TODO
 MGS_FUNC_NOT_IMPL(0x41C6B0, void __cdecl(PSX_RECT *pRect, BYTE *pPixelData), Render_sub_41C6B0);
 
-// TODO
-MGS_FUNC_NOT_IMPL(0x41C640, WORD __cdecl(PSX_RECT *pRect, WORD *pallete, BYTE *pixelData, int surfaceType, int pTga, unsigned __int16 tga6, unsigned __int16 tga7), Render_sub_41C640);
+signed int CC Render_ComputeTextureIdx_40CC50(__int16 tpage, __int16 u, __int16 v, uint32_t *textureIdx0, uint32_t *textureIdx1)
+{
+    *textureIdx0 = (tpage & 0xF) << 6;
+    *textureIdx1 = 16 * (tpage & 0x10);
+    unsigned __int16 new_u = 0 /*word_6C0EA4*/ + u;
+    unsigned __int16 new_v = 0 /*word_6C0EA6*/ + v;
 
-MGS_FUNC_NOT_IMPL(0x40CC50, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t*, uint32_t*), Render_ComputeTextureIdx);
+    int texturePage = (tpage & 0x180) >> 7;
+    if (texturePage)
+    {
+        if (texturePage == 1)
+        {
+            *textureIdx0 += (signed int)new_u >> 1;
+        }
+        else if (texturePage == 2)
+        {
+            *textureIdx0 += new_u;
+        }
+        else
+        {
+            PrintDDError("Wrong Tpage format", 0);
+        }
+    }
+    else
+    {
+        *textureIdx0 += (signed int)new_u >> 2;
+    }
+
+    *textureIdx1 += new_v;
+
+    if (*textureIdx0 >= 640 || *textureIdx1 >= 240)
+    {
+        return 0;
+    }
+
+    if (*textureIdx0 >= 320)
+    {
+        *textureIdx0 -= 320;
+    }
+
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x40CC50, Render_ComputeTextureIdx_40CC50, RENDERER_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x52078F, const char* __cdecl(), SoundGetName_52078F);
 
@@ -122,7 +161,7 @@ MGS_VAR(1, 0x6FC7DC, DWORD, gSkippedFrames_dword_6FC7DC, 0);
 MGS_VAR(1, 0x6FC724, DWORD, sSceneStarted_dword_6FC724, 0);
 MGS_VAR(1, 0x99562C, DWORD, gLastInputWasKeyBoard_dword_99562C, 0);
 MGS_VAR(1, 0x6FC764, WORD, word_6FC764, 0);
-MGS_VAR(1, 0x6FC790, WORD, word_6FC790, 0);
+MGS_VAR(1, 0x6FC790, short, gNumFreeTextures_6FC790, 0);
 MGS_VAR(1, 0x9ADDA4, DWORD, dword_9ADDA4, 0);
 MGS_VAR(1, 0x650D44, DWORD, dword_650D44, 0);
 MGS_VAR(1, 0x733EA0, DWORD, dword_733EA0, 0);
@@ -215,10 +254,10 @@ void CC Render_Loop_SetWinTitle_422210()
             hu1,
             hu2,
             gNumTextures_word_6FC78C,
-            word_6FC790, // Free tex
+            gNumFreeTextures_6FC790,
             gPrimIdx_dword_6FC788,
             word_6FC764, // ViewTexN
-            game_state_dword_72279C,
+            game_state_dword_72279C.flags,
             pSkip);
 
         SetWindowTextA(gHwnd, stringBuffer);
@@ -1173,7 +1212,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         {
             StructVertType1* pStructVert = (StructVertType1*)otItem;
             uint32_t TextureIdx0, TextureIdx1;
-            Render_ComputeTextureIdx(pStructVert->TexVtx[1].textureIdx, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
+            Render_ComputeTextureIdx_40CC50(pStructVert->TexVtx[1].textureIdx, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
             TextureIdx0 &= 0xFFFF;
             TextureIdx1 &= 0xFFFF;
 
@@ -1241,7 +1280,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             StructVertType3* pStructVert = (StructVertType3*)otItem;
 
             uint32_t TextureIdx0, TextureIdx1;
-            Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1);
+            Render_ComputeTextureIdx_40CC50(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1);
             TextureIdx0 &= 0xFFFF;
             TextureIdx1 &= 0xFFFF;
 
@@ -1372,21 +1411,21 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             }
 
             uint32_t TextureIdx0, TextureIdx1;
-            if (Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
+            if (Render_ComputeTextureIdx_40CC50(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
             {
                 gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFE;
                 g_fU0 = (float)(TextureIdx0 & 0xFFFF);
                 g_fV0 = (float)(TextureIdx1 & 0xFFFF);
 
-                Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &TextureIdx0, &TextureIdx1);
                 g_fU1 = (float)(TextureIdx0 & 0xFFFF);
                 g_fV1 = (float)(TextureIdx1 & 0xFFFF);
 
-                Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &TextureIdx0, &TextureIdx1);
                 g_fU2 = (float)(TextureIdx0 & 0xFFFF);
                 g_fV2 = (float)(TextureIdx1 & 0xFFFF);
 
-                Render_ComputeTextureIdx(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(pStructVert->DifVtx[1].textureIdx, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &TextureIdx0, &TextureIdx1);
                 g_fU3 = (float)(TextureIdx0 & 0xFFFF);
                 g_fV3 = (float)(TextureIdx1 & 0xFFFF);
             }
@@ -1613,21 +1652,21 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             float fSecondY = convertPositionFloat(pStructVert->TexVtx[0].Vtx.y) + (float)diffY;
 
             uint32_t TextureIdx0, TextureIdx1;
-            if (Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
+            if (Render_ComputeTextureIdx_40CC50(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
             {
                 gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFD;
                 g_fU0 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
                 g_fV0 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
 
-                Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
                 g_fU1 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
                 g_fV1 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
 
-                Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
                 g_fU2 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
                 g_fV2 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
 
-                Render_ComputeTextureIdx(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
                 g_fU3 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
                 g_fV3 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
             }
@@ -1644,6 +1683,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 {
                     TextureIdx0 &= 0xFFFF;
                     TextureIdx1 &= 0xFFFF;
+
                     gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
                     g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
                 }
@@ -1757,7 +1797,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             else
             {
                 uint32_t TextureIdx0, TextureIdx1;
-                Render_ComputeTextureIdx(pStructVert->Vtx[1].textureIdx, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(pStructVert->Vtx[1].textureIdx, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &TextureIdx0, &TextureIdx1);
                 TextureIdx0 &= 0xFFFF;
                 TextureIdx1 &= 0xFFFF;
                 gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
@@ -2531,3 +2571,89 @@ bool CC Render_sub_41E730()
     return (BYTE)resultingMask >= 0x75u || (BYTE)resultingMask <= 0x6Bu;
 }
 MGS_FUNC_IMPLEX(0x0041E730, Render_sub_41E730, RENDERER_IMPL);
+
+MGS_VAR(1, 0x6C076C, DWORD, dword_6C076C, 0);
+
+int CC Render_sub_41C640(PSX_RECT* pRect, WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tgaW, unsigned __int16 tgaH)
+{
+    int idx = 0;
+    if (gNumFreeTextures_6FC790 > 0)
+    {
+        // ?? actually just gNumFreeTextures_6FC790-- ?
+        idx = *((unsigned __int16 *)&gTextures_6C0F00[1499].field_4C + (unsigned __int16)gNumFreeTextures_6FC790 + 1);
+    }
+    else
+    {
+        idx = (unsigned __int16)gNumTextures_word_6FC78C;
+    }
+
+    WORD x2 = pRect->x2;
+    WORD y2 = pRect->y2;
+    gTextures_6C0F00[idx].field_8_w = x2;
+    gTextures_6C0F00[idx].field_A_h = y2;
+    gTextures_6C0F00[idx].field_4_y = pRect->x1;
+    gTextures_6C0F00[idx].field_6_x = pRect->y1;
+
+    // NOTE: Pruned software rendering branch
+    gTextures_6C0F00[idx].mSurfaceType = surfaceType;
+
+    if (!pallete || !pixelData || !x2 || !y2)
+    {
+        return 0;
+    }
+
+    if (surfaceType)
+    {
+        if (surfaceType == 1)
+        {
+            x2 *= 2;
+        }
+    }
+    else
+    {
+        x2 *= 4;
+    }
+    gTextures_6C0F00[idx].float_field_18_vQ = 1.0f;
+    gTextures_6C0F00[idx].float_field_14_uQ = 1.0f;
+    gTextures_6C0F00[idx].field_C = x2;
+    gTextures_6C0F00[idx].field_E = y2;
+    
+    if (pTga)
+    {
+        gTextures_6C0F00[idx].float_field_14_uQ = (float)tgaW / (float)x2;
+        gTextures_6C0F00[idx].float_field_18_vQ = (float)tgaH / (float)y2;
+        x2 = tgaW;
+        y2 = tgaH;
+        surfaceType = 3;
+        pixelData = pTga;
+    }
+
+    if (surfaceType == 5)
+    {
+        // Type 5 is malloc 280 byte buffer?
+        //gTextures_6C0F00[idx].mSurface = Render_sub_4241C2(pixelData, pallete);
+    }
+    // NOTE: Pruned software rendering branch
+    else
+    {
+        //gTextures_6C0F00[idx].mSurface = Render_sub_40E840(g_pDirectDraw, pixelData, pallete, &x2, &y2, &surfaceType, idx);
+        gTextures_6C0F00[idx].field_28 = surfaceType;
+    }
+
+    gTextures_6C0F00[idx].field_10_x = x2;
+    gTextures_6C0F00[idx].field_12_y = y2;
+    gTextures_6C0F00[idx].field_24_flagsQ = dword_6C076C;
+
+    if (gNumFreeTextures_6FC790)
+    {
+        --gNumFreeTextures_6FC790;
+    }
+    else
+    {
+        ++gNumTextures_word_6FC78C;
+    }
+
+    return idx;
+}
+MGS_FUNC_IMPLEX(0x0041C640, Render_sub_41C640, false); // TODO: Implement
+

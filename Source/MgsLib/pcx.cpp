@@ -424,7 +424,7 @@ int CC GV_pcx_file_handler_402B25(void* fileData, TFileNameHash fileNameHash)
         pAllocated->field_8_256_pal,
         (BYTE*)&pRect[1],
         mgs_bpp & 1,
-        (int)pTga16BitPixels,
+        pTga16BitPixels,
         tgaWidth,
         tgaHeight);
 
