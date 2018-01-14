@@ -154,21 +154,22 @@ BYTE* CC Script_VarWrite_40957B(BYTE* pScript, int)
 }
 MGS_FUNC_IMPLEX(0x40957B, Script_VarWrite_40957B, false); // TODO
 
-
-MGS_VAR(1, 0x992040, DWORD, gScript_dword_992040, 0);
-
-int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
+struct GCL_Context
 {
-    DWORD retQ; // [sp+0h] [bp-14h]@15
-    int scriptByte2; // [sp+4h] [bp-10h]@7
-    DWORD scriptByte; // [sp+8h] [bp-Ch]@6
-    DWORD *pScriptContext; // [sp+Ch] [bp-8h]@1
-    BYTE *pScriptIp = pScript; // [sp+10h] [bp-4h]@1
+    DWORD field_0_eval_ret;
+    BYTE* field_4_script_ip;
+};
+MGS_ASSERT_SIZEOF(GCL_Context, 8);
 
-    pScriptContext = &gScript_dword_992040;
-    for (;;)
+MGS_ARY(1, 0x992040, GCL_Context, 40, gGclContextStack_992040, {});
+
+int CC Script_Unknown6_409D77(BYTE* pScript, DWORD* pRet)
+{
+    int stackPos = 0;
+    GCL_Context* pScriptContext = &gGclContextStack_992040[0];
+    for (BYTE* pScriptIp = pScript; ; pScriptIp += 2)
     {
-        for(;;)
+        for (;;)
         {
             if (!pScriptIp)
             {
@@ -178,47 +179,53 @@ int CC Script_Unknown6(BYTE* pScript, DWORD* pRet)
                 }
                 return 0;
             }
-            scriptByte = *pScriptIp;
-            if (scriptByte == 0x31)                 // exit code ?
+            DWORD cmd = *pScriptIp;
+            if (*pScriptIp == 0x31) // Switch to popping items
             {
                 break;
             }
+            pScriptContext->field_4_script_ip = pScriptIp;
+            DWORD ret = 0;
+            pScriptIp = Script_GCL_Execute(pScriptIp, &cmd, &ret);
+            pScriptContext->field_0_eval_ret = ret;
+            ++pScriptContext;
+            stackPos++;
 
-            pScriptContext[1] = (DWORD)pScriptIp;
-            pScriptIp = Script_GCL_Execute(pScriptIp, &scriptByte, &retQ);
-            *pScriptContext = retQ;
-            pScriptContext += 2;
-        }
+            assert(stackPos < 40); // TODO: Its unknown what the max allowed depth should be
+        } // End context push loop
 
-        scriptByte2 = pScriptIp[1];
-
-        if (!scriptByte2)
+        // Final item
+        if (!pScriptIp[1])
         {
             break;
         }
 
-        if (scriptByte2 == 0x14)
+        if (pScriptIp[1] == 0x14)
         {
-            Script_VarWrite_40957B((BYTE*)*(pScriptContext - 3), *(pScriptContext - 2)); // Write var?
-            *(pScriptContext - 4) = *(pScriptContext - 2);
+            Script_VarWrite_40957B(pScriptContext[-2].field_4_script_ip, pScriptContext[-1].field_0_eval_ret);
+            pScriptContext[-2].field_0_eval_ret = pScriptContext[-1].field_0_eval_ret;
         }
         else
         {
-            *(pScriptContext - 4) = Script_Operator_Evaluate(pScriptIp[1], *(pScriptContext - 4), *(pScriptContext - 2));
-            *(pScriptContext - 3) = 0;
+            pScriptContext[-2].field_0_eval_ret = Script_Operator_Evaluate(pScriptIp[1],
+                    pScriptContext[-2].field_0_eval_ret,
+                    pScriptContext[-1].field_0_eval_ret);
+            pScriptContext[-2].field_4_script_ip = 0;
         }
-        pScriptContext -= 2;
-        pScriptIp += 2;
+        --pScriptContext;
+        stackPos--;
     }
+
+    assert(stackPos == 1);
 
     if (pRet)
     {
-        *pRet = *(pScriptContext - 2);
+        *pRet = pScriptContext[-1].field_0_eval_ret;
     }
 
-    return *(pScriptContext - 2);
+    return pScriptContext[-1].field_0_eval_ret;
 }
-MGS_FUNC_IMPLEX(0x00409D77, Script_Unknown6, true); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x00409D77, Script_Unknown6_409D77, SCRIPT_IMPL);
 
 MGS_ARY(1, 0x78E7E0, __int16, 96, save_data_192_word_78E7E0, {});
 MGS_ARY(1, 0x78D7C0, DWORD, 512, save_data_2048_unk_78D7C0, {});
@@ -371,7 +378,7 @@ BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet)
     // ??
     case 0x30:
     {
-        *pRet = Script_Unknown6(pScript + 2, pRet);
+        *pRet = Script_Unknown6_409D77(pScript + 2, pRet);
         pScriptByte1 += *pScriptByte1;
     }
     break;
@@ -1322,7 +1329,7 @@ signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs)
         if (cmd == 0x30)
         {
             DWORD dwRet = 0;
-            Script_Unknown6(pScript + 2, &dwRet /* &pScriptBytes*/);
+            Script_Unknown6_409D77(pScript + 2, &dwRet /* &pScriptBytes*/);
             const int length = *(pScript + 1);
             pScript = pScript + length + 1;
         }
