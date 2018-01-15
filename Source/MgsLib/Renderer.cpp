@@ -474,8 +474,119 @@ MGS_FUNC_NOT_IMPL(0x421280, void __cdecl(MGSVertex *pVert, int idx), Render_sub_
 MGS_FUNC_NOT_IMPL(0x424020, void __cdecl(IDirectDrawSurface7 *pSurface, MGSVertex* pVert), Render_DrawTextBeginScene_424020);
 MGS_FUNC_NOT_IMPL(0x420840, void __cdecl (DWORD *a1, DWORD *arg4), Render_sub_420840);
 
+HRESULT CC Render_SetTexture_41E9E0();
 
-MGS_FUNC_NOT_IMPL(0x421800, void __cdecl(int mode, const MGSVertex *pVerts, signed int vertexCount, int primIdx), Render_BlendMode_sub_421800);
+void CC Render_BlendMode_sub_421800(int mode, MGSVertex* pVerts, signed int vertexCount, int primIdx)
+{
+    MGSVertex pVertsToRender[10] = {};
+
+    assert(vertexCount < 10);
+
+    HRESULT hr = S_OK;
+    if (gBlendMode)
+    {
+        switch (mode)
+        {
+        case 0:
+            Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 0);
+            break;
+        case 1:
+            hr = Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
+            hr |= Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 5);// D3DRS_SRCBLEND 
+            hr |= Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 5);
+            if (hr || !(gBlendMode & 1))
+            {
+                int texture = 0;
+                while (texture < vertexCount)
+                {
+                    BYTE* vertDiffuse = (BYTE*)&pVerts[texture].diffuse;
+                    vertDiffuse[2] >>= 1;
+                    vertDiffuse[1] >>= 1;
+                    vertDiffuse[0] >>= 1;
+                    ++texture;
+                }
+                hr = Render_SetTexture_41E9E0();
+                if (!hr)
+                {
+                    memcpy(pVertsToRender, pVerts, 4 * ((unsigned int)(sizeof(MGSVertex) * vertexCount) >> 2));
+                    for (int i = 0; i < vertexCount; ++i)
+                    {
+                        pVertsToRender[i].diffuse = 0xFF7F7F7F;
+                    }
+
+                    hr = Render_SetRenderState_422A90(D3DRENDERSTATE_SHADEMODE, 1);
+                    hr |= Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 1);
+                    hr |= Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 3);
+                    if (!hr)
+                    {
+                        hr = gD3dDevice_6FC74C->DrawPrimitive(
+                            (D3DPRIMITIVETYPE)gPrimBuffer_dword_6C0EFC[primIdx].mPrimTypeQ,
+                            0x1C4,
+                            pVertsToRender,
+                            vertexCount,
+                            0);
+                        gD3dDevice_6FC74C->SetTexture(0, 0);
+                    }
+                }
+                Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 2);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 2);
+            }
+            else
+            {
+                for (int texture = 0; texture < vertexCount; ++texture)
+                {
+                    pVerts[texture].diffuse = pVerts[texture].diffuse & 0xFFFFFF | 0x7F000000;
+                }
+            }
+            break;
+        case 2:
+            Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
+            Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 2);
+            Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 2);
+            break;
+        case 3:
+            hr = Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
+            hr |= Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 1);
+            hr |= Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 4);
+            break;
+        case 4:
+            hr = Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHAREF, 63);
+            hr |= Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
+            hr |= Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 5);
+            hr |= Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 2);
+            if (hr || !(gBlendMode & 8))
+            {
+                int texture = 0;
+                while (texture < vertexCount)
+                {
+                    BYTE* vertDiffuse = (BYTE*)&pVerts[texture].diffuse;
+                    vertDiffuse[2] >>= 2;  // halve the RGB of the diffuse ?
+                    vertDiffuse[1] >>= 2;
+                    vertDiffuse[0] >>= 2;
+                    ++texture;
+                }
+                Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 1);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_SRCBLEND, 2);
+                Render_SetRenderState_422A90(D3DRENDERSTATE_DESTBLEND, 2);
+            }
+            else
+            {
+                for (int texture = 0; texture < vertexCount; ++texture)
+                {
+                    pVerts[texture].diffuse = pVerts[texture].diffuse & 0xFFFFFF | 0x3F000000;
+                }
+            }
+            break;
+        default:
+            return;
+        }
+    }
+    else
+    {
+        Render_SetRenderState_422A90(D3DRENDERSTATE_ALPHABLENDENABLE, 0);
+    }
+}
+MGS_FUNC_IMPLEX(0x421800, Render_BlendMode_sub_421800, RENDERER_IMPL);
 
 // WinMain.cpp
 MGS_VAR_EXTERN(LPDIRECTDRAWSURFACE7, g_pDDSurface_6FC740);
