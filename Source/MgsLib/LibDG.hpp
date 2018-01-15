@@ -48,22 +48,10 @@ MGS_VAR_EXTERN(DWORD, gBinds_dword_722A40);
 
 void* CC MemClearUnknown_40B231(void* pMem, int size);
 
-struct Prim_base
-{
-    DWORD field_0_ptr;
-    DWORD field_4_ptr;
-    DWORD field_8_ptr;
-    DWORD field_C_ptr;
-    DWORD field_10_countq;
-    DWORD field_14;
-    DWORD field_18;
-    DWORD field_1C;
-};
-MGS_ASSERT_SIZEOF(Prim_base, 0x20);
 
 struct Prim_unknown
 {
-    Prim_base mBase;
+    PSX_MATRIX field_0_matrix;
     void* field_20;
     DWORD field_24_maybe_flags;
     WORD field_28_dword_9942A0;

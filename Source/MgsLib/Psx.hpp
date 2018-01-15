@@ -6,6 +6,21 @@
 void PsxCpp_ForceLink();
 void DoPsxTests();
 
+struct MATRIX3x3
+{
+    short int m[3][3];
+};
+MGS_ASSERT_SIZEOF(MATRIX3x3, 18);
+
+
+struct PSX_MATRIX
+{
+    short int m[3][3];
+    char pad[2];
+    int t[3];
+};
+MGS_ASSERT_SIZEOF(PSX_MATRIX, 32);
+
 struct P_TAG
 {
     unsigned addr : 24;

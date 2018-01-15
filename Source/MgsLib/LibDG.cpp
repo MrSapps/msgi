@@ -8,6 +8,7 @@
 #include "Fs.hpp"
 #include "pcx.hpp"
 #include "WinMain.hpp"
+#include "Actor_Debug.hpp"
 
 #define LIBDG_IMPL true
 
@@ -24,7 +25,8 @@ struct Actor_Open
 
 Actor_Open* CC Res_open_create_486BD4(DWORD scriptData, int scriptBinds, BYTE* pScript)
 {
-    return (Actor_Open*)Res_env_test_create_62130E(scriptData, scriptBinds);
+    return (Actor_Open*)AddDebugActor();
+//    return (Actor_Open*)Res_env_test_create_62130E(scriptData, scriptBinds);
 }
 MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, false); // TODO
 
@@ -911,10 +913,18 @@ MGS_ARY(1, 0x991E40, int, 8, dword_991E40,
     // TODO: Rip this data
 });
 
-MGS_ARY(1, 0x6501F8, int, 8, dword_6501F8, 
-{
-    // TODO: Rip this data
-});
+const PSX_MATRIX gIdentity_matrix =
+{ 
+    { 
+        { 4096, 0, 0 },
+        { 0, 4096, 0 },
+        { 0, 0, 4096 } 
+    },
+    { 0, 0 },
+    { 0, 0, 0 }
+};
+
+MGS_VAR(1, 0x6501F8, PSX_MATRIX, gIdentity_matrix_6501F8, { gIdentity_matrix });
 
 struct PrimUnknownData
 {
@@ -978,7 +988,7 @@ Prim_unknown* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index
     if (pMem)
     {
         MemClearUnknown_40B231(pMem, sizeof(Prim_unknown));
-        memcpy(pMem, dword_6501F8, 32u);
+        memcpy(&pMem->field_0_matrix, &gIdentity_matrix_6501F8, sizeof(PSX_MATRIX));
         pMem->field_24_maybe_flags = maybeFlags;
         pMem->field_2A_num_items = numItems;
         pMem->field_2C_index = gv_index;

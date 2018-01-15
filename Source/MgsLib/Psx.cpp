@@ -555,20 +555,6 @@ union Reg_VXY2
     __int64 VXY2;
 };
 
-struct PSX_MATRIX
-{
-    short int m[3][3];
-    char pad[2];
-    int t[3];
-};
-MGS_ASSERT_SIZEOF(PSX_MATRIX, 32);
-
-struct MATRIX3x3
-{
-    short int m[3][3];
-};
-MGS_ASSERT_SIZEOF(MATRIX3x3, 18);
-
 struct VECTOR3
 {
     int x, y, z;
