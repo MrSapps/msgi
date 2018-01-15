@@ -5,6 +5,8 @@ MGS_VAR_EXTERN(WORD, gSnakeMaxHealth_78E7F8);
 
 struct MenuMan;
 
+void DoMenuTests();
+
 void CC Res_MenuMan_create_459A9A();
 void CC MenuTextureLoad_44DEB3();
 void CC Menu_create_459891();

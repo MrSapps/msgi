@@ -2519,6 +2519,7 @@ static void RunTests()
     DoMovie_Tests();
     DoFsTests();
     DoPsxTests();
+    DoMenuTests();
 }
 
 int Sink()

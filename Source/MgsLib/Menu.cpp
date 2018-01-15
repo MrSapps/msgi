@@ -270,6 +270,17 @@ MGS_FUNC_NOT_IMPL(0x46B92E, void __cdecl(MenuMan_Inventory_14h_Unk* pMenuUnk, in
 
 MGS_VAR(1, 0x733978, SPRT, gMenu_sprt3_733978, {});
 
+static void InitLargeFontTemplateSprite()
+{
+    setSprt(&gMenu_sprt3_733978);
+    setRGB0(&gMenu_sprt3_733978, 0x80, 0x80, 0x80);
+    gMenu_sprt3_733978.u0 = 0;
+    gMenu_sprt3_733978.v0 = 242;
+    gMenu_sprt3_733978.w = 8;
+    gMenu_sprt3_733978.h = 6;
+    gMenu_sprt3_733978.clut = 32765;
+}
+
 void CC Menu_init_num_res_font_helper_468A04()
 {
     static PSX_RECT local_static_stru_6757E0 = { 960, 498, 0, 0 };
@@ -289,13 +300,7 @@ void CC Menu_init_num_res_font_helper_468A04()
 
     Render_sub_41C6B0(&local_static_stru_6757E0, menu_unk.field_0_pixels);
 
-    setSprt(&gMenu_sprt3_733978);
-    setRGB0(&gMenu_sprt3_733978, 0x80, 0x80, 0x80);
-    gMenu_sprt3_733978.u0 = 0;
-    gMenu_sprt3_733978.v0 = 242;
-    gMenu_sprt3_733978.w = 8;
-    gMenu_sprt3_733978.h = 6;
-    gMenu_sprt3_733978.clut = 32765;
+    InitLargeFontTemplateSprite();
 }
 MGS_FUNC_IMPLEX(0x00468A04, Menu_init_num_res_font_helper_468A04, MENU_IMPL);
 
@@ -314,6 +319,23 @@ MGS_ASSERT_SIZEOF(Psx_Tim_Header, 0x14);
 MGS_VAR(1, 0x733960, SPRT, gMenu_sprt2_733960, {});
 MGS_VAR(1, 0x7339C0, SPRT, gMenu_font1_template_sprite_7339C0, {});
 
+static void InitSmallFontTemplateSprite()
+{
+    // TODO: SetSprt
+    gMenu_sprt2_733960.tag = gMenu_sprt2_733960.tag & 0xFFFFFF | 0x4000000;
+    gMenu_sprt2_733960.code = 0x64;
+
+    // TODO: SetRGB0
+    gMenu_sprt2_733960.r0 = 128;
+    gMenu_sprt2_733960.g0 = 128;
+    gMenu_sprt2_733960.b0 = 128;
+
+    gMenu_sprt2_733960.u0 = 0;
+    gMenu_sprt2_733960.v0 = 237;
+    gMenu_sprt2_733960.w = 6;
+    gMenu_sprt2_733960.h = 5;
+    gMenu_sprt2_733960.clut = 32764;
+}
 
 void CC Menu_init_num_res_font_468406(MenuMan* /*pMenu*/)
 {
@@ -343,16 +365,8 @@ void CC Menu_init_num_res_font_468406(MenuMan* /*pMenu*/)
     gMenu_font1_template_sprite_7339C0.h = 7;
     gMenu_font1_template_sprite_7339C0.clut = 32764;
 
-    gMenu_sprt2_733960.tag = gMenu_sprt2_733960.tag & 0xFFFFFF | 0x4000000;
-    gMenu_sprt2_733960.code = 0x64;
-    gMenu_sprt2_733960.r0 = 128;
-    gMenu_sprt2_733960.g0 = 128;
-    gMenu_sprt2_733960.b0 = 128;
-    gMenu_sprt2_733960.u0 = 0;
-    gMenu_sprt2_733960.v0 = 237;
-    gMenu_sprt2_733960.w = 6;
-    gMenu_sprt2_733960.h = 5;
-    gMenu_sprt2_733960.clut = 32764;
+    InitSmallFontTemplateSprite();
+
 
     Menu_init_num_res_font_helper_468A04();
 }
@@ -635,7 +649,7 @@ void CC Render_Text_Large_font_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* p
 {
     RenderTextHelper(pPrimBuffer, pTextSettings, pString, true);
 }
-MGS_FUNC_IMPLEX(0x468AAF, Render_Text_Large_font_468AAF, MENU_IMPL);
+MGS_FUNC_IMPLEX(0x468AAF, Render_Text_Large_font_468AAF, false);
 
 void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pString)
 {
@@ -1513,3 +1527,297 @@ void CC MenuTextureLoad_44DEB3()
     gMenuTexture_A0BE_722788.mHashedName = 0;
 }
 MGS_FUNC_IMPLEX(0x44DEB3, MenuTextureLoad_44DEB3, MENU_IMPL);
+
+//   Render_Text_Large_font_468AAF(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
+
+static void Test_Render_Text_Large_font_468AAF()
+{
+    BYTE backingBuffer[32 * sizeof(SPRT)] = {};
+    MenuPrimBuffer buffer;
+    buffer.mFreeLocation = backingBuffer;
+    buffer.mOt = backingBuffer;
+    buffer.mOtEnd = backingBuffer + sizeof(backingBuffer);
+
+    TextConfig config;
+    config.gTextX_dword_66C4C0 = 0;
+    config.gTextY_dword_66C4C4 = 0;
+    config.gTextFlags_dword_66C4C8 = 0;
+    config.gTextRGB_dword_66C4CC = 0x64ffffff;
+
+    InitLargeFontTemplateSprite();
+
+    Render_Text_Large_font_468AAF(&buffer, &config, "i Hello\nwor l d \n1234#9567890\n.@:_!?+-/*{}");
+
+    const SPRT expected[31] =
+    {
+        { 68759560, 255, 255, 255, 100, 1, 0, 64, 242, 32765, 8, 6 },
+        { 68758960, 255, 255, 255, 100, 9, 0, 56, 242, 32765, 8, 6 },
+        { 68758980, 255, 255, 255, 100, 18, 0, 32, 242, 32765, 8, 6 },
+        { 68759000, 255, 255, 255, 100, 27, 0, 88, 242, 32765, 8, 6 },
+        { 68759020, 255, 255, 255, 100, 36, 0, 88, 242, 32765, 8, 6 },
+        { 68759040, 255, 255, 255, 100, 45, 0, 112, 242, 32765, 8, 6 },
+        { 68759060, 255, 255, 255, 100, 0, 8, 176, 242, 32765, 8, 6 },
+        { 68759080, 255, 255, 255, 100, 9, 8, 112, 242, 32765, 8, 6 },
+        { 68759100, 255, 255, 255, 100, 18, 8, 136, 242, 32765, 8, 6 },
+        { 68759120, 255, 255, 255, 100, 31, 8, 88, 242, 32765, 8, 6 },
+        { 68759140, 255, 255, 255, 100, 44, 8, 24, 242, 32765, 8, 6 },
+        { 68759160, 255, 255, 255, 100, 0, 16, 8, 248, 32765, 8, 6 },
+        { 68759180, 255, 255, 255, 100, 9, 16, 16, 248, 32765, 8, 6 },
+        { 68759200, 255, 255, 255, 100, 18, 16, 24, 248, 32765, 8, 6 },
+        { 68759220, 255, 255, 255, 100, 27, 16, 32, 248, 32765, 8, 6 },
+        { 68759240, 255, 255, 255, 100, 45, 16, 40, 248, 32765, 8, 6 },
+        { 68759260, 255, 255, 255, 100, 54, 16, 48, 248, 32765, 8, 6 },
+        { 68759280, 255, 255, 255, 100, 63, 16, 56, 248, 32765, 8, 6 },
+        { 68759300, 255, 255, 255, 100, 72, 16, 64, 248, 32765, 8, 6 },
+        { 68759320, 255, 255, 255, 100, 81, 16, 72, 248, 32765, 8, 6 },
+        { 68759340, 255, 255, 255, 100, 90, 16, 0, 248, 32765, 8, 6 },
+        { 68759360, 255, 255, 255, 100, 1, 24, 80, 248, 32765, 8, 6 },
+        { 68759380, 255, 255, 255, 100, 5, 24, 96, 248, 32765, 8, 6 },
+        { 68759400, 255, 255, 255, 100, 9, 24, 112, 248, 32765, 8, 6 },
+        { 68759420, 255, 255, 255, 100, 12, 24, 120, 248, 32765, 8, 6 },
+        { 68759440, 255, 255, 255, 100, 21, 24, 128, 248, 32765, 8, 6 },
+        { 68759460, 255, 255, 255, 100, 30, 24, 136, 248, 32765, 8, 6 },
+        { 68759480, 255, 255, 255, 100, 39, 24, 144, 248, 32765, 8, 6 },
+        { 68759500, 255, 255, 255, 100, 48, 24, 152, 248, 32765, 8, 6 },
+        { 68759520, 255, 255, 255, 100, 57, 24, 160, 248, 32765, 8, 6 },
+        { 68759540, 255, 255, 255, 100, 60, 24, 168, 248, 32765, 8, 6 }
+    };
+
+    const SPRT* pExpectedSprt = &expected[0];
+    const SPRT* pActualSprt = reinterpret_cast<SPRT*>(backingBuffer);
+    int count = 0;
+    while (pActualSprt->tag)
+    {
+        ASSERT_EQ(pActualSprt->code, pExpectedSprt->code);
+
+        ASSERT_EQ(pActualSprt->r0, pExpectedSprt->r0);
+        ASSERT_EQ(pActualSprt->g0, pExpectedSprt->g0);
+        ASSERT_EQ(pActualSprt->b0, pExpectedSprt->b0);
+
+        ASSERT_EQ(pActualSprt->x0, pExpectedSprt->x0);
+        ASSERT_EQ(pActualSprt->y0, pExpectedSprt->y0);
+
+        ASSERT_EQ(pActualSprt->w, pExpectedSprt->w);
+        ASSERT_EQ(pActualSprt->h, pExpectedSprt->h);
+
+        ASSERT_EQ(pActualSprt->u0, pExpectedSprt->u0);
+        ASSERT_EQ(pActualSprt->v0, pExpectedSprt->v0);
+
+        ASSERT_EQ(pActualSprt->clut, pExpectedSprt->clut);
+
+        pActualSprt++;
+        pExpectedSprt++;
+        count++;
+    }
+    ASSERT_EQ(count, 31);
+}
+
+static void Test_Render_Text_Small_font_468642()
+{
+    BYTE backingBuffer[1024 * 50] = {};
+    MenuPrimBuffer buffer;
+    buffer.mFreeLocation = backingBuffer;
+    buffer.mOt = backingBuffer;
+    buffer.mOtEnd = backingBuffer + sizeof(backingBuffer);
+
+    TextConfig config;
+    config.gTextX_dword_66C4C0 = 0;
+    config.gTextY_dword_66C4C4 = 0;
+    config.gTextFlags_dword_66C4C8 = 0;
+
+    InitSmallFontTemplateSprite();
+
+    Render_Text_Small_font_468642(&buffer, &config, "i Hello\nwor l d \n1234#9567890\n.@:_!?+-/*{}");
+
+    const SPRT expected[32] =
+    {
+        { 68759568, 204, 204, 204, 204, 1, 0, 48, 237, 32764, 6, 5 },
+        { 68758948, 204, 204, 204, 204, 8, 0, 42, 237, 32764, 6, 5 },
+        { 68758968, 204, 204, 204, 204, 14, 0, 24, 237, 32764, 6, 5 },
+        { 68758988, 204, 204, 204, 204, 20, 0, 66, 237, 32764, 6, 5 },
+        { 68759008, 204, 204, 204, 204, 26, 0, 66, 237, 32764, 6, 5 },
+        { 68759028, 204, 204, 204, 204, 32, 0, 84, 237, 32764, 6, 5 },
+        { 68759048, 204, 204, 204, 204, 0, 8, 132, 237, 32764, 6, 5 },
+        { 68759068, 204, 204, 204, 204, 6, 8, 84, 237, 32764, 6, 5 },
+        { 68759088, 204, 204, 204, 204, 12, 8, 102, 237, 32764, 6, 5 },
+        { 68759108, 204, 204, 204, 204, 22, 8, 66, 237, 32764, 6, 5 },
+        { 68759128, 204, 204, 204, 204, 32, 8, 18, 237, 32764, 6, 5 },
+        { 68759148, 204, 204, 204, 204, 0, 16, 6, 232, 32764, 6, 5 },
+        { 68759168, 204, 204, 204, 204, 6, 16, 12, 232, 32764, 6, 5 },
+        { 68759188, 204, 204, 204, 204, 12, 16, 18, 232, 32764, 6, 5 },
+        { 68759208, 204, 204, 204, 204, 18, 16, 24, 232, 32764, 6, 5 },
+        { 68759228, 204, 204, 204, 204, 30, 16, 54, 232, 32764, 6, 5 },
+        { 68759248, 204, 204, 204, 204, 36, 16, 30, 232, 32764, 6, 5 },
+        { 68759268, 204, 204, 204, 204, 42, 16, 36, 232, 32764, 6, 5 },
+        { 68759288, 204, 204, 204, 204, 48, 16, 42, 232, 32764, 6, 5 },
+        { 68759308, 204, 204, 204, 204, 54, 16, 48, 232, 32764, 6, 5 },
+        { 68759328, 204, 204, 204, 204, 60, 16, 54, 232, 32764, 6, 5 },
+        { 68759348, 204, 204, 204, 204, 66, 16, 0, 232, 32764, 6, 5 },
+        { 68759368, 204, 204, 204, 204, 1, 24, 60, 232, 32764, 6, 5 },
+        { 68759388, 204, 204, 204, 204, 5, 24, 72, 232, 32764, 6, 5 },
+        { 68759408, 204, 204, 204, 204, 9, 24, 84, 232, 32764, 6, 5 },
+        { 68759428, 204, 204, 204, 204, 12, 24, 90, 232, 32764, 6, 5 },
+        { 68759448, 204, 204, 204, 204, 18, 24, 96, 232, 32764, 6, 5 },
+        { 68759468, 204, 204, 204, 204, 24, 24, 102, 232, 32764, 6, 5 },
+        { 68759488, 204, 204, 204, 204, 30, 24, 108, 232, 32764, 6, 5 },
+        { 68759508, 204, 204, 204, 204, 36, 24, 114, 232, 32764, 6, 5 },
+        { 68759528, 204, 204, 204, 204, 42, 24, 120, 232, 32764, 6, 5 },
+        { 68759548, 204, 204, 204, 204, 45, 24, 126, 232, 32764, 6, 5 }
+    };
+
+    const SPRT* pExpectedSprt = &expected[0];
+    const SPRT* pActualSprt = reinterpret_cast<SPRT*>(backingBuffer);
+    int count = 0;
+    while (pActualSprt->tag)
+    {
+        ASSERT_EQ(pActualSprt->code, pExpectedSprt->code);
+
+        ASSERT_EQ(pActualSprt->r0, pExpectedSprt->r0);
+        ASSERT_EQ(pActualSprt->g0, pExpectedSprt->g0);
+        ASSERT_EQ(pActualSprt->b0, pExpectedSprt->b0);
+
+        ASSERT_EQ(pActualSprt->x0, pExpectedSprt->x0);
+        ASSERT_EQ(pActualSprt->y0, pExpectedSprt->y0);
+
+        ASSERT_EQ(pActualSprt->w, pExpectedSprt->w);
+        ASSERT_EQ(pActualSprt->h, pExpectedSprt->h);
+
+        ASSERT_EQ(pActualSprt->u0, pExpectedSprt->u0);
+        ASSERT_EQ(pActualSprt->v0, pExpectedSprt->v0);
+
+        ASSERT_EQ(pActualSprt->clut, pExpectedSprt->clut);
+
+        pActualSprt++;
+        pExpectedSprt++;
+        count++;
+    }
+    ASSERT_EQ(count, 32);
+}
+
+struct UvPair
+{
+    int s, u, v;
+
+};
+std::map<char, UvPair> gUvs;
+
+struct FontChar
+{
+    char letter;
+    char spacing;
+    BYTE u0;
+    BYTE v0;
+    BYTE u1;
+    BYTE v1;
+};
+
+
+// Large then small maps
+const FontChar gLargeFont[] =
+{
+    // [space]
+    /*
+    { '!', 1, 84, 232, 112, 248 },
+    { '*', 0, 114, 232, 248 },
+    { '+', 0, 96, 232, 128, 248 },
+    { '-', 0, 102, 232, 136, 248 },
+    { '.', 1, 60, 232, 80, 248 },
+    { '/', 0, 108, 232, 144, 248 },
+    { '0', 0, 0, 232, 0, 248 },
+    { '1', 0, 6, 232 },     { 8, 248 },
+    { '2', 0, 12, 232 },    { 16, 248 },
+    { '3', 0, 18, 232 },    { 24, 248 },
+    { '4', 0, 24, 232 },    { 32, 248 },
+    { '5', 0, 30, 232 },    { 40, 248 },
+    { '6', 0, 36, 232 },    { 48, 248 },
+    { '7', 0, 42, 232 },    { 56, 248 },
+    { '8', 0, 48, 232 },    { 64, 248 },
+    { '9', 0, 54, 232 },    { 72, 248 },
+    { ':', 1, 72, 232 },    { 96, 248 },
+    { '?', 0, 90, 232 },    { 120, 248 },
+
+    { 'a', 0, 0, 237 },     { 0, 242 },
+    { 'b', 0, 6, 237 },     { 8, 242 },
+    { 'c', 0, 12, 237 },    { 16, 242 },
+    { 'd', 0, 18, 237 },    { 24, 242 },
+    { 'e', 0, 24, 237 },    { 32, 242 },
+    { 'f', 0, 30, 237 },    { 40, 242 },
+    { 'g', 0, 36, 237 },    { 48, 242 },
+    { 'h', 0, 42, 237 },    { 56, 242 },
+    { 'i', 1, 48, 237 },    { 64, 242 },
+    { 'j', 0, 54, 237 },    { 72, 242 },
+    { 'k', 0, 60, 237 },    { 80, 242 },
+    { 'l', 0, 66, 237 },    { 88, 242 },
+    { 'm', 0, 72, 237 },    { 96, 242 },
+    { 'n', 0, 78, 237 },    { 104, 242 },
+    { 'o', 0, 84, 237 },    { 112, 242 },
+    { 'p', 0, 90, 237 },    { 120, 242 },
+    { 'q', 0, 96, 237 },    { 128, 242 },
+    { 'r', 0, 102, 237 },   { 136, 242 },
+    { 's', 0, 108, 237 },   { 144, 242 },
+    { 't', 0, 114, 237 },   { 152, 242 },
+    { 'u', 0, 120, 237 },   { 160, 242 },
+    { 'v', 0, 126, 237 },   { 168, 242 },
+    { 'w', 0, 132, 237 },   { 176, 242 },
+    { 'x', 0, 138, 237 },   { 184, 242 },
+    { 'y', 0, 144, 237 },   { 192, 242 },
+    { 'z', 0, 150, 237 },   { 200, 242 },
+                              
+    { '{', 0, 120, 232 },   { 160, 248 },
+    { '}', 0, 126, 232 },   { 168, 248 },
+    */
+};
+
+
+static void UVCapture()
+{
+    InitSmallFontTemplateSprite();
+
+    const char* inStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\n.@:_!?+-/*{}";
+    const char* inStrIter = inStr;
+    while (*inStrIter)
+    {
+        BYTE backingBuffer[sizeof(SPRT) * 2] = {};
+        MenuPrimBuffer buffer;
+        buffer.mFreeLocation = backingBuffer;
+        buffer.mOt = backingBuffer;
+        buffer.mOtEnd = backingBuffer + sizeof(backingBuffer);
+
+        TextConfig config;
+        config.gTextX_dword_66C4C0 = 0;
+        config.gTextY_dword_66C4C4 = 0;
+        config.gTextFlags_dword_66C4C8 = 0;
+
+        char inBuffer[2] = {};
+        inBuffer[0] = *inStrIter;
+        Render_Text_Large_font_468AAF(&buffer, &config, inBuffer);
+
+        const SPRT* pActualSprt = reinterpret_cast<SPRT*>(backingBuffer);
+        if (pActualSprt->tag)
+        {
+            gUvs[inBuffer[0]] = { pActualSprt->x0, pActualSprt->u0 , pActualSprt->v0 };
+        }
+        else
+        {
+            printf("Nothing for %s\n", inBuffer);
+        }
+
+        inStrIter++;
+    }
+
+    printf("Done\n");
+
+    for (auto& p : gUvs)
+    {
+        printf("{ '%c', %d, %d, %d },\n", p.first, p.second.s, p.second.u, p.second.v);
+    }
+    printf("Done\n");
+
+}
+
+void DoMenuTests()
+{
+    UVCapture();
+    Test_Render_Text_Large_font_468AAF();
+    Test_Render_Text_Small_font_468642();
+}
