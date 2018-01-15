@@ -1121,6 +1121,23 @@ void CC Res_base_rot_vecs_407CAC(const SVECTOR* pIn, SVECTOR* pOut, int count)
 }
 MGS_FUNC_IMPLEX(0x407CAC, Res_base_rot_vecs_407CAC, IMPL_PSX);
 
+void CC Res_base_unknown_44AF20(MATRIX3x3* pMtx, VECTOR* pVec)
+{
+    int y = pVec->field_4_y;
+    int z = pVec->field_8_z;
+    int x = pVec->field_0_x;
+    pMtx->m[0][0] = (short int)((x * pMtx->m[0][0]) >> 12);
+    pMtx->m[0][1] = (short int)((x * pMtx->m[0][1]) >> 12);
+    pMtx->m[0][2] = (short int)((x * pMtx->m[0][2]) >> 12);
+    pMtx->m[1][0] = (short int)((y * pMtx->m[1][0]) >> 12);
+    pMtx->m[1][1] = (short int)((y * pMtx->m[1][1]) >> 12);
+    pMtx->m[1][2] = (short int)((y * pMtx->m[1][2]) >> 12);
+    pMtx->m[2][0] = (short int)((z * pMtx->m[2][0]) >> 12);
+    pMtx->m[2][1] = (short int)((z * pMtx->m[2][1]) >> 12);
+    pMtx->m[2][2] = (short int)((z * pMtx->m[2][2]) >> 12);
+}
+MGS_FUNC_IMPLEX(0x44AF20, Res_base_unknown_44AF20, IMPL_PSX);
+
 static void Test_Psx_gte_RT1_rtir_447480()
 {
     gGte_IR1_993EE4.IR_32 = 4096;
