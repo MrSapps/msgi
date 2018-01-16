@@ -678,7 +678,7 @@ void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* p
 {
     RenderTextHelper(pPrimBuffer, pTextSettings, pString, kFontSettings[1], gMenu_sprt2_733960);
 }
-MGS_FUNC_IMPLEX(0x468642, Render_Text_Small_font_468642, true); // TODO: Bugged
+MGS_FUNC_IMPLEX(0x468642, Render_Text_Small_font_468642, false); // TODO: Bugged
 
 int CC TextSetRGB_459B27(int r, int g, int b)
 {
@@ -1774,5 +1774,5 @@ void DoMenuTests()
 {
     //UVCapture();
    // Test_Render_Text_Large_font_468AAF();
-    Test_Render_Text_Small_font_468642();
+   // Test_Render_Text_Small_font_468642();
 }

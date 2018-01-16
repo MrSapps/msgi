@@ -222,6 +222,11 @@ struct SVECTOR
 };
 MGS_ASSERT_SIZEOF(SVECTOR, 0x8);
 
+struct VECTOR3
+{
+    int x, y, z;
+};
+MGS_ASSERT_SIZEOF(VECTOR3, 0xc);
 
 struct GTE_Data
 {
@@ -265,6 +270,8 @@ MGS_VAR_EXTERN(DISPENV, gDispEnv_6BECF0);
 MGS_VAR_EXTERN(DRAWENV, gDrawEnv_6C0E98);
 MGS_VAR_EXTERN(GTE_Data, gGteData_722688);
 
+MGS_VAR_EXTERN(VECTOR3, gGte_background_colour_993E74);
+
 signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode);
 int CC SetGraphDebug(int debug);
 void CC SetDispMask(int mask);
@@ -272,4 +279,5 @@ int CC ClearImage(PSX_RECT* pRect, BYTE r, BYTE g, BYTE b);
 int CC Psx_OpenEvent(void* desc, int spec, int mode, void* func); // Psx_ to avoid windows.h name clash
 void CC PsxGpuDebug_44A4D0();
 DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2);
-void CC SetDrawEnv_40DDE0(DR_ENV* pPacked, DRAWENV* drawEnv);;
+void CC SetDrawEnv_40DDE0(DR_ENV* pPacked, DRAWENV* drawEnv);
+void CC VectorNormal_44CAE0(const VECTOR* pVec, VECTOR* pUnitVec);

@@ -893,10 +893,92 @@ int CC Script_tbl_start_sub_451B0E(BYTE* /*pScript*/)
 }
 MGS_FUNC_IMPLEX(0x451B0E, Script_tbl_start_sub_451B0E, SCRIPT_IMPL);
 
+const SVECTOR gLightNormalVec_650128_tmp = { 0, 0, 4096, 0 };
+MGS_VAR(1, 0x650128, SVECTOR, gLightNormalVec_650128, gLightNormalVec_650128_tmp);
+
+void CC Script_light_vec_402144(int x, int y, int z)
+{
+    VECTOR vec1 = {};
+    vec1.field_0_x = x;
+    vec1.field_4_y = y;
+    vec1.field_8_z = z;
+
+    VECTOR vec1Normal = {};
+    VectorNormal_44CAE0(&vec1, &vec1Normal);
+
+    gLightNormalVec_650128.field_0_x = static_cast<short int>(vec1Normal.field_0_x);
+    gLightNormalVec_650128.field_2_y = static_cast<short int>(vec1Normal.field_4_y);
+    gLightNormalVec_650128.field_4_z = static_cast<short int>(vec1Normal.field_8_z);
+}
+MGS_FUNC_IMPLEX(0x00402144, Script_light_vec_402144, SCRIPT_IMPL);
+
+const MATRIX3x3 gLightMatrix_650148_tmp =
+{ 
+    { 
+        { 4096, 4096, 4096 },
+        { 4096, 4096, 4096 },
+        { 4096, 4096, 4096 } 
+    } 
+};
+MGS_VAR(1, 0x650148, MATRIX3x3, gLightMatrix_650148, gLightMatrix_650148_tmp);
+
+void CC Script_tbl_light_helper_param_c_40218B(__int16 x, __int16 y, __int16 z)
+{
+    gLightMatrix_650148.m[0][0] = 16 * x;
+    gLightMatrix_650148.m[1][0] = 16 * y;
+    gLightMatrix_650148.m[2][0] = 16 * z;
+}
+MGS_FUNC_IMPLEX(0x0040218B, Script_tbl_light_helper_param_c_40218B, SCRIPT_IMPL);
+
+MGS_VAR(1, 0x6BEE70, WORD, light_r_word_6BEE70, 0);
+MGS_VAR(1, 0x6BEE72, WORD, light_g_word_6BEE72, 0);
+MGS_VAR(1, 0x6BEE74, WORD, light_b_word_6BEE74, 0);
+
+MGS_VAR(1, 0x650168, DWORD, light_unknown_dword_650168, 0x3C808080);
+MGS_VAR(1, 0x65016C, DWORD, light_unknown_dword_65016C, 0x3E808080);
+
+void CC LightSettingsRelated_4020F5(int r, int g, int b)
+{
+    light_r_word_6BEE70 = static_cast<WORD>(r);
+    light_g_word_6BEE72 = static_cast<WORD>(g);
+    light_b_word_6BEE74 = static_cast<WORD>(b);
+    gGte_background_colour_993E74.x = 16 * r;
+    gGte_background_colour_993E74.y = 16 * g;
+    gGte_background_colour_993E74.z = 16 * b;
+    light_unknown_dword_650168 = 0x3CFFFFFF;
+    light_unknown_dword_65016C = 0x3EFFFFFF;
+}
+MGS_FUNC_IMPLEX(0x004020F5, LightSettingsRelated_4020F5, SCRIPT_IMPL);
+
+int CC Script_tbl_light_sub_451239(BYTE* /*pScript*/)
+{
+    SVECTOR vec = {};
+
+    DWORD scriptParam = Script_ParamExists('d');
+    if (scriptParam)
+    {
+        Script_Read3Words_409945((BYTE *)scriptParam, (WORD *)&vec.field_0_x);
+        Script_light_vec_402144(vec.field_0_x, vec.field_2_y, vec.field_4_z);
+    }
+    scriptParam = Script_ParamExists('c');
+    if (scriptParam)
+    {
+        Script_Read3Words_409945((BYTE *)scriptParam, (WORD *)&vec.field_0_x);
+        Script_tbl_light_helper_param_c_40218B(vec.field_0_x, vec.field_2_y, vec.field_4_z);
+    }
+    scriptParam = Script_ParamExists('a');
+    if (scriptParam)
+    {
+        Script_Read3Words_409945((BYTE *)scriptParam, (WORD *)&vec.field_0_x);
+        LightSettingsRelated_4020F5(vec.field_0_x, vec.field_2_y, vec.field_4_z);
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x00451239, Script_tbl_light_sub_451239, SCRIPT_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
 MGS_FUNC_NOT_IMPL(0x00451673, int __cdecl(BYTE*), Script_tbl_hzd_related_sub_451673);
 MGS_FUNC_NOT_IMPL(0x004512E5, int __cdecl(BYTE*), script_tbl_camera_sub_4512E5);
-MGS_FUNC_NOT_IMPL(0x00451239, int __cdecl(BYTE*), Script_tbl_light_sub_451239);
 MGS_FUNC_NOT_IMPL(0x00451D5C, int __cdecl(BYTE*), Script_tbl_radio_sub_451D5C);
 MGS_FUNC_NOT_IMPL(0x00451F22, int __cdecl(BYTE*), Script_tbl_str_status_sub_451F22);
 MGS_FUNC_NOT_IMPL(0x00452064, int __cdecl(BYTE*), Script_tbl_demo_sub_452064);
@@ -951,7 +1033,7 @@ MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
     { 0xC091, 0x0, Script_tbl_map_45151D },
     { 0x7D50, 0x0, Script_tbl_hzd_related_sub_451673.Ptr() },
     { 0xEEE9, 0x0, script_tbl_camera_sub_4512E5.Ptr() },
-    { 0x306A, 0x0, Script_tbl_light_sub_451239.Ptr() },
+    { 0x306A, 0x0, Script_tbl_light_sub_451239 },
     { 0x9A1F, 0x0, Script_tbl_start_sub_451B0E },
     { 0xC8BB, 0x0, Script_tbl_load_451BBF },
     { 0x24E1, 0x0, Script_tbl_radio_sub_451D5C.Ptr() },

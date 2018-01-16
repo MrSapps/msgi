@@ -555,12 +555,6 @@ union Reg_VXY2
     __int64 VXY2;
 };
 
-struct VECTOR3
-{
-    int x, y, z;
-};
-MGS_ASSERT_SIZEOF(VECTOR3, 0xc);
-
 union IR_Reg
 {
     short int IR_16;

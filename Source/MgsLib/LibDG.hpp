@@ -45,6 +45,7 @@ struct LibDG_Struct
 MGS_ASSERT_SIZEOF(LibDG_Struct, 0x2C);
 MGS_VAR_EXTERN(LibDG_Struct, gLibDG_2_stru_6BB930);
 MGS_VAR_EXTERN(DWORD, gBinds_dword_722A40);
+MGS_VAR_EXTERN(PSX_MATRIX, gIdentity_matrix_6501F8);
 
 void* CC MemClearUnknown_40B231(void* pMem, int size);
 
