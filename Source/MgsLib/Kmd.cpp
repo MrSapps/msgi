@@ -2,61 +2,161 @@
 #include "Kmd.hpp"
 #include "System.hpp"
 #include "LibDG.hpp"
+#include "System.hpp"
+#include "Script.hpp"
 
 #define KMD_IMPL true
 
 void ForceLinkKmdCpp() { }
 
+struct KmdHeader;
+
+struct Prim_unknown_0x48
+{
+    PSX_MATRIX field_0_matrix;
+    void* field_20;
+    KmdHeader* field_24_pKmdFileData;
+    DWORD field_28_flags_or_type;
+    WORD field_2C_index;
+    WORD field_2E_UnknownOrNumFaces;
+    WORD field_30_size;
+    WORD field_32;
+    SVECTOR* field_34_pVec;
+    DWORD field_38_size24b;
+    DWORD field_3C;
+    BYTE* field_40_pDataStart[2];
+};
+MGS_ASSERT_SIZEOF(Prim_unknown_0x48, 0x48);
+
+struct Prim_Mesh_0x5C
+{
+    Prim_Mesh_0x5C* field_0_pThisMesh;
+    DWORD field_4;
+    WORD field_8;
+    WORD field_A;
+    DWORD field_C;
+    DWORD field_10;
+    DWORD field_14;
+    DWORD field_18;
+    DWORD field_1C;
+    DWORD field_20;
+    DWORD field_24;
+    DWORD field_28;
+    DWORD field_2C;
+    DWORD field_30;
+    DWORD field_34;
+    DWORD field_38;
+    DWORD field_3C;
+    DWORD field_40;
+    DWORD field_44;
+    DWORD field_48;
+    DWORD field_4C;
+    DWORD field_50;
+    DWORD field_54_pMeshesStart;
+    DWORD field_58;
+};
+MGS_ASSERT_SIZEOF(Prim_Mesh_0x5C, 0x5C);
+
 struct KmdHeader
 {
-
+    DWORD mUnknownOrNumFaces;
+    DWORD mNumberOfMeshes;
+    DWORD x_coord1;
+    DWORD y_coord1;
+    DWORD z_coord1;
+    DWORD x_coord2;
+    DWORD y_coord2;
+    DWORD z_coord2;
 };
+MGS_ASSERT_SIZEOF(KmdHeader, 0x20);
 
 struct kmdObject
 {
-
+    DWORD field_0;
+    DWORD field_4;
+    DWORD x1_8;
+    DWORD y1_C;
+    DWORD z1_10;
+    DWORD x2_14;
+    DWORD y2_18;
+    DWORD z2_1C;
+    DWORD horizontal_pad_20;
+    DWORD mVertPadding_24;
+    DWORD mDeepPadding_28;
+    DWORD mRef_2C;
+    int mObjPosNum_30;
+    DWORD mFFFFFFFF_34;
+    DWORD mNumVerts_38;
+    DWORD mVertCoordsOffset_3C;
+    DWORD mVertexOrderOffset_40;
+    DWORD mNumNormals_44;
+    DWORD mNormalVertexCoordsOffset_48;
+    DWORD mNormalVertexOrderOffset_4C;
+    DWORD mTextureVertexOffset_50;
+    DWORD mTextureNameOffset_54;
 };
+MGS_ASSERT_SIZEOF(kmdObject, 0x58);
 
 // TODO: Reverse KMD loading as it seems very closely linked to the GV lib prim rendering/queues which is the linked to the GTE emu
 
-/*
-Prim_unknown* CC PrimObj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, __int16 alwaysZero)
+int __cdecl Prim_444096(kmdObject* a1)
 {
-    primSize = 92 * pFileData->mUnknown + 72;     // 72 bytes header and 92 bytes * num items other data
-    pAllocated = (Prim_unknown *)System_2_zerod_allocate_memory_40B296(primSize);
-    pAllocated2 = pAllocated;
+    unsigned int v1; // ecx
+    int result; // eax
+    int v3; // edx
+
+    v1 = a1->field_0;
+    result = 0;
+    if (v1 & 0x300)
+    {
+        v3 = (v1 >> 12) & 3;
+        result = 250 * (4 - v3);
+        if (!(v1 & 256))
+            result = -250 * (4 - v3);
+    }
+    return result;
+}
+MGS_FUNC_IMPLEX(0x444096, Prim_444096, KMD_IMPL);
+
+Prim_unknown_0x48* CC PrimObj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, __int16 usuallyZero)
+{
+    const int primSize = sizeof(Prim_unknown_0x48) + (sizeof(Prim_Mesh_0x5C) * pFileData->mNumberOfMeshes);
+    Prim_unknown_0x48* pAllocated = (Prim_unknown_0x48 *)System_2_zerod_allocate_memory_40B296(primSize);
     if (pAllocated)
     {
         MemClearUnknown_40B231(pAllocated, primSize);
-        memcpy(pAllocated2, dword_6501F8, 32u);
-        pAllocated2->field_24_maybe_flags = (int)pFileData;
-        pAllocated2->field_2E_w_or_h = pFileData->NumberOfObjects;// mUnknown ?
-        *(DWORD *)&pAllocated2->field_28_dword_9942A0 = countOrType_0x40Flag;
-        pAllocated2->field_30_size = alwaysZero;
-        pAllocated2->field_34 = (DWORD)&qword_650128;
-        pAfterHeader = (kmdObject *)&pFileData[1];
-        if (pFileData->mUnknown > 0)
+        memcpy(&pAllocated->field_0_matrix, &gIdentity_matrix_6501F8, sizeof(PSX_MATRIX));
+        pAllocated->field_24_pKmdFileData = pFileData;
+        pAllocated->field_2E_UnknownOrNumFaces = static_cast<WORD>(pFileData->mUnknownOrNumFaces);
+        pAllocated->field_28_flags_or_type = countOrType_0x40Flag;
+        pAllocated->field_30_size = usuallyZero;
+        pAllocated->field_34_pVec = &gLightNormalVec_650128;
+
+        kmdObject* pAfterHeader = (kmdObject *)&pFileData[1];
+        if (pFileData->mNumberOfMeshes > 0)
         {
-            p92Struct = (int)&pAllocated2[1].field_34;
-            count = (KmdHeader *)pFileData->mUnknown;
-            do
+            // field_72 of the first 72 byte structure?
+            Prim_Mesh_0x5C* p92Struct = (Prim_Mesh_0x5C *)&pAllocated[2];
+            for (DWORD i=0; i<pFileData->mNumberOfMeshes; i++)
             {
-                *(DWORD *)(p92Struct - 8) = *(DWORD *)pAfterHeader;
-                objPosNum = pAfterHeader->mObjPosNum_30;
-                if (objPosNum >= 0)
-                    *(DWORD *)p92Struct = *(DWORD*)(char *)&pAllocated2[objPosNum] + 72;
+                p92Struct[-1].field_54_pMeshesStart = (int)pAfterHeader;
+                if (pAfterHeader->mObjPosNum_30 >= 0)
+                {
+                    Prim_Mesh_0x5C* pFirstMesh = reinterpret_cast<Prim_Mesh_0x5C*>(&pAllocated[1]);
+                    p92Struct->field_0_pThisMesh = pFirstMesh + pAfterHeader->mObjPosNum_30;
+                }
                 else
-                    *(DWORD *)p92Struct = 0;
-                *(WORD *)(p92Struct + 8) = Prim_444096((unsigned int *)pAfterHeader);
-                *(WORD *)(p92Struct + 10) = pAfterHeader->field_4;
-                p92Struct += 0x5C;
+                {
+                    p92Struct->field_0_pThisMesh = nullptr;
+                }
+
+                p92Struct->field_8 = static_cast<WORD>(Prim_444096(pAfterHeader));
+                p92Struct->field_A = static_cast<WORD>(pAfterHeader->field_4);
+                ++p92Struct;
                 ++pAfterHeader;
-                count = (KmdHeader *)((char *)count - 1);
-            } while (count);
+            }
         }
-        pAllocated = pAllocated2;
     }
     return pAllocated;
 }
 MGS_FUNC_IMPLEX(0x443FEC, PrimObj_Alloc_443FEC, KMD_IMPL);
-*/
