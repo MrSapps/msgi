@@ -28,12 +28,13 @@ struct Prim_unknown_0x48
 };
 MGS_ASSERT_SIZEOF(Prim_unknown_0x48, 0x48);
 
+struct kmdObject;
+
 struct Prim_Mesh_0x5C
 {
-    Prim_Mesh_0x5C* field_0_pThisMesh;
+    DWORD field_0;
     DWORD field_4;
-    WORD field_8;
-    WORD field_A;
+    DWORD field_8;
     DWORD field_C;
     DWORD field_10;
     DWORD field_14;
@@ -47,12 +48,13 @@ struct Prim_Mesh_0x5C
     DWORD field_34;
     DWORD field_38;
     DWORD field_3C;
-    DWORD field_40;
+    kmdObject* field_40_pKmdObj;
     DWORD field_44;
-    DWORD field_48;
+    Prim_Mesh_0x5C* field_48_pLinked;
     DWORD field_4C;
-    DWORD field_50;
-    DWORD field_54_pMeshesStart;
+    WORD field_50;
+    WORD field_52;
+    DWORD field_54;
     DWORD field_58;
 };
 MGS_ASSERT_SIZEOF(Prim_Mesh_0x5C, 0x5C);
@@ -132,28 +134,24 @@ Prim_unknown_0x48* CC PrimObj_Alloc_443FEC(KmdHeader* pFileData, int countOrType
         pAllocated->field_30_size = usuallyZero;
         pAllocated->field_34_pVec = &gLightNormalVec_650128;
 
-        kmdObject* pAfterHeader = (kmdObject *)&pFileData[1];
+        kmdObject* pKmdObject = (kmdObject *)&pFileData[1];
         if (pFileData->mNumberOfMeshes > 0)
         {
-            // field_72 of the first 72 byte structure?
-            Prim_Mesh_0x5C* p92Struct = (Prim_Mesh_0x5C *)&pAllocated[2];
+            Prim_Mesh_0x5C* pFirstMesh = reinterpret_cast<Prim_Mesh_0x5C*>(&pAllocated[1]);
             for (DWORD i=0; i<pFileData->mNumberOfMeshes; i++)
             {
-                p92Struct[-1].field_54_pMeshesStart = (int)pAfterHeader;
-                if (pAfterHeader->mObjPosNum_30 >= 0)
+                pFirstMesh[i].field_40_pKmdObj = &pKmdObject[i];
+                if (pKmdObject[i].mObjPosNum_30 >= 0)
                 {
-                    Prim_Mesh_0x5C* pFirstMesh = reinterpret_cast<Prim_Mesh_0x5C*>(&pAllocated[1]);
-                    p92Struct->field_0_pThisMesh = pFirstMesh + pAfterHeader->mObjPosNum_30;
+                    pFirstMesh[i].field_48_pLinked = &pFirstMesh[pKmdObject[i].mObjPosNum_30];
                 }
                 else
                 {
-                    p92Struct->field_0_pThisMesh = nullptr;
+                    pFirstMesh[i].field_48_pLinked = nullptr;
                 }
 
-                p92Struct->field_8 = static_cast<WORD>(Prim_444096(pAfterHeader));
-                p92Struct->field_A = static_cast<WORD>(pAfterHeader->field_4);
-                ++p92Struct;
-                ++pAfterHeader;
+                pFirstMesh[i].field_50 = static_cast<WORD>(Prim_444096(&pKmdObject[i]));
+                pFirstMesh[i].field_52 = static_cast<WORD>(pKmdObject[i].field_4);
             }
         }
     }
