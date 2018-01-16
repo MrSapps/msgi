@@ -158,3 +158,13 @@ Prim_unknown_0x48* CC PrimObj_Alloc_443FEC(KmdHeader* pFileData, int countOrType
     return pAllocated;
 }
 MGS_FUNC_IMPLEX(0x443FEC, PrimObj_Alloc_443FEC, KMD_IMPL);
+
+void CC PrimObj_407BC1(Prim_unknown_0x48* pObj)
+{
+    memcpy(&pObj->field_0_matrix.m, gte_rotation_matrix_993E40.m, sizeof(MATRIX3x3));
+
+    pObj->field_0_matrix.t[0] = gGte_translation_vector_993E54.x;
+    pObj->field_0_matrix.t[1] = gGte_translation_vector_993E54.y;
+    pObj->field_0_matrix.t[2] = gGte_translation_vector_993E54.z;
+}
+MGS_FUNC_IMPLEX(0x407BC1, PrimObj_407BC1, KMD_IMPL);

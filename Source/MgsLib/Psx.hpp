@@ -271,6 +271,8 @@ MGS_VAR_EXTERN(DRAWENV, gDrawEnv_6C0E98);
 MGS_VAR_EXTERN(GTE_Data, gGteData_722688);
 
 MGS_VAR_EXTERN(VECTOR3, gGte_background_colour_993E74);
+MGS_VAR_EXTERN(MATRIX3x3, gte_rotation_matrix_993E40);
+MGS_VAR_EXTERN(VECTOR3, gGte_translation_vector_993E54);
 
 signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode);
 int CC SetGraphDebug(int debug);
