@@ -859,7 +859,6 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
     */
 }
 MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, false); // TODO: Fully implement
-MGS_FUNC_NOT_IMPL(0x401D64, void __cdecl(int a1), sub_401D64);
 
 MGS_VAR(1, 0x991E60, VECTOR, pVec_991E60, {});
 
@@ -908,10 +907,7 @@ MGS_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_404
 MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
 //MGS_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_40340A);
 
-MGS_ARY(1, 0x991E40, int, 8, dword_991E40, 
-{
-    // TODO: Rip this data
-});
+MGS_VAR(1, 0x991E40, PSX_MATRIX, gMatrix_dword_991E40, {});
 
 const PSX_MATRIX gIdentity_matrix =
 { 
@@ -1024,10 +1020,19 @@ signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
 }
 MGS_FUNC_IMPLEX(0x401805, PrimAdd_401805, LIBDG_IMPL);
 
+void CC sub_401D64(PSX_MATRIX* pMatrix)
+{
+    pMatrix->m[1][0] = 58 * pMatrix->m[1][0] / 64;
+    pMatrix->m[1][1] = 58 * pMatrix->m[1][1] / 64;
+    pMatrix->m[1][2] = 58 * pMatrix->m[1][2] / 64;
+    pMatrix->t[1] = 58 * pMatrix->t[1] / 64;
+}
+MGS_FUNC_IMPLEX(0x401D64, sub_401D64, LIBDG_IMPL);
+
 void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
 {
-    memcpy(dword_991E40, &pGv->dword_6BC37C_32byte_size, 32/*sizeof(dword_991E40)*/); // sizeof returns 4 since dword_991E40 is a pointer to an array
-    sub_401D64((DWORD)&dword_991E40[0]);
+    memcpy(&gMatrix_dword_991E40, &pGv->field_10_matrix, sizeof(PSX_MATRIX));
+    sub_401D64(&gMatrix_dword_991E40);
 
     for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
     {
@@ -1039,8 +1044,9 @@ MGS_FUNC_IMPLEX(0x407122, LibGV_407122, true); // TODO: Implement me
 
 void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 {
-    DWORD* dword_991E40_1_ot_ptr = (DWORD*)dword_991E40[1];
-    const int dword_991E40_2_field_2E_w_or_h = dword_991E40[2];
+    /*
+    DWORD* dword_991E40_1_ot_ptr = (DWORD*)gMatrix_dword_991E40[1];
+    const int dword_991E40_2_field_2E_w_or_h = gMatrix_dword_991E40[2];
     if (count - 1 >= 0)
     {
         int pData = pPrimDataStart;
@@ -1068,18 +1074,19 @@ void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
             pData += size;
             --count;
         } while (count);
-    }
+    }*/
 }
-MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, true); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, false); // TODO: Implement me
 
 void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
 {
+    /*
     int unkByte012Ptr; // edi@3
 
-    dword_991E40[0] = (int)gUnkSize_1024_6BE4E8;  // 256 DWORD's
+    gMatrix_dword_991E40[0] = (int)gUnkSize_1024_6BE4E8;  // 256 DWORD's
     int otPtr = (int)*(&pGv->mOrderingTables[activeBuffer]);
-    dword_991E40[1] = otPtr + 4;
-    DWORD** otrPtrNext = (DWORD**)dword_991E40[1];
+    gMatrix_dword_991E40[1] = otPtr + 4;
+    DWORD** otrPtrNext = (DWORD**)gMatrix_dword_991E40[1];
     for (int i = 0; i < 256; i++)
     {
         DWORD* unkItem = gUnkSize_1024_6BE4E8[i];
@@ -1105,15 +1112,15 @@ void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
         Prim_unknown* p = pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
         if (!(BYTE1(p->field_24_maybe_flags) & 1) && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & v9))
         {
-            dword_991E40[2] = p->field_2E_w_or_h;
+            gMatrix_dword_991E40[2] = p->field_2E_w_or_h;
             OrderingTableAdd_4034C6(
                 (int)p->field_40_pDataStart[activeBuffer],
                 p->field_2A_num_items,
                 p->field_30_size);
         }
-    }
+    }*/
 }
-MGS_FUNC_IMPLEX(0x40340A, LibGV_40340A, true); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x40340A, LibGV_40340A, false); // TODO: Implement me
 
 
 MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0,

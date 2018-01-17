@@ -136,14 +136,7 @@ struct struct_gv
     s16 word_6BC376_16;
     s16 word_6BC378_1;
     s16 word_6BC37A_0_1EC_size;
-    int dword_6BC37C_32byte_size;
-    int dword_6BC380;
-    int dword_6BC384;
-    int dword_6BC388;
-    int dword_6BC38C;
-    int dword_6BC390;
-    int dword_6BC394;
-    int dword_6BC398;
+    PSX_MATRIX field_10_matrix;
     int dword_6BC39C;
     s16 word_6BC3A0;
     s16 word_6BC3A6;
