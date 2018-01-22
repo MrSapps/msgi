@@ -311,9 +311,9 @@ MGS_ARY(1, 0x6BDC5C, DWORD, 259, ot_gv2_1_6BDC5C, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE068, DR_ENV, stru_6BE068, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE0A8, DR_ENV, pPacked_6BE0A8, {});
 
-MGS_ARY(1, 0x6BBD60, Prim_unknown*, 256, dg_dword_6BBD60_prim_ptrs, {});
+MGS_ARY(1, 0x6BBD60, Prim_unknown_0x48*, 256, dg_dword_6BBD60_prim_ptrs, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BBD5C, DWORD, dg_dword_6BBD5C_k320, 0);
-MGS_ARY(1, 0x6BB95C, Prim_unknown*, 256, dg_dword_6BB95C_prim_ptrs, {});
+MGS_ARY(1, 0x6BB95C, Prim_unknown_0x48*, 256, dg_dword_6BB95C_prim_ptrs, {});
 
 void CC sub_401570(struct_gv* gv, DRAWENV* pDrawEnv, int bNotBg)
 {
@@ -867,8 +867,9 @@ MGS_FUNC_NOT_IMPL(0x406B97, void __cdecl(int a1, int count), sub_406B97);
 MGS_FUNC_NOT_IMPL(0x406A78, void __cdecl(int a1, int count), sub_406A78);
 MGS_FUNC_NOT_IMPL(0x406906, void __cdecl(int a1, int count), sub_406906);
 
-void CC sub_4066ED(Prim_unknown* pObj)
+void CC sub_4066ED(Prim_unknown_0x48* pObj)
 {
+    /*
     void* field_20 = pObj->field_20;
     int count = pObj->field_2E_w_or_h;
     if (field_20)
@@ -896,9 +897,9 @@ void CC sub_4066ED(Prim_unknown* pObj)
             sub_406A78((int)pObj, count);
         }
         sub_406906((int)pObj, count);
-    }
+    }*/
 }
-MGS_FUNC_IMPLEX(0x4066ED, sub_4066ED, true);
+MGS_FUNC_IMPLEX(0x4066ED, sub_4066ED, false);
 
 //MGS_FUNC_NOT_IMPL(0x407122, void CC(struct_gv* pGv, int activeBuffer), LibGV_407122);
 MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
@@ -971,7 +972,7 @@ void CC sub_40514F(char a1, char a2, char a3, char a4)
 }
 MGS_FUNC_IMPLEX(0x40514F, sub_40514F, LIBDG_IMPL);
 
-Prim_unknown* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C)
+Prim_unknown_0x48* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C)
 {
     const int idx = (maybeFlags & 31);
     assert(idx < 25);
@@ -980,6 +981,9 @@ Prim_unknown* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index
     const int baseSize2 = numItems * pData->field_0;
 
     // allocate double amount for active buffer switching?
+
+    // TODO: Allocating 0x54, not 0x48!
+    // alloc 12 more bytes? 12/4=3 dwords
     Prim_unknown* pMem = (Prim_unknown *)System_2_zerod_allocate_memory_40B296(2 * baseSize2 + sizeof(Prim_unknown));
     if (pMem)
     {
@@ -1004,7 +1008,7 @@ Prim_unknown* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index
 }
 MGS_FUNC_IMPLEX(0x405050, PrimAlloc_405050, LIBDG_IMPL);
 
-signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer)
+signed int CC PrimAdd_401805(Prim_unknown_0x48* pPrimBuffer)
 {
     struct_gv* pGv = &gLibGVStruct1_6BC36C;
     assert(pPrimBuffer->field_2C_index == 0);
@@ -1036,7 +1040,7 @@ void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
 
     for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
     {
-        Prim_unknown* pObj = pGv->gObjects_dword_6BC3C4[i];
+        Prim_unknown_0x48* pObj = pGv->gObjects_dword_6BC3C4[i];
         sub_4066ED(pObj);
     }
 }

@@ -5,6 +5,7 @@
 #include "Psx.hpp"
 #include "LibGV.hpp"
 #include "types.hpp"
+#include "Kmd.hpp"
 
 void LibDGCpp_ForceLink();
 
@@ -150,7 +151,7 @@ struct struct_gv
     s16 g_PrimQueue1_word_6BC3BE_256;
     s16 gPrimQueue2_word_6BC3C0_256;
     s16 gObjectQueue_word_6BC3C2_0;
-    Prim_unknown** gObjects_dword_6BC3C4;
+    Prim_unknown_0x48** gObjects_dword_6BC3C4;
     PSX_RECT dword_6BC3C8_pStructure_rect;
     PSX_RECT dword_6BC3D0_rect;
     int dword_6BC3D8_dst[16]; // One for each active buffer
@@ -177,7 +178,7 @@ ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName);
 void CC LibDg_Init_40111A();
 
 signed int CC Script_tbl_chara_451AC3(BYTE* pScript);
-signed int CC PrimAdd_401805(Prim_unknown* pPrimBuffer);
+signed int CC PrimAdd_401805(Prim_unknown_0x48* pPrimBuffer);
 void CC LibDG_ExecFnPtrs_40171C(int activeBuffer);
 void CC LibDG_ClearTexturesCache_402487();
 void CC LibDG_Restore_Textures_From_Resident_Memory_40274C();
@@ -185,5 +186,5 @@ void CC LibDG_Save_Texture_Hashes_To_Resident_Memory_4026F5();
 void CC LibDG_Clear_Resident_Texture_Cache_Copy_4026E6();
 signed int CC LibDG_SearchForTextureRecord_4024D2(signed int hashCode, Texture_Record** ppFreeItem);
 void CC LibDG_SetRGB_401931(BYTE r, BYTE b, BYTE g);
-Prim_unknown* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C);
+Prim_unknown_0x48* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C);
 Texture_Record* CC LibDG_FindTexture_4024A0(WORD hashCode);
