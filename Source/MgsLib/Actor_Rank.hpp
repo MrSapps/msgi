@@ -3,6 +3,7 @@
 #include "MgsFunction.hpp"
 #include "Actor.hpp"
 #include "Psx.hpp"
+#include "Kmd.hpp"
 
 void Actor_RankCPP_ForceLink();
 void DoActor_RankTests();
@@ -13,8 +14,8 @@ struct Actor_Rank
 {
     Actor mBase;
     WORD* field_20_dword_7919E0;
-    Prim_unknown* field_24_ptr_16_prims;
-    Prim_unknown* field_28_ptr_9_prims;
+    Prim_unknown_0x54* field_24_ptr_16_prims;
+    Prim_unknown_0x54* field_28_ptr_9_prims;
 
     POLY_FT4 field_2C_back_l_type0_0x40_start;      // Back ground left half
     POLY_FT4 field_54_back_r_type0;                 // Back ground right half

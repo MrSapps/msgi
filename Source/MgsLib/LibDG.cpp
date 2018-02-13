@@ -311,9 +311,9 @@ MGS_ARY(1, 0x6BDC5C, DWORD, 259, ot_gv2_1_6BDC5C, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE068, DR_ENV, stru_6BE068, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE0A8, DR_ENV, pPacked_6BE0A8, {});
 
-MGS_ARY(1, 0x6BBD60, Prim_unknown_0x48*, 256, dg_dword_6BBD60_prim_ptrs, {});
+MGS_ARY(1, 0x6BBD60, Prim_unknown_0x54*, 256, dg_dword_6BBD60_prim_ptrs, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BBD5C, DWORD, dg_dword_6BBD5C_k320, 0);
-MGS_ARY(1, 0x6BB95C, Prim_unknown_0x48*, 256, dg_dword_6BB95C_prim_ptrs, {});
+MGS_ARY(1, 0x6BB95C, Prim_unknown_0x54*, 256, dg_dword_6BB95C_prim_ptrs, {});
 
 void CC sub_401570(struct_gv* gv, DRAWENV* pDrawEnv, int bNotBg)
 {
@@ -867,11 +867,11 @@ MGS_FUNC_NOT_IMPL(0x406B97, void __cdecl(int a1, int count), sub_406B97);
 MGS_FUNC_NOT_IMPL(0x406A78, void __cdecl(int a1, int count), sub_406A78);
 MGS_FUNC_NOT_IMPL(0x406906, void __cdecl(int a1, int count), sub_406906);
 
-void CC sub_4066ED(Prim_unknown_0x48* pObj)
+void CC sub_4066ED(Prim_unknown_0x54* pObj)
 {
-    /*
+    
     void* field_20 = pObj->field_20;
-    int count = pObj->field_2E_w_or_h;
+    int count = pObj->field_2E_UnknownOrNumFaces;
     if (field_20)
     {
         memcpy(pObj, field_20, 32u);
@@ -879,9 +879,10 @@ void CC sub_4066ED(Prim_unknown_0x48* pObj)
 
     memcpy(&pVec_991E60, pObj, 32u);
 
-    if (pObj->field_28_dword_9942A0 & 0x40)
+    if (pObj->field_28_flags_or_type & 0x40)
     {
         // Seems to mostly handle "static" level geometry?
+        // Prim_unknown_0x48 * ?? 
         sub_40674E((int)pObj, count);
     }
     else
@@ -889,17 +890,17 @@ void CC sub_4066ED(Prim_unknown_0x48* pObj)
         if (pObj->field_38_size24b)
         {
             // Seems to handle players/map objects?
-            sub_406B97((int)pObj, count);
+            sub_406B97((int)pObj, count); // Prim_unknown_0x54
         }
         else if (pObj->field_40_pDataStart[1])
         {
             // Seems to mostly render doors?
-            sub_406A78((int)pObj, count);
+            sub_406A78((int)pObj, count); // Prim_unknown_0x54
         }
-        sub_406906((int)pObj, count);
-    }*/
+        sub_406906((int)pObj, count); // pObj + 0x84
+    }
 }
-MGS_FUNC_IMPLEX(0x4066ED, sub_4066ED, false);
+MGS_FUNC_IMPLEX(0x4066ED, sub_4066ED, true);
 
 //MGS_FUNC_NOT_IMPL(0x407122, void CC(struct_gv* pGv, int activeBuffer), LibGV_407122);
 MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
@@ -972,7 +973,7 @@ void CC sub_40514F(char a1, char a2, char a3, char a4)
 }
 MGS_FUNC_IMPLEX(0x40514F, sub_40514F, LIBDG_IMPL);
 
-Prim_unknown_0x48* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C)
+Prim_unknown_0x54* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C)
 {
     const int idx = (maybeFlags & 31);
     assert(idx < 25);
@@ -984,13 +985,13 @@ Prim_unknown_0x48* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_
 
     // TODO: Allocating 0x54, not 0x48!
     // alloc 12 more bytes? 12/4=3 dwords
-    Prim_unknown* pMem = (Prim_unknown *)System_2_zerod_allocate_memory_40B296(2 * baseSize2 + sizeof(Prim_unknown));
+    Prim_unknown_0x54* pMem = (Prim_unknown_0x54 *)System_2_zerod_allocate_memory_40B296(2 * baseSize2 + sizeof(Prim_unknown));
     if (pMem)
     {
-        MemClearUnknown_40B231(pMem, sizeof(Prim_unknown));
+        MemClearUnknown_40B231(pMem, sizeof(Prim_unknown_0x54));
         memcpy(&pMem->field_0_matrix, &gIdentity_matrix_6501F8, sizeof(PSX_MATRIX));
-        pMem->field_24_maybe_flags = maybeFlags;
-        pMem->field_2A_num_items = numItems;
+        pMem->field_24_pKmdFileData = (KmdHeader*)maybeFlags;
+        pMem->field_2A = numItems;
         pMem->field_2C_index = gv_index;
         pMem->field_38_size24b = size;
         pMem->field_3C = field_3C;
@@ -1008,7 +1009,7 @@ Prim_unknown_0x48* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_
 }
 MGS_FUNC_IMPLEX(0x405050, PrimAlloc_405050, LIBDG_IMPL);
 
-signed int CC PrimAdd_401805(Prim_unknown_0x48* pPrimBuffer)
+signed int CC PrimAdd_401805(Prim_unknown_0x54* pPrimBuffer)
 {
     struct_gv* pGv = &gLibGVStruct1_6BC36C;
     assert(pPrimBuffer->field_2C_index == 0);
@@ -1040,11 +1041,11 @@ void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
 
     for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
     {
-        Prim_unknown_0x48* pObj = pGv->gObjects_dword_6BC3C4[i];
+        Prim_unknown_0x54* pObj = pGv->gObjects_dword_6BC3C4[i];
         sub_4066ED(pObj);
     }
 }
-MGS_FUNC_IMPLEX(0x407122, LibGV_407122, true); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x407122, LibGV_407122, false); // TODO: Implement me
 
 void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 {

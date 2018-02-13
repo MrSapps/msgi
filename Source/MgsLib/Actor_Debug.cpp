@@ -26,7 +26,7 @@ static int CC Debug_Loader(Actor_Debug* pDebug)
     pDebug->mPolyF4 = {};
 
     int numPrims = 1;
-    Prim_unknown_0x48* pPrim16Data = PrimAlloc_405050(2066, numPrims, 0, 0, 0);
+    Prim_unknown_0x54* pPrim16Data = PrimAlloc_405050(2066, numPrims, 0, 0, 0);
     if (pPrim16Data)
     {
         PrimAdd_401805(pPrim16Data);
