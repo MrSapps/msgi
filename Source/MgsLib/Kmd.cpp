@@ -111,7 +111,7 @@ MGS_FUNC_IMPLEX(0x407BC1, PrimObj_407BC1, KMD_IMPL);
 
 struct PrimUnknownData
 {
-    char field_0;
+    char field_0_prim_type_size;
     char field_1;
     char field_2;
     char field_3;
@@ -151,7 +151,7 @@ MGS_ARY(1, 0x650194, PrimUnknownData, 25, byte_650194,
 // Dynamically sets the last item of byte_650194
 void CC sub_40514F(char a1, char a2, char a3, char a4)
 {
-    byte_650194[23].field_0 = a1;
+    byte_650194[23].field_0_prim_type_size = a1;
     byte_650194[23].field_1 = a2;
     byte_650194[23].field_2 = a3;
     byte_650194[23].field_3 = a4;
@@ -203,31 +203,31 @@ Prim_unknown_0x54* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_
     assert(idx < 25);
 
     const PrimUnknownData* pData = &byte_650194[idx];
-    const int baseSize2 = numItems * pData->field_0;
+    const int primBufferSize = numItems * pData->field_0_prim_type_size;
 
     // allocate double amount for active buffer switching?
 
     // TODO: Allocating 0x54, not 0x48!
     // alloc 12 more bytes? 12/4=3 dwords
-    Prim_unknown_0x54* pMem = (Prim_unknown_0x54 *)System_2_zerod_allocate_memory_40B296(2 * baseSize2 + sizeof(Prim_unknown_0x54));
+    Prim_unknown_0x54* pMem = (Prim_unknown_0x54 *)System_2_zerod_allocate_memory_40B296(2 * primBufferSize + sizeof(Prim_unknown_0x54));
     if (pMem)
     {
         MemClearUnknown_40B231(pMem, sizeof(Prim_unknown_0x54));
         memcpy(&pMem->field_0_matrix, &gIdentity_matrix_6501F8, sizeof(PSX_MATRIX));
         pMem->field_24_pKmdFileData = (KmdHeader*)maybeFlags;
-        pMem->field_2A = static_cast<WORD>(numItems);
-        pMem->field_2C_index = gv_index;
+        pMem->field_2A_num_prims = static_cast<WORD>(numItems);
+        pMem->field_2C_gv_index = gv_index;
         pMem->field_38_size24b = size;
         pMem->field_3C = field_3C;
-        pMem->field_30_size = pData->field_0;
+        pMem->field_30_prim_size = pData->field_0_prim_type_size;
         pMem->field_32 = pData->field_1;
         pMem->field_34 = pData->field_2;
         pMem->field_36 = pData->field_3;
 
         // Point into the extra allocated space after the structure
         BYTE* endPtr = reinterpret_cast<BYTE*>(&pMem[1]);
-        pMem->field_40_pDataStart[0] = endPtr;
-        pMem->field_40_pDataStart[1] = endPtr + baseSize2;
+        pMem->field_40_pDataStart[0] = endPtr;                      // 1st prim buffer
+        pMem->field_40_pDataStart[1] = endPtr + primBufferSize;     // 2nd prim buffer
     }
     return pMem;
 }
@@ -235,8 +235,8 @@ MGS_FUNC_IMPLEX(0x405050, PrimAlloc_405050, KMD_IMPL);
 
 signed int CC PrimAdd_401805(Prim_unknown_0x54* pPrimBuffer)
 {
-    assert(pPrimBuffer->field_2C_index == 0);
-    struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrimBuffer->field_2C_index; // Always 0?
+    assert(pPrimBuffer->field_2C_gv_index == 0);
+    struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrimBuffer->field_2C_gv_index; // Always 0?
     if (pGv->gPrimQueue2_word_6BC3C0_256 > pGv->gObjectQueue_word_6BC3C2_0)
     {
         pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256 - 1] = pPrimBuffer; // PrimObject = Prim_unknown + extra ??

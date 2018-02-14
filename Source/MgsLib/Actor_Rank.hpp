@@ -9,11 +9,12 @@ void Actor_RankCPP_ForceLink();
 void DoActor_RankTests();
 
 struct Prim_unknown;
+struct ButtonStates;
 
 struct Actor_Rank
 {
     Actor mBase;
-    WORD* field_20_dword_7919E0;
+    ButtonStates* field_20_button_states;
     Prim_unknown_0x54* field_24_ptr_16_prims;
     Prim_unknown_0x54* field_28_ptr_9_prims;
 

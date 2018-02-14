@@ -30,10 +30,10 @@ struct Prim_unknown_0x54
     void* field_20;
     KmdHeader* field_24_pKmdFileData;
     WORD field_28_flags_or_type;
-    WORD field_2A;
-    WORD field_2C_index;
+    WORD field_2A_num_prims;
+    WORD field_2C_gv_index;
     WORD field_2E_UnknownOrNumFaces;
-    WORD field_30_size;
+    WORD field_30_prim_size;
     WORD field_32;
     WORD field_34; // Or 2 words?
     WORD field_36;

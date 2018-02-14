@@ -7,6 +7,7 @@
 #include "ResourceNameHash.hpp"
 #include "WinMain.hpp"
 #include "Menu.hpp"
+#include "Actor_GameD.hpp"
 
 #define ACTOR_RANK_IMPL true
 
@@ -905,7 +906,8 @@ MGS_FUNC_IMPLEX(0x46EDE8, Rank_RenderGameCompletionScreen, ACTOR_RANK_IMPL);
 
 void CC Rank_ToState2If_473E69(Actor_Rank* pRank)
 {
-    if (pRank->field_20_dword_7919E0[1]) // TODO: Discover what this field really is
+    // If any button pressed then change screen
+    if (pRank->field_20_button_states->field_2_button_pressed)
     {
         pRank->field_484_state = 2;
         pRank->field_480_ticks = 0;
@@ -992,7 +994,6 @@ MGS_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
 
 MGS_VAR_EXTERN(u32, dword_9942A0); // From Actor
 
-MGS_VAR(1, 0x7919E0, char*, dword_7919E0, 0);
 MGS_VAR(1, 0x78E896, WORD, gGameTime_word_78E896, 0);
 MGS_VAR(1, 0x78E898, WORD, gGameTime_word_78E898, 0);
 
@@ -1143,7 +1144,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_c"), &pRank->field_3EC_cur_c, 0, 0, 0, 0, 1, 3);
     pRank->field_45C_8_prim_dst[8] = 0;
 
-    pRank->field_20_dword_7919E0 = (WORD *)&dword_7919E0;
+    pRank->field_20_button_states = &gButtonsArray4_7919C0[2];
 
     if (Script_ParamExists('x'))
     {
