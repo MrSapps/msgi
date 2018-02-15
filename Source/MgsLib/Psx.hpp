@@ -274,6 +274,61 @@ MGS_VAR_EXTERN(VECTOR3, gGte_background_colour_993E74);
 MGS_VAR_EXTERN(MATRIX3x3, gte_rotation_matrix_993E40);
 MGS_VAR_EXTERN(VECTOR3, gGte_translation_vector_993E54);
 
+struct Regs_VXYZ
+{
+    short int VX;
+    short int VY;
+    short int VZ;
+    short int Zero;
+};
+MGS_ASSERT_SIZEOF(Regs_VXYZ, 8);
+
+union Reg_VXY0
+{
+    Regs_VXYZ regs;
+    __int64 VXY0;
+};
+
+union Reg_VXY1
+{
+    Regs_VXYZ regs;
+    __int64 VXY1;
+};
+
+union Reg_VXY2
+{
+    Regs_VXYZ regs;
+    __int64 VXY2;
+};
+
+MGS_VAR_EXTERN(Reg_VXY0, gGte_VXY0_993EC0);
+MGS_VAR_EXTERN(Reg_VXY1, gGte_VXY1_993EC8);
+MGS_VAR_EXTERN(Reg_VXY2, gGte_VXY2_993ED0);
+
+union MAC_Reg
+{
+    short int MAC_16;
+    int MAC_32;
+};
+MGS_ASSERT_SIZEOF(MAC_Reg, 4);
+
+MGS_VAR_EXTERN(MAC_Reg, gGte_MAC0_993F20);
+MGS_VAR_EXTERN(MAC_Reg, gGte_MAC1_993F24);
+MGS_VAR_EXTERN(MAC_Reg, gGte_MAC2_993F28);
+MGS_VAR_EXTERN(MAC_Reg, gGte_MAC3_993F2C);
+
+union IR_Reg
+{
+    short int IR_16;
+    int IR_32;
+};
+MGS_ASSERT_SIZEOF(IR_Reg, 4);
+
+MGS_VAR_EXTERN(IR_Reg, gGte_IR0_993EE0);
+MGS_VAR_EXTERN(IR_Reg, gGte_IR1_993EE4);
+MGS_VAR_EXTERN(IR_Reg, gGte_IR2_993EE8);
+MGS_VAR_EXTERN(IR_Reg, gGte_IR3_993EEC);
+
 signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode);
 int CC SetGraphDebug(int debug);
 void CC SetDispMask(int mask);
@@ -283,3 +338,6 @@ void CC PsxGpuDebug_44A4D0();
 DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2);
 void CC SetDrawEnv_40DDE0(DR_ENV* pPacked, DRAWENV* drawEnv);
 void CC VectorNormal_44CAE0(const VECTOR* pVec, VECTOR* pUnitVec);
+
+void CC Psx_gte_RT1_rtir_447480();
+void CC Psx_gte_RT1TR_rt_4477A0();

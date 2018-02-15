@@ -528,47 +528,6 @@ union Reg_SXY2
     int SXY2;
 };
 
-struct Regs_VXYZ
-{
-    short int VX;
-    short int VY;
-    short int VZ;
-    short int Zero;
-};
-MGS_ASSERT_SIZEOF(Regs_VXYZ, 8);
-
-union Reg_VXY0
-{
-    Regs_VXYZ regs;
-    __int64 VXY0;
-};
-
-union Reg_VXY1
-{
-    Regs_VXYZ regs;
-    __int64 VXY1;
-};
-
-union Reg_VXY2
-{
-    Regs_VXYZ regs;
-    __int64 VXY2;
-};
-
-union IR_Reg
-{
-    short int IR_16;
-    int IR_32;
-};
-MGS_ASSERT_SIZEOF(IR_Reg, 4);
-
-union MAC_Reg
-{
-    short int MAC_16;
-    int MAC_32;
-};
-MGS_ASSERT_SIZEOF(MAC_Reg, 4);
-
 struct Reg_RGB
 {
     unsigned char r, g, b, cd;

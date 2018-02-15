@@ -860,9 +860,111 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
 }
 MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, false); // TODO: Fully implement
 
-MGS_VAR(1, 0x991E60, VECTOR, pVec_991E60, {});
 
-MGS_FUNC_NOT_IMPL(0x40674E, void __cdecl(int a1, int count), sub_40674E);
+//MGS_FUNC_NOT_IMPL(0x40674E, void __cdecl(int a1, int count), sub_40674E);
+
+MGS_VAR(1, 0x991E40, PSX_MATRIX, gMatrix_dword_991E40, {});
+
+struct Prim_internal_0x5c
+{
+    DWORD field_0;
+    DWORD field_4;
+    DWORD field_8;
+    DWORD field_C;
+    DWORD field_10;
+    DWORD field_14;
+    DWORD field_18;
+    DWORD field_1C;
+    DWORD field_20;
+    DWORD field_24;
+    DWORD field_28;
+    DWORD field_2C;
+    DWORD field_30;
+    DWORD field_34;
+    DWORD field_38;
+    DWORD field_3C;
+    DWORD field_40;
+    DWORD field_44;
+    DWORD field_48;
+    DWORD field_4C;
+    DWORD field_50;
+    void** field_54_buffers[2];
+};
+MGS_ASSERT_SIZEOF(Prim_internal_0x5c, 0x5c);
+
+struct struc_gte_unknown
+{
+    WORD field_0_ir_1_0;
+    WORD field_2_ir1_1;
+    WORD field_4_ir1_2;
+    WORD field_6_ir_2_0;
+    WORD field_8_ir2_1;
+    WORD field_A_ir2_2;
+    WORD field_C_ir_3_0;
+    WORD field_E_ir_3_1;
+    WORD field_10_ir3_2;
+    WORD field_12;
+    int field_14_mac1;
+    int field_18_mac2;
+    int field_1C_mac3;
+};
+MGS_ASSERT_SIZEOF(struc_gte_unknown, 0x20);
+
+MGS_VAR(1, 0x991E60, struc_gte_unknown, gIR32_1_991E60, {});
+MGS_VAR(1, 0x991E80, struc_gte_unknown, gIR1_991E80, {});
+
+void CC LibGV_40674E(Prim_unknown_0x48* pPrim, int faceCount)
+{
+    memcpy(&gte_rotation_matrix_993E40.m, &gMatrix_dword_991E40.m, sizeof(gMatrix_dword_991E40.m));
+
+    gGte_IR1_993EE4.IR_32 = gIR32_1_991E60.field_0_ir_1_0;
+    gGte_IR2_993EE8.IR_32 = gIR32_1_991E60.field_6_ir_2_0;
+    gGte_IR3_993EEC.IR_32 = gIR32_1_991E60.field_C_ir_3_0;
+    Psx_gte_RT1_rtir_447480();
+    gIR1_991E80.field_0_ir_1_0 = gGte_IR1_993EE4.IR_16;
+    gIR1_991E80.field_6_ir_2_0 = gGte_IR2_993EE8.IR_16;
+    gIR1_991E80.field_C_ir_3_0 = gGte_IR3_993EEC.IR_16;
+
+    gGte_IR1_993EE4.IR_32 = gIR32_1_991E60.field_2_ir1_1;
+    gGte_IR2_993EE8.IR_32 = gIR32_1_991E60.field_8_ir2_1;
+    gGte_IR3_993EEC.IR_32 = gIR32_1_991E60.field_E_ir_3_1;
+    Psx_gte_RT1_rtir_447480();
+    gIR1_991E80.field_2_ir1_1 = gGte_IR1_993EE4.IR_16;
+    gIR1_991E80.field_8_ir2_1 = gGte_IR2_993EE8.IR_16;
+    gIR1_991E80.field_E_ir_3_1 = gGte_IR3_993EEC.IR_16;
+
+    gGte_IR1_993EE4.IR_32 = gIR32_1_991E60.field_4_ir1_2;
+    gGte_IR2_993EE8.IR_32 = gIR32_1_991E60.field_A_ir2_2;
+    gGte_IR3_993EEC.IR_32 = gIR32_1_991E60.field_10_ir3_2;
+    Psx_gte_RT1_rtir_447480();
+    gIR1_991E80.field_4_ir1_2 = gGte_IR1_993EE4.IR_16;
+    gIR1_991E80.field_A_ir2_2 = gGte_IR2_993EE8.IR_16;
+    gIR1_991E80.field_10_ir3_2 = gGte_IR3_993EEC.IR_16;
+
+    gGte_translation_vector_993E54.x = gMatrix_dword_991E40.t[0];
+    gGte_translation_vector_993E54.y = gMatrix_dword_991E40.t[1];
+    gGte_translation_vector_993E54.z = gMatrix_dword_991E40.t[2];
+
+    gGte_VXY0_993EC0.regs.VX = gIR32_1_991E60.field_14_mac1;
+    gGte_VXY0_993EC0.regs.VY = gIR32_1_991E60.field_18_mac2;
+    gGte_VXY0_993EC0.regs.VZ = gIR32_1_991E60.field_1C_mac3;
+
+    Psx_gte_RT1TR_rt_4477A0();
+
+    gIR1_991E80.field_14_mac1 = gGte_MAC1_993F24.MAC_32;
+    gIR1_991E80.field_18_mac2 = gGte_MAC2_993F28.MAC_32;
+    gIR1_991E80.field_1C_mac3 = gGte_MAC3_993F2C.MAC_32;
+
+    // Pointer to data after the main structure
+    Prim_internal_0x5c* field_48_dst_ptr = (Prim_internal_0x5c *)&pPrim[1];
+    for (int i = 0; i < faceCount; i++)
+    {
+        memcpy(&field_48_dst_ptr[i].field_0,  &gIR32_1_991E60, sizeof(struc_gte_unknown));
+        memcpy(&field_48_dst_ptr[i].field_20, &gIR1_991E80,    sizeof(struc_gte_unknown));
+    }
+}
+MGS_FUNC_IMPLEX(0x40674E, LibGV_40674E, LIBDG_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x406B97, void __cdecl(int a1, int count), sub_406B97);
 MGS_FUNC_NOT_IMPL(0x406A78, void __cdecl(int a1, int count), sub_406A78);
 MGS_FUNC_NOT_IMPL(0x406906, void __cdecl(int a1, int count), sub_406906);
@@ -877,13 +979,13 @@ void CC sub_4066ED(Prim_unknown_0x54* pObj)
         memcpy(pObj, field_20, 32u);
     }
 
-    memcpy(&pVec_991E60, pObj, 32u);
+    memcpy(&gIR32_1_991E60, pObj, 32u);
 
     if (pObj->field_28_flags_or_type & 0x40)
     {
         // Seems to mostly handle "static" level geometry?
         // Prim_unknown_0x48 * ?? 
-        sub_40674E((int)pObj, count);
+        LibGV_40674E((Prim_unknown_0x48*)pObj, count);
     }
     else
     {
@@ -909,7 +1011,6 @@ MGS_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_404
 MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
 //MGS_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_40340A);
 
-MGS_VAR(1, 0x991E40, PSX_MATRIX, gMatrix_dword_991E40, {});
 
 const PSX_MATRIX gIdentity_matrix =
 { 
