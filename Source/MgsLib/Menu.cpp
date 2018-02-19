@@ -1551,7 +1551,65 @@ void CC MenuTextureLoad_44DEB3()
 }
 MGS_FUNC_IMPLEX(0x44DEB3, MenuTextureLoad_44DEB3, MENU_IMPL);
 
-//   Render_Text_Large_font_468AAF(&gMenuPrimBuffer_7265E0, &gTextConfig_66C4C0, formattedStr);
+struct Menu_stru_0x18
+{
+    DWORD field_0;
+    MenuMan_Inventory_14h_Unk* field_4_pUnk;
+    PSX_RECT field_8_rect;
+    DWORD field_10;
+    DWORD field_14;
+};
+MGS_ASSERT_SIZEOF(Menu_stru_0x18, 0x18);
+
+MGS_ARY(1, 0x733CF8, Menu_stru_0x18, 9, gMenu_stru_733CF8, {});
+MGS_VAR(1, 0x733CF4, DWORD, flags_dword_733CF4, 0);
+MGS_VAR(1, 0x733DD0, DWORD, gBitFlags_dword_733DD0, 0);
+
+// Called for each of the 7 possible inventory slots being draw.
+// It appears to set the pal or sprite for each item.
+void CC Menu_inventory_common_set_icon_46B007(MenuMan_Inventory_14h_Unk* pUnk)
+{
+    signed int flagBits = 1;
+    int index = 0;
+    while (flagBits & flags_dword_733CF4)
+    {
+        flagBits *= 2;
+        if (++index >= 9)
+        {
+            return;
+        }
+    }
+    flags_dword_733CF4 |= flagBits;
+
+    pUnk->field_8_index = index;
+    pUnk->field_C_colour = gMenu_stru_733CF8[index].field_0;
+
+    gMenu_stru_733CF8[index].field_4_pUnk = pUnk;
+    gMenu_stru_733CF8[index].field_8_rect.x2 = pUnk->field_10_w / 4;
+    gMenu_stru_733CF8[index].field_8_rect.y2 = pUnk->field_12_h;
+
+    PSX_RECT* pRect = &gMenu_stru_733CF8[index].field_8_rect;
+    g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
+        pRect,
+        pUnk->field_4_word_ptr_pixels,
+        pUnk->field_0_pixels,
+        0, 0, 0, 0);
+    Render_sub_41C6B0(pRect, pUnk->field_0_pixels);
+}
+MGS_FUNC_IMPLEX(0x46B007, Menu_inventory_common_set_icon_46B007, MENU_IMPL);
+
+void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMenuUnk)
+{
+    if (!pMenuUnk->field_C_colour)
+    {
+        Menu_inventory_common_set_icon_46B007(pMenuUnk);
+    }
+    if (pMenuUnk->field_8_index >= 0)
+    {
+        gBitFlags_dword_733DD0 |= 1 << pMenuUnk->field_8_index;
+    }
+}
+MGS_FUNC_IMPLEX(0x46AFE1, Menu_inventory_common_icon_helper_46AFE1, MENU_IMPL);
 
 static void Test_Render_Text_Large_font_468AAF()
 {
