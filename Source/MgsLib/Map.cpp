@@ -5,6 +5,7 @@
 #include "Script.hpp"
 #include "WinMain.hpp"
 #include "LibDG.hpp"
+#include "ResourceNameHash.hpp"
 
 #define MAP_IMPL true
 
@@ -153,7 +154,19 @@ int CC Map_ScriptReloadMaps_44F75E(int zeroOrOne)
 }
 MGS_FUNC_IMPLEX(0x44F75E, Map_ScriptReloadMaps_44F75E, MAP_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x44F66F, void __cdecl(int mapNum, int resourceNameHashed), Map_LoadMapData_44F66F); // TODO
+MGS_FUNC_NOT_IMPL(0x44F5AF, void* CC(int resource_name_hashed, int default_0, __int16 bitIndex, int default_48, int default_24), Map_HZD_Load_44F5AF)
+MGS_FUNC_NOT_IMPL(0x44F53B, int CC(int resourceNameHashed, map_record *pMapStruct), Map_LitLoad_44F53B)
+
+void CC Map_LoadMapData_44F66F(int mapNum, int resourceNameHashed)
+{
+    printf("set map %d\n", mapNum);
+    map_record* pMap = Map_GetNextFreeRecord_44F505(static_cast<short>(mapNum));
+    pMap->field_8_hzd = Map_HZD_Load_44F5AF(resourceNameHashed, 0, pMap->field_0_map_index_bit, 48, 24);
+    DWORD fileNameHashed = Hash_40A58B(resourceNameHashed, 'l');
+    pMap->field_C_l_file = (DWORD)LibGV_FindFile_40A603(fileNameHashed);
+    Map_LitLoad_44F53B(resourceNameHashed, pMap);
+}
+MGS_FUNC_IMPLEX(0x44F66F, Map_LoadMapData_44F66F, MAP_IMPL);
 
 map_record* CC Map_ScriptLoadMapBlocks_44F640()
 {
