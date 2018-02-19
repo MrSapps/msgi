@@ -1077,6 +1077,14 @@ void CC Res_base_unknown_44AF20(MATRIX3x3* pMtx, VECTOR* pVec)
 }
 MGS_FUNC_IMPLEX(0x44AF20, Res_base_unknown_44AF20, IMPL_PSX);
 
+void CC Vector_op_44B200(const VECTOR* pVec1, const VECTOR* pVec2, VECTOR* pResult)
+{
+    pResult->field_0_x = (pVec1->field_4_y * pVec2->field_8_z - pVec2->field_4_y * pVec1->field_8_z) >> 12;
+    pResult->field_4_y = (pVec2->field_0_x * pVec1->field_8_z - pVec2->field_8_z * pVec1->field_0_x) >> 12;
+    pResult->field_8_z = (pVec2->field_4_y * pVec1->field_0_x - pVec1->field_4_y * pVec2->field_0_x) >> 12;
+}
+MGS_FUNC_IMPLEX(0x44B200, Vector_op_44B200, IMPL_PSX);
+
 static void Test_Psx_gte_RT1_rtir_447480()
 {
     gGte_IR1_993EE4.IR_32 = 4096;
