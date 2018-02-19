@@ -1683,6 +1683,38 @@ void CC Menu_inventory_common_set_icon_46B007(MenuMan_Inventory_14h_Unk* pUnk)
 }
 MGS_FUNC_IMPLEX(0x46B007, Menu_inventory_common_set_icon_46B007, MENU_IMPL);
 
+MGS_ARY(1, 0x733C90, Menu_stru_0x18, 4, stru_733C90, {});
+
+// Seems to render the active/selected menu item
+void CC Menu_render_unk_46B081(MenuMan_Inventory_14h_Unk *pUnk, int idx)
+{
+    Menu_stru_0x18* pStru = &stru_733C90[idx];
+
+    pUnk->field_8_index = 31 - idx;
+    pUnk->field_C_colour = pStru->field_0;
+
+    pStru->field_8_rect.x2 = pUnk->field_10_w / 4;
+    pStru->field_8_rect.y2 = pUnk->field_12_h;
+    
+    g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
+        &pStru->field_8_rect,
+        pUnk->field_4_word_ptr_pixels,
+        pUnk->field_0_pixels,
+        0, 0, 0, 0);
+    Render_sub_41C6B0(&pStru->field_8_rect, pUnk->field_0_pixels);
+}
+MGS_FUNC_IMPLEX(0x46B081, Menu_render_unk_46B081, MENU_IMPL);
+
+MGS_VAR(1, 0x7339A8, MenuMan_Inventory_14h_Unk, stru_7339A8, {});
+MGS_VAR(1, 0x733990, MenuMan_Inventory_14h_Unk, stru_733990, {});
+
+void Menu_render_unk_2_and_3_468C6B()
+{
+    Menu_render_unk_46B081(&stru_7339A8, 2);
+    Menu_render_unk_46B081(&stru_733990, 3);
+}
+MGS_FUNC_IMPLEX(0x468C6B, Menu_render_unk_2_and_3_468C6B, MENU_IMPL);
+
 void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMenuUnk)
 {
     if (!pMenuUnk->field_C_colour)
