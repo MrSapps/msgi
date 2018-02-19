@@ -39,6 +39,16 @@ struct MenuMan_MenuBars
 #pragma pack(pop)
 MGS_ASSERT_SIZEOF(MenuMan_MenuBars, 0xc);
 
+struct MenuMan_Inventory_Sub
+{
+    WORD field_0_item_idx;
+    WORD field_2;
+    WORD field_4;
+    WORD field_6;
+    struct MenuMan_Inventory_Unk_6764F8* field_8_pMenuMan_Inventory_Unk_6764F8;
+};
+MGS_ASSERT_SIZEOF(MenuMan_Inventory_Sub, 0xC);
+
 // TODO: Discover true size of structure/other data
 struct MenuMan
 {
@@ -76,21 +86,24 @@ struct MenuMan
     BYTE field_1D4;
     BYTE field_1D5;
     WORD field_1D6;
-    DWORD field_1D8;
-    DWORD field_1DC;
-    DWORD field_1E0;
-    DWORD field_1E4;
-    DWORD field_1E8;
-    DWORD field_1EC;
-    DWORD field_1F0;
-    DWORD field_1F4;
-    DWORD field_1F8;
-    DWORD field_1FC;
+
+    MenuMan_Inventory_Sub field_1D8_invent_left;
+    DWORD field_1E4_invent_left_pItem; // probably also sys alloc'd
+    BYTE field_1E8_invent_left;
+    BYTE field_1E9_invent_left;
+    WORD field_1EA;
+
+    MenuMan_Inventory_Sub field_1EC_invent_right;
+    DWORD field_1F8_sys_allocated;
+    BYTE field_1FC_invent_right;
+    BYTE field_1FD_invent_right;
+    WORD field_1FE_invent_right;
+
     MenuMan_MenuBars field_200_hp_bars_info;
     WORD field_20C_codec_state;
     WORD field_20E;
-    DWORD field_210_size_19F2_q;
-    DWORD field_214;
+    DWORD field_210_size_19F2_font;
+    DWORD field_214_108bytes;
     DWORD field_218;
 };
 MGS_ASSERT_SIZEOF(MenuMan, 0x21C);
@@ -375,7 +388,79 @@ MGS_FUNC_IMPLEX(0x00468406, Menu_init_num_res_font_468406, MENU_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x46AD91, void __cdecl(MenuMan*), Menu_init_fn0_46AD91);
 MGS_FUNC_NOT_IMPL(0x469E77, void __cdecl(MenuMan*), Menu_init_inventory_left_469E77);
-MGS_FUNC_NOT_IMPL(0x4694E4, void __cdecl(MenuMan*), Menu_init_inventory_right_4694E4);
+
+/*
+MenuMan_Inventory_Unk_6764F8 stru_6764F8[2] =
+{
+    { 12058640, 1, 24576, 36864,{ &Menu_46B36B, &Menu_46B2E0, NULL } },
+    { 12058880, 2, 12288, 49152,{ &Menu_46B2E0, &Menu_46B326, NULL } }
+};
+*/
+
+struct MenuMan_Inventory_Unk_6764F8
+{
+    DWORD field_0;
+    DWORD field_4_buttons;
+    DWORD field_8;
+    DWORD field_C;
+    DWORD field_10_fn_ptrs[3];
+};
+MGS_ASSERT_SIZEOF(MenuMan_Inventory_Unk_6764F8, 0x1C);
+
+MGS_ARY(1, 0x6764F8, MenuMan_Inventory_Unk_6764F8, 2, stru_6764F8, {});
+
+void CC Menu_inventory_right_update_4697F3(MenuMan *pMenu, int* pPrimBuffer)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x004697F3, Menu_inventory_right_update_4697F3, false); // TODO
+
+BYTE* CC Menu_inventory_right_46956F(MenuMan* pMenu, DWORD* ot, int a3, int text_ypos, int a5)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x0046956F, Menu_inventory_right_46956F, false); // TODO
+
+void CC Menu_init_inventory_right_helper_46954B()
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x0046954B, Menu_init_inventory_right_helper_46954B, false); // TODO
+
+void CC Menu_Get_current_weapon_info_46948E(MenuMan* pMenu)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x0046948E, Menu_Get_current_weapon_info_46948E, false); // TODO
+
+MGS_VAR(1, 0x7339E0, DWORD, gMenuRight_7339E0, 0);
+
+
+void CC Menu_init_inventory_set_fn_46B3B0(MenuMan_Inventory_Sub *pMenu_field_1EC, int bLeftOrRight, void* pFn)
+{
+    MenuMan_Inventory_Unk_6764F8* pUnk = &stru_6764F8[bLeftOrRight];
+    pMenu_field_1EC->field_8_pMenuMan_Inventory_Unk_6764F8 = pUnk;
+    pUnk->field_10_fn_ptrs[2] = (DWORD)pFn; // TODO: Types
+}
+MGS_FUNC_IMPLEX(0x0046B3B0, Menu_init_inventory_set_fn_46B3B0, MENU_IMPL);
+
+void CC Menu_init_inventory_right_4694E4(MenuMan* pMenu)
+{
+    pMenu->field_28_flags |= 2u;
+    pMenu->field_1EC_invent_right.field_0_item_idx = -1;
+    pMenu->field_1FD_invent_right = -1;
+    pMenu->m7FnPtrs_field_2C[1] = Menu_inventory_right_update_4697F3;
+    pMenu->field_1FC_invent_right = 0;
+    pMenu->field_1FE_invent_right = 0;
+    pMenu->field_1EC_invent_right.field_4 = 0;
+    pMenu->field_1EC_invent_right.field_6 = 1;
+    gMenuRight_7339E0 = 0;
+    Menu_init_inventory_set_fn_46B3B0(&pMenu->field_1EC_invent_right, 1, Menu_inventory_right_46956F);
+    Menu_init_inventory_right_helper_46954B();
+    Menu_Get_current_weapon_info_46948E(pMenu);
+}
+MGS_FUNC_IMPLEX(0x004694E4, Menu_init_inventory_right_4694E4, MENU_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
 
 struct TextConfig
@@ -1104,7 +1189,7 @@ MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
     Menu_init_radar_468358,
     Menu_init_codec_463746,
     Menu_init_inventory_left_469E77.Ptr(),
-    Menu_init_inventory_right_4694E4.Ptr(),
+    Menu_init_inventory_right_4694E4,
     Menu_init_menu_bars_4691CE,
     Menu_init_num_res_font_468406,
     Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC.Ptr(),
