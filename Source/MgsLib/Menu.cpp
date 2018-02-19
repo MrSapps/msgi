@@ -265,22 +265,6 @@ MGS_FUNC_IMPLEX(0x00463746, Menu_init_codec_463746, MENU_IMPL);
 
 using TMenuFn = void(CC*)(MenuMan*);
 
-struct MenuMan_Inventory_14h_Unk
-{
-    BYTE* field_0_pixels;
-    WORD* field_4_word_ptr_pixels;
-    BYTE field_8_index;
-    BYTE field_9_x;
-    BYTE field_A_y;
-    BYTE field_B;
-    DWORD field_C_colour;
-    WORD field_10_w;
-    WORD field_12_h;
-};
-MGS_ASSERT_SIZEOF(MenuMan_Inventory_14h_Unk, 0x14);
-
-MGS_FUNC_NOT_IMPL(0x46B92E, void __cdecl(MenuMan_Inventory_14h_Unk* pMenuUnk, int width, int height), Menu_get_item_file_item_46B92E);
-
 MGS_VAR(1, 0x733978, SPRT, gMenu_sprt3_733978, {});
 
 static void InitLargeFontTemplateSprite()
@@ -293,6 +277,12 @@ static void InitLargeFontTemplateSprite()
     gMenu_sprt3_733978.h = 6;
     gMenu_sprt3_733978.clut = 32765;
 }
+
+void CC Menu_get_item_file_item_46B92E(struct MenuMan_Inventory_14h_Unk *pMenuUnk, int width, int height)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x0046B92E, Menu_get_item_file_item_46B92E, false); // TODO
 
 void CC Menu_init_num_res_font_helper_468A04()
 {
@@ -385,9 +375,7 @@ void CC Menu_init_num_res_font_468406(MenuMan* /*pMenu*/)
 }
 MGS_FUNC_IMPLEX(0x00468406, Menu_init_num_res_font_468406, MENU_IMPL);
 
-
 MGS_FUNC_NOT_IMPL(0x46AD91, void __cdecl(MenuMan*), Menu_init_fn0_46AD91);
-MGS_FUNC_NOT_IMPL(0x469E77, void __cdecl(MenuMan*), Menu_init_inventory_left_469E77);
 
 /*
 MenuMan_Inventory_Unk_6764F8 stru_6764F8[2] =
@@ -409,11 +397,17 @@ MGS_ASSERT_SIZEOF(MenuMan_Inventory_Unk_6764F8, 0x1C);
 
 MGS_ARY(1, 0x6764F8, MenuMan_Inventory_Unk_6764F8, 2, stru_6764F8, {});
 
-void CC Menu_inventory_right_update_4697F3(MenuMan *pMenu, int* pPrimBuffer)
+void CC Menu_inventory_right_update_4697F3(MenuMan* pMenu, int* pPrimBuffer)
 {
     MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x004697F3, Menu_inventory_right_update_4697F3, false); // TODO
+
+void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, int* ot)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x0046A187, Menu_inventory_left_update_46A187, false); // TODO
 
 BYTE* CC Menu_inventory_right_46956F(MenuMan* pMenu, DWORD* ot, int a3, int text_ypos, int a5)
 {
@@ -421,11 +415,23 @@ BYTE* CC Menu_inventory_right_46956F(MenuMan* pMenu, DWORD* ot, int a3, int text
 }
 MGS_FUNC_IMPLEX(0x0046956F, Menu_inventory_right_46956F, false); // TODO
 
+BYTE* CC Menu_inventory_left_469F14(MenuMan *pMenu, DWORD *ot, int xpos, int ypos, int a5)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x00469F14, Menu_inventory_left_469F14, false); // TODO
+
 void CC Menu_init_inventory_right_helper_46954B()
 {
     MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x0046954B, Menu_init_inventory_right_helper_46954B, false); // TODO
+
+void CC Menu_init_inventory_left_helper_469EDB()
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x00469EDB, Menu_init_inventory_left_helper_469EDB, false); // TODO
 
 void CC Menu_Get_current_weapon_info_46948E(MenuMan* pMenu)
 {
@@ -433,8 +439,11 @@ void CC Menu_Get_current_weapon_info_46948E(MenuMan* pMenu)
 }
 MGS_FUNC_IMPLEX(0x0046948E, Menu_Get_current_weapon_info_46948E, false); // TODO
 
-MGS_VAR(1, 0x7339E0, DWORD, gMenuRight_7339E0, 0);
-
+void CC Menu_generic_update_helper_469E37(MenuMan *pMenu)
+{
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x00469E37, Menu_generic_update_helper_469E37, false); // TODO
 
 void CC Menu_init_inventory_set_fn_46B3B0(MenuMan_Inventory_Sub *pMenu_field_1EC, int bLeftOrRight, void* pFn)
 {
@@ -443,6 +452,8 @@ void CC Menu_init_inventory_set_fn_46B3B0(MenuMan_Inventory_Sub *pMenu_field_1EC
     pUnk->field_10_fn_ptrs[2] = (DWORD)pFn; // TODO: Types
 }
 MGS_FUNC_IMPLEX(0x0046B3B0, Menu_init_inventory_set_fn_46B3B0, MENU_IMPL);
+
+MGS_VAR(1, 0x7339E0, DWORD, gMenuRight_7339E0, 0);
 
 void CC Menu_init_inventory_right_4694E4(MenuMan* pMenu)
 {
@@ -460,6 +471,37 @@ void CC Menu_init_inventory_right_4694E4(MenuMan* pMenu)
     Menu_Get_current_weapon_info_46948E(pMenu);
 }
 MGS_FUNC_IMPLEX(0x004694E4, Menu_init_inventory_right_4694E4, MENU_IMPL);
+
+MGS_VAR(1, 0x733AD0, DWORD, gMenuLeft_733AD0, 0);
+
+MGS_VAR(1, 0x7339A8, MenuMan_Inventory_14h_Unk, stru_7339A8, {});
+MGS_VAR(1, 0x733990, MenuMan_Inventory_14h_Unk, stru_733990, {});
+
+void Menu_init_inventory_left_helper_468C87()
+{
+    stru_7339A8.field_8_index = 0;
+    Menu_get_item_file_item_46B92E(&stru_7339A8, 40, 39);
+    Menu_get_item_file_item_46B92E(&stru_733990, 48, 39);
+    Menu_render_unk_2_and_3_468C6B();
+}
+MGS_FUNC_IMPLEX(0x00468C87, Menu_init_inventory_left_helper_468C87, MENU_IMPL);
+
+void CC Menu_init_inventory_left_469E77(MenuMan* pMenu)
+{
+    pMenu->field_28_flags |= 4u;
+    pMenu->field_1D8_invent_left.field_0_item_idx = -1;
+    pMenu->field_1E9_invent_left = -1;
+    pMenu->m7FnPtrs_field_2C[2] = Menu_inventory_left_update_46A187;
+    pMenu->field_1E8_invent_left = 0;
+    pMenu->field_1D8_invent_left.field_4 = 0;
+    pMenu->field_1D8_invent_left.field_6 = 1;
+    gMenuLeft_733AD0 = 0;
+    Menu_init_inventory_set_fn_46B3B0(&pMenu->field_1D8_invent_left, 0, Menu_inventory_left_469F14);
+    Menu_init_inventory_left_helper_469EDB();
+    Menu_generic_update_helper_469E37(pMenu);
+    Menu_init_inventory_left_helper_468C87();
+}
+MGS_FUNC_IMPLEX(0x00469E77, Menu_init_inventory_left_469E77, MENU_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
 
@@ -1188,7 +1230,7 @@ MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
     Menu_init_fn0_46AD91.Ptr(),
     Menu_init_radar_468358,
     Menu_init_codec_463746,
-    Menu_init_inventory_left_469E77.Ptr(),
+    Menu_init_inventory_left_469E77,
     Menu_init_inventory_right_4694E4,
     Menu_init_menu_bars_4691CE,
     Menu_init_num_res_font_468406,
@@ -1704,9 +1746,6 @@ void CC Menu_render_unk_46B081(MenuMan_Inventory_14h_Unk *pUnk, int idx)
     Render_sub_41C6B0(&pStru->field_8_rect, pUnk->field_0_pixels);
 }
 MGS_FUNC_IMPLEX(0x46B081, Menu_render_unk_46B081, MENU_IMPL);
-
-MGS_VAR(1, 0x7339A8, MenuMan_Inventory_14h_Unk, stru_7339A8, {});
-MGS_VAR(1, 0x733990, MenuMan_Inventory_14h_Unk, stru_733990, {});
 
 void Menu_render_unk_2_and_3_468C6B()
 {
