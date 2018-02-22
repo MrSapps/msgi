@@ -120,7 +120,66 @@ void CC Res_MenuMan_create_459A9A()
 MGS_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, MENU_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x462A3D, void __cdecl(MenuMan* pMenu, int* ot), Menu_update_helper_462A3D);
-MGS_FUNC_NOT_IMPL(0x46B8CA, void __cdecl(char *pFileName), Menu_create_helper_item_file_46B8CA);
+
+
+struct Menu_rpk_item
+{
+    // TODO: Recover structure
+};
+
+MGS_VAR(1, 0x733C88, Menu_rpk_item**, gItemFile_table_dword_733C88, nullptr);
+
+template<class T, class Y>
+inline T DataAfterStructure(Y pStructure)
+{
+    return reinterpret_cast<T>(&pStructure[1]);
+}
+
+template<class T, class U>
+inline void OffsetToPointer(T basePointer, U* offset)
+{
+    DWORD byteBasePtr = reinterpret_cast<DWORD>(basePointer);
+    DWORD* dwOffsetPtr = reinterpret_cast<DWORD*>(offset);
+    *dwOffsetPtr += byteBasePtr;
+}
+
+Menu_rpk_item* CC Menu_Get_Radar_image_46B920(int idx)
+{
+    return gItemFile_table_dword_733C88[idx];
+}
+MGS_FUNC_IMPLEX(0x46B920, Menu_Get_Radar_image_46B920, MENU_IMPL);
+
+Menu_rpk_item* CC Menu_inventory_left_update_get_item_file_46B912(int idx)
+{
+    return gItemFile_table_dword_733C88[idx];
+}
+MGS_FUNC_IMPLEX(0x46B912, Menu_inventory_left_update_get_item_file_46B912, MENU_IMPL);
+
+void CC Menu_create_helper_item_file_46B8CA(const char* pFileName)
+{
+    struct RpkHeader
+    {
+        BYTE mCount1;
+        BYTE mCount2;
+        WORD mPadding;
+    };
+    MGS_ASSERT_SIZEOF(RpkHeader, 0x4);
+
+    const DWORD hashedFileName = HashFileName_40A5A2(pFileName, 'r'); // item.rpk
+    RpkHeader* pHeader = LibGV_FindFile_40A603_T<RpkHeader*>(hashedFileName);
+    if (pHeader)
+    {
+        const int count = pHeader->mCount1 + pHeader->mCount2;
+        Menu_rpk_item** pTable = DataAfterStructure<Menu_rpk_item**>(pHeader);
+        Menu_rpk_item** pLast = &pTable[count];
+        for (int i = 0; i < count; i++)
+        {
+            OffsetToPointer(pLast, &pTable[i]);
+        }
+        gItemFile_table_dword_733C88 = pTable;
+    }
+}
+MGS_FUNC_IMPLEX(0x46B8CA, Menu_create_helper_item_file_46B8CA, MENU_IMPL);
 
 template<class T>
 inline static T* PrimAlloc(MenuPrimBuffer* pPrimBuffer)

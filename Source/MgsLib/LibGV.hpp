@@ -76,6 +76,11 @@ void CC LibGV_Reset_System2_Memory_40B35E();
 void CC LibGV_Init_FileCache_40A6AC();
 void* CC LibGV_FindFile_40A603(int hash);
 
+template<class T>
+T CC LibGV_FindFile_40A603_T(int hash)
+{
+    return reinterpret_cast<T>(LibGV_FindFile_40A603(hash));
+}
 
 MGS_VAR_EXTERN(DWORD, gFrameTime_dword_791A04);
 MGS_VAR_EXTERN(LibGv_Struct, g_lib_gv_stru_6BFEE0);
