@@ -1085,6 +1085,26 @@ void CC Vector_op_44B200(const VECTOR* pVec1, const VECTOR* pVec2, VECTOR* pResu
 }
 MGS_FUNC_IMPLEX(0x44B200, Vector_op_44B200, IMPL_PSX);
 
+void CC Matrix_transpose_40771B(const MATRIX3x3* pMatrix1, MATRIX3x3* pOutMatrix)
+{
+    pOutMatrix->m[1][0] = pMatrix1->m[0][1];
+    pOutMatrix->m[0][1] = pMatrix1->m[1][0];
+
+    pOutMatrix->m[2][0] = pMatrix1->m[0][2];
+    pOutMatrix->m[0][2] = pMatrix1->m[2][0];
+
+    pOutMatrix->m[2][1] = pMatrix1->m[1][2];
+    pOutMatrix->m[1][2] = pMatrix1->m[2][1];
+
+    if (pMatrix1 != pOutMatrix)
+    {
+        pOutMatrix->m[0][0] = pMatrix1->m[0][0];
+        pOutMatrix->m[1][1] = pMatrix1->m[1][1];
+        pOutMatrix->m[2][2] = pMatrix1->m[2][2];
+    }
+}
+MGS_FUNC_IMPLEX(0x40771B, Matrix_transpose_40771B, IMPL_PSX);
+
 static void Test_Psx_gte_RT1_rtir_447480()
 {
     gGte_IR1_993EE4.IR_32 = 4096;
