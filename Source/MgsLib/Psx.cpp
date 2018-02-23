@@ -1108,6 +1108,15 @@ void CC Matrix_transpose_40771B(const MATRIX3x3* pMatrix1, MATRIX3x3* pOutMatrix
 }
 MGS_FUNC_IMPLEX(0x40771B, Matrix_transpose_40771B, IMPL_PSX);
 
+void CC Set_gte_rotation_matrix_and_translation_vector_407A8F(const PSX_MATRIX* pMatrix)
+{
+    memcpy(gte_rotation_matrix_993E40.m, pMatrix->m, sizeof(PSX_MATRIX::m));
+    gGte_translation_vector_993E54.x = pMatrix->t[0];
+    gGte_translation_vector_993E54.y = pMatrix->t[1];
+    gGte_translation_vector_993E54.z = pMatrix->t[2];
+}
+MGS_FUNC_IMPLEX(0x407A8F, Set_gte_rotation_matrix_and_translation_vector_407A8F, IMPL_PSX);
+
 static void Test_Psx_gte_RT1_rtir_447480()
 {
     gGte_IR1_993EE4.IR_32 = 4096;
