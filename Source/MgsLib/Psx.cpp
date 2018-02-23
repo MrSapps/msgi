@@ -1087,14 +1087,17 @@ MGS_FUNC_IMPLEX(0x44B200, Vector_op_44B200, IMPL_PSX);
 
 void CC Matrix_transpose_40771B(const MATRIX3x3* pMatrix1, MATRIX3x3* pOutMatrix)
 {
+    const auto m_1_0 = pMatrix1->m[1][0];
     pOutMatrix->m[1][0] = pMatrix1->m[0][1];
-    pOutMatrix->m[0][1] = pMatrix1->m[1][0];
+    pOutMatrix->m[0][1] = m_1_0;
 
+    const auto m_2_0 = pMatrix1->m[2][0];
     pOutMatrix->m[2][0] = pMatrix1->m[0][2];
-    pOutMatrix->m[0][2] = pMatrix1->m[2][0];
+    pOutMatrix->m[0][2] = m_2_0;
 
+    const auto m_2_1 = pMatrix1->m[2][1];
     pOutMatrix->m[2][1] = pMatrix1->m[1][2];
-    pOutMatrix->m[1][2] = pMatrix1->m[2][1];
+    pOutMatrix->m[1][2] = m_2_1;
 
     if (pMatrix1 != pOutMatrix)
     {
