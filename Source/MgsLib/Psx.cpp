@@ -1117,6 +1117,29 @@ void CC Set_gte_rotation_matrix_and_translation_vector_407A8F(const PSX_MATRIX* 
 }
 MGS_FUNC_IMPLEX(0x407A8F, Set_gte_rotation_matrix_and_translation_vector_407A8F, IMPL_PSX);
 
+void CC MatrixXVectorFixed_44B320(const MATRIX3x3* pMatrix, const VECTOR* pInVec, VECTOR* pOutVec)
+{
+    const auto y = pInVec->field_4_y;
+    const auto z = pInVec->field_8_z;
+    const auto x = pInVec->field_0_x;
+
+    pOutVec->field_0_x = 
+          (pMatrix->m[0][0] * (signed __int64)x >> 12)
+        + (pMatrix->m[0][1] * (signed __int64)y >> 12)
+        + (pMatrix->m[0][2] * (signed __int64)z >> 12);
+
+    pOutVec->field_4_y = 
+          (pMatrix->m[1][0] * (signed __int64)x >> 12)
+        + (pMatrix->m[1][1] * (signed __int64)y >> 12)
+        + (pMatrix->m[1][2] * (signed __int64)z >> 12);
+
+    pOutVec->field_8_z = 
+          (pMatrix->m[2][0] * (signed __int64)x >> 12)
+        + (pMatrix->m[2][1] * (signed __int64)y >> 12)
+        + (pMatrix->m[2][2] * (signed __int64)z >> 12);
+}
+MGS_FUNC_IMPLEX(0x44B320, MatrixXVectorFixed_44B320, IMPL_PSX);
+
 static void Test_Psx_gte_RT1_rtir_447480()
 {
     gGte_IR1_993EE4.IR_32 = 4096;
