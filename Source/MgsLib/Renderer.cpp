@@ -2700,13 +2700,18 @@ MGS_FUNC_IMPLEX(0x0040D150, Renderer_Is_Texture_In_Rect_40D150, RENDERER_IMPL);
 
 MGS_VAR(1, 0x6C076C, DWORD, dword_6C076C, 0);
 
+
+
+MGS_FUNC_NOT_IMPL(0x40E840, IDirectDrawSurface7 *__cdecl (IDirectDraw7 *, const BYTE *, const WORD *, WORD *, WORD *, int *, int), Render_sub_40E840);
+
 int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tgaW, unsigned __int16 tgaH)
 {
     int idx = 0;
     if (gNumFreeTextures_6FC790 > 0)
     {
         // ?? actually just gNumFreeTextures_6FC790-- ?
-        idx = *((unsigned __int16 *)&gTextures_6C0F00[1499].field_4C + (unsigned __int16)gNumFreeTextures_6FC790 + 1);
+//        idx = *((unsigned __int16 *)&gTextures_6C0F00[1499].field_4C + (unsigned __int16)gNumFreeTextures_6FC790 + 1);
+        idx = gNumFreeTextures_6FC790--;
     }
     else
     {
@@ -2762,7 +2767,7 @@ int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE*
     // NOTE: Pruned software rendering branch
     else
     {
-        //gTextures_6C0F00[idx].mSurface = Render_sub_40E840(g_pDirectDraw, pixelData, pallete, &x2, &y2, &surfaceType, idx);
+        gTextures_6C0F00[idx].mSurface = Render_sub_40E840(g_pDirectDraw, pixelData, pallete, &x2, &y2, &surfaceType, idx);
         gTextures_6C0F00[idx].field_28 = surfaceType;
     }
 
@@ -2784,6 +2789,18 @@ int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE*
 MGS_FUNC_IMPLEX(0x0040FA30, Render_sub_40FA30, false); // TODO: Implement
 
 MGS_VAR(1, 0x6C0770, DWORD, gbKeepCopyingSurface_dword_6C0770, 0);
+
+void CC Render_set_pixel_40C870(WORD* pData, int pitch, unsigned __int16 xpos, unsigned __int16 ypos, __int16 value)
+{
+    if (gSoftwareRendering)
+    {
+        value = value & 0x1F | 2 * (value & 0x7FE0);
+    }
+
+    const DWORD offset = (xpos) + ((pitch / sizeof(WORD)) * ypos); // Divide pitch by the pixel size as it is in bytes
+    pData[offset] = value;
+}
+MGS_FUNC_IMPLEX(0x0040C870, Render_set_pixel_40C870, RENDERER_IMPL);
 
 int CC Render_sub_41C640(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tga6, unsigned __int16 tga7)
 {
