@@ -2810,6 +2810,96 @@ __int16 CC Render_get_pixel_vram_40C8E0(const WORD* pData, int pitch, int /*unkn
 }
 MGS_FUNC_IMPLEX(0x0040C8E0, Render_get_pixel_vram_40C8E0, RENDERER_IMPL);
 
+void CC Render_copy_to_surface_40C930(WORD* pData, int pitch, unsigned __int16 width, unsigned __int16 height)
+{
+    // TODO: Need to understand what this algorithm is actually doing, its not a direct copy
+    if (!gSoftwareRendering)
+    {
+        for (int ypos = 0; ypos < height; ++ypos)
+        {
+            for (int xpos = 0; xpos < width; ++xpos)
+            {
+                __int16 readPixel1 = Render_get_pixel_vram_40C8E0(pData, pitch, 0, xpos, ypos);
+                __int16 readPixel2 = 0;
+
+                if (readPixel1)
+                {
+                    continue;
+                }
+
+                if (xpos - 1 >= 0)
+                {
+                    readPixel2 = Render_get_pixel_vram_40C8E0(pData, pitch, 0, xpos - 1, ypos);
+                    if (readPixel2 & 0x8000)
+                    {
+                        Render_set_pixel_40C870(pData, pitch, xpos, ypos, readPixel2 & 0x7FFF);
+                        continue;
+                    }
+                }
+
+                if (readPixel2)
+                {
+                    readPixel1 = readPixel2;
+                }
+
+                __int16 readPixel2a = 0;
+                __int16 readPixel3 = 0;
+
+                if (ypos - 1 >= 0)
+                {
+                    readPixel3 = Render_get_pixel_vram_40C8E0(pData, pitch, 0, xpos, ypos - 1);
+                    readPixel2a = readPixel3;
+                    if (readPixel3 & 0x8000)
+                    {
+                        Render_set_pixel_40C870(pData, pitch, xpos, ypos, readPixel3 & 0x7FFF);
+                        continue;
+                    }
+                }
+
+                if (readPixel2a)
+                {
+                    readPixel1 = readPixel2a;
+                }
+
+                __int16 readPixel4 = 0;
+                if (xpos + 1 != width)
+                {
+                    readPixel4 = Render_get_pixel_vram_40C8E0(pData, pitch, 0, xpos + 1, ypos);
+                    if (readPixel4 & 0x8000)
+                    {
+                        Render_set_pixel_40C870(pData, pitch, xpos, ypos, readPixel4 & 0x7FFF);
+                        continue;
+                    }
+                }
+
+
+                if (readPixel4)
+                {
+                    readPixel1 = readPixel4;
+                }
+
+                __int16 readPixel5 = 0;
+                if (ypos + 1 != height)
+                {
+                    readPixel5 = Render_get_pixel_vram_40C8E0(pData, pitch, 0, xpos, ypos + 1);
+                    if (readPixel5 & 0x8000)
+                    {
+                        Render_set_pixel_40C870(pData, pitch, xpos, ypos, readPixel5 & 0x7FFF);
+                        continue;
+                    }
+                }
+
+                if (readPixel5)
+                {
+                    readPixel1 = readPixel5;
+                }
+                Render_set_pixel_40C870(pData, pitch, xpos, ypos, readPixel1 & 0x7FFF);
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x0040C930, Render_copy_to_surface_40C930, RENDERER_IMPL);
+
 unsigned __int16 CC Render_convert_colour_40D420(unsigned __int16 value)
 {
     if (value == 0x8000)
