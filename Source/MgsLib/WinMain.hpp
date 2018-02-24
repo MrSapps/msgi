@@ -44,6 +44,5 @@ MGS_VAR_EXTERN(DWORD, g_dwDisplayWidth_6DF214);
 MGS_VAR_EXTERN(DWORD, g_dwDisplayHeight);
 MGS_VAR_EXTERN(DWORD, gFps);
 MGS_VAR_EXTERN(LPDIRECT3DDEVICE7, gD3dDevice_6FC74C);
-EXTERN_MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), Render_Restore_Surfaces_51E086);
 
 void CC Main_sub_401C02();

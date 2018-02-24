@@ -94,7 +94,6 @@ MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, vo
 MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
 EXTERN_MGS_FUNC_NOT_IMPL(0x004583BB, void CC(), StreamActorStop_4583BB);
-MGS_FUNC_NOT_IMPL(0x51E086, int __cdecl(), Render_Restore_Surfaces_51E086);
 MGS_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
 
 MGS_VAR(1, 0x6FC748, IDirect3D7 *, g_pDirect3D, nullptr);
@@ -277,7 +276,7 @@ int CC HandleExclusiveMode()
     }
     while (g_pDirectDraw->TestCooperativeLevel() != 0);
 
-    Render_Restore_Surfaces_51E086();
+    Render_Restore_Lost_Surfaces_51E086();
     Timer_30_1();
     Task_ResumeQ();
     Sound_PlaySample();

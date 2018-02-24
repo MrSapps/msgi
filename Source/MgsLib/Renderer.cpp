@@ -214,7 +214,7 @@ void CC Render_Loop_SetWinTitle_422210()
                 hrErr = gD3dDevice_6FC74C->EndScene();
                 if (hrErr == DDERR_SURFACELOST)
                 {
-                    Render_Restore_Surfaces_51E086();
+                    Render_Restore_Lost_Surfaces_51E086();
                 }
 
                 if (FAILED(hrErr))
@@ -428,7 +428,7 @@ void CC Render_Loop_SetWinTitle_422210()
 
                 if (hrErr == DDERR_SURFACELOST)
                 {
-                    Render_Restore_Surfaces_51E086();
+                    Render_Restore_Lost_Surfaces_51E086();
                     hrErr = gD3dDevice_6FC74C->BeginScene();
                 }
 
@@ -2924,3 +2924,117 @@ int CC Render_sub_41C640(const PSX_RECT* pRect, const WORD* pallete, const BYTE*
 }
 MGS_FUNC_IMPLEX(0x0041C640, Render_sub_41C640, RENDERER_IMPL);
 
+MGS_VAR(1, 0x774A40, DWORD, gTotalAllocated_dword_774A40, 0);
+
+struct SurfaceBackup
+{
+    IDirectDrawSurface7* field_0_dd_surface;
+    BYTE* field_4_surface_pixel_buffer;
+    DWORD field_8_array_size;
+};
+MGS_ASSERT_SIZEOF(SurfaceBackup, 0xC);
+
+MGS_VAR(1, 0x77644C, SurfaceBackup*, gSurfacesArray_77644C, nullptr);
+MGS_VAR(1, 0x776854, DWORD, gSurfaceArraySize_776854, 0);
+
+int CC Renderer_GrowSurfaceArray_51DF8E()
+{
+    gSurfacesArray_77644C = (SurfaceBackup *)realloc(gSurfacesArray_77644C, sizeof(SurfaceBackup) * (gSurfaceArraySize_776854 + 3));
+    if (!gSurfacesArray_77644C)
+    {
+        return 0;
+    }
+    return ++gSurfaceArraySize_776854 - 1;
+}
+MGS_FUNC_IMPLEX(0x0051DF8E, Renderer_GrowSurfaceArray_51DF8E, RENDERER_IMPL);
+
+void CC Render_Restore_Single_Surface_51E11A(int surfIdx)
+{
+    // TODO
+}
+MGS_FUNC_IMPLEX(0x0051E11A, Render_Restore_Single_Surface_51E11A, false); // TODO
+
+void CC Render_Restore_Lost_Surfaces_51E086()
+{
+    if (gPrimarySurface_6FC734)
+    {
+        if (gPrimarySurface_6FC734->IsLost())
+        {
+            gPrimarySurface_6FC734->Restore();
+        }
+    }
+    if (g_pBackBuffer_6FC738)
+    {
+        if (g_pBackBuffer_6FC738->IsLost())
+        {
+            g_pBackBuffer_6FC738->Restore();
+        }
+    }
+
+    if (!gSoftwareRendering)
+    {
+        for (DWORD i = 0; i < gSurfaceArraySize_776854; i++)
+        {
+            IDirectDrawSurface7* pSurface = gSurfacesArray_77644C[i].field_0_dd_surface;
+            if (pSurface)
+            {
+                if (pSurface->IsLost() == DDERR_SURFACELOST)
+                {
+                    if (!gSurfacesArray_77644C[i].field_0_dd_surface->Restore())
+                    {
+                        Render_Restore_Single_Surface_51E11A(i);
+                    }
+                }
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x0051E086, Render_Restore_Lost_Surfaces_51E086, RENDERER_IMPL);
+
+void CC Render_BackupSurface_51DE8F(IDirectDrawSurface7* pSurface)
+{
+    if (pSurface)
+    {
+        DDSURFACEDESC2 surfaceDesc = {};
+        surfaceDesc.dwSize = sizeof(DDSURFACEDESC2);
+        int retryCount = 100;
+        do
+        {
+            HRESULT hr = pSurface->Lock(0, &surfaceDesc, 17, 0);
+            if (hr != DDERR_WASSTILLDRAWING)
+            {
+                if (!FAILED(hr))
+                {
+                    int height = surfaceDesc.dwHeight;
+                    int rowSize = surfaceDesc.dwWidth * surfaceDesc.ddpfPixelFormat.dwRGBBitCount >> 3;
+                    const int pitch = surfaceDesc.lPitch;
+                    if (!rowSize)
+                    {
+                        rowSize = 1;
+                    }
+                    const int totalSize = surfaceDesc.dwHeight * rowSize;
+                    BYTE* surfacePixelsPtr = (BYTE *)surfaceDesc.lpSurface;
+                    BYTE* pixelBuffer = (BYTE *)malloc(surfaceDesc.dwHeight * rowSize);
+                    if (pixelBuffer)
+                    {
+                        const int idx = Renderer_GrowSurfaceArray_51DF8E();
+                        gSurfacesArray_77644C[idx].field_0_dd_surface = pSurface;
+                        gSurfacesArray_77644C[idx].field_4_surface_pixel_buffer = pixelBuffer;
+                        gSurfacesArray_77644C[idx].field_8_array_size = totalSize;
+                        gTotalAllocated_dword_774A40 += totalSize;
+                        for (int i = 0; i < height; i++)
+                        {
+                            memcpy(pixelBuffer, surfacePixelsPtr, rowSize);
+                            pixelBuffer += rowSize;
+                            surfacePixelsPtr += surfaceDesc.lPitch;
+                        }
+                    }
+                    pSurface->Unlock(0);
+                    return;
+                }
+                --retryCount;
+            }
+        } while (retryCount);
+    }
+}
+MGS_FUNC_IMPLEX(0x0051DE8F, Render_BackupSurface_51DE8F, RENDERER_IMPL);
