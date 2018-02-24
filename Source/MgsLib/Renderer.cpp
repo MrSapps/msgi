@@ -2802,6 +2802,14 @@ void CC Render_set_pixel_40C870(WORD* pData, int pitch, unsigned __int16 xpos, u
 }
 MGS_FUNC_IMPLEX(0x0040C870, Render_set_pixel_40C870, RENDERER_IMPL);
 
+__int16 CC Render_get_pixel_vram_40C8E0(const WORD* pData, int pitch, int /*unknown*/, __int16 xpos, __int16 ypos)
+{
+    // Limited x/y to psx vram size
+    const DWORD offset = (xpos & 1023) + ((pitch / sizeof(WORD)) * (ypos & 511));
+    return pData[offset];
+}
+MGS_FUNC_IMPLEX(0x0040C8E0, Render_get_pixel_vram_40C8E0, RENDERER_IMPL);
+
 unsigned __int16 CC Render_convert_colour_40D420(unsigned __int16 value)
 {
     if (value == 0x8000)
