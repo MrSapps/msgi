@@ -14,9 +14,83 @@
 
 MGS_VAR_EXTERN(DWORD, gStageIs_s11e_6FC778);
 
+const BYTE* CC GV_pcx_file_RLE_decompress_4bit_402F30(const BYTE* pInput, BYTE* pOutput, int count);
 
-// TODO
-MGS_FUNC_NOT_IMPL(0x402FB4, void __cdecl(const BYTE *pIn, BYTE *pOut, int bytesPerScanLine, signed int w, int h), GV_pcx_file_RLE_decompress_8bit_402FB4);
+void CC GV_pcx_file_RLE_decompress_8bit_402FB4(const BYTE *pIn, BYTE *pOut, int bytesPerScanLine, signed int w, int h)
+{
+    static BYTE byte_6BEE84[132] = {}; // TODO: Unclear why this is static in the original code
+
+    for (int i=0; i<h; i++)
+    {
+        pIn = GV_pcx_file_RLE_decompress_4bit_402F30(pIn, byte_6BEE84, 4 * bytesPerScanLine );
+
+        const BYTE* rPtr = &byte_6BEE84[bytesPerScanLine * 0];
+        const BYTE* gPtr = &byte_6BEE84[bytesPerScanLine * 1];
+        const BYTE* bPtr = &byte_6BEE84[bytesPerScanLine * 2];
+        const BYTE* aPtr = &byte_6BEE84[bytesPerScanLine * 3];
+
+        for (int j = w; j > 0; j -= 4)
+        {
+            const int rBits = *rPtr++;
+            const int gBits = *gPtr++;
+            const int bBits = *bPtr++;
+            const int aBits = *aPtr++;
+            
+            int mask = 128; // 8th bit
+            const int stopMask = (j < 4) ? 8 : 0;
+            do
+            {
+                BYTE resultingPixel = 0;
+                if (rBits & mask)
+                {
+                    resultingPixel = 0x01;
+                }
+
+                if (gBits & mask)
+                {
+                    resultingPixel |= 0x02u;
+                }
+
+                if (bBits & mask)
+                {
+                    resultingPixel |= 0x04u;
+                }
+                if (aBits & mask)
+                {
+                    resultingPixel |= 0x08u;
+                }
+                
+                mask = mask >> 1;
+
+                if (rBits & mask)
+                {
+                    resultingPixel |= 0x10u;
+                }
+                
+                if (gBits & mask)
+                {
+                    resultingPixel |= 0x20u;
+                }
+
+                if (bBits & mask)
+                {
+                    resultingPixel |= 0x40u;
+                }
+
+                if (aBits & mask)
+                {
+                    resultingPixel |= 0x80u;
+                }
+
+                *pOut++ = resultingPixel;
+
+                mask = mask >> 1;
+
+            } while (mask != stopMask);
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x402FB4, GV_pcx_file_RLE_decompress_8bit_402FB4, PCX_IMPL);
 
 struct HiTexRecord
 {
@@ -146,9 +220,9 @@ const BYTE* CC GV_pcx_file_RLE_decompress_4bit_402F30(const BYTE* pInput, BYTE* 
     do
     {
         BYTE inByte = *pInput++;
-        if ((inByte & 0xC0) == 0xC0)
+        if (inByte > 192)
         {
-            int runLength = inByte & 0x3F;
+            int runLength = inByte - 192;
             BYTE runValue = *pInput++;
             count -= runLength;
             while (--runLength >= 0)
@@ -182,9 +256,9 @@ void CC GV_pcx_file_pallete_convert_4031B9(const BYTE* pPal, WORD* pOutPal, int 
         WORD pixel16 = ((b | g | r) & 7) != 0 ? 0x20 : 0; // Top 3 bits = transparency
         if (r || g || b)
         {
-            pixel16 = ((signed int)(unsigned __int8)r >> 3)
-                | 32 * (((signed int)(unsigned __int8)g >> 3)
-                    | 32 * (((signed int)(unsigned __int8)b >> 3) | pixel16));
+            pixel16 =  ((signed int)(unsigned __int8)r >> 3)
+               | 32 * (((signed int)(unsigned __int8)g >> 3)
+               | 32 * (((signed int)(unsigned __int8)b >> 3) | pixel16));
         }
         *pOutPal = pixel16;
         ++pOutPal;
@@ -261,7 +335,7 @@ struct Tga_header
 #pragma pack(pop)
 MGS_ASSERT_SIZEOF(Tga_header, 0x12);
 
-BYTE* CC jimGetTargetBuffer_42B6A6(WORD fileNameHash, WORD *pWidth, WORD *pHeight, DWORD** ppAllocated)
+BYTE* CC jimGetTargetBuffer_42B6A6(TFileNameHash fileNameHash, WORD *pWidth, WORD *pHeight, DWORD** ppAllocated)
 {
     const char* pHiTexName = HITEX_NAME_51D4BC(fileNameHash);
     if (!pHiTexName)
@@ -321,7 +395,7 @@ BYTE* CC jimGetTargetBuffer_42B6A6(WORD fileNameHash, WORD *pWidth, WORD *pHeigh
 }
 MGS_FUNC_IMPLEX(0x42B6A6, jimGetTargetBuffer_42B6A6, PCX_IMPL);
 
-Texture_Record* CC sub_40252B(WORD hashedName, int bpp, __int16 bppShift0x30, PSX_RECT* pVramRect, pcx_mgs* pMgsPcx, BYTE numColours)
+Texture_Record* CC sub_40252B(TFileNameHash hashedName, int bpp, __int16 bppShift0x30, PSX_RECT* pVramRect, pcx_mgs* pMgsPcx, BYTE numColours)
 {
     Texture_Record* pTexture = nullptr;
     if (LibDG_SearchForTextureRecord_4024D2(hashedName, &pTexture))
