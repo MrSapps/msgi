@@ -2802,6 +2802,20 @@ void CC Render_set_pixel_40C870(WORD* pData, int pitch, unsigned __int16 xpos, u
 }
 MGS_FUNC_IMPLEX(0x0040C870, Render_set_pixel_40C870, RENDERER_IMPL);
 
+unsigned __int16 CC Render_convert_colour_40D420(unsigned __int16 value)
+{
+    if (value == 0x8000)
+    {
+        ++value;
+    }
+    if (value)
+    {
+        value |= 0x8000u;
+    }
+    return ((value & 0x7C00) >> 10) | ((value & 0x1F) << 10) | value & 0x83E0;
+}
+MGS_FUNC_IMPLEX(0x0040D420, Render_convert_colour_40D420, RENDERER_IMPL);
+
 int CC Render_sub_41C640(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tga6, unsigned __int16 tga7)
 {
     while (gbKeepCopyingSurface_dword_6C0770) {}
