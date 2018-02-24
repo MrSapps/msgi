@@ -2683,6 +2683,21 @@ bool CC Render_sub_41E730()
 }
 MGS_FUNC_IMPLEX(0x0041E730, Render_sub_41E730, RENDERER_IMPL);
 
+bool CC Renderer_Is_Texture_In_Rect_40D150(PSX_RECT* pRect, int textureIdx)
+{
+    const int width =  pRect->x1 + pRect->x2 - 1;
+    const int height = pRect->y1 + pRect->y2 - 1;
+    const int texturey = gTextures_6C0F00[textureIdx].field_4_y;
+    const int texturex = gTextures_6C0F00[textureIdx].field_6_x;
+    const int texturew = texturey + gTextures_6C0F00[textureIdx].field_8_w - 1;
+    const int textureh = texturex + gTextures_6C0F00[textureIdx].field_A_h - 1;
+    return (pRect->x1 <= texturey && texturey <= width && pRect->y1 <= texturex && texturex <= height)
+        || (pRect->x1 <= texturew && texturew <= width && pRect->y1 <= texturex && texturex <= height)
+        || (pRect->x1 <= texturey && texturey <= width && pRect->y1 <= textureh && textureh <= height)
+        || (pRect->x1 <= texturew && texturew <= width && pRect->y1 <= textureh && textureh <= height);
+}
+MGS_FUNC_IMPLEX(0x0040D150, Renderer_Is_Texture_In_Rect_40D150, RENDERER_IMPL);
+
 MGS_VAR(1, 0x6C076C, DWORD, dword_6C076C, 0);
 
 int CC Render_sub_41C640(PSX_RECT* pRect, WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tgaW, unsigned __int16 tgaH)
