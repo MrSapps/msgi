@@ -451,19 +451,37 @@ void CC Render_Loop_SetWinTitle_422210()
 }
 MGS_FUNC_IMPLEX(0x422210, Render_Loop_SetWinTitle_422210, RENDERER_IMPL);
 
-/* TODO: Implement me
-uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV);
-MSG_FUNC_IMPL(0x40CD80, Render_ComputeUVs)
-
-uint32_t __cdecl Render_ComputeUVs(uint32_t textureIdx, uint32_t a1, uint16_t u, uint16_t v, float* outU, float* outV)
+uint32_t CC Render_ComputeUVs_40CD80(uint32_t textureIdx, uint32_t tPageFormat, uint16_t u, uint16_t v, float* outU, float* outV)
 {
-uint32_t ret = Render_ComputeUVs_.Ptr()(textureIdx, a1, u, v, outU, outV);
-//LOG_INFO("t: " << textureIdx << " a: " << a1 << " u " << u << " v " << v << " ou " << *outU << " ov " << *outV);
-return ret;
-}
-*/
+    int xBound = gTextures_6C0F00[textureIdx].field_4_y & 63;
+    int yBound = gTextures_6C0F00[textureIdx].field_6_x & 255;
+    
+    int ua = /*word_6C0EA4 +*/ u;
+    int va = /*word_6C0EA6 +*/ v;
+    if (tPageFormat)
+    {
+        if (tPageFormat == 1)
+        {
+            xBound *= 2;
+        }
+        else if (tPageFormat != 2)
+        {
+            PrintDDError("Wrong Tpage format", 0);
+        }
+    }
+    else
+    {
+        xBound *= 4;
+    }
 
-MGS_FUNC_NOT_IMPL(0x40CD80, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), Render_ComputeUVs);
+    *outU = ((double)(ua - xBound) + 1.0 / gXRes * 0.1) * gTextures_6C0F00[textureIdx].float_field_14_uQ / (double)gTextures_6C0F00[textureIdx].field_10_x;
+    *outV = ((double)(va - yBound) + 1.0 / gXRes * 0.1) * gTextures_6C0F00[textureIdx].float_field_18_vQ / (double)gTextures_6C0F00[textureIdx].field_12_y;
+
+    return textureIdx * 80;
+}
+MGS_FUNC_IMPLEX(0x40CD80, Render_ComputeUVs_40CD80, RENDERER_IMPL);
+
+
 MGS_FUNC_NOT_IMPL(0x40FF20, uint32_t __cdecl(uint32_t, uint32_t, uint32_t, uint32_t, float*, float*), sub_40FF20);
 MGS_FUNC_NOT_IMPL(0x40D540, uint32_t __cdecl(int16_t*, int32_t, int32_t), sub_40D540);
 MGS_FUNC_NOT_IMPL(0x418A70, int __cdecl(struct TaggedOrderingTablePointer* a_pStructVert, int a_nSize), Render_Software);
@@ -843,7 +861,7 @@ void CC Render_DrawHardware_421C00()
                 if (textureIdx < gNumTextures_word_6FC78C && gTextures_6C0F00[textureIdx].mSurface)
                 {
                     Render_BlendMode_sub_421800(
-                        gTextures_6C0F00[textureIdx].field_28 & gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode,
+                        gTextures_6C0F00[textureIdx].field_28_surf_type & gPrimBuffer_dword_6C0EFC[primSubIdx].nBlendMode,
                         &g_pMGSVertices_6FC780[pPrimStartIdx],
                         gPrimBuffer_dword_6C0EFC[primSubIdx].dwVertexCount,
                         primSubIdx);
@@ -1334,10 +1352,10 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             else
             {
                 const uint32_t texturePage = (pStructVert->TexVtx[1].textureIdx & 0x180) >> 7;
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[1].u, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v, &g_fU2, &g_fV2);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[3].u, pStructVert->TexVtx[3].v, &g_fU3, &g_fV3);
+                Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
+                Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[1].u, pStructVert->TexVtx[1].v, &g_fU1, &g_fV1);
+                Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[2].u, pStructVert->TexVtx[2].v, &g_fU2, &g_fV2);
+                Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[3].u, pStructVert->TexVtx[3].v, &g_fU3, &g_fV3);
             }
 
             g_fXOffset = g_wXOffset;
@@ -1402,9 +1420,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             else
             {
                 const uint32_t texturePage = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
-                Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
+                Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
+                Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
+                Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
             }
 
             g_fXOffset = g_wXOffset;
@@ -1552,10 +1570,10 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 else
                 {
                     const uint32_t texturePage = (pStructVert->DifVtx[1].textureIdx & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &g_fU3, &g_fV3);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->DifVtx[0].u, pStructVert->DifVtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->DifVtx[1].u, pStructVert->DifVtx[1].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->DifVtx[3].u, pStructVert->DifVtx[3].v, &g_fU3, &g_fV3);
 
                     uint16_t* pIndex = (uint16_t*)(0x6FC728 + ((pStructVert->DifVtx[0].textureIdx >> 6) << 11) + ((pStructVert->DifVtx[0].textureIdx & 0x3F) << 5));
                     if (*pIndex == 0xEDED)
@@ -1802,10 +1820,10 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 else
                 {
                     const uint32_t texturePage = (word_6C0EAC & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v + diffY, &g_fU3, &g_fV3);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v + diffY, &g_fU3, &g_fV3);
                 }
             }
 
@@ -1918,10 +1936,10 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 else
                 {
                     const uint32_t texturePage = (pStructVert->Vtx[1].textureIdx & 0x180) >> 7;
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &g_fU0, &g_fV0);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[1].u, pStructVert->Vtx[1].v, &g_fU1, &g_fV1);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[2].u, pStructVert->Vtx[2].v, &g_fU2, &g_fV2);
-                    Render_ComputeUVs(g_nTextureIndex, texturePage, pStructVert->Vtx[3].u, pStructVert->Vtx[3].v, &g_fU3, &g_fV3);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &g_fU0, &g_fV0);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->Vtx[1].u, pStructVert->Vtx[1].v, &g_fU1, &g_fV1);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->Vtx[2].u, pStructVert->Vtx[2].v, &g_fU2, &g_fV2);
+                    Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->Vtx[3].u, pStructVert->Vtx[3].v, &g_fU3, &g_fV3);
                 }
             }
 
@@ -2502,7 +2520,7 @@ signed int CC Render_TextureScratchAlloc_41CA80()
     gTextures_6C0F00[0].float_field_14_uQ = 1.0f;
     gTextures_6C0F00[0].float_field_18_vQ = 1.0f;
     gTextures_6C0F00[0].mSurfaceType = 1;
-    gTextures_6C0F00[0].field_28 = 2;
+    gTextures_6C0F00[0].field_28_surf_type = 2;
     gTextures_6C0F00[0].field_2C = 0;
     ++gNumTextures_word_6FC78C;
     return 1;
@@ -2699,7 +2717,7 @@ MGS_VAR(1, 0x6C076C, DWORD, dword_6C076C, 0);
 
 
 
-MGS_FUNC_NOT_IMPL(0x40E840, IDirectDrawSurface7 *__cdecl (IDirectDraw7 *, const BYTE *, const WORD *, WORD *, WORD *, int *, int), Render_sub_40E840);
+MGS_FUNC_NOT_IMPL(0x40E840, IDirectDrawSurface7 *__cdecl (IDirectDraw7 *, const BYTE *, const WORD *, DWORD *, DWORD *, int *, int), Render_sub_40E840);
 
 int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tgaW, unsigned __int16 tgaH)
 {
@@ -2715,8 +2733,8 @@ int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE*
         idx = (unsigned __int16)gNumTextures_word_6FC78C;
     }
 
-    WORD x2 = pRect->x2;
-    WORD y2 = pRect->y2;
+    DWORD x2 = pRect->x2;
+    DWORD y2 = pRect->y2;
     gTextures_6C0F00[idx].field_8_w = x2;
     gTextures_6C0F00[idx].field_A_h = y2;
     gTextures_6C0F00[idx].field_4_y = pRect->x1;
@@ -2759,13 +2777,14 @@ int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE*
     if (surfaceType == 5)
     {
         // Type 5 is malloc 280 byte buffer?
+        abort();
         //gTextures_6C0F00[idx].mSurface = Render_sub_4241C2(pixelData, pallete);
     }
     // NOTE: Pruned software rendering branch
     else
     {
         gTextures_6C0F00[idx].mSurface = Render_sub_40E840(g_pDirectDraw, pixelData, pallete, &x2, &y2, &surfaceType, idx);
-        gTextures_6C0F00[idx].field_28 = surfaceType;
+        gTextures_6C0F00[idx].field_28_surf_type = surfaceType;
     }
 
     gTextures_6C0F00[idx].field_10_x = x2;

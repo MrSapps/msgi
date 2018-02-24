@@ -39,7 +39,7 @@ struct texture_struct
     DWORD mSurfaceType;
     DWORD field_20;
     DWORD field_24_flagsQ;
-    DWORD field_28;
+    DWORD field_28_surf_type;
     DWORD field_2C;
     DWORD field_30;
     DWORD field_34;
