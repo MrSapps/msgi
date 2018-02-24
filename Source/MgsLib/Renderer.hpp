@@ -74,10 +74,11 @@ MGS_VAR_EXTERN(DWORD, gModX2);
 MGS_ARY_EXTERN(texture_struct, 1500, gTextures_6C0F00);
 MGS_VAR_EXTERN(prim_struct*, gPrimBuffer_dword_6C0EFC);
 MGS_VAR_EXTERN(MGSVertex*, g_pMGSVertices_6FC780);
-MGS_VAR_EXTERN(WORD*, g_pwTextureIndices);
+MGS_VAR_EXTERN(WORD*, g_pwTextureIndices_6FC72C);
 MGS_VAR_EXTERN(DWORD, dword_6FC774);
 MGS_VAR_EXTERN(WORD, gNumTextures_word_6FC78C);
 MGS_VAR_EXTERN(WORD, g_Render_sub_41C640_ret_650D1A);
+MGS_VAR_EXTERN(DWORD *, gImageBufer_dword_6FC728);
 
 void RendererCpp_ForceLink();
 

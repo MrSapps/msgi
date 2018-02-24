@@ -150,7 +150,6 @@ MGS_VAR(1, 0x77C608, DWORD, gNumDrivers_dword_77C608, 0);
 MGS_VAR(1, 0x716F70, DWORD, dword_716F70, 0);
 MGS_VAR(1, 0x716F74, DWORD, dword_716F74, 0);
 MGS_VAR(1, 0x650D2C, DWORD, dword_650D2C, 0);
-MGS_VAR(1, 0x6FC728, DWORD *, gImageBufer_dword_6FC728, 0);
 MGS_VAR(1, 0x6DEF7C, void *, dword_6DEF7C, nullptr);
 MGS_VAR(1, 0x6DEF90, void *, dword_6DEF90, nullptr);
 
@@ -2137,7 +2136,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     if (gImageBufer_dword_6FC728)
     {
         memset(gImageBufer_dword_6FC728, 0, 0x100000u);
-        g_pwTextureIndices = (WORD*)malloc(0x100000u);
+        g_pwTextureIndices_6FC72C = (WORD*)malloc(0x100000u);
         if (gImageBufer_dword_6FC728)
         {
             memset(gImageBufer_dword_6FC728, -1, 0x100000u);
@@ -2481,7 +2480,7 @@ void __cdecl ClearAll()
     }
 
     free(gImageBufer_dword_6FC728);
-    free(g_pwTextureIndices);
+    free(g_pwTextureIndices_6FC72C);
 }
 
 void __cdecl DoClearAll()

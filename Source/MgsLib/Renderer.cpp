@@ -125,7 +125,7 @@ MGS_VAR(1, 0x6C0EA2, WORD, g_wYOffset, 0);
 
 MGS_VAR(1, 0x6C0EAC, WORD, word_6C0EAC, 0);
 MGS_VAR(1, 0x791C7C, DWORD, g_nTextureIndex, 0);
-MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices, 0);
+MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices_6FC72C, 0);
 MGS_VAR(1, 0x6FC78C, WORD, gNumTextures_word_6FC78C, 0);
 MGS_VAR(1, 0x00650D28, float, gXRes, 0.0f);
 
@@ -1324,7 +1324,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             TextureIdx0 &= 0xFFFF;
             TextureIdx1 &= 0xFFFF;
 
-            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
             g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
             if (g_nTextureIndex >= gNumTextures_word_6FC78C)
@@ -1392,7 +1392,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             TextureIdx0 &= 0xFFFF;
             TextureIdx1 &= 0xFFFF;
 
-            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
             g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
             if (g_nTextureIndex >= gNumTextures_word_6FC78C)
@@ -1542,7 +1542,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 TextureIdx0 &= 0xFFFF;
                 TextureIdx1 &= 0xFFFF;
 
-                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
                 g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
                 if (g_nTextureIndex >= gNumTextures_word_6FC78C)
@@ -1792,7 +1792,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                     TextureIdx0 &= 0xFFFF;
                     TextureIdx1 &= 0xFFFF;
 
-                    gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+                    gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
                     g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
                 }
                 if (g_nTextureIndex >= gNumTextures_word_6FC78C)
@@ -1908,7 +1908,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 Render_ComputeTextureIdx_40CC50(pStructVert->Vtx[1].textureIdx, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &TextureIdx0, &TextureIdx1);
                 TextureIdx0 &= 0xFFFF;
                 TextureIdx1 &= 0xFFFF;
-                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices[TextureIdx1 * 0x400 + TextureIdx0];
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
                 g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
                 if (g_nTextureIndex >= gNumTextures_word_6FC78C)
@@ -3167,8 +3167,68 @@ void CC Renderer_Free_Textures_At_Rect_40D2A0(const PSX_RECT* pRect)
 }
 MGS_FUNC_IMPLEX(0x0040D2A0, Renderer_Free_Textures_At_Rect_40D2A0, RENDERER_IMPL);
 
+MGS_VAR(1, 0x6FC728, DWORD *, gImageBufer_dword_6FC728, 0);
 
-MGS_FUNC_NOT_IMPL(0x40FD20, int CC(const PSX_RECT *pRect, const BYTE *pPixels), Render_BitBltToDxSurface_40FD20); // TODO
+void CC Render_BltToPixelBuffer_40CED0(const PSX_RECT* pRect, __int16 value)
+{
+    const int width = pRect->x1 + pRect->x2 - 1;
+    const int result = pRect->y1 + pRect->y2 - 1;
+    const int height = pRect->y1 + pRect->y2 - 1;
+    for (int ypos = pRect->y1; ypos <= height; ++ypos)
+    {
+        for (int xpos = pRect->x1; xpos <= width; ++xpos)
+        {
+            g_pwTextureIndices_6FC72C[1024 * ypos + xpos] = value;
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x0040CED0, Render_BltToPixelBuffer_40CED0, RENDERER_IMPL);
+
+int CC Render_BitBltToDxSurface_40FD20(const PSX_RECT* pRect, const BYTE* pPixels)
+{
+    if (pRect && pPixels)
+    {
+        const auto y = pRect->y1;
+        const auto x = pRect->x1;
+        const auto x2 = pRect->x2;
+        const auto v2 = pRect->y2;
+
+        if (pRect->x1 >= 0 && x < 640 && y >= 0 && y < 240)
+        {
+            puts(" $edq LOADING IN SCREEN AREA !!!!");
+        }
+
+        if (!pRect || !pPixels)
+        {
+            return 0;
+        }
+
+        if (pRect->x1 >= 960 && pRect->x1 < 965 && pRect->y1 >= 148 && pRect->y1 < 188)
+        {
+            puts("catch");
+        }
+
+        if (g_Render_sub_41C640_ret_650D1A == 0xFFFE)
+        {
+            // Copy into 1024x512 vram buffer
+            auto y1 = pRect->y1;
+            for (int yCount = 0;
+                yCount < pRect->y2;
+                memcpy((char *)gImageBufer_dword_6FC728 + 2048 * y1++ + 2 * x, &pPixels[2 * x2 * yCount++], 2 * x2))
+            {
+                ;
+            }
+        }
+        else
+        {
+            Render_BltToPixelBuffer_40CED0(pRect, g_Render_sub_41C640_ret_650D1A);
+            Renderer_Free_Textures_At_Rect_40D2A0(pRect);
+        }
+        g_Render_sub_41C640_ret_650D1A = -2;
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x0040FD20, Render_BitBltToDxSurface_40FD20, RENDERER_IMPL);
 
 void CC Render_sub_41C6B0(const PSX_RECT* pRect, const BYTE* pPixelData)
 {
