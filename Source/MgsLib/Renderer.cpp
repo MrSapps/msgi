@@ -2948,11 +2948,7 @@ int CC Renderer_GrowSurfaceArray_51DF8E()
 }
 MGS_FUNC_IMPLEX(0x0051DF8E, Renderer_GrowSurfaceArray_51DF8E, RENDERER_IMPL);
 
-void CC Render_Restore_Single_Surface_51E11A(int surfIdx)
-{
-    // TODO
-}
-MGS_FUNC_IMPLEX(0x0051E11A, Render_Restore_Single_Surface_51E11A, false); // TODO
+void CC Render_Restore_Single_Surface_51E11A(int idx);
 
 void CC Render_Restore_Lost_Surfaces_51E086()
 {
@@ -3038,3 +3034,41 @@ void CC Render_BackupSurface_51DE8F(IDirectDrawSurface7* pSurface)
     }
 }
 MGS_FUNC_IMPLEX(0x0051DE8F, Render_BackupSurface_51DE8F, RENDERER_IMPL);
+
+void CC Render_Restore_Single_Surface_51E11A(int idx)
+{
+    DDSURFACEDESC2 surfaceDesc = {};
+    surfaceDesc.dwSize = sizeof(DDSURFACEDESC2);
+    int retryCount = 100;
+    do
+    {
+        HRESULT hr = gSurfacesArray_77644C[idx].field_0_dd_surface->Lock(0, &surfaceDesc, 17, 0);
+        if (hr != DDERR_WASSTILLDRAWING)
+        {
+            if (!FAILED(hr))
+            {
+                int rowSize = surfaceDesc.dwWidth * surfaceDesc.ddpfPixelFormat.dwRGBBitCount >> 3;
+                const int pitch = surfaceDesc.lPitch;
+                if (!rowSize)
+                {
+                    rowSize = 1;
+                }
+
+                BYTE* pSurfaceData = gSurfacesArray_77644C[idx].field_4_surface_pixel_buffer;
+                char* pRow = (char*)surfaceDesc.lpSurface;
+
+                for (DWORD i = 0; i < surfaceDesc.dwHeight; i++)
+                {
+                    memcpy(pRow, pSurfaceData, rowSize);
+                    pRow += pitch;
+                    pSurfaceData += rowSize;
+                }
+
+                gSurfacesArray_77644C[idx].field_0_dd_surface->Unlock(0);
+                return;
+            }
+            --retryCount;
+        }
+    } while (retryCount);
+}
+MGS_FUNC_IMPLEX(0x0051E11A, Render_Restore_Single_Surface_51E11A, RENDERER_IMPL);
