@@ -102,7 +102,6 @@ MGS_ASSERT_SIZEOF(HiTexRecord, 0xC);
 
 MGS_VAR(1, 0x734A30, DWORD, gNum_HiTexs_dword_734A30, 0);
 MGS_ARY(1, 0x9956A0, HiTexRecord, 8192, gHiText_recs_9956A0, {});
-MGS_VAR(1, 0x650D1A, WORD, g_Render_sub_41C640_ret_650D1A, 0);
 
 void CC File_HITEXT_INIT_51D2ED()
 {

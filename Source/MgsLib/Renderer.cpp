@@ -10,9 +10,6 @@
 
 void RendererCpp_ForceLink() { }
 
-// TODO
-MGS_FUNC_NOT_IMPL(0x41C6B0, void __cdecl(PSX_RECT *pRect, BYTE *pPixelData), Render_sub_41C6B0);
-
 signed int CC Render_ComputeTextureIdx_40CC50(__int16 tpage, __int16 u, __int16 v, uint32_t *textureIdx0, uint32_t *textureIdx1)
 {
     *textureIdx0 = (tpage & 0xF) << 6;
@@ -2683,7 +2680,7 @@ bool CC Render_sub_41E730()
 }
 MGS_FUNC_IMPLEX(0x0041E730, Render_sub_41E730, RENDERER_IMPL);
 
-bool CC Renderer_Is_Texture_In_Rect_40D150(PSX_RECT* pRect, int textureIdx)
+bool CC Renderer_Is_Texture_In_Rect_40D150(const PSX_RECT* pRect, int textureIdx)
 {
     const int width =  pRect->x1 + pRect->x2 - 1;
     const int height = pRect->y1 + pRect->y2 - 1;
@@ -3072,3 +3069,115 @@ void CC Render_Restore_Single_Surface_51E11A(int idx)
     } while (retryCount);
 }
 MGS_FUNC_IMPLEX(0x0051E11A, Render_Restore_Single_Surface_51E11A, RENDERER_IMPL);
+
+MGS_VAR(1, 0x650D1A, WORD, g_Render_sub_41C640_ret_650D1A, 0);
+MGS_ARY(1, 0x6DE3C0, WORD, 1500, gFreeTextureIdxArray_6DE3C0, {});
+
+void CC Renderer_SurfaceArray_PopIdx_51E020(unsigned int idx)
+{
+    if (gSurfacesArray_77644C)
+    {
+        if (idx < gSurfaceArraySize_776854)
+        {
+            SurfaceBackup* pLast = &gSurfacesArray_77644C[gSurfaceArraySize_776854 - 1];
+            SurfaceBackup* pToRemove = &gSurfacesArray_77644C[idx];
+
+            // Swap the very last item with the item to move
+            pToRemove->field_0_dd_surface = pLast->field_0_dd_surface;
+            pToRemove->field_8_array_size = pLast->field_8_array_size;
+            pToRemove->field_4_surface_pixel_buffer = pLast->field_4_surface_pixel_buffer;
+
+            // Now resize the memory to knock off the last item, or totally nuke the array if there are no items
+            const int newSize = gSurfaceArraySize_776854-- - 1;
+            if (gSurfaceArraySize_776854)
+            {
+                gSurfacesArray_77644C = (SurfaceBackup *)realloc(gSurfacesArray_77644C, sizeof(SurfaceBackup) * newSize);
+            }
+            else
+            {
+                free(gSurfacesArray_77644C);
+                gSurfacesArray_77644C = 0;
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x0051E020, Renderer_SurfaceArray_PopIdx_51E020, RENDERER_IMPL);
+
+void CC Renderer_SurfaceArray_RemoveSurface_51DFC1(IDirectDrawSurface7* pSurfaceToRemove)
+{
+    signed int idx = 0;
+    if (gSurfaceArraySize_776854 > 0)
+    {
+        SurfaceBackup* pAryIter = gSurfacesArray_77644C;
+        while (pAryIter->field_0_dd_surface != pSurfaceToRemove)
+        {
+            ++idx;
+            ++pAryIter;
+            if (idx >= gSurfaceArraySize_776854)
+            {
+                return;
+            }
+        }
+
+        gTotalAllocated_dword_774A40 -= gSurfacesArray_77644C[idx].field_8_array_size;
+        free(gSurfacesArray_77644C[idx].field_4_surface_pixel_buffer);
+
+        gSurfacesArray_77644C[idx].field_4_surface_pixel_buffer = 0;
+        gSurfacesArray_77644C[idx].field_8_array_size = 0;
+        Renderer_SurfaceArray_PopIdx_51E020(idx);
+    }
+}
+MGS_FUNC_IMPLEX(0x0051DFC1, Renderer_SurfaceArray_RemoveSurface_51DFC1, RENDERER_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x4241A4, void __cdecl(void *), Renderer_Free_Surface_Type_5_4241A4); // TODO
+
+void CC Renderer_Free_Textures_At_Rect_40D2A0(const PSX_RECT* pRect)
+{
+    for (int idx = 1; idx < gNumTextures_word_6FC78C; ++idx)
+    {
+        if (idx != g_Render_sub_41C640_ret_650D1A
+            && Renderer_Is_Texture_In_Rect_40D150(pRect, idx)
+            && !gTextures_6C0F00[idx].field_24_flagsQ)
+        {
+            if (gTextures_6C0F00[idx].mSurfaceType == 5)
+            {
+                Renderer_Free_Surface_Type_5_4241A4(gTextures_6C0F00[idx].mSurface);
+            }
+            else if (gTextures_6C0F00[idx].mSurface)
+            {
+                if (gSoftwareRendering)
+                {
+                    free(gTextures_6C0F00[idx].mSurface);
+                }
+                else
+                {
+                    Renderer_SurfaceArray_RemoveSurface_51DFC1(gTextures_6C0F00[idx].mSurface);
+                    Render_PushSurface_51DDF2(gTextures_6C0F00[idx].mSurface);
+                }
+            }
+            gTextures_6C0F00[idx].mSurface = 0;
+            gTextures_6C0F00[idx].field_24_flagsQ = 0;
+            gTextures_6C0F00[idx].field_6_x = -1;
+            gTextures_6C0F00[idx].field_4_y = -1;
+            gTextures_6C0F00[idx].field_A_h = 0;
+            gTextures_6C0F00[idx].field_8_w = 0;
+            gFreeTextureIdxArray_6DE3C0[gNumFreeTextures_6FC790++] = idx;
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x0040D2A0, Renderer_Free_Textures_At_Rect_40D2A0, RENDERER_IMPL);
+
+
+MGS_FUNC_NOT_IMPL(0x40FD20, int CC(const PSX_RECT *pRect, const BYTE *pPixels), Render_BitBltToDxSurface_40FD20); // TODO
+
+void CC Render_sub_41C6B0(const PSX_RECT* pRect, const BYTE* pPixelData)
+{
+    while (gbKeepCopyingSurface_dword_6C0770)
+    {
+
+    }
+    ++gbKeepCopyingSurface_dword_6C0770;
+    Render_BitBltToDxSurface_40FD20(pRect, pPixelData);
+    --gbKeepCopyingSurface_dword_6C0770;
+}
+MGS_FUNC_IMPLEX(0x0041C6B0, Render_sub_41C6B0, RENDERER_IMPL);

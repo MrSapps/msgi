@@ -2385,8 +2385,6 @@ int __cdecl DoMain()
 
 MGS_VAR(1, 0x6FC73C, IUnknown*, dword_6FC73C, nullptr); // TODO: Check what this is
 
-MGS_FUNC_NOT_IMPL(0x4241A4, void* __cdecl(void *), sub_4241A4);
-
 // 00423020
 void __cdecl ClearAll()
 {
@@ -2397,7 +2395,7 @@ void __cdecl ClearAll()
         {
             if (gTextures_6C0F00[i].mSurfaceType == 5)
             {
-                sub_4241A4(gTextures_6C0F00[i].mSurface);
+                Renderer_Free_Surface_Type_5_4241A4(gTextures_6C0F00[i].mSurface);
             }
             else if (!gSoftwareRendering)
             {
