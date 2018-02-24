@@ -2700,7 +2700,7 @@ MGS_FUNC_IMPLEX(0x0040D150, Renderer_Is_Texture_In_Rect_40D150, RENDERER_IMPL);
 
 MGS_VAR(1, 0x6C076C, DWORD, dword_6C076C, 0);
 
-int CC Render_sub_41C640(PSX_RECT* pRect, WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tgaW, unsigned __int16 tgaH)
+int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tgaW, unsigned __int16 tgaH)
 {
     int idx = 0;
     if (gNumFreeTextures_6FC790 > 0)
@@ -2781,5 +2781,17 @@ int CC Render_sub_41C640(PSX_RECT* pRect, WORD* pallete, const BYTE* pixelData, 
 
     return idx;
 }
-MGS_FUNC_IMPLEX(0x0041C640, Render_sub_41C640, false); // TODO: Implement
+MGS_FUNC_IMPLEX(0x0040FA30, Render_sub_40FA30, false); // TODO: Implement
+
+MGS_VAR(1, 0x6C0770, DWORD, gbKeepCopyingSurface_dword_6C0770, 0);
+
+int CC Render_sub_41C640(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tga6, unsigned __int16 tga7)
+{
+    while (gbKeepCopyingSurface_dword_6C0770) {}
+    ++gbKeepCopyingSurface_dword_6C0770;
+    const auto result = Render_sub_40FA30(pRect, pallete, pixelData, surfaceType, pTga, tga6, tga7);
+    --gbKeepCopyingSurface_dword_6C0770;
+    return result;
+}
+MGS_FUNC_IMPLEX(0x0041C640, Render_sub_41C640, RENDERER_IMPL);
 

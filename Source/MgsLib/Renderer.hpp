@@ -94,4 +94,4 @@ signed int CC Render_sub_41D1D0();
 bool CC Render_sub_41E730();
 
 EXTERN_MGS_FUNC_NOT_IMPL(0x41C6B0, void __cdecl(PSX_RECT *pRect, BYTE *pPixelData), Render_sub_41C6B0);
-int CC Render_sub_41C640(PSX_RECT* pRect, WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tgaW, unsigned __int16 tgaH);
+int CC Render_sub_41C640(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tga6, unsigned __int16 tga7);
