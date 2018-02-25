@@ -46,3 +46,4 @@ MGS_VAR_EXTERN(DWORD, gFps);
 MGS_VAR_EXTERN(LPDIRECT3DDEVICE7, gD3dDevice_6FC74C);
 
 void CC Main_sub_401C02();
+void __cdecl ClearAll();

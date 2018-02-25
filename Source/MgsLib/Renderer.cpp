@@ -2715,21 +2715,226 @@ MGS_FUNC_IMPLEX(0x0040D150, Renderer_Is_Texture_In_Rect_40D150, RENDERER_IMPL);
 
 MGS_VAR(1, 0x6C076C, DWORD, dword_6C076C, 0);
 
+void CC Render_set_pixel_40C870(WORD* pData, int pitch, int xpos, int ypos, __int16 value);
+unsigned __int16 CC Render_convert_colour_40D420(unsigned __int16 value);
+void CC Render_BackupSurface_51DE8F(IDirectDrawSurface7* pSurface);
+void CC Render_copy_to_surface_40C930(WORD* pData, int pitch, int width, int height);
+
+IDirectDrawSurface7* CC Render_create_texture_at_index_40E840(IDirectDraw7* /*pDDraw*/, const WORD* pPixels, const WORD* pPal, DWORD* pWidth, DWORD* pHeight, int* pType, int index)
+{
+    int bSemiTrans = 0;
+    DWORD width = *pWidth;
+    int height = *pHeight;
+
+    DDPIXELFORMAT pixelFormat = {};
+    pixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+    pixelFormat.dwFlags = 0x41;
+    pixelFormat.dwFourCC = 0;
+    pixelFormat.dwRGBBitCount = 16;
+    pixelFormat.dwRBitMask = 0x7C00;
+    pixelFormat.dwGBitMask = 0x3E0;
+    pixelFormat.dwBBitMask = 0x1F;
+    pixelFormat.dwRGBAlphaBitMask = 0x8000;
+
+    DDSURFACEDESC2 surfaceDesc = {};
+    surfaceDesc.dwSize = sizeof(DDSURFACEDESC2);
+    if (gColourKey)
+    {
+        surfaceDesc.dwFlags = 0x11007;
+    }
+    else
+    {
+        surfaceDesc.dwFlags = 4103;
+    }
+    memcpy(&surfaceDesc.ddpfPixelFormat, &pixelFormat, sizeof(surfaceDesc.ddpfPixelFormat));
+    DWORD xpos = 0;
+    for (xpos = 1; xpos < *pHeight && xpos < 256; xpos *= 2)
+    {
+
+    }
+    if (xpos < 8)
+    {
+        gTextures_6C0F00[index].float_field_18_vQ = gTextures_6C0F00[index].float_field_18_vQ * ((double)xpos / 8.0);
+        xpos = 8;
+    }
+    *pHeight = xpos;
+    surfaceDesc.dwHeight = xpos;
+    for (xpos = 1; xpos < *pWidth && xpos < 256; xpos *= 2)
+    {
+
+    }
+    if (xpos < 8)
+    {
+        gTextures_6C0F00[index].float_field_14_uQ = gTextures_6C0F00[index].float_field_14_uQ * ((double)xpos / 8.0);
+        xpos = 8;
+    }
+    *pWidth = xpos;
+    surfaceDesc.dwWidth = xpos;
+    if (gTextureCapFlags_6FC770)
+    {
+        if (*pHeight <= *pWidth)
+        {
+            *pHeight = *pWidth;
+            surfaceDesc.dwHeight = surfaceDesc.dwWidth;
+        }
+        else
+        {
+            *pWidth = *pHeight;
+            surfaceDesc.dwWidth = surfaceDesc.dwHeight;
+        }
+    }
+    surfaceDesc.ddsCaps.dwCaps = 0x1000;
+    surfaceDesc.ddsCaps.dwCaps2 = 16;
+    IDirectDrawSurface7* pSurface = nullptr;
+    HRESULT hr = g_pDirectDraw->CreateSurface(&surfaceDesc, &pSurface, 0);
+
+    if (FAILED(hr))
+    {
+        PrintDDError("Can't create texture", 0);
+        ClearAll();
+        return nullptr;
+    }
+
+    DDBLTFX bltFx = {};
+    bltFx.dwSize = sizeof(DDBLTFX);
+    bltFx.dwFillColor = 0;
+    do
+    {
+        hr = pSurface->Blt(0, 0, 0, 0x1000400, &bltFx);
+    } while (hr == DDERR_WASSTILLDRAWING);
+
+    memset(&surfaceDesc, 0, sizeof(DDSURFACEDESC2));
+    surfaceDesc.dwSize = sizeof(DDSURFACEDESC2);
+    do
+    {
+        hr = pSurface->Lock(0, &surfaceDesc, 0, 0);
+    } while (hr == DDERR_WASSTILLDRAWING);
+
+    if (FAILED(hr))
+    {
+        PrintDDError("Can't lock surface", 0);
+        ClearAll();
+        return nullptr;
+    }
+
+    if (*pType)
+    {
+        if (*pType == 1)
+        {
+            width = (width + 1) >> 1;
+        }
+    }
+    else
+    {
+        width = (width + 3) >> 2;
+    }
+
+    for (int ypos = 0; ypos < height; ++ypos)
+    {
+        int calculated_xpos = 0;
+        for (xpos = 0; xpos < width; ++xpos)
+        {
+            int pixel_or_pal_idx = pPixels[width * ypos + xpos];
+            WORD palVal = 0;
+            switch (*pType)
+            {
+            case 0: // 4 bit pal indexes, 4 per word
+                for (int i = 0; i < 4; i++)
+                {
+                    palVal = pPal[pixel_or_pal_idx & 0xF];
+                    bSemiTrans |= (palVal & 0x8000) && (palVal & 0x7FFF);
+                    Render_set_pixel_40C870((WORD*)surfaceDesc.lpSurface, surfaceDesc.lPitch, calculated_xpos++, ypos, Render_convert_colour_40D420(palVal));
+
+                    // Grab the next nibble
+                    pixel_or_pal_idx = (signed int)(unsigned __int16)pixel_or_pal_idx >> 4;
+                }
+                break;
+            case 1: // 8 bit pal indexes, 2 per word
+                // Index 1
+                palVal = pPal[(unsigned __int8)pixel_or_pal_idx];
+                bSemiTrans |= (palVal & 0x8000) && (palVal & 0x7FFF);
+                Render_set_pixel_40C870((WORD*)surfaceDesc.lpSurface, surfaceDesc.lPitch, calculated_xpos++, ypos, Render_convert_colour_40D420(palVal));
+
+                // Index 2
+                pixel_or_pal_idx = (unsigned __int16)pixel_or_pal_idx >> 8;
+
+                palVal = pPal[(unsigned __int8)pixel_or_pal_idx];
+                bSemiTrans |= (palVal & 0x8000) && (palVal & 0x7FFF);
+                Render_set_pixel_40C870((WORD*)surfaceDesc.lpSurface, surfaceDesc.lPitch, calculated_xpos++, ypos, Render_convert_colour_40D420(palVal));
+                break;
+            case 2: // Direct 16 bit colour
+                Render_set_pixel_40C870((WORD*)surfaceDesc.lpSurface, surfaceDesc.lPitch, xpos, ypos, Render_convert_colour_40D420(pixel_or_pal_idx));
+                break;
+            case 3: // TGA?
+                bSemiTrans = 1;
+                palVal = pPixels[width * (height - 1 - ypos) + xpos];
+                if (palVal == 0x8000)
+                {
+                    palVal = 32769;
+                }
+                if (palVal & 0x7FFF)
+                {
+                    palVal |= 0x8000u;
+                }
+                else
+                {
+                    palVal = 0;
+                }
+                Render_set_pixel_40C870((WORD*)surfaceDesc.lpSurface, surfaceDesc.lPitch, xpos, ypos, palVal);
+                break;
+            default:
+                continue;
+            }
+        }
+    }
+    if (!gColourKey)
+    {
+        Render_copy_to_surface_40C930(
+            (WORD *)surfaceDesc.lpSurface,
+            surfaceDesc.lPitch,
+            *pWidth,
+            *pHeight);
+    }
+    hr = pSurface->Unlock(0);
+
+    if (FAILED(hr))
+    {
+        PrintDDError("Can't unlock surface", 0);
+        ClearAll();
+        return nullptr;
+    }
+
+    if (bSemiTrans)
+    {
+        *pType = -1;
+    }
+    else
+    {
+        *pType = 0;
+    }
+    Render_BackupSurface_51DE8F(pSurface);
+    return pSurface;
+}
+MGS_FUNC_IMPLEX(0x0040E840, Render_create_texture_at_index_40E840, RENDERER_IMPL);
 
 
-MGS_FUNC_NOT_IMPL(0x40E840, IDirectDrawSurface7 *__cdecl (IDirectDraw7 *, const BYTE *, const WORD *, DWORD *, DWORD *, int *, int), Render_sub_40E840);
+MGS_ARY(1, 0x6DE3C0, WORD, 1500, gFreeTextureIdxArray_6DE3C0, {});
+
+
+MGS_FUNC_NOT_IMPL(0x4241C2, IDirectDrawSurface7 *__cdecl (const BYTE *pixelData, const BYTE *pallete), Render_sub_4241C2); // TODO
 
 int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tgaW, unsigned __int16 tgaH)
 {
     int idx = 0;
     if (gNumFreeTextures_6FC790 > 0)
     {
-        // ?? actually just gNumFreeTextures_6FC790-- ?
-//        idx = *((unsigned __int16 *)&gTextures_6C0F00[1499].field_4C + (unsigned __int16)gNumFreeTextures_6FC790 + 1);
-        idx = gNumFreeTextures_6FC790--;
+        // At least 1 texture has been freed, find and re-use that slot
+        //idx = *((unsigned __int16 *)&gTextures_6C0F00[1499].field_4C + (unsigned __int16)gNumFreeTextures_6FC790 + 1);
+        idx = gFreeTextureIdxArray_6DE3C0[gNumFreeTextures_6FC790-1];
     }
     else
     {
+        // Use the next texture in the array
         idx = (unsigned __int16)gNumTextures_word_6FC78C;
     }
 
@@ -2777,13 +2982,12 @@ int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE*
     if (surfaceType == 5)
     {
         // Type 5 is malloc 280 byte buffer?
-        abort();
-        //gTextures_6C0F00[idx].mSurface = Render_sub_4241C2(pixelData, pallete);
+        gTextures_6C0F00[idx].mSurface = Render_sub_4241C2(pixelData, (const BYTE*) pallete);
     }
     // NOTE: Pruned software rendering branch
     else
     {
-        gTextures_6C0F00[idx].mSurface = Render_sub_40E840(g_pDirectDraw, pixelData, pallete, &x2, &y2, &surfaceType, idx);
+        gTextures_6C0F00[idx].mSurface = Render_create_texture_at_index_40E840(g_pDirectDraw, (const WORD*)pixelData, pallete, &x2, &y2, &surfaceType, idx);
         gTextures_6C0F00[idx].field_28_surf_type = surfaceType;
     }
 
@@ -2802,11 +3006,11 @@ int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE*
 
     return idx;
 }
-MGS_FUNC_IMPLEX(0x0040FA30, Render_sub_40FA30, false); // TODO: Implement
+MGS_FUNC_IMPLEX(0x0040FA30, Render_sub_40FA30, RENDERER_IMPL);
 
 MGS_VAR(1, 0x6C0770, DWORD, gbKeepCopyingSurface_dword_6C0770, 0);
 
-void CC Render_set_pixel_40C870(WORD* pData, int pitch, unsigned __int16 xpos, unsigned __int16 ypos, __int16 value)
+void CC Render_set_pixel_40C870(WORD* pData, int pitch, int xpos, int ypos, __int16 value)
 {
     if (gSoftwareRendering)
     {
@@ -2826,7 +3030,7 @@ __int16 CC Render_get_pixel_vram_40C8E0(const WORD* pData, int pitch, int /*unkn
 }
 MGS_FUNC_IMPLEX(0x0040C8E0, Render_get_pixel_vram_40C8E0, RENDERER_IMPL);
 
-void CC Render_copy_to_surface_40C930(WORD* pData, int pitch, unsigned __int16 width, unsigned __int16 height)
+void CC Render_copy_to_surface_40C930(WORD* pData, int pitch, int width, int height)
 {
     // TODO: Need to understand what this algorithm is actually doing, its not a direct copy
     if (!gSoftwareRendering)
@@ -3090,7 +3294,6 @@ void CC Render_Restore_Single_Surface_51E11A(int idx)
 MGS_FUNC_IMPLEX(0x0051E11A, Render_Restore_Single_Surface_51E11A, RENDERER_IMPL);
 
 MGS_VAR(1, 0x650D1A, WORD, g_Render_sub_41C640_ret_650D1A, 0);
-MGS_ARY(1, 0x6DE3C0, WORD, 1500, gFreeTextureIdxArray_6DE3C0, {});
 
 void CC Renderer_SurfaceArray_PopIdx_51E020(unsigned int idx)
 {
@@ -3124,7 +3327,7 @@ MGS_FUNC_IMPLEX(0x0051E020, Renderer_SurfaceArray_PopIdx_51E020, RENDERER_IMPL);
 
 void CC Renderer_SurfaceArray_RemoveSurface_51DFC1(IDirectDrawSurface7* pSurfaceToRemove)
 {
-    signed int idx = 0;
+    DWORD idx = 0;
     if (gSurfaceArraySize_776854 > 0)
     {
         SurfaceBackup* pAryIter = gSurfacesArray_77644C;
@@ -3180,6 +3383,9 @@ void CC Renderer_Free_Textures_At_Rect_40D2A0(const PSX_RECT* pRect)
             gTextures_6C0F00[idx].field_4_y = -1;
             gTextures_6C0F00[idx].field_A_h = 0;
             gTextures_6C0F00[idx].field_8_w = 0;
+
+            // Store the freed index in the array, the alloc texture will use the index from this
+            // array moving gNumFreeTextures_6FC790 back towards zero.
             gFreeTextureIdxArray_6DE3C0[gNumFreeTextures_6FC790++] = idx;
         }
     }
@@ -3260,3 +3466,80 @@ void CC Render_sub_41C6B0(const PSX_RECT* pRect, const BYTE* pPixelData)
     --gbKeepCopyingSurface_dword_6C0770;
 }
 MGS_FUNC_IMPLEX(0x0041C6B0, Render_sub_41C6B0, RENDERER_IMPL);
+
+IDirectDrawSurface7* CC Renderer_LoadToDxSurface_423870(LPCSTR w32ResourceName, DWORD* w, DWORD* h)
+{
+    HANDLE hImage = LoadImageA(0, w32ResourceName, 0, 0, 0, 16u);
+    if (!hImage)
+    {
+        return nullptr;
+    }
+
+    BITMAP bitmap = {};
+    GetObjectA(hImage, 24, &bitmap);
+
+    DDSURFACEDESC2 surfaceDesc = {};
+    surfaceDesc.dwSize = sizeof(DDSURFACEDESC2);
+    surfaceDesc.dwFlags = 7;
+    surfaceDesc.ddsCaps.dwCaps = 4096;
+    surfaceDesc.ddsCaps.dwCaps2 = 16;
+    *w = bitmap.bmWidth;
+    surfaceDesc.dwWidth = bitmap.bmWidth;
+    *h = bitmap.bmHeight;
+    surfaceDesc.dwHeight = bitmap.bmHeight;
+    DWORD i = 0;
+    for ( i = 4; i < *h && i < 256; i *= 2)
+    {
+
+    }
+
+    *h = i;
+    surfaceDesc.dwHeight = i;
+
+    for (i = 4; i < *w && i < 256; i *= 2)
+    {
+
+    }
+
+    *w = i;
+    surfaceDesc.dwWidth = i;
+
+    if (gTextureCapFlags_6FC770)
+    {
+        if (!gSoftwareRendering)
+        {
+            if (*h <= *w)
+            {
+                *h = *w;
+                surfaceDesc.dwHeight = surfaceDesc.dwWidth;
+            }
+            else
+            {
+                *w = *h;
+                surfaceDesc.dwWidth = surfaceDesc.dwHeight;
+            }
+        }
+    }
+
+    IDirectDrawSurface7* surface = nullptr;
+    HRESULT hr = g_pDirectDraw->CreateSurface(&surfaceDesc, &surface, 0);
+    if (FAILED(hr))
+    {
+        DeleteObject(hImage);
+        return nullptr;
+    }
+    else
+    {
+        HDC hdc = CreateCompatibleDC(0);
+        HDC surfaceDC = nullptr;
+        surface->GetDC(&surfaceDC);
+        SelectObject(hdc, hImage);
+        BitBlt(surfaceDC, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdc, 0, 0, 0xCC0020u);
+        DeleteDC(hdc);
+        surface->ReleaseDC(surfaceDC);
+        DeleteObject(hImage);
+        Render_BackupSurface_51DE8F(surface);
+        return surface;
+    }
+}
+MGS_FUNC_IMPLEX(0x00423870, Renderer_LoadToDxSurface_423870, RENDERER_IMPL);
