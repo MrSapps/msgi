@@ -134,7 +134,7 @@ MGS_VAR(1, 0x6C0EFC, prim_struct*, gPrimBuffer_dword_6C0EFC, nullptr); // Dynami
 MGS_VAR(1, 0x6FC788, DWORD, gPrimIdx_dword_6FC788, 0);
 MGS_VAR(1, 0x6FC774, DWORD, dword_6FC774, 0);
 MGS_VAR(1, 0x6FC744, DWORD, dword_6FC744, 0);
-MGS_VAR(1, 0x650D10, DWORD, dword_650D10, 0);
+MGS_VAR(1, 0x650D10, DWORD, dword_650D10, 1); // This never seems to be set to anything else
 MGS_VAR(1, 0x6FC778, DWORD, gStageIs_s11e_6FC778, 0);
 MGS_VAR(1, 0x6FC760, DWORD, dword_6FC760, 0);
 
