@@ -241,7 +241,7 @@ MGS_FUNC_NOT_IMPL(0x463763, void __cdecl(MenuMan*, int*), Menu_codec_update_4637
 
 
 MGS_FUNC_NOT_IMPL(0x465B38, void __cdecl(), Menu_init_radar_helper_465B38);
-MGS_FUNC_NOT_IMPL(0x465A01, void* __cdecl(int), sub_465A01);
+MGS_FUNC_NOT_IMPL(0x465A01, void* __cdecl(int), Menu_scale_465A01); // TODO
 
 
 
@@ -311,7 +311,7 @@ void CC Menu_init_radar_468358(MenuMan* pMenu)
     memcpy(&pMenu->mDrEnvDst_field_190, &pMenu->mDR_ENV_field_48[1], sizeof(pMenu->mDrEnvDst_field_190));
     Menu_init_radar_helper_465B38();
     gFn_radar_dword_733950 = 0;
-    sub_465A01(4096);
+    Menu_scale_465A01(4096);
 }
 MGS_FUNC_IMPLEX(0x00468358, Menu_init_radar_468358, MENU_IMPL);
 
@@ -1606,6 +1606,8 @@ void CC Menu_draw_blinking_arrow_463652(MenuMan* pMenu, BYTE* ot)
 }
 MGS_FUNC_IMPLEX(0x00463652, Menu_draw_blinking_arrow_463652, MENU_IMPL);
 
+MGS_FUNC_NOT_IMPL(0x45F1D0, void __cdecl (MenuMan *pMenu, char *Source), Menu_font_45F1D0);
+
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {
     int* pOtText1 = (int*)gMenuPrimBuffer_7265E0.mOt;
@@ -1636,7 +1638,6 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
             flags *= 2; // To the next bit
         }
     }
-
 
     // drawing environment change primitive
     addPrim(pOtText2, &pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]);
@@ -1834,6 +1835,163 @@ void CC TextSetRGB_459B27(int r, int g, int b)
     gTextConfig_66C4C0.gTextRGB_dword_66C4CC = r | ((g | (bEdited << 8)) << 8);
 }
 MGS_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, MENU_IMPL);
+
+DWORD ScriptReadBits_45238C()
+{
+    DWORD ret = 0;
+    while (Script_GetReturnAddress())
+    {
+        const DWORD value = Script_get_int();
+        if (value > 32)
+        {
+            return 0;
+        }
+        ret |= 1 << value;
+    }
+    return ret;
+}
+MGS_FUNC_IMPLEX(0x45238C, ScriptReadBits_45238C, MENU_IMPL);
+
+MGS_VAR(1, 0x9942C0, DWORD, gMenuRightBits_dword_9942C0, 0);
+MGS_VAR(1, 0x9942BC, DWORD, gMenuLeftBits_dword_9942BC, 0);
+
+MGS_ARY(1, 0x78E82A, WORD, 24, gItem_states_word_78E82A, {});
+MGS_ARY(1, 0x78E802, WORD, 10, gWeapon_states_word_78E802, {});
+
+void CC Menu_Remove_all_items_44D020()
+{
+    for (int i = 0; i < 24; i++)
+    {
+        gItem_states_word_78E82A[i] |= 0x8000u;
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        gWeapon_states_word_78E802[i] |= 0x8000u;
+    }
+}
+MGS_FUNC_IMPLEX(0x44D020, Menu_Remove_all_items_44D020, MENU_IMPL);
+
+void CC Menu_give_all_items_44D047()
+{
+    for (int i = 0; i < 24; i++)
+    {
+        gItem_states_word_78E82A[i] &= ~0x8000u;
+    }
+
+    for (int i = 0; i < 10; i++)
+    {
+        gWeapon_states_word_78E802[i] &= ~0x8000u;
+    }
+}
+MGS_FUNC_IMPLEX(0x44D047, Menu_give_all_items_44D047, MENU_IMPL);
+
+
+int CC Script_tbl_menu_sub_4521A7(BYTE* pScript)
+{
+    if (Script_ParamExists('j'))
+    {
+        if (Script_get_int() & 1)
+        {
+            game_state_dword_72279C.flags |= 0x800000u;
+        }
+        else
+        {
+            game_state_dword_72279C.flags &= 0xFF7FFFFF;
+        }
+    }
+
+    if (Script_ParamExists('n'))
+    {
+        if (Script_get_int() & 1)
+        {
+            Menu_Remove_all_items_44D020();
+        }
+        else
+        {
+            Menu_give_all_items_44D047();
+        }
+    }
+
+    if (Script_ParamExists('m'))
+    {
+        if (Script_get_int() & 1)
+        {
+            game_state_dword_72279C.flags &= 0xFFF7FFFF;
+        }
+        else
+        {
+            game_state_dword_72279C.flags |= 0x80000u;
+        }
+    }
+
+    if (Script_ParamExists('l'))
+    {
+        switch (Script_get_int())
+        {
+        case 0u:
+            game_state_dword_72279C.flags |= 0x20000u;
+            break;
+        case 2u:
+            game_state_dword_72279C.flags |= 0x10000u;
+            break;
+        case 1u:
+        case 3u:
+            game_state_dword_72279C.flags &= 0xFFFDFFFF;
+            break;
+        }
+    }
+
+    if (Script_ParamExists('r'))
+    {
+        switch (Script_get_int())
+        {
+        case 0u:
+            game_state_dword_72279C.flags |= 0x400000u;
+            break;
+        case 1u:
+            game_state_dword_72279C.flags &= 0xFFBFFFFF;
+            break;
+        case 2u:
+            game_state_dword_72279C.flags |= 0x200000u;
+            break;
+        case 3u:
+            game_state_dword_72279C.flags |= 0x100000u;
+            break;
+        }
+    }
+
+    if (Script_ParamExists('p'))
+    {
+        if (Script_get_int() & 1)
+        {
+            game_state_dword_72279C.mParts.flags1 |= 0x40u;
+        }
+        else
+        {
+            game_state_dword_72279C.mParts.flags1 &= 0xBFu;
+        }
+    }
+
+    if (Script_ParamExists('s'))
+    {
+        Menu_scale_465A01(Script_get_int());
+    }
+
+    // weapons?
+    if (Script_ParamExists('w'))
+    {
+        gMenuRightBits_dword_9942C0 = ScriptReadBits_45238C();
+    }
+
+    // items?
+    if (Script_ParamExists('i'))
+    {
+        gMenuLeftBits_dword_9942BC = ScriptReadBits_45238C();
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x4521A7, Script_tbl_menu_sub_4521A7, MENU_IMPL);
 
 static void Test_Render_Text_Large_font_468AAF()
 {

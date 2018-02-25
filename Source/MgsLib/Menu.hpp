@@ -32,3 +32,4 @@ void CC TextSetXYFlags_459B0B(int x, int y, int flags);
 void CC Menu_Set_Text_BlendMode_459BE0();
 int CC Menu_inventory_text_4689CB(MenuMan* pMenu, int* ot, int xpos, int ypos, const char* pText, int textFlags);
 void Menu_render_unk_2_and_3_468C6B();
+int CC Script_tbl_menu_sub_4521A7(BYTE* pScript);

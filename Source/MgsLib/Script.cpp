@@ -987,7 +987,6 @@ MGS_FUNC_NOT_IMPL(0x00452132, int __cdecl(BYTE*), Script_tbl_pad_452132);
 MGS_FUNC_NOT_IMPL(0x00451F89, int __cdecl(BYTE*), Script_tbl_varsave_sub_451F89);
 MGS_FUNC_NOT_IMPL(0x00451FE3, int __cdecl(BYTE*), Script_tbl_system_sub_451FE3);
 MGS_FUNC_NOT_IMPL(0x0045219B, int __cdecl(BYTE*), Script_tbl_sound_45219B);
-MGS_FUNC_NOT_IMPL(0x004521A7, int __cdecl(BYTE*), Script_tbl_menu_sub_4521A7);
 MGS_FUNC_NOT_IMPL(0x004523C7, int __cdecl(BYTE*), Script_Tbl_rand_4523C7);
 MGS_FUNC_NOT_IMPL(0x004523E7, int __cdecl(BYTE*), Script_tbl_sub_4523E7);
 MGS_FUNC_NOT_IMPL(0x0045256B, int __cdecl(BYTE*), Script_tbl_print_sub_45256B);
@@ -1045,7 +1044,7 @@ MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
     { 0x5C9E, 0x0, Script_tbl_varsave_sub_451F89.Ptr() },
     { 0x4AD9, 0x0, Script_tbl_system_sub_451FE3.Ptr() },
     { 0x698D, 0x0, Script_tbl_sound_45219B.Ptr() },
-    { 0x226D, 0x0, Script_tbl_menu_sub_4521A7.Ptr() },
+    { 0x226D, 0x0, Script_tbl_menu_sub_4521A7 },
     { 0x925E, 0x0, Script_Tbl_rand_4523C7.Ptr() },
     { 0xE257, 0x0, Script_tbl_sub_4523E7.Ptr() },
     { 0xB96E, 0x0, Script_tbl_print_sub_45256B.Ptr() },
