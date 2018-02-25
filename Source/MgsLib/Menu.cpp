@@ -866,13 +866,6 @@ void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* p
 }
 MGS_FUNC_IMPLEX(0x468642, Render_Text_Small_font_468642, false); // TODO: Bugged
 
-int CC TextSetRGB_459B27(int r, int g, int b)
-{
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, false);  // TODO
-
 void CC Menu_DrawText_459B63(const char* pFormatStr, int formatArg1, int formatArg2, int formatArg3, int formatArg4)
 {
     char formattedStr[64] = {};
@@ -1644,6 +1637,7 @@ void CC Menu_update_4598BC(MenuMan* pMenu)
         }
     }
 
+
     // drawing environment change primitive
     addPrim(pOtText2, &pMenu->mDR_ENV_field_48[gActiveBuffer_dword_791A08]);
 }
@@ -1825,6 +1819,21 @@ void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMen
     }
 }
 MGS_FUNC_IMPLEX(0x46AFE1, Menu_inventory_common_icon_helper_46AFE1, MENU_IMPL);
+
+void CC TextSetRGB_459B27(int r, int g, int b)
+{
+    int bEdited = b;
+    if (gTextConfig_66C4C0.gTextFlags_dword_66C4C8 & 0x20)
+    {
+        bEdited |= 0x66u;
+    }
+    else
+    {
+        bEdited |= 0x64u;
+    }
+    gTextConfig_66C4C0.gTextRGB_dword_66C4CC = r | ((g | (bEdited << 8)) << 8);
+}
+MGS_FUNC_IMPLEX(0x459B27, TextSetRGB_459B27, MENU_IMPL);
 
 static void Test_Render_Text_Large_font_468AAF()
 {
