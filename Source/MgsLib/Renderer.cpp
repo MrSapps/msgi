@@ -3543,3 +3543,39 @@ IDirectDrawSurface7* CC Renderer_LoadToDxSurface_423870(LPCSTR w32ResourceName, 
     }
 }
 MGS_FUNC_IMPLEX(0x00423870, Renderer_LoadToDxSurface_423870, RENDERER_IMPL);
+
+int CC ImageMove_40DA90(const PSX_RECT* pRect, int dstx, int dsty)
+{
+    const int w = pRect->x1 + pRect->x2 - 1;
+    const int h = pRect->y1 + pRect->y2 - 1;
+    if (pRect->x1 >= 960 && pRect->x1 < 965 && pRect->y1 >= 148 && pRect->y1 < 188)
+    {
+        puts("catch");
+    }
+
+    for (int srcy = pRect->y1; srcy <= h; )
+    {
+        // Copy a line from src to dst
+        memcpy(
+            (char *)gImageBufer_dword_6FC728 + 2048 * dsty++ + 2 * dstx,
+            (char *)gImageBufer_dword_6FC728 + 2048 * srcy++ + 2 * pRect->x1,
+            2 * pRect->x2);
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x0040DA90, ImageMove_40DA90, RENDERER_IMPL);
+
+const PSX_RECT stru_650100 = { 768, 226, 256, 30 };
+const PSX_RECT stru_650108 = { 768, 196, 256, 30 };
+
+int jImageMove_401A31()
+{
+    return ImageMove_40DA90(&stru_650108, stru_650100.x1, stru_650100.y1);
+}
+MGS_FUNC_IMPLEX(0x00401A31, jImageMove_401A31, RENDERER_IMPL);
+
+int ImageMove_401A13()
+{
+    return ImageMove_40DA90(&stru_650100, stru_650108.x1, stru_650108.y1);
+}
+MGS_FUNC_IMPLEX(0x00401A13, ImageMove_401A13, RENDERER_IMPL);

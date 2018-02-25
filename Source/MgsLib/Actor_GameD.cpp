@@ -11,6 +11,7 @@
 #include "WinMain.hpp"
 #include "Map.hpp"
 #include "Menu.hpp"
+#include "Renderer.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
@@ -59,7 +60,6 @@ MGS_FUNC_NOT_IMPL(0x00521892, int CC(), sub_521892);
 MGS_FUNC_NOT_IMPL(0x0044DEDE, int CC(), sub_44DEDE);
 MGS_FUNC_NOT_IMPL(0x0044F3F7, void CC(), Map_ResetMapCountAndKmdsCount_44F3F7);
 MGS_FUNC_NOT_IMPL(0x00453B11, void CC(), Res_game_camera_create_453B11);
-MGS_FUNC_NOT_IMPL(0x00401A13, int CC(), ImageMove_401A13);
 MGS_FUNC_NOT_IMPL(0x00455299, void CC(), sub_455299);
 MGS_FUNC_NOT_IMPL(0x0040945D, void CC(), sub_40945D);
 MGS_FUNC_NOT_IMPL(0x00459A95, void CC(), sub_459A95);

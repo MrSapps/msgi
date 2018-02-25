@@ -553,7 +553,6 @@ MGS_FUNC_IMPLEX(0x4026E6, LibDG_Clear_Resident_Texture_Cache_Copy_4026E6, LIBDG_
 
 
 MGS_FUNC_NOT_IMPL(0x4020D8, void CC(), sub_4020D8);
-MGS_FUNC_NOT_IMPL(0x401A31, void CC(), jImageMove_401A31);
 MGS_FUNC_NOT_IMPL(0x40B9FF, void CC(), LibDG_40B9FF);
 
 void CC SetRGB_40195A(char r, char g, char b)
