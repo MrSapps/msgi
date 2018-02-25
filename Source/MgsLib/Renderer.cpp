@@ -3293,7 +3293,7 @@ void CC Render_Restore_Single_Surface_51E11A(int idx)
 }
 MGS_FUNC_IMPLEX(0x0051E11A, Render_Restore_Single_Surface_51E11A, RENDERER_IMPL);
 
-MGS_VAR(1, 0x650D1A, WORD, g_Render_sub_41C640_ret_650D1A, 0);
+MGS_VAR(1, 0x650D1A, WORD, g_Render_sub_41C640_ret_650D1A, 0x0FFFF);
 
 void CC Renderer_SurfaceArray_PopIdx_51E020(unsigned int idx)
 {
