@@ -3,12 +3,41 @@
 #include "ResourceNameHash.hpp"
 #include "LibDG.hpp"
 #include "Menu.hpp"
+#include "WinMain.hpp"
+
+
+union PolyTag2
+{
+    struct
+    {
+        WORD LowPart;
+        WORD HighPart;
+    };
+    DWORD WordPart;
+};
+
+void SetDepth(POLY_F4* p, u16 depth)
+{
+    PolyTag2* pTag = (PolyTag2*)&p->tag;
+    //pTag->LowPart = depth;
+    pTag->HighPart = 0x0900;
+}
 
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
-    TextSetXYFlags_459B0B(181, 47, 0);
+    TextSetXYFlags_459B0B(181, 47, 0x10);
     TextSetRGB_459B27(255, 255, 255);
     Menu_DrawText_459B63 ("A textual test");
+
+    POLY_F4 * pDst = (POLY_F4  *)pDebug->mPrimData->field_40_pDataStart[gActiveBuffer_dword_791A08];
+
+    POLY_F4 * pSrc = &pDebug->mPolyF4;
+
+    memcpy(pDst, pSrc, sizeof(POLY_F4));
+    SetDepth(pDst, 0x0900);
+
+    //SetDepth(&pDst[i], pRank->field_41C_16_prim_dst[i]);
+
 
   //  memcpy((pDebug->mPrimData /*+ gActiveBuffer_dword_791A08*/)->field_40_pDataStart, &pDebug->mPolyF4, sizeof(POLY_FT4));
    // pDebug->mPrimData->mBase.field_0_ptr = 3;
@@ -48,13 +77,13 @@ static int CC Debug_Loader(Actor_Debug* pDebug)
     pDebug->mPolyF4.y0 = 0;
 
     pDebug->mPolyF4.x1 = 0;
-    pDebug->mPolyF4.y1 = 100;
+    pDebug->mPolyF4.y1 = 1000;
 
-    pDebug->mPolyF4.x2 = 100;
-    pDebug->mPolyF4.y2 = 100;
+    pDebug->mPolyF4.x2 = 1000;
+    pDebug->mPolyF4.y2 = 1000;
 
     pDebug->mPolyF4.x3= 0;
-    pDebug->mPolyF4.y3 = 100;
+    pDebug->mPolyF4.y3 = 1000;
 
 
     return 0;

@@ -4,12 +4,14 @@
 #include "Actor.hpp"
 #include "Psx.hpp"
 #include "Kmd.hpp"
+#include "Font.hpp"
 
 void Actor_RankCPP_ForceLink();
 void DoActor_RankTests();
 
 struct Prim_unknown;
 struct ButtonStates;
+
 
 struct Actor_Rank
 {
@@ -67,72 +69,7 @@ struct Actor_Rank
     int field_4B0_stealth;
     int field_4B4_mugen;
 
-    int field_4B8_11_byte_structs_ary;
-    int field_4BC;
-    int field_4C0;
-    int field_4C4;
-    int field_4C8;
-    int field_4CC;
-    int field_4D0;
-    int field_4D4;
-    int field_4D8;
-    int field_4DC;
-    int field_4E0;
-    int field_4E4;
-    int field_4E8;
-    int field_4EC;
-    int field_4F0;
-    int field_4F4;
-    int field_4F8;
-    int field_4FC;
-    int field_500;
-    int field_504;
-    int field_508;
-    int field_50C;
-    int field_510;
-    int field_514;
-    int field_518;
-    int field_51C;
-    int field_520;
-    int field_524;
-    int field_528;
-    int field_52C;
-    int field_530;
-    int field_534;
-    int field_538;
-    int field_53C;
-    int field_540;
-    int field_544;
-    int field_548;
-    int field_54C;
-    int field_550;
-    int field_554;
-    int field_558;
-    int field_55C;
-    int field_560;
-    int field_564;
-    int field_568;
-    int field_56C;
-    int field_570;
-    int field_574;
-    int field_578;
-    int field_57C;
-    int field_580;
-    int field_584;
-    int field_588;
-    int field_58C;
-    int field_590;
-    int field_594;
-    int field_598;
-    int field_59C;
-    int field_5A0;
-    int field_5A4;
-    int field_5A8;
-    int field_5AC;
-    int field_5B0;
-    int field_5B4;
-    int field_5B8;
-    int field_5BC;
+    Font field_4B8_font[6];
     int field_5C0;
     int field_5C4;
     int field_5C8;

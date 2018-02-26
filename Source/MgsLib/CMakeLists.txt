@@ -58,6 +58,8 @@ add_library(MgsLib
     Menu.hpp
     Kmd.cpp
     Kmd.hpp
+    Font.cpp
+    Font.hpp
     WinMain.cpp
     WinMain.hpp)
 

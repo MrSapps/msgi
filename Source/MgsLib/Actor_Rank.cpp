@@ -98,7 +98,7 @@ void CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, P
         break;
     }
 }
-MGS_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, true); // TODO
+MGS_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, ACTOR_RANK_IMPL);
 
 union PolyTag 
 {
@@ -136,7 +136,7 @@ void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
         SetDepth(&pDst2[i], pRank->field_45C_8_prim_dst[i]);
     }
 }
-MGS_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, true); // TODO
+MGS_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, ACTOR_RANK_IMPL);
 
 // TODO: Vars
 WORD gNumSaves_word_78E890 = 5;
@@ -1040,6 +1040,25 @@ MGS_FUNC_IMPLEX(0x46EC75, Rank_update_46EC75, ACTOR_RANK_IMPL);
 void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 {
     MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+
+    /*
+    if (pRank->field_24_ptr_16_prims)
+    {
+        Prim_Remove_401839(pRank->field_24_ptr_16_prims);
+        Safe_System_2_VoidAllocation_40513B(pRank->field_24_ptr_16_prims);
+    }
+
+    if (pRank->field_28_ptr_9_prims)
+    {
+        Prim_Remove_401839(pRank->field_28_ptr_9_prims);
+        Safe_System_2_VoidAllocation_40513B(pRank->field_28_ptr_9_prims);
+    }
+
+    for (int i = 0; i < 1; ++i)
+    {
+        System_Free_40B099(2, Font_get_alloc_474D8D(&pRank->field_4B8_font[i]));
+    }
+    */
 }
 MGS_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
 
@@ -1051,8 +1070,13 @@ MGS_VAR(1, 0x78E898, WORD, gGameTime_word_78E898, 0);
 MGS_FUNC_NOT_IMPL(0x475BCE, __int16 __cdecl(Actor_Rank *pRank), Rank_RankCalcs_475BCE);
 MGS_FUNC_NOT_IMPL(0x47589A, int __cdecl(Actor_Rank *pRank, int index), Rank_47589A);
 MGS_FUNC_NOT_IMPL(0x475A4A, int __cdecl(Actor_Rank *a2, int idx), Rank_475A4A);
-MGS_FUNC_NOT_IMPL(0x4742E1, int __cdecl(Actor_Rank *a1, int a2, signed int a3), Rank_4742E1);
 
+void CC Rank_set_font_and_colour_4742E1(Actor_Rank* pRank, int fontIdx, signed int colour)
+{
+    Font_ColourRelated_45A89F(&pRank->field_4B8_font[fontIdx], 0, colour, 0);
+    Font_Set_global_alloc_ptr_45C7F2(&pRank->field_4B8_font[fontIdx]);
+}
+MGS_FUNC_IMPLEX(0x4742E1, Rank_set_font_and_colour_4742E1, ACTOR_RANK_IMPL);
 
 int CC Res_rank_loader(Actor_Rank* pRank, int a3)
 {
@@ -1163,10 +1187,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     pRank->field_41C_16_prim_dst[14] = 0;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("rank_spe_mugen"), &pRank->field_284_rank_spe_mugen, -22, 33, 22, 42, 0, 0);
-    pRank->field_284_rank_spe_mugen.r0 = 74;
-    pRank->field_284_rank_spe_mugen.g0 = 107;
-    pRank->field_284_rank_spe_mugen.b0 = 148;
-    pRank->field_41C_16_prim_dst[15] = 0;
+    setRGB0(&pRank->field_284_rank_spe_mugen, 74, 107, 148);
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("cur_lu"), &pRank->field_2AC_cur_lu, 0, 0, 0, 0, 1, 0);
     pRank->field_45C_8_prim_dst[0] = 0;
@@ -1239,7 +1260,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     for (int i = 0; i < 1; ++i)
     {
         Rank_475A4A(pRank, i);
-        Rank_4742E1(pRank, i, 0);
+        Rank_set_font_and_colour_4742E1(pRank, i, 0);
     }
 
     if (pRank->field_5F8_script_x)
@@ -1251,7 +1272,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
             {
                 pRank->field_41C_16_prim_dst[i] = 0;
             }
-            Rank_4742E1(pRank, 0, 0);
+            Rank_set_font_and_colour_4742E1(pRank, 0, 0);
             pRank->field_484_state = 3;
             pRank->field_5F0 = 0;
             pRank->field_5F4 = 0;
@@ -1284,7 +1305,7 @@ MGS_FUNC_IMPLEX(0x474D98, Res_rank_loader, ACTOR_RANK_IMPL)
 
 signed int CC Res_rank_Create_46EC0E(DWORD scriptUnknown, int a_dword_722A40, BYTE* pScript)
 {
-    game_state_dword_72279C.flags |= 0x4A6000u; // TODO: Could be a code loc?
+    game_state_dword_72279C.flags |= 0x4A6000u;
 
     Actor_Rank* pRank = Actor_ResourceAllocT<Actor_Rank>(1);
     if (pRank)

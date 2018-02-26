@@ -11,6 +11,7 @@
 #include "ResourceNameHash.hpp"
 #include "Renderer.hpp"
 #include "pcx.hpp"
+#include "Font.hpp"
 
 #define MENU_IMPL true
 
@@ -544,7 +545,7 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, int* ot)
                 {
                     if (Menu_inventory_left_update_helper_46A305(pMenu))
                     {
-                        pMenu->field_2A_bSkipUpdateHpBars = 2;
+                        pMenu->field_2A_bSkipUpdateHpBars = 2; // To next state
                         gActorPauseFlags_dword_791A0C |= 4u;
                     }
                 }
@@ -603,7 +604,7 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, int* ot)
         pMenu->field_1EA = 0;
     }
 }
-MGS_FUNC_IMPLEX(0x0046A187, Menu_inventory_left_update_46A187, true); // TODO
+MGS_FUNC_IMPLEX(0x0046A187, Menu_inventory_left_update_46A187, MENU_IMPL);
 
 BYTE* CC Menu_inventory_right_46956F(MenuMan* pMenu, DWORD* ot, int a3, int text_ypos, int a5)
 {
@@ -1478,20 +1479,8 @@ MGS_FUNC_IMPLEX(0x00459B51, TextSetDefaults_459B51, MENU_IMPL);
 
 MGS_VAR(1, 0x733DD8, SPRT, gMenu_inventory_text_header_background_733DD8, {});
 
-// TODO: Recover structure
-struct Font
-{
-
-};
 MGS_VAR(1, 0x733DF0, Font, gMenuFont_733DF0, {});
 MGS_VAR(1, 0x676530, PSX_RECT, sMenu_rect_676530, {}); // TODO: Populate
-
-MGS_FUNC_NOT_IMPL(0x45A70D, int __cdecl(Font *ptr, PSX_RECT *pRect, __int16 vramX, __int16 vramY), Font_45A70D);
-MGS_FUNC_NOT_IMPL(0x45A796, int __cdecl (Font *pFont, int a2, int a3, int a4, int a5, int a6, int a7), Font_45A796);
-MGS_FUNC_NOT_IMPL(0x45AA45, int __cdecl (Font *pFont), Font_CalcSize_45AA45);
-MGS_FUNC_NOT_IMPL(0x45AAE9, int __cdecl (Font *pFont, void *pAllocated), Font_Set_Buffer_45AAE9);
-MGS_FUNC_NOT_IMPL(0x45A89F, WORD *__cdecl (Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
-MGS_FUNC_NOT_IMPL(0x45C7F2, void *__cdecl (Font *pFont), Font_45C7F2);
 
 struct uv_pair
 {
@@ -1531,7 +1520,7 @@ signed int CC Menu_inventory_common_update_helper_46B979(int idx)
     }
     Font_Set_Buffer_45AAE9(&gMenuFont_733DF0, pAllocated);
     Font_ColourRelated_45A89F(&gMenuFont_733DF0, 0, 0x6739, 0);
-    Font_45C7F2(&gMenuFont_733DF0);
+    Font_Set_global_alloc_ptr_45C7F2(&gMenuFont_733DF0);
     return 1;
 }
 MGS_FUNC_IMPLEX(0x46B979, Menu_inventory_common_update_helper_46B979, true);
