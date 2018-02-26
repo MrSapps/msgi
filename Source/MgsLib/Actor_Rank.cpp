@@ -13,12 +13,92 @@
 
 void Actor_RankCPP_ForceLink() {}
 
-BYTE* CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, POLY_FT4* pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type)
+void CC POLYFT4_SetTransparency_40E0D0(POLY_FT4* pPoly, BOOL bIsSemiTransparent)
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-    return nullptr;
+    if (bIsSemiTransparent)
+    {
+        pPoly->code |= 2u;
+    }
+    else
+    {
+        pPoly->code &= ~2u;
+    }
 }
-MGS_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, false); // TODO
+MGS_FUNC_IMPLEX(0x40E0D0, POLYFT4_SetTransparency_40E0D0, ACTOR_RANK_IMPL);
+
+void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16 x0, __int16 y0, __int16 x1, __int16 y2, int bIsSemiTransparent)
+{
+    setPolyFT4(pPoly);
+    setRGB0(pPoly, 64, 64, 64);
+    pPoly->x0 = x0;
+    pPoly->y0 = y0;
+    pPoly->x1 = x1;
+    pPoly->y1 = y0;
+    pPoly->x2 = x0;
+    pPoly->y2 = y2;
+    pPoly->x3 = x1;
+    pPoly->y3 = y2;
+    POLYFT4_SetTransparency_40E0D0(pPoly, bIsSemiTransparent);
+}
+MGS_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
+
+void CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, POLY_FT4* pPoly, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int uvType)
+{
+    Rank_Init_POLYFT4_476A96(pRank, pPoly, x, y, w, h, flagQ);
+    Texture_Record* pTexture = LibDG_FindTexture_4024A0(resourceNameHash);
+    switch (uvType)
+    {
+    case 0:
+        pPoly->u0 = pTexture->u0;
+        pPoly->v0 = pTexture->v0;
+        pPoly->u1 = pTexture->u0 + pTexture->u1 + 1;
+        pPoly->v1 = pTexture->v0;
+        pPoly->u2 = pTexture->u0;
+        pPoly->v2 = pTexture->v0 + pTexture->v1 + 1;
+        pPoly->u3 = pTexture->u0 + pTexture->u1 + 1;
+        pPoly->v3 = pTexture->v0 + pTexture->v1 + 1;
+        pPoly->tpage = pTexture->mTPage;
+        pPoly->clut = pTexture->mClut;
+        break;
+    case 1:
+        pPoly->u0 = pTexture->u0;
+        pPoly->v0 = pTexture->v0;
+        pPoly->u1 = pTexture->u0 + pTexture->u1 + 1;
+        pPoly->v1 = pTexture->v0;
+        pPoly->u2 = pTexture->u0;
+        pPoly->v2 = pTexture->v1 + pTexture->v0;
+        pPoly->u3 = pTexture->u0 + pTexture->u1 + 1;
+        pPoly->v3 = pTexture->v1 + pTexture->v0;
+        pPoly->tpage = pTexture->mTPage;
+        pPoly->clut = pTexture->mClut;
+        break;
+    case 2:
+        pPoly->u0 = pTexture->u0;
+        pPoly->v0 = pTexture->v0;
+        pPoly->u1 = pTexture->u1 + pTexture->u0;
+        pPoly->v1 = pTexture->v0;
+        pPoly->u2 = pTexture->u0;
+        pPoly->v2 = pTexture->v0 + pTexture->v1 + 1;
+        pPoly->u3 = pTexture->u1 + pTexture->u0;
+        pPoly->v3 = pTexture->v0 + pTexture->v1 + 1;
+        pPoly->tpage = pTexture->mTPage;
+        pPoly->clut = pTexture->mClut;
+        break;
+    case 3:
+        pPoly->u0 = pTexture->u0;
+        pPoly->v0 = pTexture->v0;
+        pPoly->u1 = pTexture->u1 + pTexture->u0;
+        pPoly->v1 = pTexture->v0;
+        pPoly->u2 = pTexture->u0;
+        pPoly->v2 = pTexture->v1 + pTexture->v0;
+        pPoly->u3 = pTexture->u1 + pTexture->u0;
+        pPoly->v3 = pTexture->v1 + pTexture->v0;
+        pPoly->tpage = pTexture->mTPage;
+        pPoly->clut = pTexture->mClut;
+        break;
+    }
+}
+MGS_FUNC_IMPLEX(0x4767CE, Res_rank_prim_related_4767CE, true); // TODO
 
 union PolyTag 
 {
@@ -57,35 +137,6 @@ void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
     }
 }
 MGS_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, true); // TODO
-
-void CC POLYFT4_SetTransparency_40E0D0(POLY_FT4* pPoly, BOOL bIsSemiTransparent)
-{
-    if (bIsSemiTransparent)
-    {
-        pPoly->code |= 2u;
-    }
-    else
-    {
-        pPoly->code &= ~2u;
-    }
-}
-MGS_FUNC_IMPLEX(0x40E0D0, POLYFT4_SetTransparency_40E0D0, ACTOR_RANK_IMPL);
-
-void CC Rank_Init_POLYFT4_476A96(Actor_Rank* /*pRank*/, POLY_FT4* pPoly, __int16 x0, __int16 y0, __int16 x1, __int16 y2, int bIsSemiTransparent)
-{
-    setPolyFT4(pPoly);
-    setRGB0(pPoly, 64, 64, 64);
-    pPoly->x0 = x0;
-    pPoly->y0 = y0;
-    pPoly->x1 = x1;
-    pPoly->y1 = y0;
-    pPoly->x2 = x0;
-    pPoly->y2 = y2;
-    pPoly->x3 = x1;
-    pPoly->y3 = y2;
-    POLYFT4_SetTransparency_40E0D0(pPoly, bIsSemiTransparent);
-}
-MGS_FUNC_IMPLEX(0x476A96, Rank_Init_POLYFT4_476A96, ACTOR_RANK_IMPL);
 
 // TODO: Vars
 WORD gNumSaves_word_78E890 = 5;
