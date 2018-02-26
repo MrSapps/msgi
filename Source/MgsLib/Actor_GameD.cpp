@@ -32,7 +32,6 @@ MGS_ARY(1, 0x7227C8, WORD, 8, gStageHashStack_7227C8, {});
 MGS_VAR(1, 0x7227D8, WORD, gCurrentStageNameHashed_7227D8, 0);
 MGS_ARY(1, 0x7227DC, char, 12, gStageName_7227DC, {});
 
-MGS_VAR(1, 0x78E7FE, short, word_78E7FE, 0);
 MGS_VAR(1, 0x78E7FC, short, gLoadItemFuncIdx_word_78E7FC, 0);
 
 
@@ -440,7 +439,7 @@ MGS_FUNC_IMPLEX(0x0044EB27, Stage_LoadRelated_44EB27, ACTOR_GAMED_IMPL);
 void CC sub_44E1E0()
 {
     gLoadItemFuncIdx_word_78E7FC = -1;
-    word_78E7FE = -1;
+    gMenu_Selected_item_idx_word_78E7FE = -1;
 }
 MGS_FUNC_IMPLEX(0x0044E1E0, sub_44E1E0, ACTOR_GAMED_IMPL);
 

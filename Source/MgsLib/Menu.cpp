@@ -90,7 +90,7 @@ struct MenuMan
     MenuMan_Inventory_Sub field_1D8_invent_left;
     DWORD field_1E4_invent_left_pItem; // probably also sys alloc'd
     BYTE field_1E8_invent_left;
-    BYTE field_1E9_invent_left;
+    BYTE field_1E9_invent_left_item_idx;
     WORD field_1EA;
 
     MenuMan_Inventory_Sub field_1EC_invent_right;
@@ -111,6 +111,13 @@ MGS_ASSERT_SIZEOF(MenuMan, 0x21C);
 
 MGS_VAR(1, 0x722788, Texture_Record, gMenuTexture_A0BE_722788, {});
 MGS_VAR(1, 0x725FC0, MenuMan, gMenuMan_stru_725FC0, {});
+
+
+MGS_VAR(1, 0x9942C0, DWORD, gMenuRightBits_dword_9942C0, 0);
+MGS_VAR(1, 0x9942BC, DWORD, gMenuLeftBits_dword_9942BC, 0);
+
+MGS_ARY(1, 0x78E82A, WORD, 24, gItem_states_word_78E82A, {});
+MGS_ARY(1, 0x78E802, WORD, 10, gWeapon_states_word_78E802, {});
 
 void CC Res_MenuMan_create_459A9A()
 {
@@ -446,7 +453,8 @@ MenuMan_Inventory_Unk_6764F8 stru_6764F8[2] =
 
 struct MenuMan_Inventory_Unk_6764F8
 {
-    DWORD field_0;
+    WORD field_0;
+    WORD field_2;
     DWORD field_4_buttons;
     DWORD field_8;
     DWORD field_C;
@@ -462,11 +470,140 @@ void CC Menu_inventory_right_update_4697F3(MenuMan* pMenu, int* pPrimBuffer)
 }
 MGS_FUNC_IMPLEX(0x004697F3, Menu_inventory_right_update_4697F3, false); // TODO
 
+MGS_VAR(1, 0x78E7FE, short, gMenu_Selected_item_idx_word_78E7FE, 0);
+
+void CC Menu_inventory_common_invoke_handler_46B71E(MenuMan* pMenu, int* ot, MenuMan_Inventory_Sub* pInventorySubStruct, int counter, int kZero)
+{
+    // TODO: Set fn type
+    ((void(__cdecl *)(MenuMan *, int*, int, int, MenuMan_Inventory_Sub *))pInventorySubStruct->field_8_pMenuMan_Inventory_Unk_6764F8->field_10_fn_ptrs[2])(
+        pMenu,
+        ot,
+        counter + pInventorySubStruct->field_8_pMenuMan_Inventory_Unk_6764F8->field_0,
+        kZero + pInventorySubStruct->field_8_pMenuMan_Inventory_Unk_6764F8->field_2,
+        pInventorySubStruct);
+}
+MGS_FUNC_IMPLEX(0x0046B71E, Menu_inventory_common_invoke_handler_46B71E, MENU_IMPL);
+
+MGS_VAR(1, 0x993FF8, WORD, word_993FF8, 0);
+MGS_VAR(1, 0x733DD4, MenuMan_Inventory_Unk_6764F8*, gMenu_dword_733DD4, 0);
+
+signed int CC Menu_inventory_common_update_helper_46B745(MenuMan_Inventory_Sub* pInventUnk, ButtonStates* pInput)
+{
+    if (word_993FF8 & 0x101
+        || (game_state_dword_72279C.flags & 0x1020) == 0x20
+        || !(pInput->field_0_button_status & pInventUnk->field_8_pMenuMan_Inventory_Unk_6764F8->field_4_buttons))
+    {
+        return 0;
+    }
+    gMenu_dword_733DD4 = pInventUnk->field_8_pMenuMan_Inventory_Unk_6764F8;
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x0046B745, Menu_inventory_common_update_helper_46B745, MENU_IMPL);
+
+signed int CC Menu_inventory_common_update_helper_46B77E(MenuMan_Inventory_Sub* pInventUnk, ButtonStates* pInput)
+{
+    if (pInput->field_0_button_status & pInventUnk->field_8_pMenuMan_Inventory_Unk_6764F8->field_4_buttons)
+    {
+        return 0;
+    }
+    gMenu_dword_733DD4 = 0;
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x0046B77E, Menu_inventory_common_update_helper_46B77E, MENU_IMPL);
+
+MGS_VAR(1, 0x733CF0, DWORD, g64_to_256_counter_dword_733CF0, 0);
+
+int Menu_inventory_common_update_helper_46B29C()
+{
+    return g64_to_256_counter_dword_733CF0;
+}
+MGS_FUNC_IMPLEX(0x0046B29C, Menu_inventory_common_update_helper_46B29C, MENU_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x46A305, signed int __cdecl(MenuMan *pMenu), Menu_inventory_left_update_helper_46A305);
+MGS_FUNC_NOT_IMPL(0x46A128, bool __cdecl(signed int item_idx), Menu_inventory_left_helper_46A128);
+MGS_FUNC_NOT_IMPL(0x46B3CC, void __cdecl(MenuMan_Inventory_Sub *pSub, ButtonStates *pInput), Menu_inventory_common_update_helper_46B3CC);
+MGS_FUNC_NOT_IMPL(0x46A916, void __cdecl(int pItem, char buttonsPressed), Menu_inventory_left_use_item_46A916);
+MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan *pMenu, int* pPrimBuffer), Menu_inventory_left_update_helper_46A4C1);
+MGS_FUNC_NOT_IMPL(0x46AA9B, void(), Menu_inventory_left_update_helper_46AA9B);
+MGS_FUNC_NOT_IMPL(0x44FD66, int __cdecl(unsigned __int8 music, unsigned __int8 pan, unsigned __int8 code), Sound_sub_44FD66);
+
 void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, int* ot)
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    const int field_2a = pMenu->field_2A_bSkipUpdateHpBars;
+    if (field_2a == 0 || field_2a == 2)
+    {
+        if (field_2a == 0)
+        {
+            if (game_state_dword_72279C.flags & 0x80400)
+            {
+                return;
+            }
+            if (!(byte1_flags_word_9942A8 & 0x20208000))
+            {
+                if (Menu_inventory_common_update_helper_46B745(&pMenu->field_1D8_invent_left, pMenu->field_24_input))
+                {
+                    if (Menu_inventory_left_update_helper_46A305(pMenu))
+                    {
+                        pMenu->field_2A_bSkipUpdateHpBars = 2;
+                        gActorPauseFlags_dword_791A0C |= 4u;
+                    }
+                }
+                else if (!(game_state_dword_72279C.mParts.flags2 & 4))
+                {
+                    if (pMenu->field_24_input->field_2_button_pressed & 4)
+                    {
+                        const int item_idx = gMenu_Selected_item_idx_word_78E7FE;
+                        if (gMenu_Selected_item_idx_word_78E7FE < 0)
+                        {
+                            const BYTE* left_item_idx = &pMenu->field_1E9_invent_left_item_idx;
+                            if (!Menu_inventory_left_helper_46A128(pMenu->field_1E9_invent_left_item_idx)
+                                && gItem_states_word_78E82A[*left_item_idx] > 0)
+                            {
+                                gMenu_Selected_item_idx_word_78E7FE = *left_item_idx;
+                            }
+                        }
+                        else
+                        {
+                            gMenu_Selected_item_idx_word_78E7FE = -1;
+                        }
+                        if (item_idx != gMenu_Selected_item_idx_word_78E7FE)
+                        {
+                            Sound_sub_44FD66(0, 0x3Fu, 0x14u);
+                        }
+                    }
+                }
+            }
+        }
+        else if (field_2a == 2)
+        {
+            if (Menu_inventory_common_update_helper_46B77E(&pMenu->field_1D8_invent_left, pMenu->field_24_input))
+            {
+                pMenu->field_1E8_invent_left = 3;
+            }
+            else if (Menu_inventory_common_update_helper_46B29C() >= 256)
+            {
+                Menu_inventory_common_update_helper_46B3CC(&pMenu->field_1D8_invent_left, pMenu->field_24_input);
+                Menu_inventory_left_use_item_46A916(pMenu->field_1E4_invent_left_pItem, pMenu->field_24_input->field_2_button_pressed);
+            }
+        }
+        Menu_inventory_left_update_helper_46A4C1(pMenu, ot);
+        Menu_inventory_left_update_helper_46AA9B();
+    }
+    else if (field_2a != 4)
+    {
+        if (gMenu_Selected_item_idx_word_78E7FE >= 0)
+        {
+            const int counter = Menu_inventory_common_update_helper_46B29C();
+            if (counter >= 255)
+            {
+                return;
+            }
+            Menu_inventory_common_invoke_handler_46B71E(pMenu, ot, &pMenu->field_1D8_invent_left, counter / -4, 0);
+        }
+        pMenu->field_1EA = 0;
+    }
 }
-MGS_FUNC_IMPLEX(0x0046A187, Menu_inventory_left_update_46A187, false); // TODO
+MGS_FUNC_IMPLEX(0x0046A187, Menu_inventory_left_update_46A187, true); // TODO
 
 BYTE* CC Menu_inventory_right_46956F(MenuMan* pMenu, DWORD* ot, int a3, int text_ypos, int a5)
 {
@@ -549,7 +686,7 @@ void CC Menu_init_inventory_left_469E77(MenuMan* pMenu)
 {
     pMenu->field_28_flags |= 4u;
     pMenu->field_1D8_invent_left.field_0_item_idx = -1;
-    pMenu->field_1E9_invent_left = -1;
+    pMenu->field_1E9_invent_left_item_idx = -1;
     pMenu->m7FnPtrs_field_2C[2] = Menu_inventory_left_update_46A187;
     pMenu->field_1E8_invent_left = 0;
     pMenu->field_1D8_invent_left.field_4 = 0;
@@ -1851,12 +1988,6 @@ DWORD ScriptReadBits_45238C()
     return ret;
 }
 MGS_FUNC_IMPLEX(0x45238C, ScriptReadBits_45238C, MENU_IMPL);
-
-MGS_VAR(1, 0x9942C0, DWORD, gMenuRightBits_dword_9942C0, 0);
-MGS_VAR(1, 0x9942BC, DWORD, gMenuLeftBits_dword_9942BC, 0);
-
-MGS_ARY(1, 0x78E82A, WORD, 24, gItem_states_word_78E82A, {});
-MGS_ARY(1, 0x78E802, WORD, 10, gWeapon_states_word_78E802, {});
 
 void CC Menu_Remove_all_items_44D020()
 {

@@ -19,6 +19,7 @@ struct MenuMan_Inventory_14h_Unk
 };
 MGS_ASSERT_SIZEOF(MenuMan_Inventory_14h_Unk, 0x14);
 
+MGS_VAR_EXTERN(short, gMenu_Selected_item_idx_word_78E7FE);
 
 void DoMenuTests();
 

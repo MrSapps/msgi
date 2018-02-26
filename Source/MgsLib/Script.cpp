@@ -13,7 +13,7 @@
 #include "Menu.hpp"
 #include <gmock/gmock.h>
 
-MGS_VAR(1, 0x9942A8, WORD, byte1_flags_word_9942A8, 0);
+MGS_VAR(1, 0x9942A8, DWORD, byte1_flags_word_9942A8, 0);
 MGS_VAR(1, 0x7227A4, int, gGameOverTimer_dword_7227A4, 0);
 MGS_VAR(1, 0x6BFBB4, TFileNameHash, gScriptFileNameHashedToLoad_6BFBB4, 0);
 

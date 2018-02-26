@@ -44,6 +44,7 @@ MGS_VAR_EXTERN(DWORD, script_cancel_non_zero_dword_7227A0);
 MGS_ARY_EXTERN(__int16, 96, save_data_192_word_78E7E0);
 MGS_ARY_EXTERN(DWORD, 512, save_data_2048_unk_78D7C0);
 MGS_VAR_EXTERN(SVECTOR, gLightNormalVec_650128);
+MGS_VAR_EXTERN(DWORD, byte1_flags_word_9942A8);
 
 enum GCLOperators
 {
