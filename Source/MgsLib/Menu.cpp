@@ -132,8 +132,13 @@ MGS_FUNC_NOT_IMPL(0x462A3D, void __cdecl(MenuMan* pMenu, int* ot), Menu_update_h
 
 struct Menu_rpk_item
 {
-    // TODO: Recover structure
+    BYTE field_0_x;
+    BYTE field_1_y;
+    BYTE field_2_w;
+    BYTE field_3_h;
+    BYTE* field_4_pixel_ptr;
 };
+MGS_ASSERT_SIZEOF(Menu_rpk_item, 0x8);
 
 MGS_VAR(1, 0x733C88, Menu_rpk_item**, gItemFile_table_dword_733C88, nullptr);
 
@@ -519,6 +524,70 @@ int Menu_inventory_common_update_helper_46B29C()
     return g64_to_256_counter_dword_733CF0;
 }
 MGS_FUNC_IMPLEX(0x0046B29C, Menu_inventory_common_update_helper_46B29C, MENU_IMPL);
+
+signed int Menu_inventory_common_46B2C2()
+{
+    g64_to_256_counter_dword_733CF0 -= 64;
+    if (g64_to_256_counter_dword_733CF0 > 0)
+    {
+        return 0;
+    }
+    g64_to_256_counter_dword_733CF0 = 0;
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x0046B2C2, Menu_inventory_common_46B2C2, MENU_IMPL);
+
+signed int Menu_inventory_common_update_helper_46B2A2()
+{
+    g64_to_256_counter_dword_733CF0 += 64;
+    if (g64_to_256_counter_dword_733CF0 < 256)
+    {
+        return 0;
+    }
+    g64_to_256_counter_dword_733CF0 = 256;
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x0046B2A2, Menu_inventory_common_update_helper_46B2A2, MENU_IMPL);
+
+// Seems to render orange/red/blue PAL key icons and "NO USE" text icon
+void CC Menu_inventory_left_update_helper_sprt_46A770(MenuMan* pMenu, DWORD* ot, int idx)
+{
+    Menu_rpk_item* pItem = Menu_inventory_left_update_get_item_file_46B912(2 * idx + 33);
+    Menu_rpk_item* itemRpk = Menu_Get_Radar_image_46B920(2 * idx + 34);
+    
+    PSX_RECT rect = {};
+    rect.x1 = 960;
+    rect.y1 = 337;
+    rect.x2 = itemRpk->field_2_w;
+    rect.y2 = itemRpk->field_3_h;
+
+    g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
+        &rect,
+        (WORD *)&pItem->field_4_pixel_ptr,
+        (BYTE *)&itemRpk->field_4_pixel_ptr,
+        0,
+        0,
+        0,
+        0);
+    Render_sub_41C6B0(&rect, (BYTE *)&itemRpk->field_4_pixel_ptr);
+
+    SPRT* pSprt = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
+    setSprt(pSprt);
+    pSprt->u0 = 0;
+    pSprt->v0 = 81;
+    pSprt->x0 = 230;
+    pSprt->y0 = 116;
+    pSprt->w = 4 * itemRpk->field_2_w;
+    pSprt->h = itemRpk->field_3_h;
+    pSprt->r0 = 0x80;
+    pSprt->g0 = 0x80;
+    pSprt->b0 = 0x80;
+    pSprt->clut = 0x543C;
+
+    addPrim(ot, pSprt);
+}
+MGS_FUNC_IMPLEX(0x0046A770, Menu_inventory_left_update_helper_sprt_46A770, MENU_IMPL);
+
 
 MGS_FUNC_NOT_IMPL(0x46A305, signed int __cdecl(MenuMan *pMenu), Menu_inventory_left_update_helper_46A305);
 MGS_FUNC_NOT_IMPL(0x46A128, bool __cdecl(signed int item_idx), Menu_inventory_left_helper_46A128);
