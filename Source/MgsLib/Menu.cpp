@@ -459,12 +459,14 @@ MenuMan_Inventory_Unk_6764F8 stru_6764F8[2] =
 
 struct MenuMan_Inventory_Unk_6764F8
 {
+    using Fn = void(CC*)(MenuMan* pMenu, DWORD* ot , DWORD, DWORD, MenuMan_Inventory_Sub* pSub);
+
     WORD field_0;
     WORD field_2;
     DWORD field_4_buttons;
     DWORD field_8;
     DWORD field_C;
-    DWORD field_10_fn_ptrs[3];
+    Fn field_10_fn_ptrs[3];
 };
 MGS_ASSERT_SIZEOF(MenuMan_Inventory_Unk_6764F8, 0x1C);
 
@@ -549,8 +551,21 @@ signed int Menu_inventory_common_update_helper_46B2A2()
 }
 MGS_FUNC_IMPLEX(0x0046B2A2, Menu_inventory_common_update_helper_46B2A2, MENU_IMPL);
 
+void CC Menu_inventory_common_update_helper_46B6EF(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Sub* pInventSub)
+{
+    if ((game_state_dword_72279C.flags & 0x1020) != 0x20)
+    {
+        pInventSub->field_8_pMenuMan_Inventory_Unk_6764F8->field_10_fn_ptrs[2](
+            pMenu, ot,
+            pInventSub->field_8_pMenuMan_Inventory_Unk_6764F8->field_0,
+            pInventSub->field_8_pMenuMan_Inventory_Unk_6764F8->field_2,
+            pInventSub);
+    }
+}
+MGS_FUNC_IMPLEX(0x0046B6EF, Menu_inventory_common_update_helper_46B6EF, MENU_IMPL);
+
 // Seems to render orange/red/blue PAL key icons and "NO USE" text icon
-void CC Menu_inventory_left_update_helper_sprt_46A770(MenuMan* pMenu, DWORD* ot, int idx)
+void CC Menu_inventory_left_render_PAL_key_icon_46A770(MenuMan* pMenu, DWORD* ot, int idx)
 {
     Menu_rpk_item* pItem = Menu_inventory_left_update_get_item_file_46B912(2 * idx + 33);
     Menu_rpk_item* itemRpk = Menu_Get_Radar_image_46B920(2 * idx + 34);
@@ -586,7 +601,7 @@ void CC Menu_inventory_left_update_helper_sprt_46A770(MenuMan* pMenu, DWORD* ot,
 
     addPrim(ot, pSprt);
 }
-MGS_FUNC_IMPLEX(0x0046A770, Menu_inventory_left_update_helper_sprt_46A770, MENU_IMPL);
+MGS_FUNC_IMPLEX(0x0046A770, Menu_inventory_left_render_PAL_key_icon_46A770, MENU_IMPL);
 
 
 MGS_FUNC_NOT_IMPL(0x46A305, signed int __cdecl(MenuMan *pMenu), Menu_inventory_left_update_helper_46A305);
@@ -675,13 +690,13 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, int* ot)
 }
 MGS_FUNC_IMPLEX(0x0046A187, Menu_inventory_left_update_46A187, MENU_IMPL);
 
-BYTE* CC Menu_inventory_right_46956F(MenuMan* pMenu, DWORD* ot, int a3, int text_ypos, int a5)
+void CC Menu_inventory_right_46956F(MenuMan* pMenu, DWORD* ot, DWORD a3, DWORD text_ypos, MenuMan_Inventory_Sub* pSub)
 {
     MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x0046956F, Menu_inventory_right_46956F, false); // TODO
 
-BYTE* CC Menu_inventory_left_469F14(MenuMan *pMenu, DWORD *ot, int xpos, int ypos, int a5)
+void CC Menu_inventory_left_469F14(MenuMan *pMenu, DWORD *ot, DWORD xpos, DWORD ypos, MenuMan_Inventory_Sub* pSub)
 {
     MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
@@ -711,11 +726,11 @@ void CC Menu_generic_update_helper_469E37(MenuMan *pMenu)
 }
 MGS_FUNC_IMPLEX(0x00469E37, Menu_generic_update_helper_469E37, false); // TODO
 
-void CC Menu_init_inventory_set_fn_46B3B0(MenuMan_Inventory_Sub *pMenu_field_1EC, int bLeftOrRight, void* pFn)
+void CC Menu_init_inventory_set_fn_46B3B0(MenuMan_Inventory_Sub *pMenu_field_1EC, int bLeftOrRight, MenuMan_Inventory_Unk_6764F8::Fn pFn)
 {
     MenuMan_Inventory_Unk_6764F8* pUnk = &stru_6764F8[bLeftOrRight];
     pMenu_field_1EC->field_8_pMenuMan_Inventory_Unk_6764F8 = pUnk;
-    pUnk->field_10_fn_ptrs[2] = (DWORD)pFn; // TODO: Types
+    pUnk->field_10_fn_ptrs[2] = pFn;
 }
 MGS_FUNC_IMPLEX(0x0046B3B0, Menu_init_inventory_set_fn_46B3B0, MENU_IMPL);
 
