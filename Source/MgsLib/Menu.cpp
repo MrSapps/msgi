@@ -12,6 +12,7 @@
 #include "Renderer.hpp"
 #include "pcx.hpp"
 #include "Font.hpp"
+#include "Actor_Rank.hpp"
 
 #define MENU_IMPL true
 
@@ -563,6 +564,110 @@ void CC Menu_inventory_common_update_helper_46B6EF(MenuMan* pMenu, DWORD* ot, Me
     }
 }
 MGS_FUNC_IMPLEX(0x0046B6EF, Menu_inventory_common_update_helper_46B6EF, MENU_IMPL);
+
+MGS_VAR(1, 0x6FC7AC, DWORD, gUseTrueType_dword_6FC7AC, 0);
+MGS_VAR(1, 0x733DF0, Font, gMenuFont_733DF0, {});
+
+void CC Menu_inventory_common_draw_text_46BA69(const char* pItemInfoStr)
+{
+    gUseTrueType_dword_6FC7AC = gNoTrueType_650D40;
+    Font_set_text_45C80A(&gMenuFont_733DF0, pItemInfoStr);
+    Font_render_45C76C(&gMenuFont_733DF0);
+    gUseTrueType_dword_6FC7AC = 0;
+}
+MGS_FUNC_IMPLEX(0x0046BA69, Menu_inventory_common_draw_text_46BA69, MENU_IMPL);
+
+enum Items : u32
+{
+    eCigs = 0,
+    eScope = 1,
+    eCardboardBoxA = 2,
+    eCardboardBoxB = 3,
+    eCardboardBoxC = 4,
+    eNvg = 5,
+    eThermalG = 6,
+    eGasMask = 7,
+    eBodyArmor = 8,
+    eKetchup = 9,
+    eStealth = 10,
+    eBandana = 11,
+    eCamera = 12,
+    eRations = 13,
+    eMedicine = 14,
+    eDiazepam = 15,
+    ePalKey = 16,
+    eIdCard = 17,
+    eUnknown = 18,
+    eMineDetector = 19,
+    eMoDisk = 20,
+    eRope = 21,
+    eHanderChief = 22,
+    eSurppressor = 23,
+    eRationsFrozen = 24,
+    eKetchupFrozen = 25
+};
+
+const char* gItemInfos_675C90[26] =
+{
+    "CIGARETTES\nSolid Snake's favorite\nbrand. Smoking is hazardous\nto your health.",
+    "MAGNIFYING SCOPE.\nPress <Action Key> to zoom in,\n<Crawl Key> to zoom out.",
+    "CARDBOARD BOX A\n< To Heliport > \nis written on it.",
+    "CARDBOARD BOX B\n< To Nuclear Warhead\nStorage Building >\nis written on it.",
+    "CARDBOARD BOX C\n< To Snow Field >\nis written on it.",
+    "NIGHT-VISION GOGGLE\nImage intensifier.\nAllows to see even\nin dark places.",
+    "THERMAL GOGGLE\nThermal imaging system\nfor night-vision use.",
+    "GAS MASK\nReduces speed of O2 gauge\ndecrease in poison\ngas environment.",
+    "BODY ARMOR\nBulletproof vest.\nReduces damage upon\nimpact.",
+    "KETCHUP\nItalian-tomato-based\nfood condiment.",
+    "STEALTH\nRenders wearer invisible\nthrough light reflection\nsystem.",
+    "BANDANA\nWords <Limitless>\nsewn on it.",
+    "CAMERA\nTake photos wherever\nyou like!",
+    "RATIONS\nRestores life.\nUse by pressing <Action Key>\nwhile menu is open.",
+    "MEDICINE\nCold medisine.\nUse by pressing <Action Key>\nwhile menu is open.", // medisine!?
+    "DIAZEPAM\nAnti-anxiety drug.\nTemporarily stops\ninvoluntary trembling.",
+    "PAL CARD KEY\nEmergency input or\noverride device.",
+    "ID CARD\nWhen equipped,\nopens all level %lu security\ndoors.",
+    "IDENTITY UNKNOWN.\nPress <Action Key> while menu\nis open to throw.",
+    "MINE DETECTOR\nWhen equipped,\nburied mines show up\non radar screen.",
+    "MO DISC\nOptic disc containing\nMetal Gear exercise data.",
+    "ROPE\nLong, durable rope.\nMade from nylon fibers.",
+    "HANDKERCHIEF\nSniper Wolf's handkerchief.\nSmells faintly of her.",
+    "SUPPRESSOR\nFor SOCOM pistol.\nMuffles report, blast\nand flash of it.",
+    "RATIONS\nFrozen.\nMelt it before\nyou eat.",
+    "KETCHUP\nFrozen.\nMelt it before\nyou use."
+};
+
+MGS_VAR(1, 0x78E86A, WORD, gItemsAreFrozen_word_78E86A, 0);
+
+void CC Menu_inventory_left_update_ShowItemInfo_46A718(Items id)
+{
+    const char* pItemInfoStr = gItemInfos_675C90[id];
+    if (id == Items::eKetchup && gItemsAreFrozen_word_78E86A)
+    {
+        pItemInfoStr = gItemInfos_675C90[Items::eKetchupFrozen];
+    }
+    else if (id == Items::eRations && gItemsAreFrozen_word_78E86A)
+    {
+        pItemInfoStr = gItemInfos_675C90[Items::eRationsFrozen];
+    }
+    else if (id == Items::eIdCard)
+    {
+        // Note: Real game attempts to re-write 1 char of the string in place, this change prevents writing constant
+        // strings and also allows the UI to display a card level > 9
+        char buffer[256] = {};
+        sprintf(buffer, pItemInfoStr, gItem_states_word_78E82A[Items::eIdCard]);
+        Menu_inventory_common_draw_text_46BA69(buffer);
+        return;
+    }
+    else if (id == Items::eMineDetector && (gDiffcultyLevel_78E7E2 == DiffcultyLevels::eHard || gDiffcultyLevel_78E7E2 == DiffcultyLevels::eExtreme))
+    {
+        pItemInfoStr = "MINE DETECTOR\nCannot be used in\nHARD or EXTREME mode.";
+    }
+    Menu_inventory_common_draw_text_46BA69(pItemInfoStr);
+}
+MGS_FUNC_IMPLEX(0x0046A718, Menu_inventory_left_update_ShowItemInfo_46A718, MENU_IMPL);
+
+
 
 // Seems to render orange/red/blue PAL key icons and "NO USE" text icon
 void CC Menu_inventory_left_render_PAL_key_icon_46A770(MenuMan* pMenu, DWORD* ot, int idx)
@@ -1563,7 +1668,7 @@ MGS_FUNC_IMPLEX(0x00459B51, TextSetDefaults_459B51, MENU_IMPL);
 
 MGS_VAR(1, 0x733DD8, SPRT, gMenu_inventory_text_header_background_733DD8, {});
 
-MGS_VAR(1, 0x733DF0, Font, gMenuFont_733DF0, {});
+
 MGS_VAR(1, 0x676530, PSX_RECT, sMenu_rect_676530, {}); // TODO: Populate
 
 struct uv_pair

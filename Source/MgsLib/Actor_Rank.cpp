@@ -144,7 +144,9 @@ WORD gContinues_word_78E88E = 20;
 WORD gTimesSpotted_word_78E87C = 30;
 WORD gNumEnemiesKilled_word_78E87E = 40;
 WORD gNumRations_word_78E88C = 18;
-DWORD gDiffcultyLevel = -1; // -1 = Very easy, 0 = Easy
+
+MGS_VAR(1, 0x78E7E2, short, gDiffcultyLevel_78E7E2, -1);
+
 MGS_PTR(1, 0x67676C, BYTE*, gRankXPosTable_byte_67676C, {});
 
 static void Rank_RenderPlayTime(Actor_Rank* pRank)
@@ -805,7 +807,7 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
             TextSetXYFlags_459B0B(172, 46, 16);
             TextSetRGB_459B27(140, 181, 181);
 
-            switch (gDiffcultyLevel)
+            switch (gDiffcultyLevel_78E7E2)
             {
             case -1:
                 Menu_DrawText_459B63 ("VERY EASY");
@@ -854,7 +856,7 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
             TextSetXYFlags_459B0B(172, 42, 16);
             TextSetRGB_459B27(140, 181, 181);
 
-            switch (gDiffcultyLevel)
+            switch (gDiffcultyLevel_78E7E2)
             {
             case -1:
                 Menu_DrawText_459B63 ("VERY EASY");
@@ -913,7 +915,7 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
         TextSetXYFlags_459B0B(172, 36, 16);
         TextSetRGB_459B27(140, 181, 181);
 
-        switch (gDiffcultyLevel)
+        switch (gDiffcultyLevel_78E7E2)
         {
         case -1:
             Menu_DrawText_459B63 ("VERY EASY");
@@ -946,7 +948,7 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
     TextSetXYFlags_459B0B(115 - gRankXPosTable_byte_67676C[pRank->field_494_ranking], 143, 16);
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText_459B63 ("CODE NAME");
-    if (gDiffcultyLevel != -1)
+    if (gDiffcultyLevel_78E7E2 != -1)
     {
         TextSetXYFlags_459B0B(107, 163, 16);
         TextSetRGB_459B27(82, 140, 123);

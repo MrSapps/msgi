@@ -33,6 +33,7 @@ EXTERN_MGS_FUNC_NOT_IMPL(0x45A70D, int __cdecl(Font *ptr, PSX_RECT *pRect, __int
 EXTERN_MGS_FUNC_NOT_IMPL(0x45A796, int __cdecl (Font *pFont, int a2, int a3, int a4, int a5, int a6, int a7), Font_45A796);
 EXTERN_MGS_FUNC_NOT_IMPL(0x45AA45, int __cdecl (Font *pFont), Font_CalcSize_45AA45);
 EXTERN_MGS_FUNC_NOT_IMPL(0x45A89F, void __cdecl(Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
+EXTERN_MGS_FUNC_NOT_IMPL(0x45C76C, void __cdecl(Font *pFont), Font_render_45C76C);
 
 void CC Font_Set_global_alloc_ptr_45C7F2(Font* pFont);
 void CC Font_Set_Buffer_45AAE9(Font* pFont, void* pAllocated);

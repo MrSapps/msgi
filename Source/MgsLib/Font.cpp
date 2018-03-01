@@ -9,6 +9,8 @@ MGS_FUNC_NOT_IMPL(0x45AA45, int __cdecl (Font *pFont), Font_CalcSize_45AA45);
 MGS_FUNC_NOT_IMPL(0x45A89F, void __cdecl(Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
 MGS_FUNC_NOT_IMPL(0x45C6FF, void __cdecl (Font* pFont), Font_Init_data_45C6FF);
 MGS_FUNC_NOT_IMPL(0x45AB2D, void __cdecl (Font* pFont, int a2, int a3, const char* pText, int a5), Font_45AB2D);
+MGS_FUNC_NOT_IMPL(0x45C76C, void __cdecl(Font *pFont), Font_render_45C76C);
+
 
 MGS_VAR(1, 0x6DF240, void*, gpFont_field_28_6DF240, nullptr);
 

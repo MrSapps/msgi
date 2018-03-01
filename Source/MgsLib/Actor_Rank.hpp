@@ -12,6 +12,15 @@ void DoActor_RankTests();
 struct Prim_unknown;
 struct ButtonStates;
 
+enum DiffcultyLevels
+{
+    eVeryEasy = -1,
+    eEasy = 0,
+    eNormal = 1,
+    eHard = 2,
+    eExtreme = 3
+};
+MGS_VAR_EXTERN(short, gDiffcultyLevel_78E7E2);
 
 struct Actor_Rank
 {
