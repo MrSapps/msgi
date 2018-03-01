@@ -639,6 +639,92 @@ const char* gItemInfos_675C90[26] =
 
 MGS_VAR(1, 0x78E86A, WORD, gItemsAreFrozen_word_78E86A, 0);
 
+MGS_VAR(1, 0x721E58, DWORD, dword_721E58, 0);
+
+struct Menu_unknown_pair
+{
+    BYTE field_0;
+    BYTE field_1;
+};
+MGS_ASSERT_SIZEOF(Menu_unknown_pair, 0x2);
+
+const Menu_unknown_pair gMenu_flags_word_669A93[10] =
+{
+    { 144, 67 },
+    { 144, 76 },
+    { 65, 192 },
+    { 32, 32 },
+    { 34, 16 },
+    { 65, 16 },
+    { 65, 76 },
+    { 65, 76 },
+    { 65, 32 },
+    { 146, 0 }
+};
+
+const WORD gMenu_left_item_flags_word_669AAA[27] =
+{
+    32768,
+    32771,
+    32769,
+    32769,
+    32769,
+    32768,
+    32768,
+    32768,
+    32768,
+    32768,
+    32768,
+    32768,
+    32771,
+    8192,
+    8192,
+    8192,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+};
+
+static bool MenuLeft_HaveItem(int item_idx)
+{
+    return gMenuLeftBits_dword_9942BC & (1 << item_idx);
+}
+
+static bool IsCardboardBoxItem(int item_idx)
+{
+    return item_idx == Items::eCardboardBoxA || item_idx == Items::eCardboardBoxB || item_idx == Items::eCardboardBoxC;
+}
+
+bool CC Menu_inventory_Is_Item_Disabled_46A128(signed int item_idx)
+{
+    if (!(gMenu_flags_word_669A93[gLoadItemFuncIdx_word_78E7FC].field_0 & 2))
+    {
+        return MenuLeft_HaveItem(item_idx);
+    }
+
+    if (!(gMenu_left_item_flags_word_669AAA[item_idx] & 1))
+    {
+        return MenuLeft_HaveItem(item_idx);
+    }
+
+    const bool bIsCardboardBox = IsCardboardBoxItem(item_idx);
+    if ((!(byte1_flags_word_9942A8 & 0x42) || !bIsCardboardBox) && (!dword_721E58 || (!bIsCardboardBox) && item_idx != Items::eScope && item_idx != Items::eCamera))
+    {
+        return MenuLeft_HaveItem(item_idx);
+    }
+    return true;
+}
+MGS_FUNC_IMPLEX(0x0046A128, Menu_inventory_Is_Item_Disabled_46A128, MENU_IMPL);
+
+
 void CC Menu_inventory_left_update_ShowItemInfo_46A718(Items id)
 {
     const char* pItemInfoStr = gItemInfos_675C90[id];
@@ -710,7 +796,6 @@ MGS_FUNC_IMPLEX(0x0046A770, Menu_inventory_left_render_PAL_key_icon_46A770, MENU
 
 
 MGS_FUNC_NOT_IMPL(0x46A305, signed int __cdecl(MenuMan *pMenu), Menu_inventory_left_update_helper_46A305);
-MGS_FUNC_NOT_IMPL(0x46A128, bool __cdecl(signed int item_idx), Menu_inventory_left_helper_46A128);
 MGS_FUNC_NOT_IMPL(0x46B3CC, void __cdecl(MenuMan_Inventory_Sub *pSub, ButtonStates *pInput), Menu_inventory_common_update_helper_46B3CC);
 MGS_FUNC_NOT_IMPL(0x46A916, void __cdecl(int pItem, char buttonsPressed), Menu_inventory_left_use_item_46A916);
 MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan *pMenu, int* pPrimBuffer), Menu_inventory_left_update_helper_46A4C1);
@@ -746,7 +831,7 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, int* ot)
                         if (gMenu_Selected_item_idx_word_78E7FE < 0)
                         {
                             const BYTE* left_item_idx = &pMenu->field_1E9_invent_left_item_idx;
-                            if (!Menu_inventory_left_helper_46A128(pMenu->field_1E9_invent_left_item_idx)
+                            if (!Menu_inventory_Is_Item_Disabled_46A128(pMenu->field_1E9_invent_left_item_idx)
                                 && gItem_states_word_78E82A[*left_item_idx] > 0)
                             {
                                 gMenu_Selected_item_idx_word_78E7FE = *left_item_idx;
