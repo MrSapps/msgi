@@ -639,7 +639,7 @@ const char* gItemInfos_675C90[26] =
 
 MGS_VAR(1, 0x78E86A, WORD, gItemsAreFrozen_word_78E86A, 0);
 
-MGS_VAR(1, 0x721E58, DWORD, dword_721E58, 0);
+MGS_VAR(1, 0x721E58, DWORD, gRocketLauncherInUse_dword_721E58, 0);
 
 struct Menu_unknown_pair
 {
@@ -648,7 +648,7 @@ struct Menu_unknown_pair
 };
 MGS_ASSERT_SIZEOF(Menu_unknown_pair, 0x2);
 
-const Menu_unknown_pair gMenu_flags_word_669A93[10] =
+MGS_ARY(1, 0x669A93, Menu_unknown_pair, 10, gMenu_flags_word_669A93, 
 {
     { 144, 67 },
     { 144, 76 },
@@ -660,9 +660,10 @@ const Menu_unknown_pair gMenu_flags_word_669A93[10] =
     { 65, 76 },
     { 65, 32 },
     { 146, 0 }
-};
+});
 
-const WORD gMenu_left_item_flags_word_669AAA[27] =
+// TODO: Index -1 appears to be used
+MGS_ARY(1, 0x669AAA, WORD, 27, gMenu_left_item_flags_word_669AAA, 
 {
     32768,
     32771,
@@ -690,39 +691,24 @@ const WORD gMenu_left_item_flags_word_669AAA[27] =
     0,
     0,
     0,
-    0
-};
+    0 });
 
-static bool MenuLeft_HaveItem(int item_idx)
+
+DWORD CC Menu_inventory_Is_Item_Disabled_46A128(signed int item_idx)
 {
-    return gMenuLeftBits_dword_9942BC & (1 << item_idx);
-}
-
-static bool IsCardboardBoxItem(int item_idx)
-{
-    return item_idx == Items::eCardboardBoxA || item_idx == Items::eCardboardBoxB || item_idx == Items::eCardboardBoxC;
-}
-
-bool CC Menu_inventory_Is_Item_Disabled_46A128(signed int item_idx)
-{
-    if (!(gMenu_flags_word_669A93[gLoadItemFuncIdx_word_78E7FC].field_0 & 2))
+    if ((!(gMenu_flags_word_669A93[gLoadItemFuncIdx_word_78E7FC].field_0 & 2) // gLoadItemFuncIdx_word_78E7FC can be -1
+        || !(gMenu_left_item_flags_word_669AAA[item_idx] & 1))
+        // Snake crouching?
+        && (!(byte1_flags_word_9942A8 & 0x42) || item_idx < 2 || item_idx > 4)
+        // Remote missile/stringer in use?
+        && (!gRocketLauncherInUse_dword_721E58 || (item_idx < 2 || item_idx > 4) && item_idx != Items::eScope && item_idx != Items::eCamera))
     {
-        return MenuLeft_HaveItem(item_idx);
+        return (gMenuLeftBits_dword_9942BC & (1 << item_idx));
     }
+    return 1;
 
-    if (!(gMenu_left_item_flags_word_669AAA[item_idx] & 1))
-    {
-        return MenuLeft_HaveItem(item_idx);
-    }
-
-    const bool bIsCardboardBox = IsCardboardBoxItem(item_idx);
-    if ((!(byte1_flags_word_9942A8 & 0x42) || !bIsCardboardBox) && (!dword_721E58 || (!bIsCardboardBox) && item_idx != Items::eScope && item_idx != Items::eCamera))
-    {
-        return MenuLeft_HaveItem(item_idx);
-    }
-    return true;
 }
-MGS_FUNC_IMPLEX(0x0046A128, Menu_inventory_Is_Item_Disabled_46A128, MENU_IMPL);
+MGS_FUNC_IMPLEX(0x0046A128, Menu_inventory_Is_Item_Disabled_46A128, true);
 
 
 void CC Menu_inventory_left_update_ShowItemInfo_46A718(Items id)
