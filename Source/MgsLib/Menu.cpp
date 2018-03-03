@@ -821,6 +821,35 @@ MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan *pMenu, DWORD* pPrimBuffer), Me
 MGS_FUNC_NOT_IMPL(0x46AA9B, void(), Menu_inventory_left_update_helper_46AA9B);
 MGS_FUNC_NOT_IMPL(0x44FD66, int __cdecl(unsigned __int8 music, unsigned __int8 pan, unsigned __int8 code), Sound_sub_44FD66);
 
+MGS_VAR(1, 0x733CF4, DWORD, flags_dword_733CF4, 0);
+MGS_VAR(1, 0x733DD0, DWORD, gBitFlags_dword_733DD0, 0);
+
+void CC Menu_inventory_clear_unk_46AFB7(MenuMan_Inventory_14h_Unk* pUnk, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        pUnk[i].field_8_index = -1;
+        pUnk[i].field_C_uv_clut = 0;
+    }
+    flags_dword_733CF4 = 0;
+    gBitFlags_dword_733DD0 = 0;
+}
+MGS_FUNC_IMPLEX(0x0046AFB7, Menu_inventory_clear_unk_46AFB7, MENU_IMPL);
+
+MGS_ARY(1, 0x7339E8, MenuMan_Inventory_14h_Unk, 11, gMenu_inventory_right_11_array_7339E8, {});
+
+void CC Menu_inventory_right_init_11_items_46947F()
+{
+    Menu_inventory_clear_unk_46AFB7(gMenu_inventory_right_11_array_7339E8, 11);
+}
+MGS_FUNC_IMPLEX(0x0046947F, Menu_inventory_right_init_11_items_46947F, MENU_IMPL);
+
+void CC Menu_j_inventory_right_init_11_items_459A95()
+{
+    Menu_inventory_right_init_11_items_46947F();
+}
+MGS_FUNC_IMPLEX(0x00459A95, Menu_j_inventory_right_init_11_items_459A95, MENU_IMPL);
+
 void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
 {
     const int field_2a = pMenu->field_2A_bSkipUpdateHpBars;
@@ -921,7 +950,7 @@ void CC Menu_Set_SPRT_from_unk_46B127(SPRT* pSprt, MenuMan_Inventory_14h_Unk* pM
     pSprt->x0 = x + pMenuUnk->field_9_x;
     pSprt->y0 = y + pMenuUnk->field_A_y;
     // TODO: Actually sets: u0,v0 and clut
-    *(DWORD *)&pSprt->u0 = pMenuUnk->field_C_colour;
+    *(DWORD *)&pSprt->u0 = pMenuUnk->field_C_uv_clut;
     pSprt->w = pMenuUnk->field_10_w;
     pSprt->h = pMenuUnk->field_12_h;
 }
@@ -1030,7 +1059,7 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
                 0);
         }
         
-        if (pInventItem->field_C_colour)
+        if (pInventItem->field_C_uv_clut)
         {
             // Render the item icon
             SPRT* pIconSprt = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
@@ -2305,8 +2334,7 @@ struct Menu_stru_0x18
 MGS_ASSERT_SIZEOF(Menu_stru_0x18, 0x18);
 
 MGS_ARY(1, 0x733CF8, Menu_stru_0x18, 9, gMenu_stru_733CF8, {});
-MGS_VAR(1, 0x733CF4, DWORD, flags_dword_733CF4, 0);
-MGS_VAR(1, 0x733DD0, DWORD, gBitFlags_dword_733DD0, 0);
+
 
 // Called for each of the 7 possible inventory slots being draw.
 // It appears to set the pal or sprite for each item.
@@ -2325,7 +2353,7 @@ void CC Menu_inventory_common_set_icon_46B007(MenuMan_Inventory_14h_Unk* pUnk)
     flags_dword_733CF4 |= flagBits;
 
     pUnk->field_8_index = index;
-    pUnk->field_C_colour = gMenu_stru_733CF8[index].field_0;
+    pUnk->field_C_uv_clut = gMenu_stru_733CF8[index].field_0;
 
     gMenu_stru_733CF8[index].field_4_pUnk = pUnk;
     gMenu_stru_733CF8[index].field_8_rect.x2 = pUnk->field_10_w / 4;
@@ -2349,7 +2377,7 @@ void CC Menu_render_unk_46B081(MenuMan_Inventory_14h_Unk *pUnk, int idx)
     Menu_stru_0x18* pStru = &stru_733C90[idx];
 
     pUnk->field_8_index = 31 - idx;
-    pUnk->field_C_colour = pStru->field_0;
+    pUnk->field_C_uv_clut = pStru->field_0;
 
     pStru->field_8_rect.x2 = pUnk->field_10_w / 4;
     pStru->field_8_rect.y2 = pUnk->field_12_h;
@@ -2372,7 +2400,7 @@ MGS_FUNC_IMPLEX(0x468C6B, Menu_render_unk_2_and_3_468C6B, MENU_IMPL);
 
 void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMenuUnk)
 {
-    if (!pMenuUnk->field_C_colour)
+    if (!pMenuUnk->field_C_uv_clut)
     {
         Menu_inventory_common_set_icon_46B007(pMenuUnk);
     }

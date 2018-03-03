@@ -61,7 +61,6 @@ MGS_FUNC_NOT_IMPL(0x0044F3F7, void CC(), Map_ResetMapCountAndKmdsCount_44F3F7);
 MGS_FUNC_NOT_IMPL(0x00453B11, void CC(), Res_game_camera_create_453B11);
 MGS_FUNC_NOT_IMPL(0x00455299, void CC(), sub_455299);
 MGS_FUNC_NOT_IMPL(0x0040945D, void CC(), sub_40945D);
-MGS_FUNC_NOT_IMPL(0x00459A95, void CC(), sub_459A95);
 MGS_FUNC_NOT_IMPL(0x004553C5, void CC(), sub_4553C5);
 MGS_FUNC_NOT_IMPL(0x00455017, void CC(), GM_SoundStart_455017);
 MGS_FUNC_NOT_IMPL(0x0044E8F1, void CC(), sub_44E8F1);
@@ -235,7 +234,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
             }
             printf("end scenario\n");
 
-            sub_459A95();                             // init array 11?
+            Menu_j_inventory_right_init_11_items_459A95();
             sub_4553C5();                             // call proc id idx 2
             GM_SoundStart_455017();
             pGameD->gamed_unk_722780 = 1;

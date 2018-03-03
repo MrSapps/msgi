@@ -11,11 +11,11 @@ struct MenuMan_Inventory_14h_Unk
 {
     BYTE* field_0_pixels;
     WORD* field_4_word_ptr_pixels;
-    BYTE field_8_index;
+    char field_8_index;
     char field_9_x;
     char field_A_y;
     BYTE field_B; // Padding?
-    DWORD field_C_colour;
+    DWORD field_C_uv_clut;
     WORD field_10_w;
     WORD field_12_h;
 };
@@ -41,3 +41,4 @@ void CC Menu_render_number_as_string_with_flags_4688DC(MenuMan* pMenu, DWORD* ot
 void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pString);
 void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed int currentValue, signed int maxValue);
 void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMenuUnk);
+void CC Menu_j_inventory_right_init_11_items_459A95();
