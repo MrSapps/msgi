@@ -903,9 +903,49 @@ struct Menu_Item_Unknown
 
 void CC Menu_46B215(Menu_Item_Unknown* pUnknown)
 {
+    const int arrayCount = pUnknown->field_0_main.field_0_array_count;
 
+    // Halved because half of the items go on Y, and half on X when the menu opens
+    const int arrayCountHalved = arrayCount / 2;
+
+    Menu_Item_Unknown_Array_Item* pArray = &pUnknown->field_20_array;
+
+    pArray[pUnknown->field_0_main.field_4_selected_idx].field_4 = 0;
+
+    pUnknown->field_0_main.field_8 = (arrayCount / 2 << 8) + 128;
+    short idx = 1;
+    while (idx <= arrayCountHalved)
+    {
+        int relativeToSelectedIdx = idx + pUnknown->field_0_main.field_4_selected_idx;
+        if (relativeToSelectedIdx >= pUnknown->field_0_main.field_0_array_count)
+        {
+            relativeToSelectedIdx -= pUnknown->field_0_main.field_0_array_count;
+        }
+        const __int16 value = idx++ << 8;
+        pArray[relativeToSelectedIdx].field_4 = value;
+    }
+
+    const int v6 = arrayCount - arrayCountHalved - 1;
+    pUnknown->field_0_main.field_C = -128 - (v6 << 8);
+
+    int v8 = -v6;
+
+    idx = -1;
+    if (v8 <= -1)
+    {
+        do
+        {
+            int relativeToSelectedIdx = idx + pUnknown->field_0_main.field_4_selected_idx;
+            if (relativeToSelectedIdx < 0)
+            {
+                relativeToSelectedIdx += pUnknown->field_0_main.field_0_array_count;
+            }
+            const __int16 value = idx-- << 8;
+            pArray[relativeToSelectedIdx].field_4 = value;
+        } while (idx >= v8);
+    }
 }
-MGS_FUNC_IMPLEX(0x0046B215, Menu_46B215, false); // TODO
+MGS_FUNC_IMPLEX(0x0046B215, Menu_46B215, MENU_IMPL);
 
 int CC Menu_inventory_common_item_46B1DF(Menu_Item_Unknown* pItem, int item_idx)
 {
@@ -915,13 +955,14 @@ int CC Menu_inventory_common_item_46B1DF(Menu_Item_Unknown* pItem, int item_idx)
     Menu_Item_Unknown_Array_Item* pArrayItem = &pItem->field_20_array;
     for (int i = pItem->field_0_main.field_0_array_count -1; i >=0; i--)
     {
+        // Set field_4_selected_idx to the index of the item that has item_idx in field_20_array
         if (pArrayItem[i].field_0_item_id_idx == item_idx)
         {
             pItem->field_0_main.field_4_selected_idx = i;
         }
     }
 
-    // Animates the expand (and collapse?) of the menu
+    // Set up the correct bit indexes for expanding the menu
     Menu_46B215(pItem);
     return 1;
 }
