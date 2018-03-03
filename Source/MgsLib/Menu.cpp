@@ -882,6 +882,51 @@ void CC Menu_inventory_common_set_amounts_46B1A2(Menu_Item_Unknown_Array_Item* p
 }
 MGS_FUNC_IMPLEX(0x0046B1A2, Menu_inventory_common_set_amounts_46B1A2, MENU_IMPL);
 
+struct Menu_Item_Unknown_Main
+{
+    DWORD field_0_array_count;
+    DWORD field_4_selected_idx;
+    DWORD field_8;
+    DWORD field_C;
+    DWORD field_10;
+    DWORD field_14;
+    DWORD field_18;
+    DWORD field_1C;
+};
+MGS_ASSERT_SIZEOF(Menu_Item_Unknown_Main, 0x20);
+
+struct Menu_Item_Unknown
+{
+    Menu_Item_Unknown_Main field_0_main;
+    Menu_Item_Unknown_Array_Item field_20_array;
+};
+
+void CC Menu_46B215(Menu_Item_Unknown* pUnknown)
+{
+
+}
+MGS_FUNC_IMPLEX(0x0046B215, Menu_46B215, false); // TODO
+
+int CC Menu_inventory_common_item_46B1DF(Menu_Item_Unknown* pItem, int item_idx)
+{
+    pItem->field_0_main.field_4_selected_idx = -1;
+    pItem->field_0_main.field_18 = -1;
+
+    Menu_Item_Unknown_Array_Item* pArrayItem = &pItem->field_20_array;
+    for (int i = pItem->field_0_main.field_0_array_count -1; i >=0; i--)
+    {
+        if (pArrayItem[i].field_0_item_id_idx == item_idx)
+        {
+            pItem->field_0_main.field_4_selected_idx = i;
+        }
+    }
+
+    // Animates the expand (and collapse?) of the menu
+    Menu_46B215(pItem);
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x0046B1DF, Menu_inventory_common_item_46B1DF, MENU_IMPL);
+
 enum InventoryMenuState
 {
     eClosed = 0,
