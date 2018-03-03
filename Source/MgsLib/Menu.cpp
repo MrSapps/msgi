@@ -883,14 +883,15 @@ MGS_FUNC_IMPLEX(0x0046B1A2, Menu_inventory_common_set_amounts_46B1A2, MENU_IMPL)
 
 struct Menu_Item_Unknown_Main
 {
+    using Fn = void(CC*)(Menu_Item_Unknown*, DWORD);
     DWORD field_0_array_count;
     DWORD field_4_selected_idx;
     DWORD field_8;
     DWORD field_C;
     DWORD field_10;
-    DWORD field_14;
+    DWORD field_14_fn_ctx;
     DWORD field_18;
-    DWORD field_1C;
+    Fn field_1C_fn;
 };
 MGS_ASSERT_SIZEOF(Menu_Item_Unknown_Main, 0x20);
 
@@ -945,6 +946,24 @@ void CC Menu_46B215(Menu_Item_Unknown* pUnknown)
     }
 }
 MGS_FUNC_IMPLEX(0x0046B215, Menu_46B215, MENU_IMPL);
+
+signed int CC Menu_46B540(Menu_Item_Unknown* pItem)
+{
+    if (pItem->field_0_main.field_10 <= 0)
+    {
+        return 0;
+    }
+
+    pItem->field_0_main.field_10--;
+    if (!pItem->field_0_main.field_10)
+    {
+        Menu_46B215(pItem);
+        return 0;
+    }
+    pItem->field_0_main.field_1C_fn(pItem, pItem->field_0_main.field_14_fn_ctx);
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x0046B540, Menu_46B540, MENU_IMPL);
 
 int CC Menu_inventory_common_item_46B1DF(Menu_Item_Unknown* pItem, int item_idx)
 {
