@@ -42,3 +42,4 @@ void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* p
 void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed int currentValue, signed int maxValue);
 void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMenuUnk);
 void CC Menu_j_inventory_right_init_11_items_459A95();
+signed int CC Menu_inventory_common_update_helper_46B979(int idx);

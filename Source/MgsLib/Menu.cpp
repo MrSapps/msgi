@@ -51,6 +51,18 @@ struct MenuMan_Inventory_Sub
 };
 MGS_ASSERT_SIZEOF(MenuMan_Inventory_Sub, 0xC);
 
+struct Menu_Item_Unknown;
+
+struct MenuMan_Inventory_Menu_0x14
+{
+    MenuMan_Inventory_Sub field_0_invent;
+    Menu_Item_Unknown* field_C_pItem_sys_alloc;
+    char field_10_state;
+    char field_11_item_idx;
+    short field_12;
+};
+MGS_ASSERT_SIZEOF(MenuMan_Inventory_Menu_0x14, 0x14);
+
 // TODO: Discover true size of structure/other data
 struct MenuMan
 {
@@ -88,19 +100,7 @@ struct MenuMan
     BYTE field_1D4;
     BYTE field_1D5;
     WORD field_1D6;
-
-    MenuMan_Inventory_Sub field_1D8_invent_left;
-    DWORD field_1E4_invent_left_pItem; // probably also sys alloc'd
-    BYTE field_1E8_invent_left;
-    BYTE field_1E9_invent_left_item_idx;
-    WORD field_1EA;
-
-    MenuMan_Inventory_Sub field_1EC_invent_right;
-    DWORD field_1F8_sys_allocated;
-    BYTE field_1FC_invent_right;
-    BYTE field_1FD_invent_right;
-    WORD field_1FE_invent_right;
-
+    MenuMan_Inventory_Menu_0x14 field_1D8_invetory_menus[2];
     MenuMan_MenuBars field_200_hp_bars_info;
     WORD field_20C_codec_state;
     WORD field_20E;
@@ -118,7 +118,7 @@ MGS_VAR(1, 0x725FC0, MenuMan, gMenuMan_stru_725FC0, {});
 MGS_VAR(1, 0x9942C0, DWORD, gMenuRightBits_dword_9942C0, 0);
 MGS_VAR(1, 0x9942BC, DWORD, gMenuLeftBits_dword_9942BC, 0);
 
-MGS_ARY(1, 0x78E82A, WORD, 24, gItem_states_word_78E82A, {});
+MGS_ARY(1, 0x78E82A, short, 24, gItem_states_word_78E82A, {});
 MGS_ARY(1, 0x78E802, WORD, 10, gWeapon_states_word_78E802, {});
 
 void CC Res_MenuMan_create_459A9A()
@@ -481,36 +481,36 @@ MGS_FUNC_IMPLEX(0x004697F3, Menu_inventory_right_update_4697F3, false); // TODO
 
 MGS_VAR(1, 0x78E7FE, short, gMenu_Selected_item_idx_word_78E7FE, 0);
 
-void CC Menu_inventory_common_invoke_handler_46B71E(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Sub* pInventorySubStruct, int counter, int kZero)
+void CC Menu_inventory_common_invoke_handler_46B71E(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Menu_0x14 * pInventorySubStruct, int counter, int kZero)
 {
-    pInventorySubStruct->field_8_pMenuMan_Inventory_Unk_6764F8->field_10_fn_ptrs[2](
+    pInventorySubStruct->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8->field_10_fn_ptrs[2](
         pMenu,
         ot,
-        counter + pInventorySubStruct->field_8_pMenuMan_Inventory_Unk_6764F8->field_0,
-        kZero + pInventorySubStruct->field_8_pMenuMan_Inventory_Unk_6764F8->field_2,
-        pInventorySubStruct);
+        counter + pInventorySubStruct->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8->field_0,
+        kZero + pInventorySubStruct->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8->field_2,
+        &pInventorySubStruct->field_0_invent);
 }
 MGS_FUNC_IMPLEX(0x0046B71E, Menu_inventory_common_invoke_handler_46B71E, MENU_IMPL);
 
 MGS_VAR(1, 0x993FF8, WORD, word_993FF8, 0);
 MGS_VAR(1, 0x733DD4, MenuMan_Inventory_Unk_6764F8*, gMenu_dword_733DD4, 0);
 
-signed int CC Menu_inventory_common_can_open_menu_46B745(MenuMan_Inventory_Sub* pInventUnk, ButtonStates* pInput)
+signed int CC Menu_inventory_common_can_open_menu_46B745(MenuMan_Inventory_Menu_0x14 * pInventUnk, ButtonStates* pInput)
 {
     if (word_993FF8 & 0x101
         || (game_state_dword_72279C.flags & 0x1020) == 0x20
-        || !(pInput->field_0_button_status & pInventUnk->field_8_pMenuMan_Inventory_Unk_6764F8->field_4_buttons))
+        || !(pInput->field_0_button_status & pInventUnk->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8->field_4_buttons))
     {
         return 0;
     }
-    gMenu_dword_733DD4 = pInventUnk->field_8_pMenuMan_Inventory_Unk_6764F8;
+    gMenu_dword_733DD4 = pInventUnk->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8;
     return 1;
 }
 MGS_FUNC_IMPLEX(0x0046B745, Menu_inventory_common_can_open_menu_46B745, MENU_IMPL);
 
-signed int CC Menu_inventory_common_can_close_menu_46B77E(MenuMan_Inventory_Sub* pInventUnk, ButtonStates* pInput)
+signed int CC Menu_inventory_common_can_close_menu_46B77E(MenuMan_Inventory_Menu_0x14 * pInventUnk, ButtonStates* pInput)
 {
-    if (pInput->field_0_button_status & pInventUnk->field_8_pMenuMan_Inventory_Unk_6764F8->field_4_buttons)
+    if (pInput->field_0_button_status & pInventUnk->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8->field_4_buttons)
     {
         return 0;
     }
@@ -820,9 +820,8 @@ void CC Menu_inventory_left_render_PAL_key_icon_46A770(MenuMan* pMenu, DWORD* ot
 MGS_FUNC_IMPLEX(0x0046A770, Menu_inventory_left_render_PAL_key_icon_46A770, MENU_IMPL);
 
 
-MGS_FUNC_NOT_IMPL(0x46A305, signed int __cdecl(MenuMan *pMenu), Menu_inventory_left_update_helper_46A305);
-MGS_FUNC_NOT_IMPL(0x46B3CC, void __cdecl(MenuMan_Inventory_Sub *pSub, ButtonStates *pInput), Menu_inventory_common_update_helper_46B3CC);
-MGS_FUNC_NOT_IMPL(0x46A916, void __cdecl(int pItem, char buttonsPressed), Menu_inventory_left_use_item_46A916);
+MGS_FUNC_NOT_IMPL(0x46B3CC, void __cdecl(MenuMan_Inventory_Menu_0x14  *pSub, ButtonStates *pInput), Menu_inventory_common_update_helper_46B3CC);
+MGS_FUNC_NOT_IMPL(0x46A916, void __cdecl(Menu_Item_Unknown* pItem, char buttonsPressed), Menu_inventory_left_use_item_46A916);
 MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan *pMenu, DWORD* pPrimBuffer), Menu_inventory_left_update_helper_46A4C1);
 MGS_FUNC_NOT_IMPL(0x46AA9B, void(), Menu_inventory_left_update_helper_46AA9B);
 MGS_FUNC_NOT_IMPL(0x44FD66, int __cdecl(unsigned __int8 music, unsigned __int8 pan, unsigned __int8 code), Sound_sub_44FD66);
@@ -982,6 +981,12 @@ Menu_Item_Unknown* CC Menu_inventory_common_allocate_items_46B160(int itemCount)
 }
 MGS_FUNC_IMPLEX(0x0046B160, Menu_inventory_common_allocate_items_46B160, MENU_IMPL);
 
+MGS_ARY(1, 0x733AD8, MenuMan_Inventory_14h_Unk, 21, g21_menu_left_inventory_unk_733AD8, {});
+MGS_VAR(1, 0x733AD0, DWORD, gMenuLeft_733AD0, 0);
+
+MGS_VAR(1, 0x733C80, DWORD, gInfoShowing_dword_733C80, 0);
+MGS_VAR(1, 0x733C7C, DWORD, gShowInfoDelay_dword_733C7C, 0);
+
 enum InventoryMenuState
 {
     eClosed = 0,
@@ -989,6 +994,110 @@ enum InventoryMenuState
     eClosing = 3,
     eUnknown = 4,
 };
+
+signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
+{
+    Menu_Item_Unknown* pAllocatedItem = nullptr;
+    if (game_state_dword_72279C.flags & 0x40000)
+    {
+        pAllocatedItem = Menu_inventory_common_allocate_items_46B160(1);
+        pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc = pAllocatedItem;
+        if (!pAllocatedItem)
+        {
+            return 0;
+        }
+        Menu_inventory_common_set_amounts_46B1A2(&pAllocatedItem->field_20_array, -1, 1);
+    }
+    else
+    {
+        int nonEmptyItemCount = 0;
+        for (int i = 0; i < 24; i++)
+        {
+            if (gItem_states_word_78E82A[i] > 0)
+            {
+                nonEmptyItemCount++;
+            }
+        }
+
+        pAllocatedItem = Menu_inventory_common_allocate_items_46B160(nonEmptyItemCount + 1);
+        pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc = pAllocatedItem;
+        if (!pAllocatedItem)
+        {
+            return 0;
+        }
+
+        if (gMenu_Selected_item_idx_word_78E7FE == -1 || gMenu_Selected_item_idx_word_78E7FE == 17)
+        {
+            if (gMenuLeft_733AD0 < 0)
+            {
+                gMenuLeft_733AD0 = 0;
+            }
+        }
+        else
+        {
+            gMenuLeft_733AD0 = gMenu_Selected_item_idx_word_78E7FE;
+        }
+
+        Menu_Item_Unknown_Array_Item* pArray = &pAllocatedItem->field_20_array;
+
+        int cardLevel = (gItem_states_word_78E82A[17] > 0) - 1;
+        for (int idx = 0; idx < 24; idx++)
+        {
+            if (idx == gMenuLeft_733AD0)
+            {
+                Menu_inventory_common_set_amounts_46B1A2(pArray, -1, 1);
+                ++pArray;
+                if (!cardLevel)
+                {
+                    if (gMenu_Selected_item_idx_word_78E7FE == -1)
+                    {
+                        Menu_inventory_common_set_amounts_46B1A2(pArray, 17, gItem_states_word_78E82A[Items::eIdCard]);
+                        ++pArray;
+                    }
+                    else
+                    {
+                        cardLevel = 1;
+                    }
+                }
+            }
+            
+            if (gItem_states_word_78E82A[idx] > 0 && idx != Items::eIdCard)
+            {
+                Menu_inventory_common_set_amounts_46B1A2(pArray, idx, gItem_states_word_78E82A[idx]);
+                ++pArray;
+            }
+
+            if (cardLevel > 0)
+            {
+                Menu_inventory_common_set_amounts_46B1A2(pArray, 17, gItem_states_word_78E82A[17]);
+                ++pArray;
+                cardLevel = 0;
+            }
+        }
+    }
+
+    if (!Menu_inventory_common_update_helper_46B979(0))
+    {
+        Menu_inventory_common_checked_free_46B190(pAllocatedItem);
+        return 0;
+    }
+
+    gInfoShowing_dword_733C80 = 0;
+    gShowInfoDelay_dword_733C7C = 0;
+
+    pMenu->field_1D8_invetory_menus[0].field_10_state = InventoryMenuState::eOpening;
+
+    Menu_inventory_common_46B294();
+    Menu_inventory_clear_unk_46AFB7(g21_menu_left_inventory_unk_733AD8, 21);
+    
+    Menu_inventory_common_item_46B1DF(
+        pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc,
+        pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0_item_idx);
+   
+    Sound_sub_44FD66(0, 0x3Fu, 0x15u);
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x0046A305, Menu_inventory_left_update_helper_46A305, MENU_IMPL);
 
 void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
 {
@@ -1003,7 +1112,7 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
             }
             if (!(byte1_flags_word_9942A8 & 0x20208000))
             {
-                if (Menu_inventory_common_can_open_menu_46B745(&pMenu->field_1D8_invent_left, pMenu->field_24_input))
+                if (Menu_inventory_common_can_open_menu_46B745(&pMenu->field_1D8_invetory_menus[0], pMenu->field_24_input))
                 {
                     if (Menu_inventory_left_update_helper_46A305(pMenu))
                     {
@@ -1018,8 +1127,8 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
                         const int item_idx = gMenu_Selected_item_idx_word_78E7FE;
                         if (gMenu_Selected_item_idx_word_78E7FE < 0)
                         {
-                            const BYTE* left_item_idx = &pMenu->field_1E9_invent_left_item_idx;
-                            if (!Menu_inventory_Is_Item_Disabled_46A128(pMenu->field_1E9_invent_left_item_idx)
+                            const char* left_item_idx = &pMenu->field_1D8_invetory_menus[0].field_11_item_idx;
+                            if (!Menu_inventory_Is_Item_Disabled_46A128(pMenu->field_1D8_invetory_menus[0].field_11_item_idx)
                                 && gItem_states_word_78E82A[*left_item_idx] > 0)
                             {
                                 gMenu_Selected_item_idx_word_78E7FE = *left_item_idx;
@@ -1039,18 +1148,18 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
         }
         else if (field_2a_state == InventoryMenuState::eOpening)
         {
-            if (Menu_inventory_common_can_close_menu_46B77E(&pMenu->field_1D8_invent_left, pMenu->field_24_input))
+            if (Menu_inventory_common_can_close_menu_46B77E(&pMenu->field_1D8_invetory_menus[0], pMenu->field_24_input))
             {
-                pMenu->field_1E8_invent_left = InventoryMenuState::eClosing;
+                pMenu->field_1D8_invetory_menus[0].field_10_state = InventoryMenuState::eClosing;
             }
             // Controls how fast input to the menu is for pressing up/down/use
             else if (Menu_inventory_common_update_helper_46B29C() >= 256)
             {
                 // Cycle through items
-                Menu_inventory_common_update_helper_46B3CC(&pMenu->field_1D8_invent_left, pMenu->field_24_input);
+                Menu_inventory_common_update_helper_46B3CC(&pMenu->field_1D8_invetory_menus[0], pMenu->field_24_input);
 
                 // Use selected item
-                Menu_inventory_left_use_item_46A916(pMenu->field_1E4_invent_left_pItem, pMenu->field_24_input->field_2_button_pressed);
+                Menu_inventory_left_use_item_46A916(pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc, pMenu->field_24_input->field_2_button_pressed);
             }
         }
 
@@ -1069,9 +1178,9 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
             {
                 return;
             }
-            Menu_inventory_common_invoke_handler_46B71E(pMenu, ot, &pMenu->field_1D8_invent_left, counter / -4, 0);
+            Menu_inventory_common_invoke_handler_46B71E(pMenu, ot, &pMenu->field_1D8_invetory_menus[0], counter / -4, 0);
         }
-        pMenu->field_1EA = 0;
+        pMenu->field_1D8_invetory_menus[0].field_12 = 0;
     }
 }
 MGS_FUNC_IMPLEX(0x0046A187, Menu_inventory_left_update_46A187, MENU_IMPL);
@@ -1091,7 +1200,6 @@ struct TextConfig
 };
 MGS_ASSERT_SIZEOF(TextConfig, 0x10);
 
-MGS_ARY(1, 0x733AD8, MenuMan_Inventory_14h_Unk, 21, g21_menu_left_inventory_unk_733AD8, {});
 
 void CC Menu_Set_SPRT_from_unk_46B127(SPRT* pSprt, MenuMan_Inventory_14h_Unk* pMenuUnk, __int16 x, __int16 y)
 {
@@ -1266,10 +1374,10 @@ void CC Menu_generic_update_helper_469E37(MenuMan *pMenu)
 }
 MGS_FUNC_IMPLEX(0x00469E37, Menu_generic_update_helper_469E37, false); // TODO
 
-void CC Menu_init_inventory_set_fn_46B3B0(MenuMan_Inventory_Sub *pMenu_field_1EC, int bLeftOrRight, MenuMan_Inventory_Unk_6764F8::Fn pFn)
+void CC Menu_init_inventory_set_fn_46B3B0(MenuMan_Inventory_Menu_0x14 *pMenu_field_1EC, int bLeftOrRight, MenuMan_Inventory_Unk_6764F8::Fn pFn)
 {
     MenuMan_Inventory_Unk_6764F8* pUnk = &stru_6764F8[bLeftOrRight];
-    pMenu_field_1EC->field_8_pMenuMan_Inventory_Unk_6764F8 = pUnk;
+    pMenu_field_1EC->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8 = pUnk;
     pUnk->field_10_fn_ptrs[2] = pFn;
 }
 MGS_FUNC_IMPLEX(0x0046B3B0, Menu_init_inventory_set_fn_46B3B0, MENU_IMPL);
@@ -1279,21 +1387,20 @@ MGS_VAR(1, 0x7339E0, DWORD, gMenuRight_7339E0, 0);
 void CC Menu_init_inventory_right_4694E4(MenuMan* pMenu)
 {
     pMenu->field_28_flags |= 2u;
-    pMenu->field_1EC_invent_right.field_0_item_idx = -1;
-    pMenu->field_1FD_invent_right = -1;
+    pMenu->field_1D8_invetory_menus[1].field_0_invent.field_0_item_idx = -1;
+    pMenu->field_1D8_invetory_menus[1].field_11_item_idx = -1;
     pMenu->m7FnPtrs_field_2C[1] = Menu_inventory_right_update_4697F3;
-    pMenu->field_1FC_invent_right = 0;
-    pMenu->field_1FE_invent_right = 0;
-    pMenu->field_1EC_invent_right.field_4 = 0;
-    pMenu->field_1EC_invent_right.field_6 = 1;
+    pMenu->field_1D8_invetory_menus[1].field_10_state = InventoryMenuState::eClosed;
+    pMenu->field_1D8_invetory_menus[1].field_12 = 0;
+    pMenu->field_1D8_invetory_menus[1].field_0_invent.field_4 = 0;
+    pMenu->field_1D8_invetory_menus[1].field_0_invent.field_6 = 1;
     gMenuRight_7339E0 = 0;
-    Menu_init_inventory_set_fn_46B3B0(&pMenu->field_1EC_invent_right, 1, Menu_inventory_right_46956F);
+    Menu_init_inventory_set_fn_46B3B0(&pMenu->field_1D8_invetory_menus[1], 1, Menu_inventory_right_46956F);
     Menu_init_inventory_right_helper_46954B();
     Menu_Get_current_weapon_info_46948E(pMenu);
 }
 MGS_FUNC_IMPLEX(0x004694E4, Menu_init_inventory_right_4694E4, MENU_IMPL);
 
-MGS_VAR(1, 0x733AD0, DWORD, gMenuLeft_733AD0, 0);
 
 void Menu_init_inventory_left_helper_468C87()
 {
@@ -1307,14 +1414,14 @@ MGS_FUNC_IMPLEX(0x00468C87, Menu_init_inventory_left_helper_468C87, MENU_IMPL);
 void CC Menu_init_inventory_left_469E77(MenuMan* pMenu)
 {
     pMenu->field_28_flags |= 4u;
-    pMenu->field_1D8_invent_left.field_0_item_idx = -1;
-    pMenu->field_1E9_invent_left_item_idx = -1;
+    pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0_item_idx = -1;
+    pMenu->field_1D8_invetory_menus[0].field_11_item_idx = -1;
     pMenu->m7FnPtrs_field_2C[2] = Menu_inventory_left_update_46A187;
-    pMenu->field_1E8_invent_left = 0;
-    pMenu->field_1D8_invent_left.field_4 = 0;
-    pMenu->field_1D8_invent_left.field_6 = 1;
+    pMenu->field_1D8_invetory_menus[0].field_10_state = InventoryMenuState::eClosed;
+    pMenu->field_1D8_invetory_menus[0].field_0_invent.field_4 = 0;
+    pMenu->field_1D8_invetory_menus[0].field_0_invent.field_6 = 1;
     gMenuLeft_733AD0 = 0;
-    Menu_init_inventory_set_fn_46B3B0(&pMenu->field_1D8_invent_left, 0, Menu_inventory_left_469F14);
+    Menu_init_inventory_set_fn_46B3B0(&pMenu->field_1D8_invetory_menus[0], 0, Menu_inventory_left_469F14);
     Menu_init_inventory_left_helper_469EDB();
     Menu_generic_update_helper_469E37(pMenu);
     Menu_init_inventory_left_helper_468C87();
@@ -2136,7 +2243,7 @@ signed int CC Menu_inventory_common_update_helper_46B979(int idx)
     Font_Set_global_alloc_ptr_45C7F2(&gMenuFont_733DF0);
     return 1;
 }
-MGS_FUNC_IMPLEX(0x46B979, Menu_inventory_common_update_helper_46B979, true);
+MGS_FUNC_IMPLEX(0x46B979, Menu_inventory_common_update_helper_46B979, MENU_IMPL);
 
 void CC Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95(MenuMan* pMenu, DWORD* pOt, const char* pText)
 {
