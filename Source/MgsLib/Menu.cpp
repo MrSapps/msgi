@@ -43,10 +43,10 @@ MGS_ASSERT_SIZEOF(MenuMan_MenuBars, 0xc);
 
 struct MenuMan_Inventory_Sub
 {
-    WORD field_0_item_idx;
-    WORD field_2;
-    WORD field_4;
-    WORD field_6;
+    short field_0_item_idx;
+    short field_2;
+    short field_4;
+    short field_6;
     struct MenuMan_Inventory_Unk_6764F8* field_8_pMenuMan_Inventory_Unk_6764F8;
 };
 MGS_ASSERT_SIZEOF(MenuMan_Inventory_Sub, 0xC);
@@ -597,7 +597,7 @@ enum Items : u32
     eDiazepam = 15,
     ePalKey = 16,
     eIdCard = 17,
-    eUnknown = 18,
+    eItemBomb = 18,
     eMineDetector = 19,
     eMoDisk = 20,
     eRope = 21,
@@ -710,6 +710,40 @@ DWORD CC Menu_inventory_Is_Item_Disabled_46A128(signed int item_idx)
 }
 MGS_FUNC_IMPLEX(0x0046A128, Menu_inventory_Is_Item_Disabled_46A128, true);
 
+struct Menu_Item_Info
+{
+    const char* field_0_name;
+    DWORD field_4;
+};
+MGS_ASSERT_SIZEOF(Menu_Item_Info, 0x8);
+
+const Menu_Item_Info gItemInfos_675D30[] =
+{
+    { "CIGS", 14 },
+    { "SCOPE", 30 },
+    { "C.BOX A", 17 },
+    { "C.BOX B", 17 },
+    { "C.BOX C", 17 },
+    { "N.V.G", 15 },
+    { "THERM.G", 16 },
+    { "GASMASK", 19 },
+    { "B.ARMOR", 18 },
+    { "KETCHUP", 25 },
+    { "STEALTH", 32 },
+    { "BANDANA", 31 },
+    { "CAMERA", 12 },
+    { "RATION", 22 },
+    { "MEDICINE", 21 },
+    { "DIAZEPAM", 21 },
+    { "PAL KEY", 23 },
+    { "CARD", 27 },
+    { "TIMER.B", 26 },
+    { "MINE.D", 20 },
+    { "DISC", 28 },
+    { "ROPE", 24 },
+    { "HANDKER", 29 },
+    { "SUPPR.", 13 }
+};
 
 void CC Menu_inventory_left_update_ShowItemInfo_46A718(Items id)
 {
@@ -872,11 +906,165 @@ void CC Menu_inventory_right_46956F(MenuMan* pMenu, DWORD* ot, DWORD a3, DWORD t
 }
 MGS_FUNC_IMPLEX(0x0046956F, Menu_inventory_right_46956F, false); // TODO
 
-void CC Menu_inventory_left_469F14(MenuMan *pMenu, DWORD *ot, DWORD xpos, DWORD ypos, MenuMan_Inventory_Sub* pSub)
+struct TextConfig
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    DWORD gTextX_dword_66C4C0;
+    DWORD gTextY_dword_66C4C4;
+    DWORD gTextFlags_dword_66C4C8;
+    DWORD gTextRGB_dword_66C4CC;
+};
+MGS_ASSERT_SIZEOF(TextConfig, 0x10);
+
+MGS_ARY(1, 0x733AD8, MenuMan_Inventory_14h_Unk, 21, g21_menu_left_inventory_unk_733AD8, {});
+
+void CC Menu_Set_SPRT_from_unk_46B127(SPRT* pSprt, MenuMan_Inventory_14h_Unk* pMenuUnk, __int16 x, __int16 y)
+{
+    pSprt->x0 = x + pMenuUnk->field_9_x;
+    pSprt->y0 = y + pMenuUnk->field_A_y;
+    // TODO: Actually sets: u0,v0 and clut
+    *(DWORD *)&pSprt->u0 = pMenuUnk->field_C_colour;
+    pSprt->w = pMenuUnk->field_10_w;
+    pSprt->h = pMenuUnk->field_12_h;
 }
-MGS_FUNC_IMPLEX(0x00469F14, Menu_inventory_left_469F14, false); // TODO
+MGS_FUNC_IMPLEX(0x0046B127, Menu_Set_SPRT_from_unk_46B127, MENU_IMPL);
+
+void CC Menu_render_text_image_468CCC(MenuPrimBuffer* pPrimBuffer, int x, int y, MenuMan_Inventory_14h_Unk* pMenuUnk)
+{
+    SPRT* pSprt = PrimAlloc<SPRT>(pPrimBuffer);
+    setSprt(pSprt);
+    setRGB0(pSprt, 128, 128, 128);
+    Menu_Set_SPRT_from_unk_46B127(pSprt, pMenuUnk, x - 2, y + 6);
+    addPrim(pPrimBuffer->mOt, pSprt);
+}
+MGS_FUNC_IMPLEX(0x00468CCC, Menu_render_text_image_468CCC, MENU_IMPL);
+
+
+MGS_VAR(1, 0x7339A8, MenuMan_Inventory_14h_Unk, gMenuNoUse_7339A8, {});
+MGS_VAR(1, 0x733990, MenuMan_Inventory_14h_Unk, gMenuFrozen_733990, {});
+
+void CC Menu_item_render_no_use_text_468CB2(MenuPrimBuffer* pPrimBuffer, int x, int y)
+{
+    Menu_render_text_image_468CCC(pPrimBuffer, x, y, &gMenuNoUse_7339A8);
+}
+MGS_FUNC_IMPLEX(0x00468CB2, Menu_item_render_no_use_text_468CB2, MENU_IMPL);
+
+void CC Menu_item_render_frozen_text_468D30(MenuPrimBuffer* pPrimBuffer, int x, int y)
+{
+    Menu_render_text_image_468CCC(pPrimBuffer, x, y, &gMenuFrozen_733990);
+}
+MGS_FUNC_IMPLEX(0x00468D30, Menu_item_render_frozen_text_468D30, MENU_IMPL);
+
+void CC Menu_item_render_frame_rects_46B809(MenuPrimBuffer* pPrimBuffer, __int16 itemXPos, __int16 itemYPos, int bBlueFill)
+{
+    // Top strip
+    Menu_render_rect_46B79F(pPrimBuffer, itemXPos, itemYPos, 47, 1, 0);
+
+    // Left strip
+    Menu_render_rect_46B79F(pPrimBuffer, itemXPos - 4, itemYPos, 14, 20, 0);
+    
+    // Right strip
+    Menu_render_rect_46B79F(pPrimBuffer, itemXPos + 45, itemYPos + 1, 2, 19, 0);
+
+    // Bottom strip
+    Menu_render_rect_46B79F(pPrimBuffer, itemXPos - 4, itemYPos + 20, 51, 9, 0);
+
+    // Semi trans background
+    Menu_render_rect_46B79F(pPrimBuffer, itemXPos + 10, itemYPos + 1, 35, 19, bBlueFill != 0 ? 0x800000 : 0)->code |= 2u;
+
+    DR_TPAGE* pTPage = PrimAlloc<DR_TPAGE>(pPrimBuffer);
+    pTPage->tag = 0x1000000u;
+    pTPage->code = 0xE100041F;
+    addPrim(pPrimBuffer->mOt, pTPage);
+}
+MGS_FUNC_IMPLEX(0x0046B809, Menu_item_render_frame_rects_46B809, MENU_IMPL);
+
+void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD ypos, MenuMan_Inventory_Sub* pMenuSub)
+{
+    if (pMenuSub->field_0_item_idx < 0)
+    {
+        Menu_inventory_text_4689CB(pMenu, ot, xpos + 46, ypos + 22, "NO ITEM", 1);
+    }
+    else
+    {
+        MenuMan_Inventory_14h_Unk* pInventItem = &g21_menu_left_inventory_unk_733AD8[gItemInfos_675D30[pMenuSub->field_0_item_idx].field_4 - 12];
+        Menu_inventory_common_icon_helper_46AFE1(pInventItem);
+        
+        if (Menu_inventory_Is_Item_Disabled_46A128(pMenuSub->field_0_item_idx))
+        {
+            Menu_item_render_no_use_text_468CB2(pMenu->field_20_prim_buffer, xpos, ypos);
+        }
+
+        if (gItemsAreFrozen_word_78E86A && (pMenuSub->field_0_item_idx == Items::eRations || pMenuSub->field_0_item_idx == Items::eKetchup))
+        {
+            Menu_item_render_frozen_text_468D30(pMenu->field_20_prim_buffer, xpos, ypos);
+        }
+
+        if (gMenu_left_item_flags_word_669AAA[pMenuSub->field_0_item_idx] & 0x2000)
+        {
+            Menu_render_text_fractional_468915(
+                pMenu,
+                xpos,
+                ypos + 11,
+                pMenuSub->field_2,
+                gItem_states_word_78E82A[pMenuSub->field_0_item_idx + 11]); // +11 = the item capacities
+        }
+        else if (pMenuSub->field_0_item_idx == Items::eIdCard)
+        {
+            TextConfig textConfig = {};
+            textConfig.gTextFlags_dword_66C4C8 = 0;
+            textConfig.gTextX_dword_66C4C0 = xpos;
+            textConfig.gTextY_dword_66C4C4 = ypos + 14;
+            textConfig.gTextRGB_dword_66C4CC = 0x64808080;
+            Render_Text_Small_font_468642(pMenu->field_20_prim_buffer, &textConfig, "LV.");
+            textConfig.gTextY_dword_66C4C4 -= 2;
+            Menu_render_number_as_string_468529(pMenu->field_20_prim_buffer, &textConfig, gItem_states_word_78E82A[Items::eIdCard]);
+        }
+        else if (pMenuSub->field_0_item_idx == Items::eItemBomb)
+        {
+            // The bomb count down timer
+            Menu_render_number_as_string_with_flags_4688DC(
+                pMenu,
+                ot,
+                xpos + 10,
+                ypos + 10,
+                gItem_states_word_78E82A[Items::eItemBomb],
+                0);
+        }
+        
+        if (pInventItem->field_C_colour)
+        {
+            // Render the item icon
+            SPRT* pIconSprt = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
+            setSprt(pIconSprt);
+            if (pMenuSub->field_4 != 0)
+            {
+                setRGB0(pIconSprt, 0x40, 0x40, 0x40);
+            }
+            else
+            {
+                setRGB0(pIconSprt, 0x80, 0x80, 0x80);
+            }
+            Menu_Set_SPRT_from_unk_46B127(pIconSprt, pInventItem, xpos, ypos);
+            addPrim(pMenu->field_20_prim_buffer->mOt, pIconSprt);
+        }
+
+        Menu_inventory_text_4689CB(pMenu, ot,
+            xpos + 46,
+            ypos + 22,
+            gItemInfos_675D30[pMenuSub->field_0_item_idx].field_0_name,
+            1);
+    }
+
+    // The bottom right/left items have a blue tinted background as they are
+    // the active/equipped items.
+    int bBlueBackground = 0;
+    if (!pMenuSub->field_4 && !pMenuSub->field_6)
+    {
+        bBlueBackground = 1;
+    }
+    Menu_item_render_frame_rects_46B809(pMenu->field_20_prim_buffer, xpos, ypos, bBlueBackground);
+}
+MGS_FUNC_IMPLEX(0x00469F14, Menu_inventory_left_469F14, MENU_IMPL);
 
 void CC Menu_init_inventory_right_helper_46954B()
 {
@@ -931,14 +1119,11 @@ MGS_FUNC_IMPLEX(0x004694E4, Menu_init_inventory_right_4694E4, MENU_IMPL);
 
 MGS_VAR(1, 0x733AD0, DWORD, gMenuLeft_733AD0, 0);
 
-MGS_VAR(1, 0x7339A8, MenuMan_Inventory_14h_Unk, stru_7339A8, {});
-MGS_VAR(1, 0x733990, MenuMan_Inventory_14h_Unk, stru_733990, {});
-
 void Menu_init_inventory_left_helper_468C87()
 {
-    stru_7339A8.field_8_index = 0;
-    Menu_get_item_file_item_46B92E(&stru_7339A8, 40, 39);
-    Menu_get_item_file_item_46B92E(&stru_733990, 48, 39);
+    gMenuNoUse_7339A8.field_8_index = 0;
+    Menu_get_item_file_item_46B92E(&gMenuNoUse_7339A8, 40, 39);
+    Menu_get_item_file_item_46B92E(&gMenuFrozen_733990, 48, 39);
     Menu_render_unk_2_and_3_468C6B();
 }
 MGS_FUNC_IMPLEX(0x00468C87, Menu_init_inventory_left_helper_468C87, MENU_IMPL);
@@ -962,14 +1147,6 @@ MGS_FUNC_IMPLEX(0x00469E77, Menu_init_inventory_left_469E77, MENU_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
 
-struct TextConfig
-{
-    DWORD gTextX_dword_66C4C0;
-    DWORD gTextY_dword_66C4C4;
-    DWORD gTextFlags_dword_66C4C8;
-    DWORD gTextRGB_dword_66C4CC;
-};
-MGS_ASSERT_SIZEOF(TextConfig, 0x10);
 
 template<class T>
 static inline T UnSetPointerFlag(T ptr, bool& bWasFlagged)
@@ -1785,7 +1962,7 @@ signed int CC Menu_inventory_common_update_helper_46B979(int idx)
 }
 MGS_FUNC_IMPLEX(0x46B979, Menu_inventory_common_update_helper_46B979, true);
 
-void __cdecl Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95(MenuMan* pMenu, int* pOt, const char* pText)
+void CC Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95(MenuMan* pMenu, DWORD* pOt, const char* pText)
 {
     pMenu->field_2B |= 2u;
 
@@ -1834,7 +2011,7 @@ void __cdecl Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95(M
 }
 MGS_FUNC_IMPLEX(0x46BA95, Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95, MENU_IMPL);
 
-int CC Menu_inventory_text_4689CB(MenuMan* pMenu, int* /*ot*/, int xpos, int ypos, const char* pText, int textFlags)
+int CC Menu_inventory_text_4689CB(MenuMan* pMenu, DWORD* /*ot*/, int xpos, int ypos, const char* pText, int textFlags)
 {
     TextConfig textConfig = {};
     textConfig.gTextX_dword_66C4C0 = xpos;
@@ -1926,7 +2103,7 @@ void CC Menu_render_number_as_string_468529(MenuPrimBuffer* pPrimBuffer, TextCon
 }
 MGS_FUNC_IMPLEX(0x00468529, Menu_render_number_as_string_468529, MENU_IMPL);
 
-void CC Menu_render_number_as_string_with_flags_4688DC(MenuMan* pMenu, int /*ot*/, int textX, int textY, signed int number, int textFlags)
+void CC Menu_render_number_as_string_with_flags_4688DC(MenuMan* pMenu, DWORD* /*ot*/, int textX, int textY, signed int number, int textFlags)
 {
     TextConfig textConfig = {};
     textConfig.gTextX_dword_66C4C0 = textX;
@@ -2189,8 +2366,8 @@ MGS_FUNC_IMPLEX(0x46B081, Menu_render_unk_46B081, MENU_IMPL);
 
 void Menu_render_unk_2_and_3_468C6B()
 {
-    Menu_render_unk_46B081(&stru_7339A8, 2);
-    Menu_render_unk_46B081(&stru_733990, 3);
+    Menu_render_unk_46B081(&gMenuNoUse_7339A8, 2);
+    Menu_render_unk_46B081(&gMenuFrozen_733990, 3);
 }
 MGS_FUNC_IMPLEX(0x468C6B, Menu_render_unk_2_and_3_468C6B, MENU_IMPL);
 

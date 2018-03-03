@@ -4,15 +4,17 @@ MGS_VAR_EXTERN(WORD, gSnakeCurrentHealth_78E7F6);
 MGS_VAR_EXTERN(WORD, gSnakeMaxHealth_78E7F8);
 
 struct MenuMan;
+struct TextConfig;
+struct MenuPrimBuffer;
 
 struct MenuMan_Inventory_14h_Unk
 {
     BYTE* field_0_pixels;
     WORD* field_4_word_ptr_pixels;
     BYTE field_8_index;
-    BYTE field_9_x;
-    BYTE field_A_y;
-    BYTE field_B;
+    char field_9_x;
+    char field_A_y;
+    BYTE field_B; // Padding?
     DWORD field_C_colour;
     WORD field_10_w;
     WORD field_12_h;
@@ -31,6 +33,11 @@ void CC Menu_DrawText_459B63(const char* pFormatStr, int formatArg1 = 0, int for
 void CC TextSetRGB_459B27(int r, int g, int b);
 void CC TextSetXYFlags_459B0B(int x, int y, int flags);
 void CC Menu_Set_Text_BlendMode_459BE0();
-int CC Menu_inventory_text_4689CB(MenuMan* pMenu, int* ot, int xpos, int ypos, const char* pText, int textFlags);
+int CC Menu_inventory_text_4689CB(MenuMan* pMenu, DWORD* ot, int xpos, int ypos, const char* pText, int textFlags);
 void Menu_render_unk_2_and_3_468C6B();
 int CC Script_tbl_menu_sub_4521A7(BYTE* pScript);
+void CC Menu_render_number_as_string_468529(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextConfig, signed int numberRemainder);
+void CC Menu_render_number_as_string_with_flags_4688DC(MenuMan* pMenu, DWORD* ot, int textX, int textY, signed int number, int textFlags);
+void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pString);
+void CC Menu_render_text_fractional_468915(MenuMan* pMenu, int x, int y, signed int currentValue, signed int maxValue);
+void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMenuUnk);
