@@ -527,6 +527,12 @@ int Menu_inventory_common_update_helper_46B29C()
 }
 MGS_FUNC_IMPLEX(0x0046B29C, Menu_inventory_common_update_helper_46B29C, MENU_IMPL);
 
+void Menu_inventory_common_46B294()
+{
+    g64_to_256_counter_dword_733CF0 = 0;
+}
+MGS_FUNC_IMPLEX(0x0046B294, Menu_inventory_common_46B294, MENU_IMPL);
+
 signed int Menu_inventory_common_46B2C2()
 {
     g64_to_256_counter_dword_733CF0 -= 64;
