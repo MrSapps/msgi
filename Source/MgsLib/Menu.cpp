@@ -1387,11 +1387,20 @@ void CC Menu_Get_current_weapon_info_46948E(MenuMan* pMenu)
 }
 MGS_FUNC_IMPLEX(0x0046948E, Menu_Get_current_weapon_info_46948E, false); // TODO
 
-void CC Menu_generic_update_helper_469E37(MenuMan *pMenu)
+void CC Menu_generic_update_helper_469E37(MenuMan* pMenu)
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    Menu_render_unk_2_and_3_468C6B();
+    int idx = pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0_item_idx;
+    if (idx != -1)
+    {
+        idx = pMenu->field_1D8_invetory_menus[0].field_11_item_idx;
+        if (idx != -1)
+        {
+            Menu_render_unk_46B081(&g21_menu_left_inventory_unk_733AD8[gItemInfos_675D30[idx].field_4 - 12], 0);
+        }
+    }
 }
-MGS_FUNC_IMPLEX(0x00469E37, Menu_generic_update_helper_469E37, false); // TODO
+MGS_FUNC_IMPLEX(0x00469E37, Menu_generic_update_helper_469E37, MENU_IMPL);
 
 void CC Menu_init_inventory_set_fn_46B3B0(MenuMan_Inventory_Menu_0x14 *pMenu_field_1EC, int bLeftOrRight, MenuMan_Inventory_Unk_6764F8::Fn pFn)
 {
