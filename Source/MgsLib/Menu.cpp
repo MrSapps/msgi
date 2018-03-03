@@ -24,7 +24,7 @@ struct MenuPrimBuffer
 };
 
 struct MenuMan;
-using TMenuUpdateFn = void(CC*)(MenuMan*, int*);
+using TMenuUpdateFn = void(CC*)(MenuMan*, DWORD*);
 
 #pragma pack(push)
 #pragma pack(1)
@@ -128,7 +128,7 @@ void CC Res_MenuMan_create_459A9A()
 }
 MGS_FUNC_IMPLEX(0x00459A9A, Res_MenuMan_create_459A9A, MENU_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x462A3D, void __cdecl(MenuMan* pMenu, int* ot), Menu_update_helper_462A3D);
+MGS_FUNC_NOT_IMPL(0x462A3D, void __cdecl(MenuMan* pMenu, DWORD* ot), Menu_update_helper_462A3D);
 
 
 struct Menu_rpk_item
@@ -251,7 +251,7 @@ MGS_ARY(1, 0x7269F4, BYTE, 8192, gMenuPrimArray1_7269F4, {});
 MGS_ARY(1, 0x7289F4, BYTE, 8192, gMenuPrimArray2_7289F4, {});
 MGS_ARY(1, 0x7265EC, BYTE*, 2, gMenuPrimBufferArrays_7265EC, {});
 
-MGS_FUNC_NOT_IMPL(0x463763, void __cdecl(MenuMan*, int*), Menu_codec_update_463763);
+MGS_FUNC_NOT_IMPL(0x463763, void __cdecl(MenuMan*, DWORD*), Menu_codec_update_463763);
 
 
 MGS_FUNC_NOT_IMPL(0x465B38, void __cdecl(), Menu_init_radar_helper_465B38);
@@ -263,9 +263,9 @@ MGS_VAR(1, 0x733950, DWORD, gFn_radar_dword_733950, 0);
 
 
 MGS_FUNC_NOT_IMPL(0x468264, void __cdecl(MenuMan *pMenu, int buffer), Menu_radar_helper_468264);
-MGS_FUNC_NOT_IMPL(0x465B4F, DWORD* __cdecl (MenuMan *pMenu, int *a2), Menu_radar_update_helper_465B4F);
+MGS_FUNC_NOT_IMPL(0x465B4F, DWORD* __cdecl (MenuMan *pMenu, DWORD *a2), Menu_radar_update_helper_465B4F);
 
-void CC Menu_radar_update_468158(MenuMan* pMenu, int* ot)
+void CC Menu_radar_update_468158(MenuMan* pMenu, DWORD* ot)
 {
     if (pMenu->field_1D4)
     {
@@ -473,7 +473,7 @@ MGS_ASSERT_SIZEOF(MenuMan_Inventory_Unk_6764F8, 0x1C);
 
 MGS_ARY(1, 0x6764F8, MenuMan_Inventory_Unk_6764F8, 2, stru_6764F8, {});
 
-void CC Menu_inventory_right_update_4697F3(MenuMan* pMenu, int* pPrimBuffer)
+void CC Menu_inventory_right_update_4697F3(MenuMan* pMenu, DWORD* pPrimBuffer)
 {
     MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
@@ -481,10 +481,9 @@ MGS_FUNC_IMPLEX(0x004697F3, Menu_inventory_right_update_4697F3, false); // TODO
 
 MGS_VAR(1, 0x78E7FE, short, gMenu_Selected_item_idx_word_78E7FE, 0);
 
-void CC Menu_inventory_common_invoke_handler_46B71E(MenuMan* pMenu, int* ot, MenuMan_Inventory_Sub* pInventorySubStruct, int counter, int kZero)
+void CC Menu_inventory_common_invoke_handler_46B71E(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Sub* pInventorySubStruct, int counter, int kZero)
 {
-    // TODO: Set fn type
-    ((void(__cdecl *)(MenuMan *, int*, int, int, MenuMan_Inventory_Sub *))pInventorySubStruct->field_8_pMenuMan_Inventory_Unk_6764F8->field_10_fn_ptrs[2])(
+    pInventorySubStruct->field_8_pMenuMan_Inventory_Unk_6764F8->field_10_fn_ptrs[2](
         pMenu,
         ot,
         counter + pInventorySubStruct->field_8_pMenuMan_Inventory_Unk_6764F8->field_0,
@@ -818,11 +817,11 @@ MGS_FUNC_IMPLEX(0x0046A770, Menu_inventory_left_render_PAL_key_icon_46A770, MENU
 MGS_FUNC_NOT_IMPL(0x46A305, signed int __cdecl(MenuMan *pMenu), Menu_inventory_left_update_helper_46A305);
 MGS_FUNC_NOT_IMPL(0x46B3CC, void __cdecl(MenuMan_Inventory_Sub *pSub, ButtonStates *pInput), Menu_inventory_common_update_helper_46B3CC);
 MGS_FUNC_NOT_IMPL(0x46A916, void __cdecl(int pItem, char buttonsPressed), Menu_inventory_left_use_item_46A916);
-MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan *pMenu, int* pPrimBuffer), Menu_inventory_left_update_helper_46A4C1);
+MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan *pMenu, DWORD* pPrimBuffer), Menu_inventory_left_update_helper_46A4C1);
 MGS_FUNC_NOT_IMPL(0x46AA9B, void(), Menu_inventory_left_update_helper_46AA9B);
 MGS_FUNC_NOT_IMPL(0x44FD66, int __cdecl(unsigned __int8 music, unsigned __int8 pan, unsigned __int8 code), Sound_sub_44FD66);
 
-void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, int* ot)
+void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
 {
     const int field_2a = pMenu->field_2A_bSkipUpdateHpBars;
     if (field_2a == 0 || field_2a == 2)
@@ -1739,7 +1738,7 @@ void CC Menu_menu_bars_draw_snake_life_and_O2_4693D5(MenuPrimBuffer* ot, MenuMan
 }
 MGS_FUNC_IMPLEX(0x4693D5, Menu_menu_bars_draw_snake_life_and_O2_4693D5, MENU_IMPL);
 
-void CC Menu_menu_bars_update_469215(MenuMan* pMenu, int* /*ot*/)
+void CC Menu_menu_bars_update_469215(MenuMan* pMenu, DWORD* /*ot*/)
 {
     MenuMan_MenuBars* pField_200 = &pMenu->field_200_hp_bars_info;
     signed int bHpChanged = Menu_menu_bars_update_field200_46938A(&pMenu->field_200_hp_bars_info);
@@ -2173,8 +2172,8 @@ MGS_FUNC_NOT_IMPL(0x45F1D0, void __cdecl (MenuMan *pMenu, char *Source), Menu_fo
 
 void CC Menu_update_4598BC(MenuMan* pMenu)
 {
-    int* pOtText1 = (int*)gMenuPrimBuffer_7265E0.mOt;
-    int* pOtText2 = (int*)gMenuPrimBuffer_7265E0.mOt;
+    DWORD* pOtText1 = (DWORD*)gMenuPrimBuffer_7265E0.mOt;
+    DWORD* pOtText2 = (DWORD*)gMenuPrimBuffer_7265E0.mOt;
     pMenu->field_24_input = gpActiveButtons_995324 + 2;
 
     Menu_update_helper_462A3D(pMenu, pOtText2);
