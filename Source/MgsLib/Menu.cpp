@@ -968,6 +968,20 @@ int CC Menu_inventory_common_item_46B1DF(Menu_Item_Unknown* pItem, int item_idx)
 }
 MGS_FUNC_IMPLEX(0x0046B1DF, Menu_inventory_common_item_46B1DF, MENU_IMPL);
 
+Menu_Item_Unknown* CC Menu_inventory_common_allocate_items_46B160(int itemCount)
+{
+    const int size = (sizeof(Menu_Item_Unknown_Array_Item) * itemCount) + sizeof(Menu_Item_Unknown_Main);
+    Menu_Item_Unknown* pItems = (Menu_Item_Unknown *)System_2_zerod_allocate_memory_40B296(size);
+    if (pItems)
+    {
+        MemClearUnknown_40B231(pItems, size);
+        pItems->field_0_main.field_10 = 0;
+        pItems->field_0_main.field_0_array_count = itemCount;
+    }
+    return pItems;
+}
+MGS_FUNC_IMPLEX(0x0046B160, Menu_inventory_common_allocate_items_46B160, MENU_IMPL);
+
 enum InventoryMenuState
 {
     eClosed = 0,
