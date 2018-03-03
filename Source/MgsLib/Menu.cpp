@@ -59,7 +59,7 @@ struct MenuMan
     ButtonStates* field_24_input;
     BYTE field_28_flags;
     BYTE field_29;
-    BYTE field_2A_bSkipUpdateHpBars;
+    BYTE field_2A_state;
     BYTE field_2B;
     TMenuUpdateFn m7FnPtrs_field_2C[7];
     DR_ENV mDR_ENV_field_48[2];
@@ -270,7 +270,7 @@ void CC Menu_radar_update_468158(MenuMan* pMenu, DWORD* ot)
     if (pMenu->field_1D4)
     {
         int field_1D2 = 0;
-        if (!pMenu->field_2A_bSkipUpdateHpBars)
+        if (!pMenu->field_2A_state)
         {
             if (game_state_dword_72279C.flags & 0x200000)
             {
@@ -495,7 +495,7 @@ MGS_FUNC_IMPLEX(0x0046B71E, Menu_inventory_common_invoke_handler_46B71E, MENU_IM
 MGS_VAR(1, 0x993FF8, WORD, word_993FF8, 0);
 MGS_VAR(1, 0x733DD4, MenuMan_Inventory_Unk_6764F8*, gMenu_dword_733DD4, 0);
 
-signed int CC Menu_inventory_common_update_helper_46B745(MenuMan_Inventory_Sub* pInventUnk, ButtonStates* pInput)
+signed int CC Menu_inventory_common_can_open_menu_46B745(MenuMan_Inventory_Sub* pInventUnk, ButtonStates* pInput)
 {
     if (word_993FF8 & 0x101
         || (game_state_dword_72279C.flags & 0x1020) == 0x20
@@ -506,9 +506,9 @@ signed int CC Menu_inventory_common_update_helper_46B745(MenuMan_Inventory_Sub* 
     gMenu_dword_733DD4 = pInventUnk->field_8_pMenuMan_Inventory_Unk_6764F8;
     return 1;
 }
-MGS_FUNC_IMPLEX(0x0046B745, Menu_inventory_common_update_helper_46B745, MENU_IMPL);
+MGS_FUNC_IMPLEX(0x0046B745, Menu_inventory_common_can_open_menu_46B745, MENU_IMPL);
 
-signed int CC Menu_inventory_common_update_helper_46B77E(MenuMan_Inventory_Sub* pInventUnk, ButtonStates* pInput)
+signed int CC Menu_inventory_common_can_close_menu_46B77E(MenuMan_Inventory_Sub* pInventUnk, ButtonStates* pInput)
 {
     if (pInput->field_0_button_status & pInventUnk->field_8_pMenuMan_Inventory_Unk_6764F8->field_4_buttons)
     {
@@ -517,7 +517,7 @@ signed int CC Menu_inventory_common_update_helper_46B77E(MenuMan_Inventory_Sub* 
     gMenu_dword_733DD4 = 0;
     return 1;
 }
-MGS_FUNC_IMPLEX(0x0046B77E, Menu_inventory_common_update_helper_46B77E, MENU_IMPL);
+MGS_FUNC_IMPLEX(0x0046B77E, Menu_inventory_common_can_close_menu_46B77E, MENU_IMPL);
 
 MGS_VAR(1, 0x733CF0, DWORD, g64_to_256_counter_dword_733CF0, 0);
 
@@ -850,12 +850,46 @@ void CC Menu_j_inventory_right_init_11_items_459A95()
 }
 MGS_FUNC_IMPLEX(0x00459A95, Menu_j_inventory_right_init_11_items_459A95, MENU_IMPL);
 
+void CC Menu_inventory_common_checked_free_46B190(void* pAlloc)
+{
+    if (pAlloc)
+    {
+        System_2_free_40B2A7(pAlloc);
+    }
+}
+MGS_FUNC_IMPLEX(0x0046B190, Menu_inventory_common_checked_free_46B190, MENU_IMPL);
+
+struct Menu_Item_Unknown_Array_Item
+{
+    short field_0_item_id_idx;
+    short field_2_current_amount;
+    short field_4;
+    short field_6;
+};
+MGS_ASSERT_SIZEOF(Menu_Item_Unknown_Array_Item, 0x8);
+
+void CC Menu_inventory_common_set_amounts_46B1A2(Menu_Item_Unknown_Array_Item* pItem, __int16 idx_idx, __int16 amount)
+{
+    pItem->field_6 = 0;
+    pItem->field_0_item_id_idx = idx_idx;
+    pItem->field_2_current_amount = amount;
+}
+MGS_FUNC_IMPLEX(0x0046B1A2, Menu_inventory_common_set_amounts_46B1A2, MENU_IMPL);
+
+enum InventoryMenuState
+{
+    eClosed = 0,
+    eOpening = 2,
+    eClosing = 3,
+    eUnknown = 4,
+};
+
 void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
 {
-    const int field_2a = pMenu->field_2A_bSkipUpdateHpBars;
-    if (field_2a == 0 || field_2a == 2)
+    const int field_2a_state = pMenu->field_2A_state;
+    if (field_2a_state == InventoryMenuState::eClosed || field_2a_state == InventoryMenuState::eOpening)
     {
-        if (field_2a == 0)
+        if (field_2a_state == InventoryMenuState::eClosed)
         {
             if (game_state_dword_72279C.flags & 0x80400)
             {
@@ -863,11 +897,11 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
             }
             if (!(byte1_flags_word_9942A8 & 0x20208000))
             {
-                if (Menu_inventory_common_update_helper_46B745(&pMenu->field_1D8_invent_left, pMenu->field_24_input))
+                if (Menu_inventory_common_can_open_menu_46B745(&pMenu->field_1D8_invent_left, pMenu->field_24_input))
                 {
                     if (Menu_inventory_left_update_helper_46A305(pMenu))
                     {
-                        pMenu->field_2A_bSkipUpdateHpBars = 2; // To next state
+                        pMenu->field_2A_state = InventoryMenuState::eOpening;
                         gActorPauseFlags_dword_791A0C |= 4u;
                     }
                 }
@@ -897,22 +931,30 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
                 }
             }
         }
-        else if (field_2a == 2)
+        else if (field_2a_state == InventoryMenuState::eOpening)
         {
-            if (Menu_inventory_common_update_helper_46B77E(&pMenu->field_1D8_invent_left, pMenu->field_24_input))
+            if (Menu_inventory_common_can_close_menu_46B77E(&pMenu->field_1D8_invent_left, pMenu->field_24_input))
             {
-                pMenu->field_1E8_invent_left = 3;
+                pMenu->field_1E8_invent_left = InventoryMenuState::eClosing;
             }
+            // Controls how fast input to the menu is for pressing up/down/use
             else if (Menu_inventory_common_update_helper_46B29C() >= 256)
             {
+                // Cycle through items
                 Menu_inventory_common_update_helper_46B3CC(&pMenu->field_1D8_invent_left, pMenu->field_24_input);
+
+                // Use selected item
                 Menu_inventory_left_use_item_46A916(pMenu->field_1E4_invent_left_pItem, pMenu->field_24_input->field_2_button_pressed);
             }
         }
+
+        // Render opening/closing/open menu
         Menu_inventory_left_update_helper_46A4C1(pMenu, ot);
+
+        // ??
         Menu_inventory_left_update_helper_46AA9B();
     }
-    else if (field_2a != 4)
+    else if (field_2a_state != InventoryMenuState::eUnknown)
     {
         if (gMenu_Selected_item_idx_word_78E7FE >= 0)
         {
@@ -1778,7 +1820,7 @@ void CC Menu_menu_bars_update_469215(MenuMan* pMenu, DWORD* /*ot*/)
         bHpChanged = 1;
     }
 
-    if (!pMenu->field_2A_bSkipUpdateHpBars)
+    if (!pMenu->field_2A_state)
     {
         if (game_state_dword_72279C.flags & 0x10000)
         {
@@ -1905,7 +1947,7 @@ MGS_FUNC_IMPLEX(0x00459ACE, Menu_TextReset_459ACE, MENU_IMPL);
 
 void CC Menu_create_helper_459991(MenuMan* pMenu)
 {
-    pMenu->field_2A_bSkipUpdateHpBars = 0;
+    pMenu->field_2A_state = 0;
     pMenu->field_29 = 0;
     pMenu->field_28_flags = 0;
     pMenu->field_20_prim_buffer = &gMenuPrimBuffer_7265E0;
