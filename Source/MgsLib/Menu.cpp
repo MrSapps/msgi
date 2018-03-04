@@ -351,11 +351,18 @@ static void InitLargeFontTemplateSprite()
     gMenu_sprt3_733978.clut = 32765;
 }
 
-void CC Menu_get_item_file_item_46B92E(struct MenuMan_Inventory_14h_Unk *pMenuUnk, int width, int height)
+void CC Menu_get_item_file_item_46B92E(struct MenuMan_Inventory_14h_Unk* pMenuUnk, int img_idx, int pal_idx)
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    WORD* palPtr = (WORD *)&gItemFile_table_dword_733C88[pal_idx]->field_4_pixel_ptr;
+    Menu_rpk_item* pItem = gItemFile_table_dword_733C88[img_idx];
+    pMenuUnk->field_9_x = pItem->field_0_x - 2;
+    pMenuUnk->field_A_y = pItem->field_1_y;
+    pMenuUnk->field_10_w = 4 * pItem->field_2_w;
+    pMenuUnk->field_4_word_ptr_pixels = palPtr;
+    pMenuUnk->field_12_h = pItem->field_3_h;
+    pMenuUnk->field_0_pixels = (BYTE*)&pItem->field_4_pixel_ptr;
 }
-MGS_FUNC_IMPLEX(0x0046B92E, Menu_get_item_file_item_46B92E, false); // TODO
+MGS_FUNC_IMPLEX(0x0046B92E, Menu_get_item_file_item_46B92E, MENU_IMPL);
 
 void CC Menu_init_num_res_font_helper_468A04()
 {
@@ -503,7 +510,7 @@ signed int CC Menu_inventory_common_can_open_menu_46B745(MenuMan_Inventory_Menu_
     {
         return 0;
     }
-    gMenu_dword_733DD4 = pInventUnk->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8;
+    gMenu_dword_733DD4 = pInventUnk->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8;    
     return 1;
 }
 MGS_FUNC_IMPLEX(0x0046B745, Menu_inventory_common_can_open_menu_46B745, MENU_IMPL);
