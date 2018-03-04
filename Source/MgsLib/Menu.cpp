@@ -466,7 +466,7 @@ MGS_VAR(1, 0x733DD0, DWORD, gBitFlags_dword_733DD0, 0);
 
 struct Menu_stru_0x18
 {
-    BYTE field_0_v;
+    BYTE field_0_u;
     BYTE field_1_v;
     WORD field_2_clut;
     MenuMan_Inventory_14h_Unk* field_4_pUnk;
@@ -493,7 +493,7 @@ void CC Menu_init_fn0_46AD91(MenuMan*)
         pos2 = pos1 + 4;
         for (int innerCount = 0; innerCount<3; innerCount++)
         {
-            pItem->field_0_v = field_0_pos;
+            pItem->field_0_u = field_0_pos;
             pItem->field_1_v = field_1_pos;
             field_0_pos += 64;
             pItem->field_8_rect.x2 = 16;
@@ -522,7 +522,7 @@ void CC Menu_init_fn0_46AD91(MenuMan*)
     signed int kStart16 = 16;
     for (int cnt_4 = 0; cnt_4<4; cnt_4++)
     {
-        stru_733C90[cnt_4].field_0_v = 0;
+        stru_733C90[cnt_4].field_0_u = 0;
         stru_733C90[cnt_4].field_1_v = kStart16 * 24;
         stru_733C90[cnt_4].field_2_clut = (((unsigned __int16)(cnt_4 % 8) + 480) << 6) | (16 * (cnt_4 / 8 + 60) >> 4) & 0x3F;// tpage ?
         stru_733C90[cnt_4].field_8_rect.x1 = 960;
@@ -1694,7 +1694,7 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
                 0);
         }
 
-        if (pInventItem->field_C_u && pInventItem->field_D_v && pInventItem->field_E_clut)
+        if (pInventItem->field_C_u /*&& pInventItem->field_D_v && pInventItem->field_E_clut*/) // TODO: Check correctness
         {
             // Render the item icon
             SPRT* pIconSprt = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
@@ -3007,7 +3007,7 @@ void CC Menu_inventory_common_set_icon_46B007(MenuMan_Inventory_14h_Unk* pUnk)
     flags_dword_733CF4 |= flagBits;
 
     pUnk->field_8_index = index;
-    pUnk->field_C_u = gMenu_stru_733CF8[index].field_0_v;
+    pUnk->field_C_u = gMenu_stru_733CF8[index].field_0_u;
     pUnk->field_D_v = gMenu_stru_733CF8[index].field_1_v;
     pUnk->field_E_clut = gMenu_stru_733CF8[index].field_2_clut;
 
@@ -3031,7 +3031,7 @@ void CC Menu_render_unk_46B081(MenuMan_Inventory_14h_Unk *pUnk, int idx)
     Menu_stru_0x18* pStru = &stru_733C90[idx];
 
     pUnk->field_8_index = 31 - idx;
-    pUnk->field_C_u = pStru->field_0_v;
+    pUnk->field_C_u = pStru->field_0_u;
     pUnk->field_D_v = pStru->field_1_v;
     pUnk->field_E_clut = pStru->field_2_clut;
 
@@ -3056,7 +3056,7 @@ MGS_FUNC_IMPLEX(0x468C6B, Menu_render_unk_2_and_3_468C6B, MENU_IMPL);
 
 void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMenuUnk)
 {
-    if (!pMenuUnk->field_C_u && !pMenuUnk->field_D_v && !pMenuUnk->field_E_clut)
+    if (!pMenuUnk->field_C_u) // TODO: Check correctness
     {
         Menu_inventory_common_set_icon_46B007(pMenuUnk);
     }
