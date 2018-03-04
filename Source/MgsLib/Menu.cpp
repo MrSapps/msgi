@@ -457,28 +457,74 @@ MGS_FUNC_IMPLEX(0x00468406, Menu_init_num_res_font_468406, MENU_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x46AD91, void __cdecl(MenuMan*), Menu_init_fn0_46AD91);
 
-/*
-MenuMan_Inventory_Unk_6764F8 stru_6764F8[2] =
-{
-    { 12058640, 1, 24576, 36864,{ &Menu_46B36B, &Menu_46B2E0, NULL } },
-    { 12058880, 2, 12288, 49152,{ &Menu_46B2E0, &Menu_46B326, NULL } }
-};
-*/
-
 struct MenuMan_Inventory_Unk_6764F8
 {
-    using Fn = void(CC*)(MenuMan* pMenu, DWORD* ot , DWORD, DWORD, MenuMan_Inventory_Sub* pSub);
+    using Fn = void(CC*)(MenuMan* pMenu, DWORD* ot , DWORD xpos, DWORD ypos, MenuMan_Inventory_Sub* pSub);
+    using Fn2 = void(CC*)(MenuMan_Inventory_Unk_6764F8* pUnk, int bBlendXPos, DWORD* pXPos, DWORD* pYPos);
 
     WORD field_0;
     WORD field_2;
     DWORD field_4_buttons;
     DWORD field_8;
     DWORD field_C;
-    Fn field_10_fn_ptrs[3];
+    Fn2 field_10_fn_ptrs[2];
+    Fn field_18_fn;
 };
 MGS_ASSERT_SIZEOF(MenuMan_Inventory_Unk_6764F8, 0x1C);
 
-MGS_ARY(1, 0x6764F8, MenuMan_Inventory_Unk_6764F8, 2, stru_6764F8, {});
+MGS_VAR(1, 0x733CF0, DWORD, g64_to_256_counter_dword_733CF0, 0);
+
+void CC Menu_46B36B(MenuMan_Inventory_Unk_6764F8* pUnk, int bBlendXPos, DWORD* pXPos, DWORD* pYPos)
+{
+    DWORD field_0 = pUnk->field_0;
+    DWORD field_2 = pUnk->field_2;
+    if (bBlendXPos)
+    {
+        *pXPos = field_0 + 56 * bBlendXPos * g64_to_256_counter_dword_733CF0 / 0x10000;
+    }
+    else
+    {
+        *pXPos = field_0;
+    }
+    *pYPos = field_2;
+}
+MGS_FUNC_IMPLEX(0x0046B36B, Menu_46B36B, MENU_IMPL);
+
+void CC Menu_46B2E0(MenuMan_Inventory_Unk_6764F8* pUnk, int bBlendXPos, DWORD *pXPos, DWORD *pYPos)
+{
+    DWORD field_0 = pUnk->field_0;
+    DWORD field_2 = pUnk->field_2;
+    if (bBlendXPos)
+    {
+        *pXPos = field_0;
+        field_2 -= 40 * bBlendXPos * g64_to_256_counter_dword_733CF0 / 0x10000;
+    }
+    else
+    {
+        *pXPos = field_0;
+    }
+    *pYPos = field_2;
+}
+MGS_FUNC_IMPLEX(0x0046B2E0, Menu_46B2E0, MENU_IMPL);
+
+void CC Menu_46B326(MenuMan_Inventory_Unk_6764F8* pUnk, int bBlendXPos, DWORD *pXPos, DWORD *pYPos)
+{
+    DWORD field_0 = pUnk->field_0;
+    DWORD field_2 = pUnk->field_2;
+    if (bBlendXPos)
+    {
+        field_0 -= 56 * bBlendXPos * g64_to_256_counter_dword_733CF0 / 0x10000;
+    }
+    *pXPos = field_0;
+    *pYPos = field_2;
+}
+MGS_FUNC_IMPLEX(0x0046B326, Menu_46B326, MENU_IMPL);
+
+MGS_ARY(1, 0x6764F8, MenuMan_Inventory_Unk_6764F8, 2, stru_6764F8, 
+{
+    { 16, 184, 1, 24576, 36864 ,{ Menu_46B36B, Menu_46B2E0 }, nullptr },
+    { 256, 184, 2, 12288, 49152,{ Menu_46B2E0, Menu_46B326 }, nullptr }
+});
 
 void CC Menu_inventory_right_update_4697F3(MenuMan* pMenu, DWORD* pPrimBuffer)
 {
@@ -490,7 +536,7 @@ MGS_VAR(1, 0x78E7FE, short, gMenu_Selected_item_idx_word_78E7FE, 0);
 
 void CC Menu_inventory_common_invoke_handler_46B71E(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Menu_0x14 * pInventorySubStruct, int counter, int kZero)
 {
-    pInventorySubStruct->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8->field_10_fn_ptrs[2](
+    pInventorySubStruct->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8->field_18_fn(
         pMenu,
         ot,
         counter + pInventorySubStruct->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8->field_0,
@@ -525,8 +571,6 @@ signed int CC Menu_inventory_common_can_close_menu_46B77E(MenuMan_Inventory_Menu
     return 1;
 }
 MGS_FUNC_IMPLEX(0x0046B77E, Menu_inventory_common_can_close_menu_46B77E, MENU_IMPL);
-
-MGS_VAR(1, 0x733CF0, DWORD, g64_to_256_counter_dword_733CF0, 0);
 
 int Menu_inventory_common_update_helper_46B29C()
 {
@@ -568,7 +612,7 @@ void CC Menu_inventory_common_update_helper_46B6EF(MenuMan* pMenu, DWORD* ot, Me
 {
     if ((game_state_dword_72279C.flags & 0x1020) != 0x20)
     {
-        pInventSub->field_8_pMenuMan_Inventory_Unk_6764F8->field_10_fn_ptrs[2](
+        pInventSub->field_8_pMenuMan_Inventory_Unk_6764F8->field_18_fn(
             pMenu, ot,
             pInventSub->field_8_pMenuMan_Inventory_Unk_6764F8->field_0,
             pInventSub->field_8_pMenuMan_Inventory_Unk_6764F8->field_2,
@@ -834,7 +878,9 @@ MGS_FUNC_NOT_IMPL(0x46AA9B, void(), Menu_inventory_left_update_helper_46AA9B);
 
 // TODO
 // Menu_inventory_common_update_helper_46B56C
+
 // Menu_inventory_left_update_helper_46A856
+
 // void __cdecl Menu_46B6AD()
 
 MGS_FUNC_NOT_IMPL(0x44FD66, int __cdecl(unsigned __int8 music, unsigned __int8 pan, unsigned __int8 code), Sound_sub_44FD66);
@@ -1650,7 +1696,7 @@ void CC Menu_init_inventory_set_fn_46B3B0(MenuMan_Inventory_Menu_0x14 *pMenu_fie
 {
     MenuMan_Inventory_Unk_6764F8* pUnk = &stru_6764F8[bLeftOrRight];
     pMenu_field_1EC->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8 = pUnk;
-    pUnk->field_10_fn_ptrs[2] = pFn;
+    pUnk->field_18_fn = pFn;
 }
 MGS_FUNC_IMPLEX(0x0046B3B0, Menu_init_inventory_set_fn_46B3B0, MENU_IMPL);
 
