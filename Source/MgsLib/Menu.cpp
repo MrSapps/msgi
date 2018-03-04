@@ -45,7 +45,7 @@ struct Menu_Item_Unknown_Array_Item
 {
     short field_0_item_id_idx;
     short field_2_current_amount;
-    short field_4;
+    short field_4; // max amount ?
     short field_6;
 };
 MGS_ASSERT_SIZEOF(Menu_Item_Unknown_Array_Item, 0x8);
@@ -3127,10 +3127,6 @@ MGS_FUNC_IMPLEX(0x44D047, Menu_give_all_items_44D047, MENU_IMPL);
 
 MGS_VAR(1, 0x78E862, WORD, gMenu_PAL_card_icon_idx_word_78E862, 0);
 
-// TODO
-MGS_FUNC_NOT_IMPL(0x46B56C, void __cdecl (MenuMan *pMenu, DWORD *ot, MenuMan_Inventory_Menu_0x14 *pUnk), Menu_inventory_common_update_helper_46B56C);
-// void __cdecl Menu_46B6AD()
-
 void Menu_update_game_state_4691C6()
 {
     game_state_dword_72279C.mParts.flags1 &= 0x7Fu;
@@ -3347,7 +3343,7 @@ void CC Menu_inventory_left_update_helper_46A4C1(MenuMan* pMenu, DWORD* pPrimBuf
                     Menu_inventory_left_update_helper_46A856(pMenu);
                     return;
                 }
-                Menu_inventory_common_update_helper_46B56C(pMenu, pPrimBuffer, pMenu->field_1D8_invetory_menus);
+                Menu_inventory_common_update_helper_46B56C(pMenu, pPrimBuffer, &pMenu->field_1D8_invetory_menus[0]);
                 return;
             }
             if (Menu_inventory_common_update_helper_46B2A2())
@@ -3450,6 +3446,100 @@ void CC Menu_inventory_left_update_helper_46A4C1(MenuMan* pMenu, DWORD* pPrimBuf
 }
 MGS_FUNC_IMPLEX(0x0046A4C1, Menu_inventory_left_update_helper_46A4C1, MENU_IMPL);
 
+void CC Menu_46B6AD()
+{
+    // TODO
+}
+MGS_FUNC_IMPLEX(0x0046B6AD, Menu_46B6AD, false);
+
+void CC Menu_inventory_common_update_helper_46B56C(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Menu_0x14* pUnk)
+{
+    gBitFlags_dword_733DD0 = 0;
+
+    Menu_Item_Unknown* pItemUnknown = pUnk->field_C_pItem_sys_alloc;
+    MenuMan_Inventory_Unk_6764F8* pInvent = pUnk->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8;
+
+    int ypos = 0;
+    int xpos = 0;
+    Menu_Item_Unknown_Array_Item* pItem = &pItemUnknown->field_20_array + pItemUnknown->field_0_main.field_4_selected_idx;
+    if (pItem->field_4 < 0)
+    {
+        pInvent->field_10_fn_ptrs[1](pInvent, -pItem->field_4, &xpos, &ypos);
+    }
+    else
+    {
+        pInvent->field_10_fn_ptrs[0](pInvent, pItem->field_4, &xpos, &ypos);
+    }
+    pInvent->field_18_fn(pMenu, ot, xpos, ypos, pItem);
+
+    int field_8_capped = pItemUnknown->field_0_main.field_8;
+    if (field_8_capped > 1024)
+    {
+        field_8_capped = 1152;
+    }
+
+    int idxOff = 1;
+    for (int i=0; i<pItemUnknown->field_0_main.field_0_array_count-1; i++)
+    {
+        int idx = pItemUnknown->field_0_main.field_4_selected_idx + idxOff;
+        if (idx >= pItemUnknown->field_0_main.field_0_array_count)
+        {
+            idx -= pItemUnknown->field_0_main.field_0_array_count;
+        }
+        Menu_Item_Unknown_Array_Item* pArrayItem = &pItemUnknown->field_20_array + idx;
+        if ((pArrayItem->field_4 & 0x8000u) != 0)
+        {
+            break;
+        }
+
+        if (pArrayItem->field_4 > field_8_capped)
+        {
+            break;
+        }
+
+        int ypos2 = 0;
+        int xpos2 = 0;
+        pInvent->field_10_fn_ptrs[0](pInvent, pArrayItem->field_4, &ypos2, &xpos2);
+        pInvent->field_18_fn(pMenu, ot, ypos2, xpos2, pArrayItem);
+        ++idxOff;
+    }
+
+    int field_C_capped = pItemUnknown->field_0_main.field_C;
+    if (-field_C_capped > 1024)
+    {
+        field_C_capped = -1152;
+    }
+
+    idxOff = -1;
+    for (int i = 0; i<pItemUnknown->field_0_main.field_0_array_count - 1; i++)
+    {
+        int idx = pItemUnknown->field_0_main.field_4_selected_idx + idxOff;
+        if (idx < 0)
+        {
+            idx += pItemUnknown->field_0_main.field_0_array_count;
+        }
+        Menu_Item_Unknown_Array_Item* pArrayItem = &pItemUnknown->field_20_array + idx;
+
+        if (pArrayItem->field_4 > 0)
+        {
+            break;
+        }
+
+        if (pArrayItem->field_4 < field_C_capped)
+        {
+            break;
+        }
+
+        int ypos2 = 0;
+        int xpos2 = 0;
+        pInvent->field_10_fn_ptrs[1](pInvent, -pArrayItem->field_4, &xpos2, &ypos2);
+        pInvent->field_18_fn(pMenu, ot, xpos2, ypos2, pArrayItem);
+        --idxOff;
+    }
+
+    Menu_46B6AD();
+}
+MGS_FUNC_IMPLEX(0x0046B56C, Menu_inventory_common_update_helper_46B56C, true);
 
 static void Test_Render_Text_Large_font_468AAF()
 {

@@ -7,6 +7,7 @@ struct MenuMan;
 struct TextConfig;
 struct MenuPrimBuffer;
 struct Menu_Item_Unknown;
+struct MenuMan_Inventory_Menu_0x14;
 
 struct MenuMan_Inventory_14h_Unk
 {
@@ -50,3 +51,4 @@ void CC Menu_render_unk_46B081(MenuMan_Inventory_14h_Unk *pUnk, int idx);
 signed int CC Menu_46B540(Menu_Item_Unknown* pItem);
 void CC Menu_inits_459A48();
 void CC Menu_inventory_left_update_helper_46A4C1(MenuMan* pMenu, DWORD* pPrimBuffer);
+void CC Menu_inventory_common_update_helper_46B56C(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Menu_0x14* pUnk);
