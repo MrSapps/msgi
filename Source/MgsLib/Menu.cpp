@@ -820,7 +820,6 @@ void CC Menu_inventory_left_render_PAL_key_icon_46A770(MenuMan* pMenu, DWORD* ot
 MGS_FUNC_IMPLEX(0x0046A770, Menu_inventory_left_render_PAL_key_icon_46A770, MENU_IMPL);
 
 
-MGS_FUNC_NOT_IMPL(0x46B3CC, void __cdecl(MenuMan_Inventory_Menu_0x14  *pSub, ButtonStates *pInput), Menu_inventory_common_update_helper_46B3CC);
 MGS_FUNC_NOT_IMPL(0x46A916, void __cdecl(Menu_Item_Unknown* pItem, char buttonsPressed), Menu_inventory_left_use_item_46A916);
 MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan *pMenu, DWORD* pPrimBuffer), Menu_inventory_left_update_helper_46A4C1);
 MGS_FUNC_NOT_IMPL(0x46AA9B, void(), Menu_inventory_left_update_helper_46AA9B);
@@ -883,14 +882,14 @@ MGS_FUNC_IMPLEX(0x0046B1A2, Menu_inventory_common_set_amounts_46B1A2, MENU_IMPL)
 
 struct Menu_Item_Unknown_Main
 {
-    using Fn = void(CC*)(Menu_Item_Unknown*, DWORD);
+    using Fn = void(CC*)(Menu_Item_Unknown*, int);
     DWORD field_0_array_count;
     DWORD field_4_selected_idx;
-    DWORD field_8;
-    DWORD field_C;
+    int field_8;
+    int field_C;
     DWORD field_10;
     DWORD field_14_fn_ctx;
-    DWORD field_18;
+    int field_18;
     Fn field_1C_fn;
 };
 MGS_ASSERT_SIZEOF(Menu_Item_Unknown_Main, 0x20);
@@ -900,6 +899,107 @@ struct Menu_Item_Unknown
     Menu_Item_Unknown_Main field_0_main;
     Menu_Item_Unknown_Array_Item field_20_array;
 };
+
+void CC Menu_46B506(Menu_Item_Unknown* pUnk, int amount)
+{
+    Menu_Item_Unknown_Array_Item* pArray = &pUnk->field_20_array;
+    for (DWORD i = 0; i < pUnk->field_0_main.field_0_array_count; i++)
+    {
+        pArray[i].field_4 += amount;
+        if (pArray[i].field_4 <= pUnk->field_0_main.field_C)
+        {
+            pArray[i].field_4 = pArray[i].field_4 + pUnk->field_0_main.field_8 - pUnk->field_0_main.field_C;
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x46B506, Menu_46B506, MENU_IMPL);
+
+void CC Menu_46B4CC(Menu_Item_Unknown* pUnk, int amount)
+{
+    Menu_Item_Unknown_Array_Item* pArray = &pUnk->field_20_array;
+    for (DWORD i = 0; i < pUnk->field_0_main.field_0_array_count; i++)
+    {
+        pArray[i].field_4 += amount;
+        if (pArray[i].field_4 >= pUnk->field_0_main.field_8)
+        {
+            pArray[i].field_4 = pArray[i].field_4 + pUnk->field_0_main.field_C - pUnk->field_0_main.field_8;
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x46B4CC, Menu_46B4CC, MENU_IMPL);
+
+void CC Menu_46B473(Menu_Item_Unknown* pMenuUnknown, int buttonsMatch, int k6Or4)
+{
+    pMenuUnknown->field_0_main.field_10 = k6Or4;
+    pMenuUnknown->field_0_main.field_14_fn_ctx = (buttonsMatch << 8) / k6Or4;
+
+    if (buttonsMatch <= 0)
+    {
+        pMenuUnknown->field_0_main.field_1C_fn = Menu_46B506;
+    }
+    else
+    {
+        pMenuUnknown->field_0_main.field_1C_fn = Menu_46B4CC;
+    }
+
+    // For some reason.. flip the input
+    const int flags = buttonsMatch == -1 ? 1 : -1;
+
+    // Either increment or decrement the selected index wrapped the the max count
+    pMenuUnknown->field_0_main.field_4_selected_idx = (pMenuUnknown->field_0_main.field_0_array_count
+        + pMenuUnknown->field_0_main.field_4_selected_idx
+        + flags)
+        % pMenuUnknown->field_0_main.field_0_array_count;
+
+    // The "ding ding" sound each time you cycle to a new inventory item
+    Sound_sub_44FD66(0, 0x3Fu, 0x17u);
+}
+MGS_FUNC_IMPLEX(0x46B473, Menu_46B473, true);
+
+
+void CC Menu_inventory_common_update_helper_46B3CC(MenuMan_Inventory_Menu_0x14* pInvent, ButtonStates* pInput)
+{
+    Menu_Item_Unknown* pItem = pInvent->field_C_pItem_sys_alloc;
+    MenuMan_Inventory_Unk_6764F8* pInventUnk = pInvent->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8;
+    const int bRet = Menu_46B540(pItem);
+
+    if ((pInventUnk->field_8 | pInventUnk->field_C) & pInput->field_2_button_pressed)
+    {
+        if (bRet)
+        {
+            if (pItem->field_0_main.field_18 > 0)
+            {
+                pItem->field_0_main.field_18 = 0;
+            }
+        }
+        else
+        {
+            Menu_46B473(pItem, (pInventUnk->field_8 & pInput->field_2_button_pressed) != 0 ? 1 : -1, 6);
+            pItem->field_0_main.field_18 = 10;
+        }
+    }
+
+    if (pItem->field_0_main.field_18 >= 0)
+    {
+        if ((pInventUnk->field_8 | pInventUnk->field_C) & pInput->field_0_button_status)
+        {
+            if (!bRet)
+            {
+                pItem->field_0_main.field_18--;
+                if (pItem->field_0_main.field_18 < 0)
+                {
+                    Menu_46B473(pItem, (pInventUnk->field_8 & pInput->field_0_button_status) != 0 ? 1 : -1, 4);
+                    pItem->field_0_main.field_18 = 0;
+                }
+            }
+        }
+        else
+        {
+            pItem->field_0_main.field_18 = 10;
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x46B3CC, Menu_inventory_common_update_helper_46B3CC, MENU_IMPL);
 
 void CC Menu_46B215(Menu_Item_Unknown* pUnknown)
 {
@@ -955,11 +1055,13 @@ signed int CC Menu_46B540(Menu_Item_Unknown* pItem)
     }
 
     pItem->field_0_main.field_10--;
+
     if (!pItem->field_0_main.field_10)
     {
         Menu_46B215(pItem);
         return 0;
     }
+
     pItem->field_0_main.field_1C_fn(pItem, pItem->field_0_main.field_14_fn_ctx);
     return 1;
 }

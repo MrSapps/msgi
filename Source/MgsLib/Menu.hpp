@@ -6,6 +6,7 @@ MGS_VAR_EXTERN(WORD, gSnakeMaxHealth_78E7F8);
 struct MenuMan;
 struct TextConfig;
 struct MenuPrimBuffer;
+struct Menu_Item_Unknown;
 
 struct MenuMan_Inventory_14h_Unk
 {
@@ -44,3 +45,4 @@ void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMen
 void CC Menu_j_inventory_right_init_11_items_459A95();
 signed int CC Menu_inventory_common_update_helper_46B979(int idx);
 void CC Menu_render_unk_46B081(MenuMan_Inventory_14h_Unk *pUnk, int idx);
+signed int CC Menu_46B540(Menu_Item_Unknown* pItem);
