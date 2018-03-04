@@ -665,7 +665,7 @@ enum Items : u32
     eMineDetector = 19,
     eMoDisk = 20,
     eRope = 21,
-    eHanderChief = 22,
+    HandkerChief = 22,
     eSurppressor = 23,
     eRationsFrozen = 24,
     eKetchupFrozen = 25
@@ -1661,9 +1661,26 @@ MGS_FUNC_IMPLEX(0x0046954B, Menu_init_inventory_right_helper_46954B, false); // 
 
 void CC Menu_init_inventory_left_helper_469EDB()
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    MenuMan_Inventory_14h_Unk* pItem = g21_menu_left_inventory_unk_733AD8;
+    int idx = 12;
+    do
+    {
+        int palIdx = 0; // Red pal
+        if (idx == 22)
+        {
+            // Ration (green pal)
+            palIdx = 46;
+        }
+        else if (idx == 27)
+        {
+            // Id card (blue pal)
+            palIdx = 47;
+        }
+        Menu_get_item_file_item_46B92E(pItem, idx++, palIdx);
+        ++pItem;
+    } while (idx - 12 < 21);
 }
-MGS_FUNC_IMPLEX(0x00469EDB, Menu_init_inventory_left_helper_469EDB, false); // TODO
+MGS_FUNC_IMPLEX(0x00469EDB, Menu_init_inventory_left_helper_469EDB, MENU_IMPL);
 
 void CC Menu_Get_current_weapon_info_46948E(MenuMan* pMenu)
 {
