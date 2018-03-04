@@ -42,3 +42,13 @@ void CC Font_set_text_45C80A(Font *pFont, const char* pText)
     }
 }
 MGS_FUNC_IMPLEX(0x45C80A, Font_set_text_45C80A, FONT_IMPL);
+
+void* CC Font_Get_Ptr_45AB0B(Font* pFont)
+{
+    if (pFont)
+    {
+        return pFont->field_28_ptr_sys_allocated;
+    }
+    return nullptr;
+}
+MGS_FUNC_IMPLEX(0x45AB0B, Font_Get_Ptr_45AB0B, FONT_IMPL);

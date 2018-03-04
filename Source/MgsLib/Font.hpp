@@ -38,3 +38,4 @@ EXTERN_MGS_FUNC_NOT_IMPL(0x45C76C, void __cdecl(Font *pFont), Font_render_45C76C
 void CC Font_Set_global_alloc_ptr_45C7F2(Font* pFont);
 void CC Font_Set_Buffer_45AAE9(Font* pFont, void* pAllocated);
 void CC Font_set_text_45C80A(Font *pFont, const char* pText);
+void* CC Font_Get_Ptr_45AB0B(Font* pFont);
