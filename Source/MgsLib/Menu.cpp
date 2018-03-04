@@ -1692,7 +1692,7 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
                 0);
         }
 
-        if (pInventItem->field_C_u && pInventItem->field_D_v && pInventItem->field_E_clut) // TODO: Check correctness
+        if (pInventItem->field_C_u || pInventItem->field_D_v || pInventItem->field_E_clut)
         {
             // Render the item icon
             SPRT* pIconSprt = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
@@ -3054,7 +3054,8 @@ MGS_FUNC_IMPLEX(0x468C6B, Menu_render_unk_2_and_3_468C6B, MENU_IMPL);
 
 void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMenuUnk)
 {
-    if (!pMenuUnk->field_C_u) // TODO: Check correctness
+    const WORD uvOrClutSet = pMenuUnk->field_C_u | pMenuUnk->field_E_clut | pMenuUnk->field_E_clut;
+    if (!uvOrClutSet)
     {
         Menu_inventory_common_set_icon_46B007(pMenuUnk);
     }
