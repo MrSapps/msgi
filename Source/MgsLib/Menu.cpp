@@ -819,8 +819,6 @@ void CC Menu_inventory_left_render_PAL_key_icon_46A770(MenuMan* pMenu, DWORD* ot
 }
 MGS_FUNC_IMPLEX(0x0046A770, Menu_inventory_left_render_PAL_key_icon_46A770, MENU_IMPL);
 
-
-MGS_FUNC_NOT_IMPL(0x46A916, void __cdecl(Menu_Item_Unknown* pItem, char buttonsPressed), Menu_inventory_left_use_item_46A916);
 MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan *pMenu, DWORD* pPrimBuffer), Menu_inventory_left_update_helper_46A4C1);
 MGS_FUNC_NOT_IMPL(0x46AA9B, void(), Menu_inventory_left_update_helper_46AA9B);
 MGS_FUNC_NOT_IMPL(0x44FD66, int __cdecl(unsigned __int8 music, unsigned __int8 pan, unsigned __int8 code), Sound_sub_44FD66);
@@ -1220,6 +1218,134 @@ signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
 }
 MGS_FUNC_IMPLEX(0x0046A305, Menu_inventory_left_update_helper_46A305, MENU_IMPL);
 
+MGS_VAR(1, 0x78E7FA, BYTE, gSnakeFlags_byte_78E7FA, 0);
+MGS_VAR(1, 0x78E876, short, gSnakeColdTimer_word_78E876, 0);
+MGS_VAR(1, 0x78E87A, short, gSnakeCold_word_78E87A, 0);
+MGS_VAR(1, 0x78E872, short, gSnakeShakeDelay_word_78E872, 0);
+
+
+void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char buttonsPressed)
+{
+    if (buttonsPressed & 0x20)
+    {
+        const int idx = pItem->field_0_main.field_4_selected_idx;
+        Menu_Item_Unknown_Array_Item* pArrayItem = &pItem->field_20_array + idx;
+        if (pArrayItem->field_2_current_amount > 0)
+        {
+            if (pArrayItem->field_0_item_id_idx == Items::eKetchup || pArrayItem->field_0_item_id_idx == Items::eRations)
+            {
+                if (gItemsAreFrozen_word_78E86A)
+                {
+                    // Play frozen "ice hit" sound
+                    Sound_sub_44FD66(0, 0x3Fu, 0x73u);
+                    return;
+                }
+
+                if (gSnakeCurrentHealth_78E7F6 == gSnakeMaxHealth_78E7F8)
+                {
+                    // Play "denied" sound
+                    Sound_sub_44FD66(0, 0x3Fu, 0x23u);
+                    return;
+                }
+
+                signed __int16 rationOrKetchupHealth = 0;
+                if (pArrayItem->field_0_item_id_idx == Items::eRations)
+                {
+                    if (gDiffcultyLevel_78E7E2 == DiffcultyLevels::eVeryEasy)
+                    {
+                        rationOrKetchupHealth = 1024;
+                    }
+                    else if (gDiffcultyLevel_78E7E2 == DiffcultyLevels::eEasy)
+                    {
+                        rationOrKetchupHealth = 384;
+                    }
+                    else
+                    {
+                        rationOrKetchupHealth = 256;
+                    }
+                }
+                else
+                {
+                    // Set no item to be selected
+                    pArrayItem->field_0_item_id_idx = -1;
+  
+                    // Nuke the one and only possible ketchup
+                    gItem_states_word_78E82A[Items::eKetchup] = 0;
+                    rationOrKetchupHealth = 64;
+                }
+
+                gSnakeCurrentHealth_78E7F6 += rationOrKetchupHealth;
+                ++gNumRations_word_78E88C;
+
+                // Cap to max LIFE
+                if (gSnakeCurrentHealth_78E7F6 > gSnakeMaxHealth_78E7F8)
+                {
+                    gSnakeCurrentHealth_78E7F6 = gSnakeMaxHealth_78E7F8;
+                }
+
+                // Play "used ration" sound
+                Sound_sub_44FD66(0, 0x3Fu, 0xCu);
+            }
+            else
+            {
+                switch (pArrayItem->field_0_item_id_idx)
+                {
+                case Items::eMedicine:
+                    if (gSnakeFlags_byte_78E7FA & 1)
+                    {
+                        gSnakeFlags_byte_78E7FA &= ~1u;
+                        gSnakeColdTimer_word_78E876 = 0;
+                        gSnakeCold_word_78E87A = 0;
+                    }
+                    break;
+                case Items::eDiazepam:
+                    gSnakeFlags_byte_78E7FA |= 4u;
+                    if (gSnakeShakeDelay_word_78E872 < 0)
+                    {
+                        gSnakeShakeDelay_word_78E872 = 0;
+                    }
+                    gSnakeShakeDelay_word_78E872 += 1200;
+                    break;
+                case Items::eItemBomb:
+                    if (!(byte1_flags_word_9942A8 & 0x362)
+                        && !gRocketLauncherInUse_dword_721E58
+                        && !Menu_inventory_Is_Item_Disabled_46A128(Items::eItemBomb))
+                    {
+                        byte1_flags_word_9942A8 |= 0x080000u; // TODO: BYTE2(var) |= 8u check this is correct;
+                        pArrayItem->field_0_item_id_idx = -1;
+                        gItem_states_word_78E82A[Items::eItemBomb] = -1;
+
+                        // Sounds like the menu cancel sound
+                        Sound_sub_44FD66(0, 0x3Fu, 0x21u);
+                        return;
+                    }
+                    else
+                    {
+                        // Play "denied" sound
+                        Sound_sub_44FD66(0, 0x3Fu, 0x23u);
+                        return;
+                    }
+
+                // Any other kind of item does nothing when used
+                default:
+                    return;
+                }
+
+                // Play the "Medicine" used sound
+                Sound_sub_44FD66(0, 0x3Fu, 0x22u);
+            }
+
+            // Decrement the amount
+            if (pArrayItem->field_0_item_id_idx >= 0)
+            {
+                gItem_states_word_78E82A[pArrayItem->field_0_item_id_idx]--;
+                pArrayItem->field_2_current_amount = gItem_states_word_78E82A[pArrayItem->field_0_item_id_idx];
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x0046A916, Menu_inventory_left_use_item_46A916, MENU_IMPL);
+
 void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
 {
     const int field_2a_state = pMenu->field_2A_state;
@@ -1279,8 +1405,8 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
                 // Cycle through items
                 Menu_inventory_common_update_helper_46B3CC(&pMenu->field_1D8_invetory_menus[0], pMenu->field_24_input);
 
-                // Use selected item
-                Menu_inventory_left_use_item_46A916(pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc, pMenu->field_24_input->field_2_button_pressed);
+               // Use selected item
+               Menu_inventory_left_use_item_46A916(pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc, pMenu->field_24_input->field_2_button_pressed);
             }
         }
 

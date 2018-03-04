@@ -143,8 +143,8 @@ WORD gNumSaves_word_78E890 = 5;
 WORD gContinues_word_78E88E = 20;
 WORD gTimesSpotted_word_78E87C = 30;
 WORD gNumEnemiesKilled_word_78E87E = 40;
-WORD gNumRations_word_78E88C = 18;
 
+MGS_VAR(1, 0x78E88C, WORD, gNumRations_word_78E88C, 0);
 MGS_VAR(1, 0x78E7E2, short, gDiffcultyLevel_78E7E2, -1);
 
 MGS_PTR(1, 0x67676C, BYTE*, gRankXPosTable_byte_67676C, {});

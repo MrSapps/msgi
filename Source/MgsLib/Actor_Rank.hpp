@@ -21,6 +21,7 @@ enum DiffcultyLevels
     eExtreme = 3
 };
 MGS_VAR_EXTERN(short, gDiffcultyLevel_78E7E2);
+MGS_VAR_EXTERN(WORD, gNumRations_word_78E88C);
 
 struct Actor_Rank
 {
