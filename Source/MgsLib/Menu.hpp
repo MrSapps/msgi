@@ -16,7 +16,9 @@ struct MenuMan_Inventory_14h_Unk
     char field_9_x;
     char field_A_y;
     BYTE field_B; // Padding?
-    DWORD field_C_uv_clut;
+    BYTE field_C_u;
+    BYTE field_D_v;
+    WORD field_E_clut;
     WORD field_10_w;
     WORD field_12_h;
 };

@@ -220,8 +220,8 @@ TILE* CC Menu_render_rect_46B79F(MenuPrimBuffer* pPrimBuffer, __int16 x, __int16
     pTile->y0 = y;
     pTile->w = w;
     pTile->h = h;
-    
-   
+
+
     addPrim(pPrimBuffer->mOt, pTile);
 
     return pTile;
@@ -439,7 +439,7 @@ void CC Menu_init_num_res_font_468406(MenuMan* /*pMenu*/)
     BYTE* pImageHeader = (BYTE *)&pFileData[1] + 2 * imageDataOffset;
     WORD* pPalStart = (WORD*)&pFileData[1].field_0_magic;
     *pPalStart = 0;       // set first palt pixel to black?
-    
+
     g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(&rect, (WORD *)&pFileData[1], pImageHeader, 0, 0, 0, 0);
     Render_sub_41C6B0(&rect, pImageHeader);
 
@@ -461,13 +461,89 @@ void CC Menu_init_num_res_font_468406(MenuMan* /*pMenu*/)
 }
 MGS_FUNC_IMPLEX(0x00468406, Menu_init_num_res_font_468406, MENU_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x46AD91, void __cdecl(MenuMan*), Menu_init_fn0_46AD91);
+MGS_VAR(1, 0x733CF4, DWORD, flags_dword_733CF4, 0);
+MGS_VAR(1, 0x733DD0, DWORD, gBitFlags_dword_733DD0, 0);
+
+struct Menu_stru_0x18
+{
+    BYTE field_0_v;
+    BYTE field_1_v;
+    WORD field_2_clut;
+    MenuMan_Inventory_14h_Unk* field_4_pUnk;
+    PSX_RECT field_8_rect;
+    WORD field_10;
+    WORD field_12;
+    WORD field_14;
+    WORD field_16;
+};
+MGS_ASSERT_SIZEOF(Menu_stru_0x18, 0x18);
+
+MGS_ARY(1, 0x733CF8, Menu_stru_0x18, 9, gMenu_stru_733CF8, {});
+MGS_ARY(1, 0x733C90, Menu_stru_0x18, 4, stru_733C90, {});
+
+void CC Menu_init_fn0_46AD91(MenuMan*)
+{
+    int pos1 = 0;
+    int pos2 = 0;
+    Menu_stru_0x18* pItem = &gMenu_stru_733CF8[0];
+    char field_1_pos = 128;
+    for (int cnt_3 = 0; cnt_3<3; cnt_3++)
+    {
+        signed int field_0_pos = 64;
+        pos2 = pos1 + 4;
+        for (int innerCount = 0; innerCount<3; innerCount++)
+        {
+            pItem->field_0_v = field_0_pos;
+            pItem->field_1_v = field_1_pos;
+            field_0_pos += 64;
+            pItem->field_8_rect.x2 = 16;
+            pItem->field_8_rect.y2 = 24;
+            pItem->field_14 = 16;
+            pItem->field_16 = 1;
+
+            const int field_12 = pos2 % 8 + 480;
+            pItem->field_2_clut = ((short)field_12 << 6) | (16 * (pos2 / 8 + 60) >> 4) & 0x3F;
+            pItem->field_10 = 16 * (pos2 / 8 + 60);
+            pItem->field_8_rect.x1 = ((pos1 % 3 + 1) << 6) / 4 + 960;
+            pItem->field_8_rect.y1 = 24 * (pos1 / 3 + 16);
+            pItem->field_12 = field_12;
+            pItem->field_4_pUnk = nullptr;
+
+            ++pItem;
+            ++pos1;
+            ++pos2;
+        }
+        field_1_pos += 24;
+    }
+
+    flags_dword_733CF4 = 0;
+    gBitFlags_dword_733DD0 = 0;
+
+    signed int kStart16 = 16;
+    for (int cnt_4 = 0; cnt_4<4; cnt_4++)
+    {
+        stru_733C90[cnt_4].field_0_v = 0;
+        stru_733C90[cnt_4].field_1_v = kStart16 * 24;
+        stru_733C90[cnt_4].field_2_clut = (((unsigned __int16)(cnt_4 % 8) + 480) << 6) | (16 * (cnt_4 / 8 + 60) >> 4) & 0x3F;// tpage ?
+        stru_733C90[cnt_4].field_8_rect.x1 = 960;
+        stru_733C90[cnt_4].field_8_rect.y1 = 8 * (3 * cnt_4 + 48);
+        stru_733C90[cnt_4].field_8_rect.x2 = 16;
+        stru_733C90[cnt_4].field_8_rect.y2 = 24;
+        stru_733C90[cnt_4].field_10 = 16 * (cnt_4 / 8 + 60);
+        stru_733C90[cnt_4].field_12 = cnt_4 % 8 + 480;
+        stru_733C90[cnt_4].field_14 = 16;
+        stru_733C90[cnt_4].field_16 = 1;
+        stru_733C90[cnt_4].field_4_pUnk = nullptr;
+        ++kStart16;
+    }
+}
+MGS_FUNC_IMPLEX(0x46AD91, Menu_init_fn0_46AD91, MENU_IMPL);
 
 struct Menu_Item_Unknown_Array_Item;
 
 struct MenuMan_Inventory_Unk_6764F8
 {
-    using Fn = void(CC*)(MenuMan* pMenu, DWORD* ot , DWORD xpos, DWORD ypos, Menu_Item_Unknown_Array_Item * pSub);
+    using Fn = void(CC*)(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD ypos, Menu_Item_Unknown_Array_Item * pSub);
     using Fn2 = void(CC*)(MenuMan_Inventory_Unk_6764F8* pUnk, int bBlendXPos, int* pXPos, int* pYPos);
 
     WORD field_0;
@@ -528,7 +604,7 @@ void CC Menu_46B326(MenuMan_Inventory_Unk_6764F8* pUnk, int bBlendXPos, int *pXP
 }
 MGS_FUNC_IMPLEX(0x0046B326, Menu_46B326, MENU_IMPL);
 
-MGS_ARY(1, 0x6764F8, MenuMan_Inventory_Unk_6764F8, 2, stru_6764F8, 
+MGS_ARY(1, 0x6764F8, MenuMan_Inventory_Unk_6764F8, 2, stru_6764F8,
 {
     { 16, 184, 1, 24576, 36864 ,{ Menu_46B36B, Menu_46B2E0 }, nullptr },
     { 256, 184, 2, 12288, 49152,{ Menu_46B2E0, Menu_46B326 }, nullptr }
@@ -564,7 +640,7 @@ signed int CC Menu_inventory_common_can_open_menu_46B745(MenuMan_Inventory_Menu_
     {
         return 0;
     }
-    gMenu_dword_733DD4 = pInventUnk->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8;    
+    gMenu_dword_733DD4 = pInventUnk->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8;
     return 1;
 }
 MGS_FUNC_IMPLEX(0x0046B745, Menu_inventory_common_can_open_menu_46B745, MENU_IMPL);
@@ -712,7 +788,7 @@ struct Menu_unknown_pair
 };
 MGS_ASSERT_SIZEOF(Menu_unknown_pair, 0x2);
 
-MGS_ARY(1, 0x669A93, Menu_unknown_pair, 10, gMenu_flags_word_669A93, 
+MGS_ARY(1, 0x669A93, Menu_unknown_pair, 10, gMenu_flags_word_669A93,
 {
     { 144, 67 },
     { 144, 76 },
@@ -727,7 +803,7 @@ MGS_ARY(1, 0x669A93, Menu_unknown_pair, 10, gMenu_flags_word_669A93,
 });
 
 // TODO: Index -1 appears to be used
-MGS_ARY(1, 0x669AAA, WORD, 27, gMenu_left_item_flags_word_669AAA, 
+MGS_ARY(1, 0x669AAA, WORD, 27, gMenu_left_item_flags_word_669AAA,
 {
     32768,
     32771,
@@ -844,7 +920,7 @@ void CC Menu_inventory_left_render_PAL_key_icon_46A770(MenuMan* pMenu, DWORD* ot
 {
     Menu_rpk_item* pItem = Menu_inventory_left_update_get_item_file_46B912(2 * idx + 33);
     Menu_rpk_item* itemRpk = Menu_Get_Radar_image_46B920(2 * idx + 34);
-    
+
     PSX_RECT rect = {};
     rect.x1 = 960;
     rect.y1 = 337;
@@ -885,15 +961,14 @@ MGS_FUNC_NOT_IMPL(0x46AA9B, void(), Menu_inventory_left_update_helper_46AA9B);
 
 MGS_FUNC_NOT_IMPL(0x44FD66, int __cdecl(unsigned __int8 music, unsigned __int8 pan, unsigned __int8 code), Sound_sub_44FD66);
 
-MGS_VAR(1, 0x733CF4, DWORD, flags_dword_733CF4, 0);
-MGS_VAR(1, 0x733DD0, DWORD, gBitFlags_dword_733DD0, 0);
-
 void CC Menu_inventory_clear_unk_46AFB7(MenuMan_Inventory_14h_Unk* pUnk, int size)
 {
     for (int i = 0; i < size; i++)
     {
         pUnk[i].field_8_index = -1;
-        pUnk[i].field_C_uv_clut = 0;
+        pUnk[i].field_C_u = 0;
+        pUnk[i].field_D_v = 0;
+        pUnk[i].field_E_clut = 0;
     }
     flags_dword_733CF4 = 0;
     gBitFlags_dword_733DD0 = 0;
@@ -1124,7 +1199,7 @@ int CC Menu_inventory_common_item_46B1DF(Menu_Item_Unknown* pItem, int item_idx)
     pItem->field_0_main.field_18 = -1;
 
     Menu_Item_Unknown_Array_Item* pArrayItem = &pItem->field_20_array;
-    for (int i = pItem->field_0_main.field_0_array_count -1; i >=0; i--)
+    for (int i = pItem->field_0_main.field_0_array_count - 1; i >= 0; i--)
     {
         // Set field_4_selected_idx to the index of the item that has item_idx in field_20_array
         if (pArrayItem[i].field_0_item_id_idx == item_idx)
@@ -1233,7 +1308,7 @@ signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
                     }
                 }
             }
-            
+
             if (gItem_states_word_78E82A[idx] > 0 && idx != Items::eIdCard)
             {
                 Menu_inventory_common_set_amounts_46B1A2(pArray, idx, gItem_states_word_78E82A[idx]);
@@ -1262,11 +1337,11 @@ signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
 
     Menu_inventory_common_46B294();
     Menu_inventory_clear_unk_46AFB7(g21_menu_left_inventory_unk_733AD8, 21);
-    
+
     Menu_inventory_common_item_46B1DF(
         pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc,
         pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_0_item_id_idx);
-   
+
     Sound_sub_44FD66(0, 0x3Fu, 0x15u);
     return 1;
 }
@@ -1322,7 +1397,7 @@ void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char butto
                 {
                     // Set no item to be selected
                     pArrayItem->field_0_item_id_idx = -1;
-  
+
                     // Nuke the one and only possible ketchup
                     gItem_states_word_78E82A[Items::eKetchup] = 0;
                     rationOrKetchupHealth = 64;
@@ -1380,7 +1455,7 @@ void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char butto
                         return;
                     }
 
-                // Any other kind of item does nothing when used
+                    // Any other kind of item does nothing when used
                 default:
                     return;
                 }
@@ -1461,8 +1536,8 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
                 // Cycle through items
                 Menu_inventory_common_update_helper_46B3CC(&pMenu->field_1D8_invetory_menus[0], pMenu->field_24_input);
 
-               // Use selected item
-               Menu_inventory_left_use_item_46A916(pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc, pMenu->field_24_input->field_2_button_pressed);
+                // Use selected item
+                Menu_inventory_left_use_item_46A916(pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc, pMenu->field_24_input->field_2_button_pressed);
             }
         }
 
@@ -1508,8 +1583,9 @@ void CC Menu_Set_SPRT_from_unk_46B127(SPRT* pSprt, MenuMan_Inventory_14h_Unk* pM
 {
     pSprt->x0 = x + pMenuUnk->field_9_x;
     pSprt->y0 = y + pMenuUnk->field_A_y;
-    // TODO: Actually sets: u0,v0 and clut
-    *(DWORD *)&pSprt->u0 = pMenuUnk->field_C_uv_clut;
+    pSprt->u0 = pMenuUnk->field_C_u;
+    pSprt->v0 = pMenuUnk->field_D_v;
+    pSprt->clut = pMenuUnk->field_E_clut;
     pSprt->w = pMenuUnk->field_10_w;
     pSprt->h = pMenuUnk->field_12_h;
 }
@@ -1548,7 +1624,7 @@ void CC Menu_item_render_frame_rects_46B809(MenuPrimBuffer* pPrimBuffer, __int16
 
     // Left strip
     Menu_render_rect_46B79F(pPrimBuffer, itemXPos - 4, itemYPos, 14, 20, 0);
-    
+
     // Right strip
     Menu_render_rect_46B79F(pPrimBuffer, itemXPos + 45, itemYPos + 1, 2, 19, 0);
 
@@ -1575,7 +1651,7 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
     {
         MenuMan_Inventory_14h_Unk* pInventItem = &g21_menu_left_inventory_unk_733AD8[gItemInfos_675D30[pMenuSub->field_0_item_id_idx].field_4 - 12];
         Menu_inventory_common_icon_helper_46AFE1(pInventItem);
-        
+
         if (Menu_inventory_Is_Item_Disabled_46A128(pMenuSub->field_0_item_id_idx))
         {
             Menu_item_render_no_use_text_468CB2(pMenu->field_20_prim_buffer, xpos, ypos);
@@ -1617,8 +1693,8 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
                 gItem_states_word_78E82A[Items::eItemBomb],
                 0);
         }
-        
-        if (pInventItem->field_C_uv_clut)
+
+        if (pInventItem->field_C_u && pInventItem->field_D_v && pInventItem->field_E_clut)
         {
             // Render the item icon
             SPRT* pIconSprt = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
@@ -1783,22 +1859,22 @@ MGS_ASSERT_SIZEOF(SpecialChar, 0x2);
 /*
 SpecialChar gSpecialChars_byte_6757C0[16] =
 {
-  { '.', 2 },
-  { '@', 2 },
-  { ':', 2 },
-  { '_', 4 },
-  { '!', 2 },
-  { '?', 6 },
-  { '+', 6 },
-  { '-', 6 },
-  { '/', 6 },
-  { '*', 6 },
-  { '{', 3 },
-  { '}', 3 },
-  { '\0', 0 },
-  { '\0', 0 },
-  { '\0', 0 },
-  { '\0', 0 }
+{ '.', 2 },
+{ '@', 2 },
+{ ':', 2 },
+{ '_', 4 },
+{ '!', 2 },
+{ '?', 6 },
+{ '+', 6 },
+{ '-', 6 },
+{ '/', 6 },
+{ '*', 6 },
+{ '{', 3 },
+{ '}', 3 },
+{ '\0', 0 },
+{ '\0', 0 },
+{ '\0', 0 },
+{ '\0', 0 }
 };
 */
 MGS_ARY(1, 0x6757C0, SpecialChar, 16, gSpecialChars_byte_6757C0, {}); // TODO: Populate
@@ -1829,7 +1905,7 @@ int CC Render_Text_SetGlyphPositions_4687E8(SPRT* pFirstSprt, SPRT* pLastSprt, i
             result = updated_x + xpos;
         }
 
-        while(pFirstSprt < pLastSprt)
+        while (pFirstSprt < pLastSprt)
         {
             pFirstSprt->x0 += static_cast<short>(adjustValue);
             pFirstSprt++;
@@ -1852,9 +1928,9 @@ struct CharToFontAtlasIndex
 // TODO: Can't be used.. special table works in another way ?
 const CharToFontAtlasIndex kFontCharMappings[] =
 {
-    { ':', 12 },  { '!', 14 }, { '?', 15 }, 
-    { '+', 16 },  { '-', 17 }, { '/', 18 },
-    { '*', 19 },  { '{', 20 }, { '}', 21 }
+    { ':', 12 },{ '!', 14 },{ '?', 15 },
+    { '+', 16 },{ '-', 17 },{ '/', 18 },
+    { '*', 19 },{ '{', 20 },{ '}', 21 }
 };
 
 const char kFontSpacedChars[] = ".!:iI";
@@ -1910,7 +1986,7 @@ static void RenderTextHelper(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSetti
             }
         }
 
-        short advanceXBy =  fontSettings.mCharWidth + 1;
+        short advanceXBy = fontSettings.mCharWidth + 1;
         BYTE char_u0 = 0;
         BYTE char_v0 = 0;
         bool valid = true;
@@ -2139,11 +2215,11 @@ void CC Menu_render_life_bar_468DA6(MenuPrimBuffer* pPrimBuffer, short int xpos,
 
         pPolyG4->x3 = x1;
         pPolyG4->y3 = barBottom;
-        
+
         setRGB0(pPolyG4, pBarConfig->mLeftRGB[0], pBarConfig->mLeftRGB[1], pBarConfig->mLeftRGB[2]);
 
         const int x1_m_xpos_1 = x1 - xpos;
-        
+
         pPolyG4->r1 = static_cast<BYTE>(pBarConfig->mLeftRGB[0] + x1_m_xpos_1 * (pBarConfig->mRightRGB[0] - pBarConfig->mLeftRGB[0]) / 128);
         pPolyG4->g1 = static_cast<BYTE>(pBarConfig->mLeftRGB[1] + x1_m_xpos_1 * (pBarConfig->mRightRGB[1] - pBarConfig->mLeftRGB[1]) / 128);
         pPolyG4->b1 = static_cast<BYTE>(pBarConfig->mLeftRGB[2] + x1_m_xpos_1 * (pBarConfig->mRightRGB[2] - pBarConfig->mLeftRGB[2]) / 128);
@@ -2168,7 +2244,7 @@ void CC Menu_render_life_bar_468DA6(MenuPrimBuffer* pPrimBuffer, short int xpos,
         Menu_render_rect_46B79F(pPrimBuffer, xpos, ypos, scaledBarWidth, 1, 0);
         Menu_render_rect_46B79F(pPrimBuffer, xpos, barHeight + ypos + 1, scaledBarWidth, 1, 0);
         Menu_render_rect_46B79F(pPrimBuffer, xpos + scaledBarWidth, ypos, 1, barHeight + 2, 0);
-        
+
         DR_TPAGE* drTPage = PrimAlloc<DR_TPAGE>(pPrimBuffer);
         setDrawTPage(drTPage, 1, 1, 31);
         addPrim(pPrimBuffer->mOt, drTPage);
@@ -2430,10 +2506,10 @@ void CC Menu_menu_bars_update_469215(MenuMan* pMenu, DWORD* /*ot*/)
                 Menu_menu_bars_draw_snake_life_and_O2_4693D5(pMenu->field_20_prim_buffer, pField_200);
                 return;
             }
-            
+
             pField_200->field_0_state = 0;
             pMenu->field_200_hp_bars_info.field_4_bar_y = -48;
-            
+
             if (game_state_dword_72279C.flags & 0x10000)
             {
                 game_state_dword_72279C.flags = game_state_dword_72279C.flags & 0xFFFEFFFF | 0x20000;
@@ -2466,7 +2542,7 @@ MGS_FUNC_IMPLEX(0x4691CE, Menu_init_menu_bars_4691CE, MENU_IMPL);
 
 MGS_ARY(1, 0x66C480, TMenuFn, 9, gMenuFuncs_inits_66C480,
 {
-    Menu_init_fn0_46AD91.Ptr(),
+    Menu_init_fn0_46AD91,
     Menu_init_radar_468358,
     Menu_init_codec_463746,
     Menu_init_inventory_left_469E77,
@@ -2502,7 +2578,7 @@ void CC Menu_create_helper_459991(MenuMan* pMenu)
     drEnv.isbg = 0;
     drEnv.texturePage = 31;
     SetDrawEnv_40DDE0(&pMenu->mDR_ENV_field_48[0], &drEnv);
-    
+
     Renderer_DRAWENV_Init_401888(&drEnv, 320, 0, 320, 224);
     drEnv.isbg = 0;
     drEnv.texturePage = 31;
@@ -2591,9 +2667,9 @@ void CC Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95(MenuMa
         0); // EQUIP or WEAPON/NO ITEM text
 
     Menu_render_snake_life_bar_469194(pMenu->field_20_prim_buffer, gMenu_inventory_text_header_background_733DD8.x0 - 10, 24); // HP bar
-    
+
     const short int width = static_cast<short int>(textWidth + 2);
-    for (int i=0; i<2; i++)
+    for (int i = 0; i<2; i++)
     {
         POLY_F4* pPolyFT4 = PrimAlloc<POLY_F4>(pMenu->field_20_prim_buffer); // Sloping header polygon that contains EQUIP/WEAPON text
         setPolyF4(pPolyFT4);
@@ -2664,7 +2740,7 @@ void CC Menu_render_number_as_string_468529(MenuPrimBuffer* pPrimBuffer, TextCon
             pFirstSprt = pSprt;
         }
         memcpy(pSprt, &gMenu_font1_template_sprite_7339C0, sizeof(SPRT));
-        
+
         setRGB0(pSprt,
             BYTE0(pTextConfig->gTextRGB_dword_66C4CC),
             BYTE1(pTextConfig->gTextRGB_dword_66C4CC),
@@ -2907,19 +2983,6 @@ void CC MenuTextureLoad_44DEB3()
 }
 MGS_FUNC_IMPLEX(0x44DEB3, MenuTextureLoad_44DEB3, MENU_IMPL);
 
-struct Menu_stru_0x18
-{
-    DWORD field_0;
-    MenuMan_Inventory_14h_Unk* field_4_pUnk;
-    PSX_RECT field_8_rect;
-    DWORD field_10;
-    DWORD field_14;
-};
-MGS_ASSERT_SIZEOF(Menu_stru_0x18, 0x18);
-
-MGS_ARY(1, 0x733CF8, Menu_stru_0x18, 9, gMenu_stru_733CF8, {});
-
-
 // Called for each of the 7 possible inventory slots being draw.
 // It appears to set the pal or sprite for each item.
 void CC Menu_inventory_common_set_icon_46B007(MenuMan_Inventory_14h_Unk* pUnk)
@@ -2937,7 +3000,9 @@ void CC Menu_inventory_common_set_icon_46B007(MenuMan_Inventory_14h_Unk* pUnk)
     flags_dword_733CF4 |= flagBits;
 
     pUnk->field_8_index = index;
-    pUnk->field_C_uv_clut = gMenu_stru_733CF8[index].field_0;
+    pUnk->field_C_u = gMenu_stru_733CF8[index].field_0_v;
+    pUnk->field_D_v = gMenu_stru_733CF8[index].field_1_v;
+    pUnk->field_E_clut = gMenu_stru_733CF8[index].field_2_clut;
 
     gMenu_stru_733CF8[index].field_4_pUnk = pUnk;
     gMenu_stru_733CF8[index].field_8_rect.x2 = pUnk->field_10_w / 4;
@@ -2953,19 +3018,19 @@ void CC Menu_inventory_common_set_icon_46B007(MenuMan_Inventory_14h_Unk* pUnk)
 }
 MGS_FUNC_IMPLEX(0x46B007, Menu_inventory_common_set_icon_46B007, MENU_IMPL);
 
-MGS_ARY(1, 0x733C90, Menu_stru_0x18, 4, stru_733C90, {});
-
 // Seems to render the active/selected menu item
 void CC Menu_render_unk_46B081(MenuMan_Inventory_14h_Unk *pUnk, int idx)
 {
     Menu_stru_0x18* pStru = &stru_733C90[idx];
 
     pUnk->field_8_index = 31 - idx;
-    pUnk->field_C_uv_clut = pStru->field_0;
+    pUnk->field_C_u = pStru->field_0_v;
+    pUnk->field_D_v = pStru->field_1_v;
+    pUnk->field_E_clut = pStru->field_2_clut;
 
     pStru->field_8_rect.x2 = pUnk->field_10_w / 4;
     pStru->field_8_rect.y2 = pUnk->field_12_h;
-    
+
     g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
         &pStru->field_8_rect,
         pUnk->field_4_word_ptr_pixels,
@@ -2984,7 +3049,7 @@ MGS_FUNC_IMPLEX(0x468C6B, Menu_render_unk_2_and_3_468C6B, MENU_IMPL);
 
 void CC Menu_inventory_common_icon_helper_46AFE1(MenuMan_Inventory_14h_Unk* pMenuUnk)
 {
-    if (!pMenuUnk->field_C_uv_clut)
+    if (!pMenuUnk->field_C_u && !pMenuUnk->field_D_v && !pMenuUnk->field_E_clut)
     {
         Menu_inventory_common_set_icon_46B007(pMenuUnk);
     }
@@ -3088,7 +3153,7 @@ void CC Menu_inventory_left_update_helper_46A856(MenuMan* pMenu)
     Menu_Item_Unknown* pItemUnknown = pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc;
     MenuMan_Inventory_Menu_0x14* pInvent = &pMenu->field_1D8_invetory_menus[0];
     pInvent->field_10_state = InventoryMenuState::eClosed;
-   
+
     Menu_set_sub_from_unknown_46B1BD(
         pInvent,
         &pItemUnknown->field_20_array + pItemUnknown->field_0_main.field_4_selected_idx);
@@ -3477,6 +3542,6 @@ static void UVCapture()
 void DoMenuTests()
 {
     //UVCapture();
-   // Test_Render_Text_Large_font_468AAF();
-   // Test_Render_Text_Small_font_468642();
+    // Test_Render_Text_Large_font_468AAF();
+    // Test_Render_Text_Small_font_468642();
 }
