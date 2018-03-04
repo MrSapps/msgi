@@ -52,7 +52,6 @@ MGS_VAR(1, 0x722794, DWORD, dword_722794, 0);
 
 
 MGS_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
-MGS_FUNC_NOT_IMPL(0x0044E1F9, int __cdecl(), sub_44E1F9); // Note: Not a CRT func!!
 
 MGS_FUNC_NOT_IMPL(0x00445610, DWORD CC(), GameD_Input_445610);
 MGS_FUNC_NOT_IMPL(0x00521892, int CC(), sub_521892);
@@ -76,6 +75,15 @@ MGS_FUNC_NOT_IMPL(0x0044E932, void CC(), sub_44E932);
 void CC Create_loader_44E226();
 void CC LibDG_Clean_Texture_Cache_401110();
 void CC LibGV_40A4BB();
+
+void CC Init_Menu_GV_DG_44E1F9()
+{
+    Menu_inits_459A48();
+    LibGV_40A4B1();
+    LibDG_4010A6();
+    //nullsub_3();
+}
+MGS_FUNC_IMPLEX(0x44E1F9, Init_Menu_GV_DG_44E1F9, ACTOR_GAMED_IMPL);
 
 void CC Reset_GV_DG_44E212()
 {
@@ -271,7 +279,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
                 pGameD->gamed_unk_722780 = 0;
                 pGameD->gamed_unk_722784 = 0;
                 Map_FreeHzdItems_44F38D();
-                sub_44E1F9();
+                Init_Menu_GV_DG_44E1F9();
                 sub_44E287();
                 if (!(script_cancel_non_zero_dword_7227A0 & 0x40))
                 {
@@ -513,7 +521,7 @@ void CC Init_Gamed_Create_44E12B()
     sub_44E1E0();
     Actor_PushBack_40A2AF(1, &gGameD_stru_722760.mBase, nullptr);
     Actor_Init_40A347(&gGameD_stru_722760.mBase, reinterpret_cast<TActorFunction>(GameD_update_44E381), nullptr, "C:\\mgs\\source\\Game\\gamed.c");
-    sub_44E1F9();
+    Init_Menu_GV_DG_44E1F9();
     sub_44E287();
     Reset_GV_DG_44E212();
     gStartingCdId_78E7E8 = static_cast<WORD>(gCdId_78D7B0 + 1);

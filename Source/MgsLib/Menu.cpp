@@ -265,7 +265,7 @@ MGS_FUNC_NOT_IMPL(0x465A01, void* __cdecl(int), Menu_scale_465A01); // TODO
 
 
 
-MGS_VAR(1, 0x733950, DWORD, gFn_radar_dword_733950, 0);
+MGS_VAR(1, 0x733950, void*, gFn_radar_dword_733950, 0);
 
 
 MGS_FUNC_NOT_IMPL(0x468264, void __cdecl(MenuMan *pMenu, int buffer), Menu_radar_helper_468264);
@@ -3210,6 +3210,35 @@ int CC Script_tbl_menu_sub_4521A7(BYTE* pScript)
     return 0;
 }
 MGS_FUNC_IMPLEX(0x4521A7, Script_tbl_menu_sub_4521A7, MENU_IMPL);
+
+void CC Res_countdwn_loader_set_radar_fn_465A87(void* pFn)
+{
+    gFn_radar_dword_733950 = pFn; // TODO: Type
+}
+MGS_FUNC_IMPLEX(0x465A87, Res_countdwn_loader_set_radar_fn_465A87, MENU_IMPL);
+
+void sub_462EA6(void)
+{
+    sub_462E8D();
+}
+MGS_FUNC_IMPLEX(0x462EA6, sub_462EA6, MENU_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x465967, void(), Radio_unknown_465967);
+
+void CC Menu_inits_459A48()
+{
+    Radio_unknown_465967();
+    sub_462EA6();
+    Menu_scale_465A01(4096);
+    Res_countdwn_loader_set_radar_fn_465A87(nullptr);
+    gMenuMan_stru_725FC0.field_1D5 = 0;
+    gMenuMan_stru_725FC0.field_1D6 = 0;
+    gMenuMan_stru_725FC0.field_2B = 0;
+    gMenuMan_stru_725FC0.field_1D8_invetory_menus[0].field_12 = 0;
+    gMenuMan_stru_725FC0.field_1D8_invetory_menus[1].field_12 = 0;
+    Menu_init_menu_bars_4691CE(&gMenuMan_stru_725FC0);
+}
+MGS_FUNC_IMPLEX(0x459A48, Menu_inits_459A48, MENU_IMPL);
 
 static void Test_Render_Text_Large_font_468AAF()
 {

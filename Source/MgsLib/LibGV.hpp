@@ -75,6 +75,7 @@ void CC LibGV_Restore_File_Cache_Records_From_Resident_Memory_40A72A();
 void CC LibGV_Reset_System2_Memory_40B35E();
 void CC LibGV_Init_FileCache_40A6AC();
 void* CC LibGV_FindFile_40A603(int hash);
+void CC LibGV_40A4B1();
 
 template<class T>
 T CC LibGV_FindFile_40A603_T(int hash)

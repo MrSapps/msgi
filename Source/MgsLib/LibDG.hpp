@@ -188,3 +188,4 @@ signed int CC LibDG_SearchForTextureRecord_4024D2(signed int hashCode, Texture_R
 void CC LibDG_SetRGB_401931(BYTE r, BYTE b, BYTE g);
 Prim_unknown_0x54* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C);
 Texture_Record* CC LibDG_FindTexture_4024A0(WORD hashCode);
+void CC LibDG_4010A6();
