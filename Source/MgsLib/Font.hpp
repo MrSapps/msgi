@@ -13,10 +13,9 @@ struct Font
     BYTE field_5;
     BYTE field_6_flags;
     BYTE field_7_x;
-    PSX_RECT field_8_rect;
-    WORD field_10;
-    WORD field_12;
-    void* field_14_pallocP32;
+    DWORD field_8;
+    PSX_RECT field_C_rect;
+    BYTE* field_14_pallocP32;
     WORD field_18_wh;
     WORD field_1A;
     WORD field_1C_wh;
@@ -25,7 +24,7 @@ struct Font
     WORD field_22_vramy;
     WORD field_24_bitDepth;
     WORD field_26;
-    void* field_28_ptr_sys_allocated;
+    WORD* field_28_ptr_sys_allocated; // Palt
 };
 MGS_ASSERT_SIZEOF(Font, 0x2C);
 
@@ -33,9 +32,11 @@ EXTERN_MGS_FUNC_NOT_IMPL(0x45A70D, int __cdecl(Font *ptr, PSX_RECT *pRect, __int
 EXTERN_MGS_FUNC_NOT_IMPL(0x45A796, int __cdecl (Font *pFont, int a2, int a3, int a4, int a5, int a6, int a7), Font_45A796);
 EXTERN_MGS_FUNC_NOT_IMPL(0x45AA45, int __cdecl (Font *pFont), Font_CalcSize_45AA45);
 EXTERN_MGS_FUNC_NOT_IMPL(0x45A89F, void __cdecl(Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
-EXTERN_MGS_FUNC_NOT_IMPL(0x45C76C, void __cdecl(Font *pFont), Font_render_45C76C);
 
+MGS_VAR_EXTERN(DWORD, gUseTrueType_dword_6FC7AC);
+
+void CC Font_render_45C76C(Font* pFont);
 void CC Font_Set_global_alloc_ptr_45C7F2(Font* pFont);
-void CC Font_Set_Buffer_45AAE9(Font* pFont, void* pAllocated);
+void CC Font_Set_Buffer_45AAE9(Font* pFont, WORD* pAllocated);
 void CC Font_set_text_45C80A(Font *pFont, const char* pText);
 void* CC Font_Get_Ptr_45AB0B(Font* pFont);

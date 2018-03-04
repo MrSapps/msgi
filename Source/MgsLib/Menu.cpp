@@ -705,7 +705,6 @@ void CC Menu_inventory_common_update_helper_46B6EF(MenuMan* pMenu, DWORD* ot, Me
 }
 MGS_FUNC_IMPLEX(0x0046B6EF, Menu_inventory_common_update_helper_46B6EF, MENU_IMPL);
 
-MGS_VAR(1, 0x6FC7AC, DWORD, gUseTrueType_dword_6FC7AC, 0);
 MGS_VAR(1, 0x733DF0, Font, gMenuFont_733DF0, {});
 
 void CC Menu_inventory_common_draw_text_46BA69(const char* pItemInfoStr)
@@ -2648,7 +2647,7 @@ signed int CC Menu_inventory_common_update_helper_46B979(int idx)
     {
         return 0;
     }
-    Font_Set_Buffer_45AAE9(&gMenuFont_733DF0, pAllocated);
+    Font_Set_Buffer_45AAE9(&gMenuFont_733DF0, (WORD*)pAllocated);
     Font_ColourRelated_45A89F(&gMenuFont_733DF0, 0, 0x6739, 0);
     Font_Set_global_alloc_ptr_45C7F2(&gMenuFont_733DF0);
     return 1;
