@@ -1852,32 +1852,36 @@ struct SpecialChar
 };
 MGS_ASSERT_SIZEOF(SpecialChar, 0x2);
 
-/*
-0x006757C0  2e 02 40 02 3a 02 5f 04 21 02 3f 06 2b 06 2d 06 2f 06 2a 06  ..@.:._.!.?.+.-./.*.
-0x006757D4  7b 03 7d 03 00 00 00 00 00 00 00 00 c0 03 f2 01 36 00 0c 00  {.}.........À.ò.6...
-*/
-/*
-SpecialChar gSpecialChars_byte_6757C0[16] =
+struct SpecialChar_Array
 {
-{ '.', 2 },
-{ '@', 2 },
-{ ':', 2 },
-{ '_', 4 },
-{ '!', 2 },
-{ '?', 6 },
-{ '+', 6 },
-{ '-', 6 },
-{ '/', 6 },
-{ '*', 6 },
-{ '{', 3 },
-{ '}', 3 },
-{ '\0', 0 },
-{ '\0', 0 },
-{ '\0', 0 },
-{ '\0', 0 }
+    SpecialChar mChars[16];
 };
-*/
-MGS_ARY(1, 0x6757C0, SpecialChar, 16, gSpecialChars_byte_6757C0, {}); // TODO: Populate
+
+const SpecialChar_Array kSpecialCharData =
+{
+     '.', 2,
+     '@', 2,
+     ':', 2,
+     '_', 4,
+     '!', 2,
+     '?', 6,
+     '+', 6,
+     '-', 6,
+     '/', 6,
+     '*', 6,
+     '{', 3,
+     '}', 3,
+     '\0', 0,
+     '\0', 0,
+     '\0', 0,
+     '\0', 0
+};
+
+MGS_VAR(1, 0x6757C0,  SpecialChar_Array, gSpecialChars_byte_6757C0,
+{
+    kSpecialCharData
+});
+
 
 int CC Render_Text_SetGlyphPositions_4687E8(SPRT* pFirstSprt, SPRT* pLastSprt, int updated_x, int xpos, DWORD flags)
 {
@@ -2039,7 +2043,7 @@ static void RenderTextHelper(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSetti
                     bool found = false;
                     for (int i = 0; i < 16; i++)
                     {
-                        if (gSpecialChars_byte_6757C0[i].field_0_char == curChar)
+                        if (gSpecialChars_byte_6757C0.mChars[i].field_0_char == curChar)
                         {
                             found = true;
 
@@ -2052,7 +2056,7 @@ static void RenderTextHelper(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSetti
                             //char_u0 = fontSettings.mCharWidth * (curChar - '0');
                             char_v0 = fontSettings.m0to9V;
 
-                            advanceXBy = gSpecialChars_byte_6757C0[i].field_1_width;
+                            advanceXBy = gSpecialChars_byte_6757C0.mChars[i].field_1_width;
                             if (advanceXBy < 3)
                             {
                                 ++xpos;
