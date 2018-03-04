@@ -3448,9 +3448,23 @@ MGS_FUNC_IMPLEX(0x0046A4C1, Menu_inventory_left_update_helper_46A4C1, MENU_IMPL)
 
 void CC Menu_46B6AD()
 {
-    // TODO
+    const int match = flags_dword_733CF4 & ~gBitFlags_dword_733DD0;
+    int bits = 1;
+    for (int i=0; i<9; i++)
+    {
+        if (match & bits)
+        {
+            gMenu_stru_733CF8[i].field_4_pUnk->field_C_u = 0;
+            gMenu_stru_733CF8[i].field_4_pUnk->field_D_v = 0;;
+            gMenu_stru_733CF8[i].field_4_pUnk->field_E_clut = 0;
+            gMenu_stru_733CF8[i].field_4_pUnk->field_8_index = -1;
+            gMenu_stru_733CF8[i].field_4_pUnk = nullptr;
+            flags_dword_733CF4 &= ~bits;
+        }
+        bits *= 2;
+    }
 }
-MGS_FUNC_IMPLEX(0x0046B6AD, Menu_46B6AD, false);
+MGS_FUNC_IMPLEX(0x0046B6AD, Menu_46B6AD, MENU_IMPL);
 
 void CC Menu_inventory_common_update_helper_46B56C(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Menu_0x14* pUnk)
 {
@@ -3539,7 +3553,7 @@ void CC Menu_inventory_common_update_helper_46B56C(MenuMan* pMenu, DWORD* ot, Me
 
     Menu_46B6AD();
 }
-MGS_FUNC_IMPLEX(0x0046B56C, Menu_inventory_common_update_helper_46B56C, true);
+MGS_FUNC_IMPLEX(0x0046B56C, Menu_inventory_common_update_helper_46B56C, MENU_IMPL);
 
 static void Test_Render_Text_Large_font_468AAF()
 {
