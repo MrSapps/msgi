@@ -49,3 +49,4 @@ signed int CC Menu_inventory_common_update_helper_46B979(int idx);
 void CC Menu_render_unk_46B081(MenuMan_Inventory_14h_Unk *pUnk, int idx);
 signed int CC Menu_46B540(Menu_Item_Unknown* pItem);
 void CC Menu_inits_459A48();
+void CC Menu_inventory_left_update_helper_46A4C1(MenuMan* pMenu, DWORD* pPrimBuffer);

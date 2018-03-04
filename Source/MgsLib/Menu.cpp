@@ -1475,8 +1475,6 @@ void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char butto
 }
 MGS_FUNC_IMPLEX(0x0046A916, Menu_inventory_left_use_item_46A916, MENU_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan*, DWORD*), Menu_inventory_left_update_helper_46A4C1);
-
 void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
 {
     const int field_2a_state = pMenu->field_2A_state;
@@ -1694,7 +1692,7 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
                 0);
         }
 
-        if (pInventItem->field_C_u /*&& pInventItem->field_D_v && pInventItem->field_E_clut*/) // TODO: Check correctness
+        if (pInventItem->field_C_u && pInventItem->field_D_v && pInventItem->field_E_clut) // TODO: Check correctness
         {
             // Render the item icon
             SPRT* pIconSprt = PrimAlloc<SPRT>(pMenu->field_20_prim_buffer);
@@ -3328,6 +3326,129 @@ void CC Menu_inits_459A48()
     Menu_init_menu_bars_4691CE(&gMenuMan_stru_725FC0);
 }
 MGS_FUNC_IMPLEX(0x459A48, Menu_inits_459A48, MENU_IMPL);
+
+void CC Menu_inventory_left_update_helper_46A4C1(MenuMan* pMenu, DWORD* pPrimBuffer)
+{
+    if (pMenu->field_1D8_invetory_menus[0].field_10_state)
+    {
+        if (pMenu->field_1D8_invetory_menus[0].field_10_state != InventoryMenuState::eUnknown_1)
+        {
+            if (pMenu->field_1D8_invetory_menus[0].field_10_state != InventoryMenuState::eOpening)
+            {
+                if (pMenu->field_1D8_invetory_menus[0].field_10_state != InventoryMenuState::eClosing)
+                {
+                    return;
+                }
+                if (Menu_inventory_common_46B2C2())
+                {
+                    pMenu->field_2A_state = 0;
+                    gActorPauseFlags_dword_791A0C &= 0xFFFFFFFB;
+                    Menu_inventory_left_update_helper_46A856(pMenu);
+                    return;
+                }
+                Menu_inventory_common_update_helper_46B56C(pMenu, pPrimBuffer, pMenu->field_1D8_invetory_menus);
+                return;
+            }
+            if (Menu_inventory_common_update_helper_46B2A2())
+            {
+                pMenu->field_1D8_invetory_menus[0].field_10_state = 1;
+            }
+            gShowInfoDelay_dword_733C7C = 0;
+        }
+        
+        const Menu_Item_Unknown_Array_Item* pArrayItem = &pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc->field_20_array
+            + pMenu->field_1D8_invetory_menus[0].field_C_pItem_sys_alloc->field_0_main.field_4_selected_idx;
+
+        if (game_state_dword_72279C.flags & 0x1000)
+        {
+            gInfoShowing_dword_733C80 = 0;
+            gShowInfoDelay_dword_733C7C = 0;
+        }
+        if (pArrayItem->field_4 || pArrayItem->field_0_item_id_idx < 0)
+        {
+            gInfoShowing_dword_733C80 = 0;
+            gShowInfoDelay_dword_733C7C = 0;
+        }
+        else
+        {
+            if (++gShowInfoDelay_dword_733C7C == 4)
+            {
+                Menu_inventory_left_update_ShowItemInfo_46A718(pArrayItem->field_0_item_id_idx);
+                gInfoShowing_dword_733C80 = 1;
+            }
+
+            if (gInfoShowing_dword_733C80)
+            {
+                if (pArrayItem->field_0_item_id_idx == Items::ePalKey)
+                {
+                    Menu_inventory_left_render_PAL_key_icon_46A770(
+                        pMenu,
+                        pPrimBuffer,
+                        gMenu_PAL_card_icon_idx_word_78E862);
+                }
+                Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95(pMenu, pPrimBuffer, "EQUIP");
+            }
+        }
+        Menu_inventory_common_update_helper_46B56C(pMenu, pPrimBuffer, pMenu->field_1D8_invetory_menus);
+        return;
+    }
+
+    const unsigned __int16 field_12 = pMenu->field_1D8_invetory_menus[0].field_12;
+    if (field_12 <= 0u)
+    {
+        if (Menu_inventory_Is_Item_Disabled_46A128(gMenu_Selected_item_idx_word_78E7FE))
+        {
+            gMenuLeft_733AD0 = gMenu_Selected_item_idx_word_78E7FE;
+            gMenu_Selected_item_idx_word_78E7FE = -1;
+            pMenu->field_1D8_invetory_menus[0].field_12 = 19;
+        }
+        else
+        {
+            const int item_idx = pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_0_item_id_idx;
+            signed int bUnknown = 0;
+            if (item_idx != gMenu_Selected_item_idx_word_78E7FE)
+            {
+                bUnknown = 1;
+                if (item_idx != -1 && item_idx != 17)
+                {
+                    gMenuLeft_733AD0 = item_idx;
+                }
+                pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_0_item_id_idx = gMenu_Selected_item_idx_word_78E7FE;
+            }
+            if (gMenu_Selected_item_idx_word_78E7FE >= 0)
+            {
+                if (bUnknown)
+                {
+                    Menu_render_unk_46B081(&g21_menu_left_inventory_unk_733AD8[gItemInfos_675D30[gMenu_Selected_item_idx_word_78E7FE].field_4 - 12], 0);
+                    pMenu->field_1D8_invetory_menus[0].field_11_item_idx = gMenu_Selected_item_idx_word_78E7FE;
+                }
+                pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_2_current_amount = gItem_states_word_78E82A[gMenu_Selected_item_idx_word_78E7FE];
+                Menu_inventory_common_update_helper_46B6EF(pMenu, pPrimBuffer, pMenu->field_1D8_invetory_menus);
+            }
+        }
+    }
+    else
+    {
+        pMenu->field_1D8_invetory_menus[0].field_12 = field_12 - 1;
+        const int field_12_mod_4 = field_12 % 4;
+        if (field_12_mod_4 > 1)
+        {
+            Menu_inventory_common_update_helper_46B6EF(pMenu, pPrimBuffer, pMenu->field_1D8_invetory_menus);
+            if (field_12_mod_4 == 3)
+            {
+                const int item_idx = pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_0_item_id_idx;
+                if (item_idx != gMenu_Selected_item_idx_word_78E7FE
+                    && Menu_inventory_Is_Item_Disabled_46A128(item_idx)
+                    && !counter_dword_6BED20)
+                {
+                    Sound_sub_44FD66(0, 0x3Fu, 0x36u);
+                }
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x0046A4C1, Menu_inventory_left_update_helper_46A4C1, MENU_IMPL);
+
 
 static void Test_Render_Text_Large_font_468AAF()
 {
