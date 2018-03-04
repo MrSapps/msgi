@@ -2292,8 +2292,11 @@ signed int CC Menu_menu_bars_update_field200_46938A(MenuMan_MenuBars* pMenuBarsU
 }
 MGS_FUNC_IMPLEX(0x46938A, Menu_menu_bars_update_field200_46938A, MENU_IMPL);
 
-MGS_VAR(1, 0x6757F0, BarConfig, gSnakeLifeBarConfig_6757F0, {}); // TODO: Populate
-MGS_VAR(1, 0x675800, BarConfig, gSnakeO2BarConfig_675800, {}); // TODO: Populate
+const BarConfig kLifeConfig = { "LIFE",{ 0x10, 0x8F, 0x7F },{ 0x1F, 0xDF, 0x3F } , 0 };
+const BarConfig kO2Config = { "O2",{ 0x1F, 0x3F, 0xC0 },{ 0x1F, 0x7F, 0xFF }, 1 };
+
+MGS_VAR(0, 0x6757F0, BarConfig, gSnakeLifeBarConfig_6757F0, kLifeConfig);
+MGS_VAR(1, 0x675800, BarConfig, gSnakeO2BarConfig_675800, kO2Config);
 MGS_VAR(1, 0x7339D4, int, gSnakeLifeYPos_7339D4, 0);
 
 template<class T>
