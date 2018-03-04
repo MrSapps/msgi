@@ -2609,14 +2609,21 @@ MGS_FUNC_IMPLEX(0x00459B51, TextSetDefaults_459B51, MENU_IMPL);
 MGS_VAR(1, 0x733DD8, SPRT, gMenu_inventory_text_header_background_733DD8, {});
 
 
-MGS_VAR(1, 0x676530, PSX_RECT, sMenu_rect_676530, {}); // TODO: Populate
+const PSX_RECT sMenu_rect{ 960, 256, 50, 80 };
+MGS_VAR(1, 0x676530, PSX_RECT, sMenu_rect_676530, { sMenu_rect });
 
 struct uv_pair
 {
     __int16 u;
     __int16 v;
 };
-MGS_ARY(1, 0x676538, uv_pair, 2, stru_676538, {}); // TODO: Populate
+
+struct uv_pair_array
+{
+    uv_pair uvs[2];
+};
+uv_pair_array kStru_676538 = {  86, 72 , 44, 72  };
+MGS_VAR(1, 0x676538, uv_pair_array, stru_676538, { kStru_676538 });
 
 signed int CC Menu_inventory_common_update_helper_46B979(int idx)
 {
@@ -2632,8 +2639,8 @@ signed int CC Menu_inventory_common_update_helper_46B979(int idx)
     gMenu_inventory_text_header_background_733DD8.w = 200;
     gMenu_inventory_text_header_background_733DD8.h = 80;
 
-    const __int16 x0 = stru_676538[idx].u; // TODO: Actually POINT's?
-    const __int16 y0 = stru_676538[idx].v;
+    const __int16 x0 = stru_676538.uvs[idx].u; // TODO: Actually POINT's?
+    const __int16 y0 = stru_676538.uvs[idx].v;
     gMenu_inventory_text_header_background_733DD8.x0 = x0;
     gMenu_inventory_text_header_background_733DD8.y0 = y0;
 
