@@ -819,8 +819,17 @@ void CC Menu_inventory_left_render_PAL_key_icon_46A770(MenuMan* pMenu, DWORD* ot
 }
 MGS_FUNC_IMPLEX(0x0046A770, Menu_inventory_left_render_PAL_key_icon_46A770, MENU_IMPL);
 
+// TODO
 MGS_FUNC_NOT_IMPL(0x46A4C1, void __cdecl(MenuMan *pMenu, DWORD* pPrimBuffer), Menu_inventory_left_update_helper_46A4C1);
+
+// TODO
 MGS_FUNC_NOT_IMPL(0x46AA9B, void(), Menu_inventory_left_update_helper_46AA9B);
+
+// TODO
+// Menu_inventory_common_update_helper_46B56C
+// Menu_inventory_left_update_helper_46A856
+// void __cdecl Menu_46B6AD()
+
 MGS_FUNC_NOT_IMPL(0x44FD66, int __cdecl(unsigned __int8 music, unsigned __int8 pan, unsigned __int8 code), Sound_sub_44FD66);
 
 MGS_VAR(1, 0x733CF4, DWORD, flags_dword_733CF4, 0);
