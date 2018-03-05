@@ -2124,11 +2124,132 @@ void CC Render_Text_Large_font_468AAF(MenuPrimBuffer* pPrimBuffer, TextConfig* p
 }
 MGS_FUNC_IMPLEX(0x468AAF, Render_Text_Large_font_468AAF, true);
 
-void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pString)
+void CC Render_Text_Small_font_468642(MenuPrimBuffer* pPrimBuffer, TextConfig* pTextSettings, const char* pText)
 {
-    RenderTextHelper(pPrimBuffer, pTextSettings, pString, kFontSettings[1], gMenu_sprt2_733960);
+    char specialChar;
+    char specialUPos;
+    SpecialChar *pSpecialIter;
+    __int16 ypos;
+    int v12;
+    int rgb;
+    char texture_v0;
+    signed int xpos;
+    signed int charWidth;
+
+    SPRT* pFirstSprt = nullptr;
+    xpos = 0;
+    rgb = pTextSettings->gTextRGB_dword_66C4CC;
+    while (*pText)
+    {
+        bool handledNewLine = false;
+        while (*pText == '\n')
+        {
+            Render_Text_SetGlyphPositions_4687E8(
+                pFirstSprt,
+                (SPRT *)pPrimBuffer->mFreeLocation,
+                pTextSettings->gTextX_dword_66C4C0,
+                xpos,
+                pTextSettings->gTextFlags_dword_66C4C8);
+            xpos = 0;
+            pTextSettings->gTextY_dword_66C4C4 += 8;
+            pFirstSprt = (SPRT *)pPrimBuffer->mFreeLocation;
+            handledNewLine = true;
+            pText++;
+        }
+
+        if (handledNewLine)
+        {
+            continue;
+        }
+
+        int texture_u0 = 0;
+        signed int curChar = *pText;
+        curChar = curChar | ' ';
+        if (curChar >= '0' && curChar <= '9')
+        {
+            // Handle number
+            texture_v0 = 232;
+            texture_u0 = 2 * (3 * curChar + 112);
+        }
+        else
+        {
+            // Handle not a number and not a-z
+            if (curChar < 'a' || curChar > 'z')
+            {
+                if (curChar == ' ')
+                {
+                    xpos += 4;
+                }
+                else if (curChar == '#')
+                {
+                    xpos += 6;
+                }
+                else
+                {
+                    specialChar = gSpecialChars_byte_6757C0.mChars[0].field_0_char;
+                    specialUPos = 0;
+                    pSpecialIter = gSpecialChars_byte_6757C0.mChars;
+                    while (specialChar)
+                    {
+                        if (specialChar == curChar)
+                        {
+                            texture_u0 = specialUPos + 60;
+                            texture_v0 = 232;
+                            charWidth = pSpecialIter->field_1_width;
+                            if (charWidth < 3)
+                            {
+                                ++xpos;
+                                ++charWidth;
+                            }
+                            goto add_sprite;
+                        }
+                        ++pSpecialIter;
+                        specialUPos += 6;
+                        specialChar = pSpecialIter->field_0_char;
+                    }
+                }
+                ++pText;
+                continue; // ignore unknown char
+            }
+            texture_v0 = 237;
+            texture_u0 = 2 * (3 * curChar - 291);
+            if (curChar == 'i')
+            {
+                ++xpos;
+                charWidth = 3;
+                goto add_sprite;
+            }
+        }
+        charWidth = 6;
+
+    add_sprite:
+        SPRT* pSprt = PrimAlloc<SPRT>(pPrimBuffer);
+        if (!pFirstSprt)
+        {
+            pFirstSprt = pSprt;
+        }
+        memcpy(pSprt, &gMenu_sprt2_733960, sizeof(SPRT));
+        *(DWORD *)&pSprt->r0 = rgb;
+        pSprt->x0 = xpos;
+        ypos = pTextSettings->gTextY_dword_66C4C4;
+        pSprt->u0 = texture_u0;
+        pSprt->y0 = ypos;
+        pSprt->v0 = texture_v0;
+
+        addPrim(pPrimBuffer->mOt, pSprt);
+        xpos += charWidth;
+
+        ++pText;
+    }
+
+    pTextSettings->gTextX_dword_66C4C0 = Render_Text_SetGlyphPositions_4687E8(
+        pFirstSprt,
+        (SPRT *)pPrimBuffer->mFreeLocation,
+        pTextSettings->gTextX_dword_66C4C0,
+        xpos,
+        pTextSettings->gTextFlags_dword_66C4C8);
 }
-MGS_FUNC_IMPLEX(0x468642, Render_Text_Small_font_468642, false); // TODO: Bugged
+MGS_FUNC_IMPLEX(0x468642, Render_Text_Small_font_468642, MENU_IMPL); // TODO: Refactor
 
 void CC Menu_DrawText_459B63(const char* pFormatStr, int formatArg1, int formatArg2, int formatArg3, int formatArg4)
 {
@@ -3074,14 +3195,14 @@ MGS_FUNC_IMPLEX(0x46AFE1, Menu_inventory_common_icon_helper_46AFE1, MENU_IMPL);
 
 void CC TextSetRGB_459B27(int r, int g, int b)
 {
-    int bEdited = b;
+    DWORD bEdited = b;
     if (gTextConfig_66C4C0.gTextFlags_dword_66C4C8 & 0x20)
     {
-        bEdited |= 0x66u;
+        bEdited |= 0x6600u;
     }
     else
     {
-        bEdited |= 0x64u;
+        bEdited |= 0x6400u;
     }
     gTextConfig_66C4C0.gTextRGB_dword_66C4CC = r | ((g | (bEdited << 8)) << 8);
 }

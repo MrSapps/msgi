@@ -25,9 +25,17 @@ void SetDepth(POLY_F4* p, u16 depth)
 
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
-    TextSetXYFlags_459B0B(181, 47, 0x10);
-    TextSetRGB_459B27(255, 255, 255);
+    TextSetXYFlags_459B0B(40, 80, 0);
+    TextSetRGB_459B27(0x80, 0x80, 0x80);
     Menu_DrawText_459B63 ("A textual test");
+
+    TextSetXYFlags_459B0B(20, 120, 0);
+    TextSetRGB_459B27(255, 0, 255);
+    Menu_DrawText_459B63("A textual test");
+
+    TextSetXYFlags_459B0B(100, 140, 0x10);
+    TextSetRGB_459B27(255, 255, 0);
+    Menu_DrawText_459B63("A textual test");
 
     POLY_F4 * pDst = (POLY_F4  *)pDebug->mPrimData->field_40_pDataStart[gActiveBuffer_dword_791A08];
 
