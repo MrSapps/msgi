@@ -290,7 +290,7 @@ private:
         if (err != NO_ERROR)
         {
             std::stringstream ss;
-            ss << "DetourAttach failed with " << err << " for " << std::hex << " 0x" << funcToHook;
+            ss << "DetourAttach failed with " << err << " for " << std::hex << " 0x" << funcToHook << " to 0x" << std::hex << replacement;
             MGS_FATAL(ss.str().c_str());
         }
     }

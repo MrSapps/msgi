@@ -736,6 +736,7 @@ MGS_FUNC_IMPLEX(0x445630, Psx_gte_rtps_445630, IMPL_PSX);
 void CC Psx_gte_rtpt_445990()
 {
     // TODO
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x445990, Psx_gte_rtpt_445990, false); // FIX ME
 
@@ -839,18 +840,21 @@ MGS_FUNC_IMPLEX(0x445F20, Psx_gte_nccs_445F20, IMPL_PSX);
 void CC Psx_gte_dpcs_446530()
 {
     // TODO
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR
 }
 MGS_FUNC_IMPLEX(0x446530, Psx_gte_dpcs_446530, false); // FIX ME
 
 void CC Psx_gte_ncs_446930()
 {
     // TODO
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR
 }
 MGS_FUNC_IMPLEX(0x446930, Psx_gte_ncs_446930, false); // FIX ME
 
 void CC Psx_gte_446E10()
 {
     // TODO
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR
 }
 MGS_FUNC_IMPLEX(0x446E10, Psx_gte_446E10, false); // FIX ME
 
@@ -1018,6 +1022,7 @@ MGS_FUNC_IMPLEX(0x4478C0, Psx_gte_RT1TR_rtv0tr_4478C0, IMPL_PSX);
 void CC Psx_gte_nct_449B30()
 {
      // TODO
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR
 }
 MGS_FUNC_IMPLEX(0x449B30, Psx_gte_nct_449B30, false); // FIX ME
 

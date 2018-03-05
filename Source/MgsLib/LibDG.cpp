@@ -1049,6 +1049,8 @@ MGS_FUNC_IMPLEX(0x407122, LibGV_407122, false); // TODO: Implement me
 
 void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+
     /*
     DWORD* dword_991E40_1_ot_ptr = (DWORD*)gMatrix_dword_991E40[1];
     const int dword_991E40_2_field_2E_w_or_h = gMatrix_dword_991E40[2];
@@ -1085,6 +1087,7 @@ MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, false); // TODO: Implement me
 
 void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     /*
     int unkByte012Ptr; // edi@3
 
