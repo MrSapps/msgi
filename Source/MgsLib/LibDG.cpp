@@ -692,7 +692,7 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x9942AB, BYTE, byte_9942AB, 0);
 
 
 
-MGS_FUNC_NOT_IMPL(0x40A857, void CC(), sub_40A857);
+MGS_FUNC_NOT_IMPL(0x40A857, void CC(), LibDG_Update2_helper_40A857);
 MGS_FUNC_NOT_IMPL(0x5200D2, signed __int64 CC(), sub_5200D2);
 
 signed __int64 CC WaitFor_445580(int totalCount)
@@ -750,7 +750,7 @@ void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
 
     Main_sub_401C02();
 
-    sub_40A857(); // Probably input related as input no longer works if not called?
+    LibDG_Update2_helper_40A857(); // Probably input related as input no longer works if not called?
 
     gpActiveButtons_995324 = gButtonsArray4_7919C0;
     if (byte_9942AB & 0x10)

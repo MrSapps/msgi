@@ -11,6 +11,8 @@
 #include "LibGV.hpp"
 #include "Map.hpp"
 #include "Menu.hpp"
+#include "WinMain.hpp"
+#include "LibDG.hpp"
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, DWORD, byte1_flags_word_9942A8, 0);
@@ -976,6 +978,26 @@ int CC Script_tbl_light_sub_451239(BYTE* /*pScript*/)
 }
 MGS_FUNC_IMPLEX(0x00451239, Script_tbl_light_sub_451239, SCRIPT_IMPL);
 
+int CC Script_tbl_pad_452132(BYTE*)
+{
+    if (Script_ParamExists('m'))
+    {
+        g_lib_gv_stru_6BFEE0.gGv_dword_6C03A0 = Script_get_int();
+        game_state_dword_72279C.flags |= 0x8000000u;
+    }
+    if (Script_ParamExists('r'))
+    {
+        game_state_dword_72279C.flags |= 0x10000000u;
+    }
+    else if (Script_ParamExists('s'))
+    {
+        game_state_dword_72279C.flags &= 0xE7FFFF7F;
+    }
+    LibDG_Update2_helper_40A857();
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x00452132, Script_tbl_pad_452132, SCRIPT_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
 MGS_FUNC_NOT_IMPL(0x00451673, int __cdecl(BYTE*), Script_tbl_hzd_related_sub_451673);
 MGS_FUNC_NOT_IMPL(0x004512E5, int __cdecl(BYTE*), script_tbl_camera_sub_4512E5);
@@ -983,7 +1005,6 @@ MGS_FUNC_NOT_IMPL(0x00451D5C, int __cdecl(BYTE*), Script_tbl_radio_sub_451D5C);
 MGS_FUNC_NOT_IMPL(0x00451F22, int __cdecl(BYTE*), Script_tbl_str_status_sub_451F22);
 MGS_FUNC_NOT_IMPL(0x00452064, int __cdecl(BYTE*), Script_tbl_demo_sub_452064);
 MGS_FUNC_NOT_IMPL(0x00451778, int __cdecl(BYTE*), Script_tbl_ntrap_451778);
-MGS_FUNC_NOT_IMPL(0x00452132, int __cdecl(BYTE*), Script_tbl_pad_452132);
 MGS_FUNC_NOT_IMPL(0x00451F89, int __cdecl(BYTE*), Script_tbl_varsave_sub_451F89);
 MGS_FUNC_NOT_IMPL(0x00451FE3, int __cdecl(BYTE*), Script_tbl_system_sub_451FE3);
 MGS_FUNC_NOT_IMPL(0x0045219B, int __cdecl(BYTE*), Script_tbl_sound_45219B);
@@ -1040,7 +1061,7 @@ MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
     { 0xA242, 0x0, Script_tbl_demo_sub_452064.Ptr() },
     { 0xDBAB, 0x0, Script_tbl_ntrap_451778.Ptr() },
     { 0x430D, 0x0, Script_tbl_Delay_sub_4519C7 },
-    { 0xCC85, 0x0, Script_tbl_pad_452132.Ptr() },
+    { 0xCC85, 0x0, Script_tbl_pad_452132 },
     { 0x5C9E, 0x0, Script_tbl_varsave_sub_451F89.Ptr() },
     { 0x4AD9, 0x0, Script_tbl_system_sub_451FE3.Ptr() },
     { 0x698D, 0x0, Script_tbl_sound_45219B.Ptr() },
