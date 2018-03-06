@@ -750,6 +750,19 @@ void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
 
     Main_sub_401C02();
 
+    /*
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0380 = 0; // Released bits
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0384 = PsxButtonBits::eCircle;
+    for (int i = 0; i < 6; i++)
+    {
+        g_lib_gv_stru_6BFEE0.gGv_dword_6C0388[i] = 2;
+    }
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C03A0 = PsxButtonBits::eCircle; // Script val from pad table?
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4 = PsxButtonBits::eCircle; // left analog stick?
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C03A8 = PsxButtonBits::eCircle;
+    */
+
+
     LibDG_Update2_helper_40A857(); // Probably input related as input no longer works if not called?
 
     gpActiveButtons_995324 = gButtonsArray4_7919C0;
@@ -761,39 +774,7 @@ void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
         }
     }
 
-    // gArray4_7919C0[0].field_2
-    // 0x8000 = left 15
-    // 0x4000 = down 14
-    // 0x2000 = right 13
-    // 0x1000 = up 12
-    // 0x800 = pause 11
-    // bit 10?
-    // bit 9?
-    // 0x100 = codec 8
-    // 0x80 = control 7
-    // 0x40 = escape 6
-    // 0x20 = space/enter 5
-    // 0x10 = first person view mode 4
-    // 0x8 = right menu toggle 3
-    // 0x4 = left menu toggle 2
-    // 0x2 = right menu 1
-    // 0x1 = left menu 0
-
-    // [2] is very near the same as [0] - prev button states?
-    // [1] never seems to get used, same for [3]?
-    /*
-    if (gButtonsArray4_7919C0[0].field_0_buttons_down
-    || gButtonsArray4_7919C0[0].field_2_button_pressed
-    || gButtonsArray4_7919C0[2].field_0_buttons_down
-    || gButtonsArray4_7919C0[2].field_2_button_pressed)
-    {
-    printf("0[0x%X][0x%X] 2[0x%X][0x%X]\n",
-    gButtonsArray4_7919C0[0].field_0_buttons_down,
-    gButtonsArray4_7919C0[0].field_2_button_pressed,
-    gButtonsArray4_7919C0[2].field_0_buttons_down,
-    gButtonsArray4_7919C0[2].field_2_button_pressed);
-    }
-    */
+ 
 }
 MGS_FUNC_IMPLEX(0x401234, LibDG_Update2_401234, LIBDG_IMPL);
 

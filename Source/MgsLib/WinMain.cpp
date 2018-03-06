@@ -397,8 +397,8 @@ MGS_VAR(1, 0x9AD8A6, BYTE, byte_9AD8A6, 0);
 MGS_VAR(1, 0x9AD8A8, BYTE, byte_9AD8A8, 0);
 MGS_VAR(1, 0x9AD8DA, BYTE, byte_9AD8DA, 0);
 MGS_VAR(1, 0x9AD8C1, BYTE, byte_9AD8C1, 0);
-MGS_VAR(1, 0x73490C, DWORD, dword_73490C, 0);
-MGS_VAR(1, 0x734908, DWORD, dword_734908, 0);
+MGS_VAR(1, 0x73490C, DWORD, gInput_MouseY_dword_73490C, 0);
+MGS_VAR(1, 0x734908, DWORD, gInput_MouseX_dword_734908, 0);
 MGS_ARY(1, 0x009AD9A0, int, 256, gKeys, {});
 MGS_ARY(1, 0x9AD880, BYTE, 256, byte_9AD880, {});
 MGS_VAR(1, 0x009AD980, DWORD, gvirtualKeyRepeatCount, 0);
@@ -562,13 +562,13 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             sub_5202FE(-0.02999999932944775f, 0.0f, 0.0f, 0.0f);
         }
 
-        v4 = (float)dword_73490C / 1024.0f;
-        v5 = (float)dword_734908 / 1024.0f;
+        v4 = (float)gInput_MouseY_dword_73490C / 1024.0f;
+        v5 = (float)gInput_MouseX_dword_734908 / 1024.0f;
 
         sub_5202FE(0.0, v5, v4, 0.0);
 
-        dword_734908 = 9 * dword_734908 / 10;
-        dword_73490C = 9 * dword_73490C / 10;
+        gInput_MouseX_dword_734908 = 9 * gInput_MouseX_dword_734908 / 10;
+        gInput_MouseY_dword_73490C = 9 * gInput_MouseY_dword_73490C / 10;
     }
 
     switch (Msg)
@@ -618,8 +618,8 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
     case WM_MOUSEMOVE:
         if (gFreeCameraCheat_77C934)
         {
-            dword_734908 = (unsigned __int16)lParam - dword_734900;
-            dword_73490C = (unsigned __int16)((unsigned int)lParam >> 16) - dword_734904;
+            gInput_MouseX_dword_734908 = (unsigned __int16)lParam - dword_734900;
+            gInput_MouseY_dword_73490C = (unsigned __int16)((unsigned int)lParam >> 16) - dword_734904;
             dword_734900 = (unsigned __int16)lParam;
             dword_734904 = (unsigned int)lParam >> 16;
         }
@@ -1437,7 +1437,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     fputs("InitAll {\n", gFile);
     fflush(gFile);
     gLogFile = gFile;
-    //Input_Start();
+    Input_Start_42D69E();
     fputs("jim_enumerate_devices()\n", gFile);
     fflush(gFile);
     v55 = jim_enumerate_devices();

@@ -2,6 +2,7 @@
 
 #include "MgsFunction.hpp"
 #include "System.hpp"
+#include "types.hpp"
 
 void CC Init_Gamed_Create_44E12B();
 
@@ -9,6 +10,26 @@ void* CC ResidentTopAllocate_40B379(int size);
 void CC Stage_LoadRelated_44EB27(WORD stageNameHashed, const char* pStageName);
 const char* CC File_StageName_44EB83();
 
+enum PsxButtonBits : u32
+{
+    eL2 = 1 << 0,
+    eR2 = 1 << 1,
+    eL1 = 1 << 2,
+    eR1 = 1 << 3,
+    eTriangle = 1 << 4,
+    eCircle = 1 << 5,
+    eCross = 1 << 6,
+    eSquare = 1 << 7,
+    eSelect = 1 << 8,
+    // As seen in LibEtc.h of PSYQ.. don't think these can ever be used.
+    // PADi 9 ?
+    // PADj 10 ?
+    eStart = 1 << 11,
+    eDPadUp = 1 << 12,
+    eDPadRight = 1 << 13,
+    eDPadDown = 1 << 14,
+    eDPadLeft = 1 << 15,
+};
 
 #pragma pack(push)
 #pragma pack(push, 1)

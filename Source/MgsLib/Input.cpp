@@ -17,13 +17,12 @@
 
 MGS_VAR(1, 0x71D664, LPDIRECTINPUT8, pDirectInput, nullptr);
 MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE8, pJoystickDevice, nullptr);
-MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICE8, pMouseDevice, nullptr);
+MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICE8, pMouseDevice_71D668, nullptr);
 MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
 MGS_ARY(1, 0x6571F4, DWORD, 14, dword_6571F4, {});// TODO: Check 14 is big enough
 
 
-char* sidewinderEtc = (char*)0x657298; // TODO: Dump array
 DWORD* dword_65726C = (DWORD*)0x65726C;
 
 struct ButtonName
@@ -46,7 +45,7 @@ MGS_VAR(1, 0x65510C, ButtonNamesArray, buttonNames, {}); // TODO: Dump array
 char* buttonList = (char*)0x654A98; // TODO: Dump array
 MGS_VAR(1, 0x71D68C, int, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
-MGS_VAR(1, 0x71D670, DWORD, dword_71D670, 0);
+MGS_VAR(1, 0x71D670, DWORD, gInput_MouseZ_dword_71D67C, 0);
 MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
 MGS_VAR(1, 0x71D798, DWORD, gJoyStickId_dword_71D798, 0);
 MGS_VAR(1, 0x71D41C, int, dword_71D41C, 0);
@@ -63,119 +62,117 @@ extern HINSTANCE& gHInstance;
 extern DWORD& gWindowedMode;
 extern HWND& gHwnd;
 extern DWORD& gActive_dword_688CDC;
-extern DWORD& dword_73490C;
-extern DWORD& dword_734908;
+extern DWORD& gInput_MouseY_dword_73490C;
+extern DWORD& gInput_MouseX_dword_734908;
 
 MGS_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
 
 MGS_ARY(1, 0x71D30C, DWORD, 65, gButtonStates_dword_71D30C, {});
 MGS_ARY(1, 0x71D204, DWORD, 55, gKeyBoardButtonStates_dword_71D204, {});
-MGS_VAR(1, 0x721E44, DWORD, dword_721E44, 0);
-MGS_VAR(1, 0x734910, DWORD, dword_734910, 0);
-MGS_VAR(1, 0x734914, DWORD, dword_734914, 0);
+MGS_VAR(1, 0x721E44, DWORD, gInput_MouseAnyButtons_dword_721E44, 0);
+MGS_VAR(1, 0x734910, DWORD, gInput_MouseLeftButton_734910, 0);
+MGS_VAR(1, 0x734914, DWORD, gInput_MouseRightButton_734914, 0);
 MGS_VAR(1, 0x71D680, DWORD, dword_71D680, 0);
 MGS_VAR(1, 0x71D688, DWORD, dword_71D688, 0);
 MGS_VAR(1, 0x71D684, DWORD, dword_71D684, 0);
-MGS_VAR(1, 0x71D418, DWORD, dword_71D418, 0);
+MGS_VAR(1, 0x71D418, DWORD, gInput_NoMouseButtons_dword_71D418, 0);
 MGS_VAR(1, 0x71D1EC, DWORD, dword_71D1EC, 0);
 MGS_VAR(1, 0x657148, DWORD, dword_657148, 0);
 
-// 0x43BD6E
-HRESULT __cdecl Input_Read_43BD6E()
+static inline DWORD GetMouseState1(LONG& state)
+{
+    return (state >= -15) ? 0 : 128;
+}
+
+static inline DWORD GetMouseState2(LONG& state)
+{
+    return (state <= 15) ? 0 : 128;
+}
+
+HRESULT CC Input_Read_43BD6E()
 {
     DIMOUSESTATE mouseState;
     HRESULT hr;
     DIJOYSTATE joystickState;
 
-    dword_721E44 = 0;
-    if (pMouseDevice)
+    gInput_MouseAnyButtons_dword_721E44 = 0;
+    if (pMouseDevice_71D668)
     {
         hr = DIERR_INPUTLOST;
         while (hr == DIERR_INPUTLOST)
         {
-            hr = pMouseDevice->GetDeviceState(16, &mouseState);
+            hr = pMouseDevice_71D668->GetDeviceState(16, &mouseState);
             if (hr == DIERR_INPUTLOST)
             {
-                hr = pMouseDevice->Acquire();
-                if (hr < 0)
+                hr = pMouseDevice_71D668->Acquire();
+                if (FAILED(hr))
+                {
                     return hr;
+                }
             }
         }
-        if (hr < 0)
+
+        if (FAILED(hr))
+        {
             return hr;
-        dword_734908 = mouseState.lX;
-        dword_73490C = mouseState.lY;
-        *(&dword_71D670 + 3) = mouseState.lZ; // TODO: Type isn't right
-        dword_734910 = (unsigned __int8)(mouseState.rgbButtons[0] & 0x80) != 0;
-        dword_734914 = (unsigned __int8)(mouseState.rgbButtons[1] & 0x80) != 0;
-        if (!(mouseState.rgbButtons[0] & 0x80) && !dword_734914)
-            dword_71D418 = 1;
-        if (dword_734910 || dword_734914 && dword_71D418)
-            dword_721E44 = 1;
+        }
+
+        gInput_MouseX_dword_734908 = mouseState.lX;
+        gInput_MouseY_dword_73490C = mouseState.lY;
+        gInput_MouseZ_dword_71D67C = mouseState.lZ;
+        gInput_MouseLeftButton_734910 = (mouseState.rgbButtons[0] & 0x80) != 0;
+        gInput_MouseRightButton_734914 = (mouseState.rgbButtons[1] & 0x80) != 0;
+
+        if (!gInput_MouseLeftButton_734910 && !gInput_MouseRightButton_734914)
+        {
+            gInput_NoMouseButtons_dword_71D418 = 1;
+        }
+
+        if (gInput_MouseLeftButton_734910 || gInput_MouseRightButton_734914 && gInput_NoMouseButtons_dword_71D418)
+        {
+            gInput_MouseAnyButtons_dword_721E44 = 1;
+        }
+
         gButtonStates_dword_71D30C[56] = mouseState.rgbButtons[0] & 0x80;
         gButtonStates_dword_71D30C[57] = mouseState.rgbButtons[1] & 0x80;
         gButtonStates_dword_71D30C[58] = mouseState.rgbButtons[2] & 0x80;
         gButtonStates_dword_71D30C[59] = mouseState.rgbButtons[3] & 0x80;
-        for (int i = 60; i <= 65; ++i)
-        {
-            switch (i)
-            {
-            case 60:
-                if (mouseState.lX >= -15)
-                    gButtonStates_dword_71D30C[i] = 0;
-                else
-                    gButtonStates_dword_71D30C[i] = 128;
-                break;
-            case 61:
-                if (mouseState.lX <= 15)
-                    gButtonStates_dword_71D30C[i] = 0;
-                else
-                    gButtonStates_dword_71D30C[i] = 128;
-                break;
-            case 62:
-                if (mouseState.lY >= -15)
-                    gButtonStates_dword_71D30C[i] = 0;
-                else
-                    gButtonStates_dword_71D30C[i] = 128;
-                break;
-            case 63:
-                if (mouseState.lY <= 15)
-                    gButtonStates_dword_71D30C[i] = 0;
-                else
-                    gButtonStates_dword_71D30C[i] = 128;
-                break;
-            case 64:
-                if (mouseState.lZ <= 15)
-                    gButtonStates_dword_71D30C[i] = 0;
-                else
-                    gButtonStates_dword_71D30C[i] = 128;
-                break;
-            case 65:
-                if (mouseState.lZ >= -15)
-                    gButtonStates_dword_71D30C[i] = 0;
-                else
-                    gButtonStates_dword_71D30C[i] = 128;
-                break;
-            }
-        }
+
+        gButtonStates_dword_71D30C[60] = GetMouseState1(mouseState.lX);
+        gButtonStates_dword_71D30C[61] = GetMouseState2(mouseState.lX);
+        gButtonStates_dword_71D30C[62] = GetMouseState1(mouseState.lY);
+        gButtonStates_dword_71D30C[63] = GetMouseState2(mouseState.lY);
+        gButtonStates_dword_71D30C[64] = GetMouseState2(mouseState.lZ);
+        gButtonStates_dword_71D30C[65] = GetMouseState1(mouseState.lZ);
+
     }
+
     if (pJoystickDevice)
     {
         do
         {
             hr = pJoystickDevice->Poll();
-            if (hr < 0)
+            if (FAILED(hr))
+            {
                 printf("$jim poll crashed\n");
+            }
+
             hr = pJoystickDevice->GetDeviceState(80, &joystickState);
             if (hr == DIERR_INPUTLOST)
             {
                 hr = pJoystickDevice->Acquire();
-                if (hr < 0)
+                if (FAILED(hr))
+                {
                     return hr;
+                }
             }
         } while (hr == DIERR_INPUTLOST);
-        if (hr < 0)
+        
+        if (FAILED(hr))
+        {
             return hr;
+        }
+
         dword_71D680 = 0;
         dword_71D684 = 0;
         for (DWORD i = 0; i < dword_657148; ++i)
@@ -250,7 +247,9 @@ HRESULT __cdecl Input_Read_43BD6E()
             {
                 gKeyBoardButtonStates_dword_71D204[i] = 128;
                 if (dword_71D688)
-                    dword_721E44 = 1;
+                {
+                    gInput_MouseAnyButtons_dword_721E44 = 1;
+                }
                 dword_71D684 = 1;
             }
             else
@@ -525,11 +524,11 @@ int __cdecl Input_Shutdown_sub_43C716()
         pJoystickDevice = 0;
     }
 
-    if (pMouseDevice)
+    if (pMouseDevice_71D668)
     {
-        pMouseDevice->Unacquire();
-        pMouseDevice->Release();
-        pMouseDevice = 0;
+        pMouseDevice_71D668->Unacquire();
+        pMouseDevice_71D668->Release();
+        pMouseDevice_71D668 = 0;
     }
 
     if (pDirectInput)
@@ -541,12 +540,80 @@ int __cdecl Input_Shutdown_sub_43C716()
 }
 MGS_FUNC_IMPLEX(0x43C716, Input_Shutdown_sub_43C716, INPUT_IMPL);
 
+struct PadRec
+{
+    char mName[64];
+};
 
-HRESULT CC Input_Init(HWND hWnd)
+struct PadTableEntry
+{
+    PadRec mEntries[5];
+};
+
+const PadTableEntry gPadTable_657298[6] =
+{
+    {
+        {
+            { "sidewinder" },
+            { "sidewinder" },
+            { "game" },
+            { "pad" },
+            { "pad" }
+        }
+    },
+    {
+        {
+            { "sidewinder" },
+            { "sidewinder" },
+            { "force" },
+            { "feedback" },
+            { "pro" }
+        }
+    },
+    {
+        {
+            { "sidewinder" },
+            { "sidewinder" },
+            { "precision" },
+            { "pro" },
+            { "pro" }
+        }
+    },
+    {
+        {
+            { "sidewinder" },
+            { "sidewinder" },
+            { "freestyle" },
+            { "freestyle" },
+            { "freestyle" }
+        }
+    },
+    {
+        {
+            { "game" },
+            { "controller" },
+            { "2 axis" },
+            { "9 button" },
+            { "joystick with pov hat" }
+        }
+    },
+    {
+        {
+            { "sidewinder" },
+            { "sidewinder" },
+            { "dual" },
+            { "strike" },
+            { "strike" }
+        }
+    }
+};
+
+
+HRESULT CC Input_Init_43B1D1(HWND hWnd)
 {
     char productName[0x80];
     char instanceName[0x80];
-    dword_71D670 = 0;
+    gInput_MouseZ_dword_71D67C = 0;
     //fputs("InitDirectInput {\n", gLogFile);
     // I'll do log prints later
 #if USE_DINPUT8
@@ -600,28 +667,26 @@ HRESULT CC Input_Init(HWND hWnd)
                         {
                             if (hGetInfosRes >= 0)
                             {
-                                // TODO: Make 0x71D690 a var
                                 strcpy(char_71D69, JoystickDeviceInfos.tszInstanceName);
 
                                 for (int i = 0; i < 6; i++)
                                 {
-                                    int var14 = 1;
+                                    int bFoundInTable = 1;
                                     strcpy(productName, JoystickDeviceInfos.tszProductName);
                                     _strlwr(productName);
+
                                     strcpy(instanceName, JoystickDeviceInfos.tszInstanceName);
                                     _strlwr(instanceName);
 
                                     for (int j = 0; j < 5; j++)
                                     {
-                                        // TODO: Figure out the size of sidewinderEtc
-                                        size_t offset = i * 0x140 + j * 0x40;
-                                        if (strstr(productName, &sidewinderEtc[offset]) == 0 && strstr(instanceName, &sidewinderEtc[offset]) == 0)
+                                        if (strstr(productName, gPadTable_657298[i].mEntries[j].mName) == 0 && strstr(instanceName, gPadTable_657298[i].mEntries[j].mName) == 0)
                                         {
-                                            var14 = 0;
+                                            bFoundInTable = 0;
                                         }
                                     }
 
-                                    if (var14 != 0)
+                                    if (bFoundInTable != 0)
                                     {
                                         if (i == 5)
                                         {
@@ -726,13 +791,13 @@ HRESULT CC Input_Init(HWND hWnd)
     }
 
     // 0x43BBEC
-    hr = pDirectInput->CreateDevice(GUID_SysMouse, &pMouseDevice, 0);
+    hr = pDirectInput->CreateDevice(GUID_SysMouse, &pMouseDevice_71D668, 0);
     if (FAILED(hr))
     {
         return hr;
     }
 
-    hr = pMouseDevice->SetDataFormat(&c_dfDIMouse);
+    hr = pMouseDevice_71D668->SetDataFormat(&c_dfDIMouse);
     if (FAILED(hr))
     {
         return hr;
@@ -740,28 +805,28 @@ HRESULT CC Input_Init(HWND hWnd)
 
     if (gWindowedMode != 0)
     {
-        hr = pMouseDevice->SetCooperativeLevel(hWnd, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
+        hr = pMouseDevice_71D668->SetCooperativeLevel(hWnd, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
     }
     else
     {
-        hr = pMouseDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
+        hr = pMouseDevice_71D668->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
     }
     if (FAILED(hr))
     {
         return hr;
     }
 
-    hr = pMouseDevice->Acquire();
+    hr = pMouseDevice_71D668->Acquire();
 
     return S_OK;
 }
-MGS_FUNC_IMPLEX(0x0043B1D1, Input_Init, INPUT_IMPL);
+MGS_FUNC_IMPLEX(0x0043B1D1, Input_Init_43B1D1, INPUT_IMPL);
 
 
 void CC Input_Start_42D69E()
 {
     dword_717348 = 0;
-    const HRESULT hr = Input_Init(gHwnd);
+    const HRESULT hr = Input_Init_43B1D1(gHwnd);
     if (FAILED(hr))
     {
         printf("$jim failed to init direct input");
@@ -771,15 +836,15 @@ MGS_FUNC_IMPLEX(0x0042D69E, Input_Start_42D69E, INPUT_IMPL);
 
 void __cdecl Input_AcquireOrUnAcquire()
 {
-    if (pMouseDevice)
+    if (pMouseDevice_71D668)
     {
         if (gActive_dword_688CDC)
         {
-            pMouseDevice->Acquire();
+            pMouseDevice_71D668->Acquire();
         }
         else
         {
-            pMouseDevice->Unacquire();
+            pMouseDevice_71D668->Unacquire();
         }
     }
     if (pJoystickDevice)
