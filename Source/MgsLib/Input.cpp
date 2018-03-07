@@ -20,35 +20,14 @@ MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE8, pJoystickDevice, nullptr);
 MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICE8, pMouseDevice_71D668, nullptr);
 MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
-MGS_ARY(1, 0x6571F4, DWORD, 14, dword_6571F4, {});// TODO: Check 14 is big enough
+MGS_ARY(1, 0x6571F4, DWORD, 14, gButtonMappings_6571F4, {});// TODO: Check 14 is big enough
 
-
-DWORD* dword_65726C = (DWORD*)0x65726C;
-
-struct ButtonName
-{
-    char mName[0x19];
-};
-
-struct ButtonNames
-{
-    ButtonName mNames[66];
-};
-
-struct ButtonNamesArray
-{
-    ButtonNames mNames[4];
-};
-
-MGS_VAR(1, 0x65510C, ButtonNamesArray, buttonNames, {}); // TODO: Dump array
-
-char* buttonList = (char*)0x654A98; // TODO: Dump array
 MGS_VAR(1, 0x71D68C, int, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
 MGS_VAR(1, 0x71D670, DWORD, gInput_MouseZ_dword_71D67C, 0);
 MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
 MGS_VAR(1, 0x71D798, DWORD, gJoyStickId_dword_71D798, 0);
-MGS_VAR(1, 0x71D41C, int, dword_71D41C, 0);
+MGS_VAR(1, 0x71D41C, int, gInputShiftButton_dword_71D41C, 0);
 MGS_ARY(1, 0x65714C, DWORD, 14, dword_65714C, {});
 MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, {});
 MGS_VAR(1, 0x71D79C, DWORD, dword_71D79C, 0);
@@ -608,6 +587,95 @@ const PadTableEntry gPadTable_657298[6] =
     }
 };
 
+struct PadNameAndShiftButton
+{
+    const char* field_0_name;
+    DWORD field_4_shift_button;
+};
+
+const PadNameAndShiftButton gPadNameAndShiftButton_657268[] =
+{
+    { "Microsoft SideWinder Game Pad Pro", 8u },
+    { "Microsoft SideWinder Force Feedback Pro", 9u },
+    { "Microsoft SideWinder Precision Pro", 9u },
+    { "Microsoft SideWinder Freestyle Gamepad", 9u },
+    { "Dual Strike USB", 8u },
+    { "Dual Strike USB", 8u }
+};
+
+struct ButtonName
+{
+    char field_0_button_name[0x19];
+};
+
+ButtonName gButtons_654A98[56] =
+{
+    { "Button 0" },
+    { "Button 1" },
+    { "Button 2" },
+    { "Button 3" },
+    { "Button 4" },
+    { "Button 5" },
+    { "Button 6" },
+    { "Button 7" },
+    { "Button 8" },
+    { "Button 9" },
+    { "Button 10" },
+    { "Button 11" },
+    { "Button 12" },
+    { "Button 13" },
+    { "Button 14" },
+    { "Button 15" },
+    { "Button 16" },
+    { "Button 17" },
+    { "Button 18" },
+    { "Button 19" },
+    { "Button 20" },
+    { "Button 21" },
+    { "Button 22" },
+    { "Button 23" },
+    { "Button 24" },
+    { "Button 25" },
+    { "Button 26" },
+    { "Button 27" },
+    { "Button 28" },
+    { "Button 29" },
+    { "Button 30" },
+    { "Button 31" },
+    { "Axis X up" },
+    { "Axis X dn" },
+    { "Axis Y up" },
+    { "Axis Y dn" },
+    { "Axis Z up" },
+    { "Axis Z dn" },
+    { "Rot X left" },
+    { "Rot X right" },
+    { "Rot Y left" },
+    { "Rot Y right" },
+    { "Rot Z left" },
+    { "Rot Z right" },
+    { "Slider 0 up" },
+    { "Slider 0 dn" },
+    { "Slider 1 up" },
+    { "Slider 1 dn" },
+    { "POV 0" },
+    { "POV 45" },
+    { "POV 90" },
+    { "POV135" },
+    { "POV 180" },
+    { "POV 225" },
+    { "POV 270" },
+    { "POV 315" }
+};
+
+struct ButtonCollection
+{
+    ButtonName field_0_buttons[56];
+    BYTE field_578_array[250];
+};
+MGS_ASSERT_SIZEOF(ButtonCollection, 0x672);
+
+MGS_ARY(1, 0x65510C, ButtonCollection, 6, gButtonTable_65510C, {}); // TODO: Rip data
 
 HRESULT CC Input_Init_43B1D1(HWND hWnd)
 {
@@ -655,12 +723,14 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
                         pJoystickDevice->EnumObjects(Input_Enum_Axis_43B0C8, hWnd, DIDFT_AXIS);
                         pJoystickDevice->EnumObjects(Input_Enum_Buttons_sub_43B0B3, hWnd, DIDFT_BUTTON);
 #if USE_DINPUT8
+                        int tryCount = 0;
                         do
 #endif
                         {
                             hr = pJoystickDevice->Acquire();
+                            tryCount++;
 #if USE_DINPUT8
-                        } while (hr == E_ACCESSDENIED);
+                        } while (hr == E_ACCESSDENIED && tryCount < 9999); // TODO: Never works in standalone exe?
 #endif
 
                         if (SUCCEEDED(hr))
@@ -694,12 +764,15 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
                                         }
 
                                         dword_71D790 = 1;
-                                        dword_71D41C = dword_65726C[i * 2];
+                                        gInputShiftButton_dword_71D41C = gPadNameAndShiftButton_657268[i].field_4_shift_button;
                                         gJoyStickId_dword_71D798 = i + 1;
 
-                                        for (int nButton = 0; nButton < 56; nButton++)
+                                        for (int j = 0; j < 56; ++j)
                                         {
-                                            strcpy(&buttonList[nButton * 0x19], buttonNames.mNames[i].mNames[nButton].mName);
+                                            if (&gButtonTable_65510C[i].field_0_buttons[j])
+                                            {
+                                                strcpy(gButtons_654A98[j].field_0_button_name, gButtonTable_65510C[i].field_0_buttons[j].field_0_button_name);
+                                            }
                                         }
                                         break;
                                     }
@@ -719,22 +792,22 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
                                 for (int i = 0; i < 14; i++)
                                 {
                                     dword_6571BC[i] = 0xFF;
-                                    dword_6571F4[i] = 0xFF;
+                                    gButtonMappings_6571F4[i] = 0xFF;
                                 }
-                                dword_6571BC[0] = dword_6571F4[0] = 0;
-                                dword_6571BC[1] = dword_6571F4[1] = 1;
-                                dword_6571BC[2] = dword_6571F4[2] = 2;
-                                dword_6571BC[3] = dword_6571F4[3] = 3;
-                                dword_6571BC[4] = dword_6571F4[4] = 6;
-                                dword_6571BC[5] = dword_6571F4[5] = 6;
-                                dword_6571BC[6] = dword_6571F4[6] = 7;
-                                dword_6571BC[7] = dword_6571F4[7] = 7;
-                                dword_6571BC[8] = dword_6571F4[8] = 4;
-                                dword_6571BC[9] = dword_6571F4[9] = 0x21;
-                                dword_6571BC[10] = dword_6571F4[10] = 0x20;
-                                dword_6571BC[11] = dword_6571F4[11] = 0x23;
-                                dword_6571BC[12] = dword_6571F4[12] = 0x22;
-                                dword_6571BC[13] = dword_6571F4[13] = 5;
+                                dword_6571BC[0] = gButtonMappings_6571F4[0] = 0;
+                                dword_6571BC[1] = gButtonMappings_6571F4[1] = 1;
+                                dword_6571BC[2] = gButtonMappings_6571F4[2] = 2;
+                                dword_6571BC[3] = gButtonMappings_6571F4[3] = 3;
+                                dword_6571BC[4] = gButtonMappings_6571F4[4] = 6;
+                                dword_6571BC[5] = gButtonMappings_6571F4[5] = 6;
+                                dword_6571BC[6] = gButtonMappings_6571F4[6] = 7;
+                                dword_6571BC[7] = gButtonMappings_6571F4[7] = 7;
+                                dword_6571BC[8] = gButtonMappings_6571F4[8] = 4;
+                                dword_6571BC[9] = gButtonMappings_6571F4[9] = 0x21;
+                                dword_6571BC[10] = gButtonMappings_6571F4[10] = 0x20;
+                                dword_6571BC[11] = gButtonMappings_6571F4[11] = 0x23;
+                                dword_6571BC[12] = gButtonMappings_6571F4[12] = 0x22;
+                                dword_6571BC[13] = gButtonMappings_6571F4[13] = 5;
                                 for (int i = 0; i < 14; i++)
                                 {
                                     dword_65714C[i] = dword_657184[i];
@@ -745,30 +818,35 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
                                 for (int i = 0; i < 14; i++)
                                 {
                                     dword_6571BC[i] = 0xFF;
-                                    dword_6571F4[i] = 0xFF;
+                                    gButtonMappings_6571F4[i] = 0xFF;
                                 }
                                 int var124 = 0;
                                 for (int i = 0; i < 14; i++)
                                 {
-                                    if (dword_71D790 != 0 && var124 == dword_71D41C)
+                                    if (dword_71D790 != 0 && var124 == gInputShiftButton_dword_71D41C)
                                     {
                                         var124++;
                                     }
+                                    
                                     if (var124 == nJoystickDeviceObjects)
+                                    {
                                         break;
+                                    }
 
                                     if (i == 9)
+                                    {
                                         i = 13;
+                                    }
 
                                     dword_6571BC[i] = var124;
-                                    dword_6571F4[i] = var124;
+                                    gButtonMappings_6571F4[i] = var124;
 
                                     var124++;
                                 }
-                                dword_6571BC[9] = dword_6571F4[9] = 0x21;
-                                dword_6571BC[10] = dword_6571F4[10] = 0x20;
-                                dword_6571BC[11] = dword_6571F4[11] = 0x23;
-                                dword_6571BC[12] = dword_6571F4[12] = 0x22;
+                                dword_6571BC[9] = gButtonMappings_6571F4[9] = 0x21;
+                                dword_6571BC[10] = gButtonMappings_6571F4[10] = 0x20;
+                                dword_6571BC[11] = gButtonMappings_6571F4[11] = 0x23;
+                                dword_6571BC[12] = gButtonMappings_6571F4[12] = 0x22;
                                 for (int i = 0; i < 14; i++)
                                 {
                                     dword_65714C[i] = 0;
@@ -786,7 +864,7 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
     {
         for (unsigned int i = 0; i < dword_6FD1DC; i++)
         {
-            dword_6571F4[i] = 0xFF;
+            gButtonMappings_6571F4[i] = 0xFF;
         }
     }
 
@@ -811,6 +889,7 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
     {
         hr = pMouseDevice_71D668->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
     }
+
     if (FAILED(hr))
     {
         return hr;
