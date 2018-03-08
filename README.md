@@ -46,3 +46,7 @@ Will cause the function in MGSI.EXE at address 0x0040A3ED to call the replacemen
 - Be crazy enough to take on a project like this.
 
 To get a feel for what is required a good first task will be to pick a simple unreversed function. Understand what it does and send in a PR to implement it.
+
+#### Any IRC/Discord etc?
+
+Discord here: https://discord.gg/tTvhQ8w
