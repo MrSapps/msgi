@@ -552,7 +552,7 @@ void CC LibDG_Clear_Resident_Texture_Cache_Copy_4026E6()
 MGS_FUNC_IMPLEX(0x4026E6, LibDG_Clear_Resident_Texture_Cache_Copy_4026E6, LIBDG_IMPL);
 
 
-MGS_FUNC_NOT_IMPL(0x4020D8, void CC(), sub_4020D8);
+MGS_FUNC_NOT_IMPL(0x4020D8, void CC(), LibDG_Init_helper_4020D8);
 MGS_FUNC_NOT_IMPL(0x40B9FF, void CC(), LibDG_40B9FF);
 
 void CC SetRGB_40195A(char r, char g, char b)
@@ -602,7 +602,7 @@ MGS_FUNC_IMPLEX(0x401ABE, LibDG_Init_OTs_ExecFnPtrs_401ABE, LIBDG_IMPL);
 
 void CC LibDG_4010A6()
 {
-    sub_4020D8();
+    LibDG_Init_helper_4020D8();
     LibDG_Init_OTs_ExecFnPtrs_401ABE();
     dword_78D32C = 0;
     jImageMove_401A31();
