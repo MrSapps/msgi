@@ -74,7 +74,90 @@ MGS_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
 MGS_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
 MGS_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
 MGS_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
-MGS_FUNC_NOT_IMPL(0x0043ACC4, int __cdecl(HDC), WmPaint_Handler);
+
+MGS_VAR(1, 0x71D1CC, HGDIOBJ, gScreenBitmap_71D1CC, nullptr);
+MGS_VAR(1, 0x71D17C, DWORD, dword_71D17C, 0);
+
+void CC jim_restore_screen_43AF41(HDC hdcDest)
+{
+    if (!gWindowedMode)
+    {
+        printf("$jim - jim_restore_screen {\n");
+        if (gScreenBitmap_71D1CC)
+        {
+            HDC hdc = CreateCompatibleDC(hdcDest);
+            if (hdc)
+            {
+                printf("$jim - storageDC is created\n");
+                if (SelectObject(hdc, gScreenBitmap_71D1CC))
+                {
+                    printf("$jim - StretchBlt\n");
+
+                    StretchBlt(hdcDest, 0, 0,
+                        g_dwDisplayWidth_6DF214, g_dwDisplayHeight,
+                        hdc, 0, 0,
+                        g_dwDisplayWidth_6DF214, g_dwDisplayHeight,
+                        SRCCOPY);
+
+                    printf("$jim - StretchBlt( %d, %d, %d, %d ) <- ( 0, 0, %d, %d )\n",
+                        0, 0, g_dwDisplayWidth_6DF214, g_dwDisplayHeight,
+                        g_dwDisplayWidth_6DF214, g_dwDisplayHeight);
+
+                    DeleteDC(hdc);
+                }
+                else
+                {
+                    printf("$jim - error selecting object storage in storageDC\n");
+                }
+            }
+            else
+            {
+                printf("$jim - storageDC is not created right\n");
+            }
+        }
+        else
+        {
+            printf("$jim - storage == 0 - no blt\n");
+        }
+        printf("$jim - jim_restore_screen }\n");
+    }
+}
+MGS_FUNC_IMPLEX(0x43AF41, jim_restore_screen_43AF41, WINMAIN_IMPL);
+
+void CC WmPaint_Handler_43ACC4(HDC hdcDest)
+{
+    bool bObtainedDC = false;
+    if (!hdcDest)
+    {
+        printf("$jim - WM_PAINT wParam DC is NULL\n");
+        if (gPrimarySurface_6FC734)
+        {
+            gPrimarySurface_6FC734->GetDC(&hdcDest);
+        }
+        bObtainedDC = true;
+    }
+
+    if (dword_71D17C)
+    {
+        printf("$jim - redraw\n");
+        if (gPrimarySurface_6FC734)
+        {
+            jim_restore_screen_43AF41(hdcDest);
+        }
+    }
+
+    if (bObtainedDC)
+    {
+        if (gPrimarySurface_6FC734)
+        {
+            gPrimarySurface_6FC734->ReleaseDC(hdcDest);
+        }
+    }
+
+    printf("$jim end of WM_PAINT\n");
+}
+MGS_FUNC_IMPLEX(0x43ACC4, WmPaint_Handler_43ACC4, WINMAIN_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x0040815E, void __cdecl(), MemCardsInit);
 
 
@@ -359,15 +442,6 @@ int /*__usercall*/ sub_452E6E/*<eax>*/(/*<esi>*/)
 }
 
 
-
-
-
-
-
-
-
-
-
 MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
@@ -410,7 +484,6 @@ MGS_VAR(1, 0x734900, DWORD, dword_734900, 0);
 MGS_VAR(1, 0x734904, DWORD, dword_734904, 0);
 MGS_VAR(1, 0x9AD988, BYTE, byte_9AD988,0);
 MGS_VAR(1, 0x688CDC, DWORD, gActive_dword_688CDC, 0);
-MGS_VAR(1, 0x71D17C, DWORD, dword_71D17C, 0 );
 
 MGS_VAR(1, 0x688CD8, DWORD, dword_688CD8, 0);
 MGS_VAR(1, 0x791DE4, DWORD, dword_791DE4, 0);
@@ -795,7 +868,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
         printf("$jim - WM_PAINT\n");
         if (dword_71D17C)
         {
-            WmPaint_Handler((HDC)wParam);
+            WmPaint_Handler_43ACC4((HDC)wParam);
             return 0;
         }
         return DefWindowProcA(hWnd, Msg, wParam, lParam);

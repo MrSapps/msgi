@@ -913,7 +913,7 @@ void CC Input_Start_42D69E()
 }
 MGS_FUNC_IMPLEX(0x0042D69E, Input_Start_42D69E, INPUT_IMPL);
 
-void __cdecl Input_AcquireOrUnAcquire()
+void CC Input_AcquireOrUnAcquire()
 {
     if (pMouseDevice_71D668)
     {
@@ -930,7 +930,7 @@ void __cdecl Input_AcquireOrUnAcquire()
     {
         if (gActive_dword_688CDC)
         {
-            if (pJoystickDevice->Acquire())
+            if (FAILED(pJoystickDevice->Acquire()))
             {
                 printf("$jim - cannot acquire joystick\n");
             }
