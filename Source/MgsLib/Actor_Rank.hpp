@@ -20,8 +20,6 @@ enum DiffcultyLevels
     eHard = 2,
     eExtreme = 3
 };
-MGS_VAR_EXTERN(short, gDiffcultyLevel_78E7E2);
-MGS_VAR_EXTERN(WORD, gNumRations_word_78E88C);
 
 struct Actor_Rank
 {
@@ -100,7 +98,3 @@ MGS_ASSERT_SIZEOF(Actor_Rank, 0x5FC);
 
 signed int CC Res_rank_Create_46EC0E(DWORD scriptUnknown, int a_dword_722A40, BYTE* pScript);
 void CC Res_rank_prim_related_4767CE(Actor_Rank *pRank, WORD resourceNameHash, POLY_FT4* pData, __int16 x, __int16 y, __int16 w, __int16 h, int flagQ, int type);
-
-
-MGS_VAR_EXTERN(WORD, gGameTime_word_78E896);
-MGS_VAR_EXTERN(WORD, gGameTime_word_78E898);

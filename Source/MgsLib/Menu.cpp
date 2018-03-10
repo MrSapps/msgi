@@ -124,9 +124,6 @@ MGS_VAR(1, 0x725FC0, MenuMan, gMenuMan_stru_725FC0, {});
 MGS_VAR(1, 0x9942C0, DWORD, gMenuRightBits_dword_9942C0, 0);
 MGS_VAR(1, 0x9942BC, DWORD, gMenuLeftBits_dword_9942BC, 0);
 
-MGS_ARY(1, 0x78E82A, short, 24, gItem_states_word_78E82A, {});
-MGS_ARY(1, 0x78E802, WORD, 10, gWeapon_states_word_78E802, {});
-
 void CC Res_MenuMan_create_459A9A()
 {
     Actor_PushBack_40A2AF(1, &gMenuMan_stru_725FC0.mBase, nullptr);
@@ -616,8 +613,6 @@ void CC Menu_inventory_right_update_4697F3(MenuMan* pMenu, DWORD* pPrimBuffer)
 }
 MGS_FUNC_IMPLEX(0x004697F3, Menu_inventory_right_update_4697F3, false); // TODO
 
-MGS_VAR(1, 0x78E7FE, short, gMenu_Selected_item_idx_word_78E7FE, 0);
-
 void CC Menu_inventory_common_invoke_handler_46B71E(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Menu_0x14 * pInventorySubStruct, int counter, int kZero)
 {
     pInventorySubStruct->field_0_invent.field_8_pMenuMan_Inventory_Unk_6764F8->field_18_fn(
@@ -776,8 +771,6 @@ const char* gItemInfos_675C90[26] =
     "KETCHUP\nFrozen.\nMelt it before\nyou use."
 };
 
-MGS_VAR(1, 0x78E86A, WORD, gItemsAreFrozen_word_78E86A, 0);
-
 MGS_VAR(1, 0x721E58, DWORD, gRocketLauncherInUse_dword_721E58, 0);
 
 struct Menu_unknown_pair
@@ -835,7 +828,7 @@ MGS_ARY(1, 0x669AAA, WORD, 27, gMenu_left_item_flags_word_669AAA,
 
 DWORD CC Menu_inventory_Is_Item_Disabled_46A128(signed int item_idx)
 {
-    if ((!(gMenu_flags_word_669A93[gLoadItemFuncIdx_word_78E7FC].field_0 & 2) // gLoadItemFuncIdx_word_78E7FC can be -1
+    if ((!(gMenu_flags_word_669A93[gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC].field_0 & 2) // gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC can be -1
         || !(gMenu_left_item_flags_word_669AAA[item_idx] & 1))
         // Snake crouching?
         && (!(byte1_flags_word_9942A8 & 0x42) || item_idx < 2 || item_idx > 4)
@@ -887,11 +880,11 @@ const Menu_Item_Info gItemInfos_675D30[] =
 void CC Menu_inventory_left_update_ShowItemInfo_46A718(short id)
 {
     const char* pItemInfoStr = gItemInfos_675C90[id];
-    if (id == Items::eKetchup && gItemsAreFrozen_word_78E86A)
+    if (id == Items::eKetchup && gGameStates_78E7E0.gItemsAreFrozen_word_78E86A)
     {
         pItemInfoStr = gItemInfos_675C90[Items::eKetchupFrozen];
     }
-    else if (id == Items::eRations && gItemsAreFrozen_word_78E86A)
+    else if (id == Items::eRations && gGameStates_78E7E0.gItemsAreFrozen_word_78E86A)
     {
         pItemInfoStr = gItemInfos_675C90[Items::eRationsFrozen];
     }
@@ -900,11 +893,11 @@ void CC Menu_inventory_left_update_ShowItemInfo_46A718(short id)
         // Note: Real game attempts to re-write 1 char of the string in place, this change prevents writing constant
         // strings and also allows the UI to display a card level > 9
         char buffer[256] = {};
-        sprintf(buffer, pItemInfoStr, gItem_states_word_78E82A[Items::eIdCard]);
+        sprintf(buffer, pItemInfoStr, gGameStates_78E7E0.gItem_states_word_78E82A[Items::eIdCard]);
         Menu_inventory_common_draw_text_46BA69(buffer);
         return;
     }
-    else if (id == Items::eMineDetector && (gDiffcultyLevel_78E7E2 == DiffcultyLevels::eHard || gDiffcultyLevel_78E7E2 == DiffcultyLevels::eExtreme))
+    else if (id == Items::eMineDetector && (gGameStates_78E7E0.gDiffcultyLevel_78E7E2 == DiffcultyLevels::eHard || gGameStates_78E7E0.gDiffcultyLevel_78E7E2 == DiffcultyLevels::eExtreme))
     {
         pItemInfoStr = "MINE DETECTOR\nCannot be used in\nHARD or EXTREME mode.";
     }
@@ -1260,7 +1253,7 @@ signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
         int nonEmptyItemCount = 0;
         for (int i = 0; i < 24; i++)
         {
-            if (gItem_states_word_78E82A[i] > 0)
+            if (gGameStates_78E7E0.gItem_states_word_78E82A[i] > 0)
             {
                 nonEmptyItemCount++;
             }
@@ -1273,7 +1266,7 @@ signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
             return 0;
         }
 
-        if (gMenu_Selected_item_idx_word_78E7FE == -1 || gMenu_Selected_item_idx_word_78E7FE == 17)
+        if (gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE == -1 || gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE == 17)
         {
             if (gMenuLeft_733AD0 < 0)
             {
@@ -1282,12 +1275,12 @@ signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
         }
         else
         {
-            gMenuLeft_733AD0 = gMenu_Selected_item_idx_word_78E7FE;
+            gMenuLeft_733AD0 = gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE;
         }
 
         Menu_Item_Unknown_Array_Item* pArray = &pAllocatedItem->field_20_array;
 
-        int cardLevel = (gItem_states_word_78E82A[17] > 0) - 1;
+        int cardLevel = (gGameStates_78E7E0.gItem_states_word_78E82A[17] > 0) - 1;
         for (int idx = 0; idx < 24; idx++)
         {
             if (idx == gMenuLeft_733AD0)
@@ -1296,9 +1289,9 @@ signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
                 ++pArray;
                 if (!cardLevel)
                 {
-                    if (gMenu_Selected_item_idx_word_78E7FE == -1)
+                    if (gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE == -1)
                     {
-                        Menu_inventory_common_set_amounts_46B1A2(pArray, 17, gItem_states_word_78E82A[Items::eIdCard]);
+                        Menu_inventory_common_set_amounts_46B1A2(pArray, 17, gGameStates_78E7E0.gItem_states_word_78E82A[Items::eIdCard]);
                         ++pArray;
                     }
                     else
@@ -1308,15 +1301,15 @@ signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
                 }
             }
 
-            if (gItem_states_word_78E82A[idx] > 0 && idx != Items::eIdCard)
+            if (gGameStates_78E7E0.gItem_states_word_78E82A[idx] > 0 && idx != Items::eIdCard)
             {
-                Menu_inventory_common_set_amounts_46B1A2(pArray, idx, gItem_states_word_78E82A[idx]);
+                Menu_inventory_common_set_amounts_46B1A2(pArray, idx, gGameStates_78E7E0.gItem_states_word_78E82A[idx]);
                 ++pArray;
             }
 
             if (cardLevel > 0)
             {
-                Menu_inventory_common_set_amounts_46B1A2(pArray, 17, gItem_states_word_78E82A[17]);
+                Menu_inventory_common_set_amounts_46B1A2(pArray, 17, gGameStates_78E7E0.gItem_states_word_78E82A[17]);
                 ++pArray;
                 cardLevel = 0;
             }
@@ -1346,12 +1339,6 @@ signed int CC Menu_inventory_left_update_helper_46A305(MenuMan* pMenu)
 }
 MGS_FUNC_IMPLEX(0x0046A305, Menu_inventory_left_update_helper_46A305, MENU_IMPL);
 
-MGS_VAR(1, 0x78E7FA, BYTE, gSnakeFlags_byte_78E7FA, 0);
-MGS_VAR(1, 0x78E876, short, gSnakeColdTimer_word_78E876, 0);
-MGS_VAR(1, 0x78E87A, short, gSnakeCold_word_78E87A, 0);
-MGS_VAR(1, 0x78E872, short, gSnakeShakeDelay_word_78E872, 0);
-
-
 void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char buttonsPressed)
 {
     if (buttonsPressed & 0x20)
@@ -1362,14 +1349,14 @@ void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char butto
         {
             if (pArrayItem->field_0_item_id_idx == Items::eKetchup || pArrayItem->field_0_item_id_idx == Items::eRations)
             {
-                if (gItemsAreFrozen_word_78E86A)
+                if (gGameStates_78E7E0.gItemsAreFrozen_word_78E86A)
                 {
                     // Play frozen "ice hit" sound
                     Sound_sub_44FD66(0, 0x3Fu, 0x73u);
                     return;
                 }
 
-                if (gSnakeCurrentHealth_78E7F6 == gSnakeMaxHealth_78E7F8)
+                if (gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 == gGameStates_78E7E0.gSnakeMaxHealth_78E7F8)
                 {
                     // Play "denied" sound
                     Sound_sub_44FD66(0, 0x3Fu, 0x23u);
@@ -1379,11 +1366,11 @@ void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char butto
                 signed __int16 rationOrKetchupHealth = 0;
                 if (pArrayItem->field_0_item_id_idx == Items::eRations)
                 {
-                    if (gDiffcultyLevel_78E7E2 == DiffcultyLevels::eVeryEasy)
+                    if (gGameStates_78E7E0.gDiffcultyLevel_78E7E2 == DiffcultyLevels::eVeryEasy)
                     {
                         rationOrKetchupHealth = 1024;
                     }
-                    else if (gDiffcultyLevel_78E7E2 == DiffcultyLevels::eEasy)
+                    else if (gGameStates_78E7E0.gDiffcultyLevel_78E7E2 == DiffcultyLevels::eEasy)
                     {
                         rationOrKetchupHealth = 384;
                     }
@@ -1398,17 +1385,17 @@ void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char butto
                     pArrayItem->field_0_item_id_idx = -1;
 
                     // Nuke the one and only possible ketchup
-                    gItem_states_word_78E82A[Items::eKetchup] = 0;
+                    gGameStates_78E7E0.gItem_states_word_78E82A[Items::eKetchup] = 0;
                     rationOrKetchupHealth = 64;
                 }
 
-                gSnakeCurrentHealth_78E7F6 += rationOrKetchupHealth;
-                ++gNumRations_word_78E88C;
+                gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 += rationOrKetchupHealth;
+                ++gGameStates_78E7E0.gNumRations_word_78E88C;
 
                 // Cap to max LIFE
-                if (gSnakeCurrentHealth_78E7F6 > gSnakeMaxHealth_78E7F8)
+                if (gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 > gGameStates_78E7E0.gSnakeMaxHealth_78E7F8)
                 {
-                    gSnakeCurrentHealth_78E7F6 = gSnakeMaxHealth_78E7F8;
+                    gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 = gGameStates_78E7E0.gSnakeMaxHealth_78E7F8;
                 }
 
                 // Play "used ration" sound
@@ -1419,20 +1406,20 @@ void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char butto
                 switch (pArrayItem->field_0_item_id_idx)
                 {
                 case Items::eMedicine:
-                    if (gSnakeFlags_byte_78E7FA & 1)
+                    if (gGameStates_78E7E0.gSnakeFlags_byte_78E7FA & 1)
                     {
-                        gSnakeFlags_byte_78E7FA &= ~1u;
-                        gSnakeColdTimer_word_78E876 = 0;
-                        gSnakeCold_word_78E87A = 0;
+                        gGameStates_78E7E0.gSnakeFlags_byte_78E7FA &= ~1u;
+                        gGameStates_78E7E0.gSnakeColdTimer_word_78E876 = 0;
+                        gGameStates_78E7E0.gSnakeCold_word_78E87A = 0;
                     }
                     break;
                 case Items::eDiazepam:
-                    gSnakeFlags_byte_78E7FA |= 4u;
-                    if (gSnakeShakeDelay_word_78E872 < 0)
+                    gGameStates_78E7E0.gSnakeFlags_byte_78E7FA |= 4u;
+                    if (gGameStates_78E7E0.gSnakeShakeDelay_word_78E872 < 0)
                     {
-                        gSnakeShakeDelay_word_78E872 = 0;
+                        gGameStates_78E7E0.gSnakeShakeDelay_word_78E872 = 0;
                     }
-                    gSnakeShakeDelay_word_78E872 += 1200;
+                    gGameStates_78E7E0.gSnakeShakeDelay_word_78E872 += 1200;
                     break;
                 case Items::eItemBomb:
                     if (!(byte1_flags_word_9942A8 & 0x362)
@@ -1441,7 +1428,7 @@ void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char butto
                     {
                         byte1_flags_word_9942A8 |= 0x080000u; // TODO: BYTE2(var) |= 8u check this is correct;
                         pArrayItem->field_0_item_id_idx = -1;
-                        gItem_states_word_78E82A[Items::eItemBomb] = -1;
+                        gGameStates_78E7E0.gItem_states_word_78E82A[Items::eItemBomb] = -1;
 
                         // Sounds like the menu cancel sound
                         Sound_sub_44FD66(0, 0x3Fu, 0x21u);
@@ -1466,8 +1453,8 @@ void CC Menu_inventory_left_use_item_46A916(Menu_Item_Unknown* pItem, char butto
             // Decrement the amount
             if (pArrayItem->field_0_item_id_idx >= 0)
             {
-                gItem_states_word_78E82A[pArrayItem->field_0_item_id_idx]--;
-                pArrayItem->field_2_current_amount = gItem_states_word_78E82A[pArrayItem->field_0_item_id_idx];
+                gGameStates_78E7E0.gItem_states_word_78E82A[pArrayItem->field_0_item_id_idx]--;
+                pArrayItem->field_2_current_amount = gGameStates_78E7E0.gItem_states_word_78E82A[pArrayItem->field_0_item_id_idx];
             }
         }
     }
@@ -1499,21 +1486,21 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
                 {
                     if (pMenu->field_24_input->field_2_button_pressed & 4)
                     {
-                        const int item_idx = gMenu_Selected_item_idx_word_78E7FE;
-                        if (gMenu_Selected_item_idx_word_78E7FE < 0)
+                        const int item_idx = gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE;
+                        if (gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE < 0)
                         {
                             const char* left_item_idx = &pMenu->field_1D8_invetory_menus[0].field_11_item_idx;
                             if (!Menu_inventory_Is_Item_Disabled_46A128(pMenu->field_1D8_invetory_menus[0].field_11_item_idx)
-                                && gItem_states_word_78E82A[*left_item_idx] > 0)
+                                && gGameStates_78E7E0.gItem_states_word_78E82A[*left_item_idx] > 0)
                             {
-                                gMenu_Selected_item_idx_word_78E7FE = *left_item_idx;
+                                gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE = *left_item_idx;
                             }
                         }
                         else
                         {
-                            gMenu_Selected_item_idx_word_78E7FE = -1;
+                            gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE = -1;
                         }
-                        if (item_idx != gMenu_Selected_item_idx_word_78E7FE)
+                        if (item_idx != gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE)
                         {
                             Sound_sub_44FD66(0, 0x3Fu, 0x14u);
                         }
@@ -1546,7 +1533,7 @@ void CC Menu_inventory_left_update_46A187(MenuMan* pMenu, DWORD* ot)
     }
     else if (field_2a_state != InventoryMenuState::eUnknown_4)
     {
-        if (gMenu_Selected_item_idx_word_78E7FE >= 0)
+        if (gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE >= 0)
         {
             const int counter = Menu_inventory_common_update_helper_46B29C();
             if (counter >= 255)
@@ -1654,7 +1641,7 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
             Menu_item_render_no_use_text_468CB2(pMenu->field_20_prim_buffer, xpos, ypos);
         }
 
-        if (gItemsAreFrozen_word_78E86A && (pMenuSub->field_0_item_id_idx == Items::eRations || pMenuSub->field_0_item_id_idx == Items::eKetchup))
+        if (gGameStates_78E7E0.gItemsAreFrozen_word_78E86A && (pMenuSub->field_0_item_id_idx == Items::eRations || pMenuSub->field_0_item_id_idx == Items::eKetchup))
         {
             Menu_item_render_frozen_text_468D30(pMenu->field_20_prim_buffer, xpos, ypos);
         }
@@ -1666,7 +1653,7 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
                 xpos,
                 ypos + 11,
                 pMenuSub->field_2_current_amount,
-                gItem_states_word_78E82A[pMenuSub->field_0_item_id_idx + 11]); // +11 = the item capacities
+                gGameStates_78E7E0.gItem_states_word_78E82A[pMenuSub->field_0_item_id_idx + 11]); // +11 = the item capacities
         }
         else if (pMenuSub->field_0_item_id_idx == Items::eIdCard)
         {
@@ -1677,7 +1664,7 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
             textConfig.gTextRGB_dword_66C4CC = 0x64808080;
             Render_Text_Small_font_468642(pMenu->field_20_prim_buffer, &textConfig, "LV.");
             textConfig.gTextY_dword_66C4C4 -= 2;
-            Menu_render_number_as_string_468529(pMenu->field_20_prim_buffer, &textConfig, gItem_states_word_78E82A[Items::eIdCard]);
+            Menu_render_number_as_string_468529(pMenu->field_20_prim_buffer, &textConfig, gGameStates_78E7E0.gItem_states_word_78E82A[Items::eIdCard]);
         }
         else if (pMenuSub->field_0_item_id_idx == Items::eItemBomb)
         {
@@ -1687,7 +1674,7 @@ void CC Menu_inventory_left_469F14(MenuMan* pMenu, DWORD* ot, DWORD xpos, DWORD 
                 ot,
                 xpos + 10,
                 ypos + 10,
-                gItem_states_word_78E82A[Items::eItemBomb],
+                gGameStates_78E7E0.gItem_states_word_78E82A[Items::eItemBomb],
                 0);
         }
 
@@ -2374,23 +2361,21 @@ void CC Menu_render_life_bar_468DA6(MenuPrimBuffer* pPrimBuffer, short int xpos,
 }
 MGS_FUNC_IMPLEX(0x468DA6, Menu_render_life_bar_468DA6, MENU_IMPL);
 
-MGS_VAR(1, 0x78E7F6, WORD, gSnakeCurrentHealth_78E7F6, 0);
 
 MGS_VAR(1, 0x7339D8, int, gTakeDamageCounter_dword_7339D8, 0);
-MGS_VAR(1, 0x78E7F8, WORD, gSnakeMaxHealth_78E7F8, 0);
 MGS_VAR(1, 0x995348, WORD, gSnakeCurrentO2_995348, 0);
 
 
 
 signed int CC Menu_menu_bars_update_field200_46938A(MenuMan_MenuBars* pMenuBarsUnk)
 {
-    if (pMenuBarsUnk->field_6_snake_hp == gSnakeCurrentHealth_78E7F6)
+    if (pMenuBarsUnk->field_6_snake_hp == gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6)
     {
         pMenuBarsUnk->field_A_k10_decrement = 10;
         return 0;
     }
 
-    if (pMenuBarsUnk->field_6_snake_hp > gSnakeCurrentHealth_78E7F6)
+    if (pMenuBarsUnk->field_6_snake_hp > gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6)
     {
         if (pMenuBarsUnk->field_A_k10_decrement)
         {
@@ -2402,9 +2387,9 @@ signed int CC Menu_menu_bars_update_field200_46938A(MenuMan_MenuBars* pMenuBarsU
         }
     }
 
-    if (pMenuBarsUnk->field_6_snake_hp < gSnakeCurrentHealth_78E7F6)
+    if (pMenuBarsUnk->field_6_snake_hp < gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6)
     {
-        pMenuBarsUnk->field_6_snake_hp = gSnakeCurrentHealth_78E7F6;
+        pMenuBarsUnk->field_6_snake_hp = gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6;
     }
     return 1;
 }
@@ -2430,9 +2415,9 @@ void CC Menu_render_snake_life_bar_469194(MenuPrimBuffer* ot, short xpos, short 
         ot,
         xpos,
         ypos,
-        gSnakeCurrentHealth_78E7F6,
-        gSnakeCurrentHealth_78E7F6,
-        gSnakeMaxHealth_78E7F8,
+        gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6,
+        gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6,
+        gGameStates_78E7E0.gSnakeMaxHealth_78E7F8,
         &gSnakeLifeBarConfig_6757F0);
 }
 MGS_FUNC_IMPLEX(0x469194, Menu_render_snake_life_bar_469194, MENU_IMPL);
@@ -2534,8 +2519,8 @@ void CC Menu_menu_bars_draw_snake_life_and_O2_4693D5(MenuPrimBuffer* ot, MenuMan
         pField200->field_2_bar_x,
         pField200->field_4_bar_y,
         pField200->field_6_snake_hp,
-        gSnakeCurrentHealth_78E7F6,
-        gSnakeMaxHealth_78E7F8,
+        gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6,
+        gGameStates_78E7E0.gSnakeMaxHealth_78E7F8,
         pLifeBarText);
 
     if (pField200->field_1_O2_hp)
@@ -2572,7 +2557,7 @@ void CC Menu_menu_bars_update_469215(MenuMan* pMenu, DWORD* /*ot*/)
 
         const char state_copy = pField_200->field_0_state;
         if ((!pField_200->field_0_state || state_copy == 3)
-            && (bHpChanged || game_state_dword_72279C.flags & 0x8000 || gSnakeCurrentHealth_78E7F6 <= gSnakeMaxHealth_78E7F8 / 2))
+            && (bHpChanged || game_state_dword_72279C.flags & 0x8000 || gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 <= gGameStates_78E7E0.gSnakeMaxHealth_78E7F8 / 2))
         {
             if (!state_copy)
             {
@@ -2598,7 +2583,7 @@ void CC Menu_menu_bars_update_469215(MenuMan* pMenu, DWORD* /*ot*/)
 
             if (pField_200->field_0_state == 2)
             {
-                if (bHpChanged || gSnakeCurrentHealth_78E7F6 <= gSnakeMaxHealth_78E7F8 / 2 || game_state_dword_72279C.flags & 0x8000)
+                if (bHpChanged || gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 <= gGameStates_78E7E0.gSnakeMaxHealth_78E7F8 / 2 || game_state_dword_72279C.flags & 0x8000)
                 {
                     pMenu->field_200_hp_bars_info.field_8 = 150;
                     if (pMenu->field_200_hp_bars_info.field_1_O2_hp > 0)
@@ -2656,7 +2641,7 @@ void CC Menu_init_menu_bars_4691CE(MenuMan* pMenu)
 
     pMenu->field_200_hp_bars_info.field_0_state = 0;
     pMenu->field_200_hp_bars_info.field_1_O2_hp = 0;
-    pMenu->field_200_hp_bars_info.field_6_snake_hp = gSnakeCurrentHealth_78E7F6;
+    pMenu->field_200_hp_bars_info.field_6_snake_hp = gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6;
     pMenu->field_200_hp_bars_info.field_A_k10_decrement = 10;
     pMenu->field_200_hp_bars_info.field_2_bar_x = 16;
     pMenu->field_200_hp_bars_info.field_4_bar_y = -48;
@@ -3228,12 +3213,12 @@ void CC Menu_Remove_all_items_44D020()
 {
     for (int i = 0; i < 24; i++)
     {
-        gItem_states_word_78E82A[i] |= 0x8000u;
+        gGameStates_78E7E0.gItem_states_word_78E82A[i] |= 0x8000u;
     }
 
     for (int i = 0; i < 10; i++)
     {
-        gWeapon_states_word_78E802[i] |= 0x8000u;
+        gGameStates_78E7E0.gWeapon_states_word_78E802[i] |= 0x8000u;
     }
 }
 MGS_FUNC_IMPLEX(0x44D020, Menu_Remove_all_items_44D020, MENU_IMPL);
@@ -3242,17 +3227,15 @@ void CC Menu_give_all_items_44D047()
 {
     for (int i = 0; i < 24; i++)
     {
-        gItem_states_word_78E82A[i] &= ~0x8000u;
+        gGameStates_78E7E0.gItem_states_word_78E82A[i] &= ~0x8000u;
     }
 
     for (int i = 0; i < 10; i++)
     {
-        gWeapon_states_word_78E802[i] &= ~0x8000u;
+        gGameStates_78E7E0.gWeapon_states_word_78E802[i] &= ~0x8000u;
     }
 }
 MGS_FUNC_IMPLEX(0x44D047, Menu_give_all_items_44D047, MENU_IMPL);
-
-MGS_VAR(1, 0x78E862, WORD, gMenu_PAL_card_icon_idx_word_78E862, 0);
 
 void Menu_update_game_state_4691C6()
 {
@@ -3299,14 +3282,14 @@ void CC Menu_inventory_left_update_helper_46A856(MenuMan* pMenu)
         {
             gMenuLeft_733AD0 = idx;
         }
-        gMenu_Selected_item_idx_word_78E7FE = -1;
+        gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE = -1;
         pInvent->field_0_invent.field_0.field_0_item_id_idx = -1;
     }
     else
     {
-        gMenu_Selected_item_idx_word_78E7FE = idx;
+        gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE = idx;
         Menu_render_unk_46B081(&g21_menu_left_inventory_unk_733AD8[gItemInfos_675D30[idx].field_4 - 12], 0);
-        pInvent->field_11_item_idx = gMenu_Selected_item_idx_word_78E7FE;
+        pInvent->field_11_item_idx = gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE;
     }
 
     pInvent->field_12 = 10;
@@ -3508,7 +3491,7 @@ void CC Menu_inventory_left_update_helper_46A4C1(MenuMan* pMenu, DWORD* pPrimBuf
                     Menu_inventory_left_render_PAL_key_icon_46A770(
                         pMenu,
                         pPrimBuffer,
-                        gMenu_PAL_card_icon_idx_word_78E862);
+                        gGameStates_78E7E0.gMenu_PAL_card_icon_idx_word_78E862);
                 }
                 Menu_inventory_draw_item_header_and_background_with_hp_bar_46BA95(pMenu, pPrimBuffer, "EQUIP");
             }
@@ -3520,33 +3503,33 @@ void CC Menu_inventory_left_update_helper_46A4C1(MenuMan* pMenu, DWORD* pPrimBuf
     const unsigned __int16 field_12 = pMenu->field_1D8_invetory_menus[0].field_12;
     if (field_12 <= 0u)
     {
-        if (Menu_inventory_Is_Item_Disabled_46A128(gMenu_Selected_item_idx_word_78E7FE))
+        if (Menu_inventory_Is_Item_Disabled_46A128(gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE))
         {
-            gMenuLeft_733AD0 = gMenu_Selected_item_idx_word_78E7FE;
-            gMenu_Selected_item_idx_word_78E7FE = -1;
+            gMenuLeft_733AD0 = gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE;
+            gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE = -1;
             pMenu->field_1D8_invetory_menus[0].field_12 = 19;
         }
         else
         {
             const int item_idx = pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_0_item_id_idx;
             signed int bUnknown = 0;
-            if (item_idx != gMenu_Selected_item_idx_word_78E7FE)
+            if (item_idx != gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE)
             {
                 bUnknown = 1;
                 if (item_idx != -1 && item_idx != 17)
                 {
                     gMenuLeft_733AD0 = item_idx;
                 }
-                pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_0_item_id_idx = gMenu_Selected_item_idx_word_78E7FE;
+                pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_0_item_id_idx = gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE;
             }
-            if (gMenu_Selected_item_idx_word_78E7FE >= 0)
+            if (gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE >= 0)
             {
                 if (bUnknown)
                 {
-                    Menu_render_unk_46B081(&g21_menu_left_inventory_unk_733AD8[gItemInfos_675D30[gMenu_Selected_item_idx_word_78E7FE].field_4 - 12], 0);
-                    pMenu->field_1D8_invetory_menus[0].field_11_item_idx = gMenu_Selected_item_idx_word_78E7FE;
+                    Menu_render_unk_46B081(&g21_menu_left_inventory_unk_733AD8[gItemInfos_675D30[gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE].field_4 - 12], 0);
+                    pMenu->field_1D8_invetory_menus[0].field_11_item_idx = gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE;
                 }
-                pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_2_current_amount = gItem_states_word_78E82A[gMenu_Selected_item_idx_word_78E7FE];
+                pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_2_current_amount = gGameStates_78E7E0.gItem_states_word_78E82A[gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE];
                 Menu_inventory_common_update_helper_46B6EF(pMenu, pPrimBuffer, pMenu->field_1D8_invetory_menus);
             }
         }
@@ -3561,7 +3544,7 @@ void CC Menu_inventory_left_update_helper_46A4C1(MenuMan* pMenu, DWORD* pPrimBuf
             if (field_12_mod_4 == 3)
             {
                 const int item_idx = pMenu->field_1D8_invetory_menus[0].field_0_invent.field_0.field_0_item_id_idx;
-                if (item_idx != gMenu_Selected_item_idx_word_78E7FE
+                if (item_idx != gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE
                     && Menu_inventory_Is_Item_Disabled_46A128(item_idx)
                     && !counter_dword_6BED20)
                 {

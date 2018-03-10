@@ -19,7 +19,7 @@ MGS_VAR(1, 0x71D664, LPDIRECTINPUT8, pDirectInput, nullptr);
 MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE8, pJoystickDevice, nullptr);
 MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICE8, pMouseDevice_71D668, nullptr);
 MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
-MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps, {});
+MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps_71D1D8, {});
 MGS_ARY(1, 0x6571F4, DWORD, 14, gButtonMappings_6571F4, {});// TODO: Check 14 is big enough
 
 MGS_VAR(1, 0x71D68C, int, nJoystickDeviceObjects, 0);
@@ -36,7 +36,7 @@ MGS_ARY(1, 0x71D690, char, 256, char_71D69, {});
 
 
 // WinMain.cpp
-extern DWORD& dword_717348; 
+extern DWORD& gMouseMove_dword_717348; 
 extern HINSTANCE& gHInstance;
 extern DWORD& gWindowedMode;
 extern HWND& gHwnd;
@@ -55,7 +55,6 @@ MGS_VAR(1, 0x71D680, DWORD, dword_71D680, 0);
 MGS_VAR(1, 0x71D688, DWORD, dword_71D688, 0);
 MGS_VAR(1, 0x71D684, DWORD, dword_71D684, 0);
 MGS_VAR(1, 0x71D418, DWORD, gInput_NoMouseButtons_dword_71D418, 0);
-MGS_VAR(1, 0x71D1EC, DWORD, dword_71D1EC, 0);
 MGS_VAR(1, 0x657148, DWORD, dword_657148, 0);
 
 static inline DWORD GetMouseState1(LONG& state)
@@ -320,7 +319,7 @@ HRESULT CC Input_Read_43BD6E()
                         gButtonStates_dword_71D30C[i] = 128;
                     break;
                 case 48:
-                    if ((unsigned int)dword_71D1EC < 1)
+                    if (JoystickDeviceCaps_71D1D8.dwPOVs < 1)
                         goto LABEL_152;
                     if (joystickState.rgdwPOV[0])
                         gButtonStates_dword_71D30C[i] = 0;
@@ -329,7 +328,7 @@ HRESULT CC Input_Read_43BD6E()
                     break;
                 case 49:
                 LABEL_152 :
-                    if ((unsigned int)dword_71D1EC < 1)
+                    if (JoystickDeviceCaps_71D1D8.dwPOVs < 1)
                         goto LABEL_157;
                           if (joystickState.rgdwPOV[0] == 4500)
                               gButtonStates_dword_71D30C[i] = 128;
@@ -338,7 +337,7 @@ HRESULT CC Input_Read_43BD6E()
                           break;
                 case 50:
                 LABEL_157 :
-                    if ((unsigned int)dword_71D1EC < 1)
+                    if (JoystickDeviceCaps_71D1D8.dwPOVs < 1)
                         goto LABEL_162;
                           if (joystickState.rgdwPOV[0] == 9000)
                               gButtonStates_dword_71D30C[i] = 128;
@@ -347,7 +346,7 @@ HRESULT CC Input_Read_43BD6E()
                           break;
                 case 51:
                 LABEL_162 :
-                    if ((unsigned int)dword_71D1EC < 1)
+                    if (JoystickDeviceCaps_71D1D8.dwPOVs < 1)
                         goto LABEL_167;
                           if (joystickState.rgdwPOV[0] == 13500)
                               gButtonStates_dword_71D30C[i] = 128;
@@ -356,7 +355,7 @@ HRESULT CC Input_Read_43BD6E()
                           break;
                 case 52:
                 LABEL_167 :
-                    if ((unsigned int)dword_71D1EC < 1)
+                    if (JoystickDeviceCaps_71D1D8.dwPOVs < 1)
                         goto LABEL_172;
                           if (joystickState.rgdwPOV[0] == 18000)
                               gButtonStates_dword_71D30C[i] = 128;
@@ -365,7 +364,7 @@ HRESULT CC Input_Read_43BD6E()
                           break;
                 case 53:
                 LABEL_172 :
-                    if ((unsigned int)dword_71D1EC < 1)
+                    if (JoystickDeviceCaps_71D1D8.dwPOVs < 1)
                         goto LABEL_177;
                           if (joystickState.rgdwPOV[0] == 22500)
                               gButtonStates_dword_71D30C[i] = 128;
@@ -374,7 +373,7 @@ HRESULT CC Input_Read_43BD6E()
                           break;
                 case 54:
                 LABEL_177 :
-                    if ((unsigned int)dword_71D1EC < 1)
+                    if (JoystickDeviceCaps_71D1D8.dwPOVs < 1)
                         goto LABEL_182;
                           if (joystickState.rgdwPOV[0] == 27000)
                               gButtonStates_dword_71D30C[i] = 128;
@@ -383,7 +382,7 @@ HRESULT CC Input_Read_43BD6E()
                           break;
                 case 55:
                 LABEL_182 :
-                    if ((unsigned int)dword_71D1EC < 1)
+                    if (JoystickDeviceCaps_71D1D8.dwPOVs < 1)
                         goto LABEL_187;
                           if (joystickState.rgdwPOV[0] == 31500)
                               gButtonStates_dword_71D30C[i] = 128;
@@ -675,7 +674,7 @@ struct ButtonCollection
 };
 MGS_ASSERT_SIZEOF(ButtonCollection, 0x672);
 
-MGS_ARY(1, 0x65510C, ButtonCollection, 6, gButtonTable_65510C, {}); // TODO: Rip data
+MGS_ARY(1, 0x65510C, ButtonCollection, 5, gButtonTable_65510C, {}); // TODO: Rip data
 
 HRESULT CC Input_Init_43B1D1(HWND hWnd)
 {
@@ -715,9 +714,9 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
                 hr = pJoystickDevice->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
                 if (SUCCEEDED(hr))
                 {
-                    memset(&JoystickDeviceCaps, 0, 0x2Cu);
-                    JoystickDeviceCaps.dwSize = 0x2C;
-                    hr = pJoystickDevice->GetCapabilities(&JoystickDeviceCaps);
+                    memset(&JoystickDeviceCaps_71D1D8, 0, 0x2Cu);
+                    JoystickDeviceCaps_71D1D8.dwSize = 0x2C;
+                    hr = pJoystickDevice->GetCapabilities(&JoystickDeviceCaps_71D1D8);
                     if (SUCCEEDED(hr))
                     {
                         pJoystickDevice->EnumObjects(Input_Enum_Axis_43B0C8, hWnd, DIDFT_AXIS);
@@ -904,7 +903,7 @@ MGS_FUNC_IMPLEX(0x0043B1D1, Input_Init_43B1D1, INPUT_IMPL);
 
 void CC Input_Start_42D69E()
 {
-    dword_717348 = 0;
+    gMouseMove_dword_717348 = 0;
     const HRESULT hr = Input_Init_43B1D1(gHwnd);
     if (FAILED(hr))
     {

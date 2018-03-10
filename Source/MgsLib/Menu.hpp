@@ -1,8 +1,5 @@
 #pragma once
 
-MGS_VAR_EXTERN(WORD, gSnakeCurrentHealth_78E7F6);
-MGS_VAR_EXTERN(WORD, gSnakeMaxHealth_78E7F8);
-
 struct MenuMan;
 struct TextConfig;
 struct MenuPrimBuffer;
@@ -24,8 +21,6 @@ struct MenuMan_Inventory_14h_Unk
     WORD field_12_h;
 };
 MGS_ASSERT_SIZEOF(MenuMan_Inventory_14h_Unk, 0x14);
-
-MGS_VAR_EXTERN(short, gMenu_Selected_item_idx_word_78E7FE);
 
 void DoMenuTests();
 

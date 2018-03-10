@@ -6,7 +6,7 @@
 #include "Actor_Debug.hpp"
 #include "Actor_Loader.hpp"
 #include "System.hpp"
-#include "Actor_Rank.hpp" // gGameTime_word_78E896
+#include "Actor_Rank.hpp" // gGameStates_78E7E0.gGameTime_word_78E896
 #include "Fs.hpp"
 #include "WinMain.hpp"
 #include "Map.hpp"
@@ -23,6 +23,8 @@ struct GameD_Struct
 };
 MGS_ASSERT_SIZEOF(GameD_Struct, 0x28);
 
+MGS_VAR(1, 0x78E7E0, GameState_0x180, gGameStates_78E7E0, {});
+
 MGS_VAR(1, 0x722760, GameD_Struct, gGameD_stru_722760, {});
 MGS_VAR(1, 0x995344, DWORD, gTotalFrameTime_dword_995344, 0);
 MGS_VAR(1, 0x7227A0, DWORD, script_cancel_non_zero_dword_7227A0, 0);
@@ -32,11 +34,8 @@ MGS_ARY(1, 0x7227C8, WORD, 8, gStageHashStack_7227C8, {});
 MGS_VAR(1, 0x7227D8, WORD, gCurrentStageNameHashed_7227D8, 0);
 MGS_ARY(1, 0x7227DC, char, 12, gStageName_7227DC, {});
 
-MGS_VAR(1, 0x78E7FC, short, gLoadItemFuncIdx_word_78E7FC, 0);
 
 
-
-MGS_VAR(1, 0x78E7E8, WORD, gStartingCdId_78E7E8, 0);
 MGS_VAR(1, 0x78D7B0, int, gCdId_78D7B0, 0);
 
 MGS_VAR(1, 0x995324, ButtonStates*, gpActiveButtons_995324, 0);
@@ -161,10 +160,10 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
 {
     const DWORD buttons = GameD_Input_445610();
 
-    gFlags_dword_78E7E4 |= 0x400u;
+    gGameStates_78E7E0.gFlags_dword_78E7E4 |= 0x400u;
 
 
-    if (!(gFlags_dword_78E7E4 & 0x2400)) // Dead code
+    if (!(gGameStates_78E7E0.gFlags_dword_78E7E4 & 0x2400)) // Dead code
     {
         //nullsub_10();
         int v14 = dword_99533C;
@@ -197,8 +196,8 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
     if (!(gActorPauseFlags_dword_791A0C & 2))
     {
         gTotalFrameTime_dword_995344 += gFrameTime_dword_791A04;
-        gGameTime_word_78E896 = static_cast<WORD>(gTotalFrameTime_dword_995344 / 60 / 3600); // TODO: Is DWORD?
-        gGameTime_word_78E898 = static_cast<WORD>(gTotalFrameTime_dword_995344 / 60 % 3600); // TODO: Is DWORD?
+        gGameStates_78E7E0.gGameTime_word_78E896 = static_cast<WORD>(gTotalFrameTime_dword_995344 / 60 / 3600); // TODO: Is DWORD?
+        gGameStates_78E7E0.gGameTime_word_78E898 = static_cast<WORD>(gTotalFrameTime_dword_995344 / 60 % 3600); // TODO: Is DWORD?
     }
 
     const DWORD gamed_unk_722780 = pGameD->gamed_unk_722780;
@@ -445,8 +444,8 @@ MGS_FUNC_IMPLEX(0x0044EB27, Stage_LoadRelated_44EB27, ACTOR_GAMED_IMPL);
 
 void CC sub_44E1E0()
 {
-    gLoadItemFuncIdx_word_78E7FC = -1;
-    gMenu_Selected_item_idx_word_78E7FE = -1;
+    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = -1;
+    gGameStates_78E7E0.gMenu_Selected_item_idx_word_78E7FE = -1;
 }
 MGS_FUNC_IMPLEX(0x0044E1E0, sub_44E1E0, ACTOR_GAMED_IMPL);
 
@@ -456,15 +455,13 @@ void CC SaveResidentTop_40B36E()
 }
 MGS_FUNC_IMPLEX(0x0040B36E, SaveResidentTop_40B36E, ACTOR_GAMED_IMPL);
 
-
-MGS_VAR(1, 0x78E7EC, WORD, stage_name_hash_word_78E7EC, 0);
 MGS_VAR(1, 0x6893D4, DWORD, dword_6893D4, 0);
 
 void CC Create_loader_44E226()
 {
     static char sNoFolderName_669A88[13] = "nofoldername"; // 0x669A88
     const char* strStageName = "init";
-    if (stage_name_hash_word_78E7EC)
+    if (gGameStates_78E7E0.stage_name_hash_word_78E7EC)
     {
         strStageName = File_StageName_44EB83();
     }
@@ -524,7 +521,7 @@ void CC Init_Gamed_Create_44E12B()
     Init_Menu_GV_DG_44E1F9();
     sub_44E287();
     Reset_GV_DG_44E212();
-    gStartingCdId_78E7E8 = static_cast<WORD>(gCdId_78D7B0 + 1);
+    gGameStates_78E7E0.gStartingCdId_78E7E8 = static_cast<WORD>(gCdId_78D7B0 + 1);
     gpActiveButtons_995324 = &gButtonsArray4_7919C0[0];
     SaveResidentTop_40B36E();
     gGameD_stru_722760.gamed_unk_722780 = 0;

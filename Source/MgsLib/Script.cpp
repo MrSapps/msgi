@@ -752,12 +752,8 @@ DWORD CC Script_Unknown8_409924(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x409924, Script_Unknown8_409924, SCRIPT_IMPL);
 
-MGS_VAR(1, 0x78E7EE, WORD, gScript_loader_param_m_78E7EE, 0);
-MGS_ARY(1, 0x78E7F0, WORD, 3, gScript_loader_param_p_78E7F0, {});
 MGS_VAR(1, 0x723650, DWORD, gKillResOpen_723650, 0);
 MGS_VAR(1, 0x66AFF0, DWORD, gResOpenCreated_dword_66AFF0, 1);
-MGS_VAR(1, 0x78E874, WORD, word_78E874, 0);
-
 
 MGS_ARY(1, 0x722A44, char, 8, sLastStageName_722A44, {});
 
@@ -778,7 +774,7 @@ int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
             if (Script_get_int())
             {
                 // Soft restart?
-                Stage_LoadRelated_44EB27(stage_name_hash_word_78E7EC, sLastStageName_722A44);
+                Stage_LoadRelated_44EB27(gGameStates_78E7E0.stage_name_hash_word_78E7EC, sLastStageName_722A44);
             }
             else
             {
@@ -793,14 +789,14 @@ int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
         }
         else
         {
-            word_78E874 = stage_name_hash_word_78E7EC;
-            stage_name_hash_word_78E7EC = ResourceNameHash(scriptStringData);
-            Stage_LoadRelated_44EB27(stage_name_hash_word_78E7EC, scriptStringData);
+            gGameStates_78E7E0.field_94 = gGameStates_78E7E0.stage_name_hash_word_78E7EC;
+            gGameStates_78E7E0.stage_name_hash_word_78E7EC = ResourceNameHash(scriptStringData);
+            Stage_LoadRelated_44EB27(gGameStates_78E7E0.stage_name_hash_word_78E7EC, scriptStringData);
 
             if (Script_ParamExists('m'))
             {
                 // ?
-                gScript_loader_param_m_78E7EE = static_cast<WORD>(Script_get_int());
+                gGameStates_78E7E0.gScript_loader_param_m_78E7EE = static_cast<WORD>(Script_get_int());
             }
 
             if (Script_ParamExists('p'))
@@ -808,9 +804,9 @@ int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
                 // Snakes starting position in the map?
                 WORD pWordArray3[3] = {};
                 Script_Read3Words_409945(Script_GetReturnAddress(), pWordArray3);
-                gScript_loader_param_p_78E7F0[0] = pWordArray3[0];
-                gScript_loader_param_p_78E7F0[1] = pWordArray3[1];
-                gScript_loader_param_p_78E7F0[2] = pWordArray3[2];
+                gGameStates_78E7E0.gScript_loader_param_p_78E7F0[0] = pWordArray3[0];
+                gGameStates_78E7E0.gScript_loader_param_p_78E7F0[1] = pWordArray3[1];
+                gGameStates_78E7E0.gScript_loader_param_p_78E7F0[2] = pWordArray3[2];
             }
 
             if (Script_ParamExists('s'))

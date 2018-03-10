@@ -7,8 +7,7 @@ void PsxCpp_ForceLink() { }
 
 MGS_VAR(1, 0x6C0E98, DRAWENV, gDrawEnv_6C0E98, {});
 MGS_VAR(1, 0x6BECF0, DISPENV, gDispEnv_6BECF0, {});
-MGS_VAR(1, 0x6C0EAA, WORD, word_6C0EAA, 0x0);
-MGS_VAR(1, 0x6C0EA8, WORD, word_6C0EA8, 0x0);
+
 
 struct POLY_FT3
 {
@@ -339,14 +338,14 @@ DRAWENV* CC Renderer_Set_DRAWENV_40DD90(DRAWENV* pDrawEnv)
 
     memcpy(&gDrawEnv_6C0E98, pDrawEnv, sizeof(DRAWENV));
 
-    if (!word_6C0EAA)
+    if (!gDrawEnv_6C0E98.textureWindow.y2)
     {
-        word_6C0EAA = 255;
+        gDrawEnv_6C0E98.textureWindow.y2 = 255;
     }
 
-    if (!word_6C0EA8)
+    if (!gDrawEnv_6C0E98.textureWindow.x2)
     {
-        word_6C0EA8 = 255;
+        gDrawEnv_6C0E98.textureWindow.x2 = 255;
     }
 
     return &gDrawEnv_6C0E98;

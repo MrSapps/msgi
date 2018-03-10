@@ -20,7 +20,7 @@ struct map_record
 };
 MGS_ASSERT_SIZEOF(map_record, 0x14);
 
-MGS_ARY(1, 0x722870, map_record, 20, gMap_20_array_722870, {});
+MGS_ARY(1, 0x722870, map_record, 16, gMap_20_array_722870, {});
 MGS_VAR(1, 0x7229B4, DWORD, gMap_count_dword_7229B4, 0);
 MGS_VAR(1, 0x7229B0, DWORD, gMapsChanged_dword_7229B0, 0);
 

@@ -120,10 +120,6 @@ MGS_VAR(1, 0x688CD0, DWORD, dword_688CD0, 0);
 MGS_VAR(1, 0x688CD4, DWORD, dword_688CD4, 0);
 MGS_VAR(1, 0x791C58, DWORD, size_dword_791C58, 0);
 
-MGS_VAR(1, 0x6C0EA0, WORD, g_wXOffset, 0);
-MGS_VAR(1, 0x6C0EA2, WORD, g_wYOffset, 0);
-
-MGS_VAR(1, 0x6C0EAC, WORD, word_6C0EAC, 0);
 MGS_VAR(1, 0x791C7C, DWORD, g_nTextureIndex, 0);
 MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices_6FC72C, 0);
 MGS_VAR(1, 0x6FC78C, WORD, gNumTextures_word_6FC78C, 0);
@@ -140,10 +136,6 @@ MGS_VAR(1, 0x6FC760, DWORD, dword_6FC760, 0);
 
 
 
-MGS_VAR(1, 0x6C0EAE, WORD, word_6C0EAE, 0);
-MGS_VAR(1, 0x6C0E9A, WORD, word_6C0E9A, 0);
-MGS_VAR(1, 0x6C0E9C, WORD, word_6C0E9C, 0);
-MGS_VAR(1, 0x6C0E9E, WORD, word_6C0E9E, 0);
 MGS_VAR(1, 0x6FC718, DWORD, dword_6FC718, 0);
 MGS_VAR(1, 0x6FC720, DWORD, gSkipFrame_dword_6FC720, 0);
 MGS_VAR(1, 0x6FC768, DWORD, dword_6FC768, 0);
@@ -1290,9 +1282,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         case 35:
         {
             StructVertType0* pStructVert = (StructVertType0*)otItem;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             convertVertexType0(pStructVert, 0);
             convertVertexType0(pStructVert, 1);
@@ -1313,9 +1305,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         case 43:
         {
             StructVertType0* pStructVert = (StructVertType0*)otItem;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             convertVertexType0(pStructVert, 0);
             convertVertexType0(pStructVert, 1);
@@ -1358,8 +1350,8 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[3].u, pStructVert->TexVtx[3].v, &g_fU3, &g_fV3);
             }
 
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
             handleBlendMode(pStructVert->TexVtx[1].textureIdx);
 
             convertVertexType1(pStructVert, 0, g_fU0, g_fV0);
@@ -1381,9 +1373,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         case 51:
         {
             StructVertType2* pStructVert = (StructVertType2*)otItem;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             convertVertexType2(pStructVert, 0);
             convertVertexType2(pStructVert, 1);
@@ -1425,8 +1417,8 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->DifVtx[2].u, pStructVert->DifVtx[2].v, &g_fU2, &g_fV2);
             }
 
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
             handleBlendMode(pStructVert->DifVtx[1].textureIdx);
 
             convertVertexType3(pStructVert, 0, g_fU0, g_fV0);
@@ -1446,9 +1438,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         case 59:
         {
             StructVertType2* pStructVert = (StructVertType2*)otItem;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             if (gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nBlendMode == 3)
             {
@@ -1584,8 +1576,8 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 }
             }
 
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
             handleBlendMode(pStructVert->DifVtx[1].textureIdx);
 
             g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = position[3] + g_fXOffset;
@@ -1638,11 +1630,11 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         case 67:
         {
             StructVertType0* pStructVert = (StructVertType0*)otItem;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
             float fXSize, fYSize;
             sub_40FF20(pStructVert->Vtxs[0].x, pStructVert->Vtxs[0].y, pStructVert->Vtxs[1].x, pStructVert->Vtxs[1].y, &fXSize, &fYSize);
-            handleBlendMode(word_6C0EAC);
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             convertVertexType0(pStructVert, 0);
             convertVertexType0(pStructVert, 0);
@@ -1668,9 +1660,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         case 75:
         {
             StructVertType0* pStructVert = (StructVertType0*)otItem;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             convertVertexType0(pStructVert, 0);
             convertVertexType0(pStructVert, 1);
@@ -1691,9 +1683,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         case 79:
         {
             StructVertType0* pStructVert = (StructVertType0*)otItem;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             convertVertexType0(pStructVert, 0);
             convertVertexType0(pStructVert, 1);
@@ -1715,9 +1707,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         case 83:
         {
             StructVertType2* pStructVert = (StructVertType2*)otItem;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             convertVertexType2(pStructVert, 0);
             convertVertexType2(pStructVert, 1);
@@ -1737,13 +1729,13 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         case 99:
         {
             StructVertType0* pStructVert = (StructVertType0*)otItem;
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
 
             float fSecondX = convertPositionFloat(pStructVert->Vtxs[0].x) + (float)((int16_t)pStructVert->Vtxs[1].x);
             float fSecondY = convertPositionFloat(pStructVert->Vtxs[0].y) + (float)((int16_t)pStructVert->Vtxs[1].y);
 
-            handleBlendMode(word_6C0EAC);
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
             convertVertexType0(pStructVert, 0);
             g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = fSecondX + g_fXOffset;
             g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = convertPositionFloat(pStructVert->Vtxs[0].y) + g_fYOffset;
@@ -1778,21 +1770,21 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             float fSecondY = convertPositionFloat(pStructVert->TexVtx[0].Vtx.y) + (float)diffY;
 
             uint32_t TextureIdx0, TextureIdx1;
-            if (Render_ComputeTextureIdx_40CC50(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
+            if (Render_ComputeTextureIdx_40CC50(gDrawEnv_6C0E98.texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1) != 0)
             {
                 gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = 0xFFFD;
                 g_fU0 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
                 g_fV0 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
 
-                Render_ComputeTextureIdx_40CC50(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(gDrawEnv_6C0E98.texturePage, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v, &TextureIdx0, &TextureIdx1);
                 g_fU1 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
                 g_fV1 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
 
-                Render_ComputeTextureIdx_40CC50(word_6C0EAC, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(gDrawEnv_6C0E98.texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
                 g_fU2 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
                 g_fV2 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
 
-                Render_ComputeTextureIdx_40CC50(word_6C0EAC, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
+                Render_ComputeTextureIdx_40CC50(gDrawEnv_6C0E98.texturePage, pStructVert->TexVtx[0].u + diffX - 1, pStructVert->TexVtx[0].v + diffY, &TextureIdx0, &TextureIdx1);
                 g_fU3 = ((float)(TextureIdx0 & 0xFFFF)) / fInverseRes;
                 g_fV3 = ((float)(TextureIdx1 & 0xFFFF)) / fInverseRes;
             }
@@ -1819,7 +1811,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 }
                 else
                 {
-                    const uint32_t texturePage = (word_6C0EAC & 0x180) >> 7;
+                    const uint32_t texturePage = (gDrawEnv_6C0E98.texturePage & 0x180) >> 7;
                     Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v, &g_fU0, &g_fV0);
                     Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u + diffX, pStructVert->TexVtx[0].v, &g_fU1, &g_fV1);
                     Render_ComputeUVs_40CD80(g_nTextureIndex, texturePage, pStructVert->TexVtx[0].u, pStructVert->TexVtx[0].v + diffY, &g_fU2, &g_fV2);
@@ -1827,9 +1819,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 }
             }
 
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC, 0x8000);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage, 0x8000);
 
             convertVertexType1(pStructVert, 0, g_fU0, g_fV0);
             g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = fSecondX + g_fXOffset;
@@ -1858,9 +1850,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             StructVertType0* pStructVert = (StructVertType0*)otItem;
             float fHalfOffset = (((gXRes - 1.0f) / 2.0f) + 1.0f) / gXRes;
 
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             float centerX = convertPositionFloat(pStructVert->Vtxs[0].x);
             float centerY = convertPositionFloat(pStructVert->Vtxs[0].y);
@@ -1943,9 +1935,9 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 }
             }
 
-            g_fXOffset = g_wXOffset;
-            g_fYOffset = g_wYOffset;
-            handleBlendMode(word_6C0EAC);
+            g_fXOffset = gDrawEnv_6C0E98.offx;
+            g_fYOffset = gDrawEnv_6C0E98.offy;
+            handleBlendMode(gDrawEnv_6C0E98.texturePage);
 
             convertVertexType4(pStructVert, 0, g_fU0, g_fV0);
             convertVertexType4(pStructVert, 1, g_fU1, g_fV1);
@@ -1964,8 +1956,11 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         {
             StructVertType5* pStructVert = (StructVertType5*)otItem;
 
-            word_6C0EAC = pStructVert->field0 & 0x1FF;
-            word_6C0EAE = (((pStructVert->field0 >> 10) & 1) << 8) | ((pStructVert->field0 >> 9) & 1);
+            gDrawEnv_6C0E98.texturePage = pStructVert->field0 & 0x1FF;
+
+            // Set dtd and dfe TODO: Check right way around
+            gDrawEnv_6C0E98.dtd = ((pStructVert->field0 >> 10) & 1);
+            gDrawEnv_6C0E98.dfe = ((pStructVert->field0 >> 9) & 1);
 
             size_dword_791C58 = 1;
             break;
@@ -1982,7 +1977,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             StructVertType5* pStructVert = (StructVertType5*)otItem;
 
             gDrawEnv_6C0E98.clip.x1 = pStructVert->field0 & 0x3FF;
-            word_6C0E9A = (pStructVert->field0 >> 10) & 0x3FF;
+            gDrawEnv_6C0E98.clip.y1 = (pStructVert->field0 >> 10) & 0x3FF;
 
             size_dword_791C58 = 1;
             break;
@@ -1992,13 +1987,13 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         {
             StructVertType5* pStructVert = (StructVertType5*)otItem;
 
-            word_6C0E9C = (pStructVert->field0 & 0x3FF) - gDrawEnv_6C0E98.clip.x1 + 1;
-            word_6C0E9E = ((pStructVert->field0 >> 10) & 0x3FF) - word_6C0E9A + 1;
+            gDrawEnv_6C0E98.clip.x2 = (pStructVert->field0 & 0x3FF) - gDrawEnv_6C0E98.clip.x1 + 1;
+            gDrawEnv_6C0E98.clip.y2 = ((pStructVert->field0 >> 10) & 0x3FF) - gDrawEnv_6C0E98.clip.y1 + 1;
 
             g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].x = (float)gDrawEnv_6C0E98.clip.x1;
-            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = (float)word_6C0E9A;
-            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = (float)word_6C0E9C;
-            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = (float)word_6C0E9E;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].y = (float)gDrawEnv_6C0E98.clip.y1;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].u = (float)gDrawEnv_6C0E98.clip.x2;
+            g_pMGSVertices_6FC780[g_nVertexOffset_6FC784].v = (float)gDrawEnv_6C0E98.clip.y2;
             g_nVertexOffset_6FC784++;
 
             gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].dwVertexCount = 1;
@@ -2014,8 +2009,8 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
         {
             StructVertType5* pStructVert = (StructVertType5*)otItem;
 
-            g_wXOffset = pStructVert->field0 & 0x7FF;
-            g_wYOffset = (pStructVert->field0 >> 11) & 0x3FF;
+            gDrawEnv_6C0E98.offx = pStructVert->field0 & 0x7FF;
+            gDrawEnv_6C0E98.offy = (pStructVert->field0 >> 11) & 0x3FF;
 
             size_dword_791C58 = 1;
             break;

@@ -138,16 +138,7 @@ void CC RankRenderPrimsQ_46ED0A(Actor_Rank* pRank)
 }
 MGS_FUNC_IMPLEX(0x46ED0A, RankRenderPrimsQ_46ED0A, ACTOR_RANK_IMPL);
 
-// TODO: Vars
-WORD gNumSaves_word_78E890 = 5;
-WORD gContinues_word_78E88E = 20;
-WORD gTimesSpotted_word_78E87C = 30;
-WORD gNumEnemiesKilled_word_78E87E = 40;
-
-MGS_VAR(1, 0x78E88C, WORD, gNumRations_word_78E88C, 0);
-MGS_VAR(1, 0x78E7E2, short, gDiffcultyLevel_78E7E2, -1);
-
-MGS_PTR(1, 0x67676C, BYTE*, gRankXPosTable_byte_67676C, {});
+MGS_PTR(1, 0x67676C, BYTE*, gRankXPosTable_byte_67676C, {}); // TODO: Rip data
 
 static void Rank_RenderPlayTime(Actor_Rank* pRank)
 {
@@ -343,8 +334,8 @@ static void Rank_RenderNumSaves(Actor_Rank* pRank)
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText_459B63 ("SAVE /");
 
-    WORD gNumSaves_word_78E890_copy = gNumSaves_word_78E890;
-    if (gNumSaves_word_78E890 >= 1000)
+    WORD gNumSaves_word_78E890_copy = gGameStates_78E7E0.gNumSaves_word_78E890;
+    if (gGameStates_78E7E0.gNumSaves_word_78E890 >= 1000)
     {
         gNumSaves_word_78E890_copy = 999;
     }
@@ -449,8 +440,8 @@ static void Rank_RenderNumContinues(Actor_Rank* pRank)
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText_459B63 ("CONTINUE /");
 
-    DWORD numContinues = gContinues_word_78E88E;
-    if (gContinues_word_78E88E >= 1000)
+    DWORD numContinues = gGameStates_78E7E0.gContinues_word_78E88E;
+    if (gGameStates_78E7E0.gContinues_word_78E88E >= 1000)
     {
         numContinues = 999;
     }
@@ -554,8 +545,8 @@ static void Rank_RenderTimesSpotted(Actor_Rank* pRank)
 
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText_459B63 ("BEING FOUND /");
-    DWORD numTimesSpotted = gTimesSpotted_word_78E87C;
-    if (gTimesSpotted_word_78E87C >= 1000)
+    DWORD numTimesSpotted = gGameStates_78E7E0.gTimesSpotted_word_78E87C;
+    if (gGameStates_78E7E0.gTimesSpotted_word_78E87C >= 1000)
     {
         numTimesSpotted = 999;
     }
@@ -660,8 +651,8 @@ static void Rank_RenderNumKilled(Actor_Rank* pRank)
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText_459B63 ("ENEMIES /");
 
-    DWORD numEnemiesKilled = gNumEnemiesKilled_word_78E87E;
-    if (gNumEnemiesKilled_word_78E87E >= 1000)
+    DWORD numEnemiesKilled = gGameStates_78E7E0.gNumEnemiesKilled_word_78E87E;
+    if (gGameStates_78E7E0.gNumEnemiesKilled_word_78E87E >= 1000)
     {
         numEnemiesKilled = 999;
     }
@@ -763,8 +754,8 @@ static void Rank_RenderNumRations(Actor_Rank* pRank)
 
     Rank_RenderText(pRank, "RATIONS /", 0, 164, ypos, 17, 82, 140, 123);
 
-    DWORD numRationsCapped = gNumRations_word_78E88C;
-    if (gNumRations_word_78E88C >= 1000)
+    DWORD numRationsCapped = gGameStates_78E7E0.gNumRations_word_78E88C;
+    if (gGameStates_78E7E0.gNumRations_word_78E88C >= 1000)
     {
         numRationsCapped = 999;
     }
@@ -807,7 +798,7 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
             TextSetXYFlags_459B0B(172, 46, 16);
             TextSetRGB_459B27(140, 181, 181);
 
-            switch (gDiffcultyLevel_78E7E2)
+            switch (gGameStates_78E7E0.gDiffcultyLevel_78E7E2)
             {
             case -1:
                 Menu_DrawText_459B63 ("VERY EASY");
@@ -856,7 +847,7 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
             TextSetXYFlags_459B0B(172, 42, 16);
             TextSetRGB_459B27(140, 181, 181);
 
-            switch (gDiffcultyLevel_78E7E2)
+            switch (gGameStates_78E7E0.gDiffcultyLevel_78E7E2)
             {
             case -1:
                 Menu_DrawText_459B63 ("VERY EASY");
@@ -915,7 +906,7 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
         TextSetXYFlags_459B0B(172, 36, 16);
         TextSetRGB_459B27(140, 181, 181);
 
-        switch (gDiffcultyLevel_78E7E2)
+        switch (gGameStates_78E7E0.gDiffcultyLevel_78E7E2)
         {
         case -1:
             Menu_DrawText_459B63 ("VERY EASY");
@@ -948,7 +939,7 @@ void CC Rank_RenderGameCompletionScreen(Actor_Rank* pRank)
     TextSetXYFlags_459B0B(115 - gRankXPosTable_byte_67676C[pRank->field_494_ranking], 143, 16);
     TextSetRGB_459B27(82, 140, 123);
     Menu_DrawText_459B63 ("CODE NAME");
-    if (gDiffcultyLevel_78E7E2 != -1)
+    if (gGameStates_78E7E0.gDiffcultyLevel_78E7E2 != -1)
     {
         TextSetXYFlags_459B0B(107, 163, 16);
         TextSetRGB_459B27(82, 140, 123);
@@ -1066,8 +1057,6 @@ MGS_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
 
 MGS_VAR_EXTERN(u32, dword_9942A0); // From Actor
 
-MGS_VAR(1, 0x78E896, WORD, gGameTime_word_78E896, 0);
-MGS_VAR(1, 0x78E898, WORD, gGameTime_word_78E898, 0);
 
 MGS_FUNC_NOT_IMPL(0x475BCE, __int16 __cdecl(Actor_Rank *pRank), Rank_RankCalcs_475BCE);
 MGS_FUNC_NOT_IMPL(0x47589A, int __cdecl(Actor_Rank *pRank, int index), Rank_47589A);
@@ -1284,9 +1273,9 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     {
         pRank->field_480_ticks = 0;
         pRank->field_484_state = 0;
-        pRank->field_488_time = gGameTime_word_78E896;
-        pRank->field_48C_time_mins = gGameTime_word_78E898 / 60;
-        pRank->field_490_time_secs = gGameTime_word_78E898 % 60;
+        pRank->field_488_time = gGameStates_78E7E0.gGameTime_word_78E896;
+        pRank->field_48C_time_mins = gGameStates_78E7E0.gGameTime_word_78E898 / 60;
+        pRank->field_490_time_secs = gGameStates_78E7E0.gGameTime_word_78E898 % 60;
         pRank->field_498_mc_no = 0;
         pRank->field_49C_radar = 0;
         pRank->field_4A0_stealth = 0;

@@ -65,34 +65,7 @@ class MgsFunctionBase
 public:
     MgsFunctionBase() = default;
     virtual ~MgsFunctionBase() = default;
-    static void ApplyFunctions()
-    {
-        TRACE_ENTRYEXIT;
-        LONG err = DetourTransactionBegin();
-        
-        if (err != NO_ERROR)
-        {
-            MGS_FATAL("DetourTransactionBegin failed");
-        }
-        
-        err = DetourUpdateThread(GetCurrentThread());
-        
-        if (err != NO_ERROR)
-        {
-            MGS_FATAL("DetourUpdateThread failed");
-        }
-
-        auto& funcs = GetMgsFunctionTable();
-        for (auto func : funcs)
-        {
-            func.second->Apply();
-        }
-        err = DetourTransactionCommit();
-        if (err != NO_ERROR)
-        {
-            MGS_FATAL("DetourTransactionCommit failed");
-        }
-    }
+    static void ApplyFunctions();
 protected:
     virtual void Apply() = 0;
     static std::map<DWORD, MgsFunctionBase*>& GetMgsFunctionTable();
@@ -379,3 +352,5 @@ extern TypeName* VarName ;
 #define BYTE3(x)   BYTEn(x,  3)
 #define HIWORD(l)           ((WORD)((((DWORD_PTR)(l)) >> 16) & 0xffff))
 #define MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR __asm { __asm nop __asm nop __asm nop __asm nop __asm nop }
+
+void CheckVars();

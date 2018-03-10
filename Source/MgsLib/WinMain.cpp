@@ -72,8 +72,8 @@ struct ActorList;
 
 MGS_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
 MGS_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
-MGS_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), sub_5202FE);
-MGS_FUNC_NOT_IMPL(0x00521210, void __cdecl(), sub_521210);
+MGS_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), FreeCameraMove_5202FE);
+MGS_FUNC_NOT_IMPL(0x00521210, void __cdecl(), FS_StreamEnd_521210);
 
 MGS_VAR(1, 0x71D1CC, HGDIOBJ, gScreenBitmap_71D1CC, nullptr);
 MGS_VAR(1, 0x71D17C, DWORD, dword_71D17C, 0);
@@ -175,14 +175,13 @@ MGS_FUNC_NOT_IMPL(0x0041D420, signed int __cdecl(), Render_sub_41D420);
 MGS_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
-MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), sub_42BE0A);
+MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), MainLoop_helper_42BE0A);
 EXTERN_MGS_FUNC_NOT_IMPL(0x004583BB, void CC(), StreamActorStop_4583BB);
 MGS_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
 
 MGS_VAR(1, 0x6FC748, IDirect3D7 *, g_pDirect3D, nullptr);
 
 MGS_VAR(1, 0x6FC7E0, BYTE, byte_6FC7E0, 0);
-MGS_VAR(1, 0x9AD89B, BYTE, byte_9AD89B, 0);
 MGS_VAR(1, 0x73491C, DWORD, dword_73491C, 0);
 MGS_VAR(1, 0x71D164, DWORD, dword_71D164, 0);
 
@@ -201,7 +200,7 @@ void CC CentreWindow(HWND hWnd, int nWidth, int nHeight)
 MGS_FUNC_IMPLEX(0x0051D09D, CentreWindow, WINMAIN_IMPL);
 
 MGS_VAR(1, 0x717354, DWORD, dword_717354, 0);
-MGS_VAR(1, 0x717348, DWORD, dword_717348, 0);
+MGS_VAR(1, 0x717348, DWORD, gMouseMove_dword_717348, 0);
 MGS_VAR(1, 0x7348FC, DWORD, gRestoreHealthCheat_7348FC, 0);
 MGS_VAR(1, 0x732E64, DWORD, dword_732E64, 0);
 
@@ -372,8 +371,9 @@ int CC HandleExclusiveMode()
 }
 MGS_FUNC_IMPLEX(0x51E1D9, HandleExclusiveMode, WINMAIN_IMPL);
 
-//MSG_FUNC_NOT_IMPL_NOLOG(0x0051C9A2, int __cdecl(), MainLoop);
-int CC MainLoop()
+MGS_ARY(1, 0x9AD880, BYTE, 256, gKeys_9AD880, {});
+
+int CC MainLoop_51C9A2()
 {
     //char var11C[0xFF] = { 0xFF };
     //char var21B[0xFF] = { 0xFF };
@@ -393,24 +393,26 @@ int CC MainLoop()
         }
         dword_73491C = 0;
     }
-    if (dword_71D164 == 0 && dword_717354 != 0 && dword_717348 == 0)
+    if (dword_71D164 == 0 && dword_717354 != 0 && gMouseMove_dword_717348 == 0)
     {
-        dword_717348 = 1;
-        byte_9AD89B = 0;
+        gMouseMove_dword_717348 = 1;
+        gKeys_9AD880[VK_ESCAPE] = 0;
 
-        if (sub_42BE0A() == 0xFFFFFFEF)
+        if (MainLoop_helper_42BE0A() == -17)
         {
             return 0;
         }
 
         dword_6FC718 = 1;
         dword_717354 = 0;
-        byte_9AD89B = 0;
-        dword_717348 = 0;
+        gKeys_9AD880[VK_ESCAPE] = 0;
+        gMouseMove_dword_717348 = 0;
     }
-    if (gRestoreHealthCheat_7348FC != 0)
+
+    if (gRestoreHealthCheat_7348FC)
     {
-        gSnakeCurrentHealth_78E7F6 = gSnakeMaxHealth_78E7F8 = 1024;
+        gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 = 1024;
+        gGameStates_78E7E0.gSnakeMaxHealth_78E7F8 = 1024;
     }
     
     HandleExclusiveMode();
@@ -431,6 +433,7 @@ int CC MainLoop()
 
     return 1;
 }
+MGS_FUNC_IMPLEX(0x51C9A2, MainLoop_51C9A2, WINMAIN_IMPL);
 
 
 // FIX ME - need a way to handle non standard calling conventions
@@ -446,9 +449,8 @@ MGS_VAR(1, 0x73492C, DWORD, gExitMainGameLoop, 0);
 MGS_VAR(1, 0x0071D16C, char*, gCmdLine, nullptr);
 MGS_VAR(1, 0x787774, DWORD, dword_787774, 0);
 MGS_VAR(1, 0x787778, DWORD, dword_787778, 0);
-MGS_VAR(1, 0x78E7E4, DWORD, gFlags_dword_78E7E4, 0);
 MGS_VAR(1, 0x006DEF94, DWORD, gCrashCheck, 0);
-MGS_VAR(1, 0x0071687C, DWORD, gCheatsEnabled, 0);
+MGS_VAR(1, 0x0071687C, DWORD, gCheatsEnabled_71687C, 0);
 MGS_VAR(1, 0x006FD1F8, DWORD, gNoCdEnabled, 0);
 MGS_VAR(1, 0x00650D14, DWORD, gWindowedMode, 0);
 MGS_VAR(1, 0x6FC7A0, DWORD, dword_6FC7A0, 0);
@@ -465,29 +467,21 @@ MGS_VAR(1, 0x0071D1D0, HINSTANCE, gHInstance, 0);
 MGS_VAR(1, 0x651D98, DWORD, gSoundFxVol_dword_651D98, 0);
 MGS_VAR(1, 0x716F68, DWORD, gMusicVol_dword_716F68, 0);
 MGS_VAR(1, 0x77C934, DWORD, gFreeCameraCheat_77C934, 0);
-MGS_VAR(1, 0x9AD8A5, BYTE, byte_9AD8A5, 0);
-MGS_VAR(1, 0x9AD8A7, BYTE, byte_9AD8A7, 0);
-MGS_VAR(1, 0x9AD8A6, BYTE, byte_9AD8A6, 0);
-MGS_VAR(1, 0x9AD8A8, BYTE, byte_9AD8A8, 0);
-MGS_VAR(1, 0x9AD8DA, BYTE, byte_9AD8DA, 0);
-MGS_VAR(1, 0x9AD8C1, BYTE, byte_9AD8C1, 0);
+
 MGS_VAR(1, 0x73490C, DWORD, gInput_MouseY_dword_73490C, 0);
 MGS_VAR(1, 0x734908, DWORD, gInput_MouseX_dword_734908, 0);
-MGS_ARY(1, 0x009AD9A0, int, 256, gKeys, {});
-MGS_ARY(1, 0x9AD880, BYTE, 256, byte_9AD880, {});
+MGS_ARY(1, 0x009AD9A0, int, 256, gKeys_9AD9A0, {});
+
 MGS_VAR(1, 0x009AD980, DWORD, gvirtualKeyRepeatCount, 0);
 MGS_VAR(1, 0x009AD6B0, DWORD, gVirtualKeyCode, 0);
-MGS_VAR(1, 0x009AD892, DWORD, gAltPressed, 0);
 MGS_VAR(1, 0x71D194, DWORD, dword_71D194, 0);
-MGS_VAR(1, 0x009AD8F9, DWORD, gF10Pressed, 0);
-MGS_VAR(1, 0x734900, DWORD, dword_734900, 0);
-MGS_VAR(1, 0x734904, DWORD, dword_734904, 0);
+MGS_VAR(1, 0x734900, DWORD, sLastMouseX_unk_734900, 0);
+MGS_VAR(1, 0x734904, DWORD, sLastMouseY_unk_734904, 0);
 MGS_VAR(1, 0x9AD988, BYTE, byte_9AD988,0);
 MGS_VAR(1, 0x688CDC, DWORD, gActive_dword_688CDC, 0);
 
 MGS_VAR(1, 0x688CD8, DWORD, dword_688CD8, 0);
 MGS_VAR(1, 0x791DE4, DWORD, dword_791DE4, 0);
-MGS_VAR(1, 0x9AD888, BYTE, byte_9AD888, 0);
 MGS_VAR(1, 0x733E34, DWORD, dword_733E34, 0);
 MGS_VAR(1, 0x721E78, DWORD, dword_721E78, 0);
 MGS_VAR(1, 0x650D4C, DWORD, gInfiniteAmmoCheat_650D4C, 0);
@@ -517,7 +511,6 @@ MGS_ASSERT_SIZEOF(weapon_famas, 96);
 
 MGS_VAR(1, 0x995368, WORD, word_995368, 0);
 MGS_VAR(1, 0x995320, WORD, word_995320, 0);
-MGS_VAR(1, 0x78E804, WORD, word_78E804, 0);
 
 MGS_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_update_640CDC);
 MGS_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), Res_famas_shutdown_640E9E);
@@ -580,8 +573,8 @@ weapon_famas* CC Res_Weapon_famas_96_sub_640C24(ActorList* a1, ActorList *a2, vo
     }
     else
     {
-        WORD famasClipSize = word_78E804;
-        if (mp5ClipSize > 0 && word_78E804 > mp5ClipSize)
+        WORD famasClipSize = gGameStates_78E7E0.gWeapon_states_word_78E802[1];
+        if (mp5ClipSize > 0 && famasClipSize > mp5ClipSize)
         {
             famasClipSize = mp5ClipSize;
         }
@@ -594,76 +587,67 @@ MGS_FUNC_IMPLEX(0x640C24, Res_Weapon_famas_96_sub_640C24, WINMAIN_IMPL);
 
 void __cdecl Input_AcquireOrUnAcquire();
 
-//MSG_FUNC_NOT_IMPL(0x0051C2D3, signed int __stdcall(HWND, UINT, UINT, LPARAM), MainWindowProc);
-LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
+LRESULT CALLBACK MainWindowProc_51C2D3(HWND hWnd, UINT msg, UINT wParam, LPARAM lParam)
 {
-    float v4; // ST08_4@14
-    float v5; // ST04_4@14
-    signed int result; // eax@29
-    UINT v7; // [sp+20h] [bp-104h]@54
-    CHAR String[256]; // [sp+24h] [bp-100h]@55
+    LRESULT result = 0;
+    UINT vKey = 0;
+    char keyName[256] = {};
 
     if (gFreeCameraCheat_77C934)
     {
-        if (byte_9AD8A5)
+        if (gKeys_9AD880[VK_LEFT])
         {
-            sub_5202FE(0.0, -0.003000000026077032, 0.0, 0.0);
+            FreeCameraMove_5202FE(0.0, -0.003, 0.0, 0.0);
         }
-
-        if (byte_9AD8A7)
+        if (gKeys_9AD880[VK_RIGHT])
         {
-            sub_5202FE(0.0, 0.003000000026077032, 0.0, 0.0);
+            FreeCameraMove_5202FE(0.0, 0.003, 0.0, 0.0);
         }
-
-        if (byte_9AD8A6)
+        if (gKeys_9AD880[VK_UP])
         {
-            sub_5202FE(0.0, 0.0, -0.003000000026077032, 0.0);
+            FreeCameraMove_5202FE(0.0, 0.0, -0.003, 0.0);
         }
-
-        if (byte_9AD8A8)
+        if (gKeys_9AD880[VK_DOWN])
         {
-            sub_5202FE(0.0, 0.0, 0.003000000026077032, 0.0);
+            FreeCameraMove_5202FE(0.0, 0.0, 0.003, 0.0);
         }
-
-        if (byte_9AD8C1)
+        if (gKeys_9AD880['A'])
         {
-            sub_5202FE(0.02999999932944775f, 0.0f, 0.0f, 0.0f);
+            FreeCameraMove_5202FE(0.029999999, 0.0, 0.0, 0.0);
         }
-
-        if (byte_9AD8DA)
+        if (gKeys_9AD880['Z'])
         {
-            sub_5202FE(-0.02999999932944775f, 0.0f, 0.0f, 0.0f);
+            FreeCameraMove_5202FE(-0.029999999, 0.0, 0.0, 0.0);
         }
-
-        v4 = (float)gInput_MouseY_dword_73490C / 1024.0f;
-        v5 = (float)gInput_MouseX_dword_734908 / 1024.0f;
-
-        sub_5202FE(0.0, v5, v4, 0.0);
-
+        const float mouseY = (double)gInput_MouseY_dword_73490C / 1024.0;
+        const float mouseX = (double)gInput_MouseX_dword_734908 / 1024.0;
+        FreeCameraMove_5202FE(0.0, mouseX, mouseY, 0.0);
         gInput_MouseX_dword_734908 = 9 * gInput_MouseX_dword_734908 / 10;
         gInput_MouseY_dword_73490C = 9 * gInput_MouseY_dword_73490C / 10;
     }
 
-    switch (Msg)
+    switch (msg)
     {
     case WM_SYSKEYDOWN:
-        gKeys[wParam] = lParam;
+        gKeys_9AD9A0[wParam] = lParam;
         gvirtualKeyRepeatCount = lParam;
         gVirtualKeyCode = wParam;
-        if (wParam < 0x100)
+        if (wParam < 256)
         {
-            byte_9AD880[wParam] = 1;
+            gKeys_9AD880[wParam] = 1;
+            return DefWindowProcA(hWnd, msg, wParam, lParam);
         }
 
-        if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
+        if (gVirtualKeyCode == VK_MENU)
         {
-            gAltPressed = 1;
+            gKeys_9AD880[VK_MENU] = 1;
             return 0;
         }
-        if ((unsigned __int16)gVirtualKeyCode == VK_F10)
+
+        if (gVirtualKeyCode == VK_F10)
         {
             dword_71D194 = 1;
-            gF10Pressed = 1;
+            gKeys_9AD880[VK_F10] = 1;
             return 0;
         }
         break;
@@ -671,30 +655,31 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
     case WM_SYSKEYUP:
         gvirtualKeyRepeatCount = lParam;
         gVirtualKeyCode = wParam;
-        if (wParam < 0x100)
+        if (wParam < 256)
         {
-            byte_9AD880[wParam] = 0;
+            gKeys_9AD880[wParam] = 0;
+            return DefWindowProcA(hWnd, msg, wParam, lParam);
         }
-        if ((unsigned __int16)gVirtualKeyCode == VK_MENU)
+        if (gVirtualKeyCode == VK_MENU) // ALT
         {
-            gAltPressed = 0;
+            gKeys_9AD880[VK_MENU] = 0;
             return 0;
         }
-        if ((unsigned __int16)gVirtualKeyCode == VK_F10)
+        if (gVirtualKeyCode == VK_F10)
         {
-            gF10Pressed = 0;
+            gKeys_9AD880[VK_F10] = 0;
             Actor_DumpActorSystem_40A0D4();
             return 0;
         }
         break;
 
-    case WM_MOUSEMOVE:
+    case WM_MOUSEFIRST:
         if (gFreeCameraCheat_77C934)
         {
-            gInput_MouseX_dword_734908 = (unsigned __int16)lParam - dword_734900;
-            gInput_MouseY_dword_73490C = (unsigned __int16)((unsigned int)lParam >> 16) - dword_734904;
-            dword_734900 = (unsigned __int16)lParam;
-            dword_734904 = (unsigned int)lParam >> 16;
+            gInput_MouseX_dword_734908 = LOWORD(lParam) - sLastMouseX_unk_734900;
+            gInput_MouseY_dword_73490C = HIWORD(lParam) - sLastMouseY_unk_734904;
+            sLastMouseX_unk_734900 = LOWORD(lParam);
+            sLastMouseY_unk_734904 = HIWORD(lParam);
         }
         break;
 
@@ -702,11 +687,11 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
         return BROADCAST_QUERY_DENY;
 
     case WM_CHAR:
-        byte_9AD988 = static_cast<BYTE>(wParam);
-        return DefWindowProcA(hWnd, Msg, wParam, lParam);
+        byte_9AD988 = wParam;
+        return DefWindowProcA(hWnd, msg, wParam, lParam);
 
     case WM_ACTIVATE:
-        if ((WORD)wParam)
+        if (wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE)
         {
             printf("$jim - WM_ACTIVATE (active)\n");
             gActive_dword_688CDC = 1;
@@ -718,151 +703,7 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
         }
         Input_AcquireOrUnAcquire();
         Timer_30_1();
-        result = 1;
-        break;
-
-    case WM_KEYDOWN:
-        switch (wParam)
-        {
-        case VK_F2:
-            if (gCheatsEnabled)
-            {
-                if (gRestoreHealthCheat_7348FC)
-                {
-                    gRestoreHealthCheat_7348FC = 0;
-                }
-                else
-                {
-                    gRestoreHealthCheat_7348FC = 1;
-                }
-            }
-            result = 0;
-            goto LABEL_108;
-
-        case VK_F4:
-            if (gCheatsEnabled)
-            {
-                gInfiniteAmmoCheat_650D4C ^= 1u;
-                result = 0;
-            }
-            else
-            {
-                result = 0;
-            }
-            goto LABEL_108;
-
-        case VK_F5: // Disable free camera
-            if (gCheatsEnabled)
-            {
-                gFreeCameraCheat_77C934 = 0;
-                result = 0;
-            }
-            else
-            {
-                result = 0;
-            }
-            goto LABEL_108;
-
-        case VK_F6: // Enable free camera
-            if (gCheatsEnabled)
-            {
-                gFreeCameraCheat_77C934 = 1;
-                result = 0;
-            }
-            else
-            {
-                result = 0;
-            }
-            goto LABEL_108;
-
-        case VK_F7:  // Restart level with collected items
-            if (gCheatsEnabled)
-            {
-                game_state_dword_72279C.flags = 0;
-                sub_521210();
-                sub_452E6E();
-                result = 0;
-            }
-            else
-            {
-                result = 0;
-            }
-            goto LABEL_108;
-
-        case VK_F8:
-            if (gCheatsEnabled)
-            {
-                dword_688CD0 = 0;
-                result = 0;
-            }
-            else
-            {
-                result = 0;
-            }
-            goto LABEL_108;
-
-        case VK_F9:
-            if (gCheatsEnabled)
-            {
-                dword_688CD0 = 1;
-                result = 0;
-            }
-            else
-            {
-                result = 0;
-            }
-            goto LABEL_108;
-
-        case VK_F11:
-            if (gCheatsEnabled)
-            {
-                dword_688CD4 ^= 1u;
-                result = 0;
-            }
-            else
-            {
-                result = 0;
-            }
-            goto LABEL_108;
-
-        case VK_F12:
-            if (gCheatsEnabled)
-            {
-                dword_688CD8 ^= 1u;
-                result = 0;
-            }
-            else
-            {
-                result = 0;
-            }
-            goto LABEL_108;
-
-        case VK_ESCAPE:
-            dword_791DE4 = 1;
-            if (game_state_dword_72279C.flags != 0x20000000 || !strstr(gDest, "s19a"))
-            {
-                if (!dword_717354 && !dword_717348 && !byte_9AD888 && !dword_733E34 && !dword_721E78)
-                {
-                    dword_717354 = 1;
-                }
-            }
-            goto LABEL_108;
-        }
-
-    case WM_KEYUP:
-    LABEL_108:
-        if (wParam < 0x100)
-        {
-            byte_9AD880[wParam] = Msg == WM_KEYDOWN;
-        }
-        v7 = MapVirtualKeyA(wParam, 0);
-        if (v7)
-        {
-            GetKeyNameTextA(v7 << 16, String, 256);
-            gKeys[wParam] = lParam;
-        }
-        gKeys[wParam] = lParam;
-        return DefWindowProcA(hWnd, Msg, wParam, lParam);
+        return 1;
 
     case WM_PAINT:
         printf("$jim - WM_PAINT\n");
@@ -871,18 +712,120 @@ LRESULT CALLBACK MainWindowProc(HWND hWnd, UINT Msg, UINT wParam, LPARAM lParam)
             WmPaint_Handler_43ACC4((HDC)wParam);
             return 0;
         }
-        return DefWindowProcA(hWnd, Msg, wParam, lParam);
+        return DefWindowProcA(hWnd, msg, wParam, lParam);
 
     case WM_CLOSE:
         PostQuitMessage(0);
         return 0;
 
-    default:
-        return DefWindowProcA(hWnd, Msg, wParam, lParam);
-    }
+    case WM_KEYUP:
+        if (wParam < 256)
+        {
+            gKeys_9AD880[wParam] = 0;
+        }
+        return DefWindowProcA(hWnd, msg, wParam, lParam);
 
-    return result;
+    case WM_KEYDOWN:
+        vKey = MapVirtualKeyA(wParam, 0);
+        if (vKey)
+        {
+            GetKeyNameTextA(vKey << 16, keyName, 256);
+            gKeys_9AD9A0[wParam] = lParam;
+        }
+        gKeys_9AD9A0[wParam] = lParam;
+
+        switch (wParam)
+        {
+        case VK_F2:
+            if (gCheatsEnabled_71687C)
+            {
+                gRestoreHealthCheat_7348FC = gRestoreHealthCheat_7348FC == 0;
+            }
+            return 0;
+
+        case VK_F4:
+            if (gCheatsEnabled_71687C)
+            {
+                gInfiniteAmmoCheat_650D4C ^= 1u;
+            }
+            return 0;
+
+        case VK_F5:
+            if (gCheatsEnabled_71687C)
+            {
+                gFreeCameraCheat_77C934 = 0;
+            }
+            return 0;
+
+        case VK_F6:
+            if (gCheatsEnabled_71687C)
+            {
+                gFreeCameraCheat_77C934 = 1;
+            }
+            return 0;
+
+        case VK_F7:
+            if (gCheatsEnabled_71687C)
+            {
+                game_state_dword_72279C.flags = 0;
+                FS_StreamEnd_521210();
+                sub_452E6E();
+            }
+            return 0;
+
+        case VK_F8:
+            if (gCheatsEnabled_71687C)
+            {
+                dword_688CD0 = 0;
+            }
+            return 0;
+
+        case VK_F9:
+            if (gCheatsEnabled_71687C)
+            {
+                dword_688CD0 = 1;
+            }
+            return 0;
+
+        case VK_F11:
+            if (gCheatsEnabled_71687C)
+            {
+                dword_688CD4 ^= 1u;
+            }
+            return 0;
+
+        case VK_F12:
+            if (gCheatsEnabled_71687C)
+            {
+                dword_688CD8 ^= 1u;
+            }
+            return 0;
+
+        case VK_ESCAPE:
+            dword_791DE4 = 1;
+            if ((game_state_dword_72279C.flags != 0x20000000 || !strstr(gDest, "s19a"))
+                && !dword_717354
+                && !gMouseMove_dword_717348
+                && !gKeys_9AD880[VK_BACK]
+                && !dword_733E34
+                && !dword_721E78)
+            {
+                dword_717354 = 1;
+            }
+            // Fall through
+
+        default:
+            if (wParam < 256)
+            {
+                gKeys_9AD880[wParam] = 1;
+            }
+            return DefWindowProcA(hWnd, msg, wParam, lParam);
+        }
+        break;
+    }
+    return DefWindowProcA(hWnd, msg, wParam, lParam);
 }
+MGS_FUNC_IMPLEX(0x51C2D3, MainWindowProc_51C2D3, WINMAIN_IMPL);
 
 struct MessageBoxStruct
 {
@@ -2426,7 +2369,7 @@ signed int __cdecl Main()
 
     for (;;)
     {
-        result = MainLoop();
+        result = MainLoop_51C9A2();
         if (!result)
         {
             break;
@@ -2653,6 +2596,8 @@ void ReplaceStdLib()
 
 int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLine, int /*nShowCmd*/)
 {
+    CheckVars();
+
     // DisableImports();
     ReplaceStdLib();
 
@@ -2761,20 +2706,20 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     }
     CheckForMmf(dword_787774, dword_787778);
 
-    gFlags_dword_78E7E4 |= 0x4000u;
-    gFlags_dword_78E7E4 |= 0x100u;
+    gGameStates_78E7E0.gFlags_dword_78E7E4 |= 0x4000u;
+    gGameStates_78E7E0.gFlags_dword_78E7E4 |= 0x100u;
 
     _strlwr(lpCmdLine);
     _chdir(".");
     gCdId_78D7B0 = -1;
 
     gCrashCheck = strstr(lpCmdLine, "-nocrashcheck") != nullptr;
-    gCheatsEnabled = strstr(lpCmdLine, "-cheatenable") != nullptr;
+    gCheatsEnabled_71687C = strstr(lpCmdLine, "-cheatenable") != nullptr;
     gNoCdEnabled = strstr(lpCmdLine, "-nocd") != nullptr;
 
 
     WndClass.style = 3;
-    WndClass.lpfnWndProc = MainWindowProc;
+    WndClass.lpfnWndProc = MainWindowProc_51C2D3;
     WndClass.cbClsExtra = 0;
     WndClass.cbWndExtra = 0;
     WndClass.hInstance = hInstance;
@@ -2832,7 +2777,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
         gSoftwareRendering = 0;
 
     // HACK: Set some options that allow the game to actually start for now
-    gCheatsEnabled = 1;
+    gCheatsEnabled_71687C = 1;
     gCrashCheck = 0;
     gSoftwareRendering = 0;
     gNoCdEnabled = 1;
