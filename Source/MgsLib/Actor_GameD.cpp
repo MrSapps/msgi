@@ -606,13 +606,13 @@ DWORD CC GameD_Input_42C3C7()
                 {
                     gKeys_9AD880[VK_ESCAPE] = 0;
                     gKeys_9AD880[VK_BACK] = 0;
-                    for (int n = 0; n < 23; n++) // Not 24 otherwise this will give the bomb item and instantly kill snake
+                    for (int n = 0; n < 24; n++)
                     {
                         if (n == Items::eIdCard)
                         {
                             gGameStates_78E7E0.gItem_states_word_78E82A[n] = 7;
                         }
-                        else
+                        else if (n != Items::eItemBomb)
                         {
                             gGameStates_78E7E0.gItem_states_word_78E82A[n] = 1;
                         }
