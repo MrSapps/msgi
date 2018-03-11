@@ -117,6 +117,21 @@ MGS_VAR(1, 0x652B20, DWORD, sInputSpace_dword_652B20, 1);
 MGS_VAR(1, 0x652B18, DWORD, sInputUp_dword_652B18, 1);
 MGS_VAR(1, 0x71D1BC, DWORD, sCounter_dword_71D1BC, 0);
 
+void GiveAllItemsCheat()
+{
+    for (int n = 0; n < 24; n++)
+    {
+        if (n == Items::eIdCard)
+        {
+            gGameStates_78E7E0.gItem_states_word_78E82A[n] = 7;
+        }
+        else if (n != Items::eItemBomb)
+        {
+            gGameStates_78E7E0.gItem_states_word_78E82A[n] = 1;
+        }
+    }
+}
+
 DWORD CC GameD_Input_42C3C7()
 {
     DWORD inputBits = 0;
@@ -610,17 +625,7 @@ DWORD CC GameD_Input_42C3C7()
                 {
                     gKeys_9AD880[VK_ESCAPE] = 0;
                     gKeys_9AD880[VK_BACK] = 0;
-                    for (int n = 0; n < 24; n++)
-                    {
-                        if (n == Items::eIdCard)
-                        {
-                            gGameStates_78E7E0.gItem_states_word_78E82A[n] = 7;
-                        }
-                        else if (n != Items::eItemBomb)
-                        {
-                            gGameStates_78E7E0.gItem_states_word_78E82A[n] = 1;
-                        }
-                    }
+                    GiveAllItemsCheat();
                 }
             }
         }

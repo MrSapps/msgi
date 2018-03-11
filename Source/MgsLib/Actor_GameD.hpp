@@ -120,6 +120,7 @@ MGS_VAR_EXTERN(DWORD, dword_6893D4);
 MGS_VAR_EXTERN(DWORD, gLastInputWasKeyBoard_dword_99562C);
 
 DWORD CC GameD_Input_Wrapper_4455F0();
+void GiveAllItemsCheat();
 
 // Not really like this in the real game, but we need something like this
 // so we have an end marker to allocate backwards

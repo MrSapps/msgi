@@ -219,10 +219,11 @@ static int CC Debug_Loader(Actor_Debug* pDebug)
     pDebug->mPolyF4.y3 = 1000;
 
     // TODO: Hacks because these don't get set correctly in standalone exe yet
-    game_state_dword_72279C.flags = 0x00440000;
+    game_state_dword_72279C.flags = 0x00400000;
     gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 = 1024-256;
     gGameStates_78E7E0.gSnakeMaxHealth_78E7F8 = 1024;
     gSnakeCurrentO2_995348 = 512;
+    GiveAllItemsCheat();
 
     return 0;
 }
