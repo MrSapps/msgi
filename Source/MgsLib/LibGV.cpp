@@ -37,9 +37,9 @@ void CC LibGV_40A4B1()
         gButtonsArray4_7919C0[i].field_2_button_pressed = 0;
         gButtonsArray4_7919C0[i].field_0_button_status = 0;
     }
-    g_lib_gv_stru_6BFEE0.gGv_dword_6C0380 = 0;
-    g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4 = 0;
-    memset(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388, 0, sizeof(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388));
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0380_released = 0;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4_left_stick = 0;
+    memset(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388_history, 0, sizeof(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388_history));
 }
 MGS_FUNC_IMPLEX(0x40A4B1, LibGV_40A4B1, LIBGV_IMPL);
 

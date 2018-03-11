@@ -978,7 +978,7 @@ int CC Script_tbl_pad_452132(BYTE*)
 {
     if (Script_ParamExists('m'))
     {
-        g_lib_gv_stru_6BFEE0.gGv_dword_6C03A0 = Script_get_int();
+        g_lib_gv_stru_6BFEE0.gGv_dword_6C03A0_buttons_released = Script_get_int();
         game_state_dword_72279C.flags |= 0x8000000u;
     }
     if (Script_ParamExists('r'))

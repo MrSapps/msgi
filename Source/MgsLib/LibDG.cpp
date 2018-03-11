@@ -688,9 +688,328 @@ MGS_VAR(REDIRECT_LIBDG_DATA, 0x650090, DWORD, dword_650090, 0);
 
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x9942AB, BYTE, byte_9942AB, 0);
 
+MGS_VAR(1, 0x7919B0, DWORD, dword_7919B0, 0);
+
+int __cdecl sub_40AB96(int input, int mask1, int mask2)
+{
+    int result;
+    int mask2RemainderBits;
+    int mask1RemainderBits;
+    signed int k2Counter;
+
+    result = input;
+    mask2RemainderBits = mask2;
+    mask1RemainderBits = mask1;
+    k2Counter = 2;
+    do
+    {
+        result &= ~(mask2RemainderBits | mask1RemainderBits);
+        if (mask1RemainderBits & input)
+        {
+            result |= mask2RemainderBits;
+        }
+        if (mask2RemainderBits & input)
+        {
+            result |= mask1RemainderBits;
+        }
+        mask1RemainderBits <<= 16;
+        mask2RemainderBits <<= 16;
+        --k2Counter;
+    } while (k2Counter);
+    return result;
+}
+MGS_FUNC_IMPLEX(0x40AB96, sub_40AB96, LIBDG_IMPL);
+
+int __cdecl sub_40AB6B(int input)
+{
+    if ((gGameStates_78E7E0.gFlags_dword_78E7E4 & 7) == 1) // pad number ?
+    {
+        return sub_40AB96(input, 0x20, 0x40);
+    }
+    if ((gGameStates_78E7E0.gFlags_dword_78E7E4 & 7) == 2)
+    {
+        return sub_40AB96(input, 0x20, 0x80);
+    }
+    return input;
+}
+MGS_FUNC_IMPLEX(0x40AB6B, sub_40AB6B, LIBDG_IMPL);
+
+unsigned int *__cdecl sub_40ABCA(unsigned int *a1, PadAnalogDeltas * a2)
+{
+    unsigned int *result;
+    unsigned __int8 v3;
+    unsigned __int8 v4;
+    signed int v5;
+
+    result = a1;
+    *(BYTE *)(result + 1) &= 0xFu;
+    v3 = a2[1].field_2_left_dx;
+    v4 = a2[1].field_3_left_dy;
+    v5 = 0;
+    if (v3 >= 0x40u)
+    {
+        if (v3 > 0xC0u)
+        {
+            v5 = 0x2000;
+        }
+    }
+    else
+    {
+        v5 = 0x8000;
+    }
+    if (v4 >= 0x40u)
+    {
+        if (v4 > 0xC0u)
+        {
+            v5 |= 0x4000u;
+        }
+    }
+    else
+    {
+        v5 |= 0x1000u;
+    }
+    *a1 |= v5;
+    return result;
+}
+MGS_FUNC_IMPLEX(0x40ABCA, sub_40ABCA, LIBDG_IMPL);
+
+int __cdecl Res_base_unknown_44CCD0(signed int a1, signed int a2)
+{
+    signed __int64 v2;
+
+    if (a1 || a2)
+    {
+        v2 = (signed __int64)(atan2((double)a1, (double)a2) * 651.8986476493061);
+    }
+    else
+    {
+        v2 = 0;
+    }
+    return v2;
+}
+MGS_FUNC_IMPLEX(0x44CCD0, Res_base_unknown_44CCD0, LIBDG_IMPL);
+
+int __cdecl Res_base_unknown_40B612(SVECTOR *a1)
+{
+    return Res_base_unknown_44CCD0(a1->field_0_x, a1->field_4_z) & 4095;
+}
+MGS_FUNC_IMPLEX(0x40B612, Res_base_unknown_40B612, LIBDG_IMPL);
+
+__int16 word_65089C[] = { 0, 2048, 1024, 1536, 0, 0, 512, 0, 3072, 2560, 0, 0, 3584, 0, 0, 0 };
+
+// Reverse memcpy ??
+void __cdecl System_Q_sub_40B1B6(void* pStart, void* pEnd, int sizeOrCount)
+{
+    // when the "right" way around the colours of the start screen change..
+    // I believe this is some sort of optimized memcpy like the optimized memset
+    memcpy(pEnd , pStart, sizeOrCount);
+}
+MGS_FUNC_IMPLEX(0x40B1B6, System_Q_sub_40B1B6, true);
+
+// TODO: This needs refactoring and more understanding
+void CC LibDG_Update2_helper_40A857()
+{
+    PadAnalogDeltas padDeltas[2] = {};
+
+    unsigned int releasedBits = 0;
+    unsigned int gamedInput_status = GameD_Input_Wrapper_4455F0();
+    unsigned int gamedInputCopy_status = gamedInput_status;
+    unsigned int gamedInputMapped_released = sub_40AB6B(gamedInput_status); // Get bits for current pad?
+
+    if (counter_dword_6BED20 > 0)
+    {
+        goto clear_input_and_input_mapped;
+    }
+
+    if ((game_state_dword_72279C.flags & 0x80000000) == 0)
+    {
+        if (game_state_dword_72279C.flags & 0x40000000)
+        {
+            // Mask out (~PsxButtonBits::ePADi | PsxButtonBits::ePADj) for pad0 and 1
+            gamedInput_status = dword_7919B0 & 0xF9FFF9FF;
+            gamedInputCopy_status = dword_7919B0 & 0xF9FFF9FF;
+            gamedInputMapped_released = dword_7919B0 & 0xF9FFF9FF;
+            goto LABEL_10;
+        }
+        if (!(game_state_dword_72279C.flags & 0x10000000))
+        {
+            if (!(game_state_dword_72279C.flags & 0x8000000))
+            {
+                goto LABEL_10;
+            }
+            gamedInputMapped_released &= g_lib_gv_stru_6BFEE0.gGv_dword_6C03A0_buttons_released;
+            gamedInput_status &= g_lib_gv_stru_6BFEE0.gGv_dword_6C03A0_buttons_released;
+            gamedInputCopy_status = gamedInput_status;
+            goto LABEL_10;
+        }
+    clear_input_and_input_mapped:
+        gamedInputMapped_released = 0;
+        gamedInput_status = 0;
+        gamedInputCopy_status = gamedInput_status;
+        goto LABEL_10;
+    }
+
+LABEL_10:
+    DWORD counter = 2;
+    DWORD k32Counter = 32;
+    ButtonStates* pBackingArray_0xA = &gButtonsArray4_7919C0[0];
+
+    // Never been able to test any of the code paths below as they don't hold
+    // true with a 360 controller.
+    do // TODO: Can probably just be a for loop
+    {
+        if (game_state_dword_72279C.flags & 0x40000000 && k32Counter == 32)
+        {
+            const DWORD maskedState = game_state_dword_72279C.flags & 0x40000000;
+            if (game_state_dword_72279C.flags & 0x40000000)
+            {
+                padDeltas[0].field_0_right_dx = 1;
+            }
+            const __int16 v6 = padDeltas[0].field_1_right_dy - 1;
+            pBackingArray_0xA->field_A_analog = v6;
+            if (v6 <= 0 || game_state_dword_72279C.flags & 0x90000000 && !maskedState)
+            {
+                pBackingArray_0xA->field_A_analog = 0;
+                const DWORD v10 = gamedInputMapped_released & 0xF000;
+                if (v10)
+                {
+                    pBackingArray_0xA->field_8_dir = (LOWORD(g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4_left_stick)
+                                                           + word_65089C[v10 >> 12]) & 4095;
+                }
+                else
+                {
+                    pBackingArray_0xA->field_8_dir = -1;
+                }
+            }
+            else
+            {
+                if (gamedInputMapped_released & 0xF000)
+                {
+                    if (gamedInputMapped_released & 0xF000)
+                    {
+                        pBackingArray_0xA->field_8_dir =
+                           (LOWORD(g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4_left_stick)
+                                 + word_65089C[(gamedInputMapped_released & 0xF000) >> 12]) & 4095;
+                    }
+                    else
+                    {
+                        pBackingArray_0xA->field_8_dir = -1;
+                    }
+                    pBackingArray_0xA->field_A_analog= 0;
+                }
+                else
+                {
+                    SVECTOR vec = {};
+                    vec.field_0_x = (unsigned __int16)(((unsigned __int8)padDeltas[1].field_2_left_dx - 128) / 8) << 8;
+                    vec.field_4_z = (unsigned __int16)(((unsigned __int8)padDeltas[1].field_3_left_dy - 128) / 8) << 8;
+                    if (vec.field_0_x <= -2048
+                        || (signed __int16)((unsigned __int16)(((unsigned __int8)padDeltas[1].field_2_left_dx - 128) / 8) << 8) >= 2048
+                        || (signed __int16)((unsigned __int16)(((unsigned __int8)padDeltas[1].field_3_left_dy - 128) / 8) << 8) <= -2048
+                        || (signed __int16)((unsigned __int16)(((unsigned __int8)padDeltas[1].field_3_left_dy - 128) / 8) << 8) >= 2048)
+                    {
+                        pBackingArray_0xA->field_8_dir = LOWORD(g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4_left_stick) 
+                                                              + Res_base_unknown_40B612(&vec);
+                    }
+                    else
+                    {
+                        pBackingArray_0xA->field_8_dir = -1;
+                    }
+                    sub_40ABCA(&gamedInputMapped_released, padDeltas);
+                    gamedInput_status = gamedInputCopy_status;
+
+                }
+
+                pBackingArray_0xA->field_C_deltas = padDeltas[1];
+
+                if (game_state_dword_72279C.flags & 0x8000000)
+                {
+                    if (!(g_lib_gv_stru_6BFEE0.gGv_dword_6C03A0_buttons_released & 0xF000))
+                    {
+                        pBackingArray_0xA->field_A_analog = 0;
+                        pBackingArray_0xA->field_8_dir = -1;
+                    }
+                }
+            }
+            g_lib_gv_stru_6BFEE0.gGv_dword_6C03A8 |= 1 << counter;
+        }
+        else
+        {
+            pBackingArray_0xA->field_A_analog = 0;
+            pBackingArray_0xA->field_8_dir = -1;
+        }
+
+        pBackingArray_0xA->field_A_analog = 0;
+        const DWORD v13 = gamedInputMapped_released & 0xF000;
+        if (v13)
+        {
+            pBackingArray_0xA->field_8_dir = (LOWORD(g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4_left_stick) + word_65089C[v13 >> 12]) & 4095;
+        }
+        else
+        {
+            pBackingArray_0xA->field_8_dir = -1;
+        }
+
+        const DWORD v15 = gamedInputMapped_released;
+        pBackingArray_0xA++;
+        gamedInputMapped_released >>= 16;
+        releasedBits |= v15 << (32 - k32Counter);
+        --counter;
+        k32Counter -= 16;
+    } while (k32Counter);
+
+    gamedInputMapped_released = releasedBits;
+    const DWORD v16 = releasedBits & 0xF000F000 | gamedInput_status;
+    gamedInputCopy_status = v16;
+    System_Q_sub_40B1B6(&gButtonsArray4_7919C0[0], &gButtonsArray4_7919C0[2], sizeof(ButtonStates)*2);
+
+    unsigned int f_1_button_status = gamedInputMapped_released;
+    const DWORD v18 = g_lib_gv_stru_6BFEE0.gGv_dword_6C0380_released;
+    unsigned int f_3_button_released = g_lib_gv_stru_6BFEE0.gGv_dword_6C0380_released & ~gamedInputMapped_released;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0380_released = gamedInputMapped_released;
+    unsigned int f_2_other_pressed = v16 & ~g_lib_gv_stru_6BFEE0.gGv_dword_6C0384;
+    unsigned int f_2_button_pressed = gamedInputMapped_released & ~v18;
+    gamedInputMapped_released = g_lib_gv_stru_6BFEE0.gGv_dword_6C0384 & ~v16;
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0384 = v16;
+
+    // Collect buttons pressed in the last 6 frames
+    unsigned int f_4_button_quick = 0;
+    if (f_2_button_pressed)
+    {
+        DWORD pressedButtonsAccumulator = 0;
+        for (int i = 0; i < 6; i++)
+        {
+            pressedButtonsAccumulator |= g_lib_gv_stru_6BFEE0.gGv_dword_6C0388_history[i];
+        }
+        // Ones that match this frames buttons are the "quick" presses
+        f_4_button_quick = f_2_button_pressed & pressedButtonsAccumulator;
+    }
+
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C0388_history[g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00 % 6] = f_2_button_pressed;
+
+    for (int i=0; i<4; i++)
+    {
+        if (i == 2)
+        {
+            f_1_button_status = gamedInputCopy_status;
+            f_2_button_pressed = f_2_other_pressed;
+            f_3_button_released = gamedInputMapped_released;
+        }
+        gButtonsArray4_7919C0[i].field_0_button_status = f_1_button_status;
+        gButtonsArray4_7919C0[i].field_2_button_pressed = f_2_button_pressed;
+        gButtonsArray4_7919C0[i].field_4_button_release = f_3_button_released;
+        gButtonsArray4_7919C0[i].field_6_button_quick = f_4_button_quick;
+
+        // 16 bits for buttons 0,1, then gets reset after setting 2 items of the 
+        // array for 16bits for button 2,3
+        f_1_button_status >>= 16;
+        f_2_button_pressed >>= 16;
+        f_3_button_released >>= 16;
+        f_4_button_quick >>= 16;
+    }
+}
+MGS_FUNC_IMPLEX(0x40A857, LibDG_Update2_helper_40A857, LIBDG_IMPL);
 
 
-MGS_FUNC_NOT_IMPL(0x40A857, void CC(), LibDG_Update2_helper_40A857);
 MGS_FUNC_NOT_IMPL(0x5200D2, signed __int64 CC(), sub_5200D2);
 
 signed __int64 CC WaitFor_445580(int totalCount)
@@ -703,6 +1022,7 @@ signed __int64 CC WaitFor_445580(int totalCount)
     return result;
 }
 MGS_FUNC_IMPLEX(0x445580, WaitFor_445580, LIBDG_IMPL);
+
 
 void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
 {

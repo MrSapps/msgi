@@ -49,11 +49,11 @@ struct LibGv_Struct
     int dword_6BFF78_count;
     DWORD mField_9C; // Padding?
     LibGV_FileRecord mFileCache_A0_06BFF80[128];
-    DWORD gGv_dword_6C0380;
+    DWORD gGv_dword_6C0380_released;
     DWORD gGv_dword_6C0384;
-    DWORD gGv_dword_6C0388[6];
-    DWORD gGv_dword_6C03A0;
-    DWORD gGv_dword_6C03A4;
+    DWORD gGv_dword_6C0388_history[6];
+    DWORD gGv_dword_6C03A0_buttons_released;
+    DWORD gGv_dword_6C03A4_left_stick;
     DWORD gGv_dword_6C03A8;
     DWORD mDWORD_Pad2;
     LibGv_Msg_Array gGv_dword_6C03B0_mesg_array1;

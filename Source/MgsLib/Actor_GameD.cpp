@@ -852,6 +852,16 @@ DWORD CC GameD_Input_445610()
 }
 MGS_FUNC_IMPLEX(0x00445610, GameD_Input_445610, ACTOR_GAMED_IMPL);
 
+DWORD CC GameD_Input_Wrapper_4455F0()
+{
+    if (gFreeCameraCheat_77C934)
+    {
+        return 0;
+    }
+    return GameD_Input_42C3C7();
+}
+MGS_FUNC_IMPLEX(0x004455F0, GameD_Input_Wrapper_4455F0, ACTOR_GAMED_IMPL);
+
 static void GameD_Update_helper(DWORD buttons)
 {
     //if (stateTest)

@@ -22,14 +22,22 @@ enum PsxButtonBits : u32
     eSquare = 1 << 7,
     eSelect = 1 << 8,
     // As seen in LibEtc.h of PSYQ.. don't think these can ever be used.
-    // PADi 9 ?
-    // PADj 10 ?
+    ePADi = 1 << 9,
+    ePADj = 1 <<10,
     eStart = 1 << 11,
     eDPadUp = 1 << 12,
     eDPadRight = 1 << 13,
     eDPadDown = 1 << 14,
     eDPadLeft = 1 << 15,
 };
+struct PadAnalogDeltas
+{
+    char field_0_right_dx;
+    char field_1_right_dy;
+    char field_2_left_dx;
+    char field_3_left_dy;
+};
+MGS_ASSERT_SIZEOF(PadAnalogDeltas, 0x4);
 
 #pragma pack(push)
 #pragma pack(push, 1)
@@ -41,10 +49,7 @@ struct ButtonStates
     WORD field_6_button_quick;
     short field_8_dir;
     short field_A_analog;
-    BYTE field_C_right_dx;
-    BYTE field_D_right_dy;
-    BYTE field_E_left_dx;
-    BYTE field_F_left_dy;
+    PadAnalogDeltas field_C_deltas;
 };
 MGS_ASSERT_SIZEOF(ButtonStates, 0x10);
 #pragma pack(pop)
@@ -114,6 +119,7 @@ MGS_VAR_EXTERN(BYTE*, gSavedTop_78E964);
 MGS_VAR_EXTERN(DWORD, dword_6893D4);
 MGS_VAR_EXTERN(DWORD, gLastInputWasKeyBoard_dword_99562C);
 
+DWORD CC GameD_Input_Wrapper_4455F0();
 
 // Not really like this in the real game, but we need something like this
 // so we have an end marker to allocate backwards
