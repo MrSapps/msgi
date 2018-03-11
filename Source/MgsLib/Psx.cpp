@@ -1144,6 +1144,18 @@ void CC MatrixXVectorFixed_44B320(const MATRIX3x3* pMatrix, const VECTOR* pInVec
 }
 MGS_FUNC_IMPLEX(0x44B320, MatrixXVectorFixed_44B320, IMPL_PSX);
 
+void CC Psx_gte_sqr0_44B030(const VECTOR3* pIn, VECTOR3* pOut)
+{
+    gGte_IR1_993EE4.IR_32 = pIn->x;
+    gGte_IR2_993EE8.IR_32 = pIn->y;
+    gGte_IR3_993EEC.IR_32 = pIn->z;
+    Psx_gte_sqr0_446EE0();
+    pOut->x = gGte_MAC1_993F24.MAC_32;
+    pOut->y = gGte_MAC2_993F28.MAC_32;
+    pOut->z = gGte_MAC3_993F2C.MAC_32;
+}
+MGS_FUNC_IMPLEX(0x44B030, Psx_gte_sqr0_44B030, IMPL_PSX);
+
 static void Test_Psx_gte_RT1_rtir_447480()
 {
     gGte_IR1_993EE4.IR_32 = 4096;
