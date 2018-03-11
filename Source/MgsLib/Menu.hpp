@@ -55,6 +55,8 @@ enum Items : u32
 
 void DoMenuTests();
 
+MGS_VAR_EXTERN(WORD, gSnakeCurrentO2_995348);
+
 void CC Res_MenuMan_create_459A9A();
 void CC MenuTextureLoad_44DEB3();
 void CC Menu_create_459891();

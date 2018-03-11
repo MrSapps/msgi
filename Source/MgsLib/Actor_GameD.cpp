@@ -98,7 +98,11 @@ MGS_VAR(1, 0x71D180, DWORD, gInputMouse_dword_71D180, 0);
 MGS_VAR(1, 0x99562C, DWORD, gLastInputWasKeyBoard_dword_99562C, 0);
 MGS_VAR(1, 0x71D17C, DWORD, gAllowMovement_dword_71D17C, 0);
 MGS_VAR(1, 0x721E78, DWORD, gBgStateRunning_dword_721E78, 0);
-MGS_ARY(1, 0x716E1C, BYTE, 16, vKeys_byte_716E1C, {});
+
+// TODO: This is inited by the game config load, we force it to a known good state here for standalone binary
+// which can't load configs yet
+MGS_ARY(1, 0x716E1C, BYTE, 16, vKeys_byte_716E1C, { 0x58, 0x11, 0x20, 0x10, 0x51, 0x41, 0x57, 0x53, 0x09, 0x25 /*VK_LEFT?*/, 0x27, 0x26, 0x28, 0x1b, 0, 0 });
+
 MGS_VAR(1, 0x71D144, DWORD, gbNothingPressedLastTime_71D144, 0);
 MGS_VAR(1, 0x71D790, DWORD, gConfig_dword_71D790, 0);
 
@@ -765,6 +769,7 @@ DWORD CC GameD_Input_42C3C7()
     {
         gLastInputWasKeyBoard_dword_99562C = 2;
     }
+
 
     const DWORD inputBitsCopy = inputBits;
 

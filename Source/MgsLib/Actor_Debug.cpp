@@ -108,6 +108,13 @@ static std::string LimitTo64Chars(const std::string& s)
     }
     return s;
 }
+
+Actor *__cdecl Res_strctrl_create_45803B(int scriptVar_s_vox_code, unsigned int scriptVar_p, int b24Or30fps)
+{
+    return nullptr;
+}
+MGS_FUNC_IMPLEX(0x45803B, Res_strctrl_create_45803B, false);
+
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
    
@@ -150,6 +157,20 @@ static void CC Debug_Update(Actor_Debug* pDebug)
     TextSetXYFlags_459B0B(60, 70, 0x0);
     const std::string buttonsQuick = "Button quick = " + ButtonFlagsToString(gButtonsArray4_7919C0[0].field_6_button_quick);
     Menu_DrawText_459B63(LimitTo64Chars(buttonsQuick).c_str());
+
+    if (gButtonsArray4_7919C0[0].field_2_button_pressed & PsxButtonBits::eDPadUp)
+    {
+        Res_strctrl_create_45803B(0xfc308022, 0, 0);
+    }
+
+    if (gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 < gGameStates_78E7E0.gSnakeMaxHealth_78E7F8)
+    {
+        gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6++;
+        if (gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 >= gGameStates_78E7E0.gSnakeMaxHealth_78E7F8)
+        {
+            gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 = 0;
+        }
+    }
 
   //  memcpy((pDebug->mPrimData /*+ gActiveBuffer_dword_791A08*/)->field_40_pDataStart, &pDebug->mPolyF4, sizeof(POLY_FT4));
    // pDebug->mPrimData->mBase.field_0_ptr = 3;
@@ -197,6 +218,11 @@ static int CC Debug_Loader(Actor_Debug* pDebug)
     pDebug->mPolyF4.x3= 0;
     pDebug->mPolyF4.y3 = 1000;
 
+    // TODO: Hacks because these don't get set correctly in standalone exe yet
+    game_state_dword_72279C.flags = 0x00440000;
+    gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 = 1024-256;
+    gGameStates_78E7E0.gSnakeMaxHealth_78E7F8 = 1024;
+    gSnakeCurrentO2_995348 = 512;
 
     return 0;
 }
