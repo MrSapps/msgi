@@ -61,7 +61,7 @@ struct GameState_0x180
     short gDiffcultyLevel_78E7E2;
     DWORD gFlags_dword_78E7E4;
     WORD gStartingCdId_78E7E8;
-    WORD gScripTbl_generic_78E7EA;
+    WORD mLastRand_78E7EA;
     WORD stage_name_hash_word_78E7EC;
     WORD gScript_loader_param_m_78E7EE;
     WORD gScript_loader_param_p_78E7F0[3];
