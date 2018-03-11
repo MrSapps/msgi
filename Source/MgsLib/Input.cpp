@@ -20,7 +20,7 @@ MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE8, pJoystickDevice, nullptr);
 MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICE8, pMouseDevice_71D668, nullptr);
 MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps_71D1D8, {});
-MGS_ARY(1, 0x6571F4, int, 14, gButtonMappings_6571F4, {});// TODO: Check 14 is big enough
+MGS_ARY(1, 0x6571F4, int, 14, gButtonMappings_6571F4, { 4, 3, 1, 0, 6, 6, 7, 7, 5, 33, 32, 35, 34, 2 });
 
 MGS_VAR(1, 0x71D68C, int, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
@@ -29,9 +29,9 @@ MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
 MGS_VAR(1, 0x71D798, DWORD, gJoyStickId_dword_71D798, 0);
 MGS_VAR(1, 0x71D41C, int, gInputShiftButton_dword_71D41C, 0);
 MGS_ARY(1, 0x65714C, DWORD, 14, gButtonStates2_unk_65714C, {});
-MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, {});
+MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, { 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0 });
 MGS_VAR(1, 0x71D79C, DWORD, dword_71D79C, 0);
-MGS_ARY(1, 0x6571BC, DWORD, 14, dword_6571BC, {});// TODO: Check 14 is big enough
+MGS_ARY(1, 0x6571BC, DWORD, 14, dword_6571BC, { 4, 3, 1, 0, 6, 6, 7, 7, 5, 33, 32, 35, 34, 2 });
 MGS_ARY(1, 0x71D690, char, 256, char_71D69, {});
 
 
