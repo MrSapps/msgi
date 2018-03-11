@@ -199,7 +199,7 @@ void CC CentreWindow(HWND hWnd, int nWidth, int nHeight)
 }
 MGS_FUNC_IMPLEX(0x0051D09D, CentreWindow, WINMAIN_IMPL);
 
-MGS_VAR(1, 0x717354, DWORD, dword_717354, 0);
+MGS_VAR(1, 0x717354, DWORD, gEscapePressed_NoMouseNoBgState_dword_717354, 0);
 MGS_VAR(1, 0x717348, DWORD, gMouseMove_dword_717348, 0);
 MGS_VAR(1, 0x7348FC, DWORD, gRestoreHealthCheat_7348FC, 0);
 MGS_VAR(1, 0x732E64, DWORD, dword_732E64, 0);
@@ -393,7 +393,7 @@ int CC MainLoop_51C9A2()
         }
         dword_73491C = 0;
     }
-    if (dword_71D164 == 0 && dword_717354 != 0 && gMouseMove_dword_717348 == 0)
+    if (dword_71D164 == 0 && gEscapePressed_NoMouseNoBgState_dword_717354 != 0 && gMouseMove_dword_717348 == 0)
     {
         gMouseMove_dword_717348 = 1;
         gKeys_9AD880[VK_ESCAPE] = 0;
@@ -404,7 +404,7 @@ int CC MainLoop_51C9A2()
         }
 
         dword_6FC718 = 1;
-        dword_717354 = 0;
+        gEscapePressed_NoMouseNoBgState_dword_717354 = 0;
         gKeys_9AD880[VK_ESCAPE] = 0;
         gMouseMove_dword_717348 = 0;
     }
@@ -485,7 +485,7 @@ MGS_VAR(1, 0x791DE4, DWORD, dword_791DE4, 0);
 MGS_VAR(1, 0x733E34, DWORD, dword_733E34, 0);
 MGS_VAR(1, 0x721E78, DWORD, dword_721E78, 0);
 MGS_VAR(1, 0x650D4C, DWORD, gInfiniteAmmoCheat_650D4C, 0);
-MGS_VAR(1, 0x0078E7C0, char * , gDest, nullptr);
+MGS_ARY(1, 0x0078E7C0, char, 32, gDest_78E7C0, {});
 
 struct weapon_famas
 {
@@ -803,14 +803,14 @@ LRESULT CALLBACK MainWindowProc_51C2D3(HWND hWnd, UINT msg, UINT wParam, LPARAM 
 
         case VK_ESCAPE:
             dword_791DE4 = 1;
-            if ((game_state_dword_72279C.flags != 0x20000000 || !strstr(gDest, "s19a"))
-                && !dword_717354
+            if ((game_state_dword_72279C.flags != 0x20000000 || !strstr(gDest_78E7C0, "s19a"))
+                && !gEscapePressed_NoMouseNoBgState_dword_717354
                 && !gMouseMove_dword_717348
                 && !gKeys_9AD880[VK_BACK]
                 && !dword_733E34
                 && !dword_721E78)
             {
-                dword_717354 = 1;
+                gEscapePressed_NoMouseNoBgState_dword_717354 = 1;
             }
             // Fall through
 

@@ -22,6 +22,37 @@ struct MenuMan_Inventory_14h_Unk
 };
 MGS_ASSERT_SIZEOF(MenuMan_Inventory_14h_Unk, 0x14);
 
+
+enum Items : u32
+{
+    eCigs = 0,
+    eScope = 1,
+    eCardboardBoxA = 2,
+    eCardboardBoxB = 3,
+    eCardboardBoxC = 4,
+    eNvg = 5,
+    eThermalG = 6,
+    eGasMask = 7,
+    eBodyArmor = 8,
+    eKetchup = 9,
+    eStealth = 10,
+    eBandana = 11,
+    eCamera = 12,
+    eRations = 13,
+    eMedicine = 14,
+    eDiazepam = 15,
+    ePalKey = 16,
+    eIdCard = 17,
+    eItemBomb = 18,
+    eMineDetector = 19,
+    eMoDisk = 20,
+    eRope = 21,
+    HandkerChief = 22,
+    eSurppressor = 23,
+    eRationsFrozen = 24,
+    eKetchupFrozen = 25
+};
+
 void DoMenuTests();
 
 void CC Res_MenuMan_create_459A9A();

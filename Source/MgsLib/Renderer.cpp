@@ -4,6 +4,7 @@
 #include "Script.hpp"
 #include "Timer.hpp"
 #include "WinMain.hpp"
+#include "Actor_GameD.hpp"
 #include <time.h>
 
 #define RENDERER_IMPL true
@@ -148,7 +149,6 @@ MGS_ARY(1, 0x6C0F00, texture_struct, 1500, gTextures_6C0F00, {}); // Array of 15
 
 MGS_VAR(1, 0x6FC7DC, DWORD, gSkippedFrames_dword_6FC7DC, 0);
 MGS_VAR(1, 0x6FC724, DWORD, sSceneStarted_dword_6FC724, 0);
-MGS_VAR(1, 0x99562C, DWORD, gLastInputWasKeyBoard_dword_99562C, 0);
 MGS_VAR(1, 0x6FC764, WORD, word_6FC764, 0);
 MGS_VAR(1, 0x6FC790, short, gNumFreeTextures_6FC790, 0);
 MGS_VAR(1, 0x9ADDA4, DWORD, dword_9ADDA4, 0);

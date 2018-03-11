@@ -711,36 +711,6 @@ void CC Menu_inventory_common_draw_text_46BA69(const char* pItemInfoStr)
 }
 MGS_FUNC_IMPLEX(0x0046BA69, Menu_inventory_common_draw_text_46BA69, MENU_IMPL);
 
-enum Items : u32
-{
-    eCigs = 0,
-    eScope = 1,
-    eCardboardBoxA = 2,
-    eCardboardBoxB = 3,
-    eCardboardBoxC = 4,
-    eNvg = 5,
-    eThermalG = 6,
-    eGasMask = 7,
-    eBodyArmor = 8,
-    eKetchup = 9,
-    eStealth = 10,
-    eBandana = 11,
-    eCamera = 12,
-    eRations = 13,
-    eMedicine = 14,
-    eDiazepam = 15,
-    ePalKey = 16,
-    eIdCard = 17,
-    eItemBomb = 18,
-    eMineDetector = 19,
-    eMoDisk = 20,
-    eRope = 21,
-    HandkerChief = 22,
-    eSurppressor = 23,
-    eRationsFrozen = 24,
-    eKetchupFrozen = 25
-};
-
 const char* gItemInfos_675C90[26] =
 {
     "CIGARETTES\nSolid Snake's favorite\nbrand. Smoking is hazardous\nto your health.",

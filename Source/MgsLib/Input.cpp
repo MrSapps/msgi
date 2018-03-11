@@ -20,7 +20,7 @@ MGS_VAR(1, 0x71D66C, LPDIRECTINPUTDEVICE8, pJoystickDevice, nullptr);
 MGS_VAR(1, 0x71D668, LPDIRECTINPUTDEVICE8, pMouseDevice_71D668, nullptr);
 MGS_VAR(1, 0x71D420, DIDEVICEINSTANCEA, JoystickDeviceInfos, {});
 MGS_VAR(1, 0x71D1D8, DIDEVCAPS, JoystickDeviceCaps_71D1D8, {});
-MGS_ARY(1, 0x6571F4, DWORD, 14, gButtonMappings_6571F4, {});// TODO: Check 14 is big enough
+MGS_ARY(1, 0x6571F4, int, 14, gButtonMappings_6571F4, {});// TODO: Check 14 is big enough
 
 MGS_VAR(1, 0x71D68C, int, nJoystickDeviceObjects, 0);
 MGS_VAR(1, 0x6FD1DC, DWORD, dword_6FD1DC, 0);
@@ -28,7 +28,7 @@ MGS_VAR(1, 0x71D670, DWORD, gInput_MouseZ_dword_71D67C, 0);
 MGS_VAR(1, 0x71D790, DWORD, dword_71D790, 0);
 MGS_VAR(1, 0x71D798, DWORD, gJoyStickId_dword_71D798, 0);
 MGS_VAR(1, 0x71D41C, int, gInputShiftButton_dword_71D41C, 0);
-MGS_ARY(1, 0x65714C, DWORD, 14, dword_65714C, {});
+MGS_ARY(1, 0x65714C, DWORD, 14, gButtonStates2_unk_65714C, {});
 MGS_ARY(1, 0x657184, DWORD, 14, dword_657184, {});
 MGS_VAR(1, 0x71D79C, DWORD, dword_71D79C, 0);
 MGS_ARY(1, 0x6571BC, DWORD, 14, dword_6571BC, {});// TODO: Check 14 is big enough
@@ -36,13 +36,13 @@ MGS_ARY(1, 0x71D690, char, 256, char_71D69, {});
 
 
 // WinMain.cpp
-extern DWORD& gMouseMove_dword_717348; 
+MGS_VAR_EXTERN(DWORD, gInput_MouseX_dword_734908);
+MGS_VAR_EXTERN(DWORD, gMouseMove_dword_717348);
 extern HINSTANCE& gHInstance;
 extern DWORD& gWindowedMode;
 extern HWND& gHwnd;
 extern DWORD& gActive_dword_688CDC;
 extern DWORD& gInput_MouseY_dword_73490C;
-extern DWORD& gInput_MouseX_dword_734908;
 
 MGS_FUNC_NOT_IMPL(0x00553090, signed int __stdcall(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID *ppvOut, LPUNKNOWN punkOuter), DirectInputCreateExMGS);
 
@@ -492,8 +492,7 @@ BOOL __stdcall Input_EnumDevicesCallback(LPCDIDEVICEINSTANCEA lpddi, PVOID /*pvR
 }
 MGS_FUNC_IMPLEX(0x0043B078, Input_EnumDevicesCallback, INPUT_IMPL);
 
-// 0x43C716
-int __cdecl Input_Shutdown_sub_43C716()
+int CC Input_Shutdown_sub_43C716()
 {
     if (pJoystickDevice)
     {
@@ -782,7 +781,7 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
                                 dword_71D790 = 0;
                                 for (int i = 0; i < 14; i++)
                                 {
-                                    dword_65714C[i] = 0;
+                                    gButtonStates2_unk_65714C[i] = 0;
                                     dword_657184[i] = 0;
                                 }
                             }
@@ -809,7 +808,7 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
                                 dword_6571BC[13] = gButtonMappings_6571F4[13] = 5;
                                 for (int i = 0; i < 14; i++)
                                 {
-                                    dword_65714C[i] = dword_657184[i];
+                                    gButtonStates2_unk_65714C[i] = dword_657184[i];
                                 }
                             }
                             else if (gJoyStickId_dword_71D798 != 1 && gJoyStickId_dword_71D798 != 4)
@@ -848,7 +847,7 @@ HRESULT CC Input_Init_43B1D1(HWND hWnd)
                                 dword_6571BC[12] = gButtonMappings_6571F4[12] = 0x22;
                                 for (int i = 0; i < 14; i++)
                                 {
-                                    dword_65714C[i] = 0;
+                                    gButtonStates2_unk_65714C[i] = 0;
                                     dword_657184[i] = 0;
                                 }
                             }

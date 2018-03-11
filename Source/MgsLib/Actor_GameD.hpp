@@ -67,7 +67,7 @@ struct GameState_0x180
     short gLoadItemFuncIdx_word_78E7FC;
     short gMenu_Selected_item_idx_word_78E7FE;
     WORD field_20;
-    WORD gWeapon_states_word_78E802[10];
+    short gWeapon_states_word_78E802[10];
     WORD gWeaponCapacity_word_78E816[10];
     short gItem_states_word_78E82A[24];
     WORD gEnd1_unk_78E85A[3];
@@ -112,6 +112,7 @@ MGS_VAR_EXTERN(int, gLoaderState_dword_9942B8);
 MGS_VAR_EXTERN(BYTE*, gResidentTop_dword_78E960);
 MGS_VAR_EXTERN(BYTE*, gSavedTop_78E964);
 MGS_VAR_EXTERN(DWORD, dword_6893D4);
+MGS_VAR_EXTERN(DWORD, gLastInputWasKeyBoard_dword_99562C);
 
 
 // Not really like this in the real game, but we need something like this

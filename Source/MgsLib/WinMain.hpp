@@ -14,6 +14,15 @@ MGS_VAR_EXTERN(DWORD, dword_6FC7A0);
 MGS_VAR_EXTERN(IDirectDraw7*, g_pDirectDraw);
 MGS_VAR_EXTERN(DWORD, g_surface565Mode);
 MGS_VAR_EXTERN(DWORD, gColourKey);
+MGS_ARY_EXTERN(BYTE, 256, gKeys_9AD880);
+MGS_ARY_EXTERN(char, 32, gDest_78E7C0);
+MGS_VAR_EXTERN(DWORD, gFreeCameraCheat_77C934);
+MGS_VAR_EXTERN(DWORD, gCheatsEnabled_71687C);
+MGS_VAR_EXTERN(DWORD, gMouseMove_dword_717348);
+MGS_VAR_EXTERN(DWORD, gInput_MouseX_dword_734908);
+MGS_VAR_EXTERN(DWORD, dword_732E64);
+MGS_VAR_EXTERN(DWORD, gInput_MouseY_dword_73490C);
+MGS_VAR_EXTERN(DWORD, gEscapePressed_NoMouseNoBgState_dword_717354);
 
 union UGameStates
 {

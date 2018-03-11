@@ -12,6 +12,7 @@
 #include "Map.hpp"
 #include "Menu.hpp"
 #include "Renderer.hpp"
+#include "Input.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
@@ -52,7 +53,6 @@ MGS_VAR(1, 0x722794, DWORD, dword_722794, 0);
 
 MGS_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 
-MGS_FUNC_NOT_IMPL(0x00445610, DWORD CC(), GameD_Input_445610);
 MGS_FUNC_NOT_IMPL(0x00521892, int CC(), sub_521892);
 MGS_FUNC_NOT_IMPL(0x0044DEDE, int CC(), sub_44DEDE);
 MGS_FUNC_NOT_IMPL(0x0044F3F7, void CC(), Map_ResetMapCountAndKmdsCount_44F3F7);
@@ -75,6 +75,756 @@ void CC Create_loader_44E226();
 void CC LibDG_Clean_Texture_Cache_401110();
 void CC LibGV_40A4BB();
 
+MGS_ARY(1, 0x651DE4, const BYTE, 14, gKeyPsxBitIndex_byte_651DE4, { 4, 7, 5, 6, 2, 0, 3, 1, 8, 15, 13, 12, 14, 11 });
+
+MGS_VAR(1, 0x71D188, DWORD, gCodecReturnKey_dword_71D188, 0);
+MGS_VAR(1, 0x651D8C, DWORD, dword_651D8C, 1);
+
+MGS_VAR(1, 0x651D90, DWORD, dword_651D90, 1);
+MGS_VAR(1, 0x651D88, DWORD, dword_651D88, 1);
+MGS_VAR(1, 0x71D160, DWORD, dword_71D160, 0);
+
+MGS_VAR(1, 0x733E1C, DWORD, dword_733E1C, 0);
+MGS_VAR(1, 0x657148, int, k65_unk_657148, 65);
+
+MGS_VAR(1, 0x716E34, int, gMouseXBound_dword_716E34, 0);
+MGS_VAR(1, 0x716E58, int, gMouseYBound_dword_716E58, 0);
+
+MGS_VAR(1, 0x6FD1F4, int, gMouseY_dword_6FD1F4, 0);
+MGS_VAR(1, 0x6FD1D0, int, gMouseX_dword_6FD1D0, 0);
+
+MGS_VAR(1, 0x71D180, DWORD, gInputMouse_dword_71D180, 0);
+
+MGS_VAR(1, 0x99562C, DWORD, gLastInputWasKeyBoard_dword_99562C, 0);
+MGS_VAR(1, 0x71D17C, DWORD, gAllowMovement_dword_71D17C, 0);
+MGS_VAR(1, 0x721E78, DWORD, gBgStateRunning_dword_721E78, 0);
+MGS_ARY(1, 0x716E1C, BYTE, 16, vKeys_byte_716E1C, {});
+MGS_VAR(1, 0x71D144, DWORD, gbNothingPressedLastTime_71D144, 0);
+MGS_VAR(1, 0x71D790, DWORD, gConfig_dword_71D790, 0);
+
+// Local statics of GameD_Input_42C3C7
+MGS_VAR(1, 0x6FD1BC, DWORD, sLastInputWasKeyBoard_dword_6FD1BC, 0);
+MGS_VAR(1, 0x71D1B8, DWORD, sEscapeCounter_dword_71D1B8, 0);
+MGS_VAR(1, 0x652B0C, DWORD, sButton_13_dword_652B0C, 1);
+MGS_VAR(1, 0x652B10, DWORD, sInputLeft_dword_652B10, 1);
+MGS_VAR(1, 0x652B1C, DWORD, sInputDown_dword_652B1C, 1);
+MGS_VAR(1, 0x652B14, DWORD, sInputRight_dword_652B14, 1);
+MGS_VAR(1, 0x652B20, DWORD, sInputSpace_dword_652B20, 1);
+MGS_VAR(1, 0x652B18, DWORD, sInputUp_dword_652B18, 1);
+MGS_VAR(1, 0x71D1BC, DWORD, sCounter_dword_71D1BC, 0);
+
+DWORD CC GameD_Input_42C3C7()
+{
+    DWORD inputBits = 0;
+    if (gKeys_9AD880[VK_ESCAPE] && game_state_dword_72279C.flags == 0x20000000 && strstr(gDest_78E7C0, "s19a"))
+    {
+        gKeys_9AD880[VK_ESCAPE] = 0;
+        return 1 << gKeyPsxBitIndex_byte_651DE4[13];
+    }
+
+    if (gCodecReturnKey_dword_71D188)
+    {
+        if (gKeys_9AD880[VK_RETURN])
+        {
+            inputBits = 1 << gKeyPsxBitIndex_byte_651DE4[2];
+        }
+    }
+
+    if (!gAllowMovement_dword_71D17C && sEscapeCounter_dword_71D1B8)
+    {
+        --sEscapeCounter_dword_71D1B8;
+        gKeys_9AD880[VK_ESCAPE] = 0;
+        return 0;
+    }
+
+    if (gAllowMovement_dword_71D17C)
+    {
+        sEscapeCounter_dword_71D1B8 = 15;
+    }
+
+    Input_Read_43BD6E();
+
+    if (gbNothingPressedLastTime_71D144 && gInput_MouseZ_dword_71D67C)
+    {
+        bool bNothingPressed = true;
+        for (int i = 0; i < 14; ++i)
+        {
+            if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[i]])
+            {
+                bNothingPressed = false;
+                break;
+            }
+        }
+
+        if (bNothingPressed)
+        {
+            gbNothingPressedLastTime_71D144 = 0;
+        }
+        else
+        {
+            for (int j = 0; j < 14; ++j)
+            {
+                gButtonStates_dword_71D30C[gButtonMappings_6571F4[j]] = 0;
+            }
+        }
+    }
+
+    if (!gButtonStates_dword_71D30C[gButtonMappings_6571F4[13]])
+    {
+        sButton_13_dword_652B0C = 1;
+    }
+
+    if (sButton_13_dword_652B0C
+        && (gButtonStates_dword_71D30C[gButtonMappings_6571F4[13]] && !gConfig_dword_71D790
+            || gButtonStates_dword_71D30C[gButtonMappings_6571F4[13]]
+            && gConfig_dword_71D790
+            && gButtonStates_dword_71D30C[gInputShiftButton_dword_71D41C] == (gButtonStates2_unk_65714C[gButtonMappings_6571F4[13]] != 0))
+        && gMouseMove_dword_717348 != 3)
+    {
+        if (game_state_dword_72279C.flags == 0x20000000 && strstr(gDest_78E7C0, "s19a"))
+        {
+            return 1 << gKeyPsxBitIndex_byte_651DE4[13];
+        }
+        gKeys_9AD880[VK_ESCAPE] = 1;
+        gKeys_9AD880[VK_RETURN] = 0;
+        sButton_13_dword_652B0C = 0;
+        for (int i = 0; i < k65_unk_657148; ++i)
+        {
+            gButtonStates_dword_71D30C[i] = 0;
+        }
+    }
+
+    if (gKeys_9AD880[VK_ESCAPE])
+    {
+        if (!gEscapePressed_NoMouseNoBgState_dword_717354 && !gMouseMove_dword_717348 && !gBgStateRunning_dword_721E78)
+        {
+            gEscapePressed_NoMouseNoBgState_dword_717354 = 1;
+        }
+    }
+
+    if ((game_state_dword_72279C.flags & 0x20488000) != 0x20488000
+        && (game_state_dword_72279C.flags & 0x80000 || (game_state_dword_72279C.flags & 0x104A2000) == 0x104A2000)
+        || gAllowMovement_dword_71D17C
+        || (game_state_dword_72279C.flags & 0x804A0000) == 0x804A0000
+        || dword_733E1C)
+    {
+        if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[9]] || gKeys_9AD880[VK_LEFT])
+        {
+            inputBits &= ~(1 << gKeyPsxBitIndex_byte_651DE4[9]);
+        }
+        else
+        {
+            sInputLeft_dword_652B10 = 1;
+        }
+
+        if (sInputLeft_dword_652B10)
+        {
+            if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[9]])
+            {
+                gKeys_9AD880[VK_LEFT] = 1;
+                sInputLeft_dword_652B10 = 0;
+            }
+        }
+
+        if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[10]] || gKeys_9AD880[VK_RIGHT])
+        {
+            inputBits &= ~(1 << gKeyPsxBitIndex_byte_651DE4[10]);
+        }
+        else
+        {
+            sInputRight_dword_652B14 = 1;
+        }
+
+        if (sInputRight_dword_652B14)
+        {
+            if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[10]])
+            {
+                gKeys_9AD880[VK_RIGHT] = 1;
+                sInputRight_dword_652B14 = 0;
+            }
+        }
+
+        if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[11]] || gKeys_9AD880[VK_UP])
+        {
+            inputBits &= ~(1 << gKeyPsxBitIndex_byte_651DE4[11]);
+        }
+        else
+        {
+            sInputUp_dword_652B18 = 1;
+        }
+
+        if (sInputUp_dword_652B18)
+        {
+            if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[11]])
+            {
+                gKeys_9AD880[VK_UP] = 1;
+                sInputUp_dword_652B18 = 0;
+            }
+        }
+
+        if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[12]] || gKeys_9AD880[VK_DOWN])
+        {
+            inputBits &= ~(1 << gKeyPsxBitIndex_byte_651DE4[12]);
+        }
+        else
+        {
+            sInputDown_dword_652B1C = 1;
+        }
+
+        if (sInputDown_dword_652B1C)
+        {
+            if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[12]])
+            {
+                gKeys_9AD880[VK_DOWN] = 1;
+                sInputDown_dword_652B1C = 0;
+            }
+        }
+
+        if (!gButtonStates_dword_71D30C[gButtonMappings_6571F4[2]] && !gKeys_9AD880[VK_RETURN])
+        {
+            sInputSpace_dword_652B20 = 1;
+        }
+
+        if (sInputSpace_dword_652B20 && gButtonStates_dword_71D30C[gButtonMappings_6571F4[2]])
+        {
+            dword_71D160 = 1;
+            if (gAllowMovement_dword_71D17C)
+            {
+                gKeys_9AD880[VK_RETURN] = 1;
+            }
+            sInputSpace_dword_652B20 = 0;
+        }
+        else
+        {
+            dword_71D160 = 0;
+        }
+
+        if (sInputLeft_dword_652B10)
+        {
+            if (gKeys_9AD880[VK_NUMPAD4] || gKeys_9AD880[VK_LEFT])
+            {
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[9];
+                sInputLeft_dword_652B10 = 0;
+            }
+        }
+
+        if (sInputRight_dword_652B14)
+        {
+            if (gKeys_9AD880[VK_NUMPAD6] || gKeys_9AD880[VK_RIGHT])
+            {
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[10];
+                sInputRight_dword_652B14 = 0;
+            }
+        }
+
+        if (sInputUp_dword_652B18)
+        {
+            if (gKeys_9AD880[VK_NUMPAD8] || gKeys_9AD880[VK_UP])
+            {
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[11];
+                sInputUp_dword_652B18 = 0;
+            }
+        }
+
+        if (sInputDown_dword_652B1C)
+        {
+            if (gKeys_9AD880[VK_NUMPAD2] || gKeys_9AD880[VK_DOWN])
+            {
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[12];
+                sInputDown_dword_652B1C = 0;
+            }
+        }
+
+        if (sInputSpace_dword_652B20 && (gKeys_9AD880[VK_RETURN] || gKeys_9AD880[VK_SPACE]))
+        {
+            sInputSpace_dword_652B20 = 0;
+            if (dword_733E1C)
+            {
+                gKeys_9AD880[VK_SPACE] = 0;
+                gKeys_9AD880[VK_RETURN] = 0;
+                return (1 << gKeyPsxBitIndex_byte_651DE4[13]) | inputBits;
+            }
+            if (!gMouseMove_dword_717348 && !gAllowMovement_dword_71D17C)
+            {
+                gKeys_9AD880[VK_SPACE] = 0;
+                gKeys_9AD880[VK_RETURN] = 0;
+            }
+            inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[2];
+            if (game_state_dword_72279C.flags == 0x4A6000)
+            {
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[13];
+            }
+        }
+
+        if (gKeys_9AD880[VK_ESCAPE])
+        {
+            if ((game_state_dword_72279C.flags & 0x104A2000) != 0x104A2000
+                && (game_state_dword_72279C.flags & 0x804A0000) != 0x804A0000
+                && !gCodecReturnKey_dword_71D188)
+            {
+                gKeys_9AD880[VK_ESCAPE] = 0;
+            }
+            inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[3];
+        }
+        if (!gAllowMovement_dword_71D17C)
+        {
+            gKeys_9AD880[VK_UP] = 0;
+            gKeys_9AD880[VK_DOWN] = 0;
+            gKeys_9AD880[VK_LEFT] = 0;
+            gKeys_9AD880[VK_RIGHT] = 0;
+            gKeys_9AD880[VK_SPACE] = 0;
+        }
+    }
+    else if (gKeys_9AD880[VK_PAUSE] || gKeys_9AD880[VK_F3])
+    {
+        gKeys_9AD880[VK_PAUSE] = 0;
+        gKeys_9AD880[VK_F3] = 0;
+        return (1 << gKeyPsxBitIndex_byte_651DE4[13]) | inputBits;
+    }
+
+    if (gKeys_9AD880[VK_ESCAPE] || gInput_MouseRightButton_734914 && dword_651D8C)
+    {
+        dword_651D8C = 0;
+        if (dword_732E64 == 1 || dword_732E64 == 2 && gCodecReturnKey_dword_71D188)
+        {
+            gKeys_9AD880[VK_ESCAPE] = 0;
+            inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[3];
+            dword_732E64 = 2;
+        }
+        if (gMouseMove_dword_717348)
+        {
+            gKeys_9AD880[VK_ESCAPE] = 0;
+            inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[3];
+        }
+    }
+
+    if (gKeys_9AD880[VK_ESCAPE] || sCounter_dword_71D1BC)
+    {
+        if ((game_state_dword_72279C.flags & 0x408000) != 0x408000
+            && (game_state_dword_72279C.flags == 0x10000020
+                || game_state_dword_72279C.flags == 0x70001020
+                || game_state_dword_72279C.flags & 0xC0440000))
+        {
+            if (++sCounter_dword_71D1BC == 4)
+            {
+                sCounter_dword_71D1BC = 0;
+            }
+            gKeys_9AD880[VK_ESCAPE] = 0;
+            return (1 << gKeyPsxBitIndex_byte_651DE4[3]) | inputBits;
+        }
+        sCounter_dword_71D1BC = 0;
+    }
+
+    if ((game_state_dword_72279C.flags & 0x104A2000) != 0x104A2000)
+    {
+        for (int l = 0; l < 14; ++l)
+        {
+            if (gButtonMappings_6571F4[l] < 0 || gButtonMappings_6571F4[l] >= 0x20)
+            {
+                if (gButtonMappings_6571F4[l] != 0xFF)
+                {
+                    if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[l]] & 0x80)
+                    {
+                        inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[l];
+                    }
+                }
+            }
+            else if (gConfig_dword_71D790)
+            {
+                if (gButtonMappings_6571F4[l] != gInputShiftButton_dword_71D41C)
+                {
+                    if (gButtonStates2_unk_65714C[l])
+                    {
+                        if (gButtonStates_dword_71D30C[gInputShiftButton_dword_71D41C] & 0x80)
+                        {
+                            if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[l]] & 0x80)
+                            {
+                                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[l];
+                                gButtonStates_dword_71D30C[gButtonMappings_6571F4[l]] = 0;
+                            }
+                        }
+                    }
+                    else if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[l]] & 0x80)
+                    {
+                        bool bFound = false;
+                        for (int m = 0; m < 14; ++m)
+                        {
+                            if (m != l && gButtonMappings_6571F4[l] == gButtonMappings_6571F4[m])
+                            {
+                                bFound = true;
+                                break;
+                            }
+                        }
+                        if (bFound)
+                        {
+                            if (!(gButtonStates_dword_71D30C[gInputShiftButton_dword_71D41C] & 0x80))
+                            {
+                                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[l];
+                            }
+                        }
+                        else
+                        {
+                            inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[l];
+                        }
+                    }
+                }
+            }
+            else if (gButtonStates_dword_71D30C[gButtonMappings_6571F4[l]] & 0x80)
+            {
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[l];
+            }
+        }
+    }
+
+    gMouseY_dword_6FD1F4 += gInput_MouseY_dword_73490C;
+    gMouseX_dword_6FD1D0 += gInput_MouseX_dword_734908;
+
+    if (!gMouseMove_dword_717348)
+    {
+        if (gInputMouse_dword_71D180)
+        {
+            if (gMouseX_dword_6FD1D0 <= gMouseXBound_dword_716E34 - 100)
+            {
+                gMouseXBound_dword_716E34 = gMouseX_dword_6FD1D0;
+                gInput_MouseX_dword_734908 = 0;
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[9];
+            }
+
+            if (gMouseX_dword_6FD1D0 >= gMouseXBound_dword_716E34 + 100)
+            {
+                gMouseXBound_dword_716E34 = gMouseX_dword_6FD1D0;
+                gInput_MouseX_dword_734908 = 0;
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[10];
+            }
+
+            if (gMouseY_dword_6FD1F4 <= gMouseYBound_dword_716E58 - 100)
+            {
+                gMouseY_dword_6FD1F4 = 0;
+                gMouseYBound_dword_716E58 = 0;
+                gInput_MouseY_dword_73490C = 0;
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[11];
+            }
+
+            if (gMouseY_dword_6FD1F4 >= gMouseYBound_dword_716E58 + 100)
+            {
+                gMouseY_dword_6FD1F4 = 0;
+                gMouseYBound_dword_716E58 = 0;
+                gInput_MouseY_dword_73490C = 0;
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[12];
+            }
+        }
+    }
+
+    if (gCheatsEnabled_71687C)
+    {
+        if (gKeys_9AD880[VK_BACK])
+        {
+            if ((game_state_dword_72279C.flags & 0x104A2000) != 0x104A2000)
+            {
+                if (gKeys_9AD880['1'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 0;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[0] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[0] = 999;
+                }
+
+                if (gKeys_9AD880['2'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 1;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[1] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[1] = 999;
+                }
+
+                if (gKeys_9AD880['3'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 2;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[2] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[2] = 999;
+                }
+
+                if (gKeys_9AD880['4'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 3;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[3] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[3] = 999;
+                }
+
+                if (gKeys_9AD880['5'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 4;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[4] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[4] = 999;
+                }
+
+                if (gKeys_9AD880['6'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 5;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[5] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[5] = 999;
+                }
+
+                if (gKeys_9AD880['7'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 6;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[6] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[6] = 999;
+                }
+
+                if (gKeys_9AD880['8'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 7;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[7] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[7] = 999;
+                }
+
+                if (gKeys_9AD880['9'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 8;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[8] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[8] = 999;
+                }
+
+                if (gKeys_9AD880['0'])
+                {
+                    gKeys_9AD880[VK_BACK] = 0;
+                    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 9;
+                    gGameStates_78E7E0.gWeapon_states_word_78E802[9] = 999;
+                    gGameStates_78E7E0.gWeaponCapacity_word_78E816[9] = 999;
+                }
+
+                // Give all items cheat
+                if (gKeys_9AD880[VK_ESCAPE])
+                {
+                    gKeys_9AD880[VK_ESCAPE] = 0;
+                    gKeys_9AD880[VK_BACK] = 0;
+                    for (int n = 0; n < 23; n++) // Not 24 otherwise this will give the bomb item and instantly kill snake
+                    {
+                        if (n == Items::eIdCard)
+                        {
+                            gGameStates_78E7E0.gItem_states_word_78E82A[n] = 7;
+                        }
+                        else
+                        {
+                            gGameStates_78E7E0.gItem_states_word_78E82A[n] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else if (!gCodecReturnKey_dword_71D188 && !gAllowMovement_dword_71D17C && !(gActorPauseFlags_dword_791A0C & 2))
+    {
+        if (gKeys_9AD880['1'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[0] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[0] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[0] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 0;
+            }
+        }
+
+        if (gKeys_9AD880['2'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[1] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[1] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[1] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 1;
+            }
+        }
+
+        if (gKeys_9AD880['3'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[2] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[2] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[2] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 2;
+            }
+        }
+
+        if (gKeys_9AD880['4'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[3] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[3] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[3] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 3;
+            }
+        }
+
+        if (gKeys_9AD880['5'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[4] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[4] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[4] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 4;
+            }
+        }
+
+        if (gKeys_9AD880['6'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[5] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[5] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[5] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 5;
+            }
+        }
+
+        if (gKeys_9AD880['7'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[6] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[6] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[6] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 6;
+            }
+        }
+
+        if (gKeys_9AD880['8'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[7] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[7] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[7] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 7;
+            }
+        }
+
+        if (gKeys_9AD880['9'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[8] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[8] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[8] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 8;
+            }
+        }
+
+        if (gKeys_9AD880['0'])
+        {
+            if (gGameStates_78E7E0.gWeapon_states_word_78E802[9] != -1
+                && gGameStates_78E7E0.gWeaponCapacity_word_78E816[9] > 0
+                && !(gGameStates_78E7E0.gWeapon_states_word_78E802[9] & 0x8000))
+            {
+                gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 9;
+            }
+        }
+    }
+
+    dword_651D90 = dword_651D90 != 0;
+
+    if (!gInput_MouseLeftButton_734910 || dword_651D88)
+    {
+        dword_651D88 = 1;
+    }
+
+    if (!gInput_MouseRightButton_734914 || dword_651D8C)
+    {
+        dword_651D8C = 1;
+    }
+
+    if (game_state_dword_72279C.flags & 0x104A2000)
+    {
+        if (!(game_state_dword_72279C.flags & 0x8000) && !gAllowMovement_dword_71D17C)
+        {
+            if (gInput_MouseLeftButton_734910)
+            {
+                if (dword_651D88)
+                {
+                    dword_651D88 = 0;
+                    dword_651D90 = 0;
+                    gKeyBoardButtonStates_dword_71D204[2] = 0;
+                    inputBits |= (1 << gKeyPsxBitIndex_byte_651DE4[1]) | (1 << gKeyPsxBitIndex_byte_651DE4[2]) | (1 << gKeyPsxBitIndex_byte_651DE4[8]) | (1 << gKeyPsxBitIndex_byte_651DE4[13]);
+                }
+            }
+        }
+    }
+
+    if (gInput_MouseRightButton_734914 && dword_651D8C
+        || gKeys_9AD880[VK_ESCAPE] && (game_state_dword_72279C.flags & 0x4A6000) == 0x4A6000)
+    {
+        dword_651D8C = 0;
+        gKeys_9AD880[VK_ESCAPE] = 0;
+        inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[3];
+    }
+
+    if (inputBits)
+    {
+        gLastInputWasKeyBoard_dword_99562C = 2;
+    }
+
+    const DWORD inputBitsCopy = inputBits;
+
+    for (int i = 0; i < 13; ++i)
+    {
+        if (!gMouseMove_dword_717348 || i != 3 && vKeys_byte_716E1C[i] != 16)
+        {
+            const BYTE key = vKeys_byte_716E1C[i];
+            if (key < 16u || key > 17u)
+            {
+                if (key > 17u && key == 255)
+                {
+                    continue;
+                }
+
+                inputBits |= gKeys_9AD880[vKeys_byte_716E1C[i]] << gKeyPsxBitIndex_byte_651DE4[i];
+                if ((game_state_dword_72279C.flags & 0x104A2000) == 0x104A2000)
+                {
+                    if (gKeys_9AD880[vKeys_byte_716E1C[i]])
+                    {
+                        if (gMouseMove_dword_717348 != 4)
+                        {
+                            gKeys_9AD880[vKeys_byte_716E1C[i]] = 0;
+                        }
+                    }
+                }
+                continue;
+            }
+            if (GetAsyncKeyState(vKeys_byte_716E1C[i]) & 0x8000)
+            {
+                inputBits |= 1 << gKeyPsxBitIndex_byte_651DE4[i];
+            }
+        }
+    }
+
+    if (inputBitsCopy != inputBits)
+    {
+        gLastInputWasKeyBoard_dword_99562C = 1;
+    }
+
+    if (inputBits)
+    {
+        sLastInputWasKeyBoard_dword_6FD1BC = gLastInputWasKeyBoard_dword_99562C;
+    }
+    else
+    {
+        gLastInputWasKeyBoard_dword_99562C = sLastInputWasKeyBoard_dword_6FD1BC;
+    }
+
+    gKeys_9AD880[VK_ESCAPE] = 0;
+
+    if (!(inputBits & 0x800))
+    {
+        return inputBits;
+    }
+
+    return inputBits & 0xFFF7FFFFu;
+}
+MGS_FUNC_IMPLEX(0x42C3C7, GameD_Input_42C3C7, true);
+
 void CC Init_Menu_GV_DG_44E1F9()
 {
     Menu_inits_459A48();
@@ -91,6 +841,16 @@ void CC Reset_GV_DG_44E212()
     LibDG_ClearActiveResourceFunctionPointerList_457B7C();
 }
 MGS_FUNC_IMPLEX(0x0044E212, Reset_GV_DG_44E212, ACTOR_GAMED_IMPL);
+
+DWORD CC GameD_Input_445610()
+{
+    if (gFreeCameraCheat_77C934)
+    {
+        return 0;
+    }
+    return GameD_Input_42C3C7();
+}
+MGS_FUNC_IMPLEX(0x00445610, GameD_Input_445610, ACTOR_GAMED_IMPL);
 
 static void GameD_Update_helper(DWORD buttons)
 {
