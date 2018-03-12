@@ -4,7 +4,31 @@
 
 #define FONT_IMPL true
 
-MGS_FUNC_NOT_IMPL(0x45A70D, int __cdecl(Font *ptr, PSX_RECT *pRect, __int16 vramX, __int16 vramY), Font_45A70D);
+int CC Font_45A70D(Font* pFont, PSX_RECT* pRect, __int16 vramX, __int16 vramY)
+{
+    if (pFont)
+    {
+        Font font = {};
+        memcpy(pFont, &font, sizeof(Font)); // OG bug: copy was done outside of null check
+
+        pFont->field_8 = pRect;
+        pFont->field_C_rect.x1 = pRect->x1;
+        pFont->field_C_rect.y1 = pRect->y1;
+
+        pFont->field_C_rect.x2 = pRect->x2;
+        pFont->field_C_rect.y2 = pRect->y2;
+
+        pFont->field_20_vramx = vramX;
+        pFont->field_22_vramy = vramY;
+        pFont->field_24_bitDepth = 16;
+        pFont->field_26 = 1;
+        return Font_45A796(pFont, -1, -1, 0, 0, 4, 0);
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x45A70D, Font_45A70D, FONT_IMPL);
+
+
 MGS_FUNC_NOT_IMPL(0x45A796, int __cdecl (Font *pFont, int a2, int a3, int a4, int a5, int a6, int a7), Font_45A796);
 MGS_FUNC_NOT_IMPL(0x45A89F, void __cdecl(Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
 MGS_FUNC_NOT_IMPL(0x45C6FF, void __cdecl (Font* pFont), Font_Init_data_45C6FF);
@@ -17,28 +41,14 @@ void CC Font_render_45C76C(Font* pFont)
 {
     if (pFont)
     {
-        if (gUseTrueType_dword_6FC7AC)
-        {
-            g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
-                &pFont->field_C_rect,
-                gpFont_field_28_6DF240,
-                pFont->field_14_pallocP32,
-                5,
-                0,
-                0,
-                0);
-        }
-        else
-        {
-            g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
-                &pFont->field_C_rect,
-                gpFont_field_28_6DF240,
-                pFont->field_14_pallocP32,
-                0,
-                0,
-                0,
-                0);
-        }
+        g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
+            &pFont->field_C_rect,
+            gpFont_field_28_6DF240,
+            pFont->field_14_pallocP32,
+            gUseTrueType_dword_6FC7AC ? 5 : 0, // Type 5 is a "magic" 280 byte type
+            0,
+            0,
+            0);
         Render_sub_41C6B0(&pFont->field_C_rect, pFont->field_14_pallocP32);
     }
 }
