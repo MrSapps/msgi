@@ -13,7 +13,7 @@ struct Font
     BYTE field_5;
     BYTE field_6_flags;
     BYTE field_7_x;
-    DWORD field_8;
+    PSX_RECT* field_8;
     PSX_RECT field_C_rect;
     BYTE* field_14_pallocP32;
     WORD field_18_wh;
@@ -28,7 +28,8 @@ struct Font
 };
 MGS_ASSERT_SIZEOF(Font, 0x2C);
 
-EXTERN_MGS_FUNC_NOT_IMPL(0x45A70D, int __cdecl(Font *ptr, PSX_RECT *pRect, __int16 vramX, __int16 vramY), Font_45A70D);
+int CC Font_45A70D(Font* pFont, PSX_RECT* pRect, __int16 vramX, __int16 vramY);
+
 EXTERN_MGS_FUNC_NOT_IMPL(0x45A796, int __cdecl (Font *pFont, int a2, int a3, int a4, int a5, int a6, int a7), Font_45A796);
 EXTERN_MGS_FUNC_NOT_IMPL(0x45AA45, int __cdecl (Font *pFont), Font_CalcSize_45AA45);
 EXTERN_MGS_FUNC_NOT_IMPL(0x45A89F, void __cdecl(Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
