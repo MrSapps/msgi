@@ -6,7 +6,6 @@
 
 MGS_FUNC_NOT_IMPL(0x45A70D, int __cdecl(Font *ptr, PSX_RECT *pRect, __int16 vramX, __int16 vramY), Font_45A70D);
 MGS_FUNC_NOT_IMPL(0x45A796, int __cdecl (Font *pFont, int a2, int a3, int a4, int a5, int a6, int a7), Font_45A796);
-MGS_FUNC_NOT_IMPL(0x45AA45, int __cdecl (Font *pFont), Font_CalcSize_45AA45);
 MGS_FUNC_NOT_IMPL(0x45A89F, void __cdecl(Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
 MGS_FUNC_NOT_IMPL(0x45C6FF, void __cdecl (Font* pFont), Font_Init_data_45C6FF);
 MGS_FUNC_NOT_IMPL(0x45AB2D, void __cdecl (Font* pFont, int a2, int a3, const char* pText, int a5), Font_45AB2D);
@@ -83,3 +82,24 @@ void* CC Font_Get_Ptr_45AB0B(Font* pFont)
     return nullptr;
 }
 MGS_FUNC_IMPLEX(0x45AB0B, Font_Get_Ptr_45AB0B, FONT_IMPL);
+
+void* CC Font_get_alloc_474D8D(Font* pFont)
+{
+    return pFont->field_28_ptr_sys_allocated;
+}
+MGS_FUNC_IMPLEX(0x474D8D, Font_get_alloc_474D8D, FONT_IMPL);
+
+int CC Font_CalcSize_45AA45(Font* pFont)
+{
+    if (!pFont)
+    {
+        return 0;
+    }
+    pFont->field_1A = pFont->field_0 * (pFont->field_2 + 12) - pFont->field_2;
+    pFont->field_18_wh = 4 * ((pFont->field_1A + 7) / 8);
+    pFont->field_1C_wh = pFont->field_1 * (pFont->field_3 + 12) + 2;
+    pFont->field_C_rect.x2 = 2 * pFont->field_18_wh / 4;
+    pFont->field_C_rect.y2 = pFont->field_1C_wh;
+    return pFont->field_1C_wh * pFont->field_18_wh + 32;
+}
+MGS_FUNC_IMPLEX(0x45AA45, Font_CalcSize_45AA45, FONT_IMPL);
