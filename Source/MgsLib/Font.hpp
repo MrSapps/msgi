@@ -3,6 +3,8 @@
 #include "Psx.hpp"
 #include "MgsFunction.hpp"
 
+void DoFontTests();
+
 struct Font
 {
     BYTE field_0;
@@ -38,6 +40,7 @@ MGS_VAR_EXTERN(DWORD, gUseTrueType_dword_6FC7AC);
 void CC Font_render_45C76C(Font* pFont);
 void CC Font_Set_global_alloc_ptr_45C7F2(Font* pFont);
 void CC Font_Set_Buffer_45AAE9(Font* pFont, WORD* pAllocated);
-void CC Font_set_text_45C80A(Font *pFont, const char* pText);
+void CC Font_set_text_45C80A(Font *pFont, char* pText);
 void* CC Font_Get_Ptr_45AB0B(Font* pFont);
 int CC Font_CalcSize_45AA45(Font* pFont);
+void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int a2, int a3, char *pText, int a5);
