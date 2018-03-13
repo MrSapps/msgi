@@ -702,7 +702,7 @@ MGS_FUNC_IMPLEX(0x0046B6EF, Menu_inventory_common_update_helper_46B6EF, MENU_IMP
 
 MGS_VAR(1, 0x733DF0, Font, gMenuFont_733DF0, {});
 
-void CC Menu_inventory_common_draw_text_46BA69(const char* pItemInfoStr)
+void CC Menu_inventory_common_draw_text_46BA69(char* pItemInfoStr)
 {
     gUseTrueType_dword_6FC7AC = gNoTrueType_650D40;
     Font_set_text_45C80A(&gMenuFont_733DF0, pItemInfoStr);
@@ -711,7 +711,7 @@ void CC Menu_inventory_common_draw_text_46BA69(const char* pItemInfoStr)
 }
 MGS_FUNC_IMPLEX(0x0046BA69, Menu_inventory_common_draw_text_46BA69, MENU_IMPL);
 
-const char* gItemInfos_675C90[26] =
+char* gItemInfos_675C90[26] =
 {
     "CIGARETTES\nSolid Snake's favorite\nbrand. Smoking is hazardous\nto your health.",
     "MAGNIFYING SCOPE.\nPress <Action Key> to zoom in,\n<Crawl Key> to zoom out.",
@@ -849,7 +849,7 @@ const Menu_Item_Info gItemInfos_675D30[] =
 
 void CC Menu_inventory_left_update_ShowItemInfo_46A718(short id)
 {
-    const char* pItemInfoStr = gItemInfos_675C90[id];
+    char* pItemInfoStr = gItemInfos_675C90[id];
     if (id == Items::eKetchup && gGameStates_78E7E0.gItemsAreFrozen_word_78E86A)
     {
         pItemInfoStr = gItemInfos_675C90[Items::eKetchupFrozen];
