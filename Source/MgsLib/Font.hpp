@@ -17,7 +17,7 @@ struct Font
     BYTE field_7_x;
     PSX_RECT* field_8;
     PSX_RECT field_C_rect;
-    BYTE* field_14_pallocP32;
+    BYTE* field_14_pPixelData;
     WORD field_18_wh;
     WORD field_1A;
     WORD field_1C_wh;
@@ -26,7 +26,7 @@ struct Font
     WORD field_22_vramy;
     WORD field_24_bitDepth;
     WORD field_26;
-    WORD* field_28_ptr_sys_allocated; // Palt
+    WORD* field_28_palette_ptr_sys_allocated; // Palt
 };
 MGS_ASSERT_SIZEOF(Font, 0x2C);
 
@@ -41,6 +41,6 @@ void CC Font_render_45C76C(Font* pFont);
 void CC Font_Set_global_alloc_ptr_45C7F2(Font* pFont);
 void CC Font_Set_Buffer_45AAE9(Font* pFont, WORD* pAllocated);
 void CC Font_set_text_45C80A(Font *pFont, char* pText);
-void* CC Font_Get_Ptr_45AB0B(Font* pFont);
+void* CC Font_Get_Palette_45AB0B(Font* pFont);
 int CC Font_CalcSize_45AA45(Font* pFont);
 void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int a2, int a3, BYTE *pText, int a5);

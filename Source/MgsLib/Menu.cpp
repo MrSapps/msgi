@@ -3217,7 +3217,7 @@ void Menu_UnsetStates_Free_FontData_46BC17()
 {
     gMenuMan_stru_725FC0.field_2B &= 0xFDu;
     Menu_update_game_state_4691C6();
-    System_2_free_40B2A7(Font_Get_Ptr_45AB0B(&gMenuFont_733DF0));
+    System_2_free_40B2A7(Font_Get_Palette_45AB0B(&gMenuFont_733DF0));
 }
 MGS_FUNC_IMPLEX(0x46BC17, Menu_UnsetStates_Free_FontData_46BC17, MENU_IMPL);
 

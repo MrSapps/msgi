@@ -90,7 +90,7 @@ MGS_FUNC_NOT_IMPL(0x45A796, int __cdecl (Font *pFont, int a2, int a3, int a4, in
 MGS_FUNC_NOT_IMPL(0x45A89F, void __cdecl(Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
 MGS_FUNC_NOT_IMPL(0x45C6FF, void __cdecl (Font* pFont), Font_Init_data_45C6FF);
 
-MGS_VAR(1, 0x6DF240, WORD*, gpFont_field_28_6DF240, nullptr);
+MGS_VAR(1, 0x6DF240, WORD*, gpFont_field_28_palette_6DF240, nullptr);
 MGS_VAR(1, 0x6FC7AC, DWORD, gUseTrueType_dword_6FC7AC, 0);
 
 void CC Font_render_45C76C(Font* pFont)
@@ -99,13 +99,13 @@ void CC Font_render_45C76C(Font* pFont)
     {
         g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
             &pFont->field_C_rect,
-            gpFont_field_28_6DF240,
-            pFont->field_14_pallocP32,
+            gpFont_field_28_palette_6DF240,
+            pFont->field_14_pPixelData,
             gUseTrueType_dword_6FC7AC ? 5 : 0, // Type 5 is a "magic" 280 byte type
             0,
             0,
             0);
-        Render_sub_41C6B0(&pFont->field_C_rect, pFont->field_14_pallocP32);
+        Render_sub_41C6B0(&pFont->field_C_rect, pFont->field_14_pPixelData);
     }
 }
 MGS_FUNC_IMPLEX(0x45C76C, Font_render_45C76C, FONT_IMPL);
@@ -114,7 +114,7 @@ void CC Font_Set_global_alloc_ptr_45C7F2(Font* pFont)
 {
     if (pFont)
     {
-        gpFont_field_28_6DF240 = pFont->field_28_ptr_sys_allocated;
+        gpFont_field_28_palette_6DF240 = pFont->field_28_palette_ptr_sys_allocated;
     }
 }
 MGS_FUNC_IMPLEX(0x45C7F2, Font_Set_global_alloc_ptr_45C7F2, FONT_IMPL);
@@ -123,13 +123,13 @@ void CC Font_Set_Buffer_45AAE9(Font* pFont, WORD* pAllocated)
 {
     if (pFont)
     {
-        pFont->field_28_ptr_sys_allocated = pAllocated;
-        pFont->field_14_pallocP32 = (BYTE*)pAllocated + 32;
+        pFont->field_28_palette_ptr_sys_allocated = pAllocated; // 16 colours in the palette
+        pFont->field_14_pPixelData = (BYTE*)pAllocated + 32; // Other data is the indexed texture/pixel buffer
     }
 }
 MGS_FUNC_IMPLEX(0x45AAE9, Font_Set_Buffer_45AAE9, FONT_IMPL);
 
-void CC Font_set_text_45C80A(Font *pFont, char* pText)
+void CC Font_set_text_45C80A(Font* pFont, char* pText)
 {
     if (pFont)
     {
@@ -139,21 +139,21 @@ void CC Font_set_text_45C80A(Font *pFont, char* pText)
 }
 MGS_FUNC_IMPLEX(0x45C80A, Font_set_text_45C80A, FONT_IMPL);
 
-void* CC Font_Get_Ptr_45AB0B(Font* pFont)
+void* CC Font_Get_Palette_45AB0B(Font* pFont)
 {
     if (pFont)
     {
-        return pFont->field_28_ptr_sys_allocated;
+        return pFont->field_28_palette_ptr_sys_allocated;
     }
     return nullptr;
 }
-MGS_FUNC_IMPLEX(0x45AB0B, Font_Get_Ptr_45AB0B, FONT_IMPL);
+MGS_FUNC_IMPLEX(0x45AB0B, Font_Get_Palette_45AB0B, FONT_IMPL);
 
-void* CC Font_get_alloc_474D8D(Font* pFont)
+void* CC Font_Get_Palette_474D8D(Font* pFont)
 {
-    return pFont->field_28_ptr_sys_allocated;
+    return pFont->field_28_palette_ptr_sys_allocated;
 }
-MGS_FUNC_IMPLEX(0x474D8D, Font_get_alloc_474D8D, FONT_IMPL);
+MGS_FUNC_IMPLEX(0x474D8D, Font_Get_Palette_474D8D, FONT_IMPL);
 
 int CC Font_CalcSize_45AA45(Font* pFont)
 {
@@ -324,11 +324,11 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
         if (gUseTrueType_dword_6FC7AC)
         {
             gFont_wxh_dword_732E14 = pFont->field_1C_wh * pFont->field_18_wh;
-            gFont_true_type_alloc_dword_732E18 = (int)pFont->field_14_pallocP32;
+            gFont_true_type_alloc_dword_732E18 = (int)pFont->field_14_pPixelData;
             dword_732E1C = 1;
         }
         pUpdatedText = Font_set_text_520419(pText);
-        v70 = pFont->field_14_pallocP32;
+        v70 = pFont->field_14_pPixelData;
         dword_732E3C = 0;
         v59 = pFont->field_1A;
         v51 = pFont->field_1C_wh;
