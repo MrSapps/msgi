@@ -704,7 +704,7 @@ MGS_VAR(1, 0x733DF0, Font, gMenuFont_733DF0, {});
 
 void CC Menu_inventory_common_draw_text_46BA69(char* pItemInfoStr)
 {
-    gUseTrueType_dword_6FC7AC = gNoTrueType_650D40;
+    gUseTrueType_dword_6FC7AC = gUseTrueType_650D40;
     Font_set_text_45C80A(&gMenuFont_733DF0, pItemInfoStr);
     Font_render_45C76C(&gMenuFont_733DF0);
     gUseTrueType_dword_6FC7AC = 0;

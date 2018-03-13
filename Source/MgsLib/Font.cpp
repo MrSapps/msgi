@@ -183,22 +183,27 @@ MGS_VAR(1, 0x732E48, DWORD, dword_732E48, 0);
 MGS_VAR(1, 0x72AE10, BYTE*, gFile_CA68u_dword_72AE10, nullptr);
 
 MGS_VAR(1, 0x732E14, DWORD, gFont_wxh_dword_732E14, 0);
-MGS_VAR(1, 0x732E18, DWORD, gFont_true_type_alloc_dword_732E18, 0);
+MGS_VAR(1, 0x732E18, BYTE*, gFont_pixel_buffer_732E18, 0);
 
 
 
-char __cdecl Font_45B90B(int a1, int a2, int a3, int a4, BYTE *a5)
+char __cdecl Font_45B90B(BYTE* pTexturePixels, int a2, int a3, int a4, BYTE *a5)
 {
     return 0;
 }
 MGS_FUNC_IMPLEX(0x45B90B, Font_45B90B, false); // TODO
 
-
-int __cdecl Font_45BD91(BYTE *a1, signed int a2, int a3, int a4, char a5)
+int __cdecl Font_add_char_to_atlas_45BD91(BYTE* pTexturePixels, signed int xpos, int ypos, int fontTexturePitch, char charToRender)
 {
     return 0;
 }
-MGS_FUNC_IMPLEX(0x45BD91, Font_45BD91, false); // TODO
+MGS_FUNC_IMPLEX(0x45BD91, Font_add_char_to_atlas_45BD91, false); // TODO
+
+void __cdecl Font_rubi_map2_45C1E9(BYTE* pTexturePixels, signed int a2, int a3, int a4, int a5)
+{
+
+}
+MGS_FUNC_IMPLEX(0x45C1E9, Font_rubi_map2_45C1E9, false); // TODO
 
 unsigned int __cdecl Font_45C16A(signed int a1)
 {
@@ -217,12 +222,6 @@ int __cdecl Font_map_unknown_45C1DC(int a1)
     return 0;
 }
 MGS_FUNC_IMPLEX(0x45C1DC, Font_map_unknown_45C1DC, false); // TODO
-
-void __cdecl Font_rubi_map2_45C1E9(int a1, signed int a2, int a3, int a4, int a5)
-{
-
-}
-MGS_FUNC_IMPLEX(0x45C1E9, Font_rubi_map2_45C1E9, false); // TODO
 
 BYTE *__cdecl Font_set_text_520419(BYTE *Source)
 {
@@ -317,18 +316,17 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
     int v67; // [esp+54h] [ebp-18h]
     signed int v68; // [esp+58h] [ebp-14h]
     int v69; // [esp+64h] [ebp-8h]
-    BYTE *v70; // [esp+68h] [ebp-4h]
 
     if (gFile_CA68u_dword_72AE10 && pFont)
     {
         if (gUseTrueType_dword_6FC7AC)
         {
             gFont_wxh_dword_732E14 = pFont->field_1C_wh * pFont->field_18_wh;
-            gFont_true_type_alloc_dword_732E18 = (int)pFont->field_14_pPixelData;
+            gFont_pixel_buffer_732E18 = pFont->field_14_pPixelData;
             dword_732E1C = 1;
         }
         pUpdatedText = Font_set_text_520419(pText);
-        v70 = pFont->field_14_pPixelData;
+        BYTE* pBakedPixelData = pFont->field_14_pPixelData;
         dword_732E3C = 0;
         v59 = pFont->field_1A;
         v51 = pFont->field_1C_wh;
@@ -421,7 +419,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                             {
                             case 0x9006:
                             LABEL_60:
-                                v49 = Font_45BD91(v70, v67, v66, v69, 0);
+                                v49 = Font_add_char_to_atlas_45BD91(pBakedPixelData, v67, v66, v69, 0);
                                 goto LABEL_160;
                             case 0x901D:
                                 if ((gGameStates_78E7E0.gFlags_dword_78E7E4 & 7) == 2)
@@ -484,17 +482,17 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                             v31 = Font_map_char_45B80A(v54);
                             if (v31 <= 0)
                             {
-                                Font_45B90B((int)v70, v67, v66, v69, 0);
+                                Font_45B90B(pBakedPixelData, v67, v66, v69, 0);
                             }
                             else
                             {
-                                Font_45B90B((int)v70, v67, v66, v69, (BYTE *)(36 * ((v31 & 0xFFF) - 1) + dword_732E28[v31 / 4096]));
+                                Font_45B90B(pBakedPixelData, v67, v66, v69, (BYTE *)(36 * ((v31 & 0xFFF) - 1) + dword_732E28[v31 / 4096]));
                             }
                             v49 = pFont->field_2 + 12;
                         }
                         else
                         {
-                            v49 = pFont->field_2 + Font_45BD91(v70, v67, v66, v69, v54);
+                            v49 = pFont->field_2 + Font_add_char_to_atlas_45BD91(pBakedPixelData, v67, v66, v69, v54);
                             if (v54 == 0x8021 || v54 == 0x803F)
                             {
                                 if ((signed int)(unsigned __int8)*pTextIter >= 128)
@@ -698,7 +696,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                 }
                 if (dword_732E48 == 1 && (v7 == 0x9002 || v7 == 0x9004))
                 {
-                    Font_rubi_map2_45C1E9((int)v70, v67, v66, v69, (int)(pTextIter + 2));
+                    Font_rubi_map2_45C1E9(pBakedPixelData, v67, v66, v69, (int)(pTextIter + 2));
                 }
                 dword_732E48 = 0;
                 do
@@ -768,7 +766,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                 {
                     if (text2Chars & 0x2000)
                     {
-                        Font_45B90B((int)v70, v67, v66, v69, 0);
+                        Font_45B90B(pBakedPixelData, v67, v66, v69, 0);
                         pTextIter = v60;
                         v49 = 0;
                     }
@@ -812,12 +810,12 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                                 v40 = Font_map_char_45B80A(v39);
                                 if (v40 <= 0)
                                 {
-                                    Font_45B90B((int)v70, v49 + v67, v66, v69, 0);
+                                    Font_45B90B(pBakedPixelData, v49 + v67, v66, v69, 0);
                                 }
                                 else
                                 {
                                     Font_45B90B(
-                                        (int)v70,
+                                        pBakedPixelData,
                                         v49 + v67,
                                         v66,
                                         v69,
@@ -827,7 +825,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                             }
                             else
                             {
-                                v49 += Font_45BD91(v70, v49 + v67, v66, v69, text2Charsc);
+                                v49 += Font_add_char_to_atlas_45BD91(pBakedPixelData, v49 + v67, v66, v69, text2Charsc);
                             }
                         }
                     }

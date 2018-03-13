@@ -457,7 +457,7 @@ MGS_VAR(1, 0x6FC7A0, DWORD, dword_6FC7A0, 0);
 MGS_VAR(1, 0x00650D24, DWORD, gNoEffects, 0);
 
 MGS_VAR(1, 0x00650D34, DWORD, gNoFilter, 0);
-MGS_VAR(1, 0x00650D40, DWORD, gNoTrueType_650D40, 0);
+MGS_VAR(1, 0x00650D40, DWORD, gUseTrueType_650D40, 0);
 MGS_VAR(1, 0x006FC76C, DWORD, gFps, 0);
 MGS_VAR(1, 0x006FC7A4, DWORD, gColourKey, 0);
 MGS_VAR(1, 0x00650D38, int, gBlendMode, 0);
@@ -2753,7 +2753,7 @@ int New_WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR lpCmdLin
     if (strstr(lpCmdLine, "-mod2x"))
         gModX2 = 1;
     if (strstr(lpCmdLine, "-notruetype"))
-        gNoTrueType_650D40 = 0;
+        gUseTrueType_650D40 = 0;
     if (strstr(lpCmdLine, "-1024"))
         gXRes = 3.200000047683716;
     if (strstr(lpCmdLine, "-fps"))
