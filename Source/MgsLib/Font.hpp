@@ -43,4 +43,4 @@ void CC Font_Set_Buffer_45AAE9(Font* pFont, WORD* pAllocated);
 void CC Font_set_text_45C80A(Font *pFont, char* pText);
 void* CC Font_Get_Ptr_45AB0B(Font* pFont);
 int CC Font_CalcSize_45AA45(Font* pFont);
-void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int a2, int a3, char *pText, int a5);
+void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int a2, int a3, BYTE *pText, int a5);
