@@ -5,6 +5,7 @@
 #include "Timer.hpp"
 #include "WinMain.hpp"
 #include "Actor_GameD.hpp"
+#include "Font.hpp"
 #include <time.h>
 
 #define RENDERER_IMPL true
@@ -3346,8 +3347,6 @@ void CC Renderer_SurfaceArray_RemoveSurface_51DFC1(IDirectDrawSurface7* pSurface
 }
 MGS_FUNC_IMPLEX(0x0051DFC1, Renderer_SurfaceArray_RemoveSurface_51DFC1, RENDERER_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x4241A4, void __cdecl(void *), Renderer_Free_Surface_Type_5_4241A4); // TODO
-
 void CC Renderer_Free_Textures_At_Rect_40D2A0(const PSX_RECT* pRect)
 {
     for (int idx = 1; idx < gNumTextures_word_6FC78C; ++idx)
@@ -3358,7 +3357,7 @@ void CC Renderer_Free_Textures_At_Rect_40D2A0(const PSX_RECT* pRect)
         {
             if (gTextures_6C0F00[idx].mSurfaceType == 5)
             {
-                Renderer_Free_Surface_Type_5_4241A4(gTextures_6C0F00[idx].mSurface);
+                Font_TrueTypeLinesFree_4241A4(reinterpret_cast<FontTextLine*>(gTextures_6C0F00[idx].mSurface));
             }
             else if (gTextures_6C0F00[idx].mSurface)
             {

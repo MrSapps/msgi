@@ -2410,7 +2410,7 @@ void __cdecl ClearAll()
         {
             if (gTextures_6C0F00[i].mSurfaceType == 5)
             {
-                Renderer_Free_Surface_Type_5_4241A4(gTextures_6C0F00[i].mSurface);
+                Font_TrueTypeLinesFree_4241A4(reinterpret_cast<FontTextLine*>(gTextures_6C0F00[i].mSurface));
             }
             else if (!gSoftwareRendering)
             {

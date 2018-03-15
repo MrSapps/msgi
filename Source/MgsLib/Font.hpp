@@ -8,13 +8,13 @@ void DoFontTests();
 struct Font
 {
     BYTE field_0;
-    BYTE field_1;
+    BYTE field_1_max_lines;
     BYTE field_2;
-    BYTE field_3;
+    BYTE field_3_line_spacing;
     BYTE field_4;
     BYTE field_5;
     BYTE field_6_flags;
-    BYTE field_7_x;
+    BYTE field_7_out_max_width;
     PSX_RECT* field_8;
     PSX_RECT field_C_rect;
     BYTE* field_14_pPixelData;
@@ -44,3 +44,6 @@ void CC Font_set_text_45C80A(Font *pFont, char* pText);
 void* CC Font_Get_Palette_45AB0B(Font* pFont);
 int CC Font_CalcSize_45AA45(Font* pFont);
 void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int a2, int a3, BYTE *pText, int a5);
+
+struct FontTextLine;
+void CC Font_TrueTypeLinesFree_4241A4(FontTextLine* pSurface);

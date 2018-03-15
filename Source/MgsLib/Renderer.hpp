@@ -95,10 +95,6 @@ signed int CC Render_TextureScratchAlloc_41CA80();
 signed int CC Render_sub_41D1D0();
 bool CC Render_sub_41E730();
 void CC Render_Restore_Lost_Surfaces_51E086();
-
-EXTERN_MGS_FUNC_NOT_IMPL(0x4241A4, void __cdecl(void *), Renderer_Free_Surface_Type_5_4241A4);
-
-
 int CC Render_sub_41C640(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tga6, unsigned __int16 tga7);
 void CC Render_sub_41C6B0(const PSX_RECT* pRect, const BYTE* pPixelData);
 int jImageMove_401A31();

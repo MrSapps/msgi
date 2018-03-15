@@ -85,6 +85,33 @@ int CC Font_45A70D(Font* pFont, PSX_RECT* pRect, __int16 vramX, __int16 vramY)
 }
 MGS_FUNC_IMPLEX(0x45A70D, Font_45A70D, FONT_IMPL);
 
+struct FontTextLine
+{
+    DWORD field_0_x;
+    DWORD field_4_y;
+    DWORD field_8_width;
+    DWORD field_C_height;
+    char field_10_pText[256];
+    DWORD field_110;
+    FontTextLine* field_114_pNext;
+};
+MGS_ASSERT_SIZEOF(FontTextLine, 0x118);
+
+void CC Font_TrueTypeLinesFree_4241A4(FontTextLine* pSurface)
+{
+    FontTextLine* pCurrent = pSurface;
+    if (pCurrent)
+    {
+        FontTextLine* pNext = nullptr;
+        do
+        {
+            pNext = pCurrent->field_114_pNext;
+            free(pCurrent);
+            pCurrent = pNext;
+        } while (pNext);
+    }
+}
+MGS_FUNC_IMPLEX(0x4241A4, Font_TrueTypeLinesFree_4241A4, FONT_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x45A796, int __cdecl (Font *pFont, int a2, int a3, int a4, int a5, int a6, int a7), Font_45A796);
 MGS_FUNC_NOT_IMPL(0x45A89F, void __cdecl(Font *pFont, signed int index, signed int colour1, signed int colour2), Font_ColourRelated_45A89F);
@@ -97,6 +124,15 @@ void CC Font_render_45C76C(Font* pFont)
 {
     if (pFont)
     {
+        // field_14_pPixelData is
+        // x
+        // y
+        // ??
+        // ??
+        // ??
+        // [text buffer]
+        // Repeated while x != 0
+
         g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
             &pFont->field_C_rect,
             gpFont_field_28_palette_6DF240,
@@ -134,7 +170,7 @@ void CC Font_set_text_45C80A(Font* pFont, char* pText)
     if (pFont)
     {
         Font_Init_data_45C6FF(pFont);
-        Font_set_text_shift_jis_45AB2D(pFont, 0, pFont->field_3, (BYTE*)pText, pFont->field_5);
+        Font_set_text_shift_jis_45AB2D(pFont, 0, pFont->field_3_line_spacing, (BYTE*)pText, pFont->field_5);
     }
 }
 MGS_FUNC_IMPLEX(0x45C80A, Font_set_text_45C80A, FONT_IMPL);
@@ -163,7 +199,7 @@ int CC Font_CalcSize_45AA45(Font* pFont)
     }
     pFont->field_1A = pFont->field_0 * (pFont->field_2 + 12) - pFont->field_2;
     pFont->field_18_wh = 4 * ((pFont->field_1A + 7) / 8);
-    pFont->field_1C_wh = pFont->field_1 * (pFont->field_3 + 12) + 2;
+    pFont->field_1C_wh = pFont->field_1_max_lines * (pFont->field_3_line_spacing + 12) + 2;
     pFont->field_C_rect.x2 = 2 * pFont->field_18_wh / 4;
     pFont->field_C_rect.y2 = pFont->field_1C_wh;
     return pFont->field_1C_wh * pFont->field_18_wh + 32;
@@ -180,7 +216,7 @@ MGS_VAR(1, 0x732E40, DWORD, dword_732E40, 0);
 MGS_VAR(1, 0x732E44, DWORD, dword_732E44, 0);
 MGS_VAR(1, 0x732E48, DWORD, dword_732E48, 0);
 
-MGS_VAR(1, 0x72AE10, BYTE*, gFile_CA68u_dword_72AE10, nullptr);
+MGS_VAR(1, 0x72AE10, BYTE*, gFile_CA68u_font_res_72AE10, nullptr);
 
 MGS_VAR(1, 0x732E14, DWORD, gFont_wxh_dword_732E14, 0);
 MGS_VAR(1, 0x732E18, BYTE*, gFont_pixel_buffer_732E18, 0);
@@ -317,7 +353,22 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
     signed int v68; // [esp+58h] [ebp-14h]
     int v69; // [esp+64h] [ebp-8h]
 
-    if (gFile_CA68u_dword_72AE10 && pFont)
+    /*
+    gUseTrueType_dword_6FC7AC = 0;
+
+    //gUseTrueType_dword_6FC7AC = 0;
+    BYTE test[] = { 'p',  0x90, 0x41,  0x0 };
+    pText = test;
+    */
+
+    // 0x9010 = %
+    // 0x9011 = &
+    // 0x9012 = [
+    // 0x9013 = ]
+    // 0x9040 = jp char
+
+
+    if (gFile_CA68u_font_res_72AE10 && pFont)
     {
         if (gUseTrueType_dword_6FC7AC)
         {
@@ -340,8 +391,8 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
         v68 = 0;
         v67 = kZero;
         v66 = field_3;
-        pFont->field_7_x = 0;
-        pFont->field_1E = pFont->field_3 + 14;
+        pFont->field_7_out_max_width = 0;
+        pFont->field_1E = pFont->field_3_line_spacing + 14;
         pFont->field_6_flags &= 0xEFu;
         v65 = 0;
         pTextIter = pUpdatedText;
@@ -457,9 +508,9 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                         }
                         goto LABEL_42;
                     }
-                    if (v67 > pFont->field_7_x)
+                    if (v67 > pFont->field_7_out_max_width)
                     {
-                        pFont->field_7_x = v67;
+                        pFont->field_7_out_max_width = v67;
                     }
                     if (v65)
                     {
@@ -602,7 +653,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                     goto LABEL_112;
                 }
                 pTextIter += 2;
-                if ((signed int)pFont->field_3 > 2)
+                if ((signed int)pFont->field_3_line_spacing > 2)
                 {
                     dword_732E3C = 1;
                 }
@@ -644,15 +695,15 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                     }
                     else
                     {
-                        if (v67 > pFont->field_7_x)
+                        if (v67 > pFont->field_7_out_max_width)
                         {
-                            pFont->field_7_x = v67;
+                            pFont->field_7_out_max_width = v67;
                         }
                         v67 = kZero;
-                        v66 += pFont->field_3 + 12;
+                        v66 += pFont->field_3_line_spacing + 12;
                         pFont->field_1E = v66 + 14;
                         ++v50;
-                        if (v66 + 11 >= v51 || pFont->field_6_flags & 1 || v50 >= pFont->field_1)
+                        if (v66 + 11 >= v51 || pFont->field_6_flags & 1 || v50 >= pFont->field_1_max_lines)
                         {
                             goto LABEL_207;
                         }
@@ -835,15 +886,15 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                     Font_map_unknown_45C1DC(v49 + v67);
                 }
                 v68 = 1;
-                if (v49 + v67 > pFont->field_7_x)
+                if (v49 + v67 > pFont->field_7_out_max_width)
                 {
-                    pFont->field_7_x = v49 + v67;
+                    pFont->field_7_out_max_width = v49 + v67;
                 }
                 v67 = kZero;
-                v66 += pFont->field_3 + 12;
+                v66 += pFont->field_3_line_spacing + 12;
                 pFont->field_1E = v66 + 14;
                 ++v50;
-                if (pFont->field_6_flags & 1 || v66 + 11 >= v51 || v50 >= pFont->field_1)
+                if (pFont->field_6_flags & 1 || v66 + 11 >= v51 || v50 >= pFont->field_1_max_lines)
                 {
                     if (dword_732E48)
                     {
@@ -852,18 +903,18 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                     if (*pTextIter)
                     {
                     LABEL_207:
-                        if (v67 > pFont->field_7_x)
+                        if (v67 > pFont->field_7_out_max_width)
                         {
-                            pFont->field_7_x = v67;
+                            pFont->field_7_out_max_width = v67;
                         }
                         return;
                     }
                     return;
                 }
             LABEL_203:
-                if (v67 > pFont->field_7_x)
+                if (v67 > pFont->field_7_out_max_width)
                 {
-                    pFont->field_7_x = v67;
+                    pFont->field_7_out_max_width = v67;
                 }
             }
         }
