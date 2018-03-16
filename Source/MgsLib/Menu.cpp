@@ -1789,12 +1789,18 @@ MGS_FUNC_IMPLEX(0x00469E77, Menu_init_inventory_left_469E77, MENU_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x462CFC, void __cdecl(MenuMan*), Menu_init_fn7_jimaku_font_buffer_size_sub_462CFC);
 
-
+// OG bug, was using 0x40000000 to tag the pointer but that bit can actually be used, should be 0x80000000
 template<class T>
 static inline T UnSetPointerFlag(T ptr, bool& bWasFlagged)
 {
-    bWasFlagged = (reinterpret_cast<unsigned int>(ptr) & 0x40000000) ? true : false;
-    return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) & 0xBFFFFFFF);
+    bWasFlagged = (reinterpret_cast<unsigned int>(ptr) & 0x80000000) ? true : false;
+    return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) & ~0x80000000);
+}
+
+template<class T>
+static inline T SetPointerFlag(T ptr)
+{
+    return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) | 0x80000000);
 }
 
 MGS_VAR(1, 0x66C4C0, TextConfig, gTextConfig_66C4C0, {});
@@ -2371,12 +2377,6 @@ const BarConfig kO2Config = { "O2",{ 0x1F, 0x3F, 0xC0 },{ 0x1F, 0x7F, 0xFF }, 1 
 MGS_VAR(0, 0x6757F0, BarConfig, gSnakeLifeBarConfig_6757F0, kLifeConfig);
 MGS_VAR(1, 0x675800, BarConfig, gSnakeO2BarConfig_675800, kO2Config);
 MGS_VAR(1, 0x7339D4, int, gSnakeLifeYPos_7339D4, 0);
-
-template<class T>
-static inline T SetPointerFlag(T ptr)
-{
-    return reinterpret_cast<T>(reinterpret_cast<unsigned int>(ptr) | 0x40000000);
-}
 
 void CC Menu_render_snake_life_bar_469194(MenuPrimBuffer* ot, short xpos, short ypos)
 {
