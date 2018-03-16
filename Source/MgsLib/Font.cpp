@@ -56,7 +56,7 @@ void CC Font_build_replacement_table_520511()
     /*
     for (int i = 0; i < 256; i++)
     {
-        LOG_INFO("Value: " << gTextCharTable_dword_77C938[i]);
+    LOG_INFO("Value: " << gTextCharTable_dword_77C938[i]);
     }*/
 }
 
@@ -132,7 +132,7 @@ void* CC Render_alloc_font_type5_4241C2(const BYTE* pixelData, const WORD* pPall
         do
         {
             FontTextLine* pAllocatedTextLine = (FontTextLine *)malloc(sizeof(FontTextLine));
-            
+
             // Stop if allocation failed
             if (!pAllocatedTextLine)
             {
@@ -168,7 +168,7 @@ void* CC Render_alloc_font_type5_4241C2(const BYTE* pixelData, const WORD* pPall
                 }
                 pAllocatedTextLine->field_10_pText[textBufferIdx] = pSrc->field_7_text_buffer[textBufferIdx];
             }
-            
+
             // Add null terminator
             pAllocatedTextLine->field_10_pText[textBufferIdx] = 0;
             pAllocatedTextLine->field_114_pNext = nullptr;
@@ -375,95 +375,139 @@ int __cdecl sub_45C1BF(int a1, int a2, int a3)
 }
 MGS_FUNC_IMPLEX(0x45C1BF, sub_45C1BF, false); // TODO
 
-static WORD NextVarChar(BYTE*& pTextIter)
+static WORD NextVarChar(BYTE*& pTextIter, bool incrementDouble = true, bool incrementSingle = true)
 {
     WORD text2Chars = 0;
     if (*pTextIter >= 128)
     {
         text2Chars = pTextIter[1] | (*pTextIter << 8);
+        if (incrementDouble)
+        {
+            pTextIter += 2;
+        }
     }
     else
     {
         text2Chars = pTextIter[0] | (0x80 << 8);
+        if (incrementSingle)
+        {
+            pTextIter++;
+        }
     }
     return text2Chars;
+}
+
+int HandleCharAdd(BYTE*& pTextIter, int textCurrentX, Font* pFont, int charToAdd, int xpos, int ypos, BYTE* pBakedPixelData, int v69)
+{
+    if (charToAdd >= 0x8100)
+    {
+        const int v31 = Font_map_char_45B80A(charToAdd);
+        if (v31 <= 0)
+        {
+            Font_45B90B(pBakedPixelData, xpos, ypos, v69, 0);
+        }
+        else
+        {
+            Font_45B90B(pBakedPixelData, xpos, ypos, v69, (BYTE *)(36 * ((v31 & 0xFFF) - 1) + dword_732E28[v31 / 4096]));
+        }
+        textCurrentX = pFont->field_2 + 12;
+    }
+    else
+    {
+        textCurrentX = pFont->field_2 + Font_add_char_to_atlas_45BD91(pBakedPixelData, xpos, ypos, v69, charToAdd);
+        if (charToAdd == 0x8021 || charToAdd == 0x803F)
+        {
+            const int nextChar3 = NextVarChar(pTextIter, false, false);
+            const signed int nextChar3Masked = nextChar3;
+            BYTE1(nextChar3Masked) &= 0x9Fu;
+            if (nextChar3Masked != 0x8021 && nextChar3Masked != 0x803F)
+            {
+                if (nextChar3Masked == 0x8029 || nextChar3Masked == 0x8028 || nextChar3Masked <= 36878 && nextChar3Masked >= 36873 || nextChar3Masked == 36885)
+                {
+                    textCurrentX += 2;
+                }
+                else
+                {
+                    textCurrentX += 8;
+                }
+            }
+        }
+    }
+    return textCurrentX;
+}
+
+void HandleCharSkip(BYTE*& pTextIter, int xpos, int ypos, int field_1a)
+{
+    if (dword_66C530)
+    {
+        dword_732E48 = 1;
+        sub_45C1BF(field_1a, xpos, ypos);
+        int nextChar4 = NextVarChar(pTextIter, false, false);
+        int nextChar4Masked = nextChar4;
+        BYTE1(nextChar4Masked) &= 0x9Fu;
+        if (nextChar4Masked == 0x8021)
+        {
+            pTextIter += 2;
+        }
+    }
+    else
+    {
+        int nextChar5 = NextVarChar(pTextIter, false, false);
+        int nextChar5Masked = nextChar5;
+        BYTE1(nextChar5Masked) &= 0x9Fu;
+        int nextChar5MaskedCopy = nextChar5Masked;
+        if (nextChar5Masked == 0x8021)
+        {
+            while (nextChar5MaskedCopy != 0x802C && nextChar5MaskedCopy != 0x9002)
+            {
+                int nextChar6 = NextVarChar(pTextIter, true, true);
+                int nextChar6Masked = nextChar6;
+                BYTE1(nextChar6Masked) &= 0x9Fu;
+                nextChar5MaskedCopy = nextChar6Masked;
+            }
+        }
+    }
 }
 
 void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3, BYTE *pText, int field_5)
 {
     BYTE *pUpdatedText; // eax
-    int singlechar; // eax
-    int v7; // eax
-    int v8; // eax
-    int v9; // eax
-    int v10; // ST38_4
-    int v11; // eax
-    signed int v12; // eax
-    int v13; // eax
-    int v14; // eax
-    int v15; // eax
-    int v16; // eax
-    int v17; // eax
-    int v18; // eax
-    int v19; // eax
-    int v20; // eax
-    int v21; // eax
-    int v22; // eax
-    int v23; // ST4C_4
-    int v24; // eax
-    int v25; // ST5C_4
-    int v26; // eax
-    int v27; // eax
-    int v28; // eax
-    int v29; // eax
-    signed int v30; // eax
-    int v31; // eax
-    int v32; // eax
-    signed int v33; // eax
+    signed int nextChar2Masked; // eax
+    int nextChar8Masked; // eax
+    int nextChar1Masked2; // eax
+    signed int nextChar10Masked; // eax
     signed int v34; // eax
-    int v35; // eax
-    int v36; // eax
-    int v37; // eax
-    int v38; // eax
-    signed int v39; // eax
+    int nextChar10Masked2; // eax
+    int nextChar11Masked; // eax
     int v40; // eax
-    int v41; // [esp+4h] [ebp-68h]
-    int v42; // [esp+18h] [ebp-54h]
+    int maskedGameStates; // [esp+4h] [ebp-68h]
     int v43; // [esp+20h] [ebp-4Ch]
-    int v44; // [esp+24h] [ebp-48h]
-    int v45; // [esp+24h] [ebp-48h]
-    int v46; // [esp+24h] [ebp-48h]
-    int v47; // [esp+24h] [ebp-48h]
-    int v48; // [esp+24h] [ebp-48h]
-    int v49; // [esp+28h] [ebp-44h]
-    signed int v50; // [esp+2Ch] [ebp-40h]
-    int v51; // [esp+30h] [ebp-3Ch]
+    int nextChar2; // [esp+24h] [ebp-48h]
+    int textCurrentX = 0; // [esp+28h] [ebp-44h]
+    signed int numLines; // [esp+2Ch] [ebp-40h]
+    int textYMax; // [esp+30h] [ebp-3Ch]
     BYTE *pTextIter; // [esp+34h] [ebp-38h]
-    unsigned __int8 *pTextItera; // [esp+34h] [ebp-38h]
-    signed int v54; // [esp+38h] [ebp-34h]
-    int v55; // [esp+38h] [ebp-34h]
-    int v56; // [esp+38h] [ebp-34h]
-    int v57; // [esp+38h] [ebp-34h]
-    int v58; // [esp+38h] [ebp-34h]
-    int v59; // [esp+3Ch] [ebp-30h]
-    BYTE *v60; // [esp+40h] [ebp-2Ch]
-    int text2Chars; // [esp+48h] [ebp-24h]
-    int text2Charsa; // [esp+48h] [ebp-24h]
-    int text2Charsb; // [esp+48h] [ebp-24h]
-    int text2Charsc; // [esp+48h] [ebp-24h]
+    signed int charToAdd; // [esp+38h] [ebp-34h]
+    int nextChar8; // [esp+38h] [ebp-34h]
+    int nextChar9; // [esp+38h] [ebp-34h]
+    int nextChar10; // [esp+38h] [ebp-34h]
+    int field_1a; // [esp+3Ch] [ebp-30h]
+    BYTE *pOldTextIter; // [esp+40h] [ebp-2Ch]
+    int nextChar1; // [esp+48h] [ebp-24h]
+    int nextChar7; // [esp+48h] [ebp-24h]
+    int nextChar10Masked2Copy; // [esp+48h] [ebp-24h]
+    int nextChar12; // [esp+48h] [ebp-24h]
     signed int v65; // [esp+4Ch] [ebp-20h]
-    int v66; // [esp+50h] [ebp-1Ch]
-    int v67; // [esp+54h] [ebp-18h]
+    int ypos; // [esp+50h] [ebp-1Ch]
+    int xpos; // [esp+54h] [ebp-18h]
     signed int v68; // [esp+58h] [ebp-14h]
     int v69; // [esp+64h] [ebp-8h]
 
-    /*
-    gUseTrueType_dword_6FC7AC = 0;
-
+    
     //gUseTrueType_dword_6FC7AC = 0;
-    BYTE test[] = { 'p',  0x90, 0x41,  0x0 };
-    pText = test;
-    */
+    //BYTE test[] = { 'p',  0x90, 0x41,  0x0 };
+    //pText = test;
+    
 
     // 0x9010 = %
     // 0x9011 = &
@@ -472,558 +516,368 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
     // 0x9040 = jp char
 
 
-    if (gFile_CA68u_font_res_72AE10 && pFont)
+    if (!gFile_CA68u_font_res_72AE10 || !pFont)
     {
-        if (gUseTrueType_dword_6FC7AC)
-        {
-            gFont_wxh_dword_732E14 = pFont->field_1C_wh * pFont->field_18_wh;
-            gFont_pixel_buffer_732E18 = pFont->field_14_pPixelData;
-            dword_732E1C = 1;
-        }
-        pUpdatedText = Font_set_text_520419(pText);
-        BYTE* pBakedPixelData = pFont->field_14_pPixelData;
-        dword_732E3C = 0;
-        v59 = pFont->field_1A;
-        v51 = pFont->field_1C_wh;
-        v50 = 0;
-        if (!(pFont->field_6_flags & 2))
-        {
-            v59 -= 12;
-        }
-        v69 = pFont->field_18_wh;
-        dword_732E40 = field_5;
-        v68 = 0;
-        v67 = kZero;
-        v66 = field_3;
-        pFont->field_7_out_max_width = 0;
-        pFont->field_1E = pFont->field_3_line_spacing + 14;
-        pFont->field_6_flags &= 0xEFu;
-        v65 = 0;
-        pTextIter = pUpdatedText;
-        while (1)
-        {
-            if (!pTextIter || !*pTextIter)
-            {
-                return;
-            }
-            v7 = NextVarChar(pTextIter);
+        return;
+    }
 
-            if ((signed int)(unsigned __int8)*pTextIter >= 128)
-            {
-                text2Chars = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-            }
-            else
-            {
-                singlechar = (unsigned __int8)*pTextIter;
-                BYTE1(singlechar) |= 0x80u;
-                text2Chars = singlechar;
-            }
+    if (gUseTrueType_dword_6FC7AC)
+    {
+        gFont_wxh_dword_732E14 = pFont->field_1C_wh * pFont->field_18_wh;
+        gFont_pixel_buffer_732E18 = pFont->field_14_pPixelData;
+        dword_732E1C = 1;
+    }
 
-            v7 = text2Chars;
-            BYTE1(v7) &= 0x9Fu;
-            v54 = v7;
-            if (text2Chars < 0x8020)
+    pUpdatedText = Font_set_text_520419(pText);
+    BYTE* pBakedPixelData = pFont->field_14_pPixelData;
+    dword_732E3C = 0;
+    field_1a = pFont->field_1A;
+    textYMax = pFont->field_1C_wh;
+    numLines = 0;
+    if (!(pFont->field_6_flags & 2))
+    {
+        field_1a -= 12;
+    }
+    v69 = pFont->field_18_wh;
+    dword_732E40 = field_5;
+    v68 = 0;
+    xpos = kZero;
+    ypos = field_3;
+    pFont->field_7_out_max_width = 0;
+    pFont->field_1E_line_ypos = pFont->field_3_line_spacing + 14;
+    pFont->field_6_flags &= 0xEFu;
+    v65 = 0;
+    pTextIter = pUpdatedText;
+    while (1)
+    {
+        if (!pTextIter || !*pTextIter)
+        {
+            return;
+        }
+
+        nextChar1 = NextVarChar(pTextIter, false, false);
+        const int nextChar1Masked = nextChar1;
+        BYTE1(nextChar1Masked) &= 0x9Fu;
+        charToAdd = nextChar1Masked;
+        if (nextChar1 < 0x8020)
+        {
+            nextChar1 = NextVarChar(pTextIter);
+            goto LABEL_112;
+        }
+
+        if (nextChar1Masked == 0x8023)
+        {
+            NextVarChar(pTextIter, true, true); // Skip char
+            nextChar2 = NextVarChar(pTextIter, true, true);
+            nextChar2Masked = nextChar2;
+            BYTE1(nextChar2Masked) &= 0x9Fu;
+            if (nextChar2Masked > 0x8054)
             {
-                if ((signed int)(unsigned __int8)*pTextIter >= 128)
+                if (nextChar2Masked != 0x8057)
                 {
-                    text2Chars = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                    pTextIter += 2;
-                }
-                else
-                {
-                    v8 = (unsigned __int8)*pTextIter;
-                    BYTE1(v8) |= 0x80u;
-                    text2Chars = v8;
-                    ++pTextIter;
-                }
-                goto LABEL_112;
-            }
-            if (v7 == 0x8023)
-            {
-                if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                {
-                    v10 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                    pTextItera = (unsigned __int8 *)(pTextIter + 2);
-                }
-                else
-                {
-                    v9 = (unsigned __int8)*pTextIter;
-                    pTextItera = (unsigned __int8 *)(pTextIter + 1);
-                }
-                if ((signed int)*pTextItera >= 128)
-                {
-                    v44 = pTextItera[1] | (*pTextItera << 8);
-                    pTextIter = (pTextItera + 2);
-                }
-                else
-                {
-                    v11 = *pTextItera;
-                    BYTE1(v11) |= 0x80u;
-                    v44 = v11;
-                    pTextIter = (pTextItera + 1);
-                }
-                v12 = v44;
-                BYTE1(v12) &= 0x9Fu;
-                if (v12 > 0x8054)
-                {
-                    if (v12 != 0x8057)
+                    if (nextChar2Masked != 0x807B)
                     {
-                        if (v12 != 0x807B)
+                        switch (nextChar2Masked)
                         {
-                            switch (v12)
+                        case 0x9006:
+                            textCurrentX = Font_add_char_to_atlas_45BD91(pBakedPixelData, xpos, ypos, v69, 0);
+                            goto LABEL_160;
+                        case 0x901D:
+                            if ((gGameStates_78E7E0.gFlags_dword_78E7E4 & 7) == 2)
                             {
-                            case 0x9006:
-                            LABEL_60:
-                                v49 = Font_add_char_to_atlas_45BD91(pBakedPixelData, v67, v66, v69, 0);
-                                goto LABEL_160;
-                            case 0x901D:
-                                if ((gGameStates_78E7E0.gFlags_dword_78E7E4 & 7) == 2)
-                                {
-                                    v54 = 0x9024;
-                                }
-                                else
-                                {
-                                    v54 = v12;
-                                }
-                                goto LABEL_139;
-                            case 0x901E:
-                            case 0x9024:
-                                v41 = gGameStates_78E7E0.gFlags_dword_78E7E4 & 7;
-                                if (gGameStates_78E7E0.gFlags_dword_78E7E4 & 7)
-                                {
-                                    if (v41 == 1)
-                                    {
-                                        v54 = 0x9018;
-                                    }
-                                    else if (v41 == 2)
-                                    {
-                                        v54 = 0x901D;
-                                    }
-                                }
-                                else
-                                {
-                                    v54 = v12;
-                                }
-                                goto LABEL_139;
-                            }
-                        LABEL_84:
-                            pTextIter -= 4;
-                            goto LABEL_112;
-                        }
-                        goto LABEL_42;
-                    }
-                    if (v67 > pFont->field_7_out_max_width)
-                    {
-                        pFont->field_7_out_max_width = v67;
-                    }
-                    if (v65)
-                    {
-                        goto LABEL_207;
-                    }
-                    v49 = 0;
-                    goto LABEL_160;
-                }
-                if (v12 != 0x8054)
-                {
-                    switch (v12)
-                    {
-                    case 0x802D:
-                        goto LABEL_60;
-                    case 0x8031:
-                        v54 = 0x8040;
-                    LABEL_139:
-                        if (v54 >= 0x8100)
-                        {
-                            v31 = Font_map_char_45B80A(v54);
-                            if (v31 <= 0)
-                            {
-                                Font_45B90B(pBakedPixelData, v67, v66, v69, 0);
+                                charToAdd = 0x9024;
                             }
                             else
                             {
-                                Font_45B90B(pBakedPixelData, v67, v66, v69, (BYTE *)(36 * ((v31 & 0xFFF) - 1) + dword_732E28[v31 / 4096]));
+                                charToAdd = nextChar2Masked;
                             }
-                            v49 = pFont->field_2 + 12;
-                        }
-                        else
-                        {
-                            v49 = pFont->field_2 + Font_add_char_to_atlas_45BD91(pBakedPixelData, v67, v66, v69, v54);
-                            if (v54 == 0x8021 || v54 == 0x803F)
+                            textCurrentX = HandleCharAdd(pTextIter, textCurrentX, pFont, charToAdd, xpos, ypos, pBakedPixelData, v69);
+                            v65 = 1;
+                            goto LABEL_160;
+                        case 0x901E:
+                        case 0x9024:
+                            maskedGameStates = gGameStates_78E7E0.gFlags_dword_78E7E4 & 7;
+                            if (gGameStates_78E7E0.gFlags_dword_78E7E4 & 7)
                             {
-                                if ((signed int)(unsigned __int8)*pTextIter >= 128)
+                                if (maskedGameStates == 1)
                                 {
-                                    v57 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
+                                    charToAdd = 0x9018;
                                 }
-                                else
+                                else if (maskedGameStates == 2)
                                 {
-                                    v29 = (unsigned __int8)*pTextIter;
-                                    BYTE1(v29) |= 0x80u;
-                                    v57 = v29;
-                                }
-                                v30 = v57;
-                                BYTE1(v30) &= 0x9Fu;
-                                if (v30 != 0x8021 && v30 != 0x803F)
-                                {
-                                    if (v30 == 0x8029 || v30 == 0x8028 || v30 <= 36878 && v30 >= 36873 || v30 == 36885)
-                                    {
-                                        v49 += 2;
-                                    }
-                                    else
-                                    {
-                                        v49 += 8;
-                                    }
+                                    charToAdd = 0x901D;
                                 }
                             }
+                            else
+                            {
+                                charToAdd = nextChar2Masked;
+                            }
+                            textCurrentX = HandleCharAdd(pTextIter, textCurrentX, pFont, charToAdd, xpos, ypos, pBakedPixelData, v69);
+                            v65 = 1;
+                            goto LABEL_160;
                         }
-                        v65 = 1;
-                        goto LABEL_160;
-                    case 0x8032:
-                        v54 = 32894;
-                        goto LABEL_139;
-                    case 0x804E:
-                        text2Chars = 0x800A;
+                        pTextIter -= 4;
                         goto LABEL_112;
                     }
-                    if (v12 != 0x8052)
-                    {
-                        if (v12 == 0x8053)
-                        {
-                            text2Chars = 0x8009;
-                            goto LABEL_112;
-                        }
-                        goto LABEL_84;
-                    }
-                    pTextIter += 2;
-                LABEL_42:
                     dword_732E44 = 1;
-                    if (dword_66C530)
-                    {
-                        dword_732E48 = 1;
-                        sub_45C1BF(v59, v67, v66);
-                        if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                        {
-                            v45 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                        }
-                        else
-                        {
-                            v13 = (unsigned __int8)*pTextIter;
-                            BYTE1(v13) |= 0x80u;
-                            v45 = v13;
-                        }
-                        v14 = v45;
-                        BYTE1(v14) &= 0x9Fu;
-                        if (v14 == 0x8021)
-                        {
-                            pTextIter += 2;
-                        }
-                    }
-                    else
-                    {
-                        if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                        {
-                            v46 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                        }
-                        else
-                        {
-                            v15 = (unsigned __int8)*pTextIter;
-                            BYTE1(v15) |= 0x80u;
-                            v46 = v15;
-                        }
-                        v16 = v46;
-                        BYTE1(v16) &= 0x9Fu;
-                        v47 = v16;
-                        if (v16 == 0x8021)
-                        {
-                            while (v47 != 0x802C && v47 != 0x9002)
-                            {
-                                if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                                {
-                                    v48 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                                    pTextIter += 2;
-                                }
-                                else
-                                {
-                                    v17 = (unsigned __int8)*pTextIter;
-                                    BYTE1(v17) |= 0x80u;
-                                    v48 = v17;
-                                    ++pTextIter;
-                                }
-                                v18 = v48;
-                                BYTE1(v18) &= 0x9Fu;
-                                v47 = v18;
-                            }
-                        }
-                    }
+                    HandleCharSkip(pTextIter, xpos, ypos, field_1a);
                     goto LABEL_112;
                 }
-                pTextIter += 2;
-                if ((signed int)pFont->field_3_line_spacing > 2)
+                if (xpos > pFont->field_7_out_max_width)
                 {
-                    dword_732E3C = 1;
+                    pFont->field_7_out_max_width = xpos;
                 }
-                dword_732E44 = 1;
-            LABEL_112:
-                if (text2Chars >= 0x8020)
+                if (v65)
                 {
-                    v60 = pTextIter;
-                    if ((signed int)(unsigned __int8)*pTextIter >= 128)
+                    if (xpos > pFont->field_7_out_max_width)
                     {
-                        text2Chars = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                        pTextIter += 2;
-                    }
-                    else
-                    {
-                        v27 = (unsigned __int8)*pTextIter;
-                        BYTE1(v27) |= 0x80u;
-                        text2Chars = v27;
-                        ++pTextIter;
-                    }
-                    v28 = text2Chars;
-                    BYTE1(v28) &= 0x9Fu;
-                    v54 = v28;
-                    goto LABEL_139;
-                }
-                switch (text2Chars)
-                {
-                case 0x8009:
-                    v43 = (unsigned __int8)pFont->field_4 * (pFont->field_2 + 12);
-                    if (v43 > 0)
-                    {
-                        v67 = v43 * (v67 / v43 + 1);
-                    }
-                    break;
-                case 0x800A:
-                    if (v68)
-                    {
-                        v68 = 0;
-                    }
-                    else
-                    {
-                        if (v67 > pFont->field_7_out_max_width)
-                        {
-                            pFont->field_7_out_max_width = v67;
-                        }
-                        v67 = kZero;
-                        v66 += pFont->field_3_line_spacing + 12;
-                        pFont->field_1E = v66 + 14;
-                        ++v50;
-                        if (v66 + 11 >= v51 || pFont->field_6_flags & 1 || v50 >= pFont->field_1_max_lines)
-                        {
-                            goto LABEL_207;
-                        }
-                    }
-                    break;
-                case 0x800C:
-                    if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                    {
-                        text2Charsa = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                        pTextIter += 2;
-                    }
-                    else
-                    {
-                        v26 = (unsigned __int8)*pTextIter;
-                        BYTE1(v26) |= 0x80u;
-                        text2Charsa = v26;
-                        ++pTextIter;
-                    }
-                    dword_732E40 = text2Charsa - 0x8030;
-                    break;
-                }
-            }
-            else
-            {
-                if (!dword_732E44 || v7 != 0x9002 && v7 != 0x9004 && v7 != 0x807D)
-                {
-                    if (v7 == 0x807C)
-                    {
-                        if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                        {
-                            v25 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                            pTextIter += 2;
-                        }
-                        else
-                        {
-                            v24 = (unsigned __int8)*pTextIter++;
-                        }
-                        text2Chars = 0x800A;
-                    }
-                    goto LABEL_112;
-                }
-                if (dword_732E48 == 1 && (v7 == 0x9002 || v7 == 0x9004))
-                {
-                    Font_rubi_map2_45C1E9(pBakedPixelData, v67, v66, v69, (int)(pTextIter + 2));
-                }
-                dword_732E48 = 0;
-                do
-                {
-                    if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                    {
-                        v55 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                        pTextIter += 2;
-                    }
-                    else
-                    {
-                        v19 = (unsigned __int8)*pTextIter;
-                        BYTE1(v19) |= 0x80u;
-                        v55 = v19;
-                        ++pTextIter;
-                    }
-                    v20 = v55;
-                    BYTE1(v20) &= 0x9Fu;
-                } while (v20 != 0x807D);
-                if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                {
-                    v56 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                }
-                else
-                {
-                    v21 = (unsigned __int8)*pTextIter;
-                    BYTE1(v21) |= 0x80u;
-                    v56 = v21;
-                }
-                if (v56 == 0x8023)
-                {
-                    if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                    {
-                        v23 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                        pTextIter += 2;
-                    }
-                    else
-                    {
-                        v22 = (unsigned __int8)*pTextIter++;
-                    }
-                }
-                dword_732E3C = 0;
-                dword_732E44 = 0;
-                v49 = 0;
-            LABEL_160:
-                if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                {
-                    v58 = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                }
-                else
-                {
-                    v32 = (unsigned __int8)*pTextIter;
-                    BYTE1(v32) |= 0x80u;
-                    v58 = v32;
-                }
-                v33 = v58;
-                BYTE1(v33) &= 0x9Fu;
-                v34 = Font_45C16A(v33);
-                if (v34 <= 0 || v34 + v49 + v67 + pFont->field_2 - 1 < v59)
-                {
-                LABEL_202:
-                    v67 += v49;
-                    v68 = 0;
-                    goto LABEL_203;
-                }
-                if (!(pFont->field_6_flags & 2))
-                {
-                    if (text2Chars & 0x2000)
-                    {
-                        Font_45B90B(pBakedPixelData, v67, v66, v69, 0);
-                        pTextIter = v60;
-                        v49 = 0;
-                    }
-                    else if (v58 & 0x4000)
-                    {
-                        v35 = v58;
-                        BYTE1(v35) &= 0x9Fu;
-                        text2Charsb = v35;
-                        if (dword_732E44 && (v35 == 0x9002 || v35 == 0x9004 || v35 == 0x807D))
-                        {
-                            goto LABEL_202;
-                        }
-                        if ((signed int)(unsigned __int8)pTextIter[2] >= 128)
-                        {
-                            v42 = (unsigned __int8)pTextIter[3] | ((unsigned __int8)pTextIter[2] << 8);
-                        }
-                        else
-                        {
-                            v36 = (unsigned __int8)pTextIter[2];
-                            BYTE1(v36) |= 0x80u;
-                            v42 = v36;
-                        }
-                        if (text2Charsb == 0x9003 || !(v42 & 0x4000) || (v37 = v42, BYTE1(v37) &= 0x9Fu, v37 == 33059))
-                        {
-                            if ((signed int)(unsigned __int8)*pTextIter >= 128)
-                            {
-                                text2Charsc = (unsigned __int8)pTextIter[1] | ((unsigned __int8)*pTextIter << 8);
-                                pTextIter += 2;
-                            }
-                            else
-                            {
-                                v38 = (unsigned __int8)*pTextIter;
-                                BYTE1(v38) |= 0x80u;
-                                text2Charsc = v38;
-                                ++pTextIter;
-                            }
-                            v39 = text2Charsc;
-                            BYTE1(v39) &= 0x9Fu;
-                            if (v39 >= 0x8100)
-                            {
-                                v40 = Font_map_char_45B80A(v39);
-                                if (v40 <= 0)
-                                {
-                                    Font_45B90B(pBakedPixelData, v49 + v67, v66, v69, 0);
-                                }
-                                else
-                                {
-                                    Font_45B90B(
-                                        pBakedPixelData,
-                                        v49 + v67,
-                                        v66,
-                                        v69,
-                                        (BYTE *)(36 * ((v40 & 4095) - 1) + dword_732E28[v40 / 4096]));
-                                }
-                                v49 += 12;
-                            }
-                            else
-                            {
-                                v49 += Font_add_char_to_atlas_45BD91(pBakedPixelData, v49 + v67, v66, v69, text2Charsc);
-                            }
-                        }
-                    }
-                }
-                if (dword_732E48)
-                {
-                    Font_map_unknown_45C1DC(v49 + v67);
-                }
-                v68 = 1;
-                if (v49 + v67 > pFont->field_7_out_max_width)
-                {
-                    pFont->field_7_out_max_width = v49 + v67;
-                }
-                v67 = kZero;
-                v66 += pFont->field_3_line_spacing + 12;
-                pFont->field_1E = v66 + 14;
-                ++v50;
-                if (pFont->field_6_flags & 1 || v66 + 11 >= v51 || v50 >= pFont->field_1_max_lines)
-                {
-                    if (dword_732E48)
-                    {
-                        dword_732E48 = 2;
-                    }
-                    if (*pTextIter)
-                    {
-                    LABEL_207:
-                        if (v67 > pFont->field_7_out_max_width)
-                        {
-                            pFont->field_7_out_max_width = v67;
-                        }
-                        return;
+                        pFont->field_7_out_max_width = xpos;
                     }
                     return;
                 }
-            LABEL_203:
-                if (v67 > pFont->field_7_out_max_width)
+                textCurrentX = 0;
+                goto LABEL_160;
+            }
+
+            if (nextChar2Masked != 0x8054)
+            {
+                switch (nextChar2Masked)
                 {
-                    pFont->field_7_out_max_width = v67;
+                case 0x802D:
+                    textCurrentX = Font_add_char_to_atlas_45BD91(pBakedPixelData, xpos, ypos, v69, 0);
+                    goto LABEL_160;
+                case 0x8031:
+                    charToAdd = 0x8040;
+                    textCurrentX = HandleCharAdd(pTextIter, textCurrentX, pFont, charToAdd, xpos, ypos, pBakedPixelData, v69);
+                    v65 = 1;
+                    goto LABEL_160;
+                case 0x8032:
+                    charToAdd = 32894;
+                    textCurrentX = HandleCharAdd(pTextIter, textCurrentX, pFont, charToAdd, xpos, ypos, pBakedPixelData, v69);
+                    v65 = 1;
+                    goto LABEL_160;
+                case 0x804E:
+                    nextChar1 = 0x800A;
+                    goto LABEL_112;
                 }
+                if (nextChar2Masked != 0x8052)
+                {
+                    if (nextChar2Masked == 0x8053)
+                    {
+                        nextChar1 = 0x8009;
+                        goto LABEL_112;
+                    }
+                    pTextIter -= 4;
+                    goto LABEL_112;
+                }
+                pTextIter += 2;
+                dword_732E44 = 1;
+                HandleCharSkip(pTextIter, xpos, ypos, field_1a);
+                goto LABEL_112;
+            }
+            pTextIter += 2;
+            if ((signed int)pFont->field_3_line_spacing > 2)
+            {
+                dword_732E3C = 1;
+            }
+            dword_732E44 = 1;
+        LABEL_112:
+            if (nextChar1 >= 0x8020)
+            {
+                pOldTextIter = pTextIter;
+                nextChar1 = NextVarChar(pTextIter, true, true);
+                nextChar1Masked2 = nextChar1;
+                BYTE1(nextChar1Masked2) &= 0x9Fu;
+                charToAdd = nextChar1Masked2;
+
+                textCurrentX = HandleCharAdd(pTextIter, textCurrentX, pFont, charToAdd, xpos, ypos, pBakedPixelData, v69);
+                v65 = 1;
+                goto LABEL_160;
+            }
+            switch (nextChar1)
+            {
+            case 0x8009:
+                v43 = (unsigned __int8)pFont->field_4 * (pFont->field_2 + 12);
+                if (v43 > 0)
+                {
+                    xpos = v43 * (xpos / v43 + 1);
+                }
+                break;
+            case 0x800A:
+                if (v68)
+                {
+                    v68 = 0;
+                }
+                else
+                {
+                    if (xpos > pFont->field_7_out_max_width)
+                    {
+                        pFont->field_7_out_max_width = xpos;
+                    }
+                    xpos = kZero;
+                    ypos += pFont->field_3_line_spacing + 12;
+                    pFont->field_1E_line_ypos = ypos + 14;
+                    ++numLines;
+                    if (ypos + 11 >= textYMax || pFont->field_6_flags & 1 || numLines >= pFont->field_1_max_lines)
+                    {
+                        if (xpos > pFont->field_7_out_max_width)
+                        {
+                            pFont->field_7_out_max_width = xpos;
+                        }
+                        return;
+                    }
+                }
+                break;
+            case 0x800C:
+                nextChar7 = NextVarChar(pTextIter, true, true);
+                dword_732E40 = nextChar7 - 0x8030;
+                break;
             }
         }
-    }
+        else
+        {
+            if (!dword_732E44 || nextChar1Masked != 0x9002 && nextChar1Masked != 0x9004 && nextChar1Masked != 0x807D)
+            {
+                if (nextChar1Masked == 0x807C)
+                {
+                    NextVarChar(pTextIter, true, true); // Skip char
+                    nextChar1 = 0x800A;
+                }
+                goto LABEL_112;
+            }
+            if (dword_732E48 == 1 && (nextChar1Masked == 0x9002 || nextChar1Masked == 0x9004))
+            {
+                Font_rubi_map2_45C1E9(pBakedPixelData, xpos, ypos, v69, (int)(pTextIter + 2));
+            }
+            dword_732E48 = 0;
 
+            do
+            {
+                nextChar8 = NextVarChar(pTextIter, true, true);
+                nextChar8Masked = nextChar8;
+                BYTE1(nextChar8Masked) &= 0x9Fu;
+            } while (nextChar8Masked != 0x807D);
+
+            nextChar9 = NextVarChar(pTextIter, false, false);
+            if (nextChar9 == 0x8023)
+            {
+                NextVarChar(pTextIter, true, true); // Skip char
+            }
+            dword_732E3C = 0;
+            dword_732E44 = 0;
+            textCurrentX = 0;
+
+
+        LABEL_160:
+            nextChar10 = NextVarChar(pTextIter, false, false);
+            nextChar10Masked = nextChar10;
+            BYTE1(nextChar10Masked) &= 0x9Fu;
+            v34 = Font_45C16A(nextChar10Masked);
+            if (v34 <= 0 || v34 + textCurrentX + xpos + pFont->field_2 - 1 < field_1a)
+            {
+                xpos += textCurrentX;
+                v68 = 0;
+                if (xpos > pFont->field_7_out_max_width)
+                {
+                    pFont->field_7_out_max_width = xpos;
+                }
+                continue;
+            }
+            if (!(pFont->field_6_flags & 2))
+            {
+                if (nextChar1 & 0x2000)
+                {
+                    Font_45B90B(pBakedPixelData, xpos, ypos, v69, 0);
+                    pTextIter = pOldTextIter;
+                    textCurrentX = 0;
+                }
+                else if (nextChar10 & 0x4000)
+                {
+                    nextChar10Masked2 = nextChar10;
+                    BYTE1(nextChar10Masked2) &= 0x9Fu;
+                    nextChar10Masked2Copy = nextChar10Masked2;
+                    if (dword_732E44 && (nextChar10Masked2 == 0x9002 || nextChar10Masked2 == 0x9004 || nextChar10Masked2 == 0x807D))
+                    {
+                        xpos += textCurrentX;
+                        v68 = 0;
+                        if (xpos > pFont->field_7_out_max_width)
+                        {
+                            pFont->field_7_out_max_width = xpos;
+                        }
+                        continue;
+                    }
+
+                    int nextChar11 = NextVarChar(pTextIter, false, false);
+
+                    if (nextChar10Masked2Copy == 0x9003 || !(nextChar11 & 0x4000) || (nextChar11Masked = nextChar11, BYTE1(nextChar11Masked) &= 0x9Fu, nextChar11Masked == 0x8123))
+                    {
+                        nextChar12 = NextVarChar(pTextIter, true, true);
+                        const signed int nextChar12Masked = nextChar12;
+                        BYTE1(nextChar12Masked) &= 0x9Fu;
+                        if (nextChar12Masked >= 0x8100)
+                        {
+                            v40 = Font_map_char_45B80A(nextChar12Masked);
+                            if (v40 <= 0)
+                            {
+                                Font_45B90B(pBakedPixelData, textCurrentX + xpos, ypos, v69, 0);
+                            }
+                            else
+                            {
+                                Font_45B90B(
+                                    pBakedPixelData,
+                                    textCurrentX + xpos,
+                                    ypos,
+                                    v69,
+                                    (BYTE *)(36 * ((v40 & 4095) - 1) + dword_732E28[v40 / 4096]));
+                            }
+                            textCurrentX += 12;
+                        }
+                        else
+                        {
+                            textCurrentX += Font_add_char_to_atlas_45BD91(pBakedPixelData, textCurrentX + xpos, ypos, v69, nextChar12);
+                        }
+                    }
+                }
+            }
+            if (dword_732E48)
+            {
+                Font_map_unknown_45C1DC(textCurrentX + xpos);
+            }
+            v68 = 1;
+            if (textCurrentX + xpos > pFont->field_7_out_max_width)
+            {
+                pFont->field_7_out_max_width = textCurrentX + xpos;
+            }
+
+            xpos = kZero;
+            ypos += pFont->field_3_line_spacing + 12;
+            pFont->field_1E_line_ypos = ypos + 14;
+
+            ++numLines;
+
+            if (pFont->field_6_flags & 1 || ypos + 11 >= textYMax || numLines >= pFont->field_1_max_lines)
+            {
+                if (dword_732E48)
+                {
+                    dword_732E48 = 2;
+                }
+                if (*pTextIter)
+                {
+                    if (xpos > pFont->field_7_out_max_width)
+                    {
+                        pFont->field_7_out_max_width = xpos;
+                    }
+                    return;
+                }
+                return;
+            }
+
+            if (xpos > pFont->field_7_out_max_width)
+            {
+                pFont->field_7_out_max_width = xpos;
+            }
+        }
+    } // Loop end
 }
 MGS_FUNC_IMPLEX(0x45AB2D, Font_set_text_shift_jis_45AB2D, true);
 

@@ -21,7 +21,7 @@ struct Font
     WORD field_18_wh;
     WORD field_1A;
     WORD field_1C_wh;
-    WORD field_1E;
+    WORD field_1E_line_ypos;
     WORD field_20_vramx;
     WORD field_22_vramy;
     WORD field_24_bitDepth;
