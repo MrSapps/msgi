@@ -95,7 +95,7 @@ struct FontTextLine
     DWORD field_110;
     FontTextLine* field_114_pNext;
 };
-MGS_ASSERT_SIZEOF(FontTextLine, 0x118);
+MGS_ASSERT_SIZEOF(FontTextLine, 280);
 
 #pragma pack(push)
 #pragma pack(1)
@@ -211,15 +211,6 @@ void CC Font_render_45C76C(Font* pFont)
 {
     if (pFont)
     {
-        // field_14_pPixelData is
-        // x
-        // y
-        // ??
-        // ??
-        // ??
-        // [text buffer]
-        // Repeated while x != 0
-
         g_Render_sub_41C640_ret_650D1A = Render_sub_41C640(
             &pFont->field_C_rect,
             gpFont_field_28_palette_6DF240,
@@ -308,7 +299,33 @@ MGS_VAR(1, 0x72AE10, BYTE*, gFile_CA68u_font_res_72AE10, nullptr);
 MGS_VAR(1, 0x732E14, DWORD, gFont_wxh_dword_732E14, 0);
 MGS_VAR(1, 0x732E18, BYTE*, gFont_pixel_buffer_732E18, 0);
 
+BYTE* CC Font_add_blank_line_record_4242CB(BYTE* pBuffer, BYTE xpos, BYTE ypos, BYTE width, BYTE height, __int16 unknown, DWORD* pRemainderSize)
+{
+    FontTextLineSource* pRet = reinterpret_cast<FontTextLineSource*>(pBuffer);
 
+    if (!pBuffer || *pRemainderSize < 264u)
+    {
+        return nullptr;
+    }
+
+    // Get to the end of the buffer
+    while (pRet->field_0_text_length)
+    {
+        const DWORD itemSize = pRet->field_0_text_length + 7;
+        *pRemainderSize -= itemSize;
+        pRet = (FontTextLineSource *)((BYTE*)pRet + itemSize);
+    }
+
+    pRet->field_0_text_length = 0;
+    pRet->field_3_width = width;
+    pRet->field_4_height = height;
+    pRet->field_7_text_buffer[0] = 0;
+    pRet->field_1_x = xpos;
+    pRet->field_2_y = ypos;
+    pRet->field_5_unknown = unknown;
+    return reinterpret_cast<BYTE*>(pRet);
+}
+MGS_FUNC_IMPLEX(0x4242CB, Font_add_blank_line_record_4242CB, FONT_IMPL);
 
 char __cdecl Font_45B90B(BYTE* pTexturePixels, int a2, int a3, int a4, BYTE *a5)
 {
