@@ -2917,8 +2917,6 @@ MGS_FUNC_IMPLEX(0x0040E840, Render_create_texture_at_index_40E840, RENDERER_IMPL
 MGS_ARY(1, 0x6DE3C0, WORD, 1500, gFreeTextureIdxArray_6DE3C0, {});
 
 
-MGS_FUNC_NOT_IMPL(0x4241C2, IDirectDrawSurface7 *__cdecl (const BYTE *pixelData, const BYTE *pallete), Render_Type5_alloc_4241C2); // TODO
-
 int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE* pixelData, int surfaceType, const BYTE* pTga, unsigned __int16 tgaW, unsigned __int16 tgaH)
 {
     int idx = 0;
@@ -2978,7 +2976,7 @@ int CC Render_sub_40FA30(const PSX_RECT* pRect, const WORD* pallete, const BYTE*
     if (surfaceType == 5) // True type font rendering?
     {
         // Type 5 is malloc 280 byte buffer?
-        gTextures_6C0F00[idx].mSurface = Render_Type5_alloc_4241C2(pixelData, (const BYTE*) pallete);
+        gTextures_6C0F00[idx].mSurface = (IDirectDrawSurface7*)Render_alloc_font_type5_4241C2(pixelData, pallete);
     }
     // NOTE: Pruned software rendering branch
     else

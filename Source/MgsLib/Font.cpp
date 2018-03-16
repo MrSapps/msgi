@@ -97,6 +97,93 @@ struct FontTextLine
 };
 MGS_ASSERT_SIZEOF(FontTextLine, 0x118);
 
+#pragma pack(push)
+#pragma pack(1)
+struct FontTextLineSource
+{
+    BYTE field_0_text_length;
+    BYTE field_1_x;
+    BYTE field_2_y;
+    BYTE field_3_width;
+    BYTE field_4_height;
+    WORD field_5_unknown;
+    char field_7_text_buffer[1];
+};
+#pragma pack(pop)
+
+void* CC Render_alloc_font_type5_4241C2(const BYTE* pixelData, const WORD* pPallete)
+{
+    DWORD palBits = 0;
+    for (int i = 0; i < 16; i++)
+    {
+        palBits |= pPallete[i];
+    }
+
+    if (!palBits)
+    {
+        return nullptr;
+    }
+
+    FontTextLine* pFirst = nullptr;
+    const FontTextLineSource* pSrc = reinterpret_cast<const FontTextLineSource*>(pixelData);
+    if (pSrc->field_0_text_length > 0)
+    {
+        FontTextLine* pPrevious = nullptr;
+        do
+        {
+            FontTextLine* pAllocatedTextLine = (FontTextLine *)malloc(sizeof(FontTextLine));
+            
+            // Stop if allocation failed
+            if (!pAllocatedTextLine)
+            {
+                break;
+            }
+
+            // Set next to the previously allocated item
+            if (pPrevious)
+            {
+                pPrevious->field_114_pNext = pAllocatedTextLine;
+            }
+
+            // Keep a pointer to the very first item as the return value
+            if (!pFirst)
+            {
+                pFirst = pAllocatedTextLine;
+            }
+
+            // Copy scaled fields
+            pAllocatedTextLine->field_0_x = static_cast<DWORD>(pSrc->field_1_x * gXRes);
+            pAllocatedTextLine->field_4_y = static_cast<DWORD>(pSrc->field_2_y * gXRes);
+            pAllocatedTextLine->field_8_width = static_cast<DWORD>(pSrc->field_3_width * gXRes);
+            pAllocatedTextLine->field_C_height = static_cast<DWORD>(pSrc->field_4_height * gXRes);
+            pAllocatedTextLine->field_110 = pSrc->field_5_unknown;
+
+            // Copy text buffer
+            DWORD textBufferIdx = 0;
+            for (textBufferIdx = 0; textBufferIdx < pSrc->field_0_text_length; textBufferIdx++)
+            {
+                if (textBufferIdx >= sizeof(FontTextLine::field_10_pText) - 2)
+                {
+                    break;
+                }
+                pAllocatedTextLine->field_10_pText[textBufferIdx] = pSrc->field_7_text_buffer[textBufferIdx];
+            }
+            
+            // Add null terminator
+            pAllocatedTextLine->field_10_pText[textBufferIdx] = 0;
+            pAllocatedTextLine->field_114_pNext = nullptr;
+
+            pPrevious = pAllocatedTextLine;
+
+            // Move to the next source item
+            const DWORD curTextLen = pSrc->field_0_text_length;
+            pSrc = (FontTextLineSource *)(((BYTE*)pSrc) + curTextLen + 7);
+        } while (pSrc->field_0_text_length > 0);
+    }
+    return pFirst;
+}
+MGS_FUNC_IMPLEX(0x4241C2, Render_alloc_font_type5_4241C2, FONT_IMPL);
+
 void CC Font_TrueTypeLinesFree_4241A4(FontTextLine* pSurface)
 {
     FontTextLine* pCurrent = pSurface;
