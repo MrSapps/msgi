@@ -180,6 +180,9 @@ void Debug_DrawTextTexture(Actor_Debug* pDebug, short x, short y, short w, short
     //    gMenuPrimBuffer_7265E0.mOt = gLibGvStruct2_6BC558.mOrderingTables[gActiveBuffer_dword_791A08];
 }
 
+const int kFontWidth = 220;
+const int kFontHeight = 60;
+
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
     gUseTrueType_650D40 = 0;
@@ -291,7 +294,7 @@ static void CC Debug_Update(Actor_Debug* pDebug)
     Debug_UpdateTextTexture(pDebug, (char*)toDraw);
     */
     Debug_UpdateTextTexture(pDebug, "Hello, this is a test of text render to vram");
-    Debug_DrawTextTexture(pDebug, 20, 80, 255, 100);
+    Debug_DrawTextTexture(pDebug, 20, 80, kFontWidth, kFontHeight);
 
     TextSetXYFlags_459B0B(30, 100, 0);
     TextSetRGB_459B27(0x80, 0x80, 0x80);
@@ -370,25 +373,24 @@ static void Debug_InitTestPOLYFT4s(Actor_Debug* pDebug)
 
 static void Debug_InitRenderToTextureFont(Actor_Debug* pDebug)
 {
-    static PSX_RECT textVramArea { 960, 256, 50, 80 };
-    const static int textUvs[] = { 86, 72 , 44, 72 };
-
+    static PSX_RECT textVramArea { 960, 256, kFontWidth/4, kFontHeight };
+  
     setSprt(&pDebug->mTestFontTexture);
     setRGB0(&pDebug->mTestFontTexture, 128, 128, 128);
 
     pDebug->mTestFontTexture.v0 = static_cast<BYTE>(textVramArea.y1);
     pDebug->mTestFontTexture.u0 = 0;
 
-    pDebug->mTestFontTexture.w = 200;
-    pDebug->mTestFontTexture.h = 80;
+    pDebug->mTestFontTexture.w = kFontWidth;
+    pDebug->mTestFontTexture.h = kFontHeight;
 
-    pDebug->mTestFontTexture.x0 = textUvs[0];
-    pDebug->mTestFontTexture.y0 = textUvs[1];
+    pDebug->mTestFontTexture.x0 = 0;
+    pDebug->mTestFontTexture.y0 = 0;
 
     pDebug->mTestFontTexture.clut = 32700;
     ClearImage(&textVramArea, 0, 0, 0);
     Font_45A70D(&pDebug->mTestFont, &textVramArea, 960, 510);
-    Font_45A796(&pDebug->mTestFont, -1, -1, 0, 6, 2, 0);
+    Font_45A796(&pDebug->mTestFont, -1 /*rect max x lines*/, -1 /*rect max y lines*/, 0 /*char spacing*/, 6 /*extra line spacing*/, 2, 0);
     const int sizeToAlloc = Font_CalcSize_45AA45(&pDebug->mTestFont);
     void* pAllocated = System_2_zerod_allocate_memory_40B296(sizeToAlloc);
     if (!pAllocated)
@@ -397,6 +399,8 @@ static void Debug_InitRenderToTextureFont(Actor_Debug* pDebug)
     }
     Font_Set_Buffer_45AAE9(&pDebug->mTestFont, (WORD*)pAllocated);
     Font_ColourRelated_45A89F(&pDebug->mTestFont, 0, 0x6739, 0);
+    //Font_ColourRelated_45A89F(&pDebug->mTestFont, 0, 0x0, 0xff); // pal idx, fg/bg colours
+
     Font_Set_global_alloc_ptr_45C7F2(&pDebug->mTestFont);
 }
 
