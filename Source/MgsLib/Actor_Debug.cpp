@@ -183,6 +183,8 @@ void Debug_DrawTextTexture(Actor_Debug* pDebug, short x, short y, short w, short
 const int kFontWidth = 220;
 const int kFontHeight = 60;
 
+MGS_VAR(1, 0x733858, char*, gSubsText_dword_733858, nullptr);
+
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
     gUseTrueType_650D40 = 0;
@@ -295,6 +297,7 @@ static void CC Debug_Update(Actor_Debug* pDebug)
     */
     Debug_UpdateTextTexture(pDebug, "Hello, this is a test of text render to vram");
     Debug_DrawTextTexture(pDebug, 20, 80, kFontWidth, kFontHeight);
+    //gSubsText_dword_733858 = "LOL";
 
     TextSetXYFlags_459B0B(30, 100, 0);
     TextSetRGB_459B27(0x80, 0x80, 0x80);

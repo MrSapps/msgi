@@ -68,7 +68,7 @@ int CC Font_45A70D(Font* pFont, PSX_RECT* pRect, __int16 vramX, __int16 vramY)
         Font font = {};
         memcpy(pFont, &font, sizeof(Font)); // OG bug: copy was done outside of null check
 
-        pFont->field_8 = pRect;
+        pFont->field_8_pRect = pRect;
         pFont->field_C_rect.x1 = pRect->x1;
         pFont->field_C_rect.y1 = pRect->y1;
 
@@ -275,10 +275,10 @@ int CC Font_CalcSize_45AA45(Font* pFont)
     {
         return 0;
     }
-    pFont->field_1A = pFont->field_0 * (pFont->field_2 + 12) - pFont->field_2;
+    pFont->field_1A = pFont->field_0_max_line_w * (pFont->field_2_char_spacing + 12) - pFont->field_2_char_spacing;
     pFont->field_18_wh = 4 * ((pFont->field_1A + 7) / 8);
-    pFont->field_1C_wh = pFont->field_1_max_lines * (pFont->field_3_line_spacing + 12) + 2;
-    pFont->field_C_rect.x2 = 2 * pFont->field_18_wh / 4;
+    pFont->field_1C_wh = pFont->field_1_max_lines_y * (pFont->field_3_line_spacing + 12) + 2;
+    pFont->field_C_rect.x2 = (2 * pFont->field_18_wh) / 4;
     pFont->field_C_rect.y2 = pFont->field_1C_wh;
     return pFont->field_1C_wh * pFont->field_18_wh + 32;
 }
@@ -299,11 +299,11 @@ MGS_VAR(1, 0x72AE10, BYTE*, gFile_CA68u_font_res_72AE10, nullptr);
 MGS_VAR(1, 0x732E14, DWORD, gFont_wxh_dword_732E14, 0);
 MGS_VAR(1, 0x732E18, BYTE*, gFont_pixel_buffer_732E18, 0);
 
-BYTE* CC Font_add_blank_line_record_4242CB(BYTE* pBuffer, BYTE xpos, BYTE ypos, BYTE width, BYTE height, __int16 unknown, DWORD* pRemainderSize)
+FontTextLineSource* CC Font_add_blank_line_record_4242CB(FontTextLineSource* pBuffer, BYTE xpos, BYTE ypos, BYTE width, BYTE height, __int16 unknown, DWORD* pRemainderSize)
 {
-    FontTextLineSource* pRet = reinterpret_cast<FontTextLineSource*>(pBuffer);
+    FontTextLineSource* pRet = pBuffer;
 
-    if (!pBuffer || *pRemainderSize < 264u)
+    if (!pBuffer || *pRemainderSize < 264u) // TODO: calculate structure size
     {
         return nullptr;
     }
@@ -323,9 +323,50 @@ BYTE* CC Font_add_blank_line_record_4242CB(BYTE* pBuffer, BYTE xpos, BYTE ypos, 
     pRet->field_1_x = xpos;
     pRet->field_2_y = ypos;
     pRet->field_5_unknown = unknown;
-    return reinterpret_cast<BYTE*>(pRet);
+    return pRet;
 }
 MGS_FUNC_IMPLEX(0x4242CB, Font_add_blank_line_record_4242CB, FONT_IMPL);
+
+FontTextLineSource* CC Font_add_char_to_line_record_42431F(FontTextLineSource* pTextLine, char xpos, int ypos, char width, int height, __int16 unknown, unsigned __int8 charToRender, DWORD* pRemainderSize)
+{
+    if (pTextLine)
+    {
+        while (*pRemainderSize >= 264u) // TODO: calculate structure size
+        {
+            // in printable range?
+            if (charToRender > 127u || charToRender < 12u)
+            {
+                return pTextLine;
+            }
+
+            if (!pTextLine->field_2_y)
+            {
+                pTextLine->field_2_y = ypos;
+            }
+
+            // Add to current line
+            if (pTextLine->field_2_y == ypos && pTextLine->field_4_height == height)
+            {
+                if (pTextLine->field_0_text_length != 255)
+                {
+                    pTextLine->field_7_text_buffer[pTextLine->field_0_text_length++] = charToRender;
+                    pTextLine->field_7_text_buffer[pTextLine->field_0_text_length] = 0;
+                    pTextLine->field_3_width += width;
+                }
+                return pTextLine;
+            }
+
+            // Create a new line
+            pTextLine = Font_add_blank_line_record_4242CB(pTextLine, xpos, ypos, width, height, unknown, pRemainderSize);
+            if (!pTextLine)
+            {
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x42431F, Font_add_char_to_line_record_42431F, FONT_IMPL);
 
 char __cdecl Font_45B90B(BYTE* pTexturePixels, int a2, int a3, int a4, BYTE *a5)
 {
@@ -410,11 +451,11 @@ int HandleCharAdd(BYTE*& pTextIter, int textCurrentX, Font* pFont, int charToAdd
         {
             Font_45B90B(pBakedPixelData, xpos, ypos, v69, (BYTE *)(36 * ((v31 & 0xFFF) - 1) + dword_732E28[v31 / 4096]));
         }
-        textCurrentX = pFont->field_2 + 12;
+        textCurrentX = pFont->field_2_char_spacing + 12;
     }
     else
     {
-        textCurrentX = pFont->field_2 + Font_add_char_to_atlas_45BD91(pBakedPixelData, xpos, ypos, v69, charToAdd);
+        textCurrentX = pFont->field_2_char_spacing + Font_add_char_to_atlas_45BD91(pBakedPixelData, xpos, ypos, v69, charToAdd);
         if (charToAdd == 0x8021 || charToAdd == 0x803F)
         {
             const int nextChar3 = NextVarChar(pTextIter, false, false);
@@ -697,7 +738,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
             switch (nextChar1)
             {
             case 0x8009:
-                v43 = (unsigned __int8)pFont->field_4 * (pFont->field_2 + 12);
+                v43 = (unsigned __int8)pFont->field_4 * (pFont->field_2_char_spacing + 12);
                 if (v43 > 0)
                 {
                     xpos = v43 * (xpos / v43 + 1);
@@ -718,7 +759,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
                     ypos += pFont->field_3_line_spacing + 12;
                     pFont->field_1E_line_ypos = ypos + 14;
                     ++numLines;
-                    if (ypos + 11 >= textYMax || pFont->field_6_flags & 1 || numLines >= pFont->field_1_max_lines)
+                    if (ypos + 11 >= textYMax || pFont->field_6_flags & 1 || numLines >= pFont->field_1_max_lines_y)
                     {
                         if (xpos > pFont->field_7_out_max_width)
                         {
@@ -773,7 +814,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
             nextChar10Masked = nextChar10;
             BYTE1(nextChar10Masked) &= 0x9Fu;
             v34 = Font_45C16A(nextChar10Masked);
-            if (v34 <= 0 || v34 + textCurrentX + xpos + pFont->field_2 - 1 < field_1a)
+            if (v34 <= 0 || v34 + textCurrentX + xpos + pFont->field_2_char_spacing - 1 < field_1a)
             {
                 xpos += textCurrentX;
                 v68 = 0;
@@ -855,7 +896,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
 
             ++numLines;
 
-            if (pFont->field_6_flags & 1 || ypos + 11 >= textYMax || numLines >= pFont->field_1_max_lines)
+            if (pFont->field_6_flags & 1 || ypos + 11 >= textYMax || numLines >= pFont->field_1_max_lines_y)
             {
                 if (dword_732E48)
                 {

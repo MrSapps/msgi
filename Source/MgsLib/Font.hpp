@@ -7,15 +7,15 @@ void DoFontTests();
 
 struct Font
 {
-    BYTE field_0;
-    BYTE field_1_max_lines;
-    BYTE field_2;
+    BYTE field_0_max_line_w;
+    BYTE field_1_max_lines_y;
+    BYTE field_2_char_spacing;
     BYTE field_3_line_spacing;
     BYTE field_4;
     BYTE field_5;
     BYTE field_6_flags;
     BYTE field_7_out_max_width;
-    PSX_RECT* field_8;
+    PSX_RECT* field_8_pRect;
     PSX_RECT field_C_rect;
     BYTE* field_14_pPixelData;
     WORD field_18_wh;
