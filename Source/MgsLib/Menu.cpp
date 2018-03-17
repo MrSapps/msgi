@@ -2705,9 +2705,7 @@ signed int CC Menu_inventory_common_update_helper_46B979(int idx)
 {
     setSprt(&gMenu_inventory_text_header_background_733DD8);
 
-    gMenu_inventory_text_header_background_733DD8.r0 = 128;
-    gMenu_inventory_text_header_background_733DD8.g0 = 128;
-    gMenu_inventory_text_header_background_733DD8.b0 = 128;
+    setRGB0(&gMenu_inventory_text_header_background_733DD8, 128, 128, 128);
 
     gMenu_inventory_text_header_background_733DD8.v0 = static_cast<BYTE>(sMenu_rect_676530.y1);
     gMenu_inventory_text_header_background_733DD8.u0 = 0;

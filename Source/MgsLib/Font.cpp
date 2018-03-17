@@ -285,7 +285,7 @@ int CC Font_CalcSize_45AA45(Font* pFont)
 MGS_FUNC_IMPLEX(0x45AA45, Font_CalcSize_45AA45, FONT_IMPL);
 
 MGS_VAR(1, 0x66C530, DWORD, dword_66C530, 1);
-MGS_VAR(1, 0x732E1C, DWORD, dword_732E1C, 0);
+MGS_VAR(1, 0x732E1C, DWORD, gFontFirstLine_dword_732E1C, 0);
 
 MGS_ARY(1, 0x732E28, DWORD, 4, dword_732E28, {});
 
@@ -525,7 +525,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
     {
         gFont_wxh_dword_732E14 = pFont->field_1C_wh * pFont->field_18_wh;
         gFont_pixel_buffer_732E18 = pFont->field_14_pPixelData;
-        dword_732E1C = 1;
+        gFontFirstLine_dword_732E1C = 1;
     }
 
     pUpdatedText = Font_set_text_520419(pText);
@@ -879,7 +879,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
         }
     } // Loop end
 }
-MGS_FUNC_IMPLEX(0x45AB2D, Font_set_text_shift_jis_45AB2D, true);
+MGS_FUNC_IMPLEX(0x45AB2D, Font_set_text_shift_jis_45AB2D, false); // TODO
 
 
 MGS_FUNC_NOT_IMPL(0x520458, void __cdecl(char* pText), Font_replace_psx_with_pc_strings_520458);
