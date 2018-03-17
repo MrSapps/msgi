@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "Font.hpp"
 #include "Renderer.hpp"
-
 #include "Actor_GameD.hpp"
+#include "ResourceNameHash.hpp"
+#include "LibGV.hpp"
 
 #include <gmock/gmock.h>
 
@@ -287,14 +288,13 @@ MGS_FUNC_IMPLEX(0x45AA45, Font_CalcSize_45AA45, FONT_IMPL);
 MGS_VAR(1, 0x66C530, DWORD, dword_66C530, 1);
 MGS_VAR(1, 0x732E1C, DWORD, gFontFirstLine_dword_732E1C, 0);
 
-MGS_ARY(1, 0x732E28, DWORD, 4, dword_732E28, {});
+MGS_ARY(1, 0x732E28, DWORD*, 4, dword_732E28, {});
 
 MGS_VAR(1, 0x732E3C, DWORD, dword_732E3C, 0);
 MGS_VAR(1, 0x732E40, DWORD, dword_732E40, 0);
 MGS_VAR(1, 0x732E44, DWORD, dword_732E44, 0);
 MGS_VAR(1, 0x732E48, DWORD, dword_732E48, 0);
 
-MGS_VAR(1, 0x72AE10, BYTE*, gFile_CA68u_font_res_72AE10, nullptr);
 
 MGS_VAR(1, 0x732E14, DWORD, gFont_wxh_dword_732E14, 0);
 MGS_VAR(1, 0x732E18, BYTE*, gFont_pixel_buffer_732E18, 0);
@@ -367,6 +367,67 @@ FontTextLineSource* CC Font_add_char_to_line_record_42431F(FontTextLineSource* p
     return 0;
 }
 MGS_FUNC_IMPLEX(0x42431F, Font_add_char_to_line_record_42431F, FONT_IMPL);
+
+MGS_VAR(1, 0x732E38, void*, gRubi_res_dword_732E38, nullptr);
+MGS_VAR(1, 0x732E20, DWORD*, gFontRes_2_dword_732E20, nullptr);
+MGS_VAR(1, 0x732E24, DWORD*, gpFontResEnd_dword_732E24, nullptr);
+
+struct FontRes
+{
+    DWORD field_0_mFileSize;
+    DWORD field_4_mUnknown;
+    DWORD field_8_mEntries[0];
+};
+
+MGS_VAR(1, 0x72AE10, FontRes*, gFont_res_72AE10, nullptr);
+
+void CC Font_load_fonts_45A5AF()
+{
+    gFont_res_72AE10 = (FontRes*)LibGV_FindFile_40A603(HashFileName_40A5A2("font", 'r')); // .res
+    if (gFont_res_72AE10)
+    {
+        gRubi_res_dword_732E38 = LibGV_FindFile_40A603(HashFileName_40A5A2("rubi", 'r')); // .res
+        
+        gFont_res_72AE10->field_0_mFileSize = _byteswap_ulong(gFont_res_72AE10->field_0_mFileSize);
+        gFont_res_72AE10->field_4_mUnknown = _byteswap_ulong(gFont_res_72AE10->field_4_mUnknown);
+
+        gFontRes_2_dword_732E20 = gFont_res_72AE10->field_8_mEntries;
+        gpFontResEnd_dword_732E24 = (DWORD *)((char *)gFont_res_72AE10 + gFont_res_72AE10->field_0_mFileSize);
+        
+        
+        const int tableCount = (gFont_res_72AE10->field_0_mFileSize / 4) - (sizeof(DWORD) * 2);
+
+        //DWORD* pEndOfFontData = gFont_res_72AE10->field_8_mEntries + tableCount;
+        sub_45A6F6(0, (DWORD *)((char *)gFont_res_72AE10 + gFont_res_72AE10->field_4_mUnknown));
+
+        for (int i = 0; i < tableCount; i++)
+        {
+            gFont_res_72AE10->field_8_mEntries[i] = _byteswap_ulong(gFont_res_72AE10->field_8_mEntries[i]);
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x45A5AF, Font_load_fonts_45A5AF, FONT_IMPL);
+
+void CC sub_45A6F6(int idx, void* value)
+{
+    assert(idx >= 0 && idx <= 4);
+    dword_732E28[idx] = reinterpret_cast<DWORD*>(value);
+}
+MGS_FUNC_IMPLEX(0x45A6F6, sub_45A6F6, FONT_IMPL);
+
+int __cdecl Font_look_up_char_45C138(signed int charToLookUp)
+{
+    if (charToLookUp > 0)
+    {
+        if (charToLookUp > 128)
+        {
+            charToLookUp -= 34;
+        }
+        charToLookUp -= 32;
+    }
+    return gFontRes_2_dword_732E20[charToLookUp];
+}
+MGS_FUNC_IMPLEX(0x45C138, Font_look_up_char_45C138, FONT_IMPL);
 
 char __cdecl Font_45B90B(BYTE* pTexturePixels, int a2, int a3, int a4, BYTE *a5)
 {
@@ -557,7 +618,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
     // 0x9040 = jp char
 
 
-    if (!gFile_CA68u_font_res_72AE10 || !pFont)
+    if (!gFont_res_72AE10 || !pFont)
     {
         return;
     }

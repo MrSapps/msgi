@@ -48,3 +48,5 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int a2, int a3, BYTE *p
 struct FontTextLine;
 void CC Font_TrueTypeLinesFree_4241A4(FontTextLine* pSurface);
 void* CC Render_alloc_font_type5_4241C2(const BYTE* pixelData, const WORD* pPallete);
+void CC Font_load_fonts_45A5AF();
+void CC sub_45A6F6(int idx, void* value);

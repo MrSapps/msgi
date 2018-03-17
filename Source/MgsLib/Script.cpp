@@ -13,6 +13,7 @@
 #include "Menu.hpp"
 #include "WinMain.hpp"
 #include "LibDG.hpp"
+#include "Font.hpp"
 #include <gmock/gmock.h>
 
 MGS_VAR(1, 0x9942A8, DWORD, byte1_flags_word_9942A8, 0);
@@ -29,9 +30,6 @@ MGS_VAR(1, 0x06BFBB8, DWORD*, script_args_dword_6BFBB8, 0);
 
 MGS_ARY(1, 0x6BFBBC, DWORD, 32, gScript_args_stack_32_dword_6BFBBC, {});
 MGS_ARY(1, 0x6BFC40, BYTE*, 8, gScript_stack_8_dword_6BFC40, {});
-
-
-MGS_FUNC_NOT_IMPL(0x45A6F6, int __cdecl(int a1, void* a2), sub_45A6F6);
 
 void ScriptCpp_ForceLink()
 {
@@ -841,12 +839,11 @@ MGS_FUNC_IMPLEX(0x451BBF, Script_tbl_load_451BBF, SCRIPT_IMPL);
 void CC Script_Set_MainOrDemo_40908E(DWORD bMain)
 {
     gScriptFileNameHashedToLoad_6BFBB4 = bMain != 1 ?
-        Hash_40A58B(ResourceNameHash("scenerio"), 'g') :
-        Hash_40A58B(ResourceNameHash("demo"), 'g');
+        HashFileName_40A58B(ResourceNameHash("scenerio"), 'g') :
+        HashFileName_40A58B(ResourceNameHash("demo"), 'g');
 }
 MGS_FUNC_IMPLEX(0x0040908E, Script_Set_MainOrDemo_40908E, SCRIPT_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x45A5AF, void __cdecl(), Script_tbl_start_load_other_files_45A5AF);
 MGS_FUNC_NOT_IMPL(0x45A497, void __cdecl(), Script_Clear_Named_Vars_45A497);
 MGS_FUNC_NOT_IMPL(0x409433, void __cdecl(), sub_409433);
 
@@ -865,7 +862,7 @@ int CC Script_tbl_start_sub_451B0E(BYTE* /*pScript*/)
 
     if (Script_ParamExists('f'))
     {
-        Script_tbl_start_load_other_files_45A5AF();
+        Font_load_fonts_45A5AF();
     }
 
     if (Script_ParamExists('v'))

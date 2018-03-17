@@ -162,7 +162,7 @@ void CC Map_LoadMapData_44F66F(int mapNum, int resourceNameHashed)
     printf("set map %d\n", mapNum);
     map_record* pMap = Map_GetNextFreeRecord_44F505(static_cast<short>(mapNum));
     pMap->field_8_hzd = Map_HZD_Load_44F5AF(resourceNameHashed, 0, pMap->field_0_map_index_bit, 48, 24);
-    DWORD fileNameHashed = Hash_40A58B(resourceNameHashed, 'l');
+    DWORD fileNameHashed = HashFileName_40A58B(resourceNameHashed, 'l');
     pMap->field_C_l_file = (DWORD)LibGV_FindFile_40A603(fileNameHashed);
     Map_LitLoad_44F53B(resourceNameHashed, pMap);
 }
