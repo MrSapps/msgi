@@ -252,7 +252,7 @@ void CC Font_set_text_45C80A(Font* pFont, char* pText)
         Font_set_text_shift_jis_45AB2D(pFont, 0, pFont->field_3_line_spacing, (BYTE*)pText, pFont->field_5);
     }
 }
-MGS_FUNC_IMPLEX(0x45C80A, Font_set_text_45C80A, FONT_IMPL);
+MGS_FUNC_IMPLEX(0x45C80A, Font_set_text_45C80A, false);
 
 void* CC Font_Get_Palette_45AB0B(Font* pFont)
 {
@@ -369,12 +369,12 @@ FontTextLineSource* CC Font_add_char_to_line_record_42431F(FontTextLineSource* p
 MGS_FUNC_IMPLEX(0x42431F, Font_add_char_to_line_record_42431F, FONT_IMPL);
 
 MGS_VAR(1, 0x732E38, void*, gRubi_res_dword_732E38, nullptr);
-MGS_VAR(1, 0x732E20, DWORD*, gFontRes_2_dword_732E20, nullptr);
-MGS_VAR(1, 0x732E24, DWORD*, gpFontResEnd_dword_732E24, nullptr);
+MGS_VAR(1, 0x732E20, DWORD*, gFontRes_pTable_732E20, nullptr);
+MGS_VAR(1, 0x732E24, DWORD*, gpFontResImageData_dword_732E24, nullptr);
 
 struct FontRes
 {
-    DWORD field_0_mFileSize;
+    DWORD field_0_mTableSize;
     DWORD field_4_mUnknown;
     DWORD field_8_mEntries[0];
 };
@@ -388,19 +388,20 @@ void CC Font_load_fonts_45A5AF()
     {
         gRubi_res_dword_732E38 = LibGV_FindFile_40A603(HashFileName_40A5A2("rubi", 'r')); // .res
         
-        gFont_res_72AE10->field_0_mFileSize = _byteswap_ulong(gFont_res_72AE10->field_0_mFileSize);
+        gFont_res_72AE10->field_0_mTableSize = _byteswap_ulong(gFont_res_72AE10->field_0_mTableSize);
         gFont_res_72AE10->field_4_mUnknown = _byteswap_ulong(gFont_res_72AE10->field_4_mUnknown);
 
-        gFontRes_2_dword_732E20 = gFont_res_72AE10->field_8_mEntries;
-        gpFontResEnd_dword_732E24 = (DWORD *)((char *)gFont_res_72AE10 + gFont_res_72AE10->field_0_mFileSize);
+        gFontRes_pTable_732E20 = gFont_res_72AE10->field_8_mEntries;
+        gpFontResImageData_dword_732E24 = (DWORD *)((char *)gFont_res_72AE10 + gFont_res_72AE10->field_0_mTableSize);
         
         
-        const int tableCount = (gFont_res_72AE10->field_0_mFileSize / 4) - (sizeof(DWORD) * 2);
+        const int tableCount = (gFont_res_72AE10->field_0_mTableSize / 4) - (sizeof(DWORD) * 2);
 
         //DWORD* pEndOfFontData = gFont_res_72AE10->field_8_mEntries + tableCount;
+        // Note: Inlined in real game
         sub_45A6F6(0, (DWORD *)((char *)gFont_res_72AE10 + gFont_res_72AE10->field_4_mUnknown));
 
-        for (int i = 0; i < tableCount; i++)
+        for (int i = 0; i <= tableCount; i++)
         {
             gFont_res_72AE10->field_8_mEntries[i] = _byteswap_ulong(gFont_res_72AE10->field_8_mEntries[i]);
         }
@@ -415,19 +416,100 @@ void CC sub_45A6F6(int idx, void* value)
 }
 MGS_FUNC_IMPLEX(0x45A6F6, sub_45A6F6, FONT_IMPL);
 
-int __cdecl Font_look_up_char_45C138(signed int charToLookUp)
+int CC Font_look_up_char_45C138(signed int charToLookUp)
 {
-    if (charToLookUp > 0)
+    signed int ret = charToLookUp;
+    if (ret > 0)
     {
-        if (charToLookUp > 128)
+        if (ret > 128) // Over 128 is last printable ascii char
         {
-            charToLookUp -= 34;
+            ret -= 34; // 34 "extra" unprintable chars?
         }
-        charToLookUp -= 32;
+        ret -= 32; // 32 = space, first printable acsii char
     }
-    return gFontRes_2_dword_732E20[charToLookUp];
+
+    // 13/line feed will read negatively out of bounds.. seems to be OG bug?
+    //assert(ret >= 0 && ret <= (gFont_res_72AE10->field_0_mFileSize / 4) - (sizeof(DWORD) * 2));
+    return gFontRes_pTable_732E20[ret];
 }
 MGS_FUNC_IMPLEX(0x45C138, Font_look_up_char_45C138, FONT_IMPL);
+
+int CC Font_Get_rubi_code_index_45C3C2(signed int toMap)
+{
+    switch (toMap)
+    {
+    case 0x8201: return 1;   case 0x8202: return 2;   case 0x8203: return 3;
+    case 0x8204: return 4;   case 0x8205: return 5;   case 0x8206: return 6;
+    case 0x8207: return 7;   case 0x8208: return 8;   case 0x8209: return 9;
+    case 0x820A: return 10;  case 0x820B: return 11;  case 0x820C: return 12;
+    case 0x820D: return 13;  case 0x820E: return 14;  case 0x820F: return 15;
+    case 0x8210: return 16;  case 0x8211: return 17;  case 0x8212: return 18;
+    case 0x8213: return 19;  case 0x8214: return 20;  case 0x8215: return 21;
+    case 0x8216: return 22;  case 0x8217: return 23;  case 0x8218: return 24;
+    case 0x8219: return 25;  case 0x821A: return 26;  case 0x821B: return 27;
+    case 0x821C: return 28;  case 0x821D: return 29;  case 0x821E: return 30;
+    case 0x821F: return 31;  case 0x8220: return 32;  case 0x8221: return 33;
+    case 0x8222: return 34;  case 0x8223: return 35;  case 0x8224: return 36;
+    case 0x8225: return 37;  case 0x8226: return 38;  case 0x8227: return 39;
+    case 0x8228: return 40;  case 0x8229: return 41;  case 0x822A: return 42;
+    case 0x822B: return 43;  case 0x822C: return 44;  case 0x822D: return 45;
+    case 0x822E: return 46;  case 0x822F: return 47;  case 0x8230: return 48;
+    case 0x8231: return 49;  case 0x8232: return 50;  case 0x8233: return 51;
+    case 0x8234: return 52;  case 0x8235: return 53;  case 0x8236: return 54;
+    case 0x8237: return 55;  case 0x8238: return 56;  case 0x8239: return 57;
+    case 0x823A: return 58;  case 0x823B: return 59;  case 0x823C: return 60;
+    case 0x823D: return 61;  case 0x823E: return 62;  case 0x823F: return 63;
+    case 0x8240: return 64;  case 0x8241: return 65;  case 0x8242: return 66;
+    case 0x8243: return 67;  case 0x8244: return 68;  case 0x8245: return 69;
+    case 0x8246: return 70;  case 0x8247: return 71;  case 0x8248: return 72;
+    case 0x8249: return 73;  case 0x824A: return 74;  case 0x824B: return 75;
+    case 0x824C: return 76;  case 0x824D: return 77;  case 0x824F: return 78;
+    case 0x8252: return 79;  case 0x8253: return 80;
+
+    // Jump/skip in range
+
+    case 0x8030: return 81;  case 0x8031: return 82;  case 0x8032: return 83;
+    case 0x8033: return 84;  case 0x8034: return 85;  case 0x8035: return 86;
+    case 0x8036: return 87;  case 0x8037: return 88;  case 0x8038: return 89;
+    case 0x8039: return 90;
+    
+    // Jump/skip in range
+
+    case 0x8041: return 91;  case 0x8042: return 92;  case 0x8043: return 93;
+    case 0x8044: return 94;  case 0x8045: return 95;  case 0x8046: return 96;
+    case 0x8047: return 97;  case 0x8048: return 98;  case 0x8049: return 99;
+    case 0x804A: return 100; case 0x804B: return 101; case 0x804C: return 102;
+    case 0x804D: return 103; case 0x804E: return 104; case 0x804F: return 105;
+    case 0x8050: return 106; case 0x8051: return 107; case 0x8052: return 108;
+    case 0x8053: return 109; case 0x8054: return 110; case 0x8055: return 111;
+    case 0x8056: return 112; case 0x8057: return 113; case 0x8058: return 114;
+    case 0x8059: return 115; case 0x805A: return 116;
+
+    case 0x807F: return 118; case 0x802E: return 118;
+
+    case 0x802D: return 117; case 0x9006: return 117;
+
+    case 0x8020: return 0;   case 0x9001: return 0;
+    }
+
+    return -1;
+}
+MGS_FUNC_IMPLEX(0x45C3C2, Font_Get_rubi_code_index_45C3C2, FONT_IMPL);
+
+int __cdecl Font_map_char_45B80A(signed int input)
+{
+    //return Font_Get_rubi_code_index_45C3C2(input);
+    static int t = 1;
+    static int d = 0;
+    d++;
+    if (d > 50)
+    {
+        d = 0;
+        t++;
+    }
+    return t;
+}
+MGS_FUNC_IMPLEX(0x45B80A, Font_map_char_45B80A, false);
 
 char __cdecl Font_45B90B(BYTE* pTexturePixels, int a2, int a3, int a4, BYTE *a5)
 {
@@ -441,11 +523,11 @@ int __cdecl Font_add_char_to_atlas_45BD91(BYTE* pTexturePixels, signed int xpos,
 }
 MGS_FUNC_IMPLEX(0x45BD91, Font_add_char_to_atlas_45BD91, false); // TODO
 
-void __cdecl Font_rubi_map2_45C1E9(BYTE* pTexturePixels, signed int a2, int a3, int a4, int a5)
+void __cdecl Font_rubi_add_45C1E9(BYTE* pTexturePixels, signed int a2, int a3, int a4, int a5)
 {
 
 }
-MGS_FUNC_IMPLEX(0x45C1E9, Font_rubi_map2_45C1E9, false); // TODO
+MGS_FUNC_IMPLEX(0x45C1E9, Font_rubi_add_45C1E9, false); // TODO
 
 unsigned int __cdecl Font_45C16A(signed int a1)
 {
@@ -453,11 +535,6 @@ unsigned int __cdecl Font_45C16A(signed int a1)
 }
 MGS_FUNC_IMPLEX(0x45C16A, Font_45C16A, false); // TODO
 
-int __cdecl Font_map_char_45B80A(signed int a1)
-{
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x45B80A, Font_map_char_45B80A, false); // TODO
 
 int __cdecl Font_map_unknown_45C1DC(int a1)
 {
@@ -570,9 +647,14 @@ void HandleCharSkip(BYTE*& pTextIter, int xpos, int ypos, int field_1a)
         }
     }
 }
+void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3, BYTE *pText, int field_5);
+MGS_FUNC_IMPLEX(0x45AB2D, Font_set_text_shift_jis_45AB2D, true); // TODO
 
 void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3, BYTE *pText, int field_5)
 {
+
+    return Font_set_text_shift_jis_45AB2D_.Ptr()(pFont, kZero, field_3, pText, field_5);
+
     BYTE *pUpdatedText; // eax
     signed int nextChar2Masked; // eax
     int nextChar8Masked; // eax
@@ -600,23 +682,25 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
     int nextChar10Masked2Copy; // [esp+48h] [ebp-24h]
     int nextChar12; // [esp+48h] [ebp-24h]
     signed int v65; // [esp+4Ch] [ebp-20h]
-    int ypos; // [esp+50h] [ebp-1Ch]
-    int xpos; // [esp+54h] [ebp-18h]
+    int ypos = 0; // [esp+50h] [ebp-1Ch]
+    int xpos = 0; // [esp+54h] [ebp-18h]
     signed int v68; // [esp+58h] [ebp-14h]
     int v69; // [esp+64h] [ebp-8h]
 
     
     //gUseTrueType_dword_6FC7AC = 0;
-    //BYTE test[] = { 'p',  0x90, 0x41,  0x0 };
-    //pText = test;
-    
+    BYTE test[] = { 0x90, 0x02, 0x90, 0x12, 0x82, 0x3A, 0x82, 0x3b, 0x82, 0x3c, 0x82, 0x3d, 0x80, 0x7d, 0x0,  0x0 };
+    pText = test;
 
     // 0x9010 = %
     // 0x9011 = &
     // 0x9012 = [
     // 0x9013 = ]
     // 0x9040 = jp char
+    Font_rubi_add_45C1E9(pFont->field_14_pPixelData, xpos, ypos, pFont->field_18_wh, (int)test);
+    pFont->field_7_out_max_width = 200;
 
+    return;
 
     if (!gFont_res_72AE10 || !pFont)
     {
@@ -849,7 +933,7 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
             }
             if (dword_732E48 == 1 && (nextChar1Masked == 0x9002 || nextChar1Masked == 0x9004))
             {
-                Font_rubi_map2_45C1E9(pBakedPixelData, xpos, ypos, v69, (int)(pTextIter + 2));
+                Font_rubi_add_45C1E9(pBakedPixelData, xpos, ypos, v69, (int)(pTextIter + 2));
             }
             dword_732E48 = 0;
 
@@ -981,7 +1065,6 @@ void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3,
         }
     } // Loop end
 }
-MGS_FUNC_IMPLEX(0x45AB2D, Font_set_text_shift_jis_45AB2D, false); // TODO
 
 
 MGS_FUNC_NOT_IMPL(0x520458, void __cdecl(char* pText), Font_replace_psx_with_pc_strings_520458);

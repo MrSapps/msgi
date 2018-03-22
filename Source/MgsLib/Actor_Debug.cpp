@@ -109,11 +109,29 @@ static std::string LimitTo64Chars(const std::string& s)
     return s;
 }
 
+Actor *__cdecl Res_jimctrl_create_45942B(__int16 a2);
+MGS_FUNC_IMPLEX(0x45942B, Res_jimctrl_create_45942B, false);
+
+Actor *__cdecl Res_jimctrl_create_45942B(__int16 a2)
+{
+    //return nullptr;
+    return Res_jimctrl_create_45942B_.Ptr()(a2 );
+}
+
+void __cdecl SetSubTitleTextAndOtherVars_462D96(char *pSubs, signed int a2)
+{
+
+}
+MGS_FUNC_IMPLEX(0x462D96, SetSubTitleTextAndOtherVars_462D96, false);
+
+
+Actor *__cdecl Res_strctrl_create_45803B(int scriptVar_s_vox_code, unsigned int scriptVar_p, int b24Or30fps);
+MGS_FUNC_IMPLEX(0x45803B, Res_strctrl_create_45803B, false);
+
 Actor *__cdecl Res_strctrl_create_45803B(int scriptVar_s_vox_code, unsigned int scriptVar_p, int b24Or30fps)
 {
-    return nullptr;
+    return Res_strctrl_create_45803B_.Ptr()(scriptVar_s_vox_code, scriptVar_p, b24Or30fps);
 }
-MGS_FUNC_IMPLEX(0x45803B, Res_strctrl_create_45803B, false);
 
 static void RenderInputState()
 {
@@ -180,10 +198,13 @@ void Debug_DrawTextTexture(Actor_Debug* pDebug, short x, short y, short w, short
     //    gMenuPrimBuffer_7265E0.mOt = gLibGvStruct2_6BC558.mOrderingTables[gActiveBuffer_dword_791A08];
 }
 
-const int kFontWidth = 220;
-const int kFontHeight = 60;
+const int kFontWidth = 240;
+const int kFontHeight = 100;
 
-MGS_VAR(1, 0x733858, char*, gSubsText_dword_733858, nullptr);
+MGS_VAR(1, 0x733858, char*, gSubsText_dword_733858, 0);
+MGS_VAR(1, 0x73382C, Font, gFont_73382C, {});
+
+
 
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
@@ -295,9 +316,106 @@ static void CC Debug_Update(Actor_Debug* pDebug)
     }
     Debug_UpdateTextTexture(pDebug, (char*)toDraw);
     */
-    Debug_UpdateTextTexture(pDebug, "Hello, this is a test of text render to vram");
-    Debug_DrawTextTexture(pDebug, 20, 80, kFontWidth, kFontHeight);
-    //gSubsText_dword_733858 = "LOL";
+
+
+
+/*
+static BYTE test[] = 
+{ 
+    0x82, 0x2f, // first word
+    0x82, 0x04, 
+    0x82, 0x26, 
+    0x82, 0x0f, 
+    0x90, 0xfe, 
+    0x90, 0xff, 
+    0x9c, 0x01, 
+    0x9c, 0x02, 
+    0x20, 0x80, // [f_start]FOX FOUND
+    0x23, 0x80, 
+    0x7b, 0x46, 
+    0x4f, 0x58, 
+    0x20, 0x48, 
+    0x4f, 0x55, 
+    0x4e, 0x44, 
+    0xd0, 0x02, // [f_mid]
+    0x82, 0x35, // [text here appears above FOX HOUND]
+    0xc2, 0x09, 
+    'P', 'A',
+    'U', 'L', 
+    0x82, 0x0f, 
+    0x82, 0x19, 
+    0x82, 0x2f, 
+    0x82, 0x06, 
+    0x82, 0x53, 
+    0x82, 0x29, 
+    0xc0, 0x7d, 
+    0x80, 0x23, // [f_end]
+    0x00, 0x00 
+};
+*/
+/*
+static BYTE test[] =
+{
+    'H', 'e', 'l', 'l', 'o',
+    0x23, 0x80,
+    0x7b,
+    'W', 'o', 'r', 'l', 'd',
+    0xd0, 0x02,
+    'P', 'A', 'U', 'L',
+    0xc0, 0x7d,
+    0x80, 0x23,
+    'L', 'O', 'L',
+    0x00, 0x00
+};
+*/
+static BYTE test[] =
+{
+    'H', 'e', 'l', 'l', 'o',
+    0x23, 0x80,
+    0x4e, 0x80,
+    0x7b,
+    'W', 'o', 'r', 'l', 'd',
+    0xd0, 0x02,
+    'P', 'A', 'U', 'L',
+    0xc0, 0x7d,
+    'L', 'O', 'L',
+
+    0x23, 0x80,
+    0x7b,
+    'W', 'o', 'r', 'l', 'd',
+    0xd0, 0x02,
+    'P', 'A', 'U', 'L',
+    0xc0, 0x7d,
+    'L', 'O', 'L',
+
+
+    0x00, 0x00
+};
+
+    gGameStates_78E7E0.gFlags_dword_78E7E4 |= 0x800;  // Set Japanese
+    gGameStates_78E7E0.gFlags_dword_78E7E4 &= ~0x100; // Unset English ??
+    //gGameStates_78E7E0.gFlags_dword_78E7E4 &= ~0x400; // bit 11
+
+    bool draw = true;
+  //  if (gButtonsArray4_7919C0[0].field_2_button_pressed & PsxButtonBits::eDPadDown)
+    {
+//        Font_Set_global_alloc_ptr_45C7F2(&pDebug->mTestFont);
+       
+        gUseTrueType_dword_6FC7AC = gUseTrueType_650D40;
+        Font_set_text_45C80A(&gFont_73382C, (char*)test);
+        Font_Set_global_alloc_ptr_45C7F2(&gFont_73382C);
+        Font_render_45C76C(&gFont_73382C);
+        gUseTrueType_dword_6FC7AC = 0;
+
+       // Debug_UpdateTextTexture(pDebug, (char*)test);
+      //  draw = false;
+    }
+    if (draw)
+    {
+        Debug_DrawTextTexture(pDebug, 20, 80, kFontWidth, kFontHeight);
+    }
+
+    //gSubsText_dword_733858 = (char*)test;
 
     TextSetXYFlags_459B0B(30, 100, 0);
     TextSetRGB_459B27(0x80, 0x80, 0x80);
@@ -318,7 +436,8 @@ static void CC Debug_Update(Actor_Debug* pDebug)
    
     if (gButtonsArray4_7919C0[0].field_2_button_pressed & PsxButtonBits::eDPadUp)
     {
-        Res_strctrl_create_45803B(0xfc308022, 0, 0);
+        // vc001501.vox
+        Res_strctrl_create_45803B(0xfc001501, 0, 0);
     }
 
     UpdateSnakeHpTest();
