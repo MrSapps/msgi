@@ -115,7 +115,8 @@ MGS_FUNC_IMPLEX(0x45942B, Res_jimctrl_create_45942B, false);
 Actor *__cdecl Res_jimctrl_create_45942B(__int16 a2)
 {
     //return nullptr;
-    return Res_jimctrl_create_45942B_.Ptr()(a2 );
+   // return Res_jimctrl_create_45942B_.Ptr()(a2 );
+    return nullptr;
 }
 
 void __cdecl SetSubTitleTextAndOtherVars_462D96(char *pSubs, signed int a2)
@@ -130,7 +131,8 @@ MGS_FUNC_IMPLEX(0x45803B, Res_strctrl_create_45803B, false);
 
 Actor *__cdecl Res_strctrl_create_45803B(int scriptVar_s_vox_code, unsigned int scriptVar_p, int b24Or30fps)
 {
-    return Res_strctrl_create_45803B_.Ptr()(scriptVar_s_vox_code, scriptVar_p, b24Or30fps);
+    //return Res_strctrl_create_45803B_.Ptr()(scriptVar_s_vox_code, scriptVar_p, b24Or30fps);
+    return nullptr;
 }
 
 static void RenderInputState()

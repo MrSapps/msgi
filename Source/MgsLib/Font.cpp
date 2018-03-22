@@ -47,13 +47,13 @@ StrReplacement stru_68C7D0[25] =
 };
 
 void CC Font_build_replacement_table_520511();
-MGS_FUNC_IMPLEX(0x520511, Font_build_replacement_table_520511, FONT_IMPL);
+MGS_FUNC_IMPLEX(0x520511, Font_build_replacement_table_520511, false);
 
 MGS_ARY(1, 0x77C938, DWORD, 256, gTextCharTable_dword_77C938, {});
 
 void CC Font_build_replacement_table_520511()
 {
-    Font_build_replacement_table_520511_.Ptr()();
+    //Font_build_replacement_table_520511_.Ptr()();
     /*
     for (int i = 0; i < 256; i++)
     {
@@ -648,12 +648,12 @@ void HandleCharSkip(BYTE*& pTextIter, int xpos, int ypos, int field_1a)
     }
 }
 void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3, BYTE *pText, int field_5);
-MGS_FUNC_IMPLEX(0x45AB2D, Font_set_text_shift_jis_45AB2D, true); // TODO
+MGS_FUNC_IMPLEX(0x45AB2D, Font_set_text_shift_jis_45AB2D, false); // TODO
 
 void __cdecl Font_set_text_shift_jis_45AB2D(Font *pFont, int kZero, int field_3, BYTE *pText, int field_5)
 {
 
-    return Font_set_text_shift_jis_45AB2D_.Ptr()(pFont, kZero, field_3, pText, field_5);
+  //  return Font_set_text_shift_jis_45AB2D_.Ptr()(pFont, kZero, field_3, pText, field_5);
 
     BYTE *pUpdatedText; // eax
     signed int nextChar2Masked; // eax
@@ -1072,7 +1072,7 @@ MGS_FUNC_NOT_IMPL(0x520458, void __cdecl(char* pText), Font_replace_psx_with_pc_
 void DoFontTests()
 {
     Font_build_replacement_table_520511();
-
+/*
     {
         char buffer[1024] = "hello world";
         Font_replace_psx_with_pc_strings_520458(buffer);
@@ -1084,4 +1084,5 @@ void DoFontTests()
         Font_replace_psx_with_pc_strings_520458(buffer);
         ASSERT_STREQ("Press Action btn to lol", buffer);
     }
+*/
 }
