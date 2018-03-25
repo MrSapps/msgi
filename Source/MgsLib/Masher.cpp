@@ -501,7 +501,7 @@ unsigned char Clamp(f32 v)
     return (unsigned char)v;
 }
 
-void SetElement(int x, int y, int width, u32* ptr, u32 value)
+void SetElement(int x, int y, int width, u16* ptr, u16 value)
 {
     ptr[(width * y) + x] = value;
 }
@@ -509,7 +509,28 @@ void SetElement(int x, int y, int width, u32* ptr, u32 value)
 const int kMacroBlockWidth = 16;
 const int kMacroBlockHeight = 16;
 
-static void ConvertYuvToRgbAndBlit(u32* pixelBuffer, int xoff, int yoff, int width, int height)
+struct Macroblock_RGB_Struct
+{
+    unsigned char Red;
+    unsigned char Green;
+    unsigned char Blue;
+    unsigned char A;
+};
+
+uint16_t rgb888torgb565(Macroblock_RGB_Struct& rgb888Pixel)
+{
+    uint8_t red = rgb888Pixel.Red;
+    uint8_t green = rgb888Pixel.Green;
+    uint8_t blue = rgb888Pixel.Blue;
+
+    uint16_t b = (blue >> 3) & 0x1f;
+    uint16_t g = ((green >> 2) & 0x3f) << 5;
+    uint16_t r = ((red >> 3) & 0x1f) << 11;
+
+    return (uint16_t)(r | g | b);
+}
+
+static void ConvertYuvToRgbAndBlit(u16* pixelBuffer, int xoff, int yoff, int width, int height)
 {
     // convert the Y1 Y2 Y3 Y4 and Cb and Cr blocks into a 16x16 array of (Y, Cb, Cr) pixels
     struct Macroblock_YCbCr_Struct
@@ -543,14 +564,6 @@ static void ConvertYuvToRgbAndBlit(u32* pixelBuffer, int xoff, int yoff, int wid
     }
 
     // Convert the (Y, Cb, Cr) pixels into RGB pixels
-    struct Macroblock_RGB_Struct
-    {
-        unsigned char Red;
-        unsigned char Green;
-        unsigned char Blue;
-        unsigned char A;
-    };
-
     std::array< std::array<Macroblock_RGB_Struct, 16>, 16> Macroblock_RGB = {};
 
     for (u32 x = 0; x < kMacroBlockWidth; x++)
@@ -570,14 +583,11 @@ static void ConvertYuvToRgbAndBlit(u32* pixelBuffer, int xoff, int yoff, int wid
             int ypos = y + yoff;
             if (xpos < width && ypos < height)
             {
-                u32 pixelValue = 0;
-                pixelValue = (pixelValue << 8) + Macroblock_RGB[x][y].Blue;
-                pixelValue = (pixelValue << 8) + Macroblock_RGB[x][y].Green;
-                pixelValue = (pixelValue << 8) + Macroblock_RGB[x][y].Red;
 
+                u16 pixel16Value = rgb888torgb565(Macroblock_RGB[x][y]);
                 // Actually is no alpha in FMVs
                 // pixelValue = (pixelValue << 8) + Macroblock_RGB[x][y].A
-                SetElement(xpos, ypos, width, pixelBuffer, pixelValue);
+                SetElement(xpos, ypos, width, pixelBuffer, pixel16Value);
             }
         }
     }
@@ -663,7 +673,7 @@ void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFram
             idct(block6Output, Y4_block);
             block1Output = dataSizeBytes + block6Output;
 
-            ConvertYuvToRgbAndBlit((u32*)pDecodedFrame, xoff, yoff, pMasher->field_14_video_header.field_4_width*gMovieData_724A00.field_24_double_width, pMasher->field_14_video_header.field_8_height*gMovieData_724A00.field_28_double_height);
+            ConvertYuvToRgbAndBlit((u16*)pDecodedFrame, xoff, yoff, pMasher->field_14_video_header.field_4_width*gMovieData_724A00.field_24_double_width, pMasher->field_14_video_header.field_8_height*gMovieData_724A00.field_28_double_height);
 
             yoff += kMacroBlockHeight;
         }
