@@ -5,6 +5,8 @@
 #include <mmreg.h>
 #include <dsound.h>
 
+struct Actor_Movie_Masher;
+
 void SoundCpp_Debug();
 void SoundCpp_ForceLink();
 
@@ -40,7 +42,9 @@ void __cdecl Sound_SetSoundMusicVolume(int a1);
 void __cdecl Sound_SetSoundVolume(int a1);
 bool __cdecl Sound_PlayEffect(unsigned __int8 idx, int a2, int a3);
 bool __cdecl Sound_Unknown4();
-int __cdecl Sound_Unknown5(int a1, int a2, BYTE*(__cdecl *a3)(DWORD));
+int __cdecl Sound_Masher_write_data_523CF3(Actor_Movie_Masher* pMasher,
+    signed int(CC *pFnRead)(Actor_Movie_Masher*),
+    void *(CC *pMovieUpdate)(Actor_Movie_Masher *));
 void __cdecl Sound_Unknown6();
 int __cdecl Sound_Play(unsigned int playingFlags);
 int __cdecl Sound_jPlay(unsigned int playingFlags);

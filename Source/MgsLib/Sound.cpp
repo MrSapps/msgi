@@ -284,9 +284,9 @@ MGS_PTR(1, 0x68CEE4, DWORD*, dword_68CEE4, nullptr);// TODO: Figure out array si
 MGS_VAR(REDIRECT_SOUND, 0x77D880, DWORD, dword_77D880, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1B8, DWORD, dword_77E1B8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1CC, DWORD, dword_77E1CC, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1D8, DWORD, dword_77E1D8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D8, DWORD, gSoundNumBlocksWrote_dword_77E1D8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D890, DWORD, gSndTime_dword_77D890, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1D4, DWORD, gOffsetToLock_77E1D4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D4, DWORD, gSoundWriteCursor_dword_77E1D4, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2E4, DWORD, dword_77E2E4, 0);
 MGS_PTR(1, 0x68E2D0, float*, byte_68E2D0, nullptr); // XA K0 TODO: Figure out array size and dump it
 MGS_VAR(REDIRECT_SOUND, 0x77E300, double, dbl_77E300, 0);
@@ -332,7 +332,7 @@ MGS_FUNC_IMPLEX(0x0052255B, Sound_SetSoundMusicVolume, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x005224C8, Sound_SetSoundVolume, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
 MGS_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, SOUND_IMPL);
-MGS_FUNC_IMPLEX(0x00523CF3, Sound_Unknown5, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523CF3, Sound_Masher_write_data_523CF3, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP); // calls to broken funcs
 MGS_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP); // calls to broken funcs
@@ -1237,12 +1237,12 @@ signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BY
         gSndBuffer_dword_77E0A0->Unlock(v7, v9, v6, v8);
     }
 
-    gOffsetToLock_77E1D4 = dword_77E1C4 * Size;
+    gSoundWriteCursor_dword_77E1D4 = dword_77E1C4 * Size;
     dword_77D880 = dword_77E1C4 * Size;
     dword_77E1CC = 0;
     dword_77E1B8 = 0;
     gSndTime_dword_77D890 = timeGetTime();
-    dword_77E1D8 = 0;
+    gSoundNumBlocksWrote_dword_77E1D8 = 0;
     return 1;
 }
 
@@ -1810,8 +1810,8 @@ bool __cdecl Sound_Unknown4()
     }
     else
     {
-        ret = 1000 * dword_77E1D8 / 15 < timeGetTime() - gSndTime_dword_77D890;
-        while (timeGetTime() - gSndTime_dword_77D890 <= 1000 * dword_77E1D8 / 15)
+        ret = 1000 * gSoundNumBlocksWrote_dword_77E1D8 / 15 < timeGetTime() - gSndTime_dword_77D890;
+        while (timeGetTime() - gSndTime_dword_77D890 <= 1000 * gSoundNumBlocksWrote_dword_77E1D8 / 15)
         {
 
         }
@@ -1819,61 +1819,63 @@ bool __cdecl Sound_Unknown4()
     return ret;
 }
 
-// 0x00523CF3
-int __cdecl Sound_Unknown5(int a1, int /*a2*/, BYTE*(__cdecl* fnRead)(DWORD))
+int __cdecl Sound_Masher_write_data_523CF3(Actor_Movie_Masher* pMasher,
+    signed int(CC *pFnRead)(Actor_Movie_Masher*),
+    void *(CC *pMovieUpdate)(Actor_Movie_Masher *))
 {
-    // TODO: Why a2 isn't used?
-    void *sndPtr;
-    DWORD sndBufSize;
-    void *Dst;
-    DWORD Size;
+    // TODO: Why pFnRead isn't used?
+    void *pSoundBufferBlock2;
+    DWORD numBytesLockedBlock2;
+    void *pSoundBufferBlock1;
+    DWORD numBytesLockedBlock1;
 
-    BYTE* Src = fnRead(a1);
-    if (Src)
+    BYTE* pMasherAudioFrame = (BYTE*)pMovieUpdate(pMasher);
+    if (pMasherAudioFrame)
     {
         const int numBytesToLock = gBlockAlign_dword_77E1DC * dword_77D87C;
         if (gSndBuffer_dword_77E0A0)
         {
             if (gSndBuffer_dword_77E0A0->Lock(
-                gOffsetToLock_77E1D4,
+                gSoundWriteCursor_dword_77E1D4,
                 numBytesToLock,
-                &Dst,
-                &Size,
-                &sndPtr,
-                &sndBufSize,
+                &pSoundBufferBlock1,
+                &numBytesLockedBlock1,
+                &pSoundBufferBlock2,
+                &numBytesLockedBlock2,
                 0) == DSERR_BUFFERLOST)
             {
                 gSndBuffer_dword_77E0A0->Restore();
                 gSndBuffer_dword_77E0A0->Lock(
-                    gOffsetToLock_77E1D4,
+                    gSoundWriteCursor_dword_77E1D4,
                     numBytesToLock,
-                    &Dst,
-                    &Size,
-                    &sndPtr,
-                    &sndBufSize,
+                    &pSoundBufferBlock1,
+                    &numBytesLockedBlock1,
+                    &pSoundBufferBlock2,
+                    &numBytesLockedBlock2,
                     0);
             }
-            if (Dst)
+
+            if (pSoundBufferBlock1)
             {
-                memcpy(Dst, Src, Size);
+                memcpy(pSoundBufferBlock1, pMasherAudioFrame, numBytesLockedBlock1);
             }
             
-            if (sndPtr)
+            if (pSoundBufferBlock2)
             {
-                memcpy(sndPtr, Src + Size, sndBufSize);
+                memcpy(pSoundBufferBlock2, pMasherAudioFrame + numBytesLockedBlock1, numBytesLockedBlock2);
             }
 
-            gSndBuffer_dword_77E0A0->Unlock(Dst, Size, sndPtr, sndBufSize);
+            gSndBuffer_dword_77E0A0->Unlock(pSoundBufferBlock1, numBytesLockedBlock1, pSoundBufferBlock2, numBytesLockedBlock2);
         }
         
-        gOffsetToLock_77E1D4 += numBytesToLock;
+        gSoundWriteCursor_dword_77E1D4 += numBytesToLock;
 
-        if (gOffsetToLock_77E1D4 >= gSoundBufferSize_77E1B4)
+        if (gSoundWriteCursor_dword_77E1D4 >= gSoundBufferSize_77E1B4)
         {
-            gOffsetToLock_77E1D4 = 0;
+            gSoundWriteCursor_dword_77E1D4 = 0;
         }
     }
-    return dword_77E1D8++ + 1;
+    return gSoundNumBlocksWrote_dword_77E1D8++ + 1;
 }
 
 // 0x00523CB9

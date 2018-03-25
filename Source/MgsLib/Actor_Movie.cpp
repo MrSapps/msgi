@@ -6,6 +6,7 @@
 #include "Script.hpp"
 #include <gmock/gmock.h>
 #include "Renderer.hpp"
+#include "Sound.hpp"
 
 void Force_Actor_Movie_Cpp_Link() { }
 
@@ -208,6 +209,39 @@ int CC File_ASync_Seek(File_ASync* pHandle, __int32 offset, int origin)
 }
 MGS_FUNC_IMPLEX(0x528C65, File_ASync_Seek, MOVIE_IMPL);
 
+MGS_VAR(1, 0x724A00, Actor_Movie_Data, gMovieData_724A00, {});
+
+MGS_FUNC_NOT_IMPL(0x528993, void __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_decode_image_528993); // TODO
+MGS_FUNC_NOT_IMPL(0x528985, void __cdecl(Actor_Movie_Masher *a2, void *a3), jMovie_MMX_Decode_528985); // TODO
+MGS_FUNC_NOT_IMPL(0x52897C, signed int __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_read_blocking_52897C); // TODO
+MGS_FUNC_NOT_IMPL(0x52899C, void* __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_sound_read_52899C); // TODO
+MGS_FUNC_NOT_IMPL(0x528973, DWORD __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_528973); // TODO
+
+int CC Res_movie_update_helper_45675A()
+{
+    if (gMovieData_724A00.field_20_sound_pos)
+    {
+        Res_movie_masher_decode_image_528993(gMovieData_724A00.field_0_masher_ptr);
+    }
+    else
+    {
+        jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
+    }
+    if (!gMovieData_724A00.field_2C_audio_play_started)
+    {
+        Sound_Unknown6();
+        gMovieData_724A00.field_2C_audio_play_started = 1;
+    }
+    Sound_Masher_write_data_523CF3(
+        gMovieData_724A00.field_0_masher_ptr,
+        Res_movie_masher_read_blocking_52897C.Ptr(),
+        Res_movie_masher_sound_read_52899C.Ptr());
+    gMovieData_724A00.field_1C_read_ret = Res_movie_masher_528973(gMovieData_724A00.field_0_masher_ptr);
+    gMovieData_724A00.field_20_sound_pos = Sound_Unknown4();
+    return gMovieData_724A00.field_1C_read_ret;
+}
+MGS_FUNC_IMPLEX(0x45675A, Res_movie_update_helper_45675A, MOVIE_IMPL);
+
 void CC Res_movie_copy_frame_to_back_buffer_51D613(unsigned int width, unsigned int height, const void *pPixelData)
 {
     if (!g_pBackBuffer_6FC738)
@@ -236,7 +270,7 @@ void CC Res_movie_copy_frame_to_back_buffer_51D613(unsigned int width, unsigned 
 
         if (height > 0)
         {
-            const int sizeOfRow = 2 * width;
+            const int sizeOfRow = 2 * width; // 16 bit pixels
             for (DWORD i=0; i<height; i++)
             {
                 memcpy(pRowDst, pPixelData, sizeOfRow);
