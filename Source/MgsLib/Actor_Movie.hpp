@@ -8,23 +8,23 @@ struct Actor_Movie
     WORD word_7248F0_counter;
     WORD word_7248F2_11_param_i;
     short dword_7248F4_param_o;
-    WORD field_26;
+    WORD field_26_pad;
     int dword_7248F8_script_param_p;
     DWORD dword_7248FC_bIsEnding;
 };
 MGS_ASSERT_SIZEOF(Actor_Movie, 0x30);
 
 struct Actor_Movie_Masher;
-struct Actor_Movie_Masher_16Stru;
-struct Actor_Movie_Masher_24Stru;
-struct Actor_Movie_Data_SoundSettings;
+struct Actor_Movie_DDV_Header;
+struct Actor_Movie_DDV_VideoHeader;
+struct Actor_Movie_DDV_AudioHeader;
 
 struct Actor_Movie_Data
 {
     Actor_Movie_Masher* field_0_masher_ptr;
-    Actor_Movie_Masher_16Stru* field_4_ptr;
-    Actor_Movie_Masher_24Stru* field_8;
-    Actor_Movie_Data_SoundSettings* gAudioBufferSettings_dword_724A0C;
+    Actor_Movie_DDV_Header* field_4_ddv_header;
+    Actor_Movie_DDV_VideoHeader* field_8_video_header;
+    Actor_Movie_DDV_AudioHeader* field_C_audio_header;
     DWORD gbMovieError_dword_724A10;
     void* gMovieBuffer_724A14;
     int field_18;
@@ -37,42 +37,42 @@ struct Actor_Movie_Data
 };
 MGS_ASSERT_SIZEOF(Actor_Movie_Data, 0x34);
 
-struct Actor_Movie_Masher_16Stru
+struct Actor_Movie_DDV_Header
 {
-    int field_0;
-    int field_4;
-    int field_8;
-    int field_C;
+    int field_0_ddv_version;
+    int field_4_contains;
+    int field_8_frame_rate;
+    int field_C_number_of_frames;
 };
-MGS_ASSERT_SIZEOF(Actor_Movie_Masher_16Stru, 16);
+MGS_ASSERT_SIZEOF(Actor_Movie_DDV_Header, 16);
 
-struct Actor_Movie_Masher_24Stru
+struct Actor_Movie_DDV_VideoHeader
 {
-    int field_0;
+    int field_0_unknown;
     int field_4_width;
     int field_8_height;
-    int field_C;
-    int field_10;
-    int field_14;
+    int field_C_max_audio_frame_size;
+    int field_10_max_video_frame_size;
+    int field_14_key_frame_rate;
 };
-MGS_ASSERT_SIZEOF(Actor_Movie_Masher_24Stru, 24);
+MGS_ASSERT_SIZEOF(Actor_Movie_DDV_VideoHeader, 24);
 
-struct Actor_Movie_Data_SoundSettings
+struct Actor_Movie_DDV_AudioHeader
 {
-    int field_0_flags;
+    int field_0_audio_format;
     int field_4_samples_per_second;
-    int field_8;
-    int field_C_block_size;
-    int field_10_num_buffers;
+    int field_8_max_audio_frame_size;
+    int field_C_single_audio_frame_size;
+    int field_10_num_frames_interleave;
 };
-MGS_ASSERT_SIZEOF(Actor_Movie_Data_SoundSettings, 20);
+MGS_ASSERT_SIZEOF(Actor_Movie_DDV_AudioHeader, 20);
 
 struct Actor_Movie_Masher
 {
     int field_0_file_handle;
-    Actor_Movie_Masher_16Stru field_4_16_stru;
-    Actor_Movie_Masher_24Stru field_14_24_struc;
-    Actor_Movie_Data_SoundSettings field_2C_audio_settings;
+    Actor_Movie_DDV_Header field_4_ddv_header;
+    Actor_Movie_DDV_VideoHeader field_14_video_header;
+    Actor_Movie_DDV_AudioHeader field_2C_audio_header;
     int field_40_frame_data;
     short *field_44_decoded_frame_data_buffer;
     int field_48_pField_80_buffer;
@@ -81,21 +81,21 @@ struct Actor_Movie_Masher
     int field_54_bits_per_sample;
     int field_58_macro_blocks_x;
     int field_5C_macro_blocks_y;
-    char field_60;
-    char field_61;
-    __int16 field_62;
+    char field_60_bHasAudio;
+    char field_61_bHasVideo;
+    __int16 field_62_pad;
     int field_64_audio_frame_idx;
     int field_68;
-    int field_6C;
-    void* field_70_buffer;
-    void* field_74_pfield_70_buffer;
+    int field_6C_frame_num;
+    void* field_70_frame_sizes_array;
+    void* field_74_pCurrentFrameSize;
     int field_78;
     int field_7C;
-    void* field_80_buffer;
-    int field_84;
+    void* field_80_audio_frame_buffer;
+    int field_84_max_audio_frame;
     int field_88;
-    void* field_8C_buffer;
-    int field_90;
+    void* field_8C_macro_block_buffer;
+    int field_90_64_or_0;
 };
 MGS_ASSERT_SIZEOF(Actor_Movie_Masher, 0x94);
 

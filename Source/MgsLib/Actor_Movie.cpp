@@ -226,9 +226,9 @@ void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFram
 
 
     BYTE* pFrame = (BYTE*)pDecodedFrame;
-    for (int x = 0; x < pMasher->field_14_24_struc.field_4_width*gMovieData_724A00.field_24_double_width; x++)
+    for (int x = 0; x < pMasher->field_14_video_header.field_4_width*gMovieData_724A00.field_24_double_width; x++)
     {
-        for (int y = 0; y < pMasher->field_14_24_struc.field_8_height*gMovieData_724A00.field_28_double_height; y++)
+        for (int y = 0; y < pMasher->field_14_video_header.field_8_height*gMovieData_724A00.field_28_double_height; y++)
         {
             *pFrame = 0xFF;
             pFrame++;
@@ -397,7 +397,7 @@ Actor_Movie* CC Res_movie_create_4561DF(int movieNameHashed, int bIsEnding)
 
     gActorPauseFlags_dword_791A0C |= 1;
     gMovie_actor_stru_7248D0.word_7248F2_11_param_i = 11;
-    gMovie_actor_stru_7248D0.dword_7248F4_param_o = static_cast<short>(gMovieData_724A00.field_4_ptr->field_C - 11);
+    gMovie_actor_stru_7248D0.dword_7248F4_param_o = static_cast<short>(gMovieData_724A00.field_4_ddv_header->field_C_number_of_frames - 11);
     gMovie_actor_stru_7248D0.dword_7248F8_script_param_p = -1;
     gMovie_actor_stru_7248D0.word_7248F0_counter = 0;
     gMovie_actor_stru_7248D0.dword_7248FC_bIsEnding = bIsEnding;
