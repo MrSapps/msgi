@@ -1099,6 +1099,15 @@ MGS_FUNC_IMPLEX(0x401234, LibDG_Update2_401234, LIBDG_IMPL);
 
 
 MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 1);
+
+void CC sub_40191F()
+{
+    gLibDG_ExecPtrs_6BECE8 = 0;
+    counter_dword_6BED20 = 1;
+}
+MGS_FUNC_IMPLEX(0x40191F, sub_40191F, LIBDG_IMPL);
+
+
 MGS_ARY(1, 0x6BE4E8, DWORD*, 512, gUnkSize_1024_6BE4E8, {}); // TODO: Might just be 256?
 
 

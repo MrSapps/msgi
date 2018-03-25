@@ -190,3 +190,4 @@ Prim_unknown_0x54* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_
 Texture_Record* CC LibDG_FindTexture_4024A0(WORD hashCode);
 void CC LibDG_4010A6();
 void CC LibDG_Update2_helper_40A857();
+void CC sub_40191F();
