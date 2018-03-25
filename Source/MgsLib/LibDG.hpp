@@ -9,7 +9,7 @@
 
 void LibDGCpp_ForceLink();
 
-using ResInitFn = DWORD(CC *)(DWORD scriptData, int scriptBinds, BYTE* pScript);
+using ResInitFn = Actor*(CC *)(DWORD scriptData, int scriptBinds, BYTE* pScript);
 
 struct Res_Init_Record
 {

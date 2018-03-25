@@ -2,11 +2,25 @@
 #include "Actor_Movie.hpp"
 #include "MgsFunction.hpp"
 #include "ResourceNameHash.hpp"
+#include "Actor.hpp"
+#include "Script.hpp"
 #include <gmock/gmock.h>
 
 void Force_Actor_Movie_Cpp_Link() { }
 
 #define MOVIE_IMPL true
+
+struct Actor_Movie
+{
+    Actor mBase;
+    WORD word_7248F0_counter;
+    WORD word_7248F2_11_param_i;
+    WORD dword_7248F4_param_o;
+    WORD field_26;
+    int dword_7248F8_script_param_p;
+    DWORD dword_7248FC_bIsEnding;
+};
+MGS_ASSERT_SIZEOF(Actor_Movie, 0x30);
 
 char* CC Res_movie_GetName_4564F5(char* currentDir, WORD movieNameHashed)
 {
@@ -38,6 +52,44 @@ char* CC Res_movie_GetName_4564F5(char* currentDir, WORD movieNameHashed)
     return sMoviePath_724900;
 }
 MGS_FUNC_IMPLEX(0x4564F5, Res_movie_GetName_4564F5, MOVIE_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x4561DF, Actor_Movie *__cdecl (int movieNameHashed, int bIsEnding), Res_movie_create_4561DF); // TODO
+
+Actor_Movie* CC Res_movie_create_456860(int movieNameHashed)
+{
+    Actor_Movie* pActorMovie = Res_movie_create_4561DF(movieNameHashed, 0);
+    if (pActorMovie)
+    {
+        if (Script_ParamExists('i'))
+        {
+            pActorMovie->word_7248F2_11_param_i += static_cast<WORD>(Script_Unknown8_409924(Script_GetReturnAddress()));
+        }
+
+        if (Script_ParamExists('o'))
+        {
+            pActorMovie->dword_7248F4_param_o -= static_cast<WORD>(Script_Unknown8_409924(Script_GetReturnAddress()));
+        }
+
+        if (Script_ParamExists('p'))
+        {
+            pActorMovie->dword_7248F8_script_param_p = static_cast<WORD>(Script_Unknown8_409924(Script_GetReturnAddress()));
+        }
+        return pActorMovie;
+    }
+
+    if (Script_ParamExists('p'))
+    {
+        Script_ProcCancelOrRun(static_cast<WORD>(Script_Unknown8_409924(Script_GetReturnAddress())), 0);
+    }
+    return nullptr;
+}
+MGS_FUNC_IMPLEX(0x456860, Res_movie_create_456860, MOVIE_IMPL);
+
+Actor* CC Res_movie_create_4561C6(DWORD scriptData, int /*scriptBinds*/, BYTE* /*pScript*/)
+{
+    return &Res_movie_create_456860(scriptData)->mBase;
+}
+MGS_FUNC_IMPLEX(0x4561C6, Res_movie_create_4561C6, MOVIE_IMPL);
 
 void DoMovie_Tests()
 {

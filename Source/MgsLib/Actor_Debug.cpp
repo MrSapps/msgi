@@ -5,6 +5,7 @@
 #include "Menu.hpp"
 #include "WinMain.hpp"
 #include "Actor_GameD.hpp"
+#include "Actor_Movie.hpp"
 
 union PolyTag2
 {
@@ -394,8 +395,9 @@ static BYTE test[] =
     0x00, 0x00
 };
 
-    gGameStates_78E7E0.gFlags_dword_78E7E4 |= 0x800;  // Set Japanese
-    gGameStates_78E7E0.gFlags_dword_78E7E4 &= ~0x100; // Unset English ??
+    //gGameStates_78E7E0.gFlags_dword_78E7E4 |= 0x800;  // Set Japanese
+    //gGameStates_78E7E0.gFlags_dword_78E7E4 &= ~0x100; // Unset English ??
+
     //gGameStates_78E7E0.gFlags_dword_78E7E4 &= ~0x400; // bit 11
 
     bool draw = true;
@@ -439,8 +441,11 @@ static BYTE test[] =
     if (gButtonsArray4_7919C0[0].field_2_button_pressed & PsxButtonBits::eDPadUp)
     {
         // vc001501.vox
-        Res_strctrl_create_45803B(0xfc001501, 0, 0);
+       // Res_strctrl_create_45803B(0xfc061006, 0, 0);
+        Res_movie_create_4561DF(ResourceNameHash("police"), 0);
+
     }
+    // 900074
 
     UpdateSnakeHpTest();
 

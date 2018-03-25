@@ -9,6 +9,7 @@
 #include "pcx.hpp"
 #include "WinMain.hpp"
 #include "Actor_Debug.hpp"
+#include "Actor_Movie.hpp"
 
 #define LIBDG_IMPL true
 
@@ -16,19 +17,19 @@ void LibDGCpp_ForceLink() { }
 
 #define REDIRECT_LIBDG_DATA 1
 
-MGS_FUNC_NOT_IMPL(0x62130E, Actor *__cdecl(int a1, signed int a2), Res_env_test_create_62130E);
+MGS_FUNC_NOT_IMPL(0x62130E, Actor* CC(DWORD scriptData, int scriptBinds, BYTE* pScript), Res_env_test_create_62130E);
 
 struct Actor_Open
 {
     Actor mBase;
 };
 
-Actor_Open* CC Res_open_create_486BD4(DWORD scriptData, int scriptBinds, BYTE* pScript)
+Actor* CC Res_open_create_486BD4(DWORD scriptData, int scriptBinds, BYTE* pScript)
 {
-    return (Actor_Open*)AddDebugActor();
-//    return (Actor_Open*)Res_env_test_create_62130E(scriptData, scriptBinds);
+    return &AddDebugActor()->mBase;
+//    return (Res_env_test_create_62130E(scriptData, scriptBinds, pScript);
 }
-MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, true); // TODO
+MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, false); // TODO
 
 
 MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0,
@@ -135,10 +136,10 @@ MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_
     { 0xA2B5, 0, (ResInitFn)0x0045692F },                                                { 0x7ACF, 0, (ResInitFn)0x005E61CC }, /* Res_model_dt_create_5E61CC */
     { 0x6D78, 0, (ResInitFn)0x0061A71C }, /* Res_monitor1_create_61A71C */               { 0x0065, 0, (ResInitFn)0x0061A683 }, /* Res_mosaic_create_61A683 */
     { 0xD4A5, 0, (ResInitFn)0x005E52D5 }, /* Res_mouse_create_5E52D5 */                  { 0x3453, 0, (ResInitFn)0x00456860 }, /* Res_movie_456860 */
-    { 0x5345, 0, (ResInitFn)0x004561C6 }, /* Res_movie_4561C6 */                         { 0xB98C, 0, (ResInitFn)0x005A4F47 }, /* Res_m_door_5A4F47 */
+    { 0x5345, 0, Res_movie_create_4561C6 },                                              { 0xB98C, 0, (ResInitFn)0x005A4F47 }, /* Res_m_door_5A4F47 */
     { 0xD3C0, 0, (ResInitFn)0x0050964C },                                                { 0xF002, 0, (ResInitFn)0x00508856 }, /* Res_hair_n_create_508856 */
     { 0x30BA, 0, (ResInitFn)0x00563A09 }, /* Res_ninja_create_563A0 */                   { 0x4811, 0, (ResInitFn)0x005A473D }, /* Res_object_5A473D */
-    { 0xCF79, 0, (ResInitFn)Res_open_create_486BD4 },                                    { 0x3AC3, 0, (ResInitFn)0x00482D1F }, /* Res_opena_create_482D1F */
+    { 0xCF79, 0, Res_open_create_486BD4 },                                               { 0x3AC3, 0, (ResInitFn)0x00482D1F }, /* Res_opena_create_482D1F */
     { 0xCFEF, 0, (ResInitFn)0x0047EE6E }, /* Res_openp_47EE6E */                         { 0x976C, 0, (ResInitFn)0x0047A5E5 }, /* Res_opt_create_47A5E5 */
     { 0x8D31, 0, (ResInitFn)0x004792A6 }, /* Res_opta_create_4792A6 */                   { 0xB916, 0, (ResInitFn)0x00477F58 }, /* Res_optp_create_477F58 */
     { 0xCBF8, 0, (ResInitFn)0x00456093 }, /* Res_pad_create_456093 */                    { 0x3ED7, 0, (ResInitFn)0x0061A311 }, /* Res_pad_demo_create_61A311 */
