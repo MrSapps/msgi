@@ -11,6 +11,7 @@
 #include "WinMain.hpp"
 #include "Actor_GameD.hpp"
 #include "Timer.hpp"
+#include "Masher.hpp"
 
 void Force_Actor_Movie_Cpp_Link() { }
 
@@ -213,39 +214,25 @@ int CC File_ASync_Seek(File_ASync* pHandle, __int32 offset, int origin)
 }
 MGS_FUNC_IMPLEX(0x528C65, File_ASync_Seek, MOVIE_IMPL);
 
-MGS_VAR(1, 0x724A00, Actor_Movie_Data, gMovieData_724A00, {});
 
 MGS_FUNC_NOT_IMPL(0x528993, void __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_decode_image_528993); // TODO
 MGS_FUNC_NOT_IMPL(0x52897C, signed int __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_read_blocking_52897C); // TODO
 MGS_FUNC_NOT_IMPL(0x52899C, void* __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_sound_read_52899C); // TODO
 MGS_FUNC_NOT_IMPL(0x528973, DWORD __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_528973); // TODO
 
-void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFrame)
-{
-    // pMasher->field_44_decoded_frame_data_buffer
-
-
-    BYTE* pFrame = (BYTE*)pDecodedFrame;
-    for (int x = 0; x < pMasher->field_14_video_header.field_4_width*gMovieData_724A00.field_24_double_width; x++)
-    {
-        for (int y = 0; y < pMasher->field_14_video_header.field_8_height*gMovieData_724A00.field_28_double_height; y++)
-        {
-            *pFrame = 0xFF;
-            pFrame++;
-            *pFrame = 0xaa;
-            pFrame++;
-        }
-    }
-}
-MGS_FUNC_IMPLEX(0x528985, jMovie_MMX_Decode_528985, false); // TODO
-
 int CC Res_movie_update_helper_45675A()
 {
+    /*
     if (gMovieData_724A00.field_20_sound_pos)
     {
         Res_movie_masher_decode_image_528993(gMovieData_724A00.field_0_masher_ptr);
     }
     else
+    {
+        jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
+    }
+    */
+    if (gMovieData_724A00.field_20_sound_pos)
     {
         jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
     }

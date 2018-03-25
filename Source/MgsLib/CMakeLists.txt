@@ -60,6 +60,9 @@ add_library(MgsLib
     Kmd.hpp
     Font.cpp
     Font.hpp
+    masher_tables.hpp
+    Masher.cpp
+    Masher.hpp
     WinMain.cpp
     WinMain.hpp)
 
