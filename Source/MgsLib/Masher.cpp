@@ -663,7 +663,7 @@ void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFram
             idct(block6Output, Y4_block);
             block1Output = dataSizeBytes + block6Output;
 
-            ConvertYuvToRgbAndBlit((u32*)pDecodedFrame, xoff, yoff, pMasher->field_14_video_header.field_4_width, pMasher->field_14_video_header.field_8_height);
+            ConvertYuvToRgbAndBlit((u32*)pDecodedFrame, xoff, yoff, pMasher->field_14_video_header.field_4_width*gMovieData_724A00.field_24_double_width, pMasher->field_14_video_header.field_8_height*gMovieData_724A00.field_28_double_height);
 
             yoff += kMacroBlockHeight;
         }
