@@ -73,7 +73,7 @@ struct Actor_Movie_Masher
     char field_61_bHasVideo;
     __int16 field_62_pad;
     int field_64_audio_frame_idx;
-    int field_68;
+    int field_68_frame_number;
     int field_6C_frame_num;
     void* field_70_frame_sizes_array;
     void* field_74_pCurrentFrameSize;

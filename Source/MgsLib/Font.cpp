@@ -53,6 +53,7 @@ MGS_ARY(1, 0x77C938, DWORD, 256, gTextCharTable_dword_77C938, {});
 
 void CC Font_build_replacement_table_520511()
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     //Font_build_replacement_table_520511_.Ptr()();
     /*
     for (int i = 0; i < 256; i++)
@@ -513,24 +514,27 @@ MGS_FUNC_IMPLEX(0x45B80A, Font_map_char_45B80A, false);
 
 char __cdecl Font_45B90B(BYTE* pTexturePixels, int a2, int a3, int a4, BYTE *a5)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return 0;
 }
 MGS_FUNC_IMPLEX(0x45B90B, Font_45B90B, false); // TODO
 
 int __cdecl Font_add_char_to_atlas_45BD91(BYTE* pTexturePixels, signed int xpos, int ypos, int fontTexturePitch, char charToRender)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return 0;
 }
 MGS_FUNC_IMPLEX(0x45BD91, Font_add_char_to_atlas_45BD91, false); // TODO
 
 void __cdecl Font_rubi_add_45C1E9(BYTE* pTexturePixels, signed int a2, int a3, int a4, int a5)
 {
-
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x45C1E9, Font_rubi_add_45C1E9, false); // TODO
 
 unsigned int __cdecl Font_45C16A(signed int a1)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return 0;
 }
 MGS_FUNC_IMPLEX(0x45C16A, Font_45C16A, false); // TODO
@@ -538,18 +542,21 @@ MGS_FUNC_IMPLEX(0x45C16A, Font_45C16A, false); // TODO
 
 int __cdecl Font_map_unknown_45C1DC(int a1)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return 0;
 }
 MGS_FUNC_IMPLEX(0x45C1DC, Font_map_unknown_45C1DC, false); // TODO
 
 BYTE *__cdecl Font_set_text_520419(BYTE *Source)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return nullptr;
 }
 MGS_FUNC_IMPLEX(0x520419, Font_set_text_520419, false); // TODO
 
 int __cdecl sub_45C1BF(int a1, int a2, int a3)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     return 0;
 }
 MGS_FUNC_IMPLEX(0x45C1BF, sub_45C1BF, false); // TODO

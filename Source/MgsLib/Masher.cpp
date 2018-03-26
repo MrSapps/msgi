@@ -627,6 +627,28 @@ static void after_block_decode_no_effect_q_impl(int quantScale)
 
 void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFrame)
 {
+    if (!pMasher->field_61_bHasVideo)
+    {
+        return;
+    }
+
+    ++pMasher->field_6C_frame_num;
+
+  //  if (!(pMasher->field_6C_frame_num % pMasher->field_14_video_header.field_14_key_frame_rate))
+    {
+       // return;
+    }
+
+    //if (pMasher->field_6C_frame_num < pMasher->field_2C_audio_header.field_10_num_frames_interleave)
+    {
+       // return;
+    }
+
+   // if (pMasher->field_68_frame_number < pMasher->field_2C_audio_header.field_10_num_frames_interleave)
+    {
+      //  return;
+    }
+
     const int blocksX = pMasher->field_58_macro_blocks_x;
     const int blocksY = pMasher->field_5C_macro_blocks_y;
     if (blocksX <= 0 || pMasher->field_5C_macro_blocks_y <= 0)

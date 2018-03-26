@@ -115,6 +115,7 @@ MGS_FUNC_IMPLEX(0x45942B, Res_jimctrl_create_45942B, false);
 
 Actor *__cdecl Res_jimctrl_create_45942B(__int16 a2)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     //return nullptr;
    // return Res_jimctrl_create_45942B_.Ptr()(a2 );
     return nullptr;
@@ -122,7 +123,7 @@ Actor *__cdecl Res_jimctrl_create_45942B(__int16 a2)
 
 void __cdecl SetSubTitleTextAndOtherVars_462D96(char *pSubs, signed int a2)
 {
-
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
 }
 MGS_FUNC_IMPLEX(0x462D96, SetSubTitleTextAndOtherVars_462D96, false);
 
@@ -132,6 +133,7 @@ MGS_FUNC_IMPLEX(0x45803B, Res_strctrl_create_45803B, false);
 
 Actor *__cdecl Res_strctrl_create_45803B(int scriptVar_s_vox_code, unsigned int scriptVar_p, int b24Or30fps)
 {
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     //return Res_strctrl_create_45803B_.Ptr()(scriptVar_s_vox_code, scriptVar_p, b24Or30fps);
     return nullptr;
 }
@@ -211,7 +213,7 @@ MGS_VAR(1, 0x73382C, Font, gFont_73382C, {});
 
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
-    gUseTrueType_650D40 = 0;
+   // gUseTrueType_650D40 = 0;
     /*
     static BYTE toDraw[20] = { 200, 0, 0 ,0 ,0 ,0 ,0 ,0 };
     static int delay = 0;
@@ -399,7 +401,7 @@ static BYTE test[] =
     //gGameStates_78E7E0.gFlags_dword_78E7E4 &= ~0x100; // Unset English ??
 
     //gGameStates_78E7E0.gFlags_dword_78E7E4 &= ~0x400; // bit 11
-
+/*
     bool draw = true;
   //  if (gButtonsArray4_7919C0[0].field_2_button_pressed & PsxButtonBits::eDPadDown)
     {
@@ -418,7 +420,7 @@ static BYTE test[] =
     {
         Debug_DrawTextTexture(pDebug, 20, 80, kFontWidth, kFontHeight);
     }
-
+    */
     //gSubsText_dword_733858 = (char*)test;
 
     TextSetXYFlags_459B0B(30, 100, 0);
@@ -442,14 +444,18 @@ static BYTE test[] =
     {
         // vc001501.vox
        // Res_strctrl_create_45803B(0xfc061006, 0, 0);
-        Res_movie_create_4561DF(ResourceNameHash("police"), 0);
+       Actor_Movie* pMovie = Res_movie_create_4561DF(ResourceNameHash("e399"), 0);
 
+      // pMovie->word_7248F2_11_param_i = 12;
+     //  pMovie->dword_7248F4_param_o = -12;
+
+       gSubsText_dword_733858 = "MOVIE SUB TEST";
     }
     // 900074
 
     UpdateSnakeHpTest();
 
-
+    //Sleep(50);
 }
 
 static void CC Debug_Shutdown(Actor_Debug* pDebug)
