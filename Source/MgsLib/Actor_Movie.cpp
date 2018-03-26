@@ -232,6 +232,12 @@ int CC Res_movie_update_helper_45675A()
         jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
     }
     */
+
+    if (gMovieData_724A00.field_0_masher_ptr->field_6C_frame_num == 0)
+    {
+        jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
+    }
+
     if (gMovieData_724A00.field_20_sound_pos)
     {
         jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
