@@ -1,6 +1,18 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(msgi VERSION 0.1 LANGUAGES C CXX)
 
+set(CompilerFlags
+        CMAKE_CXX_FLAGS
+        CMAKE_CXX_FLAGS_DEBUG
+        CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_C_FLAGS
+        CMAKE_C_FLAGS_DEBUG
+        CMAKE_C_FLAGS_RELEASE
+        )
+foreach(CompilerFlag ${CompilerFlags})
+  string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+endforeach()
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 function(SET_TARGET_PRECOMPILED_HEADER Target PrecompiledHeader PrecompiledSource)
