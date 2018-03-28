@@ -2457,7 +2457,7 @@ void CC PrintDDError(const char* errMsg, HRESULT hrErr)
 MGS_FUNC_IMPLEX(0x00422D40, PrintDDError, RENDERER_IMPL);
 
 // Only used by Res_movie_create_helper_4562AA
-void CC Renderer_GetWH_51D50D(DWORD *pWidth, DWORD *pHeight)
+void CC Renderer_GetWH_51D50D(DWORD* pWidth, DWORD* pHeight)
 {
     DWORD dwHeight = 0;
     DWORD dwWidth = 0;

@@ -17,203 +17,6 @@ void Force_Actor_Movie_Cpp_Link() { }
 
 #define MOVIE_IMPL true
 
-struct File_ASync
-{
-    FILE* field_0_file_handle;
-    BYTE* field_4_read_buffer;
-    DWORD field_8_read_size;
-    bool field_C_bQuit;
-    // 3 byte padding
-    DWORD field_10_read_ret;
-    HANDLE field_14_hThread;
-    HANDLE field_18_w32Event;
-    DWORD field_1C_thread_id;
-};
-MGS_ASSERT_SIZEOF(File_ASync, 0x20);
-
-int CC File_ASync_WaitFinish(File_ASync* pHandle)
-{
-    for(;;)
-    {
-        const DWORD ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
-        if (ret == WAIT_OBJECT_0)
-        {
-            return pHandle->field_10_read_ret;
-        }
-
-        if (ret != WAIT_TIMEOUT)
-        {
-            break;
-        }
-    }
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x528A20, File_ASync_WaitFinish, MOVIE_IMPL);
-
-void CC File_ASync_Close(File_ASync* pHandle)
-{
-    for (;;)
-    {
-        const DWORD ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
-        if (ret == WAIT_OBJECT_0)
-        {
-            break;
-        }
-
-        if (ret != WAIT_TIMEOUT)
-        {
-            break;
-        }
-    }
-
-    DWORD ret = 0;
-    do
-    {
-        ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
-    } while (ret == WAIT_TIMEOUT && ret != WAIT_OBJECT_0);
-
-    if (pHandle->field_0_file_handle)
-    {
-        fclose(pHandle->field_0_file_handle);
-    }
-
-    // Signal thread proc to exit
-    pHandle->field_C_bQuit = true; // TODO: OG bug - these inter-thread flags should be atomic
-
-    if (pHandle->field_14_hThread)
-    {
-        // OG bug - should wait for thread to exit instead of terminating it.
-        // Terminate will leak memory and possibly corrupt the heap.
-        //TerminateThread(pHandle->field_14_hThread, 0);
-
-        PostThreadMessageA(pHandle->field_1C_thread_id, 0x400u, 0x115Cu, 5555 + 1); // Force thread proc to re-check quit condition
-        WaitForSingleObject(pHandle->field_14_hThread, INFINITE); // Wait for thread to exit
-    }
-
-    if (pHandle->field_18_w32Event)
-    {
-        CloseHandle(pHandle->field_18_w32Event);
-    }
-
-    // OG bug - should be calling free instead
-    //delete(pHandle);
-    free(pHandle);
-}
-MGS_FUNC_IMPLEX(0x528A58, File_ASync_Close, MOVIE_IMPL);
-
-DWORD WINAPI File_ThreadProcASyncRead(LPVOID param)
-{
-    File_ASync* pHandle = (File_ASync*)param;
-    MSG msg = {};
-    while (!pHandle->field_C_bQuit)
-    {
-        if (GetMessageA(&msg, 0, 0x400u, 0x400u) != -1 && msg.wParam == 4444 && msg.lParam == 5555)
-        {
-            pHandle->field_10_read_ret = pHandle->field_8_read_size == fread(
-                pHandle->field_4_read_buffer,
-                1u,
-                pHandle->field_8_read_size,
-                pHandle->field_0_file_handle);
-            SetEvent(pHandle->field_18_w32Event);
-        }
-    }
-    return 0;
-}
-MGS_FUNC_IMPLEX(0x528B38, File_ThreadProcASyncRead, MOVIE_IMPL);
-
-FILE* CC File_ASync_Open_528ACD(const char* filename)
-{
-    File_ASync* pHandle = (File_ASync *)malloc(sizeof(File_ASync));
-    if (!pHandle)
-    {
-        return nullptr;
-    }
-    pHandle->field_C_bQuit = false;
-    pHandle->field_14_hThread = CreateThread(
-        0,
-        16384u,
-        File_ThreadProcASyncRead,
-        pHandle,
-        0,
-        &pHandle->field_1C_thread_id);
-
-    pHandle->field_18_w32Event = CreateEventA(0, 1, 1, 0);
-    pHandle->field_10_read_ret = 1;
-    pHandle->field_0_file_handle = fopen(filename, "rb");
-
-    if (!pHandle->field_0_file_handle)
-    {
-        File_ASync_Close(pHandle);
-        return nullptr;
-    }
-
-    return (FILE *)pHandle;
-}
-MGS_FUNC_IMPLEX(0x528ACD, File_ASync_Open_528ACD, MOVIE_IMPL);
-
-signed int CC File_ASync_Read(File_ASync* pHandle, BYTE* readBuffer, int readSize)
-{
-    signed int result = 0;
-    for (;;)
-    {
-        const DWORD ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
-        if (ret == WAIT_OBJECT_0)
-        {
-            result = pHandle->field_10_read_ret;
-            break;
-        }
-
-        if (ret != WAIT_TIMEOUT)
-        {
-            break;
-        }
-    }
-
-    if (result)
-    {
-        pHandle->field_4_read_buffer = readBuffer;
-        pHandle->field_8_read_size = readSize;
-        ResetEvent(pHandle->field_18_w32Event);
-        for (;;)
-        {
-            if (PostThreadMessageA(pHandle->field_1C_thread_id, 0x400u, 0x115Cu, 5555))
-            {
-                break;
-            }
-            Sleep(200u);
-        }
-        result = 1;
-    }
-    return result;
-}
-MGS_FUNC_IMPLEX(0x528BBA, File_ASync_Read, MOVIE_IMPL);
-
-int CC File_ASync_Seek(File_ASync* pHandle, __int32 offset, int origin)
-{
-    signed int result = 0;
-    for (;;)
-    {
-        const DWORD ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
-        if (ret == WAIT_OBJECT_0)
-        {
-            result = pHandle->field_10_read_ret;
-            break;
-        }
-
-        if (ret != WAIT_TIMEOUT)
-        {
-            break;
-        }
-    }
-
-    if (result)
-    {
-        result = fseek(pHandle->field_0_file_handle, offset, origin) != 0;
-    }
-    return result;
-}
-MGS_FUNC_IMPLEX(0x528C65, File_ASync_Seek, MOVIE_IMPL);
-
 
 MGS_FUNC_NOT_IMPL(0x528993, void __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_decode_image_528993); // TODO
 MGS_FUNC_NOT_IMPL(0x52897C, signed int __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_read_blocking_52897C); // TODO
@@ -257,7 +60,9 @@ int CC Res_movie_update_helper_45675A()
     gMovieData_724A00.field_1C_read_ret = Res_movie_masher_528973(gMovieData_724A00.field_0_masher_ptr);
     
     gMovieData_724A00.field_20_sound_pos = Sound_Unknown4();
-    
+
+    Sleep(50);
+
     return gMovieData_724A00.field_1C_read_ret;
 }
 MGS_FUNC_IMPLEX(0x45675A, Res_movie_update_helper_45675A, MOVIE_IMPL);
@@ -304,7 +109,7 @@ void CC Res_movie_copy_frame_to_back_buffer_51D613(unsigned int width, unsigned 
 }
 MGS_FUNC_IMPLEX(0x51D613, Res_movie_copy_frame_to_back_buffer_51D613, MOVIE_IMPL);
 
-char* CC Res_movie_GetName_4564F5(char* currentDir, WORD movieNameHashed)
+char* CC Res_movie_GetName_4564F5(char* currentDir, int movieNameHashed)
 {
     static const char* sMovieNames_66B9D8[] =
     {
@@ -337,9 +142,218 @@ MGS_FUNC_IMPLEX(0x4564F5, Res_movie_GetName_4564F5, MOVIE_IMPL);
 
 MGS_VAR(1, 0x7248D0, Actor_Movie, gMovie_actor_stru_7248D0, {});
 
-MGS_FUNC_NOT_IMPL(0x4562AA, signed int __cdecl(int movieNameHashed), Res_movie_create_helper_4562AA); // TODO
+MGS_FUNC_NOT_IMPL(0x523FA0, signed int __fastcall(Actor_Movie_Masher* pThis, void*, const char *movieFileName), Masher_constructor_523FA0); // TODO
+
+Actor_Movie_Masher* CC Masher_constructor_wrapper_5288F8(const char* pMovieFileName, Actor_Movie_DDV_Header** pDDVHeader, Actor_Movie_DDV_VideoHeader** pVideoHeader, Actor_Movie_DDV_AudioHeader** pAudioHeader, DWORD* errCode)
+{
+    Actor_Movie_Masher* pMasher = new (std::nothrow)Actor_Movie_Masher();
+    if (!pMasher)
+    {
+        *errCode = 2;
+        return nullptr;
+    }
+
+    const int ctorRet = Masher_constructor_523FA0(pMasher, 0, pMovieFileName);
+    *errCode = ctorRet;
+
+    if (ctorRet)
+    {
+        Masher_destructor_524214(pMasher, 0);
+        delete pMasher;
+        return nullptr;
+    }
+
+    *pDDVHeader = &pMasher->field_4_ddv_header;
+    *pVideoHeader = &pMasher->field_14_video_header;
+    *pAudioHeader = &pMasher->field_2C_audio_header;
+
+    return pMasher;
+}
+
+void CC Masher_destructor_wrapper_52895A(Actor_Movie_Masher *pMasher)
+{
+    if (pMasher)
+    {
+        Masher_destructor_524214(pMasher, 0);
+        delete pMasher;
+    }
+}
+
+void CC Res_movie_helper_free_45654B()
+{
+    if (gMovieData_724A00.field_0_masher_ptr)
+    {
+        Masher_destructor_wrapper_52895A(gMovieData_724A00.field_0_masher_ptr);
+        gMovieData_724A00.field_0_masher_ptr = nullptr;
+    }
+
+    if (gMovieData_724A00.gMovieBuffer_724A14)
+    {
+        free(gMovieData_724A00.gMovieBuffer_724A14);
+        gMovieData_724A00.gMovieBuffer_724A14 = nullptr;
+    }
+}
+MGS_FUNC_IMPLEX(0x45654B, Res_movie_helper_free_45654B, MOVIE_IMPL);
+
+char CC Res_Movie_GetBackBufferPixelFormat_51D566()
+{
+    if (!g_pBackBuffer_6FC738)
+    {
+        return -1;
+    }
+
+    DDPIXELFORMAT pixelFormat = {};
+    pixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+
+    if (SUCCEEDED(g_pBackBuffer_6FC738->GetPixelFormat(&pixelFormat)))
+    {
+        if (pixelFormat.dwRGBBitCount == 16)
+        {
+            switch (pixelFormat.dwRBitMask)
+            {
+            case 0x7C00u:
+                if (pixelFormat.dwGBitMask == 0x3E0 && pixelFormat.dwBBitMask == 31)
+                {
+                    return 1;
+                }
+                break;
+
+            case 0xF800u:
+                if (pixelFormat.dwGBitMask == 0x7E0 && pixelFormat.dwBBitMask == 31)
+                {
+                    return 2;
+                }
+                break;
+
+            case 0x1Fu:
+                if (pixelFormat.dwGBitMask == 0x3E0 && pixelFormat.dwBBitMask == 0x7C00)
+                {
+                    return 3;
+                }
+                else if (pixelFormat.dwGBitMask == 0x7E0 && pixelFormat.dwBBitMask == 0xF800)
+                {
+                    return 4;
+                }
+                break;
+            }
+        }
+    }
+    return -1;
+}
+MGS_FUNC_IMPLEX(0x51D566, Res_Movie_GetBackBufferPixelFormat_51D566, MOVIE_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x528683, int __cdecl(int movieRowLengthBytes, unsigned __int8 backBufferPixelFormat, int flags), Res_movie_create_helper_528683); // TODO
+
+signed int CC Res_movie_create_helper_4562AA(int movieNameHashed)
+{
+    if (!gMovieData_724A00.sMovie_IO_Ptrs_Inited_dword_724A30)
+    {
+        File_Ptrs_Init_5289B3(1);
+        atexit(Res_movie_helper_free_45654B);
+        gMovieData_724A00.sMovie_IO_Ptrs_Inited_dword_724A30 = 1;
+    }
+
+    char* pMovieFileName = Res_movie_GetName_4564F5(".", movieNameHashed);
+    gMovieData_724A00.field_0_masher_ptr = Masher_constructor_wrapper_5288F8(
+        pMovieFileName,
+        &gMovieData_724A00.field_4_ddv_header,
+        &gMovieData_724A00.field_8_video_header,
+        &gMovieData_724A00.field_C_audio_header,
+        &gMovieData_724A00.gbMovieError_dword_724A10);
+
+    if (gMovieData_724A00.gbMovieError_dword_724A10)
+    {
+        if (gMovieData_724A00.field_0_masher_ptr)
+        {
+            Masher_destructor_wrapper_52895A(gMovieData_724A00.field_0_masher_ptr);
+            gMovieData_724A00.field_0_masher_ptr = 0;
+        }
+
+        pMovieFileName = Res_movie_GetName_4564F5(".", movieNameHashed);
+        gMovieData_724A00.field_0_masher_ptr = Masher_constructor_wrapper_5288F8(
+            pMovieFileName,
+            &gMovieData_724A00.field_4_ddv_header,
+            &gMovieData_724A00.field_8_video_header,
+            &gMovieData_724A00.field_C_audio_header,
+            &gMovieData_724A00.gbMovieError_dword_724A10);
+    }
+
+    if (gMovieData_724A00.gbMovieError_dword_724A10)
+    {
+        if (gMovieData_724A00.field_0_masher_ptr)
+        {
+            Masher_destructor_wrapper_52895A(gMovieData_724A00.field_0_masher_ptr);
+            gMovieData_724A00.field_0_masher_ptr = 0;
+        }
+        return 0;
+    }
+
+    DWORD w = 0;
+    DWORD h = 0;
+    Renderer_GetWH_51D50D(&w, &h);
+    gMovieData_724A00.field_28_double_height = 1;
+    gMovieData_724A00.field_24_double_width = 1;
+
+    int flags = 0;
+    if (w >= 2 * gMovieData_724A00.field_8_video_header->field_4_width)
+    {
+        gMovieData_724A00.field_24_double_width = 2;
+        if (h >= 2 * gMovieData_724A00.field_8_video_header->field_8_height)
+        {
+            gMovieData_724A00.field_28_double_height = 2;
+            flags |= 9;
+        }
+        else
+        {
+            flags |= 6;
+        }
+    }
+
+    gMovieData_724A00.gMovieBuffer_724A14 = calloc(
+        2
+        * gMovieData_724A00.field_28_double_height
+        * gMovieData_724A00.field_8_video_header->field_8_height
+        * gMovieData_724A00.field_24_double_width
+        * gMovieData_724A00.field_8_video_header->field_4_width
+        + 0x10000,
+        1u);
+
+    if (!gMovieData_724A00.gMovieBuffer_724A14)
+    {
+        Masher_destructor_wrapper_52895A(gMovieData_724A00.field_0_masher_ptr);
+        gMovieData_724A00.field_0_masher_ptr = 0;
+
+        return 0;
+    }
+
+    const char backBufferPixelFormat = Res_Movie_GetBackBufferPixelFormat_51D566();
+    if (backBufferPixelFormat == -1)
+    {
+        free(gMovieData_724A00.gMovieBuffer_724A14);
+        gMovieData_724A00.gMovieBuffer_724A14 = 0;
+        Masher_destructor_wrapper_52895A(gMovieData_724A00.field_0_masher_ptr);
+        gMovieData_724A00.field_0_masher_ptr = 0;
+        return 0;
+    }
+
+    Res_movie_create_helper_528683(
+        2 * gMovieData_724A00.field_24_double_width * gMovieData_724A00.field_8_video_header->field_4_width,
+        backBufferPixelFormat,
+        flags);
+
+    Sound_Res_Movie_CreateBuffer_523A44(
+        ((gMovieData_724A00.field_C_audio_header->field_0_audio_format & 1) != 0) + 1,
+        (gMovieData_724A00.field_C_audio_header->field_0_audio_format & 2) != 0 ? 16 : 8,// 16 or 8 bit audio ?
+        gMovieData_724A00.field_C_audio_header->field_4_samples_per_second,
+        gMovieData_724A00.field_C_audio_header->field_C_single_audio_frame_size,
+        gMovieData_724A00.field_C_audio_header->field_10_num_frames_interleave);
+
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x4562AA, Res_movie_create_helper_4562AA, MOVIE_IMPL);
+
+
 MGS_FUNC_NOT_IMPL(0x456588, void __cdecl(Actor_Movie *pMovie), Res_movie_update_456588); // TODO
-MGS_FUNC_NOT_IMPL(0x52895A, void __cdecl(Actor_Movie_Masher *pMasher), Masher_destructor_wrapper_52895A); // TODO
 
 MGS_VAR(1, 0x7248C8, DWORD, gMovieTicks_dword_7248C8, 0);
 

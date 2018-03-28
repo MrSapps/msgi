@@ -42,12 +42,12 @@ MGS_ARY(REDIRECT_SOUND, 0x77D774, IDirectSoundBuffer*, 64, g64_dword_77D774, {})
 MGS_VAR(REDIRECT_SOUND, 0x77E2DC, DWORD, dword_77E2DC, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2F0, DWORD, dword_77E2F0, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2D8, DWORD, dword_77E2D8, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E2C0, IDirectSound*, gDSound_dword_77E2C0, nullptr);
+MGS_VAR(REDIRECT_SOUND, 0x77E2C0, IDirectSound*, gDSound_77E2C0, nullptr);
 MGS_VAR(REDIRECT_SOUND, 0x77E1B0, IDirectSoundBuffer*, gSoundBuffer_dword_77E1B0, nullptr);
 MGS_VAR(REDIRECT_SOUND, 0x77E1B4, DWORD, gSoundBufferSize_77E1B4, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1C4, DWORD, dword_77E1C4, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77D87C, DWORD, dword_77D87C, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1DC, DWORD, gBlockAlign_dword_77E1DC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1C4, DWORD, gMovieNumFramesInterleave_77E1C4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D87C, DWORD, gMovieAudioFrameSize_77D87C, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1DC, DWORD, gMovieBlockAlign_77E1DC, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D88C, LONG, gSndVolume_dword_77D88C, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1A8, QWORD, qword_77E1A8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D874, int, gMusicVolPlaying_dword_77D874, 0);
@@ -304,7 +304,7 @@ MGS_FUNC_IMPLEX(0x0052269C, Sound_Init, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00522BCE, Sound_CleanUpRelated, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00522466, Sound_CloseWavStopQ, SKIP); // File I/O
-MGS_FUNC_IMPLEX(0x00523A44, Sound_CreateBufferQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523A44, Sound_Res_Movie_CreateBuffer_523A44, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00522601, Sound_CreatePrimarySoundBuffer, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00521982, Sound_CreateSecondarySoundBuffer, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x0052236D, Sound_FadeQ, SOUND_IMPL);
@@ -350,13 +350,13 @@ MGS_FUNC_NOT_IMPL(0x005530A8, HRESULT __stdcall(LPGUID, LPDIRECTSOUND*, LPUNKNOW
 // 0x0052269C
 signed int __cdecl Sound_Init(HWND hwnd)
 {
-    HRESULT hr = DirectSoundCreate(0, &gDSound_dword_77E2C0, 0);
+    HRESULT hr = DirectSoundCreate(0, &gDSound_77E2C0, 0);
     if (FAILED(hr))
     {
         return 0;
     }
 
-    hr = gDSound_dword_77E2C0->SetCooperativeLevel(hwnd, DSSCL_EXCLUSIVE);
+    hr = gDSound_77E2C0->SetCooperativeLevel(hwnd, DSSCL_EXCLUSIVE);
     if (FAILED(hr))
     {
         return 0;
@@ -448,15 +448,15 @@ int __cdecl Sound_CloseWavStopQ()
 }
 
 // 0x00523A44
-signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample, int samplesPerSecond, int a4, int a5)
+signed int CC Sound_Res_Movie_CreateBuffer_523A44(int numChannels, signed int bitsPerSample, int samplesPerSecond, int frameSize, int numFramesInterleave)
 {
-    DSBUFFERDESC bufferDesc;
-    WAVEFORMATEX waveFormat;
+    DSBUFFERDESC bufferDesc = {};
+    WAVEFORMATEX waveFormat = {};
 
-    int blockAlign = bitsPerSample / 8 * numChannels;
-    gSoundBufferSize_77E1B4 = (a5 + 4) * blockAlign * a4;
+    const int blockAlign = bitsPerSample / 8 * numChannels;
+    gSoundBufferSize_77E1B4 = (numFramesInterleave + 4) * blockAlign * frameSize;
 
-    if (gDSound_dword_77E2C0)
+    if (gDSound_77E2C0)
     {
         waveFormat.wFormatTag = 1;
         waveFormat.nChannels = static_cast<WORD>(numChannels);
@@ -465,17 +465,16 @@ signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample
         waveFormat.nBlockAlign = static_cast<WORD>(blockAlign);
         waveFormat.wBitsPerSample = static_cast<WORD>(bitsPerSample);
         waveFormat.cbSize = 0;
-        memset(&bufferDesc, 0, 36u);
-        bufferDesc.dwSize = 36;
+        bufferDesc.dwSize = sizeof(DSBUFFERDESC);
         bufferDesc.dwFlags = 0x100C8;
         bufferDesc.dwBufferBytes = gSoundBufferSize_77E1B4;
         bufferDesc.lpwfxFormat = &waveFormat;
-        gDSound_dword_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndBuffer_dword_77E0A0, 0);
+        gDSound_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndBuffer_dword_77E0A0, 0);
     }
 
-    dword_77E1C4 = a5;
-    dword_77D87C = a4;
-    gBlockAlign_dword_77E1DC = blockAlign;
+    gMovieNumFramesInterleave_77E1C4 = numFramesInterleave;
+    gMovieAudioFrameSize_77D87C = frameSize;
+    gMovieBlockAlign_77E1DC = blockAlign;
 
     if (gSndBuffer_dword_77E0A0)
     {
@@ -505,7 +504,7 @@ bool __cdecl Sound_CreatePrimarySoundBuffer()
     bufferDesc.lpwfxFormat = 0;
     bufferDesc.dwBufferBytes = 0;
 
-    if (gDSound_dword_77E2C0->CreateSoundBuffer(&bufferDesc, &gSoundBuffer_dword_77E1B0, 0))
+    if (gDSound_77E2C0->CreateSoundBuffer(&bufferDesc, &gSoundBuffer_dword_77E1B0, 0))
     {
         result = 0;
     }
@@ -535,7 +534,7 @@ signed int __cdecl Sound_CreateSecondarySoundBuffer()
     bufferDesc.dwFlags = 0x10088;
     bufferDesc.dwBufferBytes = 176400;
     bufferDesc.lpwfxFormat = &waveFormat;
-    if (gDSound_dword_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndBuffer_dword_77E2D0, 0))
+    if (gDSound_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndBuffer_dword_77E2D0, 0))
     {
         result = 0;
     }
@@ -675,9 +674,9 @@ signed int __cdecl Sound_LoadBufferFromFile(const char *fileName)
         && (File_NormalRead_51F0F5(File, v4, 2u), File_NormalRead_51F0F5(File, &sizeToRead, 4u) == 4))
     {
         bufferDesc.dwBufferBytes = sizeToRead;
-        if (gDSound_dword_77E2C0)
+        if (gDSound_77E2C0)
         {
-            if (gDSound_dword_77E2C0->CreateSoundBuffer(
+            if (gDSound_77E2C0->CreateSoundBuffer(
                 &bufferDesc,
                 &g128_Sound_buffers_dword_77DCA0[idx],
                 0))
@@ -1195,18 +1194,18 @@ signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BY
     BYTE *pDst;
     size_t Size;
 
-    Size = gBlockAlign_dword_77E1DC * dword_77D87C;
+    Size = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
     pDst = 0;
     if (gSndBuffer_dword_77E0A0)
     {
-        if (gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0) == DSERR_BUFFERLOST)
+        if (gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0) == DSERR_BUFFERLOST)
         {
             gSndBuffer_dword_77E0A0->Restore();
-            gSndBuffer_dword_77E0A0->Lock(0, dword_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0);
+            gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0);
         }
         pDst = v7;
     }
-    for (unsigned int i = 0; i < dword_77E1C4; ++i)
+    for (unsigned int i = 0; i < gMovieNumFramesInterleave_77E1C4; ++i)
     {
         if (!fnRead(a1))
         {
@@ -1237,8 +1236,8 @@ signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BY
         gSndBuffer_dword_77E0A0->Unlock(v7, v9, v6, v8);
     }
 
-    gSoundWriteCursor_dword_77E1D4 = dword_77E1C4 * Size;
-    dword_77D880 = dword_77E1C4 * Size;
+    gSoundWriteCursor_dword_77E1D4 = gMovieNumFramesInterleave_77E1C4 * Size;
+    dword_77D880 = gMovieNumFramesInterleave_77E1C4 * Size;
     dword_77E1CC = 0;
     dword_77E1B8 = 0;
     gSndTime_dword_77D890 = timeGetTime();
@@ -1474,10 +1473,10 @@ void __cdecl Sound_ShutDown()
         gSoundBuffer_dword_77E1B0 = 0;
     }
 
-    if (gDSound_dword_77E2C0)
+    if (gDSound_77E2C0)
     {
-        gDSound_dword_77E2C0->Release();
-        gDSound_dword_77E2C0 = 0;
+        gDSound_77E2C0->Release();
+        gDSound_77E2C0 = 0;
     }
 }
 
@@ -1526,7 +1525,7 @@ signed int __cdecl Sound_Start2SamplesQ(BYTE *a1)
     bufferDesc.dwBufferBytes = 176400;
     bufferDesc.lpwfxFormat = &waveFormat;
     
-    if (gDSound_dword_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndSamp1_dword_77E2C4, 0))
+    if (gDSound_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndSamp1_dword_77E2C4, 0))
     {
         return 0;
     }
@@ -1534,7 +1533,7 @@ signed int __cdecl Sound_Start2SamplesQ(BYTE *a1)
     gSndSamp1_dword_77E2C4->SetCurrentPosition(0);
     if (dword_77E1A4)
     {
-        if (gDSound_dword_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndSamp2_dword_77E2C8, 0))
+        if (gDSound_77E2C0->CreateSoundBuffer(&bufferDesc, &gSndSamp2_dword_77E2C8, 0))
         {
             return 0;
         }
@@ -1722,7 +1721,7 @@ bool __cdecl Sound_PlayEffect(unsigned __int8 idx, int a2, int a3)
                 g64_dword_77D774[dword_77D894]->Release();
             }
 
-            gDSound_dword_77E2C0->DuplicateSoundBuffer(
+            gDSound_77E2C0->DuplicateSoundBuffer(
                 g128_Sound_buffers_dword_77DCA0[idx],
                 &g64_dword_77D774[dword_77D894]);
 
@@ -1785,15 +1784,15 @@ bool __cdecl Sound_Unknown4()
 
     if (gSndBuffer_dword_77E0A0)
     {
-        v4 = gBlockAlign_dword_77E1DC * dword_77D87C;
-        dword_77D880 += gBlockAlign_dword_77E1DC * dword_77D87C;
+        v4 = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
+        dword_77D880 += gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
         gSndBuffer_dword_77E0A0->GetCurrentPosition(&pos, 0);
         if (dword_77E1B8 - pos > gSoundBufferSize_77E1B4 / 2)
         {
             ++dword_77E1CC;
         }
         dword_77E1B8 = pos;
-        v2 = dword_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * dword_77E1CC;
+        v2 = gMovieNumFramesInterleave_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * dword_77E1CC;
         ret = dword_77D880 < v2 || dword_77D880 > v4 + v2;
         while (dword_77D880 >= v2 && dword_77D880 <= v4 + v2)
         {
@@ -1805,7 +1804,7 @@ bool __cdecl Sound_Unknown4()
             dword_77E1B8 = pos;
 
             // dead statement?
-            v2 = dword_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * dword_77E1CC;
+            v2 = gMovieNumFramesInterleave_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * dword_77E1CC;
         }
     }
     else
@@ -1832,7 +1831,7 @@ int __cdecl Sound_Masher_write_data_523CF3(Actor_Movie_Masher* pMasher,
     BYTE* pMasherAudioFrame = (BYTE*)pMovieUpdate(pMasher);
     if (pMasherAudioFrame)
     {
-        const int numBytesToLock = gBlockAlign_dword_77E1DC * dword_77D87C;
+        const int numBytesToLock = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
         if (gSndBuffer_dword_77E0A0)
         {
             if (gSndBuffer_dword_77E0A0->Lock(

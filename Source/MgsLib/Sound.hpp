@@ -14,7 +14,7 @@ signed int __cdecl Sound_Init(HWND hwnd);
 char __cdecl Sound_HexCharToInt(char value);
 signed int __cdecl Sound_CleanUpRelated();
 int __cdecl Sound_CloseWavStopQ();
-signed int __cdecl Sound_CreateBufferQ(int numChannels, signed int bitsPerSample, int samplesPerSecond, int a4, int a5);
+signed int __cdecl Sound_Res_Movie_CreateBuffer_523A44(int numChannels, signed int bitsPerSample, int samplesPerSecond, int a4, int a5);
 bool __cdecl Sound_CreatePrimarySoundBuffer();
 signed int __cdecl Sound_CreateSecondarySoundBuffer();
 __int64 __cdecl Sound_FadeQ(int a1);

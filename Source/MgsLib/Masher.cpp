@@ -2,8 +2,8 @@
 #include "Masher.hpp"
 #include "types.hpp"
 #include <array>
-
 #include "masher_tables.hpp"
+#include "MgsFunction.hpp"
 
 #define MASHER_IMPL true
 
@@ -703,3 +703,298 @@ void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFram
     }
 }
 MGS_FUNC_IMPLEX(0x528985, jMovie_MMX_Decode_528985, MASHER_IMPL);
+
+FILE* CC File_BSync_Open_528BA9(const char* filename)
+{
+    return fopen(filename, "rb");
+}
+
+void CC File_BSync_Close(FILE* pFile)
+{
+    fclose(pFile);
+}
+
+signed int CC File_BSync_Read(FILE* pFile, BYTE* pBuffer, unsigned int readSize)
+{
+    return readSize == fread(pBuffer, 1u, readSize, pFile);
+}
+
+int CC File_BSync_WaitFinish(FILE*)
+{
+    return 1;
+}
+
+int CC File_BSync_Seek(FILE* pFile, __int32 offset, int origin)
+{
+    return fseek(pFile, offset, origin) != 0;
+}
+
+struct File_ASync
+{
+    FILE* field_0_file_handle;
+    BYTE* field_4_read_buffer;
+    DWORD field_8_read_size;
+    bool field_C_bQuit;
+    // 3 byte padding
+    DWORD field_10_read_ret;
+    HANDLE field_14_hThread;
+    HANDLE field_18_w32Event;
+    DWORD field_1C_thread_id;
+};
+MGS_ASSERT_SIZEOF(File_ASync, 0x20);
+
+int CC File_ASync_WaitFinish(FILE* pFile)
+{
+    File_ASync* pHandle = reinterpret_cast<File_ASync*>(pFile);
+    for (;;)
+    {
+        const DWORD ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
+        if (ret == WAIT_OBJECT_0)
+        {
+            return pHandle->field_10_read_ret;
+        }
+
+        if (ret != WAIT_TIMEOUT)
+        {
+            break;
+        }
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x528A20, File_ASync_WaitFinish, MASHER_IMPL);
+
+void CC File_ASync_Close(FILE* pFile)
+{
+    File_ASync* pHandle = reinterpret_cast<File_ASync*>(pFile);
+    for (;;)
+    {
+        const DWORD ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
+        if (ret == WAIT_OBJECT_0)
+        {
+            break;
+        }
+
+        if (ret != WAIT_TIMEOUT)
+        {
+            break;
+        }
+    }
+
+    DWORD ret = 0;
+    do
+    {
+        ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
+    } while (ret == WAIT_TIMEOUT && ret != WAIT_OBJECT_0);
+
+    if (pHandle->field_0_file_handle)
+    {
+        fclose(pHandle->field_0_file_handle);
+    }
+
+    // Signal thread proc to exit
+    pHandle->field_C_bQuit = true; // TODO: OG bug - these inter-thread flags should be atomic
+
+    if (pHandle->field_14_hThread)
+    {
+        // OG bug - should wait for thread to exit instead of terminating it.
+        // Terminate will leak memory and possibly corrupt the heap.
+        //TerminateThread(pHandle->field_14_hThread, 0);
+
+        PostThreadMessageA(pHandle->field_1C_thread_id, 0x400u, 0x115Cu, 5555 + 1); // Force thread proc to re-check quit condition
+        WaitForSingleObject(pHandle->field_14_hThread, INFINITE); // Wait for thread to exit
+    }
+
+    if (pHandle->field_18_w32Event)
+    {
+        CloseHandle(pHandle->field_18_w32Event);
+    }
+
+    // OG bug - should be calling free instead
+    //delete(pHandle);
+    free(pHandle);
+}
+MGS_FUNC_IMPLEX(0x528A58, File_ASync_Close, MASHER_IMPL);
+
+DWORD WINAPI File_ThreadProcASyncRead(LPVOID param)
+{
+    File_ASync* pHandle = (File_ASync*)param;
+    MSG msg = {};
+    while (!pHandle->field_C_bQuit)
+    {
+        if (GetMessageA(&msg, 0, 0x400u, 0x400u) != -1 && msg.wParam == 4444 && msg.lParam == 5555)
+        {
+            pHandle->field_10_read_ret = pHandle->field_8_read_size == fread(
+                pHandle->field_4_read_buffer,
+                1u,
+                pHandle->field_8_read_size,
+                pHandle->field_0_file_handle);
+            SetEvent(pHandle->field_18_w32Event);
+        }
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x528B38, File_ThreadProcASyncRead, MASHER_IMPL);
+
+FILE* CC File_ASync_Open_528ACD(const char* filename)
+{
+    File_ASync* pHandle = (File_ASync *)malloc(sizeof(File_ASync));
+    if (!pHandle)
+    {
+        return nullptr;
+    }
+    pHandle->field_C_bQuit = false;
+    pHandle->field_14_hThread = CreateThread(
+        0,
+        16384u,
+        File_ThreadProcASyncRead,
+        pHandle,
+        0,
+        &pHandle->field_1C_thread_id);
+
+    pHandle->field_18_w32Event = CreateEventA(0, 1, 1, 0);
+    pHandle->field_10_read_ret = 1;
+    pHandle->field_0_file_handle = fopen(filename, "rb");
+
+    if (!pHandle->field_0_file_handle)
+    {
+        File_ASync_Close(reinterpret_cast<FILE*>(pHandle));
+        return nullptr;
+    }
+
+    return (FILE *)pHandle;
+}
+MGS_FUNC_IMPLEX(0x528ACD, File_ASync_Open_528ACD, MASHER_IMPL);
+
+signed int CC File_ASync_Read(FILE* pFile, BYTE* readBuffer, unsigned int readSize)
+{
+    File_ASync* pHandle = reinterpret_cast<File_ASync*>(pFile);
+    signed int result = 0;
+    for (;;)
+    {
+        const DWORD ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
+        if (ret == WAIT_OBJECT_0)
+        {
+            result = pHandle->field_10_read_ret;
+            break;
+        }
+
+        if (ret != WAIT_TIMEOUT)
+        {
+            break;
+        }
+    }
+
+    if (result)
+    {
+        pHandle->field_4_read_buffer = readBuffer;
+        pHandle->field_8_read_size = readSize;
+        ResetEvent(pHandle->field_18_w32Event);
+        for (;;)
+        {
+            if (PostThreadMessageA(pHandle->field_1C_thread_id, 0x400u, 0x115Cu, 5555))
+            {
+                break;
+            }
+            Sleep(200u);
+        }
+        result = 1;
+    }
+    return result;
+}
+MGS_FUNC_IMPLEX(0x528BBA, File_ASync_Read, MASHER_IMPL);
+
+int CC File_ASync_Seek(FILE* pFile, __int32 offset, int origin)
+{
+    File_ASync* pHandle = reinterpret_cast<File_ASync*>(pFile);
+    signed int result = 0;
+    for (;;)
+    {
+        const DWORD ret = WaitForSingleObject(pHandle->field_18_w32Event, 1000u);
+        if (ret == WAIT_OBJECT_0)
+        {
+            result = pHandle->field_10_read_ret;
+            break;
+        }
+
+        if (ret != WAIT_TIMEOUT)
+        {
+            break;
+        }
+    }
+
+    if (result)
+    {
+        result = fseek(pHandle->field_0_file_handle, offset, origin) != 0;
+    }
+    return result;
+}
+MGS_FUNC_IMPLEX(0x528C65, File_ASync_Seek, MASHER_IMPL);
+
+struct Res_Movie_IO_FnPtrs
+{
+    decltype(&File_ASync_Close) mFileClose;
+    decltype(&File_ASync_WaitFinish) mFileWait;
+    decltype(&File_ASync_Seek) mFileSeek;
+    decltype(&File_ASync_Open_528ACD) mFileOpen;
+    decltype(&File_ASync_Read) mFileRead;
+};
+MGS_ASSERT_SIZEOF(Res_Movie_IO_FnPtrs, 0x14);
+MGS_VAR(1, 0x784B44, Res_Movie_IO_FnPtrs, gMovieIo_784B44, {});
+
+void CC File_Ptrs_Init_5289B3(int bAsync)
+{
+    if (bAsync)
+    {
+        gMovieIo_784B44.mFileOpen = File_ASync_Open_528ACD;
+        gMovieIo_784B44.mFileClose = File_ASync_Close;
+        gMovieIo_784B44.mFileRead = File_ASync_Read;
+        gMovieIo_784B44.mFileWait = File_ASync_WaitFinish;
+        gMovieIo_784B44.mFileSeek = File_ASync_Seek;
+    }
+    else
+    {
+        gMovieIo_784B44.mFileOpen = File_BSync_Open_528BA9;
+        gMovieIo_784B44.mFileClose = File_BSync_Close;
+        gMovieIo_784B44.mFileRead = File_BSync_Read;
+        gMovieIo_784B44.mFileWait = File_BSync_WaitFinish;
+        gMovieIo_784B44.mFileSeek = File_BSync_Seek;
+    }
+}
+MGS_FUNC_IMPLEX(0x5289B3, File_Ptrs_Init_5289B3, MASHER_IMPL);
+
+void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*)
+{
+    if (pThis->field_0_file_handle)
+    {
+        gMovieIo_784B44.mFileClose(pThis->field_0_file_handle);
+    }
+
+    if (pThis->field_70_frame_sizes_array)
+    {
+        free(pThis->field_70_frame_sizes_array);
+    }
+
+    if (pThis->field_80_audio_frame_buffer)
+    {
+        free(pThis->field_80_audio_frame_buffer);
+    }
+
+    if (pThis->field_44_decoded_frame_data_buffer)
+    {
+        free(pThis->field_44_decoded_frame_data_buffer);
+    }
+
+    if (pThis->field_4C_audio_buffer)
+    {
+        free(pThis->field_4C_audio_buffer);
+    }
+
+    if (pThis->field_8C_macro_block_buffer)
+    {
+        if (pThis->field_90_64_or_0)
+        {
+            free(pThis->field_8C_macro_block_buffer);
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x524214, Masher_destructor_524214, MASHER_IMPL);

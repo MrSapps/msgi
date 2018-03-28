@@ -99,3 +99,4 @@ int CC Render_sub_41C640(const PSX_RECT* pRect, const WORD* pallete, const BYTE*
 void CC Render_sub_41C6B0(const PSX_RECT* pRect, const BYTE* pPixelData);
 int jImageMove_401A31();
 int ImageMove_401A13();
+void CC Renderer_GetWH_51D50D(DWORD* pWidth, DWORD* pHeight);

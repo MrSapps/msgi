@@ -74,7 +74,8 @@ protected:
 enum CallingConvention
 {
     eCDecl,
-    eStdCall
+    eStdCall,
+    eFastCall
 };
 
 template <DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, CallingConvention convention, class Signature, class ReturnType, class... Args>
@@ -177,9 +178,13 @@ public:
             {
                 return reinterpret_cast<Signature*>(StdCall_Static_Hook_Impl);
             }
+            else if (convention == eFastCall)
+            {
+                return reinterpret_cast<Signature*>(FastCall_Static_Hook_Impl);
+            }
             else
             {
-                MGS_FATAL("Not __cdecl or __stdcall");
+                MGS_FATAL("Not __cdecl, __stdcall or __fastcall");
             }
         }
 #pragma warning(pop)
@@ -213,6 +218,18 @@ protected:
         return static_cast<MgsFunctionImpl*>(baseFunc)->operator()(args...);
     }
 
+    static ReturnType __fastcall FastCall_Static_Hook_Impl(Args ... args)
+    {
+        auto it = GetMgsFunctionTable().find(kOldAddr);
+        if (it == std::end(GetMgsFunctionTable()))
+        {
+            // Impossible situation
+            MGS_FATAL("No function table??");
+        }
+
+        auto baseFunc = it->second;
+        return static_cast<MgsFunctionImpl*>(baseFunc)->operator()(args...);
+    }
     virtual void Apply() override
     {
         if (mNewAddrOverride)
@@ -255,9 +272,13 @@ private:
         {
             err = DetourAttach(&(PVOID&)mRealFuncPtr, StdCall_Static_Hook_Impl);
         }
+        else if (convention == eFastCall)
+        {
+            err = DetourAttach(&(PVOID&)mRealFuncPtr, FastCall_Static_Hook_Impl);
+        }
         else
         {
-            MGS_FATAL("Not __cdecl or __stdcall");
+            MGS_FATAL("Not __cdecl, __stdcall or __fastcall");
         }
 #pragma warning(pop)
         if (err != NO_ERROR)
@@ -290,6 +311,15 @@ public:
 template<DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, class ReturnType, class ... Args>
 class MgsFunction    <kOldAddr, kNewAddr, kReverseHook, kLogArgs, ReturnType __stdcall(Args...) > : public
     MgsFunctionImpl<kOldAddr, kNewAddr, kReverseHook, kLogArgs, eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
+{
+public:
+    MgsFunction(const char* name, void* newAddrOverride = nullptr) : MgsFunctionImpl(name, newAddrOverride) { }
+};
+
+// __fastcall partial specialization
+template<DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, class ReturnType, class ... Args>
+class MgsFunction    <kOldAddr, kNewAddr, kReverseHook, kLogArgs, ReturnType __fastcall(Args...) > : public
+    MgsFunctionImpl<kOldAddr, kNewAddr, kReverseHook, kLogArgs, eFastCall, ReturnType __fastcall(Args...), ReturnType, Args...>
 {
 public:
     MgsFunction(const char* name, void* newAddrOverride = nullptr) : MgsFunctionImpl(name, newAddrOverride) { }

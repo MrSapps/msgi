@@ -37,8 +37,8 @@ MGS_ASSERT_SIZEOF(Actor_Movie_DDV_Header, 16);
 struct Actor_Movie_DDV_VideoHeader
 {
     int field_0_unknown;
-    int field_4_width;
-    int field_8_height;
+    DWORD field_4_width;
+    DWORD field_8_height;
     int field_C_max_audio_frame_size;
     int field_10_max_video_frame_size;
     int field_14_key_frame_rate;
@@ -55,9 +55,10 @@ struct Actor_Movie_DDV_AudioHeader
 };
 MGS_ASSERT_SIZEOF(Actor_Movie_DDV_AudioHeader, 20);
 
+// This is an actual C++ class.. perhaps the only class in the entire game
 struct Actor_Movie_Masher
 {
-    int field_0_file_handle;
+    FILE* field_0_file_handle;
     Actor_Movie_DDV_Header field_4_ddv_header;
     Actor_Movie_DDV_VideoHeader field_14_video_header;
     Actor_Movie_DDV_AudioHeader field_2C_audio_header;
@@ -90,3 +91,5 @@ MGS_ASSERT_SIZEOF(Actor_Movie_Masher, 0x94);
 MGS_VAR_EXTERN(Actor_Movie_Data, gMovieData_724A00);
 
 void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFrame);
+void CC File_Ptrs_Init_5289B3(int bAsync);
+void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*);
