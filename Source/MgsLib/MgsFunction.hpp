@@ -86,8 +86,20 @@ public:
             mStubCalled = true;
         }
 
+        if (!IsMgsi())
+        {
+            if (mRealFuncPtr)
+            {
+                return mRealFuncPtr(args...);
+            }
+            // Cast handles "return void;" this case is a stub for when
+            // calling a real game function outside of the game exe
+            return (ReturnType)0;
+        }
+
 #pragma warning(push)
 #pragma warning(disable:4127) // conditional expression is constant
+
         if (kHookType == HookType::eImpl)
         {
             // This hook proc has been called because something called the original function, hence
@@ -107,12 +119,6 @@ public:
         }
         else
         {
-            if (!IsMgsi())
-            {
-                // Cast handles "return void;" this case is a stub for when
-                // calling a real game function outside of the game exe
-                return (ReturnType)0;
-            }
             // Call "mRealFuncPtr" here so that we are calling the "real" function
 
             // If not running within the game then we can't call real so just return
