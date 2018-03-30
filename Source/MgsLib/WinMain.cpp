@@ -512,7 +512,7 @@ MGS_ASSERT_SIZEOF(weapon_famas, 96);
 MGS_VAR(1, 0x995368, WORD, word_995368, 0);
 MGS_VAR(1, 0x995320, WORD, word_995320, 0);
 
-MGS_FUNC_NOT_IMPL_NOLOG(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_update_640CDC);
+MGS_FUNC_NOT_IMPL(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_update_640CDC);
 MGS_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), Res_famas_shutdown_640E9E);
 
 

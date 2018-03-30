@@ -11,52 +11,8 @@
 #include "logger.hpp"
 #include "detours.h"
 
-// Turn off logging unless required, while using a Console Window its much too
-// slow. Need to use something like ImGui and log the output in to the game 
-// rendering itself to be fast enough.
-#define ENABLE_LOGGING 0
-
 bool IsMgsi();
 void DoDetour(DWORD addr, DWORD func);
-
-inline std::ostream& operator<<(std::ostream& out, IID id)
-{
-    // TODO: Print GUIDS properly
-    out << static_cast<unsigned int>(id.Data1);
-    return out;
-}
-
-inline std::ostream& operator<<(std::ostream& out, const char* ptr)
-{
-    if (ptr)
-    {
-        out.write(ptr, strlen(ptr));
-    }
-    else
-    {
-        out << "(null char*)";
-    }
-    return out;
-}
-
-// No arguments case
-inline void doPrint(std::ostream& /*out*/)
-{
-
-}
-
-template <typename T>
-void doPrint(std::ostream& out, T t)
-{
-    out << t;
-}
-
-template <typename T, typename U, typename... Args>
-void doPrint(std::ostream& out, T t, U u, Args... args)
-{
-    out << t << ',';
-    doPrint(out, u, args...);
-}
 
 #define MGS_FATAL(x)  ::MessageBox(NULL, x, "ERROR", MB_ICONERROR | MB_OK); __debugbreak(); abort();
 
@@ -71,21 +27,28 @@ protected:
     static std::map<DWORD, MgsFunctionBase*>& GetMgsFunctionTable();
 };
 
-enum CallingConvention
+enum class CallingConvention
 {
     eCDecl,
     eStdCall,
     eFastCall
 };
 
-template <DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, CallingConvention convention, class Signature, class ReturnType, class... Args>
+enum class HookType
+{
+    eNotImpl,
+    eNotImplWithStub,
+    eImpl
+};
+
+template <DWORD kOldAddr, void* kNewAddr, HookType kHookType, CallingConvention convention, class Signature, class ReturnType, class... Args>
 class MgsFunctionImpl : public MgsFunctionBase
 {
 public:
     using TFuncType = Signature*;
 
-    MgsFunctionImpl(const char* fnName, void* newAddrOverride = nullptr)
-        : mFnName(fnName), mNewAddrOverride(newAddrOverride)
+    explicit MgsFunctionImpl(const char* fnName)
+        : mFnName(fnName)
     {
         auto it = GetMgsFunctionTable().find(kOldAddr);
         if (it != std::end(GetMgsFunctionTable()))
@@ -116,33 +79,30 @@ public:
     {
         if (!mStubCalled)
         {
-            if (!IsMgsi() && !mRealFuncPtr && !mNewAddrOverride)
+            if (!IsMgsi() && !mRealFuncPtr)
             {
                 LOG_("WARNING: Unimpl call: " << mFnName);
             }
             mStubCalled = true;
-            /*
-            std::cout << mFnName << " (";
-            doPrint(std::cout, args...);
-            std::cout << ")" << std::endl;
-            
-            */
         }
 
 #pragma warning(push)
 #pragma warning(disable:4127) // conditional expression is constant
-        if (mNewAddrOverride && !IsMgsi())
+        if (kHookType == HookType::eImpl)
         {
-            return reinterpret_cast<TFuncType>(mNewAddrOverride)(args...);
-        }
-
-        if (kNewAddr && !kReverseHook)
-        {
-            // Call "newAddr" since we've replaced the function completely
+            // This hook proc has been called because something called the original function, hence
+            // we call the new function (the replacement reimplementation).
             return reinterpret_cast<TFuncType>(kNewAddr)(args...);
         }
-        else if (kOldAddr && kReverseHook)
+        else if (kHookType == HookType::eNotImpl)
         {
+            // Just pass through to the "original" function
+            return mRealFuncPtr(args...);
+        }
+        else if (kHookType == HookType::eNotImplWithStub)
+        {
+            // Hook proc was called because something called the replacement function which is not
+            // yet finished, so call the "real" function (i.e the original game function).
             return reinterpret_cast<TFuncType>(kOldAddr)(args...);
         }
         else
@@ -170,15 +130,15 @@ public:
 #pragma warning(disable:4127) // conditional expression is constant
         if (!IsMgsi())
         {
-            if (convention == eCDecl)
+            if (convention == CallingConvention::eCDecl)
             {
                 return Cdecl_Static_Hook_Impl;
             }
-            else if (convention == eStdCall)
+            else if (convention == CallingConvention::eStdCall)
             {
                 return reinterpret_cast<Signature*>(StdCall_Static_Hook_Impl);
             }
-            else if (convention == eFastCall)
+            else if (convention == CallingConvention::eFastCall)
             {
                 return reinterpret_cast<Signature*>(FastCall_Static_Hook_Impl);
             }
@@ -232,22 +192,29 @@ protected:
     }
     virtual void Apply() override
     {
-        if (mNewAddrOverride)
-        {
-            return;
-        }
-
 #pragma warning(push)
 #pragma warning(disable:4127) // conditional expression is constant
-        if (kReverseHook)
+        switch (kHookType)
         {
-            // Redirect calls to our reimpl to the game function
-            ApplyImpl(mNewAddrOverride ? mNewAddrOverride : kNewAddr, reinterpret_cast<void*>(kOldAddr));
-        }
-        else
-        {
-            // Redirect internal game function to our reimpl
-            ApplyImpl(reinterpret_cast<void*>(kOldAddr), mNewAddrOverride ? mNewAddrOverride : kNewAddr);
+        case HookType::eImpl:
+            // Force calls from old to new
+            std::cout << "Apply impl: old addr " << reinterpret_cast<void*>(kOldAddr) << " new addr " << kNewAddr << std::endl;
+            ApplyImpl(reinterpret_cast<void*>(kOldAddr), kNewAddr);
+            break;
+
+        case HookType::eNotImpl:
+            mRealFuncPtr = (TFuncType)kOldAddr;
+            std::cout << "Apply not impl addr " << mRealFuncPtr << std::endl;
+            break;
+
+        case HookType::eNotImplWithStub:
+            // Force calls from new to old
+            std::cout << "Apply not impl: old addr " << kNewAddr  << " new addr " << reinterpret_cast<void*>(kOldAddr) << std::endl;
+            ApplyImpl(kNewAddr, reinterpret_cast<void*>(kOldAddr));
+            break;
+
+        default:
+            MGS_FATAL("Unknown Hook type");
         }
 #pragma warning(pop)
     }
@@ -256,23 +223,19 @@ private:
     void ApplyImpl(void* funcToHook, void* replacement)
     {
         //TRACE_ENTRYEXIT;
-
-        std::cout << "old addr " << funcToHook << " new addr " << replacement << std::endl;
-
-        mRealFuncPtr = (TFuncType)funcToHook;
-
         LONG err = 0;
+        mRealFuncPtr = (TFuncType)funcToHook; // Must be set before detouring
 #pragma warning(push)
 #pragma warning(disable:4127) // conditional expression is constant
-        if (convention == eCDecl)
+        if (convention == CallingConvention::eCDecl)
         {
             err = DetourAttach(&(PVOID&)mRealFuncPtr, Cdecl_Static_Hook_Impl);
         }
-        else if (convention == eStdCall)
+        else if (convention == CallingConvention::eStdCall)
         {
             err = DetourAttach(&(PVOID&)mRealFuncPtr, StdCall_Static_Hook_Impl);
         }
-        else if (convention == eFastCall)
+        else if (convention == CallingConvention::eFastCall)
         {
             err = DetourAttach(&(PVOID&)mRealFuncPtr, FastCall_Static_Hook_Impl);
         }
@@ -291,38 +254,36 @@ private:
 
     TFuncType mRealFuncPtr = nullptr;
     const char* mFnName = nullptr;
-    bool mPassThrough = false;
-    void* mNewAddrOverride = nullptr;
 };
 
-template<DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, class ReturnType>
+template<DWORD kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType>
 class MgsFunction;
 
 // __cdecl partial specialization
-template<DWORD kOldAddr, bool kLogArgs, bool kReverseHook, void* kNewAddr, class ReturnType, class... Args>
-class MgsFunction    <kOldAddr, kNewAddr, kReverseHook, kLogArgs, ReturnType __cdecl(Args...) > : public
-    MgsFunctionImpl<kOldAddr, kNewAddr, kReverseHook, kLogArgs, eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
+template<DWORD kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType, class... Args>
+class MgsFunction    <kOldAddr, kNewAddr, kHookType, ReturnType __cdecl(Args...) > : public
+    MgsFunctionImpl<kOldAddr, kNewAddr, kHookType, CallingConvention::eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
 {
 public:
-    MgsFunction(const char* name, void* newAddrOverride = nullptr) : MgsFunctionImpl(name, newAddrOverride) { }
+    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
 };
 
 // __stdcall partial specialization
-template<DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, class ReturnType, class ... Args>
-class MgsFunction    <kOldAddr, kNewAddr, kReverseHook, kLogArgs, ReturnType __stdcall(Args...) > : public
-    MgsFunctionImpl<kOldAddr, kNewAddr, kReverseHook, kLogArgs, eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
+template<DWORD kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType, class ... Args>
+class MgsFunction    <kOldAddr, kNewAddr, kHookType, ReturnType __stdcall(Args...) > : public
+    MgsFunctionImpl<kOldAddr, kNewAddr, kHookType, CallingConvention::eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
 {
 public:
-    MgsFunction(const char* name, void* newAddrOverride = nullptr) : MgsFunctionImpl(name, newAddrOverride) { }
+    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
 };
 
 // __fastcall partial specialization
-template<DWORD kOldAddr, void* kNewAddr, bool kReverseHook, bool kLogArgs, class ReturnType, class ... Args>
-class MgsFunction    <kOldAddr, kNewAddr, kReverseHook, kLogArgs, ReturnType __fastcall(Args...) > : public
-    MgsFunctionImpl<kOldAddr, kNewAddr, kReverseHook, kLogArgs, eFastCall, ReturnType __fastcall(Args...), ReturnType, Args...>
+template<DWORD kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType, class ... Args>
+class MgsFunction    <kOldAddr, kNewAddr, kHookType, ReturnType __fastcall(Args...) > : public
+    MgsFunctionImpl<kOldAddr, kNewAddr, kHookType, CallingConvention::eFastCall, ReturnType __fastcall(Args...), ReturnType, Args...>
 {
 public:
-    MgsFunction(const char* name, void* newAddrOverride = nullptr) : MgsFunctionImpl(name, newAddrOverride) { }
+    MgsFunction(const char* name) : MgsFunctionImpl(name) { }
 };
 
 class MgsVar
@@ -356,17 +317,13 @@ extern MgsVar Var_##VarName;\
 extern TypeName* VarName ;
 
 
-#define MGS_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, false, true, signature> name(#name);
-#define EXTERN_MGS_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, false, true, signature> name;
-#define MGS_FUNC_NOT_IMPL_NOLOG(addr, signature, name) MgsFunction<addr, nullptr, false, false, signature> name(#name);
-#define MGS_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, false, true, decltype(funcName)> funcName##_(#funcName);
+#define MGS_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, HookType::eNotImpl, signature> name(#name);
+#define EXTERN_MGS_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, HookType::eNotImpl, signature> name;
+
+#define MGS_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, HookType::eImpl, decltype(funcName)> funcName##_(#funcName);
 
 // isImplemented == false means redirect game func to our func. isImplemented == true means redirect our func to game func.
-#define MGS_FUNC_IMPLEX(addr, funcName, isImplemented) MgsFunction<addr, funcName, !isImplemented, true, decltype(funcName)> funcName##_(#funcName);
-#define MGS_FUNC_IMPL_NOLOG(addr, funcName) MgsFunction<addr, funcName, false, false, decltype(funcName)> funcName##_(#funcName);
-
-#define MGS_STDLIB(func, addr) MgsFunction<addr, (void*)addr, false, true, decltype(func)> mgs_##func(#func, (void*)func)
-#define EXTERN_MGS_STDLIB(func, addr) extern MgsFunction<addr, (void*)addr, false, true, decltype(func)> mgs_##func;
+#define MGS_FUNC_IMPLEX(addr, funcName, isImplemented) MgsFunction<addr, funcName, isImplemented ? HookType::eImpl : HookType::eNotImplWithStub, decltype(funcName)> funcName##_(#funcName);
 
 #define MGS_REDIRECT(addr, func) DoDetour(addr, (DWORD)func)
 

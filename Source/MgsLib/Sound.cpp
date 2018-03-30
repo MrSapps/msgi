@@ -5,6 +5,7 @@
 
 // TODO: Fix funcs using SKIP
 #ifdef _DEBUG
+//#define SOUND_IMPL true
 #define SOUND_IMPL true
 #else
 // TODO: Extra fix me, in release sound seems to get out of sync and eventually make codec calls etc hang
@@ -281,12 +282,12 @@ MGS_VAR(REDIRECT_SOUND, 0x77D888, BYTE, byte_77D888, 0);
 MGS_ARY(1, 0x68D02C, DWORD, 11, gMusicVolTbl_68D02C, { 0, 64, 70, 74, 77, 80, 83, 85, 87, 89, 90 });
 MGS_ARY(1, 0x68D000, DWORD, 11, gSoundVolTbl_68D000, { 0, 76, 82, 86, 89, 92, 94, 96, 98, 99, 100 });
 MGS_PTR(1, 0x68CEE4, DWORD*, dword_68CEE4, nullptr);// TODO: Figure out array size and dump it
-MGS_VAR(REDIRECT_SOUND, 0x77D880, DWORD, dword_77D880, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1B8, DWORD, dword_77E1B8, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1CC, DWORD, dword_77E1CC, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1D8, DWORD, gSoundNumBlocksWrote_dword_77E1D8, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77D890, DWORD, gSndTime_dword_77D890, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1D4, DWORD, gSoundWriteCursor_dword_77E1D4, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D880, DWORD, gBytesWrote_77D880, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1B8, DWORD, gSoundPos_77E1B8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1CC, DWORD, gFrameNum_77E1CC, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D8, DWORD, gSoundNumBlocksWrote_77E1D8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77D890, DWORD, gSndTime_77D890, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1D4, DWORD, gWritePosInBuffer_77E1D4, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E2E4, DWORD, dword_77E2E4, 0);
 MGS_PTR(1, 0x68E2D0, float*, byte_68E2D0, nullptr); // XA K0 TODO: Figure out array size and dump it
 MGS_VAR(REDIRECT_SOUND, 0x77E300, double, dbl_77E300, 0);
@@ -320,7 +321,7 @@ MGS_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP); // File I/O
 MGS_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, SOUND_IMPL);
-MGS_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelatedQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelated_523B2C, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);  // causes raspy codec if redirected
 MGS_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP); // causes raspy codec if redirected
 MGS_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, SOUND_IMPL);
@@ -332,7 +333,7 @@ MGS_FUNC_IMPLEX(0x0052255B, Sound_SetSoundMusicVolume, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x005224C8, Sound_SetSoundVolume, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
 MGS_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, SOUND_IMPL);
-MGS_FUNC_IMPLEX(0x00523CF3, Sound_Masher_write_data_523CF3, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523CF3, Sound_Masher_Write_Audio_Frame_523CF3, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP); // calls to broken funcs
 MGS_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP); // calls to broken funcs
@@ -1183,49 +1184,54 @@ void __cdecl Sound_ReleaseSecondaryBuffer()
     }
 }
 
-// 0x00523B2C
-signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BYTE*(__cdecl *a3)(DWORD))
+signed int CC Sound_RestoreRelated_523B2C(Actor_Movie_Masher *pMasher, 
+    int(CC* fnReadFrame)(Actor_Movie_Masher *), 
+    void *(CC* fnDecodeFrame)(Actor_Movie_Masher *))
 {
-    BYTE* v4;
-    void* v6 = nullptr; // TODO: Some of these vars could be used without being assigned, is this correct?
-    BYTE* v7 = nullptr; 
-    DWORD v8 = 0;
-    DWORD v9 = 0;
-    BYTE *pDst;
-    size_t Size;
+    void* pAudioPtr2 = nullptr;
+    void* pAudioPtr1 = nullptr; 
+    DWORD audioPtr2Size = 0;
+    DWORD audioPtr1Size = 0;
 
-    Size = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
-    pDst = 0;
+    // Get pointer to the audio buffer
+    const size_t blockXFrameSize = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
     if (gSndBuffer_dword_77E0A0)
     {
-        if (gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0) == DSERR_BUFFERLOST)
+        if (gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * blockXFrameSize, 
+            &pAudioPtr1, &audioPtr1Size, 
+            &pAudioPtr2, &audioPtr2Size, 0) == DSERR_BUFFERLOST)
         {
             gSndBuffer_dword_77E0A0->Restore();
-            gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * Size, (LPVOID*)&v7, &v9, &v6, &v8, 0);
+            gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * blockXFrameSize, 
+                &pAudioPtr1, &audioPtr1Size,
+                &pAudioPtr2, &audioPtr2Size, 0);
         }
-        pDst = v7;
     }
-    for (unsigned int i = 0; i < gMovieNumFramesInterleave_77E1C4; ++i)
+
+    BYTE* pAudioBufferWritePtr = reinterpret_cast<BYTE*>(pAudioPtr1);
+    for (unsigned int i = 0; i < gMovieNumFramesInterleave_77E1C4; i++)
     {
-        if (!fnRead(a1))
+        // Read the masher audio frame from disk
+        if (!fnReadFrame(pMasher))
         {
             if (gSndBuffer_dword_77E0A0)
             {
-                gSndBuffer_dword_77E0A0->Unlock(v7, v9, v6, v8);
+                gSndBuffer_dword_77E0A0->Unlock(pAudioPtr1, audioPtr1Size, pAudioPtr2, audioPtr2Size);
             }
             return 0;
         }
         
-        v4 = a3(a1);
-
-        if (v4)
+        // Convert/decode the masher audio frame into raw PCM
+        BYTE* pDecodedSoundData = (BYTE*)fnDecodeFrame(pMasher);
+        if (pDecodedSoundData)
         {
+            // And write it into the output sound buffer
             if (gSndBuffer_dword_77E0A0)
             {
-                if (pDst)
+                if (pAudioBufferWritePtr)
                 {
-                    memcpy(pDst, v4, Size);
-                    pDst = pDst + Size;
+                    memcpy(pAudioBufferWritePtr, pDecodedSoundData, blockXFrameSize);
+                    pAudioBufferWritePtr = pAudioBufferWritePtr + blockXFrameSize;
                 }
             }
         }
@@ -1233,15 +1239,16 @@ signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *fnRead)(DWORD), BY
 
     if (gSndBuffer_dword_77E0A0)
     {
-        gSndBuffer_dword_77E0A0->Unlock(v7, v9, v6, v8);
+        gSndBuffer_dword_77E0A0->Unlock(pAudioPtr1, audioPtr1Size, pAudioPtr2, audioPtr2Size);
     }
 
-    gSoundWriteCursor_dword_77E1D4 = gMovieNumFramesInterleave_77E1C4 * Size;
-    dword_77D880 = gMovieNumFramesInterleave_77E1C4 * Size;
-    dword_77E1CC = 0;
-    dword_77E1B8 = 0;
-    gSndTime_dword_77D890 = timeGetTime();
-    gSoundNumBlocksWrote_dword_77E1D8 = 0;
+    gWritePosInBuffer_77E1D4 = gMovieNumFramesInterleave_77E1C4 * blockXFrameSize;
+    gBytesWrote_77D880 = gMovieNumFramesInterleave_77E1C4 * blockXFrameSize;
+    gFrameNum_77E1CC = 0;
+    gSoundPos_77E1B8 = 0;
+    gSndTime_77D890 = timeGetTime();
+    gSoundNumBlocksWrote_77E1D8 = 0;
+
     return 1;
 }
 
@@ -1785,32 +1792,32 @@ bool __cdecl Sound_Unknown4()
     if (gSndBuffer_dword_77E0A0)
     {
         v4 = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
-        dword_77D880 += gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
+        gBytesWrote_77D880 += gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
         gSndBuffer_dword_77E0A0->GetCurrentPosition(&pos, 0);
-        if (dword_77E1B8 - pos > gSoundBufferSize_77E1B4 / 2)
+        if (gSoundPos_77E1B8 - pos > gSoundBufferSize_77E1B4 / 2)
         {
-            ++dword_77E1CC;
+            ++gFrameNum_77E1CC;
         }
-        dword_77E1B8 = pos;
-        v2 = gMovieNumFramesInterleave_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * dword_77E1CC;
-        ret = dword_77D880 < v2 || dword_77D880 > v4 + v2;
-        while (dword_77D880 >= v2 && dword_77D880 <= v4 + v2)
+        gSoundPos_77E1B8 = pos;
+        v2 = gMovieNumFramesInterleave_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * gFrameNum_77E1CC;
+        ret = gBytesWrote_77D880 < v2 || gBytesWrote_77D880 > v4 + v2;
+        while (gBytesWrote_77D880 >= v2 && gBytesWrote_77D880 <= v4 + v2)
         {
             gSndBuffer_dword_77E0A0->GetCurrentPosition(&pos, 0);
-            if (dword_77E1B8 - pos > gSoundBufferSize_77E1B4 / 2)
+            if (gSoundPos_77E1B8 - pos > gSoundBufferSize_77E1B4 / 2)
             {
-                ++dword_77E1CC;
+                ++gFrameNum_77E1CC;
             }
-            dword_77E1B8 = pos;
+            gSoundPos_77E1B8 = pos;
 
             // dead statement?
-            v2 = gMovieNumFramesInterleave_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * dword_77E1CC;
+            v2 = gMovieNumFramesInterleave_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * gFrameNum_77E1CC;
         }
     }
     else
     {
-        ret = 1000 * gSoundNumBlocksWrote_dword_77E1D8 / 15 < timeGetTime() - gSndTime_dword_77D890;
-        while (timeGetTime() - gSndTime_dword_77D890 <= 1000 * gSoundNumBlocksWrote_dword_77E1D8 / 15)
+        ret = 1000 * gSoundNumBlocksWrote_77E1D8 / 15 < timeGetTime() - gSndTime_77D890;
+        while (timeGetTime() - gSndTime_77D890 <= 1000 * gSoundNumBlocksWrote_77E1D8 / 15)
         {
 
         }
@@ -1818,24 +1825,23 @@ bool __cdecl Sound_Unknown4()
     return ret;
 }
 
-int __cdecl Sound_Masher_write_data_523CF3(Actor_Movie_Masher* pMasher,
-    signed int(CC *pFnRead)(Actor_Movie_Masher*),
-    void *(CC *pMovieUpdate)(Actor_Movie_Masher *))
+int CC Sound_Masher_Write_Audio_Frame_523CF3(Actor_Movie_Masher* pMasher,
+    signed int(CC* /*pFnReadFrame*/)(Actor_Movie_Masher*),
+    void* (CC* fnDecodeFrame)(Actor_Movie_Masher *))
 {
-    // TODO: Why pFnRead isn't used?
     void *pSoundBufferBlock2;
     DWORD numBytesLockedBlock2;
     void *pSoundBufferBlock1;
     DWORD numBytesLockedBlock1;
 
-    BYTE* pMasherAudioFrame = (BYTE*)pMovieUpdate(pMasher);
-    if (pMasherAudioFrame)
+    BYTE* pDecodedAudioFrame = (BYTE*)fnDecodeFrame(pMasher);
+    if (pDecodedAudioFrame)
     {
         const int numBytesToLock = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
         if (gSndBuffer_dword_77E0A0)
         {
             if (gSndBuffer_dword_77E0A0->Lock(
-                gSoundWriteCursor_dword_77E1D4,
+                gWritePosInBuffer_77E1D4,
                 numBytesToLock,
                 &pSoundBufferBlock1,
                 &numBytesLockedBlock1,
@@ -1845,7 +1851,7 @@ int __cdecl Sound_Masher_write_data_523CF3(Actor_Movie_Masher* pMasher,
             {
                 gSndBuffer_dword_77E0A0->Restore();
                 gSndBuffer_dword_77E0A0->Lock(
-                    gSoundWriteCursor_dword_77E1D4,
+                    gWritePosInBuffer_77E1D4,
                     numBytesToLock,
                     &pSoundBufferBlock1,
                     &numBytesLockedBlock1,
@@ -1856,25 +1862,25 @@ int __cdecl Sound_Masher_write_data_523CF3(Actor_Movie_Masher* pMasher,
 
             if (pSoundBufferBlock1)
             {
-                memcpy(pSoundBufferBlock1, pMasherAudioFrame, numBytesLockedBlock1);
+                memcpy(pSoundBufferBlock1, pDecodedAudioFrame, numBytesLockedBlock1);
             }
             
             if (pSoundBufferBlock2)
             {
-                memcpy(pSoundBufferBlock2, pMasherAudioFrame + numBytesLockedBlock1, numBytesLockedBlock2);
+                memcpy(pSoundBufferBlock2, pDecodedAudioFrame + numBytesLockedBlock1, numBytesLockedBlock2);
             }
 
             gSndBuffer_dword_77E0A0->Unlock(pSoundBufferBlock1, numBytesLockedBlock1, pSoundBufferBlock2, numBytesLockedBlock2);
         }
         
-        gSoundWriteCursor_dword_77E1D4 += numBytesToLock;
+        gWritePosInBuffer_77E1D4 += numBytesToLock;
 
-        if (gSoundWriteCursor_dword_77E1D4 >= gSoundBufferSize_77E1B4)
+        if (gWritePosInBuffer_77E1D4 >= gSoundBufferSize_77E1B4)
         {
-            gSoundWriteCursor_dword_77E1D4 = 0;
+            gWritePosInBuffer_77E1D4 = 0;
         }
     }
-    return gSoundNumBlocksWrote_dword_77E1D8++ + 1;
+    return gSoundNumBlocksWrote_77E1D8++ + 1;
 }
 
 // 0x00523CB9

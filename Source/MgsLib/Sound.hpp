@@ -30,7 +30,6 @@ void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, i
 void __cdecl Sound_PopulateBufferQ();
 void __cdecl Sound_ReleaseBufferQ();
 void __cdecl Sound_ReleaseSecondaryBuffer();
-signed int __cdecl Sound_RestoreRelatedQ(int a1, int(__cdecl *a2)(DWORD), BYTE*(__cdecl *a3)(DWORD));
 signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuffer *snd, int a4); // Seems to do XA conversion
 signed int __cdecl Sound_Samp1Related_2(char *a1, unsigned int a2);
 void __cdecl Sound_ShutDown();
@@ -42,9 +41,15 @@ void __cdecl Sound_SetSoundMusicVolume(int a1);
 void __cdecl Sound_SetSoundVolume(int a1);
 bool __cdecl Sound_PlayEffect(unsigned __int8 idx, int a2, int a3);
 bool __cdecl Sound_Unknown4();
-int __cdecl Sound_Masher_write_data_523CF3(Actor_Movie_Masher* pMasher,
-    signed int(CC *pFnRead)(Actor_Movie_Masher*),
-    void *(CC *pMovieUpdate)(Actor_Movie_Masher *));
+
+signed int CC Sound_RestoreRelated_523B2C(Actor_Movie_Masher *pMasher,
+    int(CC* fnReadFrame)(Actor_Movie_Masher *),
+    void *(CC* fnDecodeFrame)(Actor_Movie_Masher *));
+
+int CC Sound_Masher_Write_Audio_Frame_523CF3(Actor_Movie_Masher* pMasher,
+    signed int(CC* pFnReadFrame)(Actor_Movie_Masher*),
+    void* (CC* fnDecodeFrame)(Actor_Movie_Masher *));
+
 void __cdecl Sound_Unknown6();
 int __cdecl Sound_Play(unsigned int playingFlags);
 int __cdecl Sound_jPlay(unsigned int playingFlags);

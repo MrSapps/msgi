@@ -19,9 +19,10 @@ void Force_Actor_Movie_Cpp_Link() { }
 
 
 MGS_FUNC_NOT_IMPL(0x528993, void __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_decode_image_528993); // TODO
-MGS_FUNC_NOT_IMPL(0x52897C, signed int __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_read_blocking_52897C); // TODO
-MGS_FUNC_NOT_IMPL(0x52899C, void* __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_sound_read_52899C); // TODO
-MGS_FUNC_NOT_IMPL(0x528973, DWORD __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_528973); // TODO
+
+MGS_FUNC_NOT_IMPL(0x52B015, signed int __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_sound_read_data_52B015); // TODO
+
+MGS_FUNC_NOT_IMPL(0x52899C, void* __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_sound_decode_data_52899C); // TODO
 
 int CC Res_movie_update_helper_45675A()
 {
@@ -52,12 +53,12 @@ int CC Res_movie_update_helper_45675A()
         gMovieData_724A00.field_2C_audio_play_started = 1;
     }
 
-    Sound_Masher_write_data_523CF3(
+    Sound_Masher_Write_Audio_Frame_523CF3(
         gMovieData_724A00.field_0_masher_ptr,
-        Res_movie_masher_read_blocking_52897C.Ptr(),
-        Res_movie_masher_sound_read_52899C.Ptr());
+        Res_movie_masher_sound_read_data_52B015.Ptr(),
+        Res_movie_masher_sound_decode_data_52899C.Ptr());
     
-    gMovieData_724A00.field_1C_read_ret = Res_movie_masher_528973(gMovieData_724A00.field_0_masher_ptr);
+    gMovieData_724A00.field_1C_read_ret = Res_movie_masher_read_frame_data_528973(gMovieData_724A00.field_0_masher_ptr);
     
     gMovieData_724A00.field_20_sound_pos = Sound_Unknown4();
 
@@ -108,6 +109,37 @@ void CC Res_movie_copy_frame_to_back_buffer_51D613(unsigned int width, unsigned 
     g_pBackBuffer_6FC738->Unlock(0);
 }
 MGS_FUNC_IMPLEX(0x51D613, Res_movie_copy_frame_to_back_buffer_51D613, MOVIE_IMPL);
+
+MGS_VAR(1, 0x7248C8, DWORD, gMovieTicks_dword_7248C8, 0);
+
+void CC Res_movie_update_helper_456622(Actor_Movie* pMovie)
+{
+    bool bKeepPlaying = true;
+    if (!pMovie->dword_7248FC_bIsEnding || !(gMovieTicks_dword_7248C8 % 2))
+    {
+        bKeepPlaying = Res_movie_update_helper_45675A() ? true : false;
+        // NOTE: Trimmed dead branches here called stub function
+        ++pMovie->word_7248F0_counter;
+    }
+
+    Res_movie_copy_frame_to_back_buffer_51D613(
+        gMovieData_724A00.field_24_double_width * gMovieData_724A00.field_8_video_header->field_4_width,
+        gMovieData_724A00.field_28_double_height * gMovieData_724A00.field_8_video_header->field_8_height,
+        gMovieData_724A00.gMovieBuffer_724A14);
+
+    ++gMovieTicks_dword_7248C8;
+
+    if (GameD_Input_445610() & PsxButtonBits::eCross)
+    {
+        bKeepPlaying = false;
+    }
+
+    if (!bKeepPlaying)
+    {
+        Actor_DestroyOnNextUpdate_40A3ED(&pMovie->mBase);
+    }
+}
+MGS_FUNC_IMPLEX(0x456622, Res_movie_update_helper_456622, MOVIE_IMPL);
 
 char* CC Res_movie_GetName_4564F5(char* currentDir, int movieNameHashed)
 {
@@ -352,11 +384,48 @@ signed int CC Res_movie_create_helper_4562AA(int movieNameHashed)
 }
 MGS_FUNC_IMPLEX(0x4562AA, Res_movie_create_helper_4562AA, MOVIE_IMPL);
 
+MGS_FUNC_NOT_IMPL(0x4018E0, void __cdecl(), MarkObjectQueueVoid_4018E0);
 
-MGS_FUNC_NOT_IMPL(0x456588, void __cdecl(Actor_Movie *pMovie), Res_movie_update_456588); // TODO
+int CC Res_movie_write_sound_buffer_4565CA()
+{
+    Sound_RestoreRelated_523B2C(
+        gMovieData_724A00.field_0_masher_ptr,
+        Res_movie_masher_sound_read_data_52B015.Ptr(),
+        Res_movie_masher_sound_decode_data_52899C.Ptr());
 
-MGS_VAR(1, 0x7248C8, DWORD, gMovieTicks_dword_7248C8, 0);
+    const int read2FramesRet =
+        Res_movie_masher_read_frame_data_528973(gMovieData_724A00.field_0_masher_ptr)
+     && Res_movie_masher_read_frame_data_528973(gMovieData_724A00.field_0_masher_ptr);
+    
+    gMovieData_724A00.field_1C_read_ret = read2FramesRet;
 
+    return read2FramesRet;
+}
+MGS_FUNC_IMPLEX(0x4565CA, Res_movie_write_sound_buffer_4565CA, false); // TODO: fix me
+
+void CC Res_movie_update_456588(Actor_Movie* pMovie)
+{
+    MarkObjectQueueVoid_4018E0();
+    System_Init_0_And_1_40A465();
+
+    if (Res_movie_write_sound_buffer_4565CA())
+    {
+        if (pMovie->dword_7248FC_bIsEnding)
+        {
+            Timer_30();
+        }
+        else
+        {
+            Timer_15();
+        }
+        pMovie->mBase.mFnUpdate = reinterpret_cast<TActorFunction>(Res_movie_update_helper_456622);
+    }
+    else
+    {
+        Actor_DestroyOnNextUpdate_40A3ED(&pMovie->mBase);
+    }
+}
+MGS_FUNC_IMPLEX(0x456588, Res_movie_update_456588, MOVIE_IMPL);
 
 void CC Res_movie_shutdown_4567DE(Actor_Movie* pMovie)
 {
@@ -398,7 +467,7 @@ Actor_Movie* CC Res_movie_create_4561DF(int movieNameHashed, int bIsEnding)
     Actor_PushBack_40A2AF(1, &gMovie_actor_stru_7248D0.mBase, 0);
     Actor_Init_40A347(
         &gMovie_actor_stru_7248D0.mBase,
-        reinterpret_cast<TActorFunction>(Res_movie_update_456588.Ptr()),
+        reinterpret_cast<TActorFunction>(Res_movie_update_456588),
         reinterpret_cast<TActorFunction>(Res_movie_shutdown_4567DE),
         "C:\\mgs\\source\\Game\\movie.c");
 

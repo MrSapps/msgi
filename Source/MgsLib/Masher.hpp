@@ -93,3 +93,4 @@ MGS_VAR_EXTERN(Actor_Movie_Data, gMovieData_724A00);
 void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFrame);
 void CC File_Ptrs_Init_5289B3(int bAsync);
 void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*);
+int CC Res_movie_masher_read_frame_data_528973(Actor_Movie_Masher* pMasher);

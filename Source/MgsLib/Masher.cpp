@@ -998,3 +998,11 @@ void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*)
     }
 }
 MGS_FUNC_IMPLEX(0x524214, Masher_destructor_524214, MASHER_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x52427C, int __fastcall(Actor_Movie_Masher* pThis, void*), Res_movie_masher_read_frame_data_52427C); // TODO
+
+int CC Res_movie_masher_read_frame_data_528973(Actor_Movie_Masher* pMasher)
+{
+    return Res_movie_masher_read_frame_data_52427C(pMasher, 0);
+}
+MGS_FUNC_IMPLEX(0x528973, Res_movie_masher_read_frame_data_528973, MASHER_IMPL);
