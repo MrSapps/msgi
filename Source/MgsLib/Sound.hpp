@@ -14,7 +14,7 @@ signed int __cdecl Sound_Init(HWND hwnd);
 char __cdecl Sound_HexCharToInt(char value);
 signed int __cdecl Sound_CleanUpRelated();
 int __cdecl Sound_CloseWavStopQ();
-signed int __cdecl Sound_Res_Movie_CreateBuffer_523A44(int numChannels, signed int bitsPerSample, int samplesPerSecond, int a4, int a5);
+signed int __cdecl Sound_Res_Movie_CreateBuffer_523A44(int numChannels, signed int bitsPerSample, int samplesPerSecond, int frameSize, int numFramesInterleave);
 bool __cdecl Sound_CreatePrimarySoundBuffer();
 signed int __cdecl Sound_CreateSecondarySoundBuffer();
 __int64 __cdecl Sound_FadeQ(int a1);
@@ -40,7 +40,7 @@ int __cdecl Sound_TableUnknown1(int a1, int rate, int vol);
 void __cdecl Sound_SetSoundMusicVolume(int a1);
 void __cdecl Sound_SetSoundVolume(int a1);
 bool __cdecl Sound_PlayEffect(unsigned __int8 idx, int a2, int a3);
-bool __cdecl Sound_Unknown4();
+int CC Sound_Masher_Unknown_523E12();
 
 signed int CC Sound_RestoreRelated_523B2C(Actor_Movie_Masher *pMasher,
     int(CC* fnReadFrame)(Actor_Movie_Masher *),
@@ -57,3 +57,4 @@ int __cdecl Sound_jPlay(unsigned int playingFlags);
 // void Sound_music_relatedQ()
 // int __cdecl Sound_music_set()
 // _BYTE *__cdecl Sound_set_noise_sound(int a2)
+MGS_VAR_EXTERN(DWORD, gBytesWrote_77D880);

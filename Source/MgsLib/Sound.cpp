@@ -4,13 +4,11 @@
 #include "Fs.hpp"
 
 // TODO: Fix funcs using SKIP
-#ifdef _DEBUG
-//#define SOUND_IMPL true
-#define SOUND_IMPL true
-#else
+
 // TODO: Extra fix me, in release sound seems to get out of sync and eventually make codec calls etc hang
 #define SOUND_IMPL false
-#endif
+
+#define SOUND_MASHER_IMPL true
 
 using QWORD = __int64;
 
@@ -283,7 +281,7 @@ MGS_ARY(1, 0x68D02C, DWORD, 11, gMusicVolTbl_68D02C, { 0, 64, 70, 74, 77, 80, 83
 MGS_ARY(1, 0x68D000, DWORD, 11, gSoundVolTbl_68D000, { 0, 76, 82, 86, 89, 92, 94, 96, 98, 99, 100 });
 MGS_PTR(1, 0x68CEE4, DWORD*, dword_68CEE4, nullptr);// TODO: Figure out array size and dump it
 MGS_VAR(REDIRECT_SOUND, 0x77D880, DWORD, gBytesWrote_77D880, 0);
-MGS_VAR(REDIRECT_SOUND, 0x77E1B8, DWORD, gSoundPos_77E1B8, 0);
+MGS_VAR(REDIRECT_SOUND, 0x77E1B8, DWORD, gBufferPlayPos_77E1B8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1CC, DWORD, gFrameNum_77E1CC, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77E1D8, DWORD, gSoundNumBlocksWrote_77E1D8, 0);
 MGS_VAR(REDIRECT_SOUND, 0x77D890, DWORD, gSndTime_77D890, 0);
@@ -321,7 +319,6 @@ MGS_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP); // File I/O
 MGS_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, SOUND_IMPL);
-MGS_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelated_523B2C, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);  // causes raspy codec if redirected
 MGS_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP); // causes raspy codec if redirected
 MGS_FUNC_IMPLEX(0x005226EB, Sound_ShutDown, SOUND_IMPL);
@@ -332,8 +329,6 @@ MGS_FUNC_IMPLEX(0x00521898, Sound_TableUnknown1, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x0052255B, Sound_SetSoundMusicVolume, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x005224C8, Sound_SetSoundVolume, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00522CB2, Sound_PlayEffect, SKIP);
-MGS_FUNC_IMPLEX(0x00523E12, Sound_Unknown4, SOUND_IMPL);
-MGS_FUNC_IMPLEX(0x00523CF3, Sound_Masher_Write_Audio_Frame_523CF3, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00523CB9, Sound_Unknown6, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00646660, Sound_Play, SKIP); // calls to broken funcs
 MGS_FUNC_IMPLEX(0x0044FF6C, Sound_jPlay, SKIP); // calls to broken funcs
@@ -454,7 +449,7 @@ signed int CC Sound_Res_Movie_CreateBuffer_523A44(int numChannels, signed int bi
     DSBUFFERDESC bufferDesc = {};
     WAVEFORMATEX waveFormat = {};
 
-    const int blockAlign = bitsPerSample / 8 * numChannels;
+    const int blockAlign = bitsPerSample / (8 * numChannels);
     gSoundBufferSize_77E1B4 = (numFramesInterleave + 4) * blockAlign * frameSize;
 
     if (gDSound_77E2C0)
@@ -1194,15 +1189,15 @@ signed int CC Sound_RestoreRelated_523B2C(Actor_Movie_Masher *pMasher,
     DWORD audioPtr1Size = 0;
 
     // Get pointer to the audio buffer
-    const size_t blockXFrameSize = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
+    const size_t alignedFrameSize = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
     if (gSndBuffer_dword_77E0A0)
     {
-        if (gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * blockXFrameSize, 
+        if (gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * alignedFrameSize, 
             &pAudioPtr1, &audioPtr1Size, 
             &pAudioPtr2, &audioPtr2Size, 0) == DSERR_BUFFERLOST)
         {
             gSndBuffer_dword_77E0A0->Restore();
-            gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * blockXFrameSize, 
+            gSndBuffer_dword_77E0A0->Lock(0, gMovieNumFramesInterleave_77E1C4 * alignedFrameSize, 
                 &pAudioPtr1, &audioPtr1Size,
                 &pAudioPtr2, &audioPtr2Size, 0);
         }
@@ -1230,8 +1225,8 @@ signed int CC Sound_RestoreRelated_523B2C(Actor_Movie_Masher *pMasher,
             {
                 if (pAudioBufferWritePtr)
                 {
-                    memcpy(pAudioBufferWritePtr, pDecodedSoundData, blockXFrameSize);
-                    pAudioBufferWritePtr = pAudioBufferWritePtr + blockXFrameSize;
+                    memcpy(pAudioBufferWritePtr, pDecodedSoundData, alignedFrameSize);
+                    pAudioBufferWritePtr = pAudioBufferWritePtr + alignedFrameSize;
                 }
             }
         }
@@ -1242,15 +1237,16 @@ signed int CC Sound_RestoreRelated_523B2C(Actor_Movie_Masher *pMasher,
         gSndBuffer_dword_77E0A0->Unlock(pAudioPtr1, audioPtr1Size, pAudioPtr2, audioPtr2Size);
     }
 
-    gWritePosInBuffer_77E1D4 = gMovieNumFramesInterleave_77E1C4 * blockXFrameSize;
-    gBytesWrote_77D880 = gMovieNumFramesInterleave_77E1C4 * blockXFrameSize;
+    gWritePosInBuffer_77E1D4 = gMovieNumFramesInterleave_77E1C4 * alignedFrameSize;
+    gBytesWrote_77D880 = gMovieNumFramesInterleave_77E1C4 * alignedFrameSize;
     gFrameNum_77E1CC = 0;
-    gSoundPos_77E1B8 = 0;
+    gBufferPlayPos_77E1B8 = 0;
     gSndTime_77D890 = timeGetTime();
     gSoundNumBlocksWrote_77E1D8 = 0;
 
     return 1;
 }
+MGS_FUNC_IMPLEX(0x00523B2C, Sound_RestoreRelated_523B2C, SOUND_MASHER_IMPL);
 
 // 0x00523563
 signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuffer *snd, int a4)
@@ -1781,49 +1777,52 @@ bool __cdecl Sound_PlayEffect(unsigned __int8 idx, int a2, int a3)
     return result;
 }
 
-// 0x00523E12
-bool __cdecl Sound_Unknown4()
+int CC Sound_Masher_Unknown_523E12()
 {
-    DWORD v2;
-    bool ret;
-    int v4;
-    DWORD pos;
-
     if (gSndBuffer_dword_77E0A0)
     {
-        v4 = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
-        gBytesWrote_77D880 += gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
-        gSndBuffer_dword_77E0A0->GetCurrentPosition(&pos, 0);
-        if (gSoundPos_77E1B8 - pos > gSoundBufferSize_77E1B4 / 2)
+        const DWORD alignedFrameSize = gMovieBlockAlign_77E1DC * gMovieAudioFrameSize_77D87C;
+        gBytesWrote_77D880 += alignedFrameSize;
+        
+        DWORD dwPosPlayPos = 0;
+        gSndBuffer_dword_77E0A0->GetCurrentPosition(&dwPosPlayPos, 0);
+        if ((signed int)(gBufferPlayPos_77E1B8 - dwPosPlayPos) > gSoundBufferSize_77E1B4 / 2)
         {
             ++gFrameNum_77E1CC;
         }
-        gSoundPos_77E1B8 = pos;
-        v2 = gMovieNumFramesInterleave_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * gFrameNum_77E1CC;
-        ret = gBytesWrote_77D880 < v2 || gBytesWrote_77D880 > v4 + v2;
-        while (gBytesWrote_77D880 >= v2 && gBytesWrote_77D880 <= v4 + v2)
+        gBufferPlayPos_77E1B8 = dwPosPlayPos;
+
+        DWORD offset = (gMovieNumFramesInterleave_77E1C4 * alignedFrameSize) + dwPosPlayPos + (gSoundBufferSize_77E1B4 * gFrameNum_77E1CC);
+        const int ret = gBytesWrote_77D880 < offset || gBytesWrote_77D880 > alignedFrameSize + offset;
+        
+        // Wait for the data to finish playing
+        while (gBytesWrote_77D880 >= offset && gBytesWrote_77D880 <= alignedFrameSize + offset)
         {
-            gSndBuffer_dword_77E0A0->GetCurrentPosition(&pos, 0);
-            if (gSoundPos_77E1B8 - pos > gSoundBufferSize_77E1B4 / 2)
+            gSndBuffer_dword_77E0A0->GetCurrentPosition(&dwPosPlayPos, 0);
+            if ((signed int)(gBufferPlayPos_77E1B8 - dwPosPlayPos) > gSoundBufferSize_77E1B4 / 2)
             {
                 ++gFrameNum_77E1CC;
             }
-            gSoundPos_77E1B8 = pos;
-
-            // dead statement?
-            v2 = gMovieNumFramesInterleave_77E1C4 * v4 + pos + gSoundBufferSize_77E1B4 * gFrameNum_77E1CC;
+            gBufferPlayPos_77E1B8 = dwPosPlayPos;
+            offset = (gMovieNumFramesInterleave_77E1C4 * alignedFrameSize) + dwPosPlayPos + (gSoundBufferSize_77E1B4 * gFrameNum_77E1CC);
         }
+        // TODO: HACK - also do the timer wait since the above wait seems to not work in this reimpl
+        // even though it appears to be the same as the real function which does work. Needs some
+        // investigation to figure out why.
+       // return ret;
     }
-    else
+  //  else
     {
-        ret = 1000 * gSoundNumBlocksWrote_77E1D8 / 15 < timeGetTime() - gSndTime_77D890;
-        while (timeGetTime() - gSndTime_77D890 <= 1000 * gSoundNumBlocksWrote_77E1D8 / 15)
+        // Wait for "fake" audio data to finish playing (audio frame count is bumped but we didn't actually have anything to play)
+        const int ret = ((1000 * gSoundNumBlocksWrote_77E1D8) / 15) < (timeGetTime() - gSndTime_77D890);
+        while (timeGetTime() - gSndTime_77D890 <= (1000 * gSoundNumBlocksWrote_77E1D8) / 15)
         {
-
+            ;
         }
+        return ret;
     }
-    return ret;
 }
+MGS_FUNC_IMPLEX(0x00523E12, Sound_Masher_Unknown_523E12, SOUND_MASHER_IMPL);
 
 int CC Sound_Masher_Write_Audio_Frame_523CF3(Actor_Movie_Masher* pMasher,
     signed int(CC* /*pFnReadFrame*/)(Actor_Movie_Masher*),
@@ -1882,6 +1881,7 @@ int CC Sound_Masher_Write_Audio_Frame_523CF3(Actor_Movie_Masher* pMasher,
     }
     return gSoundNumBlocksWrote_77E1D8++ + 1;
 }
+MGS_FUNC_IMPLEX(0x00523CF3, Sound_Masher_Write_Audio_Frame_523CF3, SOUND_MASHER_IMPL);
 
 // 0x00523CB9
 void __cdecl Sound_Unknown6()

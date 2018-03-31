@@ -77,21 +77,22 @@ public:
 
     ReturnType operator()(Args ... args)
     {
-        if (!mStubCalled)
-        {
-            if (!IsMgsi() && !mRealFuncPtr)
-            {
-                LOG_("WARNING: Unimpl call: " << mFnName);
-            }
-            mStubCalled = true;
-        }
-
         if (!IsMgsi())
         {
+            if (!mStubCalled)
+            {
+                if (!mRealFuncPtr)
+                {
+                    LOG_("WARNING: Unimpl call: " << mFnName);
+                }
+                mStubCalled = true;
+            }
+
             if (mRealFuncPtr)
             {
                 return mRealFuncPtr(args...);
             }
+
             // Cast handles "return void;" this case is a stub for when
             // calling a real game function outside of the game exe
             return (ReturnType)0;
@@ -119,15 +120,9 @@ public:
         }
         else
         {
-            // Call "mRealFuncPtr" here so that we are calling the "real" function
-
-            // If not running within the game then we can't call real so just return
-            // a default R and log params
-            return mRealFuncPtr(args...);
+            MGS_FATAL("Unknown HookType");
         }
 #pragma warning(pop)
-
-
     }
     
     Signature* Ptr() const

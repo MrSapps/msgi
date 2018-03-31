@@ -501,9 +501,43 @@ unsigned char Clamp(f32 v)
     return (unsigned char)v;
 }
 
-void SetElement(int x, int y, int width, u16* ptr, u16 value)
+void SetElement(int x, int y, int width, int height, u16* ptr, u16 value, bool doubleWidth, bool doubleHeight)
 {
+    if (doubleWidth)
+    {
+        x *= 2;
+    }
+
+    if (doubleHeight)
+    {
+        y *= 2;
+    }
+
     ptr[(width * y) + x] = value;
+    
+    if (doubleWidth)
+    {
+        if (x + 1 < width)
+        {
+            ptr[(width * y) + x + 1] = value;
+        }
+    }
+
+    if (doubleHeight)
+    {
+        if (y + 1 < height)
+        {
+            ptr[(width * (y + 1)) + x] = value;
+
+            if (doubleWidth)
+            {
+                if (x + 1 < width)
+                {
+                    ptr[(width * (y + 1)) + x + 1] = value;
+                }
+            }
+        }
+    }
 }
 
 const int kMacroBlockWidth = 16;
@@ -530,7 +564,7 @@ uint16_t rgb888torgb565(Macroblock_RGB_Struct& rgb888Pixel)
     return (uint16_t)(r | g | b);
 }
 
-static void ConvertYuvToRgbAndBlit(u16* pixelBuffer, int xoff, int yoff, int width, int height)
+static void ConvertYuvToRgbAndBlit(u16* pixelBuffer, int xoff, int yoff, int width, int height, bool doubleWidth, bool doubleHeight)
 {
     // convert the Y1 Y2 Y3 Y4 and Cb and Cr blocks into a 16x16 array of (Y, Cb, Cr) pixels
     struct Macroblock_YCbCr_Struct
@@ -587,7 +621,7 @@ static void ConvertYuvToRgbAndBlit(u16* pixelBuffer, int xoff, int yoff, int wid
                 u16 pixel16Value = rgb888torgb565(Macroblock_RGB[x][y]);
                 // Actually is no alpha in FMVs
                 // pixelValue = (pixelValue << 8) + Macroblock_RGB[x][y].A
-                SetElement(xpos, ypos, width, pixelBuffer, pixel16Value);
+                SetElement(xpos, ypos, width, height, pixelBuffer, pixel16Value, doubleWidth, doubleHeight);
             }
         }
     }
@@ -695,7 +729,11 @@ void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFram
             idct(block6Output, Y4_block);
             block1Output = dataSizeBytes + block6Output;
 
-            ConvertYuvToRgbAndBlit((u16*)pDecodedFrame, xoff, yoff, pMasher->field_14_video_header.field_4_width*gMovieData_724A00.field_24_double_width, pMasher->field_14_video_header.field_8_height*gMovieData_724A00.field_28_double_height);
+            ConvertYuvToRgbAndBlit((u16*)pDecodedFrame, xoff, yoff, 
+                pMasher->field_14_video_header.field_4_width*gMovieData_724A00.field_24_double_width,
+                pMasher->field_14_video_header.field_8_height*gMovieData_724A00.field_28_double_height,
+                !!gMovieData_724A00.field_24_double_width,
+                !!gMovieData_724A00.field_28_double_height);
 
             yoff += kMacroBlockHeight;
         }
