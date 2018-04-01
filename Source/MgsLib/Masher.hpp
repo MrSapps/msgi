@@ -64,7 +64,7 @@ struct Actor_Movie_Masher
     Actor_Movie_DDV_AudioHeader field_2C_audio_header;
     void* field_40_frame_data;
     unsigned short *field_44_decoded_frame_data_buffer;
-    int field_48_pField_80_buffer;
+    int* field_48_pField_80_buffer;
     void *field_4C_audio_buffer;
     int field_50_num_channels;
     int field_54_bits_per_sample;
@@ -76,11 +76,11 @@ struct Actor_Movie_Masher
     int field_64_audio_frame_idx;
     int field_68_frame_number;
     int field_6C_frame_num;
-    void* field_70_frame_sizes_array;
-    void* field_74_pCurrentFrameSize;
+    int* field_70_frame_sizes_array;
+    int* field_74_pCurrentFrameSize;
     int field_78;
     int field_7C;
-    void* field_80_audio_frame_buffer;
+    int* field_80_audio_frame_buffer;
     int field_84_max_audio_frame;
     int field_88;
     void* field_8C_macro_block_buffer;
@@ -94,3 +94,6 @@ void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFram
 void CC File_Ptrs_Init_5289B3(int bAsync);
 void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*);
 int CC Res_movie_masher_read_frame_data_528973(Actor_Movie_Masher* pMasher);
+void CC Res_movie_masher_set_channels_and_bits_per_sample_52B015(int numChannels, int bitsPerSample);
+signed int CC Res_movie_masher_read_blocking_52897C(Actor_Movie_Masher* pMasher);
+void* CC Res_movie_masher_sound_read_52899C(Actor_Movie_Masher* pMasher);

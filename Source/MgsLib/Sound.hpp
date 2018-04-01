@@ -28,7 +28,7 @@ signed int __cdecl Sound_PlayMusic(unsigned int a1);
 int __cdecl Sound_PlaySample();
 void __cdecl Sound_PlaySampleRelated(IDirectSoundBuffer* pSoundBuffer, int a2, int a3, signed int a4);
 void __cdecl Sound_PopulateBufferQ();
-void __cdecl Sound_ReleaseBufferQ();
+void __cdecl Sound_Masher_Release_Buffer_523A1F();
 void __cdecl Sound_ReleaseSecondaryBuffer();
 signed int __cdecl Sound_Samp1Related(char *a1, unsigned int a2, IDirectSoundBuffer *snd, int a4); // Seems to do XA conversion
 signed int __cdecl Sound_Samp1Related_2(char *a1, unsigned int a2);

@@ -1044,3 +1044,53 @@ int CC Res_movie_masher_read_frame_data_528973(Actor_Movie_Masher* pMasher)
     return Res_movie_masher_read_frame_data_52427C(pMasher, 0);
 }
 MGS_FUNC_IMPLEX(0x528973, Res_movie_masher_read_frame_data_528973, MASHER_IMPL);
+
+MGS_VAR(1, 0x7851E4, DWORD, gMasher_num_channels_dword_7851E4, 0);
+MGS_VAR(1, 0x7851D8, DWORD, gMasher_bits_per_sample_dword_7851D8, 0);
+
+void CC Res_movie_masher_set_channels_and_bits_per_sample_52B015(int numChannels, int bitsPerSample)
+{
+    gMasher_num_channels_dword_7851E4 = numChannels;
+    gMasher_bits_per_sample_dword_7851D8 = bitsPerSample;
+}
+MGS_FUNC_IMPLEX(0x52B015, Res_movie_masher_set_channels_and_bits_per_sample_52B015, MASHER_IMPL);
+
+signed int CC Res_movie_masher_read_blocking_52897C(Actor_Movie_Masher* pMasher)
+{
+    int* pFrameSize = pMasher->field_74_pCurrentFrameSize;
+    int sizeToRead = *pFrameSize;
+    pMasher->field_74_pCurrentFrameSize = pFrameSize + 1;
+    if (!gMovieIo_784B44.mFileRead(pMasher->field_0_file_handle, (BYTE*)pMasher->field_80_audio_frame_buffer, sizeToRead)
+        || !gMovieIo_784B44.mFileWait(pMasher->field_0_file_handle))
+    {
+        return 0;
+    }
+    pMasher->field_48_pField_80_buffer = pMasher->field_80_audio_frame_buffer;
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x52897C, Res_movie_masher_read_blocking_52897C, MASHER_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x52B028, int __cdecl (int *a1, BYTE *a2, int a3), Res_movie_masher_sound_decode_data_52B028); // TODO
+
+void* CC Res_movie_masher_sound_read_52899C(Actor_Movie_Masher* pMasher)
+{
+    void* result = nullptr;
+    if (pMasher->field_60_bHasAudio
+        && pMasher->field_64_audio_frame_idx < pMasher->field_4_ddv_header.field_C_number_of_frames)
+    {
+        Res_movie_masher_set_channels_and_bits_per_sample_52B015(pMasher->field_50_num_channels, pMasher->field_54_bits_per_sample);
+        Res_movie_masher_sound_decode_data_52B028(
+            pMasher->field_48_pField_80_buffer,
+            (BYTE*)pMasher->field_4C_audio_buffer,
+            pMasher->field_2C_audio_header.field_C_single_audio_frame_size);
+        result = pMasher->field_4C_audio_buffer;
+        ++pMasher->field_64_audio_frame_idx;
+    }
+    else
+    {
+        ++pMasher->field_64_audio_frame_idx;
+        result = nullptr;
+    }
+    return result;
+}
+MGS_FUNC_IMPLEX(0x52899C, Res_movie_masher_sound_read_52899C, MASHER_IMPL);

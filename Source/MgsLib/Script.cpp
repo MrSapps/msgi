@@ -992,7 +992,7 @@ int CC Script_tbl_pad_452132(BYTE*)
 }
 MGS_FUNC_IMPLEX(0x00452132, Script_tbl_pad_452132, SCRIPT_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_ntrap_removeQ_451688);
+MGS_FUNC_NOT_IMPL(0x00451688, int __cdecl(BYTE*), Script_tbl_trap_451688);
 MGS_FUNC_NOT_IMPL(0x00451673, int __cdecl(BYTE*), Script_tbl_hzd_related_sub_451673);
 MGS_FUNC_NOT_IMPL(0x004512E5, int __cdecl(BYTE*), script_tbl_camera_sub_4512E5);
 MGS_FUNC_NOT_IMPL(0x00451D5C, int __cdecl(BYTE*), Script_tbl_radio_sub_451D5C);
@@ -1042,7 +1042,7 @@ static void TestCommonHashes()
 MGS_ARY(1, 0x66B000, proc_struct_sub, 24, script_funcs_tbl_66B000,
 {
     { 0x22FF, 0x0, Script_tbl_mesg_sub_451A5E },
-    { 0xD4CB, 0x0, Script_tbl_ntrap_removeQ_451688.Ptr() },
+    { 0xD4CB, 0x0, Script_tbl_trap_451688.Ptr() },
     { 0x9906, 0x0, Script_tbl_chara_451AC3 },
     { 0xC091, 0x0, Script_tbl_map_45151D },
     { 0x7D50, 0x0, Script_tbl_hzd_related_sub_451673.Ptr() },

@@ -317,7 +317,7 @@ MGS_FUNC_IMPLEX(0x00521A54, Sound_PlayMusic, SKIP);
 MGS_FUNC_IMPLEX(0x005231A9, Sound_PlaySample, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x0052307F, Sound_PlaySampleRelated, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00521F82, Sound_PopulateBufferQ, SKIP); // File I/O
-MGS_FUNC_IMPLEX(0x00523A1F, Sound_ReleaseBufferQ, SOUND_IMPL);
+MGS_FUNC_IMPLEX(0x00523A1F, Sound_Masher_Release_Buffer_523A1F, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00521A18, Sound_ReleaseSecondaryBuffer, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x00523563, Sound_Samp1Related, SKIP);  // causes raspy codec if redirected
 MGS_FUNC_IMPLEX(0x005239B5, Sound_Samp1Related_2, SKIP); // causes raspy codec if redirected
@@ -1158,7 +1158,7 @@ void __cdecl Sound_PopulateBufferQ()
 }
 
 // 0x00523A1F
-void __cdecl Sound_ReleaseBufferQ()
+void __cdecl Sound_Masher_Release_Buffer_523A1F()
 {
     if (gSndBuffer_dword_77E0A0)
     {

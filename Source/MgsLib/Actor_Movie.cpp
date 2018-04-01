@@ -20,9 +20,6 @@ void Force_Actor_Movie_Cpp_Link() { }
 
 MGS_FUNC_NOT_IMPL(0x528993, void __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_decode_image_528993); // TODO
 
-MGS_FUNC_NOT_IMPL(0x52B015, signed int __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_sound_read_data_52B015); // TODO
-
-MGS_FUNC_NOT_IMPL(0x52899C, void* __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_sound_decode_data_52899C); // TODO
 
 int CC Res_movie_update_helper_45675A()
 {
@@ -55,8 +52,8 @@ int CC Res_movie_update_helper_45675A()
 
     Sound_Masher_Write_Audio_Frame_523CF3(
         gMovieData_724A00.field_0_masher_ptr,
-        Res_movie_masher_sound_read_data_52B015.Ptr(),
-        Res_movie_masher_sound_decode_data_52899C.Ptr());
+        Res_movie_masher_read_blocking_52897C,
+        Res_movie_masher_sound_read_52899C);
     
     gMovieData_724A00.field_1C_read_ret = Res_movie_masher_read_frame_data_528973(gMovieData_724A00.field_0_masher_ptr);
     
@@ -388,12 +385,13 @@ MGS_FUNC_IMPLEX(0x4562AA, Res_movie_create_helper_4562AA, MOVIE_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x4018E0, void __cdecl(), MarkObjectQueueVoid_4018E0);
 
+
 int CC Res_movie_write_sound_buffer_4565CA()
 {
     Sound_RestoreRelated_523B2C(
         gMovieData_724A00.field_0_masher_ptr,
-        Res_movie_masher_sound_read_data_52B015.Ptr(),
-        Res_movie_masher_sound_decode_data_52899C.Ptr());
+        Res_movie_masher_read_blocking_52897C,
+        Res_movie_masher_sound_read_52899C);
 
     const int read2FramesRet =
         Res_movie_masher_read_frame_data_528973(gMovieData_724A00.field_0_masher_ptr)
@@ -403,7 +401,7 @@ int CC Res_movie_write_sound_buffer_4565CA()
 
     return read2FramesRet;
 }
-MGS_FUNC_IMPLEX(0x4565CA, Res_movie_write_sound_buffer_4565CA, false); // TODO: fix me
+MGS_FUNC_IMPLEX(0x4565CA, Res_movie_write_sound_buffer_4565CA, true); // TODO: fix me
 
 void CC Res_movie_update_456588(Actor_Movie* pMovie)
 {
@@ -441,7 +439,7 @@ void CC Res_movie_shutdown_4567DE(Actor_Movie* pMovie)
     }
     Masher_destructor_wrapper_52895A(gMovieData_724A00.field_0_masher_ptr);
     gMovieData_724A00.field_0_masher_ptr = 0;
-    Sound_ReleaseBufferQ();
+    Sound_Masher_Release_Buffer_523A1F();
     game_state_dword_72279C.flags &= 0x7FFFFFFFu;
     Timer_30_1();
     if (pMovie->dword_7248F8_script_param_p != -1)
