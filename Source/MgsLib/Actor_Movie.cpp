@@ -173,8 +173,6 @@ MGS_FUNC_IMPLEX(0x4564F5, Res_movie_GetName_4564F5, MOVIE_IMPL);
 
 MGS_VAR(1, 0x7248D0, Actor_Movie, gMovie_actor_stru_7248D0, {});
 
-MGS_FUNC_NOT_IMPL(0x523FA0, signed int __fastcall(Actor_Movie_Masher* pThis, void*, const char *movieFileName), Masher_constructor_523FA0); // TODO
-
 Actor_Movie_Masher* CC Masher_constructor_wrapper_5288F8(const char* pMovieFileName, Actor_Movie_DDV_Header** pDDVHeader, Actor_Movie_DDV_VideoHeader** pVideoHeader, Actor_Movie_DDV_AudioHeader** pAudioHeader, DWORD* errCode)
 {
     Actor_Movie_Masher* pMasher = new (std::nothrow)Actor_Movie_Masher();
@@ -274,6 +272,9 @@ char CC Res_Movie_GetBackBufferPixelFormat_51D566()
 MGS_FUNC_IMPLEX(0x51D566, Res_Movie_GetBackBufferPixelFormat_51D566, MOVIE_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x528683, int __cdecl(int movieRowLengthBytes, unsigned __int8 backBufferPixelFormat, int flags), Res_movie_create_helper_528683); // TODO
+MGS_FUNC_NOT_IMPL(0x52A812, void __cdecl(), Res_movie_create_sound_table_52A812); // TODO
+
+
 
 signed int CC Res_movie_create_helper_4562AA(int movieNameHashed)
 {
@@ -325,18 +326,12 @@ signed int CC Res_movie_create_helper_4562AA(int movieNameHashed)
     gMovieData_724A00.field_28_double_height = 1;
     gMovieData_724A00.field_24_double_width = 1;
 
-    int flags = 0;
     if (w >= 2 * gMovieData_724A00.field_8_video_header->field_4_width)
     {
         gMovieData_724A00.field_24_double_width = 2;
         if (h >= 2 * gMovieData_724A00.field_8_video_header->field_8_height)
         {
             gMovieData_724A00.field_28_double_height = 2;
-            flags |= 9;
-        }
-        else
-        {
-            flags |= 6;
         }
     }
 
@@ -366,11 +361,14 @@ signed int CC Res_movie_create_helper_4562AA(int movieNameHashed)
         gMovieData_724A00.field_0_masher_ptr = 0;
         return 0;
     }
-
+    
+    Res_movie_create_sound_table_52A812();
+    /*
     Res_movie_create_helper_528683(
         2 * gMovieData_724A00.field_24_double_width * gMovieData_724A00.field_8_video_header->field_4_width,
         backBufferPixelFormat,
         flags);
+        */
 
     Sound_Res_Movie_CreateBuffer_523A44(
         ((gMovieData_724A00.field_C_audio_header->field_0_audio_format & 1) != 0) + 1,
@@ -401,7 +399,7 @@ int CC Res_movie_write_sound_buffer_4565CA()
 
     return read2FramesRet;
 }
-MGS_FUNC_IMPLEX(0x4565CA, Res_movie_write_sound_buffer_4565CA, true); // TODO: fix me
+MGS_FUNC_IMPLEX(0x4565CA, Res_movie_write_sound_buffer_4565CA, MOVIE_IMPL);
 
 void CC Res_movie_update_456588(Actor_Movie* pMovie)
 {

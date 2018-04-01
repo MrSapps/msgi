@@ -70,8 +70,8 @@ struct Actor_Movie_Masher
     int field_54_bits_per_sample;
     int field_58_macro_blocks_x;
     int field_5C_macro_blocks_y;
-    char field_60_bHasAudio;
-    char field_61_bHasVideo;
+    bool field_60_bHasAudio;
+    bool field_61_bHasVideo;
     __int16 field_62_pad;
     int field_64_audio_frame_idx;
     int field_68_frame_number;
@@ -92,6 +92,7 @@ MGS_VAR_EXTERN(Actor_Movie_Data, gMovieData_724A00);
 
 void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFrame);
 void CC File_Ptrs_Init_5289B3(int bAsync);
+signed int __fastcall Masher_constructor_523FA0(Actor_Movie_Masher* pThis, void*, const char* movieFileName);
 void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*);
 int CC Res_movie_masher_read_frame_data_528973(Actor_Movie_Masher* pMasher);
 void CC Res_movie_masher_set_channels_and_bits_per_sample_52B015(int numChannels, int bitsPerSample);

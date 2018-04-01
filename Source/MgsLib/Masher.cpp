@@ -4,6 +4,7 @@
 #include <array>
 #include "masher_tables.hpp"
 #include "MgsFunction.hpp"
+#include "System.hpp"
 
 #define MASHER_IMPL true
 
@@ -999,6 +1000,157 @@ void CC File_Ptrs_Init_5289B3(int bAsync)
     }
 }
 MGS_FUNC_IMPLEX(0x5289B3, File_Ptrs_Init_5289B3, MASHER_IMPL);
+
+signed int __fastcall Masher_constructor_523FA0(Actor_Movie_Masher* pThis, void*, const char* movieFileName)
+{
+    pThis->field_40_frame_data = nullptr;
+    pThis->field_44_decoded_frame_data_buffer = nullptr;
+    pThis->field_48_pField_80_buffer = nullptr;
+    pThis->field_4C_audio_buffer = nullptr;
+    pThis->field_8C_macro_block_buffer = nullptr;
+    pThis->field_80_audio_frame_buffer = nullptr;
+    pThis->field_70_frame_sizes_array = nullptr;
+    pThis->field_90_64_or_0 = 0;
+    pThis->field_84_max_audio_frame = 8;
+    pThis->field_88 = 0;
+
+    // Open the file
+    pThis->field_0_file_handle = gMovieIo_784B44.mFileOpen(movieFileName);
+    
+    // Read file magic
+    DWORD fileMagic = 0;
+    if (!pThis->field_0_file_handle
+        || !gMovieIo_784B44.mFileRead(pThis->field_0_file_handle, (BYTE*)&fileMagic, sizeof(DWORD))
+        || !gMovieIo_784B44.mFileWait(pThis->field_0_file_handle))
+    {
+        return 1;
+    }
+
+    // Verify magic
+    const DWORD kDDV_dword_68EE70 = 0x564444;
+    if (memcmp(&fileMagic, &kDDV_dword_68EE70, sizeof(DWORD)))
+    {
+        return 3;
+    }
+
+    // Read DDV header
+    if (!gMovieIo_784B44.mFileRead(pThis->field_0_file_handle, (BYTE*)&pThis->field_4_ddv_header, sizeof(Actor_Movie_DDV_Header))
+     || !gMovieIo_784B44.mFileWait(pThis->field_0_file_handle))
+    {
+        return 1;
+    }
+
+    // Verify version is correct
+    if (pThis->field_4_ddv_header.field_0_ddv_version != 1)
+    {
+        return 4;
+    }
+
+    // Does the file contain a video stream?
+    pThis->field_61_bHasVideo = pThis->field_4_ddv_header.field_4_contains & 1;
+    if (pThis->field_61_bHasVideo)
+    {
+        // Read the video header
+        if (!gMovieIo_784B44.mFileRead(pThis->field_0_file_handle, (BYTE*)&pThis->field_14_video_header, sizeof(Actor_Movie_DDV_VideoHeader))
+         || !gMovieIo_784B44.mFileWait(pThis->field_0_file_handle))
+        {
+            return 1;
+        }
+
+        // Add on to the max frame size
+        pThis->field_84_max_audio_frame += pThis->field_14_video_header.field_C_max_audio_frame_size;
+
+        // Allocate buffer for decoding frame data
+        pThis->field_44_decoded_frame_data_buffer = (WORD*)malloc(sizeof(WORD) * pThis->field_14_video_header.field_10_max_video_frame_size);
+        if (!pThis->field_44_decoded_frame_data_buffer)
+        {
+            return 2;
+        }
+
+        // Calculate blocks X/Y
+        pThis->field_58_macro_blocks_x = (pThis->field_14_video_header.field_4_width + 15) / kMacroBlockWidth;
+        pThis->field_5C_macro_blocks_y = (pThis->field_14_video_header.field_8_height + 15) / kMacroBlockHeight;
+
+        // Alloc macro block temp buffer (6 blocks for Cr, Cb, Y1, Y2, Y3, Y4)
+        pThis->field_8C_macro_block_buffer = malloc(kMacroBlockWidth * kMacroBlockHeight * 6 * pThis->field_58_macro_blocks_x * pThis->field_5C_macro_blocks_y);
+        if (!pThis->field_8C_macro_block_buffer)
+        {
+            return 2;
+        }
+
+        pThis->field_90_64_or_0 = 64;
+
+        // NOTE: Pruned dead branches here
+    }
+
+    pThis->field_2C_audio_header.field_10_num_frames_interleave = 0;
+
+    // Does the file contain an audio stream?
+    pThis->field_60_bHasAudio = (pThis->field_4_ddv_header.field_4_contains >> 1) & 1;
+    if (pThis->field_60_bHasAudio)
+    {
+        // Read audio header
+        if (!gMovieIo_784B44.mFileRead(pThis->field_0_file_handle, (BYTE*)&pThis->field_2C_audio_header, sizeof(Actor_Movie_DDV_AudioHeader))
+         || !gMovieIo_784B44.mFileWait(pThis->field_0_file_handle))
+        {
+            return 1;
+        }
+
+        pThis->field_50_num_channels = 1;
+        pThis->field_54_bits_per_sample = 8;
+
+        if (pThis->field_2C_audio_header.field_0_audio_format & 1)
+        {
+            pThis->field_50_num_channels = 2;
+        }
+
+        if (pThis->field_2C_audio_header.field_0_audio_format & 2)
+        {
+            pThis->field_54_bits_per_sample = 16;
+        }
+
+        pThis->field_84_max_audio_frame += pThis->field_2C_audio_header.field_8_max_audio_frame_size;
+
+        pThis->field_4C_audio_buffer = (BYTE*)malloc(pThis->field_2C_audio_header.field_C_single_audio_frame_size
+                                                  * (pThis->field_50_num_channels * pThis->field_54_bits_per_sample / 8));
+
+        if (!pThis->field_4C_audio_buffer)
+        {
+            return 2;
+        }
+    }
+
+    // Align the size
+    pThis->field_84_max_audio_frame = RoundUpPowerOf2(pThis->field_84_max_audio_frame, 2);
+    pThis->field_80_audio_frame_buffer = (int*)malloc(2 * pThis->field_84_max_audio_frame);
+    if (!pThis->field_80_audio_frame_buffer)
+    {
+        return 2;
+    }
+
+    // Allocate buffer for frame sizes
+    const DWORD frameSizeArrayInBytes = sizeof(DWORD) * (pThis->field_2C_audio_header.field_10_num_frames_interleave + pThis->field_4_ddv_header.field_C_number_of_frames);
+    pThis->field_70_frame_sizes_array = (int*)malloc(frameSizeArrayInBytes);
+    if (!pThis->field_70_frame_sizes_array)
+    {
+        return 2;
+    }
+
+    // Populate frame sizes array from disk
+    if (!gMovieIo_784B44.mFileRead(pThis->field_0_file_handle, (BYTE*)pThis->field_70_frame_sizes_array, frameSizeArrayInBytes)
+     || !gMovieIo_784B44.mFileWait(pThis->field_0_file_handle))
+    {
+        return 1;
+    }
+
+    pThis->field_64_audio_frame_idx = 0;
+    pThis->field_74_pCurrentFrameSize = pThis->field_70_frame_sizes_array;
+    pThis->field_68_frame_number = 0;
+    pThis->field_6C_frame_num = 0;
+
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x523FA0, Masher_constructor_523FA0, MASHER_IMPL);
 
 void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*)
 {

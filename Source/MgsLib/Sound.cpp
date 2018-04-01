@@ -7,6 +7,7 @@
 
 // TODO: Extra fix me, in release sound seems to get out of sync and eventually make codec calls etc hang
 #define SOUND_IMPL false
+#define SKIP false
 
 #define SOUND_MASHER_IMPL true
 
@@ -297,7 +298,6 @@ MGS_PTR(1, 0x77E1E8, double*, dbl_77E1E8, nullptr); // array?
 MGS_PTR(1, 0x68E2C8, DWORD*, dword_68E2C8, nullptr); // array?
 MGS_VAR(1, 0x77E2CC, DWORD, dword_77E2CC, 0); // Used outside of sound module
 
-#define SKIP false
 
 MGS_FUNC_IMPLEX(0x0052269C, Sound_Init, SOUND_IMPL);
 MGS_FUNC_IMPLEX(0x005227AD, Sound_HexCharToInt, SOUND_IMPL);
