@@ -691,7 +691,7 @@ void CC jMovie_MMX_Decode_528985(Actor_Movie_Masher* pMasher, void* pDecodedFram
         return;
     }
 
-    const int quantScale = decode_bitstream((u16*)pMasher->field_40_frame_data, pMasher->field_44_decoded_frame_data_buffer);
+    const int quantScale = decode_bitstream((u16*)pMasher->field_40_video_frame_to_decode, pMasher->field_44_decoded_frame_data_buffer);
 
     after_block_decode_no_effect_q_impl(quantScale);
 
@@ -1003,16 +1003,16 @@ MGS_FUNC_IMPLEX(0x5289B3, File_Ptrs_Init_5289B3, MASHER_IMPL);
 
 signed int __fastcall Masher_constructor_523FA0(Actor_Movie_Masher* pThis, void*, const char* movieFileName)
 {
-    pThis->field_40_frame_data = nullptr;
+    pThis->field_40_video_frame_to_decode = nullptr;
     pThis->field_44_decoded_frame_data_buffer = nullptr;
-    pThis->field_48_pField_80_buffer = nullptr;
-    pThis->field_4C_audio_buffer = nullptr;
+    pThis->field_48_sound_frame_to_decode = nullptr;
+    pThis->field_4C_decoded_audio_buffer = nullptr;
     pThis->field_8C_macro_block_buffer = nullptr;
-    pThis->field_80_audio_frame_buffer = nullptr;
+    pThis->field_80_raw_frame_data = nullptr;
     pThis->field_70_frame_sizes_array = nullptr;
     pThis->field_90_64_or_0 = 0;
-    pThis->field_84_max_audio_frame = 8;
-    pThis->field_88 = 0;
+    pThis->field_84_max_frame_size = 8;
+    pThis->field_88_audio_data_offset = 0;
 
     // Open the file
     pThis->field_0_file_handle = gMovieIo_784B44.mFileOpen(movieFileName);
@@ -1058,7 +1058,7 @@ signed int __fastcall Masher_constructor_523FA0(Actor_Movie_Masher* pThis, void*
         }
 
         // Add on to the max frame size
-        pThis->field_84_max_audio_frame += pThis->field_14_video_header.field_C_max_audio_frame_size;
+        pThis->field_84_max_frame_size += pThis->field_14_video_header.field_C_max_audio_frame_size;
 
         // Allocate buffer for decoding frame data
         pThis->field_44_decoded_frame_data_buffer = (WORD*)malloc(sizeof(WORD) * pThis->field_14_video_header.field_10_max_video_frame_size);
@@ -1109,21 +1109,21 @@ signed int __fastcall Masher_constructor_523FA0(Actor_Movie_Masher* pThis, void*
             pThis->field_54_bits_per_sample = 16;
         }
 
-        pThis->field_84_max_audio_frame += pThis->field_2C_audio_header.field_8_max_audio_frame_size;
+        pThis->field_84_max_frame_size += pThis->field_2C_audio_header.field_8_max_audio_frame_size;
 
-        pThis->field_4C_audio_buffer = (BYTE*)malloc(pThis->field_2C_audio_header.field_C_single_audio_frame_size
+        pThis->field_4C_decoded_audio_buffer = (BYTE*)malloc(pThis->field_2C_audio_header.field_C_single_audio_frame_size
                                                   * (pThis->field_50_num_channels * pThis->field_54_bits_per_sample / 8));
 
-        if (!pThis->field_4C_audio_buffer)
+        if (!pThis->field_4C_decoded_audio_buffer)
         {
             return 2;
         }
     }
 
     // Align the size
-    pThis->field_84_max_audio_frame = RoundUpPowerOf2(pThis->field_84_max_audio_frame, 2);
-    pThis->field_80_audio_frame_buffer = (int*)malloc(2 * pThis->field_84_max_audio_frame);
-    if (!pThis->field_80_audio_frame_buffer)
+    pThis->field_84_max_frame_size = RoundUpPowerOf2(pThis->field_84_max_frame_size, 2);
+    pThis->field_80_raw_frame_data = (int*)malloc(2 * pThis->field_84_max_frame_size);
+    if (!pThis->field_80_raw_frame_data)
     {
         return 2;
     }
@@ -1164,9 +1164,9 @@ void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*)
         free(pThis->field_70_frame_sizes_array);
     }
 
-    if (pThis->field_80_audio_frame_buffer)
+    if (pThis->field_80_raw_frame_data)
     {
-        free(pThis->field_80_audio_frame_buffer);
+        free(pThis->field_80_raw_frame_data);
     }
 
     if (pThis->field_44_decoded_frame_data_buffer)
@@ -1174,9 +1174,9 @@ void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*)
         free(pThis->field_44_decoded_frame_data_buffer);
     }
 
-    if (pThis->field_4C_audio_buffer)
+    if (pThis->field_4C_decoded_audio_buffer)
     {
-        free(pThis->field_4C_audio_buffer);
+        free(pThis->field_4C_decoded_audio_buffer);
     }
 
     if (pThis->field_8C_macro_block_buffer)
@@ -1188,8 +1188,6 @@ void __fastcall Masher_destructor_524214(Actor_Movie_Masher* pThis, void*)
     }
 }
 MGS_FUNC_IMPLEX(0x524214, Masher_destructor_524214, MASHER_IMPL);
-
-MGS_FUNC_NOT_IMPL(0x52427C, int __fastcall(Actor_Movie_Masher* pThis, void*), Res_movie_masher_read_frame_data_52427C); // TODO
 
 int CC Res_movie_masher_read_frame_data_528973(Actor_Movie_Masher* pMasher)
 {
@@ -1212,12 +1210,12 @@ signed int CC Res_movie_masher_read_blocking_52897C(Actor_Movie_Masher* pMasher)
     int* pFrameSize = pMasher->field_74_pCurrentFrameSize;
     int sizeToRead = *pFrameSize;
     pMasher->field_74_pCurrentFrameSize = pFrameSize + 1;
-    if (!gMovieIo_784B44.mFileRead(pMasher->field_0_file_handle, (BYTE*)pMasher->field_80_audio_frame_buffer, sizeToRead)
-        || !gMovieIo_784B44.mFileWait(pMasher->field_0_file_handle))
+    if (!gMovieIo_784B44.mFileRead(pMasher->field_0_file_handle, (BYTE*)pMasher->field_80_raw_frame_data, sizeToRead)
+     || !gMovieIo_784B44.mFileWait(pMasher->field_0_file_handle))
     {
         return 0;
     }
-    pMasher->field_48_pField_80_buffer = pMasher->field_80_audio_frame_buffer;
+    pMasher->field_48_sound_frame_to_decode = pMasher->field_80_raw_frame_data;
     return 1;
 }
 MGS_FUNC_IMPLEX(0x52897C, Res_movie_masher_read_blocking_52897C, MASHER_IMPL);
@@ -1232,10 +1230,10 @@ void* CC Res_movie_masher_sound_read_52899C(Actor_Movie_Masher* pMasher)
     {
         Res_movie_masher_set_channels_and_bits_per_sample_52B015(pMasher->field_50_num_channels, pMasher->field_54_bits_per_sample);
         Res_movie_masher_sound_decode_data_52B028(
-            pMasher->field_48_pField_80_buffer,
-            (BYTE*)pMasher->field_4C_audio_buffer,
+            pMasher->field_48_sound_frame_to_decode,
+            (BYTE*)pMasher->field_4C_decoded_audio_buffer,
             pMasher->field_2C_audio_header.field_C_single_audio_frame_size);
-        result = pMasher->field_4C_audio_buffer;
+        result = pMasher->field_4C_decoded_audio_buffer;
         ++pMasher->field_64_audio_frame_idx;
     }
     else
@@ -1246,3 +1244,54 @@ void* CC Res_movie_masher_sound_read_52899C(Actor_Movie_Masher* pMasher)
     return result;
 }
 MGS_FUNC_IMPLEX(0x52899C, Res_movie_masher_sound_read_52899C, MASHER_IMPL);
+
+int __fastcall Res_movie_masher_read_frame_data_52427C(Actor_Movie_Masher* pThis, void*)
+{
+    // Read next frame data if we are not at the end
+    if (pThis->field_68_frame_number < pThis->field_4_ddv_header.field_C_number_of_frames)
+    {
+        int frameSizeToRead = *pThis->field_74_pCurrentFrameSize;
+        pThis->field_74_pCurrentFrameSize++;
+
+        if (pThis->field_60_bHasAudio && pThis->field_61_bHasVideo)
+        {
+            // Contains offset to audio in the buffer
+            frameSizeToRead += sizeof(DWORD);
+        }
+
+        if (frameSizeToRead > 0
+            && (!gMovieIo_784B44.mFileWait(pThis->field_0_file_handle)
+             || !gMovieIo_784B44.mFileRead(pThis->field_0_file_handle,
+                (BYTE*)pThis->field_80_raw_frame_data + pThis->field_88_audio_data_offset,
+                    frameSizeToRead)))
+        {
+            return 0;
+        }
+    }
+
+    const int frameOffset = pThis->field_84_max_frame_size - pThis->field_88_audio_data_offset;
+    pThis->field_88_audio_data_offset = frameOffset;
+
+    // Audio with no video
+    if (pThis->field_60_bHasAudio && !pThis->field_61_bHasVideo)
+    {
+        pThis->field_48_sound_frame_to_decode = (int *)((char *)pThis->field_80_raw_frame_data + frameOffset);
+    }
+    // Video with no audio
+    else if (!pThis->field_60_bHasAudio && pThis->field_61_bHasVideo)
+    {
+        pThis->field_40_video_frame_to_decode = pThis->field_80_raw_frame_data + frameOffset;
+    }
+    // Audio and video
+    else
+    {
+        BYTE* pFrameData = (BYTE *)pThis->field_80_raw_frame_data;
+        pThis->field_40_video_frame_to_decode = (void*)&pFrameData[frameOffset + sizeof(DWORD)];
+        
+        // Skip video data + video data len to get start of sound data
+        DWORD videoDataSize = *(DWORD *)&pFrameData[frameOffset];
+        pThis->field_48_sound_frame_to_decode = (int *)&pFrameData[frameOffset + sizeof(DWORD) + videoDataSize];
+    }
+    return ++pThis->field_68_frame_number < pThis->field_4_ddv_header.field_C_number_of_frames + 2;
+}
+MGS_FUNC_IMPLEX(0x52427C, Res_movie_masher_read_frame_data_52427C, MASHER_IMPL);
