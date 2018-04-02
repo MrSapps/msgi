@@ -1342,7 +1342,8 @@ bool AudioDecompressor::SampleMatches(s16& sample, s16 bitNum)
     return false;
 }
 
-void AudioDecompressor::decode_16bit_audio_frame(u16* outPtr, s32 numSamplesPerFrame, bool isLast)
+template<class T>
+void AudioDecompressor::decode_generic(T* outPtr, s32 numSamplesPerFrame, bool isLast)
 {
     const s16 useTableFlag = NextSoundBits(16);
     const s16 firstWord = NextSoundBits(16);
@@ -1352,20 +1353,20 @@ void AudioDecompressor::decode_16bit_audio_frame(u16* outPtr, s32 numSamplesPerF
     const s16 previous1 = NextSoundBits(16);
     s32 previousValue1 = static_cast<s16>(previous1);
 
-    *outPtr = previous1;
-    outPtr += mAudioFrameSizeBytes;
+    *outPtr = static_cast<T>(previous1);
+    outPtr += mAudioNumChannels;
 
     const s16 previous2 = NextSoundBits(16);
     s32 previousValue2 = static_cast<s16>(previous2);
 
-    *outPtr = previous2;
-    outPtr += mAudioFrameSizeBytes;
+    *outPtr = static_cast<T>(previous2);
+    outPtr += mAudioNumChannels;
 
     const s16 previous3 = NextSoundBits(16);
     s32 previousValue3 = static_cast<s16>(previous3);
 
-    *outPtr = previous3;
-    outPtr += mAudioFrameSizeBytes;
+    *outPtr = static_cast<T>(previous3);
+    outPtr += mAudioNumChannels;
 
     if (numSamplesPerFrame > 3)
     {
@@ -1412,8 +1413,8 @@ void AudioDecompressor::decode_16bit_audio_frame(u16* outPtr, s32 numSamplesPerF
                 previousValue3 = static_cast<s16>(samplePartOrTableIndex + samplePart);
             }
 
-            *outPtr = static_cast<u16>(previousValue3); // int to word
-            outPtr += mAudioFrameSizeBytes;
+            *outPtr = static_cast<T>(previousValue3); // int to word
+            outPtr += mAudioNumChannels;
         }
     }
 
@@ -1421,6 +1422,16 @@ void AudioDecompressor::decode_16bit_audio_frame(u16* outPtr, s32 numSamplesPerF
     {
         SndRelated_sub_409650();
     }
+}
+
+void AudioDecompressor::decode_8bit_audio_frame(u8* outPtr, s32 numSamplesPerFrame, bool isLast)
+{
+    decode_generic(outPtr, numSamplesPerFrame, isLast);
+}
+
+void AudioDecompressor::decode_16bit_audio_frame(u16* outPtr, s32 numSamplesPerFrame, bool isLast)
+{
+    decode_generic(outPtr, numSamplesPerFrame, isLast);
 }
 
 u16* AudioDecompressor::SetupAudioDecodePtrs(u16 *rawFrameBuffer)
@@ -1432,10 +1443,9 @@ u16* AudioDecompressor::SetupAudioDecodePtrs(u16 *rawFrameBuffer)
     return mAudioFrameDataPtr;
 }
 
-s32 AudioDecompressor::SetAudioFrameSizeBytesAndBits(s32 audioFrameSizeBytes)
+void AudioDecompressor::SetFrameSizeAndChannelCount(s32 audioFrameSizeBytes, s32 numChannels)
 {
-    mAudioFrameSizeBytes = audioFrameSizeBytes;
-    return mAudioFrameSizeBytes;
+    mAudioNumChannels = numChannels;
 }
 
 /*static*/ void AudioDecompressor::init_Snd_tbl()
@@ -1459,24 +1469,6 @@ s32 AudioDecompressor::SetAudioFrameSizeBytesAndBits(s32 audioFrameSizeBytes)
 
 /*static*/ u8 AudioDecompressor::gSndTbl_byte_62EEB0[256];
 
-/*
-void decode_audio_frame(u16 *rawFrameBuffer, u16 *outPtr, signed int numSamplesPerFrame)
-{
-    AudioDecompressor decompressor;
-    decompressor.SetAudioFrameSizeBytesAndBits(2);
-    decompressor.SetupAudioDecodePtrs(rawFrameBuffer);
-    memset(outPtr, 0, numSamplesPerFrame * 4);
-    decompressor.decode_16bit_audio_frame(outPtr, numSamplesPerFrame, false);
-
-    if (decompressor.mAudioFrameSizeBytes == 2)
-    {
-        decompressor.decode_16bit_audio_frame(outPtr + 1, numSamplesPerFrame, true);
-    }
-}
-*/
-
-MGS_FUNC_NOT_IMPL(0x52B028, void __cdecl (int* pMasherFrame, BYTE* pDecodedFrame, int frameSize), Res_movie_masher_sound_decode_data_52B028); // TODO
-
 MGS_VAR(1, 0x7851E4, DWORD, gMasher_num_channels_dword_7851E4, 0);
 MGS_VAR(1, 0x7851D8, DWORD, gMasher_bits_per_sample_dword_7851D8, 0);
 
@@ -1486,6 +1478,35 @@ void CC Res_movie_masher_set_channels_and_bits_per_sample_52B015(int numChannels
     gMasher_bits_per_sample_dword_7851D8 = bitsPerSample;
 }
 MGS_FUNC_IMPLEX(0x52B015, Res_movie_masher_set_channels_and_bits_per_sample_52B015, MASHER_IMPL);
+
+void CC Res_movie_masher_sound_decode_data_52B028(int* pMasherFrame, BYTE* pDecodedFrame, int frameSize)
+{
+    AudioDecompressor decompressor;
+    const int bytesPerSample = gMasher_bits_per_sample_dword_7851D8 / 8;
+    decompressor.SetFrameSizeAndChannelCount(bytesPerSample, gMasher_num_channels_dword_7851E4);
+    decompressor.SetupAudioDecodePtrs((u16*)pMasherFrame);
+    memset(pDecodedFrame, 0, frameSize * bytesPerSample * gMasher_num_channels_dword_7851E4);
+
+    if (gMasher_bits_per_sample_dword_7851D8 == 8)
+    {
+        BYTE* pAsByte = (BYTE*)pDecodedFrame;
+        decompressor.decode_8bit_audio_frame(pAsByte, frameSize, false);
+        if (gMasher_num_channels_dword_7851E4 == 2)
+        {
+            decompressor.decode_8bit_audio_frame(pAsByte + 1, frameSize, true);
+        }
+    }
+
+    if (gMasher_bits_per_sample_dword_7851D8 == 16)
+    {
+        decompressor.decode_16bit_audio_frame((u16*)pDecodedFrame, frameSize, false);
+        if (gMasher_num_channels_dword_7851E4 == 2)
+        {
+            decompressor.decode_16bit_audio_frame((u16*)pDecodedFrame + 1, frameSize, true);
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x52B028, Res_movie_masher_sound_decode_data_52B028, MASHER_IMPL);
 
 void* CC Res_movie_masher_sound_read_52899C(Actor_Movie_Masher* pMasher)
 {

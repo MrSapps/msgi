@@ -62,7 +62,7 @@ public:
 
     s32 mUsedBits = 0;
     u32 mWorkBits = 0;
-    s32 mAudioFrameSizeBytes = 0;
+    s32 mAudioNumChannels = 0;
     u16* mAudioFrameDataPtr = nullptr;
 
     static u8 gSndTbl_byte_62EEB0[256];
@@ -74,9 +74,12 @@ public:
     s32 SndRelated_sub_409650();
     s16 NextSoundBits(u16 numBits);
     bool SampleMatches(s16& sample, s16 bits);
+    template<class T>
+    void decode_generic(T* outPtr, s32 numSamplesPerFrame, bool isLast);
+    void decode_8bit_audio_frame(u8* outPtr, s32 numSamplesPerFrame, bool isLast);
     void decode_16bit_audio_frame(u16* outPtr, s32 numSamplesPerFrame, bool isLast);
     u16* SetupAudioDecodePtrs(u16 *rawFrameBuffer);
-    s32 SetAudioFrameSizeBytesAndBits(s32 audioFrameSizeBytes);
+    void SetFrameSizeAndChannelCount(s32 audioFrameSizeBytes, s32 channelCount);
     static void init_Snd_tbl();
 };
 
