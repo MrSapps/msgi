@@ -221,20 +221,23 @@ MGS_FUNC_NOT_IMPL(0x5B6EA9, Actor *__cdecl(PSX_MATRIX *pMtx, SVECTOR *pVec), Res
 PSX_MATRIX gIdentity_matrix2 =
 {
     {
-        { 4096, 0, 0 },
-        { 0, 4096, 0 },
-        { 0, 0, 4096 }
+        { 4096*3, 0, 0 },
+        { 0, 4096 , 0 },
+        { 0, 0, 4096 * 3 }
     },
     { 0, 0 },
-    { 0, 0, 0 }
+    { 4096 , -4096, -4096 }
 };
 
 MGS_VAR(1, 0x99534C, PSX_MATRIX*, dword_99534C, 0);
 
-void BoxKickSpawn()
+void Debug_BoxKickSpawn()
 {
     // HACK
-    dword_99534C = &gIdentity_matrix2;
+    if (!dword_99534C)
+    {
+        dword_99534C = &gIdentity_matrix2;
+    }
 
     static SVECTOR vec = {};
     Res_Enemy_boxkeri_create_5B6EA9(&gIdentity_matrix2, &vec);
@@ -494,7 +497,7 @@ static BYTE test[] =
         //gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 9;
         //Res_Okajima_bullet_create_5FE56D(&gIdentity_matrix2, 0, 0, 1);
 
-        BoxKickSpawn();
+        Debug_BoxKickSpawn();
     }
     // 900074
 

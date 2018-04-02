@@ -17,3 +17,4 @@ struct Actor_Debug
 };
 
 Actor_Debug* AddDebugActor();
+void Debug_BoxKickSpawn();
