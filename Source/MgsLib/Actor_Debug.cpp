@@ -214,8 +214,6 @@ MGS_VAR(1, 0x73382C, Font, gFont_73382C, {});
 
 MGS_FUNC_NOT_IMPL(0x4421C2, signed int __cdecl(int fileNameHashed), Res_Cache_Kmd_4421C2);
 MGS_FUNC_NOT_IMPL(0x5FE56D, Actor *__cdecl(PSX_MATRIX *pMtx, int a2, int a3, int a4), Res_Okajima_bullet_create_5FE56D);
-MGS_FUNC_NOT_IMPL(0x5B6EA9, Actor *__cdecl(PSX_MATRIX *pMtx, SVECTOR *pVec), Res_Enemy_boxkeri_create_5B6EA9);
-
 
 
 PSX_MATRIX gIdentity_matrix2 =

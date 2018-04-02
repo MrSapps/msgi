@@ -19,15 +19,23 @@ void LibDGCpp_ForceLink() { }
 
 MGS_FUNC_NOT_IMPL(0x62130E, Actor* CC(DWORD scriptData, int scriptBinds, BYTE* pScript), Res_env_test_create_62130E);
 
+// "Metal gear solid" animated - for demo end or disk swap screen
+MGS_FUNC_NOT_IMPL(0x4B54AB, Actor* CC(DWORD scriptData, int scriptBinds, BYTE* pScript), Res_met_logo_create_4B54AB);
+
+MGS_FUNC_NOT_IMPL(0x455BB8, Actor* CC(DWORD scriptData, int scriptBinds, BYTE* pScript), Res_sndtst_create_455BB8);
+
 struct Actor_Open
 {
     Actor mBase;
 };
 
+
 Actor* CC Res_open_create_486BD4(DWORD scriptData, int scriptBinds, BYTE* pScript)
 {
     return &AddDebugActor()->mBase;
-//    return (Res_env_test_create_62130E(scriptData, scriptBinds, pScript);
+//    return Res_sndtst_create_455BB8(scriptData, scriptBinds, pScript);
+//    return Res_env_test_create_62130E(scriptData, scriptBinds, pScript);
+//    return Res_met_logo_create_4B54AB(scriptData, scriptBinds, pScript);
 }
 MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, false); // TODO
 
@@ -774,25 +782,20 @@ unsigned int *__cdecl sub_40ABCA(unsigned int *a1, PadAnalogDeltas * a2)
 }
 MGS_FUNC_IMPLEX(0x40ABCA, sub_40ABCA, LIBDG_IMPL);
 
-int __cdecl Res_base_unknown_44CCD0(signed int a1, signed int a2)
+int CC Res_base_unknown_44CCD0(signed int a1, signed int a2)
 {
-    signed __int64 v2;
-
     if (a1 || a2)
     {
-        v2 = (signed __int64)(atan2((double)a1, (double)a2) * 651.8986476493061);
+        // TODO: Figure out what the constant value relates to
+        return static_cast<int>((atan2(static_cast<double>(a1), static_cast<double>(a2)) * 651.8986476493061));
     }
-    else
-    {
-        v2 = 0;
-    }
-    return v2;
+    return 0;
 }
 MGS_FUNC_IMPLEX(0x44CCD0, Res_base_unknown_44CCD0, LIBDG_IMPL);
 
-int __cdecl Res_base_unknown_40B612(SVECTOR *a1)
+int CC Res_base_unknown_40B612(const SVECTOR* pVec)
 {
-    return Res_base_unknown_44CCD0(a1->field_0_x, a1->field_4_z) & 4095;
+    return Res_base_unknown_44CCD0(pVec->field_0_x, pVec->field_4_z) & 4095;
 }
 MGS_FUNC_IMPLEX(0x40B612, Res_base_unknown_40B612, LIBDG_IMPL);
 
