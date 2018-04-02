@@ -209,7 +209,36 @@ const int kFontHeight = 100;
 MGS_VAR(1, 0x733858, char*, gSubsText_dword_733858, 0);
 MGS_VAR(1, 0x73382C, Font, gFont_73382C, {});
 
+#include "Actor_Loader.hpp"
+#include "Script.hpp"
 
+MGS_FUNC_NOT_IMPL(0x4421C2, signed int __cdecl(int fileNameHashed), Res_Cache_Kmd_4421C2);
+MGS_FUNC_NOT_IMPL(0x5FE56D, Actor *__cdecl(PSX_MATRIX *pMtx, int a2, int a3, int a4), Res_Okajima_bullet_create_5FE56D);
+MGS_FUNC_NOT_IMPL(0x5B6EA9, Actor *__cdecl(PSX_MATRIX *pMtx, SVECTOR *pVec), Res_Enemy_boxkeri_create_5B6EA9);
+
+
+
+PSX_MATRIX gIdentity_matrix2 =
+{
+    {
+        { 4096, 0, 0 },
+        { 0, 4096, 0 },
+        { 0, 0, 4096 }
+    },
+    { 0, 0 },
+    { 0, 0, 0 }
+};
+
+MGS_VAR(1, 0x99534C, PSX_MATRIX*, dword_99534C, 0);
+
+void BoxKickSpawn()
+{
+    // HACK
+    dword_99534C = &gIdentity_matrix2;
+
+    static SVECTOR vec = {};
+    Res_Enemy_boxkeri_create_5B6EA9(&gIdentity_matrix2, &vec);
+}
 
 static void CC Debug_Update(Actor_Debug* pDebug)
 {
@@ -444,12 +473,28 @@ static BYTE test[] =
     {
         // vc001501.vox
        // Res_strctrl_create_45803B(0xfc061006, 0, 0);
-       Actor_Movie* pMovie = Res_movie_create_4561DF(ResourceNameHash("e399"), 0);
+     //  Actor_Movie* pMovie = Res_movie_create_4561DF(ResourceNameHash("e399"), 0);
 
       // pMovie->word_7248F2_11_param_i = 12;
      //  pMovie->dword_7248F4_param_o = -12;
 
-       gSubsText_dword_733858 = "MOVIE SUB TEST";
+      // gSubsText_dword_733858 = "MOVIE SUB TEST";
+
+        //Res_loader_Create_457BDD("rank");
+        /*
+        auto scriptStringData = "selectd";
+        auto stageNameHashed = ResourceNameHash(scriptStringData);
+        Stage_LoadRelated_44EB27(stageNameHashed, scriptStringData);
+        script_cancel_non_zero_dword_7227A0 = 1;
+        Actor_DestroyOnNextUpdate_40A3ED(&pDebug->mBase);
+        game_state_dword_72279C.flags = 0;*/
+
+        // snake.kmd
+
+        //gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 9;
+        //Res_Okajima_bullet_create_5FE56D(&gIdentity_matrix2, 0, 0, 1);
+
+        BoxKickSpawn();
     }
     // 900074
 
