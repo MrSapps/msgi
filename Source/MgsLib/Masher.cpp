@@ -1443,7 +1443,7 @@ u16* AudioDecompressor::SetupAudioDecodePtrs(u16 *rawFrameBuffer)
     return mAudioFrameDataPtr;
 }
 
-void AudioDecompressor::SetFrameSizeAndChannelCount(s32 audioFrameSizeBytes, s32 numChannels)
+void AudioDecompressor::SetChannelCount(s32 numChannels)
 {
     mAudioNumChannels = numChannels;
 }
@@ -1483,7 +1483,7 @@ void CC Res_movie_masher_sound_decode_data_52B028(int* pMasherFrame, BYTE* pDeco
 {
     AudioDecompressor decompressor;
     const int bytesPerSample = gMasher_bits_per_sample_dword_7851D8 / 8;
-    decompressor.SetFrameSizeAndChannelCount(bytesPerSample, gMasher_num_channels_dword_7851E4);
+    decompressor.SetChannelCount(bytesPerSample);
     decompressor.SetupAudioDecodePtrs((u16*)pMasherFrame);
     memset(pDecodedFrame, 0, frameSize * bytesPerSample * gMasher_num_channels_dword_7851E4);
 

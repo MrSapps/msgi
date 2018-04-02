@@ -19,26 +19,7 @@ void Force_Actor_Movie_Cpp_Link() { }
 
 int CC Res_movie_update_helper_45675A()
 {
-    /*
-    if (gMovieData_724A00.field_20_sound_pos)
-    {
-        Res_movie_masher_decode_image_528993(gMovieData_724A00.field_0_masher_ptr);
-    }
-    else
-    {
-        jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
-    }
-    */
-
-   // if (gMovieData_724A00.field_0_masher_ptr->field_6C_frame_num == 0)
-    {
-        jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
-    }
-
-   // if (gMovieData_724A00.field_20_sound_pos)
-    {
-      //  jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
-    }
+    jMovie_MMX_Decode_528985(gMovieData_724A00.field_0_masher_ptr, gMovieData_724A00.gMovieBuffer_724A14);
 
     if (!gMovieData_724A00.field_2C_audio_play_started)
     {
@@ -50,14 +31,10 @@ int CC Res_movie_update_helper_45675A()
         gMovieData_724A00.field_0_masher_ptr,
         Res_movie_masher_read_blocking_52897C,
         Res_movie_masher_sound_read_52899C);
-    
-    gMovieData_724A00.field_1C_read_ret = Res_movie_masher_read_frame_data_528973(gMovieData_724A00.field_0_masher_ptr);
-    
-    int sound_pos = Sound_Masher_Unknown_523E12();
-    //LOG_INFO("sound_pos " << sound_pos << " gBytesWrote_77D880 " << gBytesWrote_77D880);
-    gMovieData_724A00.field_20_sound_pos = sound_pos;
 
-    //Sleep(50);
+    gMovieData_724A00.field_1C_read_ret = Res_movie_masher_read_frame_data_528973(gMovieData_724A00.field_0_masher_ptr);
+
+    gMovieData_724A00.field_20_sound_pos = Sound_Masher_Unknown_523E12();
 
     return gMovieData_724A00.field_1C_read_ret;
 }
@@ -267,10 +244,6 @@ char CC Res_Movie_GetBackBufferPixelFormat_51D566()
 }
 MGS_FUNC_IMPLEX(0x51D566, Res_Movie_GetBackBufferPixelFormat_51D566, MOVIE_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x52A812, void __cdecl(), Res_movie_create_sound_table_52A812); // TODO
-
-
-
 signed int CC Res_movie_create_helper_4562AA(int movieNameHashed)
 {
     if (!gMovieData_724A00.sMovie_IO_Ptrs_Inited_dword_724A30)
@@ -356,14 +329,6 @@ signed int CC Res_movie_create_helper_4562AA(int movieNameHashed)
         gMovieData_724A00.field_0_masher_ptr = 0;
         return 0;
     }
-    
-    Res_movie_create_sound_table_52A812();
-    /*
-    Res_movie_create_helper_528683(
-        2 * gMovieData_724A00.field_24_double_width * gMovieData_724A00.field_8_video_header->field_4_width,
-        backBufferPixelFormat,
-        flags);
-        */
 
     Sound_Res_Movie_CreateBuffer_523A44(
         ((gMovieData_724A00.field_C_audio_header->field_0_audio_format & 1) != 0) + 1,

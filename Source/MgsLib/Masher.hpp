@@ -79,7 +79,7 @@ public:
     void decode_8bit_audio_frame(u8* outPtr, s32 numSamplesPerFrame, bool isLast);
     void decode_16bit_audio_frame(u16* outPtr, s32 numSamplesPerFrame, bool isLast);
     u16* SetupAudioDecodePtrs(u16 *rawFrameBuffer);
-    void SetFrameSizeAndChannelCount(s32 audioFrameSizeBytes, s32 channelCount);
+    void SetChannelCount(s32 channelCount);
     static void init_Snd_tbl();
 };
 
