@@ -17,10 +17,6 @@ void Force_Actor_Movie_Cpp_Link() { }
 
 #define MOVIE_IMPL true
 
-
-MGS_FUNC_NOT_IMPL(0x528993, void __cdecl(Actor_Movie_Masher *pMasher), Res_movie_masher_decode_image_528993); // TODO
-
-
 int CC Res_movie_update_helper_45675A()
 {
     /*
@@ -271,7 +267,6 @@ char CC Res_Movie_GetBackBufferPixelFormat_51D566()
 }
 MGS_FUNC_IMPLEX(0x51D566, Res_Movie_GetBackBufferPixelFormat_51D566, MOVIE_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x528683, int __cdecl(int movieRowLengthBytes, unsigned __int8 backBufferPixelFormat, int flags), Res_movie_create_helper_528683); // TODO
 MGS_FUNC_NOT_IMPL(0x52A812, void __cdecl(), Res_movie_create_sound_table_52A812); // TODO
 
 
@@ -381,7 +376,7 @@ signed int CC Res_movie_create_helper_4562AA(int movieNameHashed)
 }
 MGS_FUNC_IMPLEX(0x4562AA, Res_movie_create_helper_4562AA, MOVIE_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x4018E0, void __cdecl(), MarkObjectQueueVoid_4018E0);
+MGS_FUNC_NOT_IMPL(0x4018E0, void __cdecl(), MarkObjectQueueVoid_4018E0); // TODO
 
 
 int CC Res_movie_write_sound_buffer_4565CA()

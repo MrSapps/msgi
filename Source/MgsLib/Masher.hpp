@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MgsFunction.hpp"
+#include "types.hpp"
 
 struct Actor_Movie_Masher;
 struct Actor_Movie_DDV_Header;
@@ -54,6 +55,30 @@ struct Actor_Movie_DDV_AudioHeader
     int field_10_num_frames_interleave;
 };
 MGS_ASSERT_SIZEOF(Actor_Movie_DDV_AudioHeader, 20);
+
+class AudioDecompressor
+{
+public:
+
+    s32 mUsedBits = 0;
+    u32 mWorkBits = 0;
+    s32 mAudioFrameSizeBytes = 0;
+    u16* mAudioFrameDataPtr = nullptr;
+
+    static u8 gSndTbl_byte_62EEB0[256];
+
+    AudioDecompressor();
+    static s32 GetSoundTableValue(s16 tblIndex);
+    s16 sub_408F50(s16 a1);
+    s32 ReadNextAudioWord(s32 value);
+    s32 SndRelated_sub_409650();
+    s16 NextSoundBits(u16 numBits);
+    bool SampleMatches(s16& sample, s16 bits);
+    void decode_16bit_audio_frame(u16* outPtr, s32 numSamplesPerFrame, bool isLast);
+    u16* SetupAudioDecodePtrs(u16 *rawFrameBuffer);
+    s32 SetAudioFrameSizeBytesAndBits(s32 audioFrameSizeBytes);
+    static void init_Snd_tbl();
+};
 
 // This is an actual C++ class.. perhaps the only class in the entire game
 struct Actor_Movie_Masher
