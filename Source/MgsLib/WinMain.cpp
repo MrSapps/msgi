@@ -517,7 +517,6 @@ MGS_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), Res_famas_shutdown_64
 
 
 
-MGS_FUNC_NOT_IMPL(0x0044FF7C, int __cdecl(int, int, int), sub_44FF7C);
 MGS_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
 
 //MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
@@ -533,10 +532,10 @@ signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, 
         resNameHashed = ResourceNameHash("famas");
     }
 
-    DWORD* pField20 = (DWORD*)&pFamas->field_20;
-    sub_44FF7C((int)pField20, resNameHashed, 'm');
+    struc_kmd* pField20 = (struc_kmd*)&pFamas->field_20;
+    LoadKmdRelated_44FF7C(pField20, resNameHashed, 'm');
 
-    if (*pField20)
+    if (pField20->field_0_pObj)
     {
         sub_45011B((int)pField20, a2, a3);
         return 0;

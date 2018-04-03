@@ -49,20 +49,28 @@ struct Prim_unknown_0x54
 };
 MGS_ASSERT_SIZEOF(Prim_unknown_0x54, 0x54);
 
+struct struc_kmd_14
+{
+    VECTOR3 v;
+};
+
+struct struc_kmd
+{
+    Prim_unknown_0x48* field_0_pObj;
+    int field_4_size;
+    PSX_MATRIX* field_8_light_mtx_array;
+    short field_C_mapflags_or_script_binds;
+    short field_E_anim_id;
+    int field_10;
+    struc_kmd_14 field_14_struc;
+    int field_20;
+};
+MGS_ASSERT_SIZEOF(struc_kmd, 0x24);
 
 struct Actor_boxkeri
 {
     Actor mBase;
-    Prim_unknown_0x48 *field_20_kmd;
-    int field_24;
-    int field_28;
-    int field_2C;
-    int field_30;
-    int field_34;
-    int field_38;
-    int field_3C;
-    int field_40;
-
+    struc_kmd field_20_kmd;
     SVECTOR field_44;
     SVECTOR field_4C;
     PSX_MATRIX field_54_mtx;
@@ -75,3 +83,4 @@ struct Actor_boxkeri
 MGS_ASSERT_SIZEOF(Actor_boxkeri, 0xBC);
 
 Actor_boxkeri* CC Res_Enemy_boxkeri_create_5B6EA9(PSX_MATRIX* pMtx, SVECTOR* pVec);
+void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size);

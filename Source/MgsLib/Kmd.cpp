@@ -405,7 +405,7 @@ void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
                 {
                     if (ticks >= 19)
                     {
-                        pKmd = pBox->field_20_kmd;
+                        pKmd = pBox->field_20_kmd.field_0_pObj;
                         if (ticks % 2)
                         {
                             //LOBYTE(pKmd->field_28_flags_or_type) |= 0x80u;
@@ -477,7 +477,7 @@ void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
     PsxSetRotationAndTranslation_407A8F(&pBox->field_54_mtx);
     Res_base_unknown_407B3D(&pBox->field_4C);
     Res_base_unknown_407B79(&pBox->field_44);
-    PsxGetRotationAndTranslation_407BC1(&pBox->field_20_kmd->field_0_matrix);
+    PsxGetRotationAndTranslation_407BC1(&pBox->field_20_kmd.field_0_pObj->field_0_matrix);
     Res_base_unknown_40241F(&gSnakePos_stru_9942B0, pBox->field_7C_set_on_kmd_light_matrix_ptrs);
     ++pBox->field_74_ticks;
 }
@@ -501,24 +501,6 @@ void CC Res_Enemy_boxkeri_loader_mesg_5B711B()
 }
 MGS_FUNC_IMPLEX(0x5B711B, Res_Enemy_boxkeri_loader_mesg_5B711B, BOXKERI_IMPL);
 
-struct struc_kmd_14
-{
-    // TODO
-};
-
-struct struc_kmd
-{
-    Prim_unknown_0x48* field_0_pObj;
-    int field_4_size;
-    PSX_MATRIX* field_8_light_mtx_array;
-    short field_C_mapflags_or_script_binds;
-    short field_E_anim_id;
-    int field_10;
-    struc_kmd_14* field_14_struc;
-    int field_20;
-};
-MGS_ASSERT_SIZEOF(struc_kmd, 0x1C);
-
 void CC Kmd_Set_Light_matrices_450109(struc_kmd* pKmd, PSX_MATRIX* pLightMtxAry)
 {
     pKmd->field_8_light_mtx_array = pLightMtxAry;
@@ -526,16 +508,59 @@ void CC Kmd_Set_Light_matrices_450109(struc_kmd* pKmd, PSX_MATRIX* pLightMtxAry)
 }
 MGS_FUNC_IMPLEX(0x450109, Kmd_Set_Light_matrices_450109, BOXKERI_IMPL);
 
+signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
+{
+    Prim_unknown_0x48* pOldObj = pKmd->field_0_pObj;
+    KmdHeader* pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(resHash, 'k'));
+    if (!pFileData)
+    {
+        auto nk = ResourceNameHash("null");
+
+        pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(0xE224u, 'k'));// null.kmd ?
+    }
+
+    Prim_unknown_0x48* pPrimObj = Obj_Alloc_443FEC(pFileData, pKmd->field_4_size, 0);
+    if (!pPrimObj)
+    {
+        return -1;
+    }
+
+    if (pOldObj)
+    {
+        // TODO
+        //Object_Remove_4017C3(pOldObj);
+        //Prim_void_and_free_4440BE(pOldObj);
+    }
+
+    PSX_MATRIX* pKmdLightMtxAry = pKmd->field_8_light_mtx_array;
+    pKmd->field_0_pObj = pPrimObj;
+    pPrimObj->field_34_light_mtx_array = pKmdLightMtxAry;
+    pPrimObj->field_2C_index = pKmd->field_C_mapflags_or_script_binds;
+    Object_Add_40178F(pPrimObj);
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x450243, LoadKmdImpl_450243, false); // TODO
+
+void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size)
+{
+    MemClearUnknown_40B231(pObj, sizeof(struc_kmd));
+    pObj->field_4_size = size;
+    pObj->field_8_light_mtx_array = &gLightNormalVec_650128;
+    // TODO
+    //pObj->field_C_mapflags_or_script_binds = (signed __int16)mapChangeFlagsOrScriptBinds;
+    LoadKmdImpl_450243(pObj, resHash);
+}
+MGS_FUNC_IMPLEX(0x44FF7C, LoadKmdRelated_44FF7C, false); // TODO
 
 int CC Res_Enemy_boxkeri_loader_5B702E(Actor_boxkeri* pBox, PSX_MATRIX* pMtx, SVECTOR* pVec)
 {
-    /* TODO
-    mapChangeFlagsOrScriptBinds = (char *)map_change_flags_dword_99535C;
+    // TODO
+    //mapChangeFlagsOrScriptBinds = (char *)map_change_flags_dword_99535C;
     LoadKmdRelated_44FF7C(&pBox->field_20_kmd, ResourceNameHash("cb_box"), 109);
     Kmd_Set_Light_matrices_450109(&pBox->field_20_kmd, pBox->field_7C_set_on_kmd_light_matrix_ptrs);
 
-    pBox->field_20_kmd[2].field_0_matrix.m[1][1] = 500;
-    */
+    //pBox->field_20_kmd[2].field_0_matrix.m[1][1] = 500;
+
 
     /* TODO
     *(DWORD *)&pBox->field_44.field_0_x = *(DWORD *)&pControl_6BEF28.field_0_vec.field_0_x;
