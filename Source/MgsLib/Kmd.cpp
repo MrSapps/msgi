@@ -309,6 +309,86 @@ MGS_FUNC_IMPLEX(0x44B690, sub_44B690, KMD_IMPL);
 
 MGS_VAR(1, 0x9942B0, SVECTOR, gSnakePos_stru_9942B0, {});
 
+MGS_ARY(1, 0x665A3C, int, 4096, dword_665A3C, {}); // TODO: values
+
+
+MATRIX3x3 gIdentityMatrix_6659BC ={ { { 4096, 0, 0 },{ 0, 4096, 0 },{ 0, 0, 4096 } } };
+
+
+void CC VectorRotationMatrix_unknown_44C620(const SVECTOR* pVec, PSX_MATRIX* pMatrix)
+{
+    memcpy(pMatrix->m, gIdentityMatrix_6659BC.m, sizeof(MATRIX3x3::m));
+
+    // ============================================================================
+
+    const int tbl_vec_z_1 = dword_665A3C[(pVec->field_4_z + 1024) & 4095];
+    const int tbl_vec_z_2 = dword_665A3C[pVec->field_4_z & 4095];
+
+    const int matrix_0_0 = pMatrix->m[0][0];
+    const int matrix_1_0 = pMatrix->m[1][0];
+    pMatrix->m[1][0] = static_cast<short>((tbl_vec_z_2 * matrix_0_0 + tbl_vec_z_1 * matrix_1_0) >> 12);
+    pMatrix->m[0][0] = static_cast<short>((tbl_vec_z_1 * matrix_0_0 - tbl_vec_z_2 * matrix_1_0) >> 12);
+
+    const int matrix_0_1 = pMatrix->m[0][1];
+    const int matrix_1_1 = pMatrix->m[1][1];
+    pMatrix->m[0][1] = static_cast<short>((tbl_vec_z_1 * matrix_0_1 - tbl_vec_z_2 * matrix_1_1) >> 12);
+    pMatrix->m[1][1] = static_cast<short>((tbl_vec_z_2 * matrix_0_1 + tbl_vec_z_1 * matrix_1_1) >> 12);
+
+    const int matrix_1_2 = pMatrix->m[1][2];
+    const int matrix_0_2 = pMatrix->m[0][2];
+    pMatrix->m[1][2] = static_cast<short>((tbl_vec_z_2 * matrix_0_2 + tbl_vec_z_1 * matrix_1_2) >> 12);
+    pMatrix->m[0][2] = static_cast<short>((tbl_vec_z_1 * matrix_0_2 - tbl_vec_z_2 * matrix_1_2) >> 12);
+
+    // ============================================================================
+
+    const int tbl_vec_x_1 = dword_665A3C[(pVec->field_0_x + 1024) & 4095];
+    const int tbl_vec_x_2 = dword_665A3C[pVec->field_0_x & 4095];
+
+    const int matrix_1_0_2 = pMatrix->m[1][0];
+    const int matrix_2_0 = pMatrix->m[2][0];
+    pMatrix->m[1][0] = static_cast<short>((tbl_vec_x_1 * matrix_1_0_2 - tbl_vec_x_2 * matrix_2_0) >> 12);
+    pMatrix->m[2][0] = static_cast<short>((tbl_vec_x_2 * matrix_1_0_2 + tbl_vec_x_1 * matrix_2_0) >> 12);
+
+    const int matrix_1_1_1 = pMatrix->m[1][1];
+    const int matrix_2_1_1 = pMatrix->m[2][1];
+    pMatrix->m[1][1] = static_cast<short>((tbl_vec_x_1 * matrix_1_1_1 - tbl_vec_x_2 * matrix_2_1_1) >> 12);
+    pMatrix->m[2][1] = static_cast<short>((tbl_vec_x_2 * matrix_1_1_1 + tbl_vec_x_1 * matrix_2_1_1) >> 12);
+
+    const int matrix_2_2_2 = pMatrix->m[2][2];
+    pMatrix->m[1][2] = static_cast<short>((tbl_vec_x_1 * matrix_1_2 - tbl_vec_x_2 * matrix_2_2_2) >> 12);
+    pMatrix->m[2][2] = static_cast<short>((tbl_vec_x_2 * matrix_1_2 + tbl_vec_x_1 * matrix_2_2_2) >> 12);
+
+    // ============================================================================
+
+    const int tbl_vec_y_1 = dword_665A3C[pVec->field_2_y & 4095];
+    const int tbl_vec_y_2 = dword_665A3C[(pVec->field_2_y + 1024) & 4095];
+
+    const int matrix_0_0_1 = pMatrix->m[0][0];
+    const int matrix_2_0_1 = pMatrix->m[2][0];
+    pMatrix->m[0][0] = static_cast<short>((tbl_vec_y_1 * matrix_2_0_1 + tbl_vec_y_2 * matrix_0_0_1) >> 12);
+    pMatrix->m[2][0] = static_cast<short>((tbl_vec_y_2 * matrix_2_0_1 - tbl_vec_y_1 * matrix_0_0_1) >> 12);
+
+    const int matrix_0_1_1 = pMatrix->m[0][1];
+    const int matrix_2_1 = pMatrix->m[2][1];
+    pMatrix->m[0][1] = static_cast<short>((tbl_vec_y_1 * matrix_2_1 + tbl_vec_y_2 * matrix_0_1_1) >> 12);
+    pMatrix->m[2][1] = static_cast<short>((tbl_vec_y_2 * matrix_2_1 - tbl_vec_y_1 * matrix_0_1_1) >> 12);
+
+    const int matrix_0_2_1 = pMatrix->m[0][2];
+    const int matrix_2_2_1 = pMatrix->m[2][2];
+    pMatrix->m[0][2] = static_cast<short>((tbl_vec_y_1 * matrix_2_2_1 + tbl_vec_y_2 * matrix_0_2_1) >> 12);
+    pMatrix->m[2][2] = static_cast<short>((tbl_vec_y_2 * matrix_2_2_1 - tbl_vec_y_1 * matrix_0_2_1) >> 12);
+}
+MGS_FUNC_IMPLEX(0x44C620, VectorRotationMatrix_unknown_44C620, true); // TODO
+
+void CC Res_base_unknown_407B79(const SVECTOR* pRotVec)
+{
+    PSX_MATRIX rotMatrix = {};
+    VectorRotationMatrix_unknown_44C620(pRotVec, &rotMatrix);
+    sub_44B690(&rotMatrix);
+    memcpy(gte_rotation_matrix_993E40.m, rotMatrix.m, sizeof(MATRIX3x3::m));
+}
+MGS_FUNC_IMPLEX(0x407B79, Res_base_unknown_407B79, true); // TODO
+
 void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
 {
     signed int ticks; // ecx
@@ -403,8 +483,7 @@ void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
     //mapChangeFlagsOrScriptBinds = (char *)map_change_flags_dword_99535C;
     Set_gte_rotation_matrix_and_translation_vector_407A8F(&pBox->field_54_mtx);
     Res_base_unknown_407B3D(&pBox->field_4C);
-    // TODO
-    //Res_base_unknown_407B79(&pBox->field_44);
+    Res_base_unknown_407B79(&pBox->field_44);
     PrimObj_407BC1(pBox->field_20_kmd);
     // TODO
     //Res_base_unknown_40241F(&gSnakePos_stru_9942B0, pBox->field_7C_set_on_kmd_light_matrix_ptrs);
