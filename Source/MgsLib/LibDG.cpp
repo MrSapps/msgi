@@ -1330,7 +1330,7 @@ const PSX_MATRIX gIdentity_matrix =
         { 0, 4096, 0 },
         { 0, 0, 4096 } 
     },
-    { 0, 0 },
+    { 0 },
     { 0, 0, 0 }
 };
 

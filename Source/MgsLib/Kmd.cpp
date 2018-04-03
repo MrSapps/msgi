@@ -163,7 +163,7 @@ Prim_unknown_0x48* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x4
         pAllocated->field_2E_UnknownOrNumFaces = static_cast<WORD>(pFileData->mUnknownOrNumFaces);
         pAllocated->field_28_flags_or_type = countOrType_0x40Flag;
         pAllocated->field_30_size = usuallyZero;
-        pAllocated->field_34_pVec = &gLightNormalVec_650128;
+        pAllocated->field_34_light_mtx_array = &gLightNormalVec_650128;
 
         kmdObject* pKmdObject = (kmdObject *)&pFileData[1];
         if (pFileData->mNumberOfMeshes > 0)
@@ -486,7 +486,7 @@ MGS_FUNC_IMPLEX(0x5B6EF7, Res_Enemy_boxkeri_update_5B6EF7, false); // TODO
 void CC Res_Enemy_boxkeri_shutdown_5B701F(Actor_boxkeri* pBox)
 {
     // TODO
-    //Res_base_shutdown_helper_4500DD(&pBox->field_20_kmd);
+    //Kmd_free_4500DD(&pBox->field_20_kmd);
 }
 MGS_FUNC_IMPLEX(0x5B701F, Res_Enemy_boxkeri_shutdown_5B701F, false); // TODO
 
@@ -501,12 +501,38 @@ void CC Res_Enemy_boxkeri_loader_mesg_5B711B()
 }
 MGS_FUNC_IMPLEX(0x5B711B, Res_Enemy_boxkeri_loader_mesg_5B711B, BOXKERI_IMPL);
 
+struct struc_kmd_14
+{
+    // TODO
+};
+
+struct struc_kmd
+{
+    Prim_unknown_0x48* field_0_pObj;
+    int field_4_size;
+    PSX_MATRIX* field_8_light_mtx_array;
+    short field_C_mapflags_or_script_binds;
+    short field_E_anim_id;
+    int field_10;
+    struc_kmd_14* field_14_struc;
+    int field_20;
+};
+MGS_ASSERT_SIZEOF(struc_kmd, 0x1C);
+
+void CC Kmd_Set_Light_matrices_450109(struc_kmd* pKmd, PSX_MATRIX* pLightMtxAry)
+{
+    pKmd->field_8_light_mtx_array = pLightMtxAry;
+    pKmd->field_0_pObj->field_34_light_mtx_array = pLightMtxAry;
+}
+MGS_FUNC_IMPLEX(0x450109, Kmd_Set_Light_matrices_450109, BOXKERI_IMPL);
+
+
 int CC Res_Enemy_boxkeri_loader_5B702E(Actor_boxkeri* pBox, PSX_MATRIX* pMtx, SVECTOR* pVec)
 {
     /* TODO
     mapChangeFlagsOrScriptBinds = (char *)map_change_flags_dword_99535C;
-    LoadKmdRelated_44FF7C((struc_kmd *)&pBox->field_20_kmd, ResourceNameHash("cb_box"), 109);
-    Res_generic_unknown_450109((int)&pBox->field_20_kmd, pBox->field_7C_set_on_kmd_light_matrix_ptrs);
+    LoadKmdRelated_44FF7C(&pBox->field_20_kmd, ResourceNameHash("cb_box"), 109);
+    Kmd_Set_Light_matrices_450109(&pBox->field_20_kmd, pBox->field_7C_set_on_kmd_light_matrix_ptrs);
 
     pBox->field_20_kmd[2].field_0_matrix.m[1][1] = 500;
     */

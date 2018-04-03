@@ -18,7 +18,7 @@ struct Prim_unknown_0x48
     WORD field_2E_UnknownOrNumFaces;
     WORD field_30_size;
     WORD field_32;
-    SVECTOR* field_34_pVec; // Or 2 words?
+    PSX_MATRIX* field_34_light_mtx_array;
     DWORD field_38_size24b;
     DWORD field_3C;
     BYTE* field_40_pDataStart[2];
@@ -36,7 +36,7 @@ struct Prim_unknown_0x54
     WORD field_2E_UnknownOrNumFaces;
     WORD field_30_prim_size;
     WORD field_32;
-    WORD field_34; // Or 2 words?
+    WORD field_34; // most likely also a matrix pointer ?
     WORD field_36;
     DWORD field_38_size24b;
     DWORD field_3C;

@@ -889,8 +889,18 @@ int CC Script_tbl_start_sub_451B0E(BYTE* /*pScript*/)
 }
 MGS_FUNC_IMPLEX(0x451B0E, Script_tbl_start_sub_451B0E, SCRIPT_IMPL);
 
-const SVECTOR gLightNormalVec_650128_tmp = { 0, 0, 4096, 0 };
-MGS_VAR(1, 0x650128, SVECTOR, gLightNormalVec_650128, gLightNormalVec_650128_tmp);
+const PSX_MATRIX gLightNormalVec_650128_tmp = 
+{ 
+    { 
+        { 0, 0, 4096 },
+        { 0, 0, 0 },
+        { 0, 0, 0 }
+    },
+    0,
+    { 0, 0, 0 }
+};
+
+MGS_VAR(1, 0x650128, PSX_MATRIX, gLightNormalVec_650128, gLightNormalVec_650128_tmp);
 
 void CC Script_light_vec_402144(int x, int y, int z)
 {
@@ -901,10 +911,9 @@ void CC Script_light_vec_402144(int x, int y, int z)
 
     VECTOR vec1Normal = {};
     VectorNormal_44CAE0(&vec1, &vec1Normal);
-
-    gLightNormalVec_650128.field_0_x = static_cast<short int>(vec1Normal.field_0_x);
-    gLightNormalVec_650128.field_2_y = static_cast<short int>(vec1Normal.field_4_y);
-    gLightNormalVec_650128.field_4_z = static_cast<short int>(vec1Normal.field_8_z);
+    gLightNormalVec_650128.m[0][0] = static_cast<short int>(vec1Normal.field_0_x);
+    gLightNormalVec_650128.m[0][1] = static_cast<short int>(vec1Normal.field_4_y);
+    gLightNormalVec_650128.m[0][2] = static_cast<short int>(vec1Normal.field_8_z);
 }
 MGS_FUNC_IMPLEX(0x00402144, Script_light_vec_402144, SCRIPT_IMPL);
 
