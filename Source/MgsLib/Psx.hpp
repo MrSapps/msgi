@@ -338,7 +338,8 @@ void CC PsxGpuDebug_44A4D0();
 DRAWENV* CC Renderer_DRAWENV_Init_401888(DRAWENV* pDrawEnv, __int16 clipX1, __int16 clipY1, __int16 clipX2, __int16 clipY2);
 void CC SetDrawEnv_40DDE0(DR_ENV* pPacked, DRAWENV* drawEnv);
 void CC VectorNormal_44CAE0(const VECTOR* pVec, VECTOR* pUnitVec);
-void CC Set_gte_rotation_matrix_and_translation_vector_407A8F(const PSX_MATRIX* pMatrix);
+void CC PsxSetRotationAndTranslation_407A8F(const PSX_MATRIX* pMatrix);
+void CC PsxGetRotationAndTranslation_407BC1(PSX_MATRIX* pMatrix);
 
 void CC Psx_gte_RT1_rtir_447480();
 void CC Psx_gte_RT1TR_rt_4477A0();

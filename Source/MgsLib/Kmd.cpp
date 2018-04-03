@@ -101,15 +101,6 @@ int __cdecl Prim_444096(kmdObject* pKmdObj)
 }
 MGS_FUNC_IMPLEX(0x444096, Prim_444096, KMD_IMPL);
 
-void CC PrimObj_407BC1(Prim_unknown_0x48* pObj)
-{
-    memcpy(&pObj->field_0_matrix.m, gte_rotation_matrix_993E40.m, sizeof(MATRIX3x3));
-
-    pObj->field_0_matrix.t[0] = gGte_translation_vector_993E54.x;
-    pObj->field_0_matrix.t[1] = gGte_translation_vector_993E54.y;
-    pObj->field_0_matrix.t[2] = gGte_translation_vector_993E54.z;
-}
-MGS_FUNC_IMPLEX(0x407BC1, PrimObj_407BC1, KMD_IMPL);
 
 struct PrimUnknownData
 {
@@ -378,7 +369,7 @@ void CC VectorRotationMatrix_unknown_44C620(const SVECTOR* pVec, PSX_MATRIX* pMa
     pMatrix->m[0][2] = static_cast<short>((tbl_vec_y_1 * matrix_2_2_1 + tbl_vec_y_2 * matrix_0_2_1) >> 12);
     pMatrix->m[2][2] = static_cast<short>((tbl_vec_y_2 * matrix_2_2_1 - tbl_vec_y_1 * matrix_0_2_1) >> 12);
 }
-MGS_FUNC_IMPLEX(0x44C620, VectorRotationMatrix_unknown_44C620, true); // TODO
+MGS_FUNC_IMPLEX(0x44C620, VectorRotationMatrix_unknown_44C620, KMD_IMPL);
 
 void CC Res_base_unknown_407B79(const SVECTOR* pRotVec)
 {
@@ -387,7 +378,9 @@ void CC Res_base_unknown_407B79(const SVECTOR* pRotVec)
     sub_44B690(&rotMatrix);
     memcpy(gte_rotation_matrix_993E40.m, rotMatrix.m, sizeof(MATRIX3x3::m));
 }
-MGS_FUNC_IMPLEX(0x407B79, Res_base_unknown_407B79, true); // TODO
+MGS_FUNC_IMPLEX(0x407B79, Res_base_unknown_407B79, KMD_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x40241F, int __cdecl(SVECTOR *a1, PSX_MATRIX *pMtxAry), Res_base_unknown_40241F); // TODO
 
 void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
 {
@@ -481,12 +474,11 @@ void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
     }
     // TODO
     //mapChangeFlagsOrScriptBinds = (char *)map_change_flags_dword_99535C;
-    Set_gte_rotation_matrix_and_translation_vector_407A8F(&pBox->field_54_mtx);
+    PsxSetRotationAndTranslation_407A8F(&pBox->field_54_mtx);
     Res_base_unknown_407B3D(&pBox->field_4C);
     Res_base_unknown_407B79(&pBox->field_44);
-    PrimObj_407BC1(pBox->field_20_kmd);
-    // TODO
-    //Res_base_unknown_40241F(&gSnakePos_stru_9942B0, pBox->field_7C_set_on_kmd_light_matrix_ptrs);
+    PsxGetRotationAndTranslation_407BC1(&pBox->field_20_kmd->field_0_matrix);
+    Res_base_unknown_40241F(&gSnakePos_stru_9942B0, pBox->field_7C_set_on_kmd_light_matrix_ptrs);
     ++pBox->field_74_ticks;
 }
 MGS_FUNC_IMPLEX(0x5B6EF7, Res_Enemy_boxkeri_update_5B6EF7, false); // TODO

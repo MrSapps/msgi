@@ -1112,14 +1112,24 @@ void CC Matrix_transpose_40771B(const MATRIX3x3* pMatrix1, MATRIX3x3* pOutMatrix
 }
 MGS_FUNC_IMPLEX(0x40771B, Matrix_transpose_40771B, IMPL_PSX);
 
-void CC Set_gte_rotation_matrix_and_translation_vector_407A8F(const PSX_MATRIX* pMatrix)
+void CC PsxSetRotationAndTranslation_407A8F(const PSX_MATRIX* pMatrix)
 {
     memcpy(gte_rotation_matrix_993E40.m, pMatrix->m, sizeof(PSX_MATRIX::m));
     gGte_translation_vector_993E54.x = pMatrix->t[0];
     gGte_translation_vector_993E54.y = pMatrix->t[1];
     gGte_translation_vector_993E54.z = pMatrix->t[2];
 }
-MGS_FUNC_IMPLEX(0x407A8F, Set_gte_rotation_matrix_and_translation_vector_407A8F, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x407A8F, PsxSetRotationAndTranslation_407A8F, IMPL_PSX);
+
+void CC PsxGetRotationAndTranslation_407BC1(PSX_MATRIX* pMatrix)
+{
+    memcpy(&pMatrix->m, gte_rotation_matrix_993E40.m, sizeof(MATRIX3x3));
+
+    pMatrix->t[0] = gGte_translation_vector_993E54.x;
+    pMatrix->t[1] = gGte_translation_vector_993E54.y;
+    pMatrix->t[2] = gGte_translation_vector_993E54.z;
+}
+MGS_FUNC_IMPLEX(0x407BC1, PsxGetRotationAndTranslation_407BC1, IMPL_PSX);
 
 void CC MatrixXVectorFixed_44B320(const MATRIX3x3* pMatrix, const VECTOR* pInVec, VECTOR* pOutVec)
 {
