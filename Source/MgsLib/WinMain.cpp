@@ -631,11 +631,6 @@ LRESULT CALLBACK MainWindowProc_51C2D3(HWND hWnd, UINT msg, UINT wParam, LPARAM 
         gKeys_9AD9A0[wParam] = lParam;
         gvirtualKeyRepeatCount = lParam;
         gVirtualKeyCode = wParam;
-        if (wParam < 256)
-        {
-            gKeys_9AD880[wParam] = 1;
-            return DefWindowProcA(hWnd, msg, wParam, lParam);
-        }
 
         if (gVirtualKeyCode == VK_MENU)
         {
@@ -649,16 +644,18 @@ LRESULT CALLBACK MainWindowProc_51C2D3(HWND hWnd, UINT msg, UINT wParam, LPARAM 
             gKeys_9AD880[VK_F10] = 1;
             return 0;
         }
+
+        if (wParam < 256)
+        {
+            gKeys_9AD880[wParam] = 1;
+            return DefWindowProcA(hWnd, msg, wParam, lParam);
+        }
         break;
 
     case WM_SYSKEYUP:
         gvirtualKeyRepeatCount = lParam;
         gVirtualKeyCode = wParam;
-        if (wParam < 256)
-        {
-            gKeys_9AD880[wParam] = 0;
-            return DefWindowProcA(hWnd, msg, wParam, lParam);
-        }
+
         if (gVirtualKeyCode == VK_MENU) // ALT
         {
             gKeys_9AD880[VK_MENU] = 0;
@@ -669,6 +666,12 @@ LRESULT CALLBACK MainWindowProc_51C2D3(HWND hWnd, UINT msg, UINT wParam, LPARAM 
             gKeys_9AD880[VK_F10] = 0;
             Actor_DumpActorSystem_40A0D4();
             return 0;
+        }
+
+        if (wParam < 256)
+        {
+            gKeys_9AD880[wParam] = 0;
+            return DefWindowProcA(hWnd, msg, wParam, lParam);
         }
         break;
 
