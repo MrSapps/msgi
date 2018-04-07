@@ -274,7 +274,7 @@ void CC Res_base_unknown_407B3D(const SVECTOR* pVec)
     gGte_VXY0_993EC0.regs.VZ = pVec->field_4_z;
     gGte_VXY0_993EC0.regs.Zero = pVec->padding;
 
-    Psx_gte_RT1TR_rt_4477A0();
+    Psx_gte_RT1TR_rt_4477A0(); // Also called MVMVA?
     gGte_translation_vector_993E54.x = gGte_MAC1_993F24.MAC_32;
     gGte_translation_vector_993E54.y = gGte_MAC2_993F28.MAC_32;
     gGte_translation_vector_993E54.z = gGte_MAC3_993F2C.MAC_32;

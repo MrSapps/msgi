@@ -1048,7 +1048,7 @@ void CC Res_base_rotate_vecs_407C59(const SVECTOR* pIn, SVECTOR* pOut, int size_
 }
 MGS_FUNC_IMPLEX(0x407C59, Res_base_rotate_vecs_407C59, IMPL_PSX);
 
-void CC Res_base_rot_vecs_407CAC(const SVECTOR* pIn, SVECTOR* pOut, int count)
+void CC DG_RotVector_407CAC(const SVECTOR* pIn, SVECTOR* pOut, int count)
 {
     for (int i = 0; i < count; i++)
     {
@@ -1062,7 +1062,7 @@ void CC Res_base_rot_vecs_407CAC(const SVECTOR* pIn, SVECTOR* pOut, int count)
         pOut[i].field_4_z = gGte_IR3_993EEC.IR_16;
     }
 }
-MGS_FUNC_IMPLEX(0x407CAC, Res_base_rot_vecs_407CAC, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x407CAC, DG_RotVector_407CAC, IMPL_PSX);
 
 void CC Res_base_unknown_44AF20(MATRIX3x3* pMtx, VECTOR* pVec)
 {
