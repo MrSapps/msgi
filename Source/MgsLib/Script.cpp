@@ -161,12 +161,11 @@ struct GCL_Context
 };
 MGS_ASSERT_SIZEOF(GCL_Context, 8);
 
-MGS_ARY(1, 0x992040, GCL_Context, 40, gGclContextStack_992040, {});
-
 int CC Script_Unknown6_409D77(BYTE* pScript, DWORD* pRet)
 {
     int stackPos = 0;
-    GCL_Context* pScriptContext = &gGclContextStack_992040[0];
+    BYTE* scratchPadArea = &gScratchPadMemory_991E40.field_0_raw.field_0[512]; // Half of scratch pad is used for GCL stack
+    GCL_Context* pScriptContext = reinterpret_cast<GCL_Context*>(scratchPadArea);
     for (BYTE* pScriptIp = pScript; ; pScriptIp += 2)
     {
         for (;;)
@@ -191,7 +190,7 @@ int CC Script_Unknown6_409D77(BYTE* pScript, DWORD* pRet)
             ++pScriptContext;
             stackPos++;
 
-            assert(stackPos < 40); // TODO: Its unknown what the max allowed depth should be
+            assert(stackPos < 64); // Half of scratch pad area, 1024/2 = 512 bytes, 512 bytes / context size = 64
         } // End context push loop
 
         // Final item

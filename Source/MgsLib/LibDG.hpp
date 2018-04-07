@@ -191,3 +191,25 @@ Texture_Record* CC LibDG_FindTexture_4024A0(WORD hashCode);
 void CC LibDG_4010A6();
 void CC LibDG_Update2_helper_40A857();
 void CC sub_40191F();
+
+
+struct Psx_ScratchPad_Raw
+{
+    BYTE field_0[1024];
+};
+MGS_ASSERT_SIZEOF(Psx_ScratchPad_Raw, 1024);
+
+struct Psx_ScratchPad_Matrix
+{
+    PSX_MATRIX mtx[32];
+};
+
+union Psx_ScratchPad
+{
+    Psx_ScratchPad_Raw field_0_raw;
+    SVECTOR field_1_8Vecs[8];
+    Psx_ScratchPad_Matrix field_2_Matrix;
+};
+MGS_ASSERT_SIZEOF(Psx_ScratchPad, 1024);
+
+MGS_VAR_EXTERN(Psx_ScratchPad, gScratchPadMemory_991E40);
