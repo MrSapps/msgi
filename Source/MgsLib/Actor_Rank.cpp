@@ -1077,21 +1077,21 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     pRank->field_5E8_896 = 896;
     pRank->field_5EC_276 = 276;
 
-    Prim_unknown_0x54* pPrim16Data = PrimAlloc_405050(2066, 16, 0, 0, 0);
+    Prim_Union* pPrim16Data = PrimAlloc_405050(2066, 16, 0, 0, 0);
     if (pPrim16Data)
     {
         PrimAdd_401805(pPrim16Data);
-        pPrim16Data->field_28_flags_or_type = (signed __int16)dword_9942A0;
+        pPrim16Data->prim_54.field_28_flags_or_type = (signed __int16)dword_9942A0;
     }
-    pRank->field_24_ptr_16_prims = pPrim16Data;
+    pRank->field_24_ptr_16_prims = &pPrim16Data->prim_54;
     
-    Prim_unknown_0x54* pPrim9Data = PrimAlloc_405050(2066, 9, 0, 0, 0);
+    Prim_Union* pPrim9Data = PrimAlloc_405050(2066, 9, 0, 0, 0);
     if (pPrim9Data)
     {
         PrimAdd_401805(pPrim9Data);
-        pPrim9Data->field_28_flags_or_type = (signed __int16)dword_9942A0;
+        pPrim9Data->prim_54.field_28_flags_or_type = (signed __int16)dword_9942A0;
     }
-    pRank->field_28_ptr_9_prims = pPrim9Data;
+    pRank->field_28_ptr_9_prims = &pPrim9Data->prim_54;
 
     Res_rank_prim_related_4767CE(pRank, ResourceNameHash("back_l"), &pRank->field_2C_back_l_type0_0x40_start, -160, -112, 0, 112, 0, 0);
     pRank->field_41C_16_prim_dst[0] = 0;

@@ -49,6 +49,13 @@ struct Prim_unknown_0x54
 };
 MGS_ASSERT_SIZEOF(Prim_unknown_0x54, 0x54);
 
+union Prim_Union
+{
+    Prim_unknown_0x54 prim_54;
+    Prim_unknown_0x48 prim_48;
+};
+MGS_ASSERT_SIZEOF(Prim_Union, 0x54);
+
 struct struc_kmd_14
 {
     VECTOR3 v;
@@ -56,7 +63,7 @@ struct struc_kmd_14
 
 struct struc_kmd
 {
-    Prim_unknown_0x48* field_0_pObj;
+    Prim_Union* field_0_pObj;
     int field_4_size;
     PSX_MATRIX* field_8_light_mtx_array;
     short field_C_mapflags_or_script_binds;

@@ -151,7 +151,7 @@ void CC sub_40514F(char a1, char a2, char a3, char a4)
 }
 MGS_FUNC_IMPLEX(0x40514F, sub_40514F, KMD_IMPL);
 
-Prim_unknown_0x48* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, __int16 usuallyZero)
+Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, __int16 usuallyZero)
 {
     const int primSize = sizeof(Prim_unknown_0x48) + (sizeof(Prim_Mesh_0x5C) * pFileData->mNumberOfMeshes);
     Prim_unknown_0x48* pAllocated = (Prim_unknown_0x48 *)System_2_zerod_allocate_memory_40B296(primSize);
@@ -186,11 +186,11 @@ Prim_unknown_0x48* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x4
             }
         }
     }
-    return pAllocated;
+    return reinterpret_cast<Prim_Union*>(pAllocated);
 }
 MGS_FUNC_IMPLEX(0x443FEC, Obj_Alloc_443FEC, KMD_IMPL);
 
-Prim_unknown_0x54* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C)
+Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C)
 {
     const int idx = (maybeFlags & 31);
     assert(idx < 25);
@@ -222,14 +222,14 @@ Prim_unknown_0x54* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_
         pMem->field_40_pDataStart[0] = endPtr;                      // 1st prim buffer
         pMem->field_40_pDataStart[1] = endPtr + primBufferSize;     // 2nd prim buffer
     }
-    return pMem;
+    return reinterpret_cast<Prim_Union*>(pMem);
 }
 MGS_FUNC_IMPLEX(0x405050, PrimAlloc_405050, KMD_IMPL);
 
-signed int CC PrimAdd_401805(Prim_unknown_0x54* pPrimBuffer)
+signed int CC PrimAdd_401805(Prim_Union* pPrimBuffer)
 {
-    assert(pPrimBuffer->field_2C_gv_index == 0);
-    struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrimBuffer->field_2C_gv_index; // Always 0?
+    assert(pPrimBuffer->prim_54.field_2C_gv_index == 0);
+    struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrimBuffer->prim_54.field_2C_gv_index; // Always 0?
     if (pGv->gPrimQueue2_word_6BC3C0_256 > pGv->gObjectQueue_word_6BC3C2_0)
     {
         pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256 - 1] = pPrimBuffer; // PrimObject = Prim_unknown + extra ??
@@ -240,15 +240,15 @@ signed int CC PrimAdd_401805(Prim_unknown_0x54* pPrimBuffer)
 }
 MGS_FUNC_IMPLEX(0x401805, PrimAdd_401805, KMD_IMPL);
 
-int CC Object_Add_40178F(Prim_unknown_0x48* pPrim)
+int CC Object_Add_40178F(Prim_Union* pPrim)
 {
-    assert(pPrim->field_30_size == 0);
-    struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrim->field_30_size;
+    assert(pPrim->prim_48.field_30_size == 0);
+    struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrim->prim_48.field_30_size;
     if (pGv->gObjectQueue_word_6BC3C2_0 >= pGv->gPrimQueue2_word_6BC3C0_256)
     {
         return -1;
     }
-    pGv->gObjects_dword_6BC3C4[pGv->gObjectQueue_word_6BC3C2_0++] = (Prim_unknown_0x54 *)pPrim;
+    pGv->gObjects_dword_6BC3C4[pGv->gObjectQueue_word_6BC3C2_0++] = pPrim;
     return 0;
 }
 MGS_FUNC_IMPLEX(0x40178F, Object_Add_40178F, KMD_IMPL);
@@ -405,7 +405,7 @@ void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
                 {
                     if (ticks >= 19)
                     {
-                        pKmd = pBox->field_20_kmd.field_0_pObj;
+                        pKmd = &pBox->field_20_kmd.field_0_pObj->prim_48;
                         if (ticks % 2)
                         {
                             //LOBYTE(pKmd->field_28_flags_or_type) |= 0x80u;
@@ -477,7 +477,7 @@ void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
     PsxSetRotationAndTranslation_407A8F(&pBox->field_54_mtx);
     Res_base_unknown_407B3D(&pBox->field_4C);
     Res_base_unknown_407B79(&pBox->field_44);
-    PsxGetRotationAndTranslation_407BC1(&pBox->field_20_kmd.field_0_pObj->field_0_matrix);
+    PsxGetRotationAndTranslation_407BC1(&pBox->field_20_kmd.field_0_pObj->prim_48.field_0_matrix);
     Res_base_unknown_40241F(&gSnakePos_stru_9942B0, pBox->field_7C_set_on_kmd_light_matrix_ptrs);
     ++pBox->field_74_ticks;
 }
@@ -504,13 +504,13 @@ MGS_FUNC_IMPLEX(0x5B711B, Res_Enemy_boxkeri_loader_mesg_5B711B, BOXKERI_IMPL);
 void CC Kmd_Set_Light_matrices_450109(struc_kmd* pKmd, PSX_MATRIX* pLightMtxAry)
 {
     pKmd->field_8_light_mtx_array = pLightMtxAry;
-    pKmd->field_0_pObj->field_34_light_mtx_array = pLightMtxAry;
+    pKmd->field_0_pObj->prim_48.field_34_light_mtx_array = pLightMtxAry;
 }
 MGS_FUNC_IMPLEX(0x450109, Kmd_Set_Light_matrices_450109, BOXKERI_IMPL);
 
 signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
 {
-    Prim_unknown_0x48* pOldObj = pKmd->field_0_pObj;
+    Prim_unknown_0x48* pOldObj = &pKmd->field_0_pObj->prim_48;
     KmdHeader* pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(resHash, 'k'));
     if (!pFileData)
     {
@@ -519,7 +519,7 @@ signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
         pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(0xE224u, 'k'));// null.kmd ?
     }
 
-    Prim_unknown_0x48* pPrimObj = Obj_Alloc_443FEC(pFileData, pKmd->field_4_size, 0);
+    Prim_Union* pPrimObj = Obj_Alloc_443FEC(pFileData, pKmd->field_4_size, 0);
     if (!pPrimObj)
     {
         return -1;
@@ -534,8 +534,8 @@ signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
 
     PSX_MATRIX* pKmdLightMtxAry = pKmd->field_8_light_mtx_array;
     pKmd->field_0_pObj = pPrimObj;
-    pPrimObj->field_34_light_mtx_array = pKmdLightMtxAry;
-    pPrimObj->field_2C_index = pKmd->field_C_mapflags_or_script_binds;
+    pPrimObj->prim_48.field_34_light_mtx_array = pKmdLightMtxAry;
+    pPrimObj->prim_48.field_2C_index = pKmd->field_C_mapflags_or_script_binds;
     Object_Add_40178F(pPrimObj);
     return 0;
 }

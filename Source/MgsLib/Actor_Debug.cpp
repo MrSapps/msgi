@@ -520,13 +520,13 @@ static void Debug_InitTestPOLYFT4s(Actor_Debug* pDebug)
     pDebug->mPolyF4 = {};
 
     int numPrims = 1;
-    Prim_unknown_0x54* pPrim16Data = PrimAlloc_405050(2066, numPrims, 0, 0, 0);
+    Prim_Union* pPrim16Data = PrimAlloc_405050(2066, numPrims, 0, 0, 0);
     if (pPrim16Data)
     {
         PrimAdd_401805(pPrim16Data);
-        pPrim16Data->field_28_flags_or_type = (signed __int16)dword_9942A0;
+        pPrim16Data->prim_54.field_28_flags_or_type = (signed __int16)dword_9942A0;
     }
-    pDebug->mPrimData = pPrim16Data;
+    pDebug->mPrimData = &pPrim16Data->prim_54;
 
     //const WORD resHash = ResourceNameHash("back_l");
     //Res_rank_prim_related_4767CE(nullptr, resHash, &pDebug->mPolyF4, -160, -112, 0, 112, 0, 0);

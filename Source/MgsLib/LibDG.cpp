@@ -320,9 +320,9 @@ MGS_ARY(1, 0x6BDC5C, DWORD, 259, ot_gv2_1_6BDC5C, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE068, DR_ENV, stru_6BE068, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BE0A8, DR_ENV, pPacked_6BE0A8, {});
 
-MGS_ARY(1, 0x6BBD60, Prim_unknown_0x54*, 256, dg_dword_6BBD60_prim_ptrs, {});
+MGS_ARY(1, 0x6BBD60, Prim_Union*, 256, dg_dword_6BBD60_prim_ptrs, {});
 MGS_VAR(REDIRECT_LIBDG_DATA, 0x6BBD5C, DWORD, dg_dword_6BBD5C_k320, 0);
-MGS_ARY(1, 0x6BB95C, Prim_unknown_0x54*, 256, dg_dword_6BB95C_prim_ptrs, {});
+MGS_ARY(1, 0x6BB95C, Prim_Union*, 256, dg_dword_6BB95C_prim_ptrs, {});
 
 void CC sub_401570(struct_gv* gv, DRAWENV* pDrawEnv, int bNotBg)
 {
@@ -1264,11 +1264,11 @@ MGS_FUNC_NOT_IMPL(0x406B97, void __cdecl(int a1, int count), sub_406B97);
 MGS_FUNC_NOT_IMPL(0x406A78, void __cdecl(int a1, int count), sub_406A78);
 MGS_FUNC_NOT_IMPL(0x406906, void __cdecl(int a1, int count), sub_406906);
 
-void CC LibGV_4066ED(Prim_unknown_0x54* pObj)
+void CC LibGV_4066ED(Prim_Union* pObj)
 {
     
-    void* field_20 = pObj->field_20;
-    int count = pObj->field_2E_UnknownOrNumFaces;
+    void* field_20 = pObj->prim_54.field_20;
+    int count = pObj->prim_54.field_2E_UnknownOrNumFaces;
     if (field_20)
     {
         memcpy(pObj, field_20, 32u);
@@ -1276,7 +1276,7 @@ void CC LibGV_4066ED(Prim_unknown_0x54* pObj)
 
     memcpy(&gScratchPadMemory_991E40.field_2_Matrix.mtx[1], pObj, sizeof(PSX_MATRIX));
 
-    if (pObj->field_28_flags_or_type & 0x40)
+    if (pObj->prim_48.field_28_flags_or_type & 0x40)
     {
         // Seems to mostly handle "static" level geometry?
         // Prim_unknown_0x48 * ?? 
@@ -1284,12 +1284,12 @@ void CC LibGV_4066ED(Prim_unknown_0x54* pObj)
     }
     else
     {
-        if (pObj->field_38_size24b)
+        if (pObj->prim_54.field_38_size24b)
         {
             // Seems to handle players/map objects?
             sub_406B97((int)pObj, count); // Prim_unknown_0x54
         }
-        else if (pObj->field_40_pDataStart[1])
+        else if (pObj->prim_54.field_40_pDataStart[1])
         {
             // Seems to mostly render doors?
             sub_406A78((int)pObj, count); // Prim_unknown_0x54
@@ -1337,11 +1337,11 @@ void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
 
     for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
     {
-        Prim_unknown_0x54* pObj = pGv->gObjects_dword_6BC3C4[i];
+        Prim_Union* pObj = pGv->gObjects_dword_6BC3C4[i];
         LibGV_4066ED(pObj);
     }
 }
-MGS_FUNC_IMPLEX(0x407122, LibGV_407122, false); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x407122, LibGV_407122, true); // TODO: Implement me
 
 void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 {
