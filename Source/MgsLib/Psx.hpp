@@ -165,6 +165,26 @@ struct POLY_FT4
 };
 MGS_ASSERT_SIZEOF(POLY_FT4, 40);
 
+struct POLY_FT3
+{
+    DWORD* tag;      // Pointer to the next primitive
+    BYTE r0, g0, b0; // RGB color values
+    BYTE code;       // Primitive ID(reserved)
+
+    short x0, y0;    // Vertex coordinates 
+    BYTE u0, v0;    // Texture coordinates
+    WORD clut;       // CLUT ID(color - look - up table for 4 - bit / 8 - bit mode only)
+
+    short x1, y1;    // Vertex coordinates
+    BYTE u1, v1;     // Texture coordinates
+    WORD tpage;      // Texture page ID
+
+    short x2, y2;    // Vertex coordinates
+    BYTE u2, v2;     // Texture coordinates
+    WORD pad1;       // Reserved by the system
+};
+MGS_ASSERT_SIZEOF(POLY_FT3, 32);
+
 struct POLY_F4
 {
     DWORD tag;      // Pointer to the next primitive
@@ -191,6 +211,31 @@ struct POLY_G4
     short   x3, y3;
 };
 MGS_ASSERT_SIZEOF(POLY_G4, 36);
+
+struct POLY_GT4
+{
+    DWORD   tag;
+    BYTE    r0, g0, b0, code;
+    short   x0, y0;
+    BYTE    u0, v0;
+    WORD    clut;
+
+    BYTE    r1, g1, b1, p1;
+    short   x1, y1;
+    BYTE    u1, v1;
+    WORD    tpage;
+
+    BYTE    r2, g2, b2, p2;
+    short   x2, y2;
+    BYTE    u2, v2;
+    WORD    pad1;
+
+    BYTE    r3, g3, b3, p3;
+    short   x3, y3;
+    BYTE    u3, v3;
+    WORD    pad2;
+};
+MGS_ASSERT_SIZEOF(POLY_GT4, 52);
 
 struct DISPENV
 {

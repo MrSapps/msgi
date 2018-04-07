@@ -9,25 +9,6 @@ MGS_VAR(1, 0x6C0E98, DRAWENV, gDrawEnv_6C0E98, {});
 MGS_VAR(1, 0x6BECF0, DISPENV, gDispEnv_6BECF0, {});
 
 
-struct POLY_FT3
-{
-    DWORD* tag;      // Pointer to the next primitive
-    BYTE r0, g0, b0; // RGB color values
-    BYTE code;       // Primitive ID(reserved)
-    
-    short x0, y0;    // Vertex coordinates 
-    BYTE u0, v0;    // Texture coordinates
-    WORD clut;       // CLUT ID(color - look - up table for 4 - bit / 8 - bit mode only)
-
-    short x1, y1;    // Vertex coordinates
-    BYTE u1, v1;     // Texture coordinates
-    WORD tpage;      // Texture page ID
-
-    short x2, y2;    // Vertex coordinates
-    BYTE u2, v2;     // Texture coordinates
-    WORD pad1;       // Reserved by the system
-};
-MGS_ASSERT_SIZEOF(POLY_FT3, 32);
 
 struct RECT32
 {

@@ -37,13 +37,12 @@ struct Prim_Mesh_0x5C
     PSX_MATRIX field_0_mtx;
     PSX_MATRIX field_20_mtx;
     kmdObject* field_40_pKmdObj;
-    DWORD field_44;
+    void* field_44_colour_buffer; // 16 bytes with rgbp for each POLY_GT4
     Prim_Mesh_0x5C* field_48_pLinked;
     DWORD field_4C;
     WORD field_50_numObjTranslated;
     WORD field_52_num_faces;
-    DWORD field_54;
-    DWORD field_58;
+    POLY_GT4* field_54_prim_buffers[2];
 };
 MGS_ASSERT_SIZEOF(Prim_Mesh_0x5C, 0x5C);
 
