@@ -1177,34 +1177,7 @@ MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, false); // TODO: Fully implement
 
 MGS_VAR(1, 0x991E40, Psx_ScratchPad, gScratchPadMemory_991E40, {});
 
-struct Prim_internal_0x5c
-{
-    DWORD field_0;
-    DWORD field_4;
-    DWORD field_8;
-    DWORD field_C;
-    DWORD field_10;
-    DWORD field_14;
-    DWORD field_18;
-    DWORD field_1C;
-    DWORD field_20;
-    DWORD field_24;
-    DWORD field_28;
-    DWORD field_2C;
-    DWORD field_30;
-    DWORD field_34;
-    DWORD field_38;
-    DWORD field_3C;
-    DWORD field_40;
-    DWORD field_44;
-    DWORD field_48;
-    DWORD field_4C;
-    DWORD field_50;
-    void** field_54_buffers[2];
-};
-MGS_ASSERT_SIZEOF(Prim_internal_0x5c, 0x5c);
-
-void CC LibGV_40674E(Prim_unknown_0x48* pPrim, int faceCount)
+void CC LibGV_40674E(Prim_Union* pPrim, int faceCount)
 {
     Psx_ScratchPad_Matrix* pScratch = &gScratchPadMemory_991E40.field_2_Matrix;
     memcpy(&gte_rotation_matrix_993E40.m, &pScratch->mtx[0].m, sizeof(PSX_MATRIX::m));
@@ -1251,11 +1224,12 @@ void CC LibGV_40674E(Prim_unknown_0x48* pPrim, int faceCount)
     pScratch->mtx[2].t[2] = gGte_MAC3_993F2C.MAC_32;
 
     // Pointer to data after the main structure
-    Prim_internal_0x5c* field_48_dst_ptr = (Prim_internal_0x5c *)&pPrim[1];
+    Prim_unknown_0x48* ptr = &pPrim->prim_48;
+    Prim_Mesh_0x5C* pData = reinterpret_cast<Prim_Mesh_0x5C*>(&ptr[1]);
     for (int i = 0; i < faceCount; i++)
     {
-        memcpy(&field_48_dst_ptr[i].field_0,  &pScratch->mtx[1], sizeof(PSX_MATRIX));
-        memcpy(&field_48_dst_ptr[i].field_20, &pScratch->mtx[2], sizeof(PSX_MATRIX));
+        memcpy(&pData[i].field_0_mtx,  &pScratch->mtx[1], sizeof(PSX_MATRIX));
+        memcpy(&pData[i].field_20_mtx, &pScratch->mtx[2], sizeof(PSX_MATRIX));
     }
 }
 MGS_FUNC_IMPLEX(0x40674E, LibGV_40674E, LIBDG_IMPL);
@@ -1267,11 +1241,11 @@ MGS_FUNC_NOT_IMPL(0x406906, void __cdecl(int a1, int count), sub_406906);
 void CC LibGV_4066ED(Prim_Union* pObj)
 {
     
-    void* field_20 = pObj->prim_54.field_20;
+    PSX_MATRIX* field_20 = pObj->prim_54.field_20;
     int count = pObj->prim_54.field_2E_UnknownOrNumFaces;
     if (field_20)
     {
-        memcpy(pObj, field_20, 32u);
+        memcpy(&pObj->prim_54.field_0_matrix, field_20, sizeof(PSX_MATRIX));
     }
 
     memcpy(&gScratchPadMemory_991E40.field_2_Matrix.mtx[1], pObj, sizeof(PSX_MATRIX));
@@ -1280,7 +1254,7 @@ void CC LibGV_4066ED(Prim_Union* pObj)
     {
         // Seems to mostly handle "static" level geometry?
         // Prim_unknown_0x48 * ?? 
-        LibGV_40674E((Prim_unknown_0x48*)pObj, count);
+        LibGV_40674E(pObj, count);
     }
     else
     {

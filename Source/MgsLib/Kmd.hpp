@@ -8,6 +8,45 @@ void ForceLinkKmdCpp();
 
 struct KmdHeader;
 
+struct kmdObject
+{
+    WORD field_0_numObj;
+    WORD numUnk;
+    DWORD field_4_numFaces;
+    int boundingBox[6];
+    int translation[3];
+    int mRef_2C_parentObjIndex;
+    int mObjPosNum_30_translationUnk;
+
+    DWORD numVerts_34;
+    DWORD vertOfs_38;
+    DWORD indexOfs_3C;
+
+    DWORD numNorms_40;
+    DWORD normOfs_44;
+    DWORD normIndex_48;
+
+    DWORD ofsUV_4C;
+    DWORD ofsUnk_50;
+    DWORD nullpad_54;
+};
+MGS_ASSERT_SIZEOF(kmdObject, 0x58);
+
+struct Prim_Mesh_0x5C
+{
+    PSX_MATRIX field_0_mtx;
+    PSX_MATRIX field_20_mtx;
+    kmdObject* field_40_pKmdObj;
+    DWORD field_44;
+    Prim_Mesh_0x5C* field_48_pLinked;
+    DWORD field_4C;
+    WORD field_50_numObjTranslated;
+    WORD field_52_num_faces;
+    DWORD field_54;
+    DWORD field_58;
+};
+MGS_ASSERT_SIZEOF(Prim_Mesh_0x5C, 0x5C);
+
 struct Prim_unknown_0x48
 {
     PSX_MATRIX field_0_matrix;
@@ -21,15 +60,16 @@ struct Prim_unknown_0x48
     PSX_MATRIX* field_34_light_mtx_array;
     DWORD field_38_size24b;
     DWORD field_3C;
-    BYTE* field_40_pDataStart[2];
+    DWORD field_40;
+    DWORD field_44;
 };
 MGS_ASSERT_SIZEOF(Prim_unknown_0x48, 0x48);
 
 struct Prim_unknown_0x54
 {
     PSX_MATRIX field_0_matrix;
-    void* field_20;
-    KmdHeader* field_24_pKmdFileData;
+    PSX_MATRIX* field_20;
+    int field_24_flags;
     WORD field_28_flags_or_type;
     WORD field_2A_num_prims;
     WORD field_2C_gv_index;
