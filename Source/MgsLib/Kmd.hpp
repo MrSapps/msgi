@@ -61,7 +61,7 @@ struct Prim_unknown_0x48
     DWORD field_38_size24b;
     DWORD field_3C;
     DWORD field_40;
-    DWORD field_44;
+    SVECTOR* field_44;
 };
 MGS_ASSERT_SIZEOF(Prim_unknown_0x48, 0x48);
 

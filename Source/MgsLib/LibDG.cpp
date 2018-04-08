@@ -1235,7 +1235,50 @@ void CC LibGV_40674E(Prim_Union* pPrim, int faceCount)
 MGS_FUNC_IMPLEX(0x40674E, LibGV_40674E, LIBDG_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x406B97, void __cdecl(int a1, int count), sub_406B97);
-MGS_FUNC_NOT_IMPL(0x406A78, void __cdecl(int a1, int count), sub_406A78);
+
+void CC LibGV_406A78(Prim_unknown_0x48* pObj, int innerCount)
+{
+    Psx_ScratchPad_Matrix* pScratch = &gScratchPadMemory_991E40.field_2_Matrix;
+    memcpy(&gte_rotation_matrix_993E40.m, &pScratch->mtx[1].m, sizeof(PSX_MATRIX::m));
+
+    SVECTOR* field_44_iter = pObj->field_44;
+    Prim_Mesh_0x5C* pMeshObj = (Prim_Mesh_0x5C *)&pObj[1];
+    PSX_MATRIX* pScratch3 = &pScratch->mtx[2];
+
+    for (int i = 0; i < innerCount; i++)
+    {
+        PSX_MATRIX* pScratchMatrix = &pScratch->mtx[pMeshObj->field_40_pKmdObj->mRef_2C_parentObjIndex + 2]; // + 2 because matrix 0 and 1 are in use
+
+        gGte_translation_vector_993E54.x = pScratchMatrix->t[0];
+        gGte_translation_vector_993E54.y = pScratchMatrix->t[1];
+        gGte_translation_vector_993E54.z = pScratchMatrix->t[2];
+
+        gGte_VXY0_993EC0.regs.VX = field_44_iter->field_0_x;
+        gGte_VXY0_993EC0.regs.VY = field_44_iter->field_2_y;
+        gGte_VXY0_993EC0.regs.VZ = field_44_iter->field_4_z;
+        gGte_VXY0_993EC0.regs.Zero = field_44_iter->padding;
+
+        Psx_gte_RT1TR_rt_4477A0();
+    
+        memcpy(&pScratch3->m, &gte_rotation_matrix_993E40.m, sizeof(PSX_MATRIX::m));
+
+        pScratch3->t[0] = gGte_translation_vector_993E54.x;
+        pScratch3->t[1] = gGte_translation_vector_993E54.y;
+        pScratch3->t[2] = gGte_translation_vector_993E54.z;
+
+        // This makes the above stores pointless..
+        pScratch3->t[0] = gGte_MAC1_993F24.MAC_32;
+        pScratch3->t[1] = gGte_MAC2_993F28.MAC_32;
+        pScratch3->t[2] = gGte_MAC3_993F2C.MAC_32;
+
+        memcpy(&pMeshObj->field_0_mtx, pScratch3, sizeof(PSX_MATRIX));
+        pMeshObj++;
+        pScratch3++;
+        field_44_iter++;
+    }
+
+}
+MGS_FUNC_IMPLEX(0x406A78, LibGV_406A78, LIBDG_IMPL);
 
 void CC LibGV_406906(Prim_unknown_0x48* pObj, int innerCount)
 {
@@ -1312,8 +1355,7 @@ void CC LibGV_4066ED(Prim_Union* pObj)
         }
         else if (pObj->prim_54.field_40_pDataStart[1])
         {
-            // Seems to mostly render doors?
-            sub_406A78((int)pObj, count); // Prim_unknown_0x54
+            LibGV_406A78(&pObj->prim_48, count);
         }
         LibGV_406906(&pObj->prim_48, count);
     }
