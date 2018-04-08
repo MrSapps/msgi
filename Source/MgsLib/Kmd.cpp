@@ -245,6 +245,69 @@ MGS_ARY(1, 0x665A3C, int, 4096, dword_665A3C, {}); // TODO: values
 
 MATRIX3x3 gIdentityMatrix_6659BC ={ { { 4096, 0, 0 },{ 0, 4096, 0 },{ 0, 0, 4096 } } };
 
+void CC VectorMatrix_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx)
+{
+    memcpy(&pMtx->m, &gIdentityMatrix_6659BC.m, sizeof(MATRIX3x3::m));
+
+    int tbl1 = dword_665A3C[(pVec->field_0_x + 1024) & 4095];
+    const int tbl2 = dword_665A3C[pVec->field_0_x & 4095];
+
+    const int mtx_2_0 = pMtx->m[2][0];
+   
+    const int mtx_1_0 = pMtx->m[1][0];
+    const int mtx_1_1 = pMtx->m[1][1];
+    pMtx->m[2][0] = (tbl2 * mtx_1_0 + tbl1 * mtx_2_0) >> 12;
+    const int mtx_2_1 = pMtx->m[2][1];
+    pMtx->m[1][0] = (tbl1 * mtx_1_0 - tbl2 * mtx_2_0) >> 12;
+    const int mtx_2_1_copy = mtx_2_1;
+    const int mtx_1_1_copy = mtx_1_1;
+    const int v11 = tbl2 * mtx_1_1 + tbl1 * mtx_2_1;
+    const int v12 = pMtx->m[2][2];
+    pMtx->m[1][1] = (tbl1 * mtx_1_1_copy - tbl2 * mtx_2_1_copy) >> 12;
+    const int v13 = pMtx->m[1][2];
+    pMtx->m[2][1] = v11 >> 12;
+    const int v14 = tbl2 * v12;
+    const int v13_copy = v13;
+    int v16 = tbl2 * v13 + tbl1 * v12;
+    const int mtx_0_0 = pMtx->m[0][0];
+    v16 >>= 12;
+    const int v18 = (tbl1 * v13_copy - v14) >> 12;
+    pMtx->m[1][2] = v18;
+    pMtx->m[2][2] = v16;
+    
+    tbl1 = pVec->field_2_y;
+    const __int16 v19 = v16;
+    const int v20 = dword_665A3C[((WORD)tbl1 + 1024) & 4095];
+    const int v21 = pMtx->m[2][0];
+    const int v22 = dword_665A3C[tbl1 & 4095];
+    pMtx->m[0][0] = (v22 * v21 + v20 * mtx_0_0) >> 12;
+    const int v23 = v20 * v21 - v22 * mtx_0_0;
+    const int v24 = pMtx->m[0][1];
+    const int pMtxa = pMtx->m[0][1];
+    pMtx->m[2][0] = v23 >> 12;
+    const int v25 = pMtx->m[2][1];
+    pMtx->m[0][1] = (v22 * v25 + v20 * v24) >> 12;
+    pMtx->m[2][1] = (v20 * v25 - v22 * pMtxa) >> 12;
+    const int v26 = pMtx->m[0][2];
+    pMtx->m[2][2] = (v20 * v19 - v22 * v26) >> 12;
+    const int v27 = pMtx->m[0][0];
+    const int v28 = pMtx->m[1][0];
+    const int pMtxb = pMtx->m[0][0];
+    const int v29 = (v22 * v19 + v20 * v26) >> 12;
+    pMtx->m[0][2] = v29;
+    const int v30 = dword_665A3C[pVec->field_4_z & 4095];
+    const int v31 = dword_665A3C[(pVec->field_4_z + 1024) & 4095];
+    pMtx->m[0][0] = (v31 * v27 - v30 * v28) >> 12;
+    const int v32 = v30 * pMtxb + v31 * v28;
+    const int v33 = pMtx->m[1][1];
+    pMtx->m[1][0] = v32 >> 12;
+    const int v34 = pMtx->m[0][1];
+    pMtx->m[0][1] = (v31 * v34 - v30 * v33) >> 12;
+    pMtx->m[1][1] = (v30 * v34 + v31 * v33) >> 12;
+    pMtx->m[0][2] = (v31 * (signed __int16)v29 - v30 * (signed __int16)v18) >> 12;
+    pMtx->m[1][2] = (v30 * (signed __int16)v29 + v31 * (signed __int16)v18) >> 12;
+}
+MGS_FUNC_IMPLEX(0x44C880, VectorMatrix_44C880, KMD_IMPL);
 
 void CC VectorRotationMatrix_unknown_44C620(const SVECTOR* pVec, PSX_MATRIX* pMatrix)
 {
