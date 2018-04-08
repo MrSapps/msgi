@@ -204,28 +204,6 @@ struct POLY_GT3
 };
 MGS_ASSERT_SIZEOF(POLY_GT3, 40);
 
-struct POLY_GT4 
-{
-    DWORD*  tag;
-    BYTE    r0, g0, b0, code;
-    short   x0, y0;
-    BYTE    u0, v0;
-    WORD    clut;
-    BYTE    r1, g1, b1, p1;
-    short   x1, y1;
-    BYTE    u1, v1;
-    WORD    tpage;
-    BYTE    r2, g2, b2, p2;
-    short   x2, y2;
-    BYTE    u2, v2;
-    WORD    pad2;
-    BYTE    r3, g3, b3, p3;
-    short   x3, y3;
-    BYTE    u3, v3;
-    WORD    pad3;
-};
-MGS_ASSERT_SIZEOF(POLY_GT4, 52);
-
 #define PRINT_SIZE(sturcture, name)   printf("sizeof( %10.10s ):\t%2d(%2X), %2d(%2X) longs\n", name, sizeof(sturcture), sizeof(sturcture), sizeof(sturcture) / sizeof(DWORD), sizeof(sturcture) / sizeof(DWORD))
 
 signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode)

@@ -1236,11 +1236,61 @@ MGS_FUNC_IMPLEX(0x40674E, LibGV_40674E, LIBDG_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x406B97, void __cdecl(int a1, int count), sub_406B97);
 MGS_FUNC_NOT_IMPL(0x406A78, void __cdecl(int a1, int count), sub_406A78);
-MGS_FUNC_NOT_IMPL(0x406906, void __cdecl(int a1, int count), sub_406906);
+
+void CC LibGV_406906(Prim_unknown_0x48* pObj, int innerCount)
+{
+    Psx_ScratchPad_Matrix* pScratch = &gScratchPadMemory_991E40.field_2_Matrix;
+    memcpy(&gte_rotation_matrix_993E40.m, &pScratch->mtx[0].m, sizeof(PSX_MATRIX::m));
+
+    gGte_translation_vector_993E54.x = pScratch->mtx[0].t[0];
+    gGte_translation_vector_993E54.y = pScratch->mtx[0].t[1];
+    gGte_translation_vector_993E54.z = pScratch->mtx[0].t[2];
+
+    if (innerCount > 0)
+    {
+        int counter = innerCount;
+        PSX_MATRIX* pMtx = &gScratchPadMemory_991E40.field_2_Matrix.mtx[2];
+        Prim_Mesh_0x5C* pMesh = (Prim_Mesh_0x5C*)&pObj[1];
+        do
+        {
+            gGte_VXY0_993EC0.regs.VX = pMtx->t[0];
+            gGte_VXY0_993EC0.regs.VY = pMtx->t[1];
+            gGte_VXY0_993EC0.regs.VZ = pMtx->t[2];
+            Psx_gte_RT1TR_rt_4477A0();
+            pMesh->field_20_mtx.t[0] = gGte_MAC1_993F24.MAC_32;
+            pMesh->field_20_mtx.t[1] = gGte_MAC2_993F28.MAC_32;
+            pMesh->field_20_mtx.t[2] = gGte_MAC3_993F2C.MAC_32;
+            gGte_IR1_993EE4.IR_32 = pMtx->m[0][0];
+            gGte_IR2_993EE8.IR_32 = pMtx->m[1][0];
+            gGte_IR3_993EEC.IR_32 = pMtx->m[2][0];
+            Psx_gte_RT1_rtir_447480();
+            pMesh->field_20_mtx.m[0][0] = gGte_IR1_993EE4.IR_16;
+            pMesh->field_20_mtx.m[1][0] = gGte_IR2_993EE8.IR_16;
+            pMesh->field_20_mtx.m[2][0] = gGte_IR3_993EEC.IR_16;
+            gGte_IR1_993EE4.IR_32 = pMtx->m[0][1];
+            gGte_IR2_993EE8.IR_32 = pMtx->m[1][1];
+            gGte_IR3_993EEC.IR_32 = pMtx->m[2][1];
+            Psx_gte_RT1_rtir_447480();
+            pMesh->field_20_mtx.m[0][1] = gGte_IR1_993EE4.IR_16;
+            pMesh->field_20_mtx.m[1][1] = gGte_IR2_993EE8.IR_16;
+            pMesh->field_20_mtx.m[2][1] = gGte_IR3_993EEC.IR_16;
+            gGte_IR1_993EE4.IR_32 = pMtx->m[0][2];
+            gGte_IR2_993EE8.IR_32 = pMtx->m[1][2];
+            gGte_IR3_993EEC.IR_32 = pMtx->m[2][2];
+            Psx_gte_RT1_rtir_447480();
+            pMtx++;
+            pMesh->field_20_mtx.m[0][2] = gGte_IR1_993EE4.IR_16;
+            pMesh->field_20_mtx.m[1][2] = gGte_IR2_993EE8.IR_16;
+            pMesh->field_20_mtx.m[2][2] = gGte_IR3_993EEC.IR_16;
+            pMesh++;
+            --counter;
+        } while (counter);
+    }
+}
+MGS_FUNC_IMPLEX(0x406906, LibGV_406906, LIBDG_IMPL);
 
 void CC LibGV_4066ED(Prim_Union* pObj)
 {
-    
     PSX_MATRIX* field_20 = pObj->prim_54.field_20;
     int count = pObj->prim_54.field_2E_UnknownOrNumFaces;
     if (field_20)
@@ -1268,10 +1318,10 @@ void CC LibGV_4066ED(Prim_Union* pObj)
             // Seems to mostly render doors?
             sub_406A78((int)pObj, count); // Prim_unknown_0x54
         }
-        sub_406906((int)pObj, count); // pObj + 0x84
+        LibGV_406906(&pObj->prim_48, count);
     }
 }
-MGS_FUNC_IMPLEX(0x4066ED, LibGV_4066ED, true);
+MGS_FUNC_IMPLEX(0x4066ED, LibGV_4066ED, LIBDG_IMPL);
 
 //MGS_FUNC_NOT_IMPL(0x407122, void CC(struct_gv* pGv, int activeBuffer), LibGV_407122);
 MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);

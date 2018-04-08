@@ -39,7 +39,8 @@ struct Prim_Mesh_0x5C
     kmdObject* field_40_pKmdObj;
     void* field_44_colour_buffer; // 16 bytes with rgbp for each POLY_GT4
     Prim_Mesh_0x5C* field_48_pLinked;
-    DWORD field_4C;
+    WORD field_4C;
+    WORD field_4E;
     WORD field_50_numObjTranslated;
     WORD field_52_num_faces;
     POLY_GT4* field_54_prim_buffers[2];
