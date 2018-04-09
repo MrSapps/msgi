@@ -245,7 +245,7 @@ MGS_ARY(1, 0x665A3C, int, 4096, dword_665A3C, {}); // TODO: values
 
 const MATRIX3x3 gIdentityMatrix_6659BC ={ { { 4096, 0, 0 },{ 0, 4096, 0 },{ 0, 0, 4096 } } };
 
-void CC Matrix_44C270(__int16 value, PSX_MATRIX* pMtx)
+void CC RotMatrixY_44C270(__int16 value, PSX_MATRIX* pMtx)
 {
     const int tbl1 = dword_665A3C[(value + 1024) & 4095];
     const int tbl2 = dword_665A3C[value & 4095];
@@ -265,9 +265,9 @@ void CC Matrix_44C270(__int16 value, PSX_MATRIX* pMtx)
     pMtx->m[2][2] = static_cast<short>((tbl1 * m_2_2 - tbl2 * m_0_2) >> 12);
     pMtx->m[0][2] = static_cast<short>((tbl2 * m_2_2 + tbl1 * m_0_2) >> 12);
 }
-MGS_FUNC_IMPLEX(0x44C270, Matrix_44C270, KMD_IMPL);
+MGS_FUNC_IMPLEX(0x44C270, RotMatrixY_44C270, KMD_IMPL);
 
-void CC Matrix_44C1C0(__int16 value, PSX_MATRIX* pMatrix)
+void CC RotMatrixX_44C1C0(__int16 value, PSX_MATRIX* pMatrix)
 {
     const int tbl1 = dword_665A3C[(value + 1024) & 4095];
     const int tbl2 = dword_665A3C[value & 4095];
@@ -287,9 +287,9 @@ void CC Matrix_44C1C0(__int16 value, PSX_MATRIX* pMatrix)
     pMatrix->m[2][2] = static_cast<short>((tbl2 * m_1_2 + tbl1 * m_2_2) >> 12);
     pMatrix->m[1][2] = static_cast<short>((tbl1 * m_1_2 - tbl2 * m_2_2) >> 12);
 }
-MGS_FUNC_IMPLEX(0x44C1C0, Matrix_44C1C0, KMD_IMPL);
+MGS_FUNC_IMPLEX(0x44C1C0, RotMatrixX_44C1C0, KMD_IMPL);
 
-void CC Matrix_44C320(__int16 value, PSX_MATRIX* pMatrix)
+void CC RotMatrixZ_44C320(__int16 value, PSX_MATRIX* pMatrix)
 {
     const int tbl1 = dword_665A3C[(value + 1024) & 4095];
     const int tbl2 = dword_665A3C[value & 4095];
@@ -309,7 +309,7 @@ void CC Matrix_44C320(__int16 value, PSX_MATRIX* pMatrix)
     pMatrix->m[1][2] = static_cast<short>((tbl2 * m_0_2 + tbl1 * m_1_2) >> 12);
     pMatrix->m[0][2] = static_cast<short>((tbl1 * m_0_2 - tbl2 * m_1_2) >> 12);
 }
-MGS_FUNC_IMPLEX(0x44C320, Matrix_44C320, KMD_IMPL);
+MGS_FUNC_IMPLEX(0x44C320, RotMatrixZ_44C320, KMD_IMPL);
 
 
 void CC VectorMatrix_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx)

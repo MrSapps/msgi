@@ -50,7 +50,7 @@ MGS_ASSERT_SIZEOF(Prim_Mesh_0x5C, 0x5C);
 struct Prim_unknown_0x48
 {
     PSX_MATRIX field_0_matrix;
-    void* field_20;
+    PSX_MATRIX* field_20;
     KmdHeader* field_24_pKmdFileData;
     DWORD field_28_flags_or_type;
     WORD field_2C_index;
@@ -58,9 +58,9 @@ struct Prim_unknown_0x48
     WORD field_30_size;
     WORD field_32;
     PSX_MATRIX* field_34_light_mtx_array;
-    DWORD field_38_size24b;
-    DWORD field_3C;
-    DWORD field_40;
+    SVECTOR* field_38_size24b;
+    SVECTOR* field_3C;
+    SVECTOR* field_40;
     SVECTOR* field_44;
 };
 MGS_ASSERT_SIZEOF(Prim_unknown_0x48, 0x48);
@@ -131,3 +131,8 @@ MGS_ASSERT_SIZEOF(Actor_boxkeri, 0xBC);
 
 Actor_boxkeri* CC Res_Enemy_boxkeri_create_5B6EA9(PSX_MATRIX* pMtx, SVECTOR* pVec);
 void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size);
+
+void CC VectorMatrix_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx);
+void CC RotMatrixY_44C270(__int16 value, PSX_MATRIX* pMtx);
+void CC RotMatrixX_44C1C0(__int16 value, PSX_MATRIX* pMatrix);
+void CC RotMatrixZ_44C320(__int16 value, PSX_MATRIX* pMatrix);
