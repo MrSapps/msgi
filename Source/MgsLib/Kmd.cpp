@@ -13,14 +13,6 @@ void ForceLinkKmdCpp() { }
 
 struct kmdObject;
 
-struct KmdHeader
-{
-    DWORD numBlocks;
-    DWORD unkNum;
-    int mBoundingBox[6];
-};
-MGS_ASSERT_SIZEOF(KmdHeader, 0x20);
-
 
 // TODO: Reverse KMD loading as it seems very closely linked to the GV lib prim rendering/queues which is the linked to the GTE emu
 

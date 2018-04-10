@@ -129,6 +129,15 @@ struct Actor_boxkeri
 };
 MGS_ASSERT_SIZEOF(Actor_boxkeri, 0xBC);
 
+struct KmdHeader
+{
+    DWORD numBlocks;
+    DWORD unkNum;
+    int mBoundingBox[6];
+};
+MGS_ASSERT_SIZEOF(KmdHeader, 0x20);
+
+
 Actor_boxkeri* CC Res_Enemy_boxkeri_create_5B6EA9(PSX_MATRIX* pMtx, SVECTOR* pVec);
 void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size);
 

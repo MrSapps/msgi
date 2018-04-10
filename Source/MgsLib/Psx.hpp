@@ -388,3 +388,4 @@ void CC PsxGetRotationAndTranslation_407BC1(PSX_MATRIX* pMatrix);
 
 void CC Psx_gte_RT1_rtir_447480();
 void CC Psx_gte_RT1TR_rt_4477A0();
+void CC Gte_project_distance_rect_401DA8(const PSX_RECT* pRect, int projectDistance);

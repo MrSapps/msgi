@@ -572,6 +572,19 @@ static inline const T& clamp(const T& v, const T& lo, const T& hi)
     return v;
 }
 
+
+MGS_VAR(1, 0x78D324, PSX_RECT, gProjectionPlane_78D324, {});
+
+void CC Gte_project_distance_rect_401DA8(const PSX_RECT* pRect, int projectDistance)
+{
+    gGte_project_plane_distance_993EA8 = projectDistance;
+    gProjectionPlane_78D324.x1 = pRect->x1;
+    gProjectionPlane_78D324.x2 = gProjectionPlane_78D324.x1 + pRect->x2 - 1;
+    gProjectionPlane_78D324.y1 = pRect->y1;
+    gProjectionPlane_78D324.y2 = gProjectionPlane_78D324.y1 + pRect->y2 - 1;
+}
+MGS_FUNC_IMPLEX(0x401DA8, Gte_project_distance_rect_401DA8, IMPL_PSX);
+
 void CC Psx_gte_rtps_445630()
 {
     // Perspective Transformation single

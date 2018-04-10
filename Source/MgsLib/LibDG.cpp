@@ -1122,58 +1122,46 @@ MGS_FUNC_IMPLEX(0x40B231, MemClearUnknown_40B231, LIBDG_IMPL);
 
 using TDG_FnPtr = void(CC*)(struct_gv* pGv, int activeBuffer);
 
-MGS_FUNC_NOT_IMPL(0x4065AA, int CC(struct_gv* pGv, int activeBuffer), sub_4065AA);
-MGS_FUNC_NOT_IMPL(0x4064B1, void CC(Prim_Object *pObject, int activeBuffer, char a3, int a4), sub_4064B1);
-MGS_FUNC_NOT_IMPL(0x401DA8, int CC(PSX_RECT* pRect, int a2), sub_401DA8);
-
-
-
+MGS_FUNC_NOT_IMPL(0x4062CB, void __cdecl (int* pBoundingBox), LibGV_Helper_4062CB);
+MGS_FUNC_NOT_IMPL(0x40640F, signed int (), LibGV_Helper_40640F);
+MGS_FUNC_NOT_IMPL(0x4064B1, void __cdecl (Prim_unknown_0x48 *pObject, int activeBuffer, char flags, int a4), LibGV_Helper_4064B1);
+MGS_FUNC_NOT_IMPL(0x4065AA, void __cdecl (struct_gv *pGv, int activeBuffer), LibGV_Helper_4065AA);
 
 void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    const unsigned __int16 dword_78D32C_copy = dword_78D32C;
 
-    /*
-    sub_401DA8((PSX_RECT*)&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
+    Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
 
-    Prim_Object **pObjects = pGv->gObjects_dword_6BC3C4;
-    if (pGv->gObjectQueue_word_6BC3C2_0 > 0)
+    for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
     {
-    s16 objectQueueCount = pGv->gObjectQueue_word_6BC3C2_0;
-    do
-    {
-    Prim_Object* pObject = *pObjects;
-    ++pObjects;
-    s16 v5 = 0;
+        Prim_Union* pObject = pGv->gObjects_dword_6BC3C4[i];
+        Prim_unknown_0x48* pObj48 = &pObject->prim_48;
 
-    const int flags = pObject->field_28_flags;
-    if (!(pObject->field_28_flags & 0x80) && (!pObject->field_2C || pObject->field_2C & dword_78D32C))
-    {
-    v5 = 2;
-    if (flags & 0x20)
-    {
+        signed int unknownArg3 = 0;
+        const int flags = pObj48->field_28_flags_or_type;
+        if ((flags & 0x80u) == 0 && (!pObj48->field_2C_index || pObj48->field_2C_index & dword_78D32C_copy))
+        {
+            if (flags & 0x20)
+            {
+                Prim_Mesh_0x5C* pMesh = (Prim_Mesh_0x5C*)&pObj48[1];
+                memcpy(gte_rotation_matrix_993E40.m, pMesh->field_20_mtx.m, sizeof(PSX_MATRIX::m));
+                memcpy(&gGte_translation_vector_993E54, &pMesh->field_20_mtx.t, sizeof(PSX_MATRIX::t));
 
-    *(QWORD *)&stru_993E40 = *(QWORD *)&pObject->field_68_92b_size;
-    *((QWORD *)&stru_993E40 + 1) = *(QWORD *)&pObject->field_70_pInners;
-    *((QWORD *)&stru_993E40 + 2) = *(QWORD *)&pObject->field_78;
-    *((QWORD *)&stru_993E40 + 3) = *(QWORD *)&pObject->field_80;
-    sub_4062CB(pObject->field_24 + 8);
-    v5 = sub_40640F();
+                LibGV_Helper_4062CB(pObj48->field_24_pKmdFileData->mBoundingBox);
+                unknownArg3 = LibGV_Helper_40640F();
+            }
+            else
+            {
+                unknownArg3 = 2;
+            }
+        }
+        pObj48->field_32 = unknownArg3;
+        LibGV_Helper_4064B1(&pObject->prim_48, activeBuffer, flags, unknownArg3);
     }
-    }
-    pObject->field_32_hasInners = v5;
-    sub_4064B1(pObject, activeBuffer, static_cast<char>(flags), v5);
-    --objectQueueCount;
-    } while (objectQueueCount);
-    }
-    sub_4065AA(pGv, activeBuffer);
-    */
+    LibGV_Helper_4065AA(pGv, activeBuffer);
 }
-MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, false); // TODO: Fully implement
-
-
-//MGS_FUNC_NOT_IMPL(0x40674E, void __cdecl(int a1, int count), sub_40674E);
-
+MGS_FUNC_IMPLEX(0x4061E7, LibGV_4061E7, LIBDG_IMPL);
 
 MGS_VAR(1, 0x991E40, Psx_ScratchPad, gScratchPadMemory_991E40, {});
 
