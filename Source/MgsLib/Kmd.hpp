@@ -65,6 +65,14 @@ struct Prim_unknown_0x48
 };
 MGS_ASSERT_SIZEOF(Prim_unknown_0x48, 0x48);
 
+struct Prim_24b
+{
+    SVECTOR field_0_v1;
+    SVECTOR field_8_v2;
+    SVECTOR field_10_v3;
+};
+MGS_ASSERT_SIZEOF(Prim_24b, 0x18);
+
 struct Prim_unknown_0x54
 {
     PSX_MATRIX field_0_matrix;
@@ -78,7 +86,7 @@ struct Prim_unknown_0x54
     WORD field_32_primF2_vert_count;
     WORD field_34_primF3;
     WORD field_36_primF4;
-    void* field_38_size24b;
+    Prim_24b* field_38_size24b;
     void* field_3C;
     BYTE* field_40_pDataStart[2];
     // ^^^ BASE

@@ -186,7 +186,7 @@ void CC LibDG_Save_Texture_Hashes_To_Resident_Memory_4026F5();
 void CC LibDG_Clear_Resident_Texture_Cache_Copy_4026E6();
 signed int CC LibDG_SearchForTextureRecord_4024D2(signed int hashCode, Texture_Record** ppFreeItem);
 void CC LibDG_SetRGB_401931(BYTE r, BYTE b, BYTE g);
-Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, void* size, void* field_3C);
+Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, Prim_24b* size, void* field_3C);
 Texture_Record* CC LibDG_FindTexture_4024A0(WORD hashCode);
 void CC LibDG_4010A6();
 void CC LibDG_Update2_helper_40A857();
@@ -213,3 +213,5 @@ union Psx_ScratchPad
 MGS_ASSERT_SIZEOF(Psx_ScratchPad, 1024);
 
 MGS_VAR_EXTERN(Psx_ScratchPad, gScratchPadMemory_991E40);
+
+void DoDGTests();

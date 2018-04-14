@@ -46,6 +46,8 @@ MGS_ASSERT_SIZEOF(PrimUnknownData, 0x4);
 // Data maybe related to Resetgraph_AndPrintPsxStructureSizes() ?
 MGS_ARY(1, 0x650194, PrimUnknownData, 25, byte_650194,
 {
+    // header size ?
+    // size per attribute
     { 16,   2,   8,   4 }, // LINE_F2
     { 24,   3,   8,   4 }, // LINE_F3
     { 28,   4,   8,   4 }, // LINE_F4
@@ -122,7 +124,7 @@ Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, 
 }
 MGS_FUNC_IMPLEX(0x443FEC, Obj_Alloc_443FEC, KMD_IMPL);
 
-Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, void* size, void* field_3C)
+Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, Prim_24b* size, void* field_3C)
 {
     const int idx = (maybeFlags & 31);
     assert(idx < 25);

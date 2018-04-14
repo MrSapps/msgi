@@ -461,31 +461,6 @@ void CC VectorNormalSS_44CC00(const SVECTOR* pVec, SVECTOR* pUnitVec)
 }
 MGS_FUNC_IMPLEX(0x44CC00, VectorNormalSS_44CC00, IMPL_PSX);
 
-struct Regs_SYSX
-{
-    short int SY;
-    short int SX;
-};
-MGS_ASSERT_SIZEOF(Regs_SYSX, 4);
-
-union Reg_SXY0
-{
-    Regs_SYSX regs;
-    int SXY0;
-};
-
-union Reg_SXY1
-{
-    Regs_SYSX regs;
-    int SXY1;
-};
-
-union Reg_SXY2
-{
-    Regs_SYSX regs;
-    int SXY2;
-};
-
 struct Reg_RGB
 {
     unsigned char r, g, b, cd;
@@ -516,10 +491,10 @@ MGS_VAR(1, 0x993E74, VECTOR3, gGte_background_colour_993E74, {});
 MGS_VAR(1, 0x993E80, MATRIX3x3, gGte_light_colour_matrix_source_993E80, {});
 
 MGS_VAR(1, 0x993E94, VECTOR3, gGte_far_colour_993E94, {});
-MGS_VAR(1, 0x993EA0, DWORD, gGte_ScreenOffsetX_993EA0, 0);
-MGS_VAR(1, 0x993EA4, DWORD, gGte_ScreenOffSetY_993EA4, 0);
-MGS_VAR(1, 0x993EA8, DWORD, gGte_project_plane_distance_993EA8, 0);
-MGS_VAR(1, 0x993EBC, DWORD, gGte_FLAG_993EBC, 0);
+MGS_VAR(1, 0x993EA0, int, gGte_ScreenOffsetX_993EA0, 0);
+MGS_VAR(1, 0x993EA4, int, gGte_ScreenOffSetY_993EA4, 0);
+MGS_VAR(1, 0x993EA8, int, gGte_project_plane_distance_993EA8, 0);
+MGS_VAR(1, 0x993EBC, int, gGte_FLAG_993EBC, 0);
 
 MGS_VAR(1, 0x993EC0, Reg_VXY0, gGte_VXY0_993EC0, {});
 MGS_VAR(1, 0x993EC8, Reg_VXY1, gGte_VXY1_993EC8, {});
@@ -528,7 +503,7 @@ MGS_VAR(1, 0x993ED0, Reg_VXY2, gGte_VXY2_993ED0, {});
 MGS_VAR(1, 0x993ED8, BYTE, gGte_r_993ED8, 0);
 MGS_VAR(1, 0x993ED9, BYTE, gGte_g_993ED9, 0);
 MGS_VAR(1, 0x993EDA, BYTE, gGte_b_993EDA, 0);
-MGS_VAR(1, 0x993EDB, WORD, gGte_OTZ_993EDB, 0);
+MGS_VAR(1, 0x993EDB, short, gGte_OTZ_993EDB, 0);
 
 MGS_VAR(1, 0x993EE0, IR_Reg, gGte_IR0_993EE0, {});
 MGS_VAR(1, 0x993EE4, IR_Reg, gGte_IR1_993EE4, {});
@@ -539,10 +514,10 @@ MGS_VAR(1, 0x993EF0, Reg_SXY0, gGte_SXY0_993EF0, {});
 MGS_VAR(1, 0x993EF4, Reg_SXY1, gGte_SXY1_993EF4, {});
 MGS_VAR(1, 0x993EF8, Reg_SXY2, gGte_SXY2_993EF8, {});
 
-MGS_VAR(1, 0x993F00, DWORD, gGte_SZ0_993F00, 0);
-MGS_VAR(1, 0x993F04, DWORD, gGte_SZ1_993F04, 0);
-MGS_VAR(1, 0x993F08, DWORD, gGte_SZ2_993F08, 0);
-MGS_VAR(1, 0x993F0C, DWORD, gGte_SZ3_993F0C, 0);
+MGS_VAR(1, 0x993F00, int, gGte_SZ0_993F00, 0);
+MGS_VAR(1, 0x993F04, int, gGte_SZ1_993F04, 0);
+MGS_VAR(1, 0x993F08, int, gGte_SZ2_993F08, 0);
+MGS_VAR(1, 0x993F0C, int, gGte_SZ3_993F0C, 0);
 
 MGS_VAR(1, 0x993F10, Reg_RGB, gGte_RGB0_993F10, {});
 MGS_VAR(1, 0x993F14, Reg_RGB, gGte_RGB1_993F14, {});

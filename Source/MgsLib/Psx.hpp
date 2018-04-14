@@ -319,6 +319,41 @@ MGS_VAR_EXTERN(VECTOR3, gGte_background_colour_993E74);
 MGS_VAR_EXTERN(MATRIX3x3, gte_rotation_matrix_993E40);
 MGS_VAR_EXTERN(VECTOR3, gGte_translation_vector_993E54);
 
+
+struct Regs_SYSX
+{
+    short int SY;
+    short int SX;
+};
+MGS_ASSERT_SIZEOF(Regs_SYSX, 4);
+
+union Reg_SXY0
+{
+    Regs_SYSX regs;
+    int SXY0;
+};
+
+union Reg_SXY1
+{
+    Regs_SYSX regs;
+    int SXY1;
+};
+
+union Reg_SXY2
+{
+    Regs_SYSX regs;
+    int SXY2;
+};
+
+MGS_VAR_EXTERN(Reg_SXY0, gGte_SXY0_993EF0);
+MGS_VAR_EXTERN(Reg_SXY1, gGte_SXY1_993EF4);
+MGS_VAR_EXTERN(Reg_SXY2, gGte_SXY2_993EF8);
+
+MGS_VAR_EXTERN(int, gGte_SZ0_993F00);
+MGS_VAR_EXTERN(int, gGte_SZ1_993F04);
+MGS_VAR_EXTERN(int, gGte_SZ2_993F08);
+MGS_VAR_EXTERN(int, gGte_SZ3_993F0C);
+
 struct Regs_VXYZ
 {
     short int VX;
@@ -389,3 +424,4 @@ void CC PsxGetRotationAndTranslation_407BC1(PSX_MATRIX* pMatrix);
 void CC Psx_gte_RT1_rtir_447480();
 void CC Psx_gte_RT1TR_rt_4477A0();
 void CC Gte_project_distance_rect_401DA8(const PSX_RECT* pRect, int projectDistance);
+void CC Psx_gte_rtpt_445990();
