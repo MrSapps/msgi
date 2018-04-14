@@ -1516,7 +1516,7 @@ MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405
 MGS_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
 MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
 
-MGS_FUNC_NOT_IMPL(0x4045A5, void* __cdecl (int p24Struct, int count), LibGV_4045A5);
+MGS_FUNC_NOT_IMPL(0x4045A5, void* __cdecl (void* p24Struct, int count), LibGV_4045A5);
 MGS_FUNC_NOT_IMPL(0x404AB2, void* __cdecl (Prim_unknown_0x54 *pObj), LibGV_404AB2);
 MGS_FUNC_NOT_IMPL(0x40498B, void __cdecl (Prim_unknown_0x54 *pPrim), LibGV_40498B);
 MGS_FUNC_NOT_IMPL(0x404766, void* __cdecl (Prim_unknown_0x54 *pPrim), LibGV_404766);
@@ -1613,7 +1613,7 @@ void CC LibGV_4041A5(struct_gv* pGv, int activeBuffer)
                 }
                 else if (flags & 0x400)
                 {
-                    if (pObj->field_32_bUnknown == 1)
+                    if (pObj->field_32_primF2_vert_count == 1)
                     {
                         LibGV_40498B(pObj);
                     }

@@ -37,7 +37,7 @@ MGS_FUNC_IMPLEX(0x444096, Prim_444096, KMD_IMPL);
 struct PrimUnknownData
 {
     char field_0_prim_type_size;
-    char field_1;
+    char field_1_vert_count;
     char field_2;
     char field_3;
 };
@@ -46,38 +46,38 @@ MGS_ASSERT_SIZEOF(PrimUnknownData, 0x4);
 // Data maybe related to Resetgraph_AndPrintPsxStructureSizes() ?
 MGS_ARY(1, 0x650194, PrimUnknownData, 25, byte_650194,
 {
-    { 16,   2,   8,   4 },
-    { 24,   3,   8,   4 },
-    { 28,   4,   8,   4 },
-    { 20,   2,   8,   8 },
-    { 32,   3,   8,   8 },
-    { 40,   4,   8,   8 },
-    { 20,   1,   8,   0 },
-    { 16,   1,   8,   0 },
-    { 16,   1,   8,   0 },
-    { 16,   1,   8,   0 },
-    { 12,   1,   8,   0 },
-    { 12,   1,   8,   0 },
-    { 12,   1,   8,   0 },
-    { 20,   3,   8,   4 },
-    { 24,   4,   8,   4 },
-    { 28,   3,   8,   8 },
-    { 36,   4,   8,   8 },
-    { 32,   3,   8,   8 },
-    { 40,   4,   8,   8 },
-    { 40,   3,   8,  12 },
-    { 52,   4,   8,  12 },
-    { 40,   2,   8,   8 },
-    { 52,   2,   8,  12 },
-    { 12,   1,   8,   0 },
-    { 0,    0,   0,   0 }
+    { 16,   2,   8,   4 }, // LINE_F2
+    { 24,   3,   8,   4 }, // LINE_F3
+    { 28,   4,   8,   4 }, // LINE_F4
+    { 20,   2,   8,   8 }, // LINE_G2
+    { 32,   3,   8,   8 }, // LINE_G3
+    { 40,   4,   8,   8 }, // LINE_G4
+    { 20,   1,   8,   0 }, // SPRT
+    { 16,   1,   8,   0 }, // SPRT_16 ?
+    { 16,   1,   8,   0 }, // SPRT_8 ?
+    { 16,   1,   8,   0 }, // TILE ?
+    { 12,   1,   8,   0 }, // TILE_16 ?
+    { 12,   1,   8,   0 }, // TILE_8 ?
+    { 12,   1,   8,   0 }, // TILE_1 ?
+    { 20,   3,   8,   4 }, // POLY_F3
+    { 24,   4,   8,   4 }, // POLY_F4
+    { 28,   3,   8,   8 }, // POLY_G3
+    { 36,   4,   8,   8 }, // POLY_G4
+    { 32,   3,   8,   8 }, // POLY_FT3
+    { 40,   4,   8,   8 }, // POLY_FT4
+    { 40,   3,   8,  12 }, // POLY_GT3
+    { 52,   4,   8,  12 }, // POLY_GT4
+    { 40,   2,   8,   8 }, // ?
+    { 52,   2,   8,  12 }, // poly line?
+    { 12,   1,   8,   0 }, // ?
+    { 0,    0,   0,   0 }  // dynamically set
 });
 
 // Dynamically sets the last item of byte_650194
-void CC sub_40514F(char a1, char a2, char a3, char a4)
+void CC sub_40514F(char sizeInBytes, char vertCount, char a3, char a4)
 {
-    byte_650194[23].field_0_prim_type_size = a1;
-    byte_650194[23].field_1 = a2;
+    byte_650194[23].field_0_prim_type_size = sizeInBytes;
+    byte_650194[23].field_1_vert_count = vertCount;
     byte_650194[23].field_2 = a3;
     byte_650194[23].field_3 = a4;
 }
@@ -122,7 +122,7 @@ Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, 
 }
 MGS_FUNC_IMPLEX(0x443FEC, Obj_Alloc_443FEC, KMD_IMPL);
 
-Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, int size, int field_3C)
+Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, void* size, void* field_3C)
 {
     const int idx = (maybeFlags & 31);
     assert(idx < 25);
@@ -130,11 +130,8 @@ Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, 
     const PrimUnknownData* pData = &byte_650194[idx];
     const int primBufferSize = numItems * pData->field_0_prim_type_size;
 
-    // allocate double amount for active buffer switching?
-
-    // TODO: Allocating 0x54, not 0x48!
-    // alloc 12 more bytes? 12/4=3 dwords
-    Prim_unknown_0x54* pMem = (Prim_unknown_0x54 *)System_2_zerod_allocate_memory_40B296(2 * primBufferSize + sizeof(Prim_unknown_0x54));
+    // As the rendering is double buffered we allocate twice as much
+    Prim_unknown_0x54* pMem = (Prim_unknown_0x54 *)System_2_zerod_allocate_memory_40B296((primBufferSize*2) + sizeof(Prim_unknown_0x54));
     if (pMem)
     {
         MemClearUnknown_40B231(pMem, sizeof(Prim_unknown_0x54));
@@ -145,9 +142,9 @@ Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, 
         pMem->field_38_size24b = size;
         pMem->field_3C = field_3C;
         pMem->field_30_prim_size = pData->field_0_prim_type_size;
-        pMem->field_32_bUnknown = pData->field_1;
-        pMem->field_34 = pData->field_2;
-        pMem->field_36 = pData->field_3;
+        pMem->field_32_primF2_vert_count = pData->field_1_vert_count;
+        pMem->field_34_primF3 = pData->field_2;
+        pMem->field_36_primF4 = pData->field_3;
 
         // Point into the extra allocated space after the structure
         BYTE* endPtr = reinterpret_cast<BYTE*>(&pMem[1]);

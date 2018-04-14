@@ -75,11 +75,11 @@ struct Prim_unknown_0x54
     WORD field_2C_gv_index;
     WORD field_2E_UnknownOrNumFaces;
     WORD field_30_prim_size;
-    WORD field_32_bUnknown;
-    WORD field_34; // most likely also a matrix pointer ?
-    WORD field_36;
-    DWORD field_38_size24b;
-    DWORD field_3C;
+    WORD field_32_primF2_vert_count;
+    WORD field_34_primF3;
+    WORD field_36_primF4;
+    void* field_38_size24b;
+    void* field_3C;
     BYTE* field_40_pDataStart[2];
     // ^^^ BASE
 
