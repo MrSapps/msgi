@@ -69,13 +69,13 @@ struct Prim_unknown_0x54
 {
     PSX_MATRIX field_0_matrix;
     PSX_MATRIX* field_20;
-    int field_24_flags;
+    int field_24_flags2;
     WORD field_28_flags_or_type;
     WORD field_2A_num_prims;
     WORD field_2C_gv_index;
     WORD field_2E_UnknownOrNumFaces;
     WORD field_30_prim_size;
-    WORD field_32;
+    WORD field_32_bUnknown;
     WORD field_34; // most likely also a matrix pointer ?
     WORD field_36;
     DWORD field_38_size24b;
@@ -83,9 +83,10 @@ struct Prim_unknown_0x54
     BYTE* field_40_pDataStart[2];
     // ^^^ BASE
 
-    DWORD field_48;
+    WORD field_48_count;
+    WORD field_4A;
     DWORD field_4C;
-    DWORD field_50;
+    void(__cdecl* field_50_pFn)(struct Prim_unknown_0x54 *, BYTE*, int);
 };
 MGS_ASSERT_SIZEOF(Prim_unknown_0x54, 0x54);
 
@@ -141,7 +142,7 @@ MGS_ASSERT_SIZEOF(KmdHeader, 0x20);
 Actor_boxkeri* CC Res_Enemy_boxkeri_create_5B6EA9(PSX_MATRIX* pMtx, SVECTOR* pVec);
 void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size);
 
-void CC VectorMatrix_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx);
+void CC RotMatrixZYX_gte_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx);
 void CC RotMatrixY_44C270(__int16 value, PSX_MATRIX* pMtx);
 void CC RotMatrixX_44C1C0(__int16 value, PSX_MATRIX* pMatrix);
 void CC RotMatrixZ_44C320(__int16 value, PSX_MATRIX* pMatrix);

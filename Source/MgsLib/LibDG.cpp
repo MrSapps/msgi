@@ -770,6 +770,7 @@ unsigned int *__cdecl sub_40ABCA(unsigned int *a1, PadAnalogDeltas * a2)
     {
         if (v4 > 0xC0u)
         {
+            //PsxButtonBits::eDPadDown
             v5 |= 0x4000u;
         }
     }
@@ -1322,11 +1323,11 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
 
     if (pObj->field_40)
     {
-        VectorMatrix_44C880(pObj->field_40, (MATRIX3x3 *)&pScratch->mtx[26]);
+        RotMatrixZYX_gte_44C880(pObj->field_40, (MATRIX3x3 *)&pScratch->mtx[26]);
     }
     else
     {
-        VectorMatrix_44C880(pObj->field_38_size24b, (MATRIX3x3 *)&pScratch->mtx[26]);
+        RotMatrixZYX_gte_44C880(pObj->field_38_size24b, (MATRIX3x3 *)&pScratch->mtx[26]);
     }
 
     pScratch->mtx[26].t[0] = pKmd->translation[0];
@@ -1380,7 +1381,7 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
         do
         {
             PSX_MATRIX* pMtx = &pScratch->mtx[pMeshIter->field_40_pKmdObj->mRef_2C_parentObjIndex + 2];
-            VectorMatrix_44C880(pLightsIter, (MATRIX3x3 *)pScratchMtx);
+            RotMatrixZYX_gte_44C880(pLightsIter, (MATRIX3x3 *)pScratchMtx);
             pScratchMtx->t[0] = pMeshIter->field_40_pKmdObj->translation[0];
             pScratchMtx->t[1] = pMeshIter->field_40_pKmdObj->translation[1];
             pScratchMtx->t[2] = pMeshIter->field_40_pKmdObj->translation[2];
@@ -1484,14 +1485,13 @@ MGS_FUNC_IMPLEX(0x406B97, LibGV_406B97, LIBDG_IMPL);
 
 void CC LibGV_4066ED(Prim_Union* pObj)
 {
-    PSX_MATRIX* field_20 = pObj->prim_54.field_20;
-    int count = pObj->prim_48.field_2E_UnknownOrNumFaces;
-    if (field_20)
+    const int count = pObj->prim_48.field_2E_UnknownOrNumFaces;
+    if (pObj->prim_48.field_20)
     {
-        memcpy(&pObj->prim_48.field_0_matrix, field_20, sizeof(PSX_MATRIX));
+        memcpy(&pObj->prim_48.field_0_matrix, pObj->prim_48.field_20, sizeof(PSX_MATRIX));
     }
 
-    memcpy(&gScratchPadMemory_991E40.field_2_Matrix.mtx[1], pObj, sizeof(PSX_MATRIX));
+    memcpy(&gScratchPadMemory_991E40.field_2_Matrix.mtx[1], &pObj->prim_48.field_0_matrix, sizeof(PSX_MATRIX));
 
     if (pObj->prim_48.field_28_flags_or_type & 0x40)
     {
@@ -1512,13 +1512,135 @@ void CC LibGV_4066ED(Prim_Union* pObj)
 }
 MGS_FUNC_IMPLEX(0x4066ED, LibGV_4066ED, LIBDG_IMPL);
 
-//MGS_FUNC_NOT_IMPL(0x407122, void CC(struct_gv* pGv, int activeBuffer), LibGV_407122);
 MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
 MGS_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
-MGS_FUNC_NOT_IMPL(0x4041A5, void CC(struct_gv* pGv, int activeBuffer), LibGV_4041A5);
 MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
-//MGS_FUNC_NOT_IMPL(0x40340A, void CC(struct_gv* pGv, int activeBuffer), LibGV_40340A);
 
+MGS_FUNC_NOT_IMPL(0x4045A5, void* __cdecl (int p24Struct, int count), LibGV_4045A5);
+MGS_FUNC_NOT_IMPL(0x404AB2, void* __cdecl (Prim_unknown_0x54 *pObj), LibGV_404AB2);
+MGS_FUNC_NOT_IMPL(0x40498B, void __cdecl (Prim_unknown_0x54 *pPrim), LibGV_40498B);
+MGS_FUNC_NOT_IMPL(0x404766, void* __cdecl (Prim_unknown_0x54 *pPrim), LibGV_404766);
+MGS_FUNC_NOT_IMPL(0x4044E8, void __cdecl (Prim_unknown_0x54 *pPrim), LibGV_4044E8);
+MGS_FUNC_NOT_IMPL(0x40436E, void __cdecl (Prim_unknown_0x54 *pPrims, int a2), LibGV_40436E);
+
+void CC LibGV_404E08(const PSX_MATRIX* pMtx, Prim_unknown_0x54* pObj)
+{
+    PSX_MATRIX mtx = {};
+    memcpy(&gte_rotation_matrix_993E40.m, &pMtx->m, sizeof(PSX_MATRIX::m));
+
+    gGte_IR1_993EE4.IR_32 = (unsigned __int16)pObj->field_0_matrix.m[0][0];
+    gGte_IR2_993EE8.IR_32 = (unsigned __int16)pObj->field_0_matrix.m[1][0];
+    gGte_IR3_993EEC.IR_32 = (unsigned __int16)pObj->field_0_matrix.m[2][0];
+    Psx_gte_RT1_rtir_447480();
+    mtx.m[0][0] = gGte_IR2_993EE8.IR_16;
+    mtx.m[2][0] = gGte_IR3_993EEC.IR_16;
+
+    gGte_IR1_993EE4.IR_32 = (unsigned __int16)pObj->field_0_matrix.m[0][1];
+    gGte_IR2_993EE8.IR_32 = (unsigned __int16)pObj->field_0_matrix.m[1][1];
+    gGte_IR3_993EEC.IR_32 = (unsigned __int16)pObj->field_0_matrix.m[2][1];
+    Psx_gte_RT1_rtir_447480();
+    mtx.m[0][1] = gGte_IR1_993EE4.IR_16;
+    mtx.m[1][1] = gGte_IR2_993EE8.IR_16;
+    mtx.m[2][1] = gGte_IR3_993EEC.IR_16;
+
+    gGte_IR1_993EE4.IR_32 = (unsigned __int16)pObj->field_0_matrix.m[0][2];
+    gGte_IR2_993EE8.IR_32 = (unsigned __int16)pObj->field_0_matrix.m[1][2];
+    gGte_IR3_993EEC.IR_32 = (unsigned __int16)pObj->field_0_matrix.m[2][2];
+    Psx_gte_RT1_rtir_447480();
+    mtx.m[0][2] = gGte_IR1_993EE4.IR_16;
+    mtx.m[1][2] = gGte_IR2_993EE8.IR_16;
+    mtx.m[2][2] = gGte_IR3_993EEC.IR_16;
+
+    gGte_translation_vector_993E54.x = pMtx->t[0];
+    gGte_translation_vector_993E54.y = pMtx->t[1];
+    gGte_translation_vector_993E54.z = pMtx->t[2];
+
+    gGte_VXY0_993EC0.regs.VX = pObj->field_0_matrix.t[0];
+    gGte_VXY0_993EC0.regs.VY = pObj->field_0_matrix.t[1];
+    gGte_VXY0_993EC0.regs.VZ = pObj->field_0_matrix.t[2];
+    Psx_gte_RT1TR_rt_4477A0();
+    mtx.m[1][0] = 58 * mtx.m[1][0] / 64;
+    mtx.m[1][1] = 58 * mtx.m[1][1] / 64;
+    mtx.m[1][2] = 58 * mtx.m[1][2] / 64;
+
+   //
+    //*(__int64 *)&gte_rotation_matrix_993E40.m[0][0] = *(__int64 *)&mtx.m[0][0];
+    //*(DWORD *)&gte_rotation_matrix_993E40.m[1][1] = *(DWORD *)&mtx.m[1][1];
+   // *(__int64 *)&gte_rotation_matrix_993E40.m[2][0] = *(__int64 *)&mtx.m[2][0];
+
+    gGte_translation_vector_993E54.x = gGte_MAC1_993F24.MAC_32;
+    gGte_translation_vector_993E54.y = 58 * gGte_MAC2_993F28.MAC_32 / 64;
+    gGte_translation_vector_993E54.z = gGte_MAC3_993F2C.MAC_32;
+}
+MGS_FUNC_IMPLEX(0x404E08, LibGV_404E08, false); // TODO: Bugged, shoot famas tracer rounds to repro
+
+void CC LibGV_404DBA(Prim_unknown_0x54* pObj)
+{
+    LibGV_4045A5(pObj->field_38_size24b, pObj->field_48_count);
+    pObj->field_50_pFn(pObj, pObj->field_40_pDataStart[gActiveBuffer_dword_791A08], pObj->field_2A_num_prims);
+}
+MGS_FUNC_IMPLEX(0x404DBA, LibGV_404DBA, LIBDG_IMPL);
+
+void CC LibGV_4041A5(struct_gv* pGv, int activeBuffer)
+{
+    if (pGv->g_PrimQueue1_word_6BC3BE_256 != pGv->gPrimQueue2_word_6BC3C0_256)
+    {
+        Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
+        Prim_Union** ppObjs = &pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256];
+        const unsigned __int16 primTypeMask = dword_78D32C;
+        const int counter = pGv->g_PrimQueue1_word_6BC3BE_256 - pGv->gPrimQueue2_word_6BC3C0_256;
+        for (int i = 0; i < counter; i++)
+        {
+            Prim_unknown_0x54* pObj = &ppObjs[i]->prim_54;
+            const int flags = pObj->field_24_flags2;
+            if (!(flags & 0x900) && (!pObj->field_28_flags_or_type || primTypeMask & pObj->field_28_flags_or_type))
+            {
+                if (flags & 0x200)
+                {
+                    memcpy(&gte_rotation_matrix_993E40, &gIdentity_matrix_6501F8.m, sizeof(PSX_MATRIX::m));
+                    memcpy(&gGte_translation_vector_993E54, &gIdentity_matrix_6501F8.t, sizeof(PSX_MATRIX::t)); // TODO: Check this should be copied too
+                }
+                else
+                {
+                    if (pObj->field_20)
+                    {
+                        memcpy(&pObj->field_0_matrix, pObj->field_20, sizeof(PSX_MATRIX));
+                    }
+                    LibGV_404E08(&pGv->field_10_matrix, pObj);
+                }
+                if (flags & 0x2000)
+                {
+                    LibGV_404DBA(pObj);
+                }
+                else if (flags & 0x400)
+                {
+                    if (pObj->field_32_bUnknown == 1)
+                    {
+                        LibGV_40498B(pObj);
+                    }
+                    else
+                    {
+                        LibGV_404AB2(pObj);
+                    }
+                }
+                else if (flags & 0x1000)
+                {
+                    LibGV_404766(pObj);
+                }
+                else
+                {
+                    LibGV_4044E8(pObj);
+                }
+                const int flagsMasked = flags & 0x1F;
+                if (flagsMasked == 0x15 || flagsMasked == 0x16)
+                {
+                    LibGV_40436E(pObj, flagsMasked);
+                }
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x4041A5, LibGV_4041A5, LIBDG_IMPL);
 
 const PSX_MATRIX gIdentity_matrix =
 { 
@@ -1646,7 +1768,7 @@ MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0,
     LibGV_4061E7,
     LibGV_405668.Ptr(),
     LibGV_405180.Ptr(),
-    LibGV_4041A5.Ptr(),
+    LibGV_4041A5,
     LibGV_403528.Ptr(),
     LibGV_40340A,
     nullptr

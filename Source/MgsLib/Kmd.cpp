@@ -139,13 +139,13 @@ Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, 
     {
         MemClearUnknown_40B231(pMem, sizeof(Prim_unknown_0x54));
         memcpy(&pMem->field_0_matrix, &gIdentity_matrix_6501F8, sizeof(PSX_MATRIX));
-        pMem->field_24_flags = maybeFlags;
+        pMem->field_24_flags2 = maybeFlags;
         pMem->field_2A_num_prims = static_cast<WORD>(numItems);
         pMem->field_2C_gv_index = gv_index;
         pMem->field_38_size24b = size;
         pMem->field_3C = field_3C;
         pMem->field_30_prim_size = pData->field_0_prim_type_size;
-        pMem->field_32 = pData->field_1;
+        pMem->field_32_bUnknown = pData->field_1;
         pMem->field_34 = pData->field_2;
         pMem->field_36 = pData->field_3;
 
@@ -304,7 +304,7 @@ void CC RotMatrixZ_44C320(__int16 value, PSX_MATRIX* pMatrix)
 MGS_FUNC_IMPLEX(0x44C320, RotMatrixZ_44C320, KMD_IMPL);
 
 
-void CC VectorMatrix_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx)
+void CC RotMatrixZYX_gte_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx)
 {
     memcpy(&pMtx->m, &gIdentityMatrix_6659BC.m, sizeof(MATRIX3x3::m));
 
@@ -377,7 +377,7 @@ void CC VectorMatrix_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx)
         pMtx->m[1][2] = static_cast<short>((tab_vec_z_1 * mtx_0_2 + tab_vec_z_2 * mtx_1_2) >> 12);
     }
 }
-MGS_FUNC_IMPLEX(0x44C880, VectorMatrix_44C880, KMD_IMPL);
+MGS_FUNC_IMPLEX(0x44C880, RotMatrixZYX_gte_44C880, KMD_IMPL);
 
 void CC VectorRotationMatrix_unknown_44C620(const SVECTOR* pVec, PSX_MATRIX* pMatrix)
 {
