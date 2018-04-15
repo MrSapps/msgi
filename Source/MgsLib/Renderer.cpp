@@ -123,7 +123,7 @@ MGS_VAR(1, 0x688CD4, DWORD, dword_688CD4, 0);
 MGS_VAR(1, 0x791C58, DWORD, size_dword_791C58, 0);
 
 MGS_VAR(1, 0x791C7C, DWORD, g_nTextureIndex, 0);
-MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices_6FC72C, 0);
+MGS_VAR(1, 0x6FC72C, WORD*, g_pwTextureIndices_6FC72C, 0); // Might just be 16bit emulated VRAM?
 MGS_VAR(1, 0x6FC78C, WORD, gNumTextures_word_6FC78C, 0);
 MGS_VAR(1, 0x00650D28, float, gXRes, 0.0f);
 
@@ -1335,7 +1335,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             TextureIdx0 &= 0xFFFF;
             TextureIdx1 &= 0xFFFF;
 
-            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 1024 + TextureIdx0];
             g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
             if (g_nTextureIndex >= gNumTextures_word_6FC78C)
@@ -1403,7 +1403,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
             TextureIdx0 &= 0xFFFF;
             TextureIdx1 &= 0xFFFF;
 
-            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
+            gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 1024 + TextureIdx0];
             g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
             if (g_nTextureIndex >= gNumTextures_word_6FC78C)
@@ -1553,7 +1553,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 TextureIdx0 &= 0xFFFF;
                 TextureIdx1 &= 0xFFFF;
 
-                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 1024 + TextureIdx0];
                 g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
                 if (g_nTextureIndex >= gNumTextures_word_6FC78C)
@@ -1803,7 +1803,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                     TextureIdx0 &= 0xFFFF;
                     TextureIdx1 &= 0xFFFF;
 
-                    gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
+                    gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 1024 + TextureIdx0];
                     g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
                 }
                 if (g_nTextureIndex >= gNumTextures_word_6FC78C)
@@ -1919,7 +1919,7 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
                 Render_ComputeTextureIdx_40CC50(pStructVert->Vtx[1].textureIdx, pStructVert->Vtx[0].u, pStructVert->Vtx[0].v, &TextureIdx0, &TextureIdx1);
                 TextureIdx0 &= 0xFFFF;
                 TextureIdx1 &= 0xFFFF;
-                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 0x400 + TextureIdx0];
+                gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex = g_pwTextureIndices_6FC72C[TextureIdx1 * 1024 + TextureIdx0];
                 g_nTextureIndex = gPrimBuffer_dword_6C0EFC[gPrimIdx_dword_6FC788].nTextureIndex;
 
                 if (g_nTextureIndex >= gNumTextures_word_6FC78C)

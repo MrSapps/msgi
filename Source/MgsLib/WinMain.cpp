@@ -1409,10 +1409,10 @@ int __cdecl jim_enumerate_devices()
 }
 
 
-//MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardwareQ);
+//MSG_FUNC_NOT_IMPL(0x0041ECB0, signed int __cdecl(), InitD3d_ProfileGfxHardware_41ECB0);
 signed int Render_sub_41E3C0();
 
-signed int __cdecl InitD3d_ProfileGfxHardwareQ()
+signed int CC InitD3d_ProfileGfxHardware_41ECB0()
 {
     signed int result; // eax@41
     int v1; // edx@115
@@ -2154,7 +2154,7 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     if (gImageBufer_dword_6FC728)
     {
         memset(gImageBufer_dword_6FC728, 0, 0x100000u);
-        g_pwTextureIndices_6FC72C = (WORD*)malloc(0x100000u);
+        g_pwTextureIndices_6FC72C = (WORD*)malloc(1024*512*2); // Index per pixel of PSX VRAM
         if (gImageBufer_dword_6FC728)
         {
             memset(gImageBufer_dword_6FC728, -1, 0x100000u);
@@ -2186,13 +2186,13 @@ signed int __cdecl InitD3d_ProfileGfxHardwareQ()
     }
     return result;
 }
-MGS_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardwareQ);
+MGS_FUNC_IMPL(0x0041ECB0, InitD3d_ProfileGfxHardware_41ECB0);
 
 
 // 0x00420810
 signed int __cdecl DoInitAll()
 {
-    const auto ret = InitD3d_ProfileGfxHardwareQ();
+    const auto ret = InitD3d_ProfileGfxHardware_41ECB0();
     MessageBox_Error(gHwnd, -1, "Metal Gear Solid PC", MB_OK);
     return ret;
 }
