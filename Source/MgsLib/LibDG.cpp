@@ -1516,11 +1516,12 @@ MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405
 MGS_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
 MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
 
-MGS_FUNC_NOT_IMPL(0x404AB2, void* __cdecl (Prim_unknown_0x54 *pObj), LibGV_MultiVert_404AB2);
-MGS_FUNC_NOT_IMPL(0x404766, void* __cdecl (Prim_unknown_0x54 *pPrim), LibGV_404766);
 
-MGS_FUNC_NOT_IMPL(0x404A0F, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *primBuffer, int count), LibGV_404A0F);
-MGS_FUNC_NOT_IMPL(0x40466A, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrims, int count), LibGV_40466A);
+MGS_FUNC_NOT_IMPL(0x404A0F, BYTE *__cdecl (Prim_unknown_0x54 *pPrim, BYTE *primBuffer, int count), LibGV_404A0F);
+MGS_FUNC_NOT_IMPL(0x40466A, BYTE *__cdecl (Prim_unknown_0x54 *pPrim, BYTE *pPrims, int count), LibGV_40466A);
+
+MGS_FUNC_NOT_IMPL(0x404823, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404823);
+MGS_FUNC_NOT_IMPL(0x404B36, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404B36);
 
 void CC LibGV_4044E8(Prim_unknown_0x54* pPrim)
 {
@@ -1550,20 +1551,62 @@ void CC LibGV_4044E8(Prim_unknown_0x54* pPrim)
 }
 MGS_FUNC_IMPLEX(0x4044E8, LibGV_4044E8, LIBDG_IMPL);
 
+void CC LibGV_404766(Prim_unknown_0x54* pPrim)
+{
+    const int vertCount = pPrim->field_32_primF2_vert_count;
+    int count = 0;
+    int numItems = 0;
+    if (vertCount == 4)
+    {
+        count = 40;
+        numItems = 30;
+    }
+    else
+    {
+        count = 42;
+        numItems = 126 / vertCount;
+    }
+    Prim_24b* p24Struct = pPrim->field_38_size24b;
+    BYTE* pPrimBuffer = pPrim->field_40_pDataStart[gActiveBuffer_dword_791A08];
+    int i = 0;
+    for (i = pPrim->field_2A_num_prims; i > numItems; i -= numItems)
+    {
+        p24Struct = LibGV_ProcessAndStoreInScratch_4045A5(p24Struct, count);
+        pPrimBuffer = LibGV_404823(pPrim, pPrimBuffer, numItems);
+    }
+    LibGV_ProcessAndStoreInScratch_4045A5(p24Struct, (vertCount * i + 2) / 3);
+    LibGV_404823(pPrim, pPrimBuffer, i);
+}
+
 void CC LibGV_SingleVert_40498B(Prim_unknown_0x54* pPrim)
 {
-    Prim_24b* field_38 = pPrim->field_38_size24b;
+    Prim_24b* p24Struct = pPrim->field_38_size24b;
     BYTE* pPrimBuffer = pPrim->field_40_pDataStart[gActiveBuffer_dword_791A08];
     int count = 0;
     for (count = pPrim->field_2A_num_prims; count > 126; count -= 126)
     {
-        field_38 = LibGV_ProcessAndStoreInScratch_4045A5(field_38, 42);
+        p24Struct = LibGV_ProcessAndStoreInScratch_4045A5(p24Struct, 42);
         pPrimBuffer = LibGV_404A0F(pPrim, pPrimBuffer, 126);
     }
-    LibGV_ProcessAndStoreInScratch_4045A5(field_38, (count + 2) / 3);
+    LibGV_ProcessAndStoreInScratch_4045A5(p24Struct, (count + 2) / 3);
     LibGV_404A0F(pPrim, pPrimBuffer, count);
 }
 MGS_FUNC_IMPLEX(0x40498B, LibGV_SingleVert_40498B, LIBDG_IMPL);
+
+void CC LibGV_MultiVert_404AB2(Prim_unknown_0x54* pPrim)
+{
+    Prim_24b* p24Struct = pPrim->field_38_size24b;
+    BYTE* pPrimBuffer = pPrim->field_40_pDataStart[gActiveBuffer_dword_791A08];
+    int count = 0;
+    for (count = pPrim->field_2A_num_prims; count > 123; count -= 123)
+    {
+        p24Struct = LibGV_ProcessAndStoreInScratch_4045A5(p24Struct, 41);
+        pPrimBuffer = LibGV_404B36(pPrim, pPrimBuffer, 123);
+    }
+    LibGV_ProcessAndStoreInScratch_4045A5(p24Struct, (count + 2) / 3);
+    LibGV_404B36(pPrim, pPrimBuffer, count);
+}
+MGS_FUNC_IMPLEX(0x404AB2, LibGV_MultiVert_404AB2, LIBDG_IMPL);
 
 void CC LibGV_40442C(__int16* pXY0, __int16* pXY1, __int16* pXY2, __int16* pXY3)
 {
