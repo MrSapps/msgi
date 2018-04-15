@@ -514,10 +514,10 @@ MGS_VAR(1, 0x993EF0, Reg_SXY0, gGte_SXY0_993EF0, {});
 MGS_VAR(1, 0x993EF4, Reg_SXY1, gGte_SXY1_993EF4, {});
 MGS_VAR(1, 0x993EF8, Reg_SXY2, gGte_SXY2_993EF8, {});
 
-MGS_VAR(1, 0x993F00, int, gGte_SZ0_993F00, 0);
-MGS_VAR(1, 0x993F04, int, gGte_SZ1_993F04, 0);
-MGS_VAR(1, 0x993F08, int, gGte_SZ2_993F08, 0);
-MGS_VAR(1, 0x993F0C, int, gGte_SZ3_993F0C, 0);
+MGS_VAR(1, 0x993F00, Z_Reg, gGte_SZ0_993F00, {});
+MGS_VAR(1, 0x993F04, Z_Reg, gGte_SZ1_993F04, {});
+MGS_VAR(1, 0x993F08, Z_Reg, gGte_SZ2_993F08, {});
+MGS_VAR(1, 0x993F0C, Z_Reg, gGte_SZ3_993F0C, {});
 
 MGS_VAR(1, 0x993F10, Reg_RGB, gGte_RGB0_993F10, {});
 MGS_VAR(1, 0x993F14, Reg_RGB, gGte_RGB1_993F14, {});
@@ -620,7 +620,7 @@ void CC Psx_gte_rtps_445630()
 
     matrix_2_fixed = clamp(matrix_2_fixed, 0, 65535);
 
-    gGte_SZ3_993F0C = matrix_2_fixed;
+    gGte_SZ3_993F0C.Z_32 = matrix_2_fixed;
 
     matrix_0 = clamp(matrix_0, -1024.0, 1023.0);
     matrix_1 = clamp(matrix_1, -1024.0, 1023.0);
@@ -642,9 +642,9 @@ void CC Psx_gte_rtps_445630()
     gGte_unknown_72270C.d[2].field_C_v = (float)screen_off_y_matrix_1;
     gGte_unknown_72270C.d[0].field_C_v = (float)clamped_matrix_2;
 
-    gGte_SXY0_993EF0.regs.SY = gGte_SXY1_993EF4.regs.SY;
-    gGte_SXY1_993EF4.regs.SY = gGte_SXY2_993EF8.regs.SY;
-    
+    gGte_SXY0_993EF0.regs.SX = gGte_SXY1_993EF4.regs.SX;
+    gGte_SXY1_993EF4.regs.SX = gGte_SXY2_993EF8.regs.SX;
+
     signed int screen_off_x_matrix_0_clamped = (signed int)screen_off_x_matrix_0;
     if ((signed int)screen_off_x_matrix_0 >= -1024)
     {
@@ -658,9 +658,9 @@ void CC Psx_gte_rtps_445630()
         screen_off_x_matrix_0_clamped = -1024;
     }
 
-    gGte_SXY0_993EF0.regs.SX = gGte_SXY1_993EF4.regs.SX;
-    gGte_SXY1_993EF4.regs.SX = gGte_SXY2_993EF8.regs.SX;
-    gGte_SXY2_993EF8.regs.SY = (short int)screen_off_x_matrix_0_clamped;
+    gGte_SXY0_993EF0.regs.SY = gGte_SXY1_993EF4.regs.SY;
+    gGte_SXY1_993EF4.regs.SY = gGte_SXY2_993EF8.regs.SY;
+    gGte_SXY2_993EF8.regs.SX = (short int)screen_off_x_matrix_0_clamped;
 
   
     signed int screen_off_y_matrix_1_clamped = (signed int)screen_off_y_matrix_1;
@@ -670,11 +670,11 @@ void CC Psx_gte_rtps_445630()
         {
             screen_off_y_matrix_1_clamped = 1023;
         }
-        gGte_SXY2_993EF8.regs.SX = (short int)screen_off_y_matrix_1_clamped;
+        gGte_SXY2_993EF8.regs.SY = (short int)screen_off_y_matrix_1_clamped;
     }
     else
     {
-        gGte_SXY2_993EF8.regs.SX = -1024;
+        gGte_SXY2_993EF8.regs.SY = -1024;
     }
 }
 MGS_FUNC_IMPLEX(0x445630, Psx_gte_rtps_445630, IMPL_PSX);
@@ -809,10 +809,10 @@ void CC Psx_gte_nclip_446E90()
     ++gGteData_722688.gte_nclip_count_7226A4;
 
     gGte_MAC0_993F20.MAC_32 =
-          (gGte_SXY1_993EF4.regs.SY - gGte_SXY0_993EF0.regs.SY)
-        * (gGte_SXY2_993EF8.regs.SX - gGte_SXY0_993EF0.regs.SX)
-        - (gGte_SXY2_993EF8.regs.SY - gGte_SXY0_993EF0.regs.SY)
-        * (gGte_SXY1_993EF4.regs.SX - gGte_SXY0_993EF0.regs.SX);
+        (gGte_SXY1_993EF4.regs.SX - gGte_SXY0_993EF0.regs.SX)
+        * (gGte_SXY2_993EF8.regs.SY - gGte_SXY0_993EF0.regs.SY)
+        - (gGte_SXY2_993EF8.regs.SX - gGte_SXY0_993EF0.regs.SX)
+        * (gGte_SXY1_993EF4.regs.SY - gGte_SXY0_993EF0.regs.SY);
 }
 MGS_FUNC_IMPLEX(0x446E90, Psx_gte_nclip_446E90, IMPL_PSX);
 

@@ -322,8 +322,8 @@ MGS_VAR_EXTERN(VECTOR3, gGte_translation_vector_993E54);
 
 struct Regs_SYSX
 {
-    short int SY;
     short int SX;
+    short int SY;
 };
 MGS_ASSERT_SIZEOF(Regs_SYSX, 4);
 
@@ -349,10 +349,21 @@ MGS_VAR_EXTERN(Reg_SXY0, gGte_SXY0_993EF0);
 MGS_VAR_EXTERN(Reg_SXY1, gGte_SXY1_993EF4);
 MGS_VAR_EXTERN(Reg_SXY2, gGte_SXY2_993EF8);
 
-MGS_VAR_EXTERN(int, gGte_SZ0_993F00);
-MGS_VAR_EXTERN(int, gGte_SZ1_993F04);
-MGS_VAR_EXTERN(int, gGte_SZ2_993F08);
-MGS_VAR_EXTERN(int, gGte_SZ3_993F0C);
+struct Z_Regs
+{
+    short int hi;
+    short int lo;
+};
+
+union Z_Reg
+{
+    int Z_32;
+    Z_Regs regs;
+};
+MGS_VAR_EXTERN(Z_Reg, gGte_SZ0_993F00);
+MGS_VAR_EXTERN(Z_Reg, gGte_SZ1_993F04);
+MGS_VAR_EXTERN(Z_Reg, gGte_SZ2_993F08);
+MGS_VAR_EXTERN(Z_Reg, gGte_SZ3_993F0C);
 
 struct Regs_VXYZ
 {

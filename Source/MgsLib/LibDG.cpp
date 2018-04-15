@@ -1572,47 +1572,55 @@ void CC LibGV_404E08(const PSX_MATRIX* pMtx, const Prim_unknown_0x54* pObj)
 }
 MGS_FUNC_IMPLEX(0x404E08, LibGV_404E08, false); // TODO: Bugged, shoot famas tracer rounds to repro
 
-Prim_24b* CC LibGV_4045A5(Prim_24b* p24Struct, int count)
+Prim_24b* CC LibGV_4045A5(Prim_24b* pIn, int count)
 {
-    Prim_24b *pIter = (Prim_24b *)&gScratchPadMemory_991E40.field_0_raw.field_0[0];
+    Prim_24b* pOut = (Prim_24b *)&gScratchPadMemory_991E40.field_0_raw.field_0[0];
     for (int i=0; i<count; i++)
     {
-        gGte_VXY0_993EC0.regs.VX = p24Struct->field_0_v1.field_0_x;
-        gGte_VXY0_993EC0.regs.VY = p24Struct->field_0_v1.field_2_y;
-        gGte_VXY0_993EC0.regs.VZ = p24Struct->field_0_v1.field_4_z;
-        gGte_VXY0_993EC0.regs.Zero = p24Struct->field_0_v1.padding;
+        // Copy inputs
+        gGte_VXY0_993EC0.regs.VX = pIn->field_0_v1.field_0_x;
+        gGte_VXY0_993EC0.regs.VY = pIn->field_0_v1.field_2_y;
+        gGte_VXY0_993EC0.regs.VZ = pIn->field_0_v1.field_4_z;
+        gGte_VXY0_993EC0.regs.Zero = pIn->field_0_v1.padding;
 
-        gGte_VXY1_993EC8.regs.VX = p24Struct->field_8_v2.field_0_x;
-        gGte_VXY1_993EC8.regs.VY = p24Struct->field_8_v2.field_2_y;
-        gGte_VXY1_993EC8.regs.VZ = p24Struct->field_8_v2.field_4_z;
-        gGte_VXY1_993EC8.regs.Zero = p24Struct->field_8_v2.padding;
+        gGte_VXY1_993EC8.regs.VX = pIn->field_8_v2.field_0_x;
+        gGte_VXY1_993EC8.regs.VY = pIn->field_8_v2.field_2_y;
+        gGte_VXY1_993EC8.regs.VZ = pIn->field_8_v2.field_4_z;
+        gGte_VXY1_993EC8.regs.Zero = pIn->field_8_v2.padding;
 
-        gGte_VXY2_993ED0.regs.VX = p24Struct->field_10_v3.field_0_x;
-        gGte_VXY2_993ED0.regs.VY = p24Struct->field_10_v3.field_2_y;
-        gGte_VXY2_993ED0.regs.VZ = p24Struct->field_10_v3.field_4_z;
-        gGte_VXY2_993ED0.regs.Zero = p24Struct->field_10_v3.padding;
+        gGte_VXY2_993ED0.regs.VX = pIn->field_10_v3.field_0_x;
+        gGte_VXY2_993ED0.regs.VY = pIn->field_10_v3.field_2_y;
+        gGte_VXY2_993ED0.regs.VZ = pIn->field_10_v3.field_4_z;
+        gGte_VXY2_993ED0.regs.Zero = pIn->field_10_v3.padding;
 
         Psx_gte_rtpt_445990();
 
-        pIter->field_0_v1.field_0_x = gGte_SXY0_993EF0.regs.SY;
-        pIter->field_0_v1.field_2_y = gGte_SXY0_993EF0.regs.SX;
+        // Copy output X/Y's
+        pOut->field_0_v1.field_0_x = gGte_SXY0_993EF0.regs.SX;
+        pOut->field_0_v1.field_2_y = gGte_SXY0_993EF0.regs.SY;
 
-        pIter->field_8_v2.field_0_x = gGte_SXY1_993EF4.regs.SY;
-        pIter->field_8_v2.field_2_y = gGte_SXY1_993EF4.regs.SX;
+        pOut->field_8_v2.field_0_x = gGte_SXY1_993EF4.regs.SX;
+        pOut->field_8_v2.field_2_y = gGte_SXY1_993EF4.regs.SY;
 
-        pIter->field_10_v3.field_0_x = gGte_SXY2_993EF8.regs.SY;
-        pIter->field_10_v3.field_2_y = gGte_SXY2_993EF8.regs.SX;
+        pOut->field_10_v3.field_0_x = gGte_SXY2_993EF8.regs.SX;
+        pOut->field_10_v3.field_2_y = gGte_SXY2_993EF8.regs.SY;
 
-        *(int*)&pIter->field_0_v1.field_4_z = (gGte_SZ1_993F04);
-        *(int*)&pIter->field_8_v2.field_4_z = (gGte_SZ2_993F08);
-        *(int*)&pIter->field_10_v3.field_4_z = (gGte_SZ3_993F0C);
+        // Copy output Z's
+        pOut->field_0_v1.field_4_z = gGte_SZ1_993F04.regs.hi;
+        pOut->field_0_v1.padding = 0;
 
-        p24Struct++;
-        pIter++;
+        pOut->field_8_v2.field_4_z = gGte_SZ2_993F08.regs.hi;
+        pOut->field_8_v2.padding = 0;
+
+        pOut->field_10_v3.field_4_z = gGte_SZ3_993F0C.regs.hi;
+        pOut->field_10_v3.padding = 0;
+
+        pIn++;
+        pOut++;
     }
-    return p24Struct;
+    return pIn;
 }
-MGS_FUNC_IMPLEX(0x4045A5, LibGV_4045A5, true);
+MGS_FUNC_IMPLEX(0x4045A5, LibGV_4045A5, LIBDG_IMPL);
 
 static void Test_LibGV_4045A5()
 {
@@ -1624,6 +1632,7 @@ static void Test_LibGV_4045A5()
     test[0].field_0_v1.field_0_x = 1345;
     test[0].field_0_v1.field_2_y = 50;
     test[0].field_0_v1.field_4_z = 70;
+    test[0].field_0_v1.padding = 99999;
 
     test[0].field_8_v2.field_0_x = 6000;
     test[0].field_8_v2.field_2_y = 2;
@@ -1637,6 +1646,8 @@ static void Test_LibGV_4045A5()
     Prim_24b *pIter = (Prim_24b *)&gScratchPadMemory_991E40.field_0_raw.field_0[0];
 
     ASSERT_EQ(pIter->field_0_v1.field_4_z, 220);
+    ASSERT_EQ(pIter->field_0_v1.padding, 0);
+
     ASSERT_EQ(pIter->field_8_v2.field_4_z, 10149);
     ASSERT_EQ(pIter->field_10_v3.field_4_z, 2150);
 }
