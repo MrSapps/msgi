@@ -1595,6 +1595,45 @@ int CC LibGV_prim_buffer_allocate_407354(Prim_Mesh_0x5C* pMesh, int activeBuffer
 }
 MGS_FUNC_IMPLEX(0x407354, LibGV_prim_buffer_allocate_407354, LIBDG_IMPL);
 
+void CC LibGV_prim_buffer_init_polyGT4s_40738D(Prim_Mesh_0x5C* pMesh, int activeBuffer)
+{
+    POLY_GT4* pPrimBufferIter = pMesh->field_54_prim_buffers[activeBuffer];
+    Prim_Mesh_0x5C* pMeshIter = pMesh;
+    do
+    {
+        for (int i = 0; i < pMeshIter->field_52_num_faces; i++)
+        {
+            setPolyGT4(pPrimBufferIter);
+            pPrimBufferIter->code |= pMesh->field_40_pKmdObj->field_0_numObj & 2;
+            setRGB0(pPrimBufferIter, 128, 128, 128);
+            setRGB1(pPrimBufferIter, 128, 128, 128);
+            setRGB2(pPrimBufferIter, 128, 128, 128);
+            setRGB3(pPrimBufferIter, 128, 128, 128);
+            pPrimBufferIter++;
+        }
+        pMeshIter = pMeshIter->field_48_pLinked;
+    } while (pMeshIter);
+}
+MGS_FUNC_IMPLEX(0x40738D, LibGV_prim_buffer_init_polyGT4s_40738D, LIBDG_IMPL);
+
+static void Test_LibGV_prim_buffer_init_polyGT4s_40738D()
+{
+    POLY_GT4 prim = {};
+    Prim_Mesh_0x5C mesh = {};
+    kmdObject kmdObj = {};
+    mesh.field_40_pKmdObj = &kmdObj;
+    mesh.field_40_pKmdObj->field_0_numObj = 2;
+    mesh.field_52_num_faces = 1;
+    mesh.field_54_prim_buffers[0] = &prim;
+
+    LibGV_prim_buffer_init_polyGT4s_40738D(&mesh, 0);
+    ASSERT_EQ(prim.code, 0x3E);
+
+    mesh.field_40_pKmdObj->field_0_numObj = 0;
+    LibGV_prim_buffer_init_polyGT4s_40738D(&mesh, 0);
+    ASSERT_EQ(prim.code, 0x3C);
+}
+
 void CC LibGV_prim_buffer_apply_textures_407163(Prim_Mesh_0x5C* pMeshObj, int activeBuffer)
 {
     Prim_Mesh_0x5C* pLinked = pMeshObj;
@@ -2208,4 +2247,5 @@ void DoDGTests()
     Test_LibGV_4045A5();
     Test_LibGV_404E08();
     Test_LibGV_apply_texture_to_quads_4071E1();
+    Test_LibGV_prim_buffer_init_polyGT4s_40738D();
 }

@@ -87,9 +87,14 @@ MGS_ASSERT_SIZEOF(POLY_F3, 20);
 #define termPrim(p) setaddr(p, 0xffffffff)
 
 #define setRGB0(p,_r0,_g0,_b0) (p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
+#define setRGB1(p,_r1,_g1,_b1) (p)->r1 = _r1,(p)->g1 = _g1,(p)->b1 = _b1
+#define setRGB2(p,_r2,_g2,_b2) (p)->r2 = _r2,(p)->g2 = _g2,(p)->b2 = _b2
+#define setRGB3(p,_r3,_g3,_b3) (p)->r3 = _r3,(p)->g3 = _g3,(p)->b3 = _b3
+
 #define setPolyF3(p)  setlen(p, 4),  setcode(p, 0x20)
 #define setPolyF4(p)  setlen(p, 5),  setcode(p, 0x28)
 #define setPolyFT4(p) setlen(p, 9),  setcode(p, 0x2c)
+#define setPolyGT4(p) setlen(p, 12), setcode(p, 0x3c)
 #define setPolyG4(p)  setlen(p, 8),  setcode(p, 0x38)
 #define setTile(p)    setlen(p, 3),  setcode(p, 0x60)
 #define setSprt(p)    setlen(p, 4),  setcode(p, 0x64)
