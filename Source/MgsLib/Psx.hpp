@@ -272,6 +272,12 @@ struct SVECTOR
 };
 MGS_ASSERT_SIZEOF(SVECTOR, 0x8);
 
+struct CVECTOR
+{
+    BYTE r, g, b, cd;
+};
+MGS_ASSERT_SIZEOF(CVECTOR, 0x4);
+
 struct VECTOR3
 {
     int x, y, z;

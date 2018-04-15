@@ -1616,6 +1616,27 @@ void CC LibGV_prim_buffer_init_polyGT4s_40738D(Prim_Mesh_0x5C* pMesh, int active
 }
 MGS_FUNC_IMPLEX(0x40738D, LibGV_prim_buffer_init_polyGT4s_40738D, LIBDG_IMPL);
 
+void CC LibGV_prim_buffer_set_shade_colour_4072B7(Prim_Mesh_0x5C* pMesh, int activeBuffer)
+{
+    POLY_GT4* pPrimBufferIter = pMesh->field_54_prim_buffers[activeBuffer];
+    Prim_Mesh_0x5C* pMeshIter = pMesh;
+    do
+    {
+        CVECTOR* pVec = pMeshIter->field_44_colour_buffer;
+        for (int i = 0; i < pMeshIter->field_52_num_faces; i++)
+        {
+            setRGB0(pPrimBufferIter, pVec[0].r, pVec[0].g, pVec[0].b);
+            setRGB1(pPrimBufferIter, pVec[1].r, pVec[1].g, pVec[1].b);
+            setRGB2(pPrimBufferIter, pVec[3].r, pVec[3].g, pVec[3].b);
+            setRGB3(pPrimBufferIter, pVec[2].r, pVec[2].g, pVec[2].b);
+            pPrimBufferIter++;
+            pVec += 4;
+        }
+        pMeshIter = pMeshIter->field_48_pLinked;
+    } while (pMeshIter);
+}
+MGS_FUNC_IMPLEX(0x4072B7, LibGV_prim_buffer_set_shade_colour_4072B7, LIBDG_IMPL);
+
 static void Test_LibGV_prim_buffer_init_polyGT4s_40738D()
 {
     POLY_GT4 prim = {};
@@ -1668,6 +1689,27 @@ void CC LibGV_prim_buffer_apply_textures_407163(Prim_Mesh_0x5C* pMeshObj, int ac
     }
 }
 MGS_FUNC_IMPLEX(0x407163, LibGV_prim_buffer_apply_textures_407163, LIBDG_IMPL);
+
+int CC LibGV_prim_buffer_allocate_texture_and_shade_40730A(Prim_Mesh_0x5C* pMeshObj, int activeBuffer, BYTE flags)
+{
+    if (LibGV_prim_buffer_allocate_407354(pMeshObj, activeBuffer) < 0)
+    {
+        return -1;
+    }
+
+    LibGV_prim_buffer_init_polyGT4s_40738D(pMeshObj, activeBuffer);
+    if (flags & 1)
+    {
+        LibGV_prim_buffer_apply_textures_407163(pMeshObj, activeBuffer);
+    }
+
+    if (flags & 2)
+    {
+        LibGV_prim_buffer_set_shade_colour_4072B7(pMeshObj, activeBuffer);
+    }
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x40730A, LibGV_prim_buffer_allocate_texture_and_shade_40730A, LIBDG_IMPL);
 
 void CC LibGV_4044E8(Prim_unknown_0x54* pPrim)
 {

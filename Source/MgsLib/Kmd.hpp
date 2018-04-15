@@ -37,7 +37,7 @@ struct Prim_Mesh_0x5C
     PSX_MATRIX field_0_mtx;
     PSX_MATRIX field_20_mtx;
     kmdObject* field_40_pKmdObj;
-    void* field_44_colour_buffer; // 16 bytes with rgbp for each POLY_GT4
+    CVECTOR* field_44_colour_buffer; // 16 bytes with rgbp for each POLY_GT4
     Prim_Mesh_0x5C* field_48_pLinked;
     WORD field_4C;
     WORD field_4E;
