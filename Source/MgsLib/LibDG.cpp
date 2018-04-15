@@ -1574,6 +1574,27 @@ static void Test_LibGV_apply_texture_to_quads_4071E1()
     ASSERT_EQ(poly.v3, 10);
 }
 
+int CC LibGV_prim_buffer_allocate_407354(Prim_Mesh_0x5C* pMesh, int activeBuffer)
+{
+    // Get number of polys
+    Prim_Mesh_0x5C* pMeshIter = pMesh;
+    int totalCount = 0;
+    do
+    {
+        totalCount += pMeshIter->field_52_num_faces;
+        pMeshIter = pMeshIter->field_48_pLinked;
+    } while (pMeshIter);
+
+    // Allocate
+    void* alloc = System_mem_zerod_alloc_40AFA4(activeBuffer, totalCount * sizeof(POLY_GT4), (void**)&pMesh->field_54_prim_buffers[activeBuffer]);
+    if (alloc)
+    {
+        return 1;
+    }
+    return -1;
+}
+MGS_FUNC_IMPLEX(0x407354, LibGV_prim_buffer_allocate_407354, LIBDG_IMPL);
+
 void CC LibGV_prim_buffer_apply_textures_407163(Prim_Mesh_0x5C* pMeshObj, int activeBuffer)
 {
     Prim_Mesh_0x5C* pLinked = pMeshObj;
