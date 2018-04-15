@@ -26,8 +26,8 @@ struct kmdObject
     DWORD normOfs_44;
     DWORD normIndex_48;
 
-    DWORD ofsUV_4C;
-    DWORD ofsUnk_50;
+    BYTE* ofsUV_4C;
+    WORD* ofsUnk_50;
     DWORD nullpad_54;
 };
 MGS_ASSERT_SIZEOF(kmdObject, 0x58);

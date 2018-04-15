@@ -1523,6 +1523,92 @@ MGS_FUNC_NOT_IMPL(0x40466A, BYTE *__cdecl (Prim_unknown_0x54 *pPrim, BYTE *pPrim
 MGS_FUNC_NOT_IMPL(0x404823, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404823);
 MGS_FUNC_NOT_IMPL(0x404B36, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404B36);
 
+MGS_VAR(1, 0x6BEF18, Texture_Record, stru_6BEF18, {});
+
+void CC LibGV_apply_texture_to_quads_4071E1(Texture_Record* pTexture, BYTE* pUvs, POLY_GT4* pPolyGT4)
+{
+    DWORD u0 = pTexture->u0;
+    DWORD v0 = pTexture->v0;
+    DWORD u11 = pTexture->u1 + 1;
+    DWORD v11 = pTexture->v1 + 1;
+
+    pPolyGT4->u0 = static_cast<BYTE>(u0 + u11 * pUvs[0] / 256);
+    pPolyGT4->v0 = static_cast<BYTE>(v0 + v11 * pUvs[1] / 256);
+
+    pPolyGT4->u1 = static_cast<BYTE>(u0 + u11 * pUvs[2] / 256);
+    pPolyGT4->v1 = static_cast<BYTE>(v0 + v11 * pUvs[3] / 256);
+   
+    pPolyGT4->u2 = static_cast<BYTE>(u0 + u11 * pUvs[6] / 256);
+    pPolyGT4->v2 = static_cast<BYTE>(v0 + v11 * pUvs[7] / 256);
+    
+    pPolyGT4->u3 = static_cast<BYTE>(u0 + u11 * pUvs[4] / 256);
+    pPolyGT4->v3 = static_cast<BYTE>(v0 + v11 * pUvs[5] / 256);
+
+    pPolyGT4->tpage = pTexture->mTPage;
+    pPolyGT4->clut = pTexture->mClut;
+}
+MGS_FUNC_IMPLEX(0x4071E1, LibGV_apply_texture_to_quads_4071E1, LIBDG_IMPL);
+
+static void Test_LibGV_apply_texture_to_quads_4071E1()
+{
+    Texture_Record tr = {};
+    tr.u0 = 5;
+    tr.v0 = 10;
+    tr.u1 = 15;
+    tr.v1 = 20;
+
+    BYTE uvs[8] = {1,2,3,4,5,6,7,8};
+    POLY_GT4 poly = {};
+    LibGV_apply_texture_to_quads_4071E1(&tr, uvs, &poly);
+
+    ASSERT_EQ(poly.u0, 5);
+    ASSERT_EQ(poly.v0, 10);
+
+    ASSERT_EQ(poly.u1, 5);
+    ASSERT_EQ(poly.v1, 10);
+
+    ASSERT_EQ(poly.u2, 5);
+    ASSERT_EQ(poly.v2, 10);
+
+    ASSERT_EQ(poly.u3, 5);
+    ASSERT_EQ(poly.v3, 10);
+}
+
+void CC LibGV_prim_buffer_apply_textures_407163(Prim_Mesh_0x5C* pMeshObj, int activeBuffer)
+{
+    Prim_Mesh_0x5C* pLinked = pMeshObj;
+    POLY_GT4* pPolys = pMeshObj->field_54_prim_buffers[activeBuffer];
+    if (pPolys)
+    {
+        WORD lastTextureHash = 0;
+        for (Texture_Record* pRec = &stru_6BEF18; pLinked; pLinked = pLinked->field_48_pLinked)
+        {
+            kmdObject* pKmd = pLinked->field_40_pKmdObj;
+            WORD* pUnk = pKmd->ofsUnk_50;
+            BYTE* pUvs = pKmd->ofsUV_4C;
+            if (pLinked->field_52_num_faces > 0)
+            {
+                int count = pLinked->field_52_num_faces;
+                do
+                {
+                    WORD textureHash = *pUnk;
+                    ++pUnk;
+                    if (textureHash != lastTextureHash)
+                    {
+                        lastTextureHash = textureHash;
+                        pRec = LibDG_FindTexture_4024A0(textureHash);
+                    }
+                    LibGV_apply_texture_to_quads_4071E1(pRec, pUvs, pPolys);
+                    ++pPolys;
+                    pUvs += 8;
+                    --count;
+                } while (count);
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x407163, LibGV_prim_buffer_apply_textures_407163, LIBDG_IMPL);
+
 void CC LibGV_4044E8(Prim_unknown_0x54* pPrim)
 {
     const int vertCount = pPrim->field_32_primF2_vert_count;
@@ -2100,4 +2186,5 @@ void DoDGTests()
 {
     Test_LibGV_4045A5();
     Test_LibGV_404E08();
+    Test_LibGV_apply_texture_to_quads_4071E1();
 }
