@@ -1516,11 +1516,67 @@ MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405
 MGS_FUNC_NOT_IMPL(0x405180, void CC(struct_gv* pGv, int activeBuffer), LibGV_405180);
 MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
 
-MGS_FUNC_NOT_IMPL(0x404AB2, void* __cdecl (Prim_unknown_0x54 *pObj), LibGV_404AB2);
-MGS_FUNC_NOT_IMPL(0x40498B, void __cdecl (Prim_unknown_0x54 *pPrim), LibGV_40498B);
+MGS_FUNC_NOT_IMPL(0x404AB2, void* __cdecl (Prim_unknown_0x54 *pObj), LibGV_MultiVert_404AB2);
+MGS_FUNC_NOT_IMPL(0x40498B, void __cdecl (Prim_unknown_0x54 *pPrim), LibGV_SingleVert_40498B);
 MGS_FUNC_NOT_IMPL(0x404766, void* __cdecl (Prim_unknown_0x54 *pPrim), LibGV_404766);
 MGS_FUNC_NOT_IMPL(0x4044E8, void __cdecl (Prim_unknown_0x54 *pPrim), LibGV_4044E8);
-MGS_FUNC_NOT_IMPL(0x40436E, void __cdecl (Prim_unknown_0x54 *pPrims, int a2), LibGV_40436E);
+
+void CC LibGV_40442C(__int16* pXY0, __int16* pXY1, __int16* pXY2, __int16* pXY3)
+{
+    const short int pX0 = pXY0[0];
+    const short int pX1 = pXY1[0];
+    const short int pY0 = pXY0[1];
+    const short int pY1 = pXY1[1];
+
+    int xDiff = pX1 - pX0;
+    if (pX1 - pX0 < 0)
+    {
+        xDiff = pX0 - pX1;
+    }
+
+    int yDiff = pY1 - pY0;
+    if (yDiff < 0)
+    {
+        yDiff = pY0 - pY1;
+    }
+
+    if (xDiff > yDiff)
+    {
+        pXY2[0] = pX0;      // X2
+        pXY2[1] = pY0 + 1;  // Y2
+        pXY3[0] = pX1;      // X3
+        pXY3[1] = pY1 + 1;  // Y3
+    }
+    else
+    {
+        pXY2[0] = pX0 + 2;  // X2
+        pXY2[1] = pY0;      // Y2
+        pXY3[0] = pX1 + 2;  // X3
+        pXY3[1] = pY1;      // Y3
+    }
+}
+MGS_FUNC_IMPLEX(0x40442C, LibGV_40442C, LIBDG_IMPL);
+
+void CC LibGV_Transform_XYs_40436E(Prim_unknown_0x54* pPrims, int type)
+{
+    if (type == 21)
+    {
+        POLY_FT4* pIter = reinterpret_cast<POLY_FT4*>(pPrims->field_40_pDataStart[gActiveBuffer_dword_791A08]);
+        for (int i = 0; i <  pPrims->field_2A_num_prims; i++)
+        {
+            LibGV_40442C(&pIter[i].x0, &pIter[i].x1, &pIter[i].x2, &pIter[i].x3);
+        }
+    }
+    else // type == 22s
+    {
+        POLY_GT4* pIter = reinterpret_cast<POLY_GT4*>(pPrims->field_40_pDataStart[gActiveBuffer_dword_791A08]);
+        for (int i = 0; i < pPrims->field_2A_num_prims; i++)
+        {
+            LibGV_40442C(&pIter[i].x0, &pIter[i].x1, &pIter[i].x2, &pIter[i].x3);
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x40436E, LibGV_Transform_XYs_40436E, LIBDG_IMPL);
 
 void CC LibGV_404E08(const PSX_MATRIX* pMtx, const Prim_unknown_0x54* pObj)
 {
@@ -1605,7 +1661,7 @@ static void Test_LibGV_404E08()
     ASSERT_EQ(gGte_translation_vector_993E54.z, 350);
 }
 
-Prim_24b* CC LibGV_4045A5(Prim_24b* pIn, int count)
+Prim_24b* CC LibGV_ProcessAndStoreInScratch_4045A5(Prim_24b* pIn, int count)
 {
     Prim_24b* pOut = (Prim_24b *)&gScratchPadMemory_991E40.field_0_raw.field_0[0];
     for (int i=0; i<count; i++)
@@ -1653,7 +1709,7 @@ Prim_24b* CC LibGV_4045A5(Prim_24b* pIn, int count)
     }
     return pIn;
 }
-MGS_FUNC_IMPLEX(0x4045A5, LibGV_4045A5, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x4045A5, LibGV_ProcessAndStoreInScratch_4045A5, LIBDG_IMPL);
 
 static void Test_LibGV_4045A5()
 {
@@ -1675,7 +1731,7 @@ static void Test_LibGV_4045A5()
     test[0].field_10_v3.field_2_y = 1000;
     test[0].field_10_v3.field_4_z = 2000;
 
-    Prim_24b* pRet = LibGV_4045A5(test, 1);
+    Prim_24b* pRet = LibGV_ProcessAndStoreInScratch_4045A5(test, 1);
     Prim_24b *pIter = (Prim_24b *)&gScratchPadMemory_991E40.field_0_raw.field_0[0];
 
     ASSERT_EQ(pIter->field_0_v1.field_4_z, 220);
@@ -1687,7 +1743,7 @@ static void Test_LibGV_4045A5()
 
 void CC LibGV_404DBA(Prim_unknown_0x54* pObj)
 {
-    LibGV_4045A5(pObj->field_38_size24b, pObj->field_48_count);
+    LibGV_ProcessAndStoreInScratch_4045A5(pObj->field_38_size24b, pObj->field_48_count);
     pObj->field_50_pFn(pObj, pObj->field_40_pDataStart[gActiveBuffer_dword_791A08], pObj->field_2A_num_prims);
 }
 MGS_FUNC_IMPLEX(0x404DBA, LibGV_404DBA, LIBDG_IMPL);
@@ -1727,11 +1783,12 @@ void CC LibGV_4041A5(struct_gv* pGv, int activeBuffer)
                 {
                     if (pObj->field_32_primF2_vert_count == 1)
                     {
-                        LibGV_40498B(pObj);
+                        // Chaff squares
+                        LibGV_SingleVert_40498B(pObj);
                     }
                     else
                     {
-                        LibGV_404AB2(pObj);
+                        LibGV_MultiVert_404AB2(pObj);
                     }
                 }
                 else if (flags & 0x1000)
@@ -1745,7 +1802,8 @@ void CC LibGV_4041A5(struct_gv* pGv, int activeBuffer)
                 const int flagsMasked = flags & 0x1F;
                 if (flagsMasked == 0x15 || flagsMasked == 0x16)
                 {
-                    LibGV_40436E(pObj, flagsMasked);
+                    // Square socom laser target and source
+                    LibGV_Transform_XYs_40436E(pObj, flagsMasked);
                 }
             }
         }
