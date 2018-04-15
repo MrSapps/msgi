@@ -1532,24 +1532,25 @@ void CC LibGV_404E08(const PSX_MATRIX* pMtx, const Prim_unknown_0x54* pObj)
     gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][0];
     gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][0];
     Psx_gte_RT1_rtir_447480();
-    mtx.m[0][0] = static_cast<short>(gGte_IR2_993EE8.IR_32);
-    mtx.m[2][0] = static_cast<short>(gGte_IR3_993EEC.IR_32);
+    mtx.m[0][0] = gGte_IR1_993EE4.IR_16;
+    mtx.m[1][0] = gGte_IR2_993EE8.IR_16;
+    mtx.m[2][0] = gGte_IR3_993EEC.IR_16;
 
     gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][1];
     gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][1];
     gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][1];
     Psx_gte_RT1_rtir_447480();
-    mtx.m[0][1] = static_cast<short>(gGte_IR1_993EE4.IR_32);
-    mtx.m[1][1] = static_cast<short>(gGte_IR2_993EE8.IR_32);
-    mtx.m[2][1] = static_cast<short>(gGte_IR3_993EEC.IR_32);
+    mtx.m[0][1] = gGte_IR1_993EE4.IR_16;
+    mtx.m[1][1] = gGte_IR2_993EE8.IR_16;
+    mtx.m[2][1] = gGte_IR3_993EEC.IR_16;
 
     gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][2];
     gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][2];
     gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][2];
     Psx_gte_RT1_rtir_447480();
-    mtx.m[0][2] = static_cast<short>(gGte_IR1_993EE4.IR_32);
-    mtx.m[1][2] = static_cast<short>(gGte_IR2_993EE8.IR_32);
-    mtx.m[2][2] = static_cast<short>(gGte_IR3_993EEC.IR_32);
+    mtx.m[0][2] = gGte_IR1_993EE4.IR_16;
+    mtx.m[1][2] = gGte_IR2_993EE8.IR_16;
+    mtx.m[2][2] = gGte_IR3_993EEC.IR_16;
 
     gGte_translation_vector_993E54.x = pMtx->t[0];
     gGte_translation_vector_993E54.y = pMtx->t[1];
@@ -1563,14 +1564,46 @@ void CC LibGV_404E08(const PSX_MATRIX* pMtx, const Prim_unknown_0x54* pObj)
     mtx.m[1][1] = 58 * mtx.m[1][1] / 64;
     mtx.m[1][2] = 58 * mtx.m[1][2] / 64;
 
-    memcpy(&gte_rotation_matrix_993E40.m, &pMtx->m, sizeof(PSX_MATRIX::m));
+    memcpy(&gte_rotation_matrix_993E40.m, &mtx.m, sizeof(PSX_MATRIX::m));
 
     gGte_translation_vector_993E54.x = gGte_MAC1_993F24.MAC_32;
-    gGte_translation_vector_993E54.y = gGte_MAC2_993F28.MAC_32;
+    gGte_translation_vector_993E54.y = 58 * gGte_MAC2_993F28.MAC_32 / 64;
     gGte_translation_vector_993E54.z = gGte_MAC3_993F2C.MAC_32;
 
 }
-MGS_FUNC_IMPLEX(0x404E08, LibGV_404E08, false); // TODO: Bugged, shoot famas tracer rounds to repro
+MGS_FUNC_IMPLEX(0x404E08, LibGV_404E08, LIBDG_IMPL);
+
+static void Test_LibGV_404E08()
+{
+    Prim_unknown_0x54 obj = {};
+    obj.field_0_matrix.t[0] = 50;
+    obj.field_0_matrix.t[1] = 100;
+    obj.field_0_matrix.t[2] = 150;
+
+    obj.field_0_matrix.m[0][0] = 4096 * 2;
+    obj.field_0_matrix.m[0][1] = 0;
+  
+    obj.field_0_matrix.m[1][0] = 0;
+    obj.field_0_matrix.m[1][1] = 4096 * 2;
+
+    obj.field_0_matrix.m[2][0] = 0;
+    obj.field_0_matrix.m[2][1] = 4096 * 2;
+
+    LibGV_404E08(&obj.field_0_matrix, &obj);
+
+    ASSERT_EQ(gte_rotation_matrix_993E40.m[0][0], 16384);
+    ASSERT_EQ(gte_rotation_matrix_993E40.m[0][1], 0);
+
+    ASSERT_EQ(gte_rotation_matrix_993E40.m[1][0], 0);
+    ASSERT_EQ(gte_rotation_matrix_993E40.m[1][1], 14848);
+
+    ASSERT_EQ(gte_rotation_matrix_993E40.m[2][0], 0);
+    ASSERT_EQ(gte_rotation_matrix_993E40.m[2][1], 16384);
+
+    ASSERT_EQ(gGte_translation_vector_993E54.x, 150);
+    ASSERT_EQ(gGte_translation_vector_993E54.y, 271);
+    ASSERT_EQ(gGte_translation_vector_993E54.z, 350);
+}
 
 Prim_24b* CC LibGV_4045A5(Prim_24b* pIn, int count)
 {
@@ -1921,4 +1954,5 @@ MGS_FUNC_IMPLEX(0x40171C, LibDG_ExecFnPtrs_40171C, LIBDG_IMPL);
 void DoDGTests()
 {
     Test_LibGV_4045A5();
+    Test_LibGV_404E08();
 }
