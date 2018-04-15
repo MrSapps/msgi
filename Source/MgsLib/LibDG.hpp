@@ -214,4 +214,6 @@ MGS_ASSERT_SIZEOF(Psx_ScratchPad, 1024);
 
 MGS_VAR_EXTERN(Psx_ScratchPad, gScratchPadMemory_991E40);
 
+Prim_24b* CC LibGV_ProcessAndStoreInScratch_4045A5(Prim_24b* pIn, int count);
+
 void DoDGTests();
