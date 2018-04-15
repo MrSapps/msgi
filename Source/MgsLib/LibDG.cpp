@@ -1125,8 +1125,67 @@ using TDG_FnPtr = void(CC*)(struct_gv* pGv, int activeBuffer);
 
 MGS_FUNC_NOT_IMPL(0x4062CB, void __cdecl (int* pBoundingBox), LibGV_Helper_4062CB);
 MGS_FUNC_NOT_IMPL(0x40640F, signed int (), LibGV_Helper_40640F);
-MGS_FUNC_NOT_IMPL(0x4064B1, void __cdecl (Prim_unknown_0x48 *pObject, int activeBuffer, char flags, int a4), LibGV_Helper_4064B1);
 MGS_FUNC_NOT_IMPL(0x4065AA, void __cdecl (struct_gv *pGv, int activeBuffer), LibGV_Helper_4065AA);
+
+void CC LibGV_void_active_prim_buffer_4073E8(Prim_Mesh_0x5C* pMesh, int activeBuffer)
+{
+    if (pMesh->field_54_prim_buffers[activeBuffer])
+    {
+        System_VoidAllocation_40B187(activeBuffer, (void **)&pMesh->field_54_prim_buffers[activeBuffer]);
+        pMesh->field_54_prim_buffers[activeBuffer] = nullptr;
+    }
+}
+MGS_FUNC_IMPLEX(0x4073E8, LibGV_void_active_prim_buffer_4073E8, LIBDG_IMPL);
+
+void CC LibGV_allocate_in_bounds_and_void_out_of_bounds_4064B1(Prim_unknown_0x48* pObject, int activeBuffer, BYTE flags, int previousBoundingRet)
+{
+    Prim_Mesh_0x5C* pMeshObj = reinterpret_cast<Prim_Mesh_0x5C*>(&pObject[1]);
+    for (int i = 0; i < pObject->field_2E_UnknownOrNumFaces; i++)
+    {
+        int boundingRet = 0;
+        if (previousBoundingRet)
+        {
+            boundingRet = 2;
+            if (flags & 0x10)
+            {
+                memcpy(&gte_rotation_matrix_993E40, pMeshObj->field_20_mtx.m, sizeof(PSX_MATRIX::m));
+                gGte_translation_vector_993E54.x = pMeshObj->field_20_mtx.t[0];
+                gGte_translation_vector_993E54.y = pMeshObj->field_20_mtx.t[1];
+                gGte_translation_vector_993E54.z = pMeshObj->field_20_mtx.t[2];
+                LibGV_Helper_4062CB(pMeshObj->field_40_pKmdObj->boundingBox);
+                boundingRet = LibGV_Helper_40640F();
+            }
+        }
+
+        pMeshObj->field_4C_bounding_ret = boundingRet;
+
+        if (boundingRet)
+        {
+            pMeshObj->field_4E_counter = 8;
+            if (pMeshObj->field_52_num_faces > 0 && !pMeshObj->field_54_prim_buffers[activeBuffer])
+            {
+                if (LibGV_prim_buffer_allocate_texture_and_shade_40730A(pMeshObj, activeBuffer, flags) < 0)
+                {
+                    pMeshObj->field_4C_bounding_ret = 0;
+                    if (flags & 0x20)
+                    {
+                        pObject->field_32 = 0;
+                        return;
+                    }
+                }
+            }
+        }
+        else if (pMeshObj->field_54_prim_buffers[activeBuffer])
+        {
+            if (--pMeshObj->field_4E_counter <= 0)
+            {
+                LibGV_void_active_prim_buffer_4073E8(pMeshObj, activeBuffer);
+            }
+        }
+        ++pMeshObj;
+    }
+}
+MGS_FUNC_IMPLEX(0x4064B1, LibGV_allocate_in_bounds_and_void_out_of_bounds_4064B1, LIBDG_IMPL);
 
 void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
 {
@@ -1158,7 +1217,7 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
             }
         }
         pObj48->field_32 = unknownArg3;
-        LibGV_Helper_4064B1(&pObject->prim_48, activeBuffer, flags, unknownArg3);
+        LibGV_allocate_in_bounds_and_void_out_of_bounds_4064B1(&pObject->prim_48, activeBuffer, flags, unknownArg3);
     }
     LibGV_Helper_4065AA(pGv, activeBuffer);
 }
