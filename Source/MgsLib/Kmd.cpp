@@ -555,12 +555,12 @@ void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
 }
 MGS_FUNC_IMPLEX(0x5B6EF7, Res_Enemy_boxkeri_update_5B6EF7, false); // TODO
 
+
 void CC Res_Enemy_boxkeri_shutdown_5B701F(Actor_boxkeri* pBox)
 {
-    // TODO
-    //Kmd_free_4500DD(&pBox->field_20_kmd);
+    Kmd_free_4500DD(&pBox->field_20_kmd);
 }
-MGS_FUNC_IMPLEX(0x5B701F, Res_Enemy_boxkeri_shutdown_5B701F, false); // TODO
+MGS_FUNC_IMPLEX(0x5B701F, Res_Enemy_boxkeri_shutdown_5B701F, BOXKERI_IMPL);
 
 void CC Res_Enemy_boxkeri_loader_mesg_5B711B()
 {
@@ -649,6 +649,17 @@ void CC Prim_void_and_free_4440BE(Prim_unknown_0x48* pPrim)
     System_2_free_40B2A7(pPrim);
 }
 MGS_FUNC_IMPLEX(0x4440BE, Prim_void_and_free_4440BE, BOXKERI_IMPL);
+
+void CC Kmd_free_4500DD(struc_kmd* pKmd)
+{
+    Prim_unknown_0x48* pObj = &pKmd->field_0_pObj->prim_48;
+    if (pObj)
+    {
+        Object_Remove_4017C3(pObj);
+        Prim_void_and_free_4440BE(pObj);
+    }
+}
+MGS_FUNC_IMPLEX(0x4500DD, Kmd_free_4500DD, BOXKERI_IMPL);
 
 signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
 {
