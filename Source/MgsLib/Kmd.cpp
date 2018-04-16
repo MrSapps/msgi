@@ -87,7 +87,7 @@ MGS_FUNC_IMPLEX(0x40514F, sub_40514F, KMD_IMPL);
 
 Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, __int16 usuallyZero)
 {
-    const int primSize = sizeof(Prim_unknown_0x48) + (sizeof(Prim_Mesh_0x5C) * pFileData->unkNum);
+    const int primSize = sizeof(Prim_unknown_0x48) + (sizeof(Prim_Mesh_0x5C) * pFileData->mNumberOfMeshes);
     Prim_unknown_0x48* pAllocated = (Prim_unknown_0x48 *)System_2_zerod_allocate_memory_40B296(primSize);
     if (pAllocated)
     {
@@ -100,10 +100,10 @@ Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, 
         pAllocated->field_34_light_mtx_array = &gLightNormalVec_650128;
 
         kmdObject* pKmdObject = (kmdObject *)&pFileData[1];
-        if (pFileData->unkNum > 0)
+        if (pFileData->mNumberOfMeshes > 0)
         {
             Prim_Mesh_0x5C* pFirstMesh = reinterpret_cast<Prim_Mesh_0x5C*>(&pAllocated[1]);
-            for (DWORD i = 0; i < pFileData->unkNum; i++)
+            for (DWORD i = 0; i < pFileData->mNumberOfMeshes; i++)
             {
                 pFirstMesh[i].field_40_pKmdObj = &pKmdObject[i];
                 if (pKmdObject[i].mObjPosNum_30_translationUnk >= 0)
@@ -580,6 +580,76 @@ void CC Kmd_Set_Light_matrices_450109(struc_kmd* pKmd, PSX_MATRIX* pLightMtxAry)
 }
 MGS_FUNC_IMPLEX(0x450109, Kmd_Set_Light_matrices_450109, BOXKERI_IMPL);
 
+int CC Kmd_TotalObjectSizeInBytes_443FAF(KmdHeader* pKmdHeader)
+{
+    int totalCount = 0;
+    for (int i = 0; i < pKmdHeader->mNumberOfMeshes; i++)
+    {
+        kmdObject* pKmdObj = (kmdObject *)&pKmdHeader[1];
+        totalCount += pKmdObj[i].field_4_numFaces;
+    }
+    return (16 * totalCount); // TODO: 16 = sizeof(?)
+}
+MGS_FUNC_IMPLEX(0x443FAF, Kmd_TotalObjectSizeInBytes_443FAF, BOXKERI_IMPL);
+
+void CC Object_Remove_4017C3(Prim_unknown_0x48* pPrim)
+{
+    struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrim->field_30_size;
+    int used = pGv->gObjectQueue_word_6BC3C2_0;
+    if (used > 0)
+    {
+        // Find position in the array
+        Prim_unknown_0x48** ppPrimIter = (Prim_unknown_0x48**)pGv->gObjects_dword_6BC3C4;
+        int locationOfItemToRemove = used;
+        while (*ppPrimIter != pPrim)
+        {
+            ++ppPrimIter;
+            if (--locationOfItemToRemove <= 0)
+            {
+                return;
+            }
+        }
+        
+        // Decrement the used count as we are about to erase an item
+        const int newCount = locationOfItemToRemove - 1;
+        if (newCount > 0)
+        {
+            // Overwrite the old item with everything after it up to the new count
+            memcpy(ppPrimIter, ppPrimIter + 1, sizeof(Prim_unknown_0x48*) * newCount);
+        }
+        pGv->gObjectQueue_word_6BC3C2_0 = used - 1;
+    }
+}
+MGS_FUNC_IMPLEX(0x4017C3, Object_Remove_4017C3, BOXKERI_IMPL);
+
+void CC Prim_free_colour_buffer_443FCB(Prim_unknown_0x48* pPrim)
+{
+    Prim_Mesh_0x5C* pMesh = (Prim_Mesh_0x5C *)&pPrim[1];
+    if (pMesh->field_44_colour_buffer)
+    {
+        System_2_free_40B2A7(pMesh->field_44_colour_buffer);
+        pMesh->field_44_colour_buffer = nullptr;
+    }
+}
+MGS_FUNC_IMPLEX(0x443FCB, Prim_free_colour_buffer_443FCB, BOXKERI_IMPL);
+
+void CC Prim_void_and_free_4440BE(Prim_unknown_0x48* pPrim)
+{
+    Prim_Mesh_0x5C* pMeshIter = (Prim_Mesh_0x5C *)&pPrim[1];
+    if (pPrim->field_2E_UnknownOrNumFaces > 0)
+    {
+        for (int i=0; i<pPrim->field_2E_UnknownOrNumFaces; i++)
+        {
+            LibGV_void_active_prim_buffer_4073E8(pMeshIter, 0);
+            LibGV_void_active_prim_buffer_4073E8(pMeshIter, 1);
+            pMeshIter++;
+        }
+    }
+    Prim_free_colour_buffer_443FCB(pPrim);
+    System_2_free_40B2A7(pPrim);
+}
+MGS_FUNC_IMPLEX(0x4440BE, Prim_void_and_free_4440BE, BOXKERI_IMPL);
+
 signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
 {
     Prim_unknown_0x48* pOldObj = &pKmd->field_0_pObj->prim_48;
@@ -599,9 +669,8 @@ signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
 
     if (pOldObj)
     {
-        // TODO
-        //Object_Remove_4017C3(pOldObj);
-        //Prim_void_and_free_4440BE(pOldObj);
+        Object_Remove_4017C3(pOldObj);
+        Prim_void_and_free_4440BE(pOldObj);
     }
 
     PSX_MATRIX* pKmdLightMtxAry = pKmd->field_8_light_mtx_array;
@@ -611,7 +680,7 @@ signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
     Object_Add_40178F(pPrimObj);
     return 0;
 }
-MGS_FUNC_IMPLEX(0x450243, LoadKmdImpl_450243, false); // TODO
+MGS_FUNC_IMPLEX(0x450243, LoadKmdImpl_450243, BOXKERI_IMPL);
 
 void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size)
 {

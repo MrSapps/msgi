@@ -216,5 +216,6 @@ MGS_VAR_EXTERN(Psx_ScratchPad, gScratchPadMemory_991E40);
 
 Prim_24b* CC LibGV_ProcessAndStoreInScratch_4045A5(Prim_24b* pIn, int count);
 int CC LibGV_prim_buffer_allocate_texture_and_shade_40730A(Prim_Mesh_0x5C* pMeshObj, int activeBuffer, BYTE flags);
+void CC LibGV_void_active_prim_buffer_4073E8(Prim_Mesh_0x5C* pMesh, int activeBuffer);
 
 void DoDGTests();

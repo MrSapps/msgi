@@ -141,7 +141,7 @@ MGS_ASSERT_SIZEOF(Actor_boxkeri, 0xBC);
 struct KmdHeader
 {
     DWORD numBlocks;
-    DWORD unkNum;
+    DWORD mNumberOfMeshes;
     int mBoundingBox[6];
 };
 MGS_ASSERT_SIZEOF(KmdHeader, 0x20);

@@ -1127,6 +1127,28 @@ MGS_FUNC_NOT_IMPL(0x4062CB, void __cdecl (int* pBoundingBox), LibGV_Helper_4062C
 MGS_FUNC_NOT_IMPL(0x40640F, signed int (), LibGV_Helper_40640F);
 MGS_FUNC_NOT_IMPL(0x4065AA, void __cdecl (struct_gv *pGv, int activeBuffer), LibGV_Helper_4065AA);
 
+void CC LibGV_prim_buffer_set_all_cluts_to_3FFF_406649(Prim_Mesh_0x5C* pMeshObj, int activeBuffer)
+{
+    Prim_Mesh_0x5C* pMeshObjIter = pMeshObj;
+    POLY_GT4* pPrimBufferIter = pMeshObj->field_54_prim_buffers[activeBuffer];
+    if (pPrimBufferIter)
+    {
+        if (pPrimBufferIter->clut != 0x3FFF)
+        {
+            while (pMeshObjIter)
+            {
+                for (int i = 0; i < pMeshObjIter->field_52_num_faces; i++)
+                {
+                    pPrimBufferIter->clut = 0x3FFF;
+                    ++pPrimBufferIter;
+                }
+                pMeshObjIter = pMeshObjIter->field_48_pLinked;
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x406649, LibGV_prim_buffer_set_all_cluts_to_3FFF_406649, LIBDG_IMPL);
+
 void CC LibGV_void_active_prim_buffer_4073E8(Prim_Mesh_0x5C* pMesh, int activeBuffer)
 {
     if (pMesh->field_54_prim_buffers[activeBuffer])
