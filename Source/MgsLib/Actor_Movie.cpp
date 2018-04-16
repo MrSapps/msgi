@@ -341,9 +341,6 @@ signed int CC Res_movie_create_helper_4562AA(int movieNameHashed)
 }
 MGS_FUNC_IMPLEX(0x4562AA, Res_movie_create_helper_4562AA, MOVIE_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x4018E0, void __cdecl(), MarkObjectQueueVoid_4018E0); // TODO
-
-
 int CC Res_movie_write_sound_buffer_4565CA()
 {
     Sound_RestoreRelated_523B2C(

@@ -667,9 +667,7 @@ signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
     KmdHeader* pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(resHash, 'k'));
     if (!pFileData)
     {
-        auto nk = ResourceNameHash("null");
-
-        pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(0xE224u, 'k'));// null.kmd ?
+        pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(ResourceNameHash("null"), 'k'));
     }
 
     Prim_Union* pPrimObj = Obj_Alloc_443FEC(pFileData, pKmd->field_4_size, 0);

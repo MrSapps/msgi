@@ -2167,6 +2167,32 @@ void CC LibGV_4041A5(struct_gv* pGv, int activeBuffer)
 }
 MGS_FUNC_IMPLEX(0x4041A5, LibGV_4041A5, LIBDG_IMPL);
 
+void CC MarkObjectVoided_40744A(Prim_unknown_0x48* pObj, int bufferIndex)
+{
+    for (int i = 0; i < pObj->field_2E_UnknownOrNumFaces; i++)
+    {
+        Prim_Mesh_0x5C* pMeshIter = (Prim_Mesh_0x5C *)&pObj[1];
+        if (pMeshIter[i].field_54_prim_buffers[bufferIndex])
+        {
+            System_VoidAllocation_40B187(bufferIndex, (void **)&pMeshIter[i].field_54_prim_buffers[bufferIndex]);
+            pMeshIter[i].field_54_prim_buffers[bufferIndex] = nullptr;
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x40744A, MarkObjectVoided_40744A, LIBDG_IMPL);
+
+void CC MarkObjectQueueVoid_4018E0()
+{
+    gLibDG_ExecPtrs_6BECE8 = 1;
+    Prim_Union** pObj = gLibGVStruct1_6BC36C.gObjects_dword_6BC3C4;
+    for (int i = 0; i < gLibGVStruct1_6BC36C.gObjectQueue_word_6BC3C2_0; i++)
+    {
+        MarkObjectVoided_40744A(&pObj[i]->prim_48, 0);
+        MarkObjectVoided_40744A(&pObj[i]->prim_48, 1);
+    }
+}
+MGS_FUNC_IMPLEX(0x4018E0, MarkObjectQueueVoid_4018E0, LIBDG_IMPL);
+
 const PSX_MATRIX gIdentity_matrix =
 { 
     { 
