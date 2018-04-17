@@ -119,7 +119,7 @@ DWORD CC Hash_40A5C3(const char* pName)
 }
 MGS_FUNC_IMPLEX(0x0040A5C3, Hash_40A5C3, RESOURCENAMEHASH_IMPL);
 
-DWORD CC HashFileName_40A58B(WORD resourceNameHashed, char extensionChar)
+DWORD CC HashFileName_40A58B(DWORD resourceNameHashed, char extensionChar)
 {
     int extHash = extensionChar;
     extHash = extHash - 0x61;

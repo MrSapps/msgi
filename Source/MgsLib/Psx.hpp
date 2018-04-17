@@ -447,3 +447,4 @@ void CC Psx_gte_RT1_rtir_447480();
 void CC Psx_gte_RT1TR_rt_4477A0();
 void CC Gte_project_distance_rect_401DA8(const PSX_RECT* pRect, int projectDistance);
 void CC Psx_gte_rtpt_445990();
+void CC Psx_gte_sqr0_44B030(const VECTOR3* pIn, VECTOR3* pOut);

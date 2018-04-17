@@ -192,11 +192,49 @@ void CC Vector_subtract_40B4ED(const SVECTOR* aLhs, const SVECTOR* aRhs, SVECTOR
 }
 MGS_FUNC_IMPLEX(0x40B4ED, Vector_subtract_40B4ED, KMD_IMPL);
 
-int CC sub_40B6BD(__int16 a1, __int16 a2)
+void CC Vector_add_40B4BD(const SVECTOR*pRhs, const SVECTOR* pLhs, SVECTOR* pOut)
 {
-    return (a2 - a1) & 4095;
+    pOut->field_0_x = pLhs->field_0_x + pRhs->field_0_x;
+    pOut->field_2_y = pLhs->field_2_y + pRhs->field_2_y;
+    pOut->field_4_z = pLhs->field_4_z + pRhs->field_4_z;
 }
-MGS_FUNC_IMPLEX(0x40B6BD, sub_40B6BD, KMD_IMPL);
+MGS_FUNC_IMPLEX(0x40B4BD, Vector_add_40B4BD, KMD_IMPL);
+
+__int64 CC j_sqrt(signed int value)
+{
+    return (__int64)sqrt(static_cast<float>(value));
+}
+MGS_FUNC_IMPLEX(0x44ADB0, j_sqrt, KMD_IMPL);
+
+__int64 CC Vector_unknown_40B51D(const SVECTOR* pVec)
+{
+    VECTOR3 vec = {};
+    vec.x = pVec->field_0_x;
+    vec.y = pVec->field_2_y;
+    vec.z = pVec->field_4_z;
+    Psx_gte_sqr0_44B030(&vec, &vec);
+    return j_sqrt(vec.x + vec.y + vec.z);
+}
+MGS_FUNC_IMPLEX(0x40B51D, Vector_unknown_40B51D, KMD_IMPL);
+
+void CC Vector_unknown_40B55D(const SVECTOR* pVec, SVECTOR* pOut, signed int value1, int value2)
+{
+    const int fixedWholeNum = value2 << 12;
+    if (!value1)
+    {
+        value1 = 1;
+    }
+    pOut->field_0_x = static_cast<short int>(fixedWholeNum / value1 * pVec->field_0_x / 4096);
+    pOut->field_2_y = static_cast<short int>(fixedWholeNum / value1 * pVec->field_2_y / 4096);
+    pOut->field_4_z = static_cast<short int>(fixedWholeNum / value1 * pVec->field_4_z / 4096);
+}
+MGS_FUNC_IMPLEX(0x40B55D, Vector_unknown_40B55D, false);
+
+int CC FixedSubtract_40B6BD(__int16 value1, __int16 value2)
+{
+    return (value2 - value1) & 4095;
+}
+MGS_FUNC_IMPLEX(0x40B6BD, FixedSubtract_40B6BD, KMD_IMPL);
 
 void CC Res_base_unknown_407B3D(const SVECTOR* pVec)
 {
@@ -583,7 +621,7 @@ MGS_FUNC_IMPLEX(0x450109, Kmd_Set_Light_matrices_450109, BOXKERI_IMPL);
 int CC Kmd_TotalObjectSizeInBytes_443FAF(KmdHeader* pKmdHeader)
 {
     int totalCount = 0;
-    for (int i = 0; i < pKmdHeader->mNumberOfMeshes; i++)
+    for (DWORD i = 0; i < pKmdHeader->mNumberOfMeshes; i++)
     {
         kmdObject* pKmdObj = (kmdObject *)&pKmdHeader[1];
         totalCount += pKmdObj[i].field_4_numFaces;
@@ -617,7 +655,7 @@ void CC Object_Remove_4017C3(Prim_unknown_0x48* pPrim)
             // Overwrite the old item with everything after it up to the new count
             memcpy(ppPrimIter, ppPrimIter + 1, sizeof(Prim_unknown_0x48*) * newCount);
         }
-        pGv->gObjectQueue_word_6BC3C2_0 = used - 1;
+        pGv->gObjectQueue_word_6BC3C2_0 = static_cast<s16>(used - 1);
     }
 }
 MGS_FUNC_IMPLEX(0x4017C3, Object_Remove_4017C3, BOXKERI_IMPL);
@@ -724,7 +762,7 @@ int CC Res_Enemy_boxkeri_loader_5B702E(Actor_boxkeri* pBox, PSX_MATRIX* pMtx, SV
 
     SVECTOR vec = {};
     Vector_subtract_40B4ED(pVec, &gSnakePos_stru_9942B0, &vec);
-    const int v5 = 0;// sub_40B6BD(dword_99534C->field_8_3_words[1], Res_base_unknown_40B612(&vec)); // TODO
+    const int v5 = 0;// FixedSubtract_40B6BD(dword_99534C->field_8_3_words[1], Res_base_unknown_40B612(&vec)); // TODO
     if (v5 < 512 || v5 > 3606)
     {
         pBox->field_76_state = 0;
