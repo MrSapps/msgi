@@ -252,3 +252,39 @@ signed int CC Script_tbl_map_45151D(BYTE* /*pScript*/)
     return 0;
 }
 MGS_FUNC_IMPLEX(0x45151D, Script_tbl_map_45151D, MAP_IMPL);
+
+MGS_ARY(1, 0x7229B8, Prim_unknown_0x48*, 32, gMapOrKmd_Array_dword_7229B8, {});
+MGS_VAR(1, 0x722868, DWORD, gMapOrKmdCount_dword_722868, 0);
+
+void CC Map_ResetMapCountAndKmdsCount_44F3F7()
+{
+    gMapOrKmdCount_dword_722868 = 0;
+    memset(gMapOrKmd_Array_dword_7229B8, 0, 32 * sizeof(Prim_unknown_0x48*));
+    gMap_count_dword_7229B4 = 0;
+    gMapsChanged_dword_7229B0 = 0;
+}
+MGS_FUNC_IMPLEX(0x44F3F7, Map_ResetMapCountAndKmdsCount_44F3F7, MAP_IMPL);
+
+void CC Map_FreeKmds_44F3B5()
+{
+    for (DWORD i = 0; i < gMapOrKmdCount_dword_722868; i++)
+    {
+        Object_Remove_4017C3(gMapOrKmd_Array_dword_7229B8[i]);
+        Prim_free_colour_buffer_443FCB(gMapOrKmd_Array_dword_7229B8[i]);
+        Prim_void_and_free_4440BE(gMapOrKmd_Array_dword_7229B8[i]);
+        gMapOrKmd_Array_dword_7229B8[i] = nullptr;
+    }
+    gMapOrKmdCount_dword_722868 = 0;
+}
+MGS_FUNC_IMPLEX(0x44F3B5, Map_FreeKmds_44F3B5, MAP_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x44F888, void __cdecl (Prim_unknown_0x48 *pKmd), Map_Reshade_44F888) // TODO
+
+void CC Map_Reshade_all_44F8C3()
+{
+    for (DWORD i = 0; i < gMapOrKmdCount_dword_722868; i++)
+    {
+        Map_Reshade_44F888(gMapOrKmd_Array_dword_7229B8[i]);
+    }
+}
+MGS_FUNC_IMPLEX(0x44F8C3, Map_Reshade_all_44F8C3, MAP_IMPL);
