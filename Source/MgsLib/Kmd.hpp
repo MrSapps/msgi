@@ -153,6 +153,8 @@ void CC Kmd_free_4500DD(struc_kmd* pKmd);
 void CC Object_Remove_4017C3(Prim_unknown_0x48* pPrim);
 void CC Prim_free_colour_buffer_443FCB(Prim_unknown_0x48* pPrim);
 void CC Prim_void_and_free_4440BE(Prim_unknown_0x48* pPrim);
+Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, __int16 usuallyZero);
+int CC Object_Add_40178F(Prim_Union* pPrim);
 
 void CC RotMatrixZYX_gte_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx);
 void CC RotMatrixY_44C270(__int16 value, PSX_MATRIX* pMtx);

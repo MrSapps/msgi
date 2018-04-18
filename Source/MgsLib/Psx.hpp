@@ -329,7 +329,9 @@ MGS_VAR_EXTERN(GTE_Data, gGteData_722688);
 MGS_VAR_EXTERN(VECTOR3, gGte_background_colour_993E74);
 MGS_VAR_EXTERN(MATRIX3x3, gte_rotation_matrix_993E40);
 MGS_VAR_EXTERN(VECTOR3, gGte_translation_vector_993E54);
-
+MGS_VAR_EXTERN(MATRIX3x3, gGte_light_source_matrix_993E60);
+MGS_VAR_EXTERN(VECTOR3, gGte_background_colour_993E74);
+MGS_VAR_EXTERN(MATRIX3x3, gGte_light_colour_matrix_source_993E80);
 
 struct Regs_SYSX
 {
