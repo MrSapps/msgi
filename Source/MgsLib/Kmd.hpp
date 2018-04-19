@@ -19,15 +19,15 @@ struct kmdObject
     int mObjPosNum_30_translationUnk;
 
     DWORD numVerts_34;
-    DWORD vertOfs_38;
-    DWORD indexOfs_3C;
+    SVECTOR* vertOfs_38;
+    unsigned int *indexOfs_3C;
 
     DWORD numNorms_40;
     DWORD normOfs_44;
     DWORD normIndex_48;
 
     BYTE* ofsUV_4C;
-    WORD* ofsUnk_50;
+    WORD* ofsTextureNameHashes_50;
     DWORD nullpad_54;
 };
 MGS_ASSERT_SIZEOF(kmdObject, 0x58);
@@ -140,8 +140,8 @@ MGS_ASSERT_SIZEOF(Actor_boxkeri, 0xBC);
 
 struct KmdHeader
 {
-    DWORD numBlocks;
     DWORD mNumberOfMeshes;
+    DWORD mNumberOfObjects;
     int mBoundingBox[6];
 };
 MGS_ASSERT_SIZEOF(KmdHeader, 0x20);

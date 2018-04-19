@@ -87,23 +87,23 @@ MGS_FUNC_IMPLEX(0x40514F, sub_40514F, KMD_IMPL);
 
 Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, __int16 usuallyZero)
 {
-    const int primSize = sizeof(Prim_unknown_0x48) + (sizeof(Prim_Mesh_0x5C) * pFileData->mNumberOfMeshes);
+    const int primSize = sizeof(Prim_unknown_0x48) + (sizeof(Prim_Mesh_0x5C) * pFileData->mNumberOfObjects);
     Prim_unknown_0x48* pAllocated = (Prim_unknown_0x48 *)System_2_zerod_allocate_memory_40B296(primSize);
     if (pAllocated)
     {
         MemClearUnknown_40B231(pAllocated, primSize);
         memcpy(&pAllocated->field_0_matrix, &gIdentity_matrix_6501F8, sizeof(PSX_MATRIX));
         pAllocated->field_24_pKmdFileData = pFileData;
-        pAllocated->field_2E_UnknownOrNumFaces = static_cast<WORD>(pFileData->numBlocks);
+        pAllocated->field_2E_UnknownOrNumFaces = static_cast<WORD>(pFileData->mNumberOfMeshes);
         pAllocated->field_28_flags_or_type = countOrType_0x40Flag;
         pAllocated->field_30_size = usuallyZero;
         pAllocated->field_34_light_mtx_array = &gLightNormalVec_650128;
 
         kmdObject* pKmdObject = (kmdObject *)&pFileData[1];
-        if (pFileData->mNumberOfMeshes > 0)
+        if (pFileData->mNumberOfObjects > 0)
         {
             Prim_Mesh_0x5C* pFirstMesh = reinterpret_cast<Prim_Mesh_0x5C*>(&pAllocated[1]);
-            for (DWORD i = 0; i < pFileData->mNumberOfMeshes; i++)
+            for (DWORD i = 0; i < pFileData->mNumberOfObjects; i++)
             {
                 pFirstMesh[i].field_40_pKmdObj = &pKmdObject[i];
                 if (pKmdObject[i].mObjPosNum_30_translationUnk >= 0)
@@ -236,12 +236,13 @@ int CC FixedSubtract_40B6BD(__int16 value1, __int16 value2)
 }
 MGS_FUNC_IMPLEX(0x40B6BD, FixedSubtract_40B6BD, KMD_IMPL);
 
+
 void CC Res_base_unknown_407B3D(const SVECTOR* pVec)
 {
     gGte_VXY0_993EC0.regs.VX = pVec->field_0_x;
     gGte_VXY0_993EC0.regs.VY = pVec->field_2_y;
     gGte_VXY0_993EC0.regs.VZ = pVec->field_4_z;
-    gGte_VXY0_993EC0.regs.Zero = pVec->padding;
+    gGte_VXY0_993EC0.regs.Zero = pVec->field_6_padding;
 
     Psx_gte_RT1TR_rt_4477A0(); // Also called MVMVA?
     gGte_translation_vector_993E54.x = gGte_MAC1_993F24.MAC_32;
@@ -481,6 +482,20 @@ void CC VectorRotationMatrix_unknown_44C620(const SVECTOR* pVec, PSX_MATRIX* pMa
 }
 MGS_FUNC_IMPLEX(0x44C620, VectorRotationMatrix_unknown_44C620, KMD_IMPL);
 
+void CC Res_base_unknown_407ADA(const SVECTOR* pVec1, SVECTOR* pVec2)
+{
+    PSX_MATRIX matrix = {};
+
+    VectorRotationMatrix_unknown_44C620(pVec2, &matrix);
+
+    memcpy(&gte_rotation_matrix_993E40.m, &matrix.m, sizeof(PSX_MATRIX::m));
+
+    gGte_translation_vector_993E54.x = pVec1->field_0_x;
+    gGte_translation_vector_993E54.y = pVec1->field_2_y;
+    gGte_translation_vector_993E54.z = pVec1->field_4_z;
+}
+MGS_FUNC_IMPLEX(0x407ADA, Res_base_unknown_407ADA, KMD_IMPL);
+
 void CC Res_base_unknown_407B79(const SVECTOR* pRotVec)
 {
     PSX_MATRIX rotMatrix = {};
@@ -598,6 +613,15 @@ void CC Gte_set_light_colour_matrix_source_44AEB0(const MATRIX3x3* pMtx)
     memcpy(&gGte_light_colour_matrix_source_993E80, pMtx, sizeof(MATRIX3x3));
 }
 MGS_FUNC_IMPLEX(0x44AEB0, Gte_set_light_colour_matrix_source_44AEB0, KMD_IMPL);
+
+void CC Gte_get_rot_matrix_and_trans_vec_407C0D(PSX_MATRIX* pMatrix)
+{
+    memcpy(&pMatrix->m, &gte_rotation_matrix_993E40.m, sizeof(PSX_MATRIX::m));
+    pMatrix->t[0] = gGte_translation_vector_993E54.x;
+    pMatrix->t[1] = gGte_translation_vector_993E54.y;
+    pMatrix->t[2] = gGte_translation_vector_993E54.z;
+}
+MGS_FUNC_IMPLEX(0x407C0D, Gte_get_rot_matrix_and_trans_vec_407C0D, KMD_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x40241F, int __cdecl(SVECTOR *a1, PSX_MATRIX *pMtxAry), Res_base_unknown_40241F); // TODO
 
@@ -730,7 +754,7 @@ MGS_FUNC_IMPLEX(0x450109, Kmd_Set_Light_matrices_450109, BOXKERI_IMPL);
 int CC Kmd_TotalObjectSizeInBytes_443FAF(KmdHeader* pKmdHeader)
 {
     int totalCount = 0;
-    for (DWORD i = 0; i < pKmdHeader->mNumberOfMeshes; i++)
+    for (DWORD i = 0; i < pKmdHeader->mNumberOfObjects; i++)
     {
         kmdObject* pKmdObj = (kmdObject *)&pKmdHeader[1];
         totalCount += pKmdObj[i].field_4_numFaces;

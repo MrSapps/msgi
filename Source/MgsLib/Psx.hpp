@@ -268,7 +268,7 @@ struct SVECTOR
     short int field_0_x;
     short int field_2_y;
     short int field_4_z;
-    short int padding;
+    short int field_6_padding;
 };
 MGS_ASSERT_SIZEOF(SVECTOR, 0x8);
 

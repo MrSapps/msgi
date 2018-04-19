@@ -934,9 +934,9 @@ void CC Script_tbl_light_helper_param_c_40218B(__int16 x, __int16 y, __int16 z)
 }
 MGS_FUNC_IMPLEX(0x0040218B, Script_tbl_light_helper_param_c_40218B, SCRIPT_IMPL);
 
-MGS_VAR(1, 0x6BEE70, WORD, light_r_word_6BEE70, 0);
-MGS_VAR(1, 0x6BEE72, WORD, light_g_word_6BEE72, 0);
-MGS_VAR(1, 0x6BEE74, WORD, light_b_word_6BEE74, 0);
+MGS_VAR(1, 0x6BEE70, short int, light_r_word_6BEE70, 0);
+MGS_VAR(1, 0x6BEE72, short int, light_g_word_6BEE72, 0);
+MGS_VAR(1, 0x6BEE74, short int, light_b_word_6BEE74, 0);
 
 MGS_VAR(1, 0x650168, DWORD, light_unknown_dword_650168, 0x3C808080);
 MGS_VAR(1, 0x65016C, DWORD, light_unknown_dword_65016C, 0x3E808080);

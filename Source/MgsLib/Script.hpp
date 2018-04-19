@@ -81,3 +81,7 @@ static inline WORD ToWORD(const BYTE* ptr)
 {
     return (ptr[1]) | (ptr[0] << 8);
 }
+
+MGS_VAR_EXTERN(short int, light_r_word_6BEE70);
+MGS_VAR_EXTERN(short int, light_g_word_6BEE72);
+MGS_VAR_EXTERN(short int, light_b_word_6BEE74);

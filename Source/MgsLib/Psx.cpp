@@ -985,7 +985,7 @@ void CC Res_base_rotate_vecs_407C59(const SVECTOR* pIn, SVECTOR* pOut, int size_
         gGte_VXY0_993EC0.regs.VX = pIn[i].field_0_x;
         gGte_VXY0_993EC0.regs.VY = pIn[i].field_2_y;
         gGte_VXY0_993EC0.regs.VZ = pIn[i].field_4_z;
-        gGte_VXY0_993EC0.regs.Zero = pIn[i].padding;
+        gGte_VXY0_993EC0.regs.Zero = pIn[i].field_6_padding;
         Psx_gte_RT1TR_rt_4477A0();
 
         pOut[i].field_0_x = gGte_IR1_993EE4.IR_16;

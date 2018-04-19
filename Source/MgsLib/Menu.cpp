@@ -146,20 +146,6 @@ MGS_ASSERT_SIZEOF(Menu_rpk_item, 0x8);
 
 MGS_VAR(1, 0x733C88, Menu_rpk_item**, gItemFile_table_dword_733C88, nullptr);
 
-template<class T, class Y>
-inline T DataAfterStructure(Y pStructure)
-{
-    return reinterpret_cast<T>(&pStructure[1]);
-}
-
-template<class T, class U>
-inline void OffsetToPointer(T basePointer, U* offset)
-{
-    DWORD byteBasePtr = reinterpret_cast<DWORD>(basePointer);
-    DWORD* dwOffsetPtr = reinterpret_cast<DWORD*>(offset);
-    *dwOffsetPtr += byteBasePtr;
-}
-
 Menu_rpk_item* CC Menu_Get_Radar_image_46B920(int idx)
 {
     return gItemFile_table_dword_733C88[idx];

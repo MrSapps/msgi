@@ -80,3 +80,17 @@ signed int CC Menu_46B540(Menu_Item_Unknown* pItem);
 void CC Menu_inits_459A48();
 void CC Menu_inventory_left_update_helper_46A4C1(MenuMan* pMenu, DWORD* pPrimBuffer);
 void CC Menu_inventory_common_update_helper_46B56C(MenuMan* pMenu, DWORD* ot, MenuMan_Inventory_Menu_0x14* pUnk);
+
+template<class T, class Y>
+inline T DataAfterStructure(Y pStructure)
+{
+    return reinterpret_cast<T>(&pStructure[1]);
+}
+
+template<class T, class U>
+inline void OffsetToPointer(T basePointer, U* offset)
+{
+    DWORD byteBasePtr = reinterpret_cast<DWORD>(basePointer);
+    DWORD* dwOffsetPtr = reinterpret_cast<DWORD*>(offset);
+    *dwOffsetPtr += byteBasePtr;
+}
