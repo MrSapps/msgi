@@ -292,17 +292,6 @@ void CC Map_FreeKmds_44F3B5()
 }
 MGS_FUNC_IMPLEX(0x44F3B5, Map_FreeKmds_44F3B5, MAP_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x44F888, void __cdecl (Prim_unknown_0x48 *pKmd), Map_Reshade_44F888) // TODO
-
-void CC Map_Reshade_all_44F8C3()
-{
-    for (DWORD i = 0; i < gMapOrKmdCount_dword_722868; i++)
-    {
-        Map_Reshade_44F888(gMapOrKmd_Array_dword_7229B8[i]);
-    }
-}
-MGS_FUNC_IMPLEX(0x44F8C3, Map_Reshade_all_44F8C3, MAP_IMPL);
-
 
 MGS_FUNC_NOT_IMPL(0x443A4E, signed int CC (Prim_unknown_0x48 *pObj, Light* pLights, int lightCount), PrimObjRelated_443A4E);
 
@@ -328,3 +317,50 @@ void CC Map_LitLoad_44F53B(int resourceNameHashed, const map_record* pMapStruct)
     gMapOrKmdCount_dword_722868++;
 }
 MGS_FUNC_IMPLEX(0x44F53B, Map_LitLoad_44F53B, MAP_IMPL);
+
+map_record* CC Map_FromId_44F79E(signed int mapChangeFlags)
+{
+    map_record* result = nullptr;
+    signed int bitNMask = mapChangeFlags;
+    for (DWORD i = 0; i < gMap_count_dword_7229B4; i++)
+    {
+        if (!bitNMask)
+        {
+            break;
+        }
+
+        if (bitNMask & 1)
+        {
+            result = &gMap_20_array_722870[i];
+        }
+
+        bitNMask >>= 1;
+    }
+    return result;
+}
+MGS_FUNC_IMPLEX(0x44F79E, Map_FromId_44F79E, MAP_IMPL);
+
+void CC Map_Reshade_44F888(Prim_unknown_0x48* pObj)
+{
+    map_record* pMap = Map_FromId_44F79E(pObj->field_2C_index);
+    if (!pMap)
+    {
+        printf("Reshade NULL map\n");
+    }
+
+    LitHeader* p_l_file = pMap->field_C_l_file;
+    if (p_l_file)
+    {
+        PrimObjRelated_443A4E(pObj, DataAfterStructure<Light*>(p_l_file), p_l_file->field_0_num_lights);
+    }
+}
+MGS_FUNC_IMPLEX(0x44F888, Map_Reshade_44F888, MAP_IMPL);
+
+void CC Map_Reshade_all_44F8C3()
+{
+    for (DWORD i = 0; i < gMapOrKmdCount_dword_722868; i++)
+    {
+        Map_Reshade_44F888(gMapOrKmd_Array_dword_7229B8[i]);
+    }
+}
+MGS_FUNC_IMPLEX(0x44F8C3, Map_Reshade_all_44F8C3, MAP_IMPL);
