@@ -792,10 +792,174 @@ MGS_FUNC_IMPLEX(0x446530, Psx_gte_dpcs_446530, false); // FIX ME
 
 void CC Psx_gte_ncs_446930()
 {
-    // TODO
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR
+    // Normal color single
+    ++gGteData_722688.gte_ncs_count_72268C;
+
+    const double vx_scaled = (double)gGte_VXY0_993EC0.regs.VX * 0.000244140625;
+    const double vy_scaled = (double)gGte_VXY0_993EC0.regs.VY * 0.000244140625;
+    const double vz_scaled = (double)gGte_VXY0_993EC0.regs.VZ * 0.000244140625;
+    
+    double light_matrix_0 = (
+          (double)gGte_light_source_matrix_993E60.m[0][2] * vz_scaled
+        + (double)gGte_light_source_matrix_993E60.m[0][1] * vy_scaled
+        + (double)gGte_light_source_matrix_993E60.m[0][0] * vx_scaled)
+        * 0.000244140625;
+
+    double light_matrix_1 = (
+          (double)gGte_light_source_matrix_993E60.m[1][2] * vz_scaled
+        + (double)gGte_light_source_matrix_993E60.m[1][1] * vy_scaled
+        + (double)gGte_light_source_matrix_993E60.m[1][0] * vx_scaled)
+        * 0.000244140625;
+
+    double light_matrix_2 = (
+          (double)gGte_light_source_matrix_993E60.m[2][2] * vz_scaled
+        + (double)gGte_light_source_matrix_993E60.m[2][1] * vy_scaled
+        + (double)gGte_light_source_matrix_993E60.m[2][0] * vx_scaled)
+        * 0.000244140625;
+    
+    if (light_matrix_0 < 0.0)
+    {
+        light_matrix_0 = 0.0;
+    }
+    else if (light_matrix_0 > 7.999)
+    {
+        light_matrix_0 = 7.999;
+    }
+
+    if (light_matrix_1 < 0.0)
+    {
+        light_matrix_1 = 0.0;
+    }
+    else if (light_matrix_1 > 7.999)
+    {
+        light_matrix_1 = 7.999;
+    }
+
+    if (light_matrix_2 < 0.0)
+    {
+        light_matrix_2 = 0.0;
+    }
+    else if (light_matrix_2 > 7.999)
+    {
+        light_matrix_2 = 7.999;
+    }
+
+    double light_colour_matrix_1 = (
+          (double)gGte_light_colour_matrix_source_993E80.m[0][2] * light_matrix_2
+        + (double)gGte_light_colour_matrix_source_993E80.m[0][1] * light_matrix_1
+        + (double)gGte_light_colour_matrix_source_993E80.m[0][0] * light_matrix_0
+        + (double)gGte_background_colour_993E74.x)
+        * 0.000244140625;
+
+    double light_colour_matrix_2 = (
+          (double)gGte_light_colour_matrix_source_993E80.m[1][2] * light_matrix_2
+        + (double)gGte_light_colour_matrix_source_993E80.m[1][1] * light_matrix_1
+        + (double)gGte_light_colour_matrix_source_993E80.m[1][0] * light_matrix_0
+        + (double)gGte_background_colour_993E74.y)
+        * 0.000244140625;
+
+    double light_colour_matrix_3 = (
+          (double)gGte_light_colour_matrix_source_993E80.m[2][2] * light_matrix_2 
+        + (double)gGte_light_colour_matrix_source_993E80.m[2][1] * light_matrix_1
+        + (double)gGte_light_colour_matrix_source_993E80.m[2][0] * light_matrix_0
+        + (double)gGte_background_colour_993E74.z)
+        * 0.000244140625;
+
+    if (light_colour_matrix_1 < 0.0)
+    {
+        light_colour_matrix_1 = 0.0;
+    }
+    else if (light_colour_matrix_1 > 7.999)
+    {
+        light_colour_matrix_1 = 7.999;
+    }
+
+    if (light_colour_matrix_2 < 0.0)
+    {
+        light_colour_matrix_2 = 0.0;
+    }
+    else if (light_colour_matrix_2 > 7.999)
+    {
+        light_colour_matrix_2 = 7.999;
+    }
+
+    if (light_colour_matrix_3 < 0.0)
+    {
+        light_colour_matrix_3 = 0.0;
+    }
+    else if (light_colour_matrix_3 > 7.999)
+    {
+        light_colour_matrix_3 = 7.999;
+    }
+
+    gGte_RGB0_993F10.cd = gGte_RGB1_993F14.cd;
+    gGte_RGB1_993F14.cd = gGte_RGB2_993F18.cd;
+    gGte_RGB2_993F18.cd = static_cast<unsigned char>(gGte_OTZ_993EDB);
+    gGte_RGB0_993F10.r = gGte_RGB1_993F14.r;
+    gGte_RGB1_993F14.r = gGte_RGB2_993F18.r;
+
+    const double r_value = (double)gGte_r_993ED8 * light_colour_matrix_1 * 0.00390625;
+    const double g_value = (double)gGte_g_993ED9 * light_colour_matrix_2 * 0.00390625;
+    const double b_value = (double)gGte_b_993EDA * light_colour_matrix_3 * 0.00390625;
+
+    if (r_value * 256.0 >= 0.0)
+    {
+        if (r_value * 256.0 <= 255.0)
+        {
+            gGte_RGB2_993F18.r = (unsigned char)(r_value * 256.0);
+        }
+        else
+        {
+            gGte_RGB2_993F18.r = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB2_993F18.r = 0;
+    }
+
+    gGte_RGB0_993F10.g = gGte_RGB1_993F14.g;
+    gGte_RGB1_993F14.g = gGte_RGB2_993F18.g;
+    if (g_value * 256.0 >= 0.0)
+    {
+        if (g_value * 256.0 <= 255.0)
+        {
+            gGte_RGB2_993F18.g = (unsigned char)(g_value * 256.0);
+        }
+        else
+        {
+            gGte_RGB2_993F18.g = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB2_993F18.g = 0;
+       
+    }
+    gGte_RGB0_993F10.b = gGte_RGB1_993F14.b;
+    gGte_RGB1_993F14.b = gGte_RGB2_993F18.b;
+
+    if (b_value * 256.0 >= 0.0)
+    {
+        if (b_value * 256.0 <= 255.0)
+        {
+            gGte_RGB2_993F18.b = (unsigned char)(b_value * 256.0);
+        }
+        else
+        {
+            gGte_RGB2_993F18.b = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB2_993F18.b = 0;
+    }
+
+    gGte_MAC1_993F24.MAC_32 = (signed int)(r_value * 4096.0);
+    gGte_MAC2_993F28.MAC_32 = (signed int)(g_value * 4096.0);
+    gGte_MAC3_993F2C.MAC_32 = (signed int)(b_value * 4096.0);
 }
-MGS_FUNC_IMPLEX(0x446930, Psx_gte_ncs_446930, false); // FIX ME
+MGS_FUNC_IMPLEX(0x446930, Psx_gte_ncs_446930, IMPL_PSX);
 
 void CC Psx_gte_446E10()
 {
