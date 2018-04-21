@@ -1131,10 +1131,378 @@ MGS_FUNC_IMPLEX(0x4478C0, Psx_gte_RT1TR_rtv0tr_4478C0, IMPL_PSX);
 
 void CC Psx_gte_nct_449B30()
 {
-     // TODO
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR
+    double ls_mtx_0_0; // st7
+    double ls_mtx_0_1; // st6
+    double ls_mtx_0_2; // st5
+    double ls_mtx_1_0; // st4
+    double ls_mtx_1_1; // st3
+    signed int offset; // ecx
+    double ls_mtx_v2; // st2
+    double v7; // kr00_8
+    double v8; // st1
+    double v9; // st0
+    double v10; // st1
+    double v11; // kr08_8
+    double v12; // st2
+    double v13; // st1
+    double v14; // st2
+    double vy[3]; // [esp+8h] [ebp-130h]
+    double lc_mtx_2_2; // [esp+20h] [ebp-118h]
+    double vx[3]; // [esp+28h] [ebp-110h]
+    double ls_mtx_1_2; // [esp+40h] [ebp-F8h]
+    double vz[3]; // [esp+48h] [ebp-F0h]
+    double lc_mtx_1_0; // [esp+60h] [ebp-D8h]
+    double lc_mtx_0_2; // [esp+68h] [ebp-D0h]
+    double lc_mtx_0_0; // [esp+70h] [ebp-C8h]
+    double ls_mtx_2_1; // [esp+78h] [ebp-C0h]
+    double background_colour_y; // [esp+80h] [ebp-B8h]
+    double ls_mtx_2_0; // [esp+88h] [ebp-B0h]
+    double lc_mtx_1_1; // [esp+90h] [ebp-A8h]
+    double ls_mtx_2_2; // [esp+98h] [ebp-A0h]
+    double background_colour_x; // [esp+A0h] [ebp-98h]
+    double lc_mtx_2_0; // [esp+A8h] [ebp-90h]
+    double lc_mtx_0_1; // [esp+B0h] [ebp-88h]
+    double lc_mtx_2_1; // [esp+B8h] [ebp-80h]
+    double lc_mtx_1_2; // [esp+C0h] [ebp-78h]
+    double v36[3]; // [esp+C8h] [ebp-70h]
+    double v37[3]; // [esp+E0h] [ebp-58h]
+    double v38[3]; // [esp+F8h] [ebp-40h]
+    double lc_mtx_v0; // [esp+110h] [ebp-28h]
+    double v40; // [esp+118h] [ebp-20h]
+    double ls_mtx_v0; // [esp+120h] [ebp-18h]
+    double background_colour_z; // [esp+128h] [ebp-10h]
+    double ls_mtx_v1; // [esp+130h] [ebp-8h]
+
+    ++gGteData_722688.gte_nct_count_7226F4;       // Normal color triple
+
+    vx[0] = (double)gGte_VXY0_993EC0.regs.VX * 0.000244140625;
+    vy[0] = (double)gGte_VXY0_993EC0.regs.VY * 0.000244140625;
+    vz[0] = (double)gGte_VXY0_993EC0.regs.VZ * 0.000244140625;
+    vx[1] = (double)gGte_VXY1_993EC8.regs.VX * 0.000244140625;
+    vy[1] = (double)gGte_VXY1_993EC8.regs.VY * 0.000244140625;
+    vz[1] = (double)gGte_VXY1_993EC8.regs.VZ * 0.000244140625;
+    vx[2] = (double)gGte_VXY2_993ED0.regs.VX * 0.000244140625;
+    vy[2] = (double)gGte_VXY2_993ED0.regs.VY * 0.000244140625;
+    vz[2] = (double)gGte_VXY2_993ED0.regs.VZ * 0.000244140625;
+    ls_mtx_0_0 = (double)gGte_light_source_matrix_993E60.m[0][0] * 0.000244140625;
+    ls_mtx_0_1 = (double)gGte_light_source_matrix_993E60.m[0][1] * 0.000244140625;
+    ls_mtx_0_2 = (double)gGte_light_source_matrix_993E60.m[0][2] * 0.000244140625;
+    ls_mtx_1_0 = (double)gGte_light_source_matrix_993E60.m[1][0] * 0.000244140625;
+    ls_mtx_1_1 = (double)gGte_light_source_matrix_993E60.m[1][1] * 0.000244140625;
+    ls_mtx_1_2 = (double)gGte_light_source_matrix_993E60.m[1][2] * 0.000244140625;
+    ls_mtx_2_0 = (double)gGte_light_source_matrix_993E60.m[2][0] * 0.000244140625;
+    ls_mtx_2_1 = (double)gGte_light_source_matrix_993E60.m[2][1] * 0.000244140625;
+    ls_mtx_2_2 = (double)gGte_light_source_matrix_993E60.m[2][2] * 0.000244140625;
+    background_colour_x = (double)gGte_background_colour_993E74.x * 0.000244140625;
+    background_colour_y = (double)gGte_background_colour_993E74.y * 0.000244140625;
+    background_colour_z = (double)gGte_background_colour_993E74.z * 0.000244140625;
+    lc_mtx_0_0 = (double)gGte_light_colour_matrix_source_993E80.m[0][0] * 0.000244140625;
+    lc_mtx_0_1 = (double)gGte_light_colour_matrix_source_993E80.m[0][1] * 0.000244140625;
+    lc_mtx_0_2 = (double)gGte_light_colour_matrix_source_993E80.m[0][2] * 0.000244140625;
+    lc_mtx_1_0 = (double)gGte_light_colour_matrix_source_993E80.m[1][0] * 0.000244140625;
+    lc_mtx_1_1 = (double)gGte_light_colour_matrix_source_993E80.m[1][1] * 0.000244140625;
+    lc_mtx_1_2 = (double)gGte_light_colour_matrix_source_993E80.m[1][2] * 0.000244140625;
+    lc_mtx_2_0 = (double)gGte_light_colour_matrix_source_993E80.m[2][0] * 0.000244140625;
+    ls_mtx_v1 = gGte_light_colour_matrix_source_993E80.m[2][2];
+    offset = 0;
+    lc_mtx_2_1 = (double)gGte_light_colour_matrix_source_993E80.m[2][1] * 0.000244140625;
+    lc_mtx_2_2 = (double)gGte_light_colour_matrix_source_993E80.m[2][2] * 0.000244140625;
+    do
+    {
+        ls_mtx_v0 = ls_mtx_0_2 * vz[offset] + ls_mtx_0_0 * vx[offset] + ls_mtx_0_1 * vy[offset];
+        ls_mtx_v1 = ls_mtx_1_2 * vz[offset] + ls_mtx_1_0 * vx[offset] + ls_mtx_1_1 * vy[offset];
+        ls_mtx_v2 = ls_mtx_2_2 * vz[offset] + ls_mtx_2_0 * vx[offset] + ls_mtx_2_1 * vy[offset];
+        if (ls_mtx_v0 < 0.0)
+        {
+            ls_mtx_v0 = 0.0;
+        }
+        if (ls_mtx_v1 < 0.0)
+        {
+            ls_mtx_v1 = 0.0;
+        }
+        if (ls_mtx_v2 < 0.0)
+        {
+            ls_mtx_v2 = 0.0;
+        }
+        if (ls_mtx_v0 > 7.999)
+        {
+            ls_mtx_v0 = 7.999;
+        }
+        if (ls_mtx_v1 > 7.999)
+        {
+            ls_mtx_v1 = 7.999;
+        }
+        if (ls_mtx_v2 > 7.999)
+        {
+            ls_mtx_v2 = 7.999;
+        }
+        lc_mtx_v0 = ls_mtx_v2 * lc_mtx_0_2 + ls_mtx_v1 * lc_mtx_0_1 + ls_mtx_v0 * lc_mtx_0_0 + background_colour_x;
+        v7 = ls_mtx_v2 * lc_mtx_0_2 + ls_mtx_v1 * lc_mtx_0_1 + ls_mtx_v0 * lc_mtx_0_0 + background_colour_x;
+        v8 = ls_mtx_v2 * lc_mtx_1_2;
+        v9 = ls_mtx_v1 * lc_mtx_1_1;
+        v37[offset] = v7;
+        v10 = v8 + v9;
+        v40 = v10 + ls_mtx_v0 * lc_mtx_1_0 + background_colour_y;
+        v11 = v10 + ls_mtx_v0 * lc_mtx_1_0 + background_colour_y;
+        v12 = ls_mtx_v2 * lc_mtx_2_2;
+        v13 = ls_mtx_v1 * lc_mtx_2_1;
+        v38[offset] = v11;
+       
+        v14 = v12 + v13 + ls_mtx_v0 * lc_mtx_2_0 + background_colour_z;
+        v36[offset] = v14;
+        if (lc_mtx_v0 < 0.0)
+        {
+            v37[offset] = 0;
+        }
+        if (v40 < 0.0)
+        {
+            v38[offset] = 0;
+        }
+        if (v14 < 0.0)
+        {
+            v36[offset] = 0;
+        }
+        if (v37[offset] > 7.999)
+        {
+            v37[offset] = 7.999;
+        }
+        if (v38[offset] > 7.999)
+        {
+            v38[offset] = 7.999;
+        }
+        if (v36[offset] > 7.999)
+        {
+            v36[offset] = 7.999;
+        }
+        ++offset;
+    } while (offset < 3);
+
+
+    gGte_RGB0_993F10.cd = gGte_OTZ_993EDB;
+    gGte_RGB1_993F14.cd = gGte_OTZ_993EDB;
+    gGte_RGB2_993F18.cd = gGte_OTZ_993EDB;
+    background_colour_z = v37[0] * 256.0;
+
+    if (background_colour_z >= 0.0)
+    {
+        if (v37[0] * 256.0 <= 255.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_RGB0_993F10.r = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_RGB0_993F10.r = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB0_993F10.r = 0;
+    }
+    background_colour_z = v37[1] * 256.0;
+    if (background_colour_z >= 0.0)
+    {
+        if (v37[1] * 256.0 <= 255.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_RGB1_993F14.r = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_RGB1_993F14.r = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB1_993F14.r = 0;
+    }
+    background_colour_z = v37[2] * 256.0;
+    if (background_colour_z >= 0.0)
+    {
+        if (v37[2] * 256.0 <= 255.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_RGB2_993F18.r = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_RGB2_993F18.r = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB2_993F18.r = 0;
+    }
+    background_colour_z = v38[0] * 256.0;
+    if (background_colour_z >= 0.0)
+    {
+        if (v38[0] * 256.0 <= 255.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_RGB0_993F10.g = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_RGB0_993F10.g = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB0_993F10.g = 0;
+    }
+    background_colour_z = v38[1] * 256.0;
+    if (background_colour_z >= 0.0)
+    {
+        if (v38[1] * 256.0 <= 255.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_RGB1_993F14.g = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_RGB1_993F14.g = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB1_993F14.g = 0;
+    }
+    background_colour_z = v38[2] * 256.0;
+    if (background_colour_z >= 0.0)
+    {
+        if (v38[2] * 256.0 <= 255.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_RGB2_993F18.g = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_RGB2_993F18.g = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB2_993F18.g = 0;
+    }
+    background_colour_z = v36[0] * 256.0;
+    if (background_colour_z >= 0.0)
+    {
+        if (v36[0] * 256.0 <= 255.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_RGB0_993F10.b = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_RGB0_993F10.b = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB0_993F10.b = 0;
+    }
+    background_colour_z = v36[1] * 256.0;
+    if (background_colour_z >= 0.0)
+    {
+        if (v36[1] * 256.0 <= 255.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_RGB1_993F14.b = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_RGB1_993F14.b = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB1_993F14.b = 0;
+    }
+    background_colour_z = v36[2] * 256.0;
+    if (background_colour_z >= 0.0)
+    {
+        if (v36[2] * 256.0 <= 255.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_RGB2_993F18.b = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_RGB2_993F18.b = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB2_993F18.b = 0;
+    }
+
+    background_colour_z = v37[2] * 4096.0;
+    if (background_colour_z >= -32768.0)
+    {
+        if (v37[2] * 4096.0 <= 32767.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_IR1_993EE4.IR_16 = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_IR1_993EE4.IR_16 = 32767;
+        }
+    }
+    else
+    {
+        gGte_IR1_993EE4.IR_16 = -32768;
+    }
+    background_colour_z = v38[2] * 4096.0;
+    if (background_colour_z >= -32768.0)
+    {
+        if (v38[2] * 4096.0 <= 32767.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_IR2_993EE8.IR_16 = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_IR2_993EE8.IR_16 = 32767;
+        }
+    }
+    else
+    {
+        gGte_IR2_993EE8.IR_16 = -32768;
+    }
+
+    background_colour_z = v36[2] * 4096.0;
+    if (background_colour_z >= -32768.0)
+    {
+        if (v36[2] * 4096.0 <= 32767.0)
+        {
+            ls_mtx_v1 = (signed int)background_colour_z;
+            gGte_IR3_993EEC.IR_16 = (signed int)background_colour_z;
+        }
+        else
+        {
+            gGte_IR3_993EEC.IR_16 = 32767;
+        }
+    }
+    else
+    {
+        gGte_IR3_993EEC.IR_16 = -32768;
+    }
+
+    background_colour_z = v37[2] * 4096.0;
+    gGte_MAC1_993F24.MAC_32 = (signed int)background_colour_z;
+    background_colour_z = v38[2] * 4096.0;
+    gGte_MAC2_993F28.MAC_32 = (signed int)background_colour_z;
+    background_colour_z = v36[2] * 4096.0;
+    gGte_MAC3_993F2C.MAC_32 = (signed int)background_colour_z;
+
+    /*
+    v17 = (gGte_ORGB_993F34 & 0xFFFFFFE0 | (gGte_IR1_993EE4.IR_32 >> 7) & 0x1F) & 0xFFFFFC1F | 32 * ((gGte_IR2_993EE8.IR_32 >> 7) & 0x1F);
+    BYTE1(v17) &= 0x83u;
+    gGte_ORGB_993F34 = v17 | (((gGte_IR3_993EEC.IR_32 >> 7) & 0x1F) << 10);
+    */
 }
-MGS_FUNC_IMPLEX(0x449B30, Psx_gte_nct_449B30, false); // FIX ME
+MGS_FUNC_IMPLEX(0x449B30, Psx_gte_nct_449B30, IMPL_PSX);
 
 void CC Psx_gte_nop_44A460()
 {
