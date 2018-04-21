@@ -963,10 +963,11 @@ MGS_FUNC_IMPLEX(0x446930, Psx_gte_ncs_446930, IMPL_PSX);
 
 void CC Psx_gte_446E10()
 {
-    // TODO
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR
+    gGte_IR1_993EE4.IR_32 = ((gGte_IR1_993EE4.IR_32 * gGte_far_colour_993E94.x) + (4096 - gGte_IR0_993EE0.IR_32) * gGte_IR0_993EE0.IR_32) / 4096;
+    gGte_IR2_993EE8.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.y) + (4096 - gGte_IR0_993EE0.IR_32) * gGte_IR2_993EE8.IR_32) / 4096;
+    gGte_IR3_993EEC.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.z) + (4096 - gGte_IR0_993EE0.IR_32) * gGte_IR3_993EEC.IR_32) / 4096;
 }
-MGS_FUNC_IMPLEX(0x446E10, Psx_gte_446E10, false); // FIX ME
+MGS_FUNC_IMPLEX(0x446E10, Psx_gte_446E10, IMPL_PSX);
 
 void CC Psx_gte_nclip_446E90()
 {
@@ -1278,9 +1279,9 @@ void CC Psx_gte_nct_449B30()
     } while (offset < 3);
 
 
-    gGte_RGB0_993F10.cd = gGte_OTZ_993EDB;
-    gGte_RGB1_993F14.cd = gGte_OTZ_993EDB;
-    gGte_RGB2_993F18.cd = gGte_OTZ_993EDB;
+    gGte_RGB0_993F10.cd = static_cast<unsigned char>(gGte_OTZ_993EDB);
+    gGte_RGB1_993F14.cd = static_cast<unsigned char>(gGte_OTZ_993EDB);
+    gGte_RGB2_993F18.cd = static_cast<unsigned char>(gGte_OTZ_993EDB);
     background_colour_z = v37[0] * 256.0;
 
     if (background_colour_z >= 0.0)
@@ -1288,7 +1289,7 @@ void CC Psx_gte_nct_449B30()
         if (v37[0] * 256.0 <= 255.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_RGB0_993F10.r = (signed int)background_colour_z;
+            gGte_RGB0_993F10.r = (unsigned char)background_colour_z;
         }
         else
         {
@@ -1305,7 +1306,7 @@ void CC Psx_gte_nct_449B30()
         if (v37[1] * 256.0 <= 255.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_RGB1_993F14.r = (signed int)background_colour_z;
+            gGte_RGB1_993F14.r = (unsigned char)background_colour_z;
         }
         else
         {
@@ -1322,7 +1323,7 @@ void CC Psx_gte_nct_449B30()
         if (v37[2] * 256.0 <= 255.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_RGB2_993F18.r = (signed int)background_colour_z;
+            gGte_RGB2_993F18.r = (unsigned char)background_colour_z;
         }
         else
         {
@@ -1339,7 +1340,7 @@ void CC Psx_gte_nct_449B30()
         if (v38[0] * 256.0 <= 255.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_RGB0_993F10.g = (signed int)background_colour_z;
+            gGte_RGB0_993F10.g = (unsigned char)background_colour_z;
         }
         else
         {
@@ -1356,7 +1357,7 @@ void CC Psx_gte_nct_449B30()
         if (v38[1] * 256.0 <= 255.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_RGB1_993F14.g = (signed int)background_colour_z;
+            gGte_RGB1_993F14.g = (unsigned char)background_colour_z;
         }
         else
         {
@@ -1373,7 +1374,7 @@ void CC Psx_gte_nct_449B30()
         if (v38[2] * 256.0 <= 255.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_RGB2_993F18.g = (signed int)background_colour_z;
+            gGte_RGB2_993F18.g = (unsigned char)background_colour_z;
         }
         else
         {
@@ -1390,7 +1391,7 @@ void CC Psx_gte_nct_449B30()
         if (v36[0] * 256.0 <= 255.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_RGB0_993F10.b = (signed int)background_colour_z;
+            gGte_RGB0_993F10.b = (unsigned char)background_colour_z;
         }
         else
         {
@@ -1407,7 +1408,7 @@ void CC Psx_gte_nct_449B30()
         if (v36[1] * 256.0 <= 255.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_RGB1_993F14.b = (signed int)background_colour_z;
+            gGte_RGB1_993F14.b = (unsigned char)background_colour_z;
         }
         else
         {
@@ -1424,7 +1425,7 @@ void CC Psx_gte_nct_449B30()
         if (v36[2] * 256.0 <= 255.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_RGB2_993F18.b = (signed int)background_colour_z;
+            gGte_RGB2_993F18.b = (unsigned char)background_colour_z;
         }
         else
         {
@@ -1442,7 +1443,7 @@ void CC Psx_gte_nct_449B30()
         if (v37[2] * 4096.0 <= 32767.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_IR1_993EE4.IR_16 = (signed int)background_colour_z;
+            gGte_IR1_993EE4.IR_16 = (short)background_colour_z;
         }
         else
         {
@@ -1459,7 +1460,7 @@ void CC Psx_gte_nct_449B30()
         if (v38[2] * 4096.0 <= 32767.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_IR2_993EE8.IR_16 = (signed int)background_colour_z;
+            gGte_IR2_993EE8.IR_16 = (short)background_colour_z;
         }
         else
         {
@@ -1477,7 +1478,7 @@ void CC Psx_gte_nct_449B30()
         if (v36[2] * 4096.0 <= 32767.0)
         {
             ls_mtx_v1 = (signed int)background_colour_z;
-            gGte_IR3_993EEC.IR_16 = (signed int)background_colour_z;
+            gGte_IR3_993EEC.IR_16 = (short)background_colour_z;
         }
         else
         {
