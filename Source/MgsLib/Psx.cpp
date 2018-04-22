@@ -963,11 +963,11 @@ MGS_FUNC_IMPLEX(0x446930, Psx_gte_ncs_446930, IMPL_PSX);
 
 void CC Psx_gte_446E10()
 {
-    gGte_IR1_993EE4.IR_32 = ((gGte_IR1_993EE4.IR_32 * gGte_far_colour_993E94.x) + (4096 - gGte_IR0_993EE0.IR_32) * gGte_IR0_993EE0.IR_32) / 4096;
-    gGte_IR2_993EE8.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.y) + (4096 - gGte_IR0_993EE0.IR_32) * gGte_IR2_993EE8.IR_32) / 4096;
-    gGte_IR3_993EEC.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.z) + (4096 - gGte_IR0_993EE0.IR_32) * gGte_IR3_993EEC.IR_32) / 4096;
+    gGte_IR1_993EE4.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.x) + ((4096 - gGte_IR0_993EE0.IR_32) * gGte_IR1_993EE4.IR_32)) / 4096;
+    gGte_IR2_993EE8.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.y) + ((4096 - gGte_IR0_993EE0.IR_32) * gGte_IR2_993EE8.IR_32)) / 4096;
+    gGte_IR3_993EEC.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.z) + ((4096 - gGte_IR0_993EE0.IR_32) * gGte_IR3_993EEC.IR_32)) / 4096;
 }
-MGS_FUNC_IMPLEX(0x446E10, Psx_gte_446E10, IMPL_PSX);
+MGS_FUNC_IMPLEX(0x446E10, Psx_gte_446E10, true);
 
 void CC Psx_gte_nclip_446E90()
 {
