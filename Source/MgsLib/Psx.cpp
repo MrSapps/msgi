@@ -560,6 +560,23 @@ void CC Gte_project_distance_rect_401DA8(const PSX_RECT* pRect, int projectDista
 }
 MGS_FUNC_IMPLEX(0x401DA8, Gte_project_distance_rect_401DA8, IMPL_PSX);
 
+static int LimitRange(double v)
+{
+    int temp = static_cast<int>(v);
+    if (temp >= -1024)
+    {
+        if (temp > 1023)
+        {
+            temp = 1023;
+        }
+    }
+    else
+    {
+        temp = -1024;
+    }
+    return temp;
+}
+
 void CC Psx_gte_rtps_445630()
 {
     // Perspective Transformation single
@@ -585,7 +602,7 @@ void CC Psx_gte_rtps_445630()
     const double vz = (double)gGte_VXY0_993EC0.regs.VZ / 4096.0;
 
     const double matrix_2 =
-             ((double)gte_rotation_matrix_993E40.m[2][2] * vz
+        ((double)gte_rotation_matrix_993E40.m[2][2] * vz
             + (double)gte_rotation_matrix_993E40.m[2][1] * vy
             + (double)gte_rotation_matrix_993E40.m[2][0] * vx
             + (double)gGte_translation_vector_993E54.z) / 4096.0;
@@ -628,15 +645,12 @@ void CC Psx_gte_rtps_445630()
     const double screen_off_x_matrix_0 = (double)gGte_ScreenOffsetX_993EA0 + matrix_0;
     const double screen_off_y_matrix_1 = (double)gGte_ScreenOffSetY_993EA4 + matrix_1;
 
-    double clamped_matrix_2;
+    double clamped_matrix_2 = matrix_2;
     if (matrix_2 <= 0.0)
     {
         clamped_matrix_2 = 0.0;
     }
-    else
-    {
-        clamped_matrix_2 = matrix_2;
-    }
+
 
     gGte_unknown_72270C.d[1].field_4_prev_8[2] = (float)screen_off_x_matrix_0;
     gGte_unknown_72270C.d[2].field_4_prev_8[2] = (float)screen_off_y_matrix_1;
@@ -645,56 +659,14 @@ void CC Psx_gte_rtps_445630()
     gGte_SXY0_993EF0.regs.SX = gGte_SXY1_993EF4.regs.SX;
     gGte_SXY1_993EF4.regs.SX = gGte_SXY2_993EF8.regs.SX;
 
-    signed int screen_off_x_matrix_0_clamped = (signed int)screen_off_x_matrix_0;
-    if ((signed int)screen_off_x_matrix_0 >= -1024)
-    {
-        if (screen_off_x_matrix_0_clamped > 1023)
-        {
-            screen_off_x_matrix_0_clamped = 1023;
-        }
-    }
-    else
-    {
-        screen_off_x_matrix_0_clamped = -1024;
-    }
-
     gGte_SXY0_993EF0.regs.SY = gGte_SXY1_993EF4.regs.SY;
     gGte_SXY1_993EF4.regs.SY = gGte_SXY2_993EF8.regs.SY;
-    gGte_SXY2_993EF8.regs.SX = (short int)screen_off_x_matrix_0_clamped;
+    gGte_SXY2_993EF8.regs.SX = static_cast<short int>(LimitRange(screen_off_x_matrix_0));
 
-  
-    signed int screen_off_y_matrix_1_clamped = (signed int)screen_off_y_matrix_1;
-    if ((signed int)screen_off_y_matrix_1 >= -1024)
-    {
-        if (screen_off_y_matrix_1_clamped > 1023)
-        {
-            screen_off_y_matrix_1_clamped = 1023;
-        }
-        gGte_SXY2_993EF8.regs.SY = (short int)screen_off_y_matrix_1_clamped;
-    }
-    else
-    {
-        gGte_SXY2_993EF8.regs.SY = -1024;
-    }
+    gGte_SXY2_993EF8.regs.SY = static_cast<short int>(LimitRange(screen_off_y_matrix_1));
 }
 MGS_FUNC_IMPLEX(0x445630, Psx_gte_rtps_445630, IMPL_PSX);
 
-static int LimitRange(double v)
-{
-    int temp = static_cast<int>(v);
-    if (temp >= -1024)
-    {
-        if (temp > 1023)
-        {
-            temp = 1023;
-        }
-    }
-    else
-    {
-        temp = -1024;
-    }
-    return temp;
-}
 
 void CC Psx_gte_rtpt_445990()
 {
