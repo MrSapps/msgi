@@ -645,6 +645,15 @@ void CC RotMatrixZYX_gte_44BF60(const SVECTOR* pVec, PSX_MATRIX* pMtx)
 }
 MGS_FUNC_IMPLEX(0x44BF60, RotMatrixZYX_gte_44BF60, KMD_IMPL);
 
+void CC Res_base_get_gte_rot_mtx_44AE10(PSX_MATRIX* pMtx)
+{
+    memcpy(&pMtx->m, &gte_rotation_matrix_993E40.m, sizeof(PSX_MATRIX::m));
+    pMtx->t[0] = gGte_translation_vector_993E54.x;
+    pMtx->t[1] = gGte_translation_vector_993E54.y;
+    pMtx->t[2] = gGte_translation_vector_993E54.z;
+}
+MGS_FUNC_IMPLEX(0x44AE10, Res_base_get_gte_rot_mtx_44AE10, KMD_IMPL);
+
 void CC VectorMatrix_40B66B(const SVECTOR* pVec, int value, SVECTOR* pOutVec)
 {
     PSX_MATRIX mtx = {};
