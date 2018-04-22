@@ -6,6 +6,7 @@
 #include "Script.hpp"
 #include "ResourceNameHash.hpp"
 #include "Psx.hpp"
+#include "Table_665A3C.hpp"
 
 #define KMD_IMPL true
 
@@ -269,9 +270,6 @@ MGS_FUNC_IMPLEX(0x44B690, sub_44B690, KMD_IMPL);
 #define BOXKERI_IMPL true
 
 MGS_VAR(1, 0x9942B0, SVECTOR, gSnakePos_stru_9942B0, {});
-
-MGS_ARY(1, 0x665A3C, int, 4096, dword_665A3C, {}); // TODO: values
-
 
 const MATRIX3x3 gIdentityMatrix_6659BC ={ { { 4096, 0, 0 },{ 0, 4096, 0 },{ 0, 0, 4096 } } };
 
@@ -782,6 +780,18 @@ void CC RotMatrixC_44C3D0(const SVECTOR* pVec, PSX_MATRIX* pMtx)
     }
 }
 MGS_FUNC_IMPLEX(0x44C3D0, RotMatrixC_44C3D0, KMD_IMPL);
+
+int CC Res_get_constant_44AF00(__int16 value)
+{
+    return dword_665A3C[value & 4095];
+}
+MGS_FUNC_IMPLEX(0x44AF00, Res_get_constant_44AF00, KMD_IMPL);
+
+int CC Res_base_get_constant_44AEE0(__int16 idx)
+{
+    return dword_665A3C[(idx + 1024) & 4095];
+}
+MGS_FUNC_IMPLEX(0x44AEE0, Res_base_get_constant_44AEE0, KMD_IMPL);
 
 void CC Res_base_get_gte_rot_mtx_44AE10(PSX_MATRIX* pMtx)
 {
