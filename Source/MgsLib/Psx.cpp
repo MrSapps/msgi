@@ -470,9 +470,9 @@ MGS_ASSERT_SIZEOF(Reg_RGB, 4);
 struct Unk_72270C_Sub
 {
     float field_0_v;
-    float field_4_prev_8;
-    float field_8_prev_C;
-    float field_C_v;
+    float field_4_prev_8[3];
+    //float field_8_prev_C;
+    //float field_C_v;
 };
 MGS_ASSERT_SIZEOF(Unk_72270C_Sub, 0x10);
 
@@ -565,20 +565,20 @@ void CC Psx_gte_rtps_445630()
     // Perspective Transformation single
     ++gGteData_722688.gte_rtps_count_7226F0;
 
-    const float field_4_1 = gGte_unknown_72270C.d[1].field_4_prev_8;
-    gGte_unknown_72270C.d[1].field_4_prev_8 = gGte_unknown_72270C.d[1].field_8_prev_C;
-    gGte_unknown_72270C.d[1].field_0_v = field_4_1;
-    gGte_unknown_72270C.d[1].field_8_prev_C = gGte_unknown_72270C.d[1].field_C_v;
+    const float field_4_1 = gGte_unknown_72270C.d[1].field_4_prev_8[0];
+    gGte_unknown_72270C.d[1].field_4_prev_8[0] = gGte_unknown_72270C.d[1].field_4_prev_8[1];
+    gGte_unknown_72270C.d[1].field_4_prev_8[2] = field_4_1;
+    gGte_unknown_72270C.d[1].field_4_prev_8[1] = gGte_unknown_72270C.d[1].field_4_prev_8[2];
 
-    const float field_4_2 = gGte_unknown_72270C.d[2].field_4_prev_8;
-    gGte_unknown_72270C.d[2].field_4_prev_8 = gGte_unknown_72270C.d[2].field_8_prev_C;
-    gGte_unknown_72270C.d[2].field_0_v = field_4_2;
-    gGte_unknown_72270C.d[2].field_8_prev_C = gGte_unknown_72270C.d[2].field_C_v;
+    const float field_4_2 = gGte_unknown_72270C.d[2].field_4_prev_8[0];
+    gGte_unknown_72270C.d[2].field_4_prev_8[0] = gGte_unknown_72270C.d[2].field_4_prev_8[1];
+    gGte_unknown_72270C.d[2].field_4_prev_8[2] = field_4_2;
+    gGte_unknown_72270C.d[2].field_4_prev_8[1] = gGte_unknown_72270C.d[2].field_4_prev_8[2];
 
-    const float field_4_0 = gGte_unknown_72270C.d[0].field_4_prev_8;
-    gGte_unknown_72270C.d[0].field_4_prev_8 = gGte_unknown_72270C.d[0].field_8_prev_C;
-    gGte_unknown_72270C.d[0].field_0_v = field_4_0;
-    gGte_unknown_72270C.d[0].field_8_prev_C = gGte_unknown_72270C.d[0].field_C_v;
+    const float field_4_0 = gGte_unknown_72270C.d[0].field_4_prev_8[0];
+    gGte_unknown_72270C.d[0].field_4_prev_8[0] = gGte_unknown_72270C.d[0].field_4_prev_8[1];
+    gGte_unknown_72270C.d[0].field_4_prev_8[2] = field_4_0;
+    gGte_unknown_72270C.d[0].field_4_prev_8[1] = gGte_unknown_72270C.d[0].field_4_prev_8[2];
 
     const double vx = (double)gGte_VXY0_993EC0.regs.VX / 4096.0;
     const double vy = (double)gGte_VXY0_993EC0.regs.VY / 4096.0;
@@ -638,9 +638,9 @@ void CC Psx_gte_rtps_445630()
         clamped_matrix_2 = matrix_2;
     }
 
-    gGte_unknown_72270C.d[1].field_C_v = (float)screen_off_x_matrix_0;
-    gGte_unknown_72270C.d[2].field_C_v = (float)screen_off_y_matrix_1;
-    gGte_unknown_72270C.d[0].field_C_v = (float)clamped_matrix_2;
+    gGte_unknown_72270C.d[1].field_4_prev_8[2] = (float)screen_off_x_matrix_0;
+    gGte_unknown_72270C.d[2].field_4_prev_8[2] = (float)screen_off_y_matrix_1;
+    gGte_unknown_72270C.d[0].field_4_prev_8[2] = (float)clamped_matrix_2;
 
     gGte_SXY0_993EF0.regs.SX = gGte_SXY1_993EF4.regs.SX;
     gGte_SXY1_993EF4.regs.SX = gGte_SXY2_993EF8.regs.SX;
@@ -679,10 +679,160 @@ void CC Psx_gte_rtps_445630()
 }
 MGS_FUNC_IMPLEX(0x445630, Psx_gte_rtps_445630, IMPL_PSX);
 
+static int LimitRange(double v)
+{
+    int temp = static_cast<int>(v);
+    if (temp >= -1024)
+    {
+        if (temp > 1023)
+        {
+            temp = 1023;
+        }
+    }
+    else
+    {
+        temp = -1024;
+    }
+    return temp;
+}
+
 void CC Psx_gte_rtpt_445990()
 {
-    // TODO
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+    ++gGteData_722688.gte_rtpt_count_7226D0;      // Perspective Transformation triple
+
+    double vy[3]; // [esp+6Ch] [ebp-C8h]
+    double vx[3]; // [esp+8Ch] [ebp-A8h]
+    double vz[3]; // [esp+ACh] [ebp-88h]
+    vx[0] = (double)gGte_VXY0_993EC0.regs.VX / 4096.0;
+    vy[0] = (double)gGte_VXY0_993EC0.regs.VY / 4096.0;
+    vz[0] = (double)gGte_VXY0_993EC0.regs.VZ / 4096.0;
+    vx[1] = (double)gGte_VXY1_993EC8.regs.VX / 4096.0;
+    vy[1] = (double)gGte_VXY1_993EC8.regs.VY / 4096.0;
+    vz[1] = (double)gGte_VXY1_993EC8.regs.VZ / 4096.0;
+    vx[2] = (double)gGte_VXY2_993ED0.regs.VX / 4096.0;
+    vy[2] = (double)gGte_VXY2_993ED0.regs.VY / 4096.0;
+    vz[2] = (double)gGte_VXY2_993ED0.regs.VZ / 4096.0;
+
+    const double gte_x = (double)gGte_translation_vector_993E54.x / 4096.0;
+    const double gte_y = (double)gGte_translation_vector_993E54.y / 4096.0;
+    const double gte_z = (double)gGte_translation_vector_993E54.z / 4096.0;
+
+    const double m_0_0 = (double)gte_rotation_matrix_993E40.m[0][0] / 4096.0;
+    const double m_0_1 = (double)gte_rotation_matrix_993E40.m[0][1] / 4096.0;
+    const double m_0_2 = (double)gte_rotation_matrix_993E40.m[0][2] / 4096.0;
+
+    const double m_1_0 = (double)gte_rotation_matrix_993E40.m[1][0] / 4096.0;
+    const double m_1_1 = (double)gte_rotation_matrix_993E40.m[1][1] / 4096.0;
+    const double m_1_2 = (double)gte_rotation_matrix_993E40.m[1][2] / 4096.0;
+
+    const double m_2_0 = (double)gte_rotation_matrix_993E40.m[2][0] / 4096.0;
+    const double m_2_1 = (double)gte_rotation_matrix_993E40.m[2][1] / 4096.0;
+    const double m_2_2 = (double)gte_rotation_matrix_993E40.m[2][2] / 4096.0;
+
+    gGte_unknown_72270C.d[1].field_0_v = gGte_unknown_72270C.d[1].field_4_prev_8[2];
+    gGte_unknown_72270C.d[0].field_0_v = gGte_unknown_72270C.d[0].field_4_prev_8[2];
+    gGte_unknown_72270C.d[2].field_0_v = gGte_unknown_72270C.d[2].field_4_prev_8[2];
+
+    double gte_screenOffX = (double)gGte_ScreenOffsetX_993EA0;
+    double gte_screenOffY = (double)gGte_ScreenOffSetY_993EA4;
+
+   
+    double matrix_1[3]; // [esp+Ch] [ebp-128h]
+    double matrix_0[3]; // [esp+24h] [ebp-110h]
+    double matrix_2[3]; // [esp+3Ch] [ebp-F8h]
+    double screen_off_x_matrix_0[3]; // [esp+F4h] [ebp-40h]
+    double screen_off_y_matrix_1[3]; // [esp+10Ch] [ebp-28h]
+    for (int i=0; i<3; i++)
+    {
+        matrix_0[i] = m_0_2 * vz[i] + m_0_0 * vx[i] + m_0_1 * vy[i] + gte_x;
+        matrix_1[i] = m_1_2 * vz[i] + m_1_0 * vx[i] + m_1_1 * vy[i] + gte_y;
+        matrix_2[i] = m_2_2 * vz[i] + m_2_0 * vx[i] + m_2_1 * vy[i] + gte_z;
+
+        double scaled_project_plane_distance;
+        if (matrix_2[i] >= (double)((unsigned __int16)gGte_project_plane_distance_993EA8 >> 1) / 4096.0)
+        {
+            double gte_planeDistance = (double)(unsigned __int16)gGte_project_plane_distance_993EA8;
+
+            scaled_project_plane_distance = gte_planeDistance / matrix_2[i];
+        }
+        else
+        {
+            scaled_project_plane_distance = 8192.0;
+        }
+
+        screen_off_x_matrix_0[i] = scaled_project_plane_distance * matrix_0[i];
+        screen_off_y_matrix_1[i] = scaled_project_plane_distance * matrix_1[i];
+
+        screen_off_x_matrix_0[i] = clamp(screen_off_x_matrix_0[i], -1024.0, 1023.0);
+        screen_off_y_matrix_1[i] = clamp(screen_off_y_matrix_1[i], -1024.0, 1023.0);
+
+        screen_off_x_matrix_0[i] = gte_screenOffX + screen_off_x_matrix_0[i];
+        screen_off_y_matrix_1[i] = gte_screenOffY + screen_off_y_matrix_1[i];
+
+        gGte_unknown_72270C.d[1].field_4_prev_8[i] = static_cast<float>(screen_off_x_matrix_0[i]);
+        gGte_unknown_72270C.d[2].field_4_prev_8[i] = static_cast<float>(screen_off_y_matrix_1[i]);
+
+        double matrix_2_clamped = matrix_2[i];
+        if (matrix_2_clamped <= 0.0)
+        {
+            matrix_2_clamped = 0.0;
+        }
+        gGte_unknown_72270C.d[0].field_4_prev_8[i] = static_cast<float>(matrix_2_clamped);
+    }
+    
+    // FIFO rotate
+    gGte_SZ0_993F00 = gGte_SZ3_993F0C;
+
+    signed int regz1 = (signed int)(matrix_2[0] * 4096.0);
+    if (regz1 >= 0)
+    {
+        if (regz1 > 65535)
+        {
+            regz1 = 65535;
+        }
+    }
+    else
+    {
+        regz1 = 0;
+    }
+    gGte_SZ1_993F04.Z_32 = regz1;
+
+    signed int regz2 = (signed int)(matrix_2[1] * 4096.0);
+    if (regz2 >= 0)
+    {
+        if (regz2 > 65535)
+        {
+            regz2 = 65535;
+        }
+    }
+    else
+    {
+        regz2 = 0;
+    }
+    gGte_SZ2_993F08.Z_32 = regz2;
+
+    signed int regz3 = (signed int)(matrix_2[2] * 4096.0);
+    if (regz3 >= 0)
+    {
+        if (regz3 > 65535)
+        {
+            regz3 = 65535;
+        }
+    }
+    else
+    {
+        regz3 = 0;
+    }
+    gGte_SZ3_993F0C.Z_32 = regz3;
+
+
+    gGte_SXY0_993EF0.regs.SY = static_cast<short int>(LimitRange(screen_off_x_matrix_0[0]));
+    gGte_SXY1_993EF4.regs.SY = static_cast<short int>(LimitRange(screen_off_x_matrix_0[1]));
+    gGte_SXY2_993EF8.regs.SY = static_cast<short int>(LimitRange(screen_off_x_matrix_0[2]));
+
+    gGte_SXY0_993EF0.regs.SX = static_cast<short int>(LimitRange(screen_off_y_matrix_1[0]));
+    gGte_SXY1_993EF4.regs.SX = static_cast<short int>(LimitRange(screen_off_y_matrix_1[1]));
+    gGte_SXY2_993EF8.regs.SX = static_cast<short int>(LimitRange(screen_off_y_matrix_1[2]));
 }
 MGS_FUNC_IMPLEX(0x445990, Psx_gte_rtpt_445990, false); // FIX ME
 
