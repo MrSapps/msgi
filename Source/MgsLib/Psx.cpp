@@ -629,14 +629,6 @@ void CC Psx_gte_rtps_445630()
             + (double)gte_rotation_matrix_993E40.m[1][0] * vx
             + (double)gGte_translation_vector_993E54.y) / 4096.0);
 
-    // Rotate the SZ fifo
-    gGte_SZ0_993F00 = gGte_SZ1_993F04;
-    gGte_SZ1_993F04 = gGte_SZ2_993F08;
-    gGte_SZ2_993F08 = gGte_SZ3_993F0C;
-
-    signed int matrix_2_fixed = (signed int)(matrix_2 * 4096.0);
-    matrix_2_fixed = clamp(matrix_2_fixed, 0, 65535);
-    gGte_SZ3_993F0C.Z_32 = matrix_2_fixed;
 
     matrix_0 = clamp(matrix_0, -1024.0, 1023.0);
     matrix_1 = clamp(matrix_1, -1024.0, 1023.0);
@@ -653,6 +645,15 @@ void CC Psx_gte_rtps_445630()
     gGte_unknown_72270C.d[1].field_4_prev_8[2] = (float)screen_off_x_matrix_0;
     gGte_unknown_72270C.d[2].field_4_prev_8[2] = (float)screen_off_y_matrix_1;
     gGte_unknown_72270C.d[0].field_4_prev_8[2] = (float)clamped_matrix_2;
+
+    // Rotate the SZ fifo
+    gGte_SZ0_993F00 = gGte_SZ1_993F04;
+    gGte_SZ1_993F04 = gGte_SZ2_993F08;
+    gGte_SZ2_993F08 = gGte_SZ3_993F0C;
+
+    signed int matrix_2_fixed = (signed int)(matrix_2 * 4096.0);
+    matrix_2_fixed = clamp(matrix_2_fixed, 0, 65535);
+    gGte_SZ3_993F0C.Z_32 = matrix_2_fixed;
 
     gGte_SXY0_993EF0.regs.SX = gGte_SXY1_993EF4.regs.SX;
     gGte_SXY1_993EF4.regs.SX = gGte_SXY2_993EF8.regs.SX;
@@ -716,8 +717,6 @@ void CC Psx_gte_rtpt_445990()
     double screen_off_y_matrix_1[3]; // [esp+10Ch] [ebp-28h]
     for (int i=0; i<3; i++)
     {
-        matrix_0[i] = m_0_2 * vz[i] + m_0_0 * vx[i] + m_0_1 * vy[i] + gte_x;
-        matrix_1[i] = m_1_2 * vz[i] + m_1_0 * vx[i] + m_1_1 * vy[i] + gte_y;
         matrix_2[i] = m_2_2 * vz[i] + m_2_0 * vx[i] + m_2_1 * vy[i] + gte_z;
 
         double scaled_project_plane_distance;
@@ -730,16 +729,14 @@ void CC Psx_gte_rtpt_445990()
             scaled_project_plane_distance = 8192.0;
         }
 
-        double v1 = scaled_project_plane_distance * matrix_0[i];
-        double v2 = scaled_project_plane_distance * matrix_1[i];
-        screen_off_x_matrix_0[i] = v1;
-        screen_off_y_matrix_1[i] = v2;
+        matrix_0[i] = scaled_project_plane_distance * (m_0_2 * vz[i] + m_0_0 * vx[i] + m_0_1 * vy[i] + gte_x);
+        matrix_1[i] = scaled_project_plane_distance * (m_1_2 * vz[i] + m_1_0 * vx[i] + m_1_1 * vy[i] + gte_y);
 
-        screen_off_x_matrix_0[i] = clamp(screen_off_x_matrix_0[i], -1024.0, 1023.0);
-        screen_off_y_matrix_1[i] = clamp(screen_off_y_matrix_1[i], -1024.0, 1023.0);
+        matrix_0[i] = clamp(matrix_0[i], -1024.0, 1023.0);
+        matrix_1[i] = clamp(matrix_1[i], -1024.0, 1023.0);
 
-        screen_off_x_matrix_0[i] = gte_screenOffX + screen_off_x_matrix_0[i];
-        screen_off_y_matrix_1[i] = gte_screenOffY + screen_off_y_matrix_1[i];
+        screen_off_x_matrix_0[i] = gte_screenOffX + matrix_0[i];
+        screen_off_y_matrix_1[i] = gte_screenOffY + matrix_1[i];
 
         double matrix_2_clamped = matrix_2[i];
         if (matrix_2_clamped <= 0.0)
@@ -747,8 +744,8 @@ void CC Psx_gte_rtpt_445990()
             matrix_2_clamped = 0.0;
         }
 
-        gGte_unknown_72270C.d[1].field_4_prev_8[i] = static_cast<float>(v1);
-        gGte_unknown_72270C.d[2].field_4_prev_8[i] = static_cast<float>(v2);
+        gGte_unknown_72270C.d[1].field_4_prev_8[i] = static_cast<float>(screen_off_x_matrix_0[i]);
+        gGte_unknown_72270C.d[2].field_4_prev_8[i] = static_cast<float>(screen_off_y_matrix_1[i]);
         gGte_unknown_72270C.d[0].field_4_prev_8[i] = static_cast<float>(matrix_2_clamped);
     }
     
