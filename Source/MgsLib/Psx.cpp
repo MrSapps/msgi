@@ -785,10 +785,173 @@ MGS_FUNC_IMPLEX(0x445F20, Psx_gte_nccs_445F20, IMPL_PSX);
 
 void CC Psx_gte_dpcs_446530()
 {
-    // TODO
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR
+    ++gGteData_722688.gte_dpcs_count_722704;      // Depth Cueing single
+
+    double r = (double)gGte_r_993ED8 * 0.00390625;
+    double g = (double)gGte_g_993ED9 * 0.00390625;
+    double b = (double)gGte_b_993EDA * 0.00390625;
+    double ir0 = (double)gGte_IR0_993EE0.IR_16 * 0.000244140625;
+    double z_r = (double)gGte_far_colour_993E94.x * 0.0625 - r;
+    double z_g = (double)gGte_far_colour_993E94.y * 0.0625 - g;
+    double z_b = (double)gGte_far_colour_993E94.z * 0.0625 - b;
+
+    if (z_r >= -7.999)
+    {
+        if (z_r > 7.999)
+        {
+            z_r = 7.999;
+        }
+    }
+    else
+    {
+        z_r = -7.999;
+    }
+
+    if (z_g >= -7.999)
+    {
+        if (z_g > 7.999)
+        {
+            z_g = 7.999;
+        }
+    }
+    else
+    {
+        z_g = -7.999;
+    }
+
+    if (z_b >= -7.999)
+    {
+        if (z_b > 7.999)
+        {
+            z_b = 7.999;
+        }
+    }
+    else
+    {
+        z_b = -7.999;
+    }
+
+    double z_r_ir0 = z_r * ir0 + r;
+    double z_g_ir0 = z_g * ir0 + g;
+    double z_b_ir0 = z_b * ir0 + b;
+
+    if (z_r_ir0 >= -32768.0)
+    {
+        if (z_r_ir0 <= 32767.0)
+        {
+            gGte_IR1_993EE4.IR_16 = static_cast<short int>(z_r_ir0);
+        }
+        else
+        {
+            gGte_IR1_993EE4.IR_16 = 32767;
+        }
+    }
+    else
+    {
+        gGte_IR1_993EE4.IR_16 = -32768;
+    }
+
+    if (z_g_ir0 >= -32768.0)
+    {
+        if (z_g_ir0 <= 32767.0)
+        {
+            gGte_IR2_993EE8.IR_16 = static_cast<short int>(z_g_ir0);
+        }
+        else
+        {
+            gGte_IR2_993EE8.IR_16 = 32767;
+        }
+    }
+    else
+    {
+        gGte_IR2_993EE8.IR_16 = -32768;
+    }
+
+    if (z_b_ir0 >= -32768.0)
+    {
+        if (z_b_ir0 <= 32767.0)
+        {
+            gGte_IR3_993EEC.IR_16 = static_cast<short int>(z_b_ir0);
+        }
+        else
+        {
+            gGte_IR3_993EEC.IR_16 = 32767;
+        }
+    }
+    else
+    {
+        gGte_IR3_993EEC.IR_16 = -32768;
+    }
+
+    const char gGte_RGB1_993F14_cd = gGte_RGB1_993F14.cd;
+    gGte_RGB1_993F14.cd = gGte_RGB2_993F18.cd;
+    gGte_RGB0_993F10.cd = gGte_RGB1_993F14_cd;
+    const char gGte_RGB1_993F14_r = gGte_RGB1_993F14.r;
+    gGte_RGB1_993F14.r = gGte_RGB2_993F18.r;
+    gGte_RGB2_993F18.cd = static_cast<unsigned char>(gGte_OTZ_993EDB);
+    gGte_RGB0_993F10.r = gGte_RGB1_993F14_r;
+
+    if (z_r_ir0 * 256.0 >= 0.0)
+    {
+        if (z_r_ir0 * 256.0 <= 255.0)
+        {
+            gGte_RGB2_993F18.r = static_cast<unsigned char>(z_r_ir0 * 256.0);
+        }
+        else
+        {
+            gGte_RGB2_993F18.r = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB2_993F18.r = 0;
+    }
+
+    gGte_RGB0_993F10.g = gGte_RGB1_993F14.g;
+    gGte_RGB1_993F14.g = gGte_RGB2_993F18.g;
+
+    if (z_g_ir0 * 256.0 >= 0.0)
+    {
+        if (z_g_ir0 * 256.0 <= 255.0)
+        {
+            gGte_RGB2_993F18.g = static_cast<unsigned char>(z_g_ir0 * 256.0);
+        }
+        else
+        {
+            gGte_RGB2_993F18.g = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB2_993F18.g = 0;
+    }
+
+    const char gGte_RGB1_993F14_b = gGte_RGB1_993F14.b;
+    gGte_RGB1_993F14.b = gGte_RGB2_993F18.b;
+    gGte_RGB0_993F10.b = gGte_RGB1_993F14_b;
+
+    if (z_b_ir0 * 256.0 >= 0.0)
+    {
+        if (z_b_ir0 * 256.0 <= 255.0)
+        {
+            gGte_RGB2_993F18.b = static_cast<unsigned char>(z_b_ir0 * 256.0);
+        }
+        else
+        {
+            gGte_RGB2_993F18.b = 255;
+        }
+    }
+    else
+    {
+        gGte_RGB2_993F18.b = 0;
+    }
+
+
+    gGte_MAC1_993F24.MAC_32 = (signed int)(z_r_ir0 * 16.0);
+    gGte_MAC2_993F28.MAC_32 = (signed int)(z_g_ir0 * 16.0);
+    gGte_MAC3_993F2C.MAC_32 = (signed int)(z_b_ir0 * 16.0);
 }
-MGS_FUNC_IMPLEX(0x446530, Psx_gte_dpcs_446530, false); // FIX ME
+MGS_FUNC_IMPLEX(0x446530, Psx_gte_dpcs_446530, IMPL_PSX);
 
 void CC Psx_gte_ncs_446930()
 {
