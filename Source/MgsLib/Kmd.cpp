@@ -855,6 +855,28 @@ void CC Gte_get_rot_matrix_and_trans_vec_407C0D(PSX_MATRIX* pMatrix)
 }
 MGS_FUNC_IMPLEX(0x407C0D, Gte_get_rot_matrix_and_trans_vec_407C0D, KMD_IMPL);
 
+void CC VectorSqr_40225C(const VECTOR3* pInVec, signed int value, SVECTOR* pResult)
+{
+    VECTOR3 sqrtVec = {};
+    Psx_gte_sqr0_44B030(pInVec, &sqrtVec);
+    
+    __int64 squareRoot = j_sqrt(sqrtVec.x + sqrtVec.y + sqrtVec.z);
+    if (!squareRoot)
+    {
+        squareRoot = 1;
+    }
+
+    __int64 calc = 2 * value - squareRoot;
+    if (calc < 0)
+    {
+        calc = 0;
+    }
+    pResult->field_0_x = static_cast<short int>(calc * (3072 * pInVec->x / squareRoot) / value);// 3072 fixed point of 0.75f
+    pResult->field_2_y = static_cast<short int>(calc * (3072 * pInVec->y / squareRoot) / value);
+    pResult->field_4_z = static_cast<short int>(calc * (3072 * pInVec->z / squareRoot) / value);
+}
+MGS_FUNC_IMPLEX(0x40225C, VectorSqr_40225C, KMD_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x40241F, int __cdecl(SVECTOR *a1, PSX_MATRIX *pMtxAry), Res_base_unknown_40241F); // TODO
 
 void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
