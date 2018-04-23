@@ -671,9 +671,9 @@ void CC Psx_gte_rtpt_445990()
 {
     ++gGteData_722688.gte_rtpt_count_7226D0;      // Perspective Transformation triple
 
-    double vy[3]; // [esp+6Ch] [ebp-C8h]
-    double vx[3]; // [esp+8Ch] [ebp-A8h]
-    double vz[3]; // [esp+ACh] [ebp-88h]
+    double vy[3] = {};
+    double vx[3] = {};
+    double vz[3] = {};
     vx[0] = (double)gGte_VXY0_993EC0.regs.VX / 4096.0;
     vy[0] = (double)gGte_VXY0_993EC0.regs.VY / 4096.0;
     vz[0] = (double)gGte_VXY0_993EC0.regs.VZ / 4096.0;
@@ -709,12 +709,11 @@ void CC Psx_gte_rtpt_445990()
     double gte_screenOffX = (double)gGte_ScreenOffsetX_993EA0;
     double gte_screenOffY = (double)gGte_ScreenOffSetY_993EA4;
 
-   
-    double matrix_1[3]; // [esp+Ch] [ebp-128h]
-    double matrix_0[3]; // [esp+24h] [ebp-110h]
-    double matrix_2[3]; // [esp+3Ch] [ebp-F8h]
-    double screen_off_x_matrix_0[3]; // [esp+F4h] [ebp-40h]
-    double screen_off_y_matrix_1[3]; // [esp+10Ch] [ebp-28h]
+    double matrix_1[3] = {};
+    double matrix_0[3] = {};
+    double matrix_2[3] = {};
+    double screen_off_x_matrix_0[3] = {};
+    double screen_off_y_matrix_1[3] = {};
     for (int i=0; i<3; i++)
     {
         matrix_2[i] = m_2_2 * vz[i] + m_2_0 * vx[i] + m_2_1 * vy[i] + gte_z;
@@ -767,15 +766,15 @@ void CC Psx_gte_rtpt_445990()
     gGte_SZ3_993F0C.Z_32 = matrix_2_fixed[2];
 
 
-    gGte_SXY0_993EF0.regs.SY = static_cast<short int>(LimitRange(screen_off_x_matrix_0[0]));
-    gGte_SXY1_993EF4.regs.SY = static_cast<short int>(LimitRange(screen_off_x_matrix_0[1]));
-    gGte_SXY2_993EF8.regs.SY = static_cast<short int>(LimitRange(screen_off_x_matrix_0[2]));
+    gGte_SXY0_993EF0.regs.SX = static_cast<short int>(LimitRange(screen_off_x_matrix_0[0]));
+    gGte_SXY1_993EF4.regs.SX = static_cast<short int>(LimitRange(screen_off_x_matrix_0[1]));
+    gGte_SXY2_993EF8.regs.SX = static_cast<short int>(LimitRange(screen_off_x_matrix_0[2]));
 
-    gGte_SXY0_993EF0.regs.SX = static_cast<short int>(LimitRange(screen_off_y_matrix_1[0]));
-    gGte_SXY1_993EF4.regs.SX = static_cast<short int>(LimitRange(screen_off_y_matrix_1[1]));
-    gGte_SXY2_993EF8.regs.SX = static_cast<short int>(LimitRange(screen_off_y_matrix_1[2]));
+    gGte_SXY0_993EF0.regs.SY = static_cast<short int>(LimitRange(screen_off_y_matrix_1[0]));
+    gGte_SXY1_993EF4.regs.SY = static_cast<short int>(LimitRange(screen_off_y_matrix_1[1]));
+    gGte_SXY2_993EF8.regs.SY = static_cast<short int>(LimitRange(screen_off_y_matrix_1[2]));
 }
-MGS_FUNC_IMPLEX(0x445990, Psx_gte_rtpt_445990, true); // FIX ME
+MGS_FUNC_IMPLEX(0x445990, Psx_gte_rtpt_445990, IMPL_PSX);
 
 
 template<class T>
