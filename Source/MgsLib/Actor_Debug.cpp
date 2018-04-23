@@ -592,7 +592,8 @@ static int CC Debug_Loader(Actor_Debug* pDebug)
     Debug_InitRenderToTextureFont(pDebug);
 
     // TODO: Hacks because these don't get set correctly in standalone exe yet
-    game_state_dword_72279C.flags = 0x00400000;
+    game_state_dword_72279C.flags = 0x0;
+    gGameStates_78E7E0.gLoadItemFuncIdx_word_78E7FC = 2;
     gGameStates_78E7E0.gSnakeCurrentHealth_78E7F6 = 1024-256;
     gGameStates_78E7E0.gSnakeMaxHealth_78E7F8 = 1024;
     gSnakeCurrentO2_995348 = 512;
