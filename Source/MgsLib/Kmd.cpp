@@ -859,7 +859,7 @@ void CC VectorSqr_40225C(const VECTOR3* pInVec, signed int value, SVECTOR* pResu
 {
     VECTOR3 sqrtVec = {};
     Psx_gte_sqr0_44B030(pInVec, &sqrtVec);
-    
+
     __int64 squareRoot = j_sqrt(sqrtVec.x + sqrtVec.y + sqrtVec.z);
     if (!squareRoot)
     {
@@ -877,7 +877,82 @@ void CC VectorSqr_40225C(const VECTOR3* pInVec, signed int value, SVECTOR* pResu
 }
 MGS_FUNC_IMPLEX(0x40225C, VectorSqr_40225C, KMD_IMPL);
 
+struct Light
+{
+    short int field_0_r;
+    short int field_2_g;
+    short int field_4_b;
+    short int field_6_a;
+};
+MGS_ASSERT_SIZEOF(Light, 0x8);
+
+void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, SVECTOR* pScratchBuffer, const Light* pLights, int lightCount)
+{
+    if (vertCount - 1 < 0)
+    {
+        return;
+    }
+
+    SVECTOR* pScratchIter = pScratchBuffer;
+    for (int i = 0; i < vertCount; i++)
+    {
+        gGte_VXY0_993EC0 = *(Reg_VXY0 *)&pVerts[i];
+        Psx_gte_RT1TR_rt_4477A0();
+
+        const Light* pLightIter = pLights;
+        int halvesWrote = 0;
+        for (int j = 0; j < lightCount; j++)
+        {
+            VECTOR3 vec = {};
+            const int light1_g = pLightIter[1].field_2_g;
+            vec.x = gGte_MAC1_993F24.MAC_32 - pLightIter[0].field_0_r;
+            if (!(vec.x < -light1_g || vec.x > light1_g))
+            {
+                vec.y = gGte_MAC2_993F28.MAC_32 - pLightIter[0].field_2_g;
+                if (!(vec.y < -light1_g || vec.y > light1_g))
+                {
+                    vec.z = gGte_MAC3_993F2C.MAC_32 - pLightIter[0].field_4_b;
+                    if (!(vec.z < -light1_g || vec.z > light1_g))
+                    {
+                        halvesWrote++;
+                        if (halvesWrote == 2)
+                        {
+                            VectorSqr_40225C(&vec, pLightIter[1].field_0_r, pScratchIter + 1);
+                            pScratchIter[2].field_4_z = pLightIter[1].field_4_b;
+                            pScratchIter[2].field_6_padding = pLightIter[1].field_6_a;
+                            break;
+                        }
+                        VectorSqr_40225C(&vec, pLightIter[1].field_0_r, pScratchIter);
+                        pScratchIter[2].field_0_x = pLightIter[1].field_4_b;
+                        pScratchIter[2].field_2_y = pLightIter[1].field_6_a;
+                    }
+                }
+            }
+            pLightIter += 2;
+        }
+
+        if (halvesWrote == 0)
+        {
+            // Nothing wrote, zero everything.
+            pScratchIter[2].field_0_x = 0;
+            pScratchIter[2].field_2_y = 0;
+            pScratchIter[2].field_4_z = 0;
+            pScratchIter[2].field_6_padding = 0;
+        }
+        else if (halvesWrote == 1)
+        {
+            // Only the first half wrote, zero out the 2nd half.
+            pScratchIter[2].field_4_z = 0;
+            pScratchIter[2].field_6_padding = 0;
+        }
+
+        pScratchIter += 3;
+    }
+}
+MGS_FUNC_IMPLEX(0x443C39, Kmd_verts_unknown_443C39, true); // TODO
+
 MGS_FUNC_NOT_IMPL(0x40241F, int __cdecl(SVECTOR *a1, PSX_MATRIX *pMtxAry), Res_base_unknown_40241F); // TODO
+
 
 void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
 {
