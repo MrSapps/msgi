@@ -7,6 +7,7 @@
 #include "ResourceNameHash.hpp"
 #include "Psx.hpp"
 #include "Table_665A3C.hpp"
+#include "Menu.hpp"
 
 #define KMD_IMPL true
 
@@ -877,15 +878,6 @@ void CC VectorSqr_40225C(const VECTOR3* pInVec, signed int value, SVECTOR* pResu
 }
 MGS_FUNC_IMPLEX(0x40225C, VectorSqr_40225C, KMD_IMPL);
 
-struct Light
-{
-    short int field_0_r;
-    short int field_2_g;
-    short int field_4_b;
-    short int field_6_a;
-};
-MGS_ASSERT_SIZEOF(Light, 0x8);
-
 void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, SVECTOR* pScratchBuffer, const Light* pLights, int lightCount)
 {
     if (vertCount - 1 < 0)
@@ -907,31 +899,30 @@ void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, SVECTOR* 
         for (int j = 0; j < lightCount; j++)
         {
             VECTOR3 vec = {};
-            const int light1_g = pLightIter[1].field_2_g;
-            vec.x = gGte_MAC1_993F24.MAC_32 - pLightIter[0].field_0_r;
+            const int light1_g = pLightIter[j].field_A_g;
+            vec.x = gGte_MAC1_993F24.MAC_32 - pLightIter[j].field_0_x;
             if (!(vec.x < -light1_g || vec.x > light1_g))
             {
-                vec.y = gGte_MAC2_993F28.MAC_32 - pLightIter[0].field_2_g;
+                vec.y = gGte_MAC2_993F28.MAC_32 - pLightIter[j].field_2_y;
                 if (!(vec.y < -light1_g || vec.y > light1_g))
                 {
-                    vec.z = gGte_MAC3_993F2C.MAC_32 - pLightIter[0].field_4_b;
+                    vec.z = gGte_MAC3_993F2C.MAC_32 - pLightIter[j].field_4_z;
                     if (!(vec.z < -light1_g || vec.z > light1_g))
                     {
                         halvesWrote++;
                         if (halvesWrote == 2)
                         {
-                            VectorSqr_40225C(&vec, pLightIter[1].field_0_r, pScratchIter + 1);
-                            pScratchIter[2].field_4_z = pLightIter[1].field_4_b;
-                            pScratchIter[2].field_6_padding = pLightIter[1].field_6_a;
+                            VectorSqr_40225C(&vec, pLightIter[j].field_8_r, pScratchIter + 1);
+                            pScratchIter[2].field_4_z = pLightIter[j].field_C_b;
+                            pScratchIter[2].field_6_padding = pLightIter[j].field_E_a;
                             break;
                         }
-                        VectorSqr_40225C(&vec, pLightIter[1].field_0_r, pScratchIter);
-                        pScratchIter[2].field_0_x = pLightIter[1].field_4_b;
-                        pScratchIter[2].field_2_y = pLightIter[1].field_6_a;
+                        VectorSqr_40225C(&vec, pLightIter[j].field_8_r, pScratchIter);
+                        pScratchIter[2].field_0_x = pLightIter[j].field_C_b;
+                        pScratchIter[2].field_2_y = pLightIter[j].field_E_a;
                     }
                 }
             }
-            pLightIter += 2;
         }
 
         if (halvesWrote == 0)
@@ -973,6 +964,77 @@ void CC Kmd_verts_unknown_443BEC(const kmdObject* pKmdObj, const Light* pLights,
     Kmd_verts_unknown_443C39(pVerts, vertCount, pScratch, pLights, lightCount);
 }
 MGS_FUNC_IMPLEX(0x443BEC, Kmd_verts_unknown_443BEC, KMD_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x443D4F, CVECTOR* __cdecl(const kmdObject *a1, CVECTOR* a2, Prim_unknown_0x48 *a3), PrimObjRelated_helper_443D4F); // TODO
+
+signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLights, int lightCount)
+{
+    // Allocate light buffer if we don't have one already
+    Prim_Mesh_0x5C* pMeshIter = DataAfterStructure<Prim_Mesh_0x5C*>(pObj);
+    if (!pMeshIter->field_44_light_colour_buffer)
+    {
+        const int lightsSizeBytes = Kmd_TotalLightSizeInBytes_443FAF(pObj->field_24_pKmdFileData);
+        pMeshIter->field_44_light_colour_buffer = (CVECTOR *)System_2_zerod_allocate_memory_40B296(lightsSizeBytes);
+        if (!pMeshIter->field_44_light_colour_buffer)
+        {
+            return -1;
+        }
+    }
+
+    const MATRIX3x3 rotMatrixBackup = gte_rotation_matrix_993E40;
+    const VECTOR3 translationVecBackup = gGte_translation_vector_993E54;
+
+    CVECTOR* pLightsBuffer = pMeshIter->field_44_light_colour_buffer;
+    KmdHeader* pKmdFileData = pObj->field_24_pKmdFileData;
+    for (DWORD i = 0; i < pKmdFileData->mNumberOfObjects; i++)
+    {
+        const kmdObject* pKmd = pMeshIter[i].field_40_pKmdObj;
+        pMeshIter[i].field_44_light_colour_buffer = pLightsBuffer;
+
+        // Real game always sets this.. although it seems it only needs doing once
+        memcpy(&gte_rotation_matrix_993E40.m, &pObj->field_0_matrix.m, sizeof(PSX_MATRIX::m));
+        gGte_translation_vector_993E54.x = pObj->field_0_matrix.t[0];
+        gGte_translation_vector_993E54.y = pObj->field_0_matrix.t[1];
+        gGte_translation_vector_993E54.z = pObj->field_0_matrix.t[2];
+
+        Kmd_verts_unknown_443BEC(pKmd, pLights, lightCount);// put data in scratch
+
+        // Flag 4 = don't apply lights or apply dynamically?
+        if (pKmd->field_0_numObj & 4)
+        {
+            for (int j = 0; j < pKmd->numLights; j++)
+            {
+                pLightsBuffer[j].r = 0x80;
+                pLightsBuffer[j].g = 0x80;
+                pLightsBuffer[j].b = 0x80;
+                pLightsBuffer[j].cd = 0x3C | (pKmd->field_0_numObj & 2);
+            }
+            pLightsBuffer += pKmd->numLights;
+        }
+        else
+        {
+            pLightsBuffer = PrimObjRelated_helper_443D4F(pKmd, pLightsBuffer, pObj);// use data from scratch
+        }
+    }
+
+    for (int i = 0; i < pObj->field_2E_UnknownOrNumFaces; i++)
+    {
+        if (pMeshIter[i].field_54_prim_buffers[0])
+        {
+            LibGV_prim_buffer_set_shade_colour_4072B7(&pMeshIter[i], 0);
+        }
+        if (pMeshIter[i].field_54_prim_buffers[1])
+        {
+            LibGV_prim_buffer_set_shade_colour_4072B7(&pMeshIter[i], 1);
+        }
+    }
+
+    gte_rotation_matrix_993E40 = rotMatrixBackup;
+    gGte_translation_vector_993E54 = translationVecBackup;
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x443A4E, PrimObjRelated_443A4E, KMD_IMPL);
+
 
 MGS_FUNC_NOT_IMPL(0x40241F, int __cdecl(SVECTOR *a1, PSX_MATRIX *pMtxAry), Res_base_unknown_40241F); // TODO
 
@@ -1103,17 +1165,17 @@ void CC Kmd_Set_Light_matrices_450109(struc_kmd* pKmd, PSX_MATRIX* pLightMtxAry)
 }
 MGS_FUNC_IMPLEX(0x450109, Kmd_Set_Light_matrices_450109, BOXKERI_IMPL);
 
-int CC Kmd_TotalObjectSizeInBytes_443FAF(KmdHeader* pKmdHeader)
+int CC Kmd_TotalLightSizeInBytes_443FAF(const KmdHeader* pKmdHeader)
 {
     int totalCount = 0;
+    const kmdObject* pKmdObj = DataAfterStructure<const kmdObject*>(pKmdHeader);
     for (DWORD i = 0; i < pKmdHeader->mNumberOfObjects; i++)
     {
-        kmdObject* pKmdObj = (kmdObject *)&pKmdHeader[1];
         totalCount += pKmdObj[i].field_4_numFaces;
     }
-    return (16 * totalCount); // TODO: 16 = sizeof(?)
+    return sizeof(Light) * totalCount; // Or size of CVECTOR*4 verts?
 }
-MGS_FUNC_IMPLEX(0x443FAF, Kmd_TotalObjectSizeInBytes_443FAF, BOXKERI_IMPL);
+MGS_FUNC_IMPLEX(0x443FAF, Kmd_TotalLightSizeInBytes_443FAF, BOXKERI_IMPL);
 
 void CC Object_Remove_4017C3(Prim_unknown_0x48* pPrim)
 {
@@ -1148,10 +1210,10 @@ MGS_FUNC_IMPLEX(0x4017C3, Object_Remove_4017C3, BOXKERI_IMPL);
 void CC Prim_free_colour_buffer_443FCB(Prim_unknown_0x48* pPrim)
 {
     Prim_Mesh_0x5C* pMesh = (Prim_Mesh_0x5C *)&pPrim[1];
-    if (pMesh->field_44_colour_buffer)
+    if (pMesh->field_44_light_colour_buffer)
     {
-        System_2_free_40B2A7(pMesh->field_44_colour_buffer);
-        pMesh->field_44_colour_buffer = nullptr;
+        System_2_free_40B2A7(pMesh->field_44_light_colour_buffer);
+        pMesh->field_44_light_colour_buffer = nullptr;
     }
 }
 MGS_FUNC_IMPLEX(0x443FCB, Prim_free_colour_buffer_443FCB, BOXKERI_IMPL);

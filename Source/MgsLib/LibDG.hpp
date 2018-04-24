@@ -220,4 +220,6 @@ int CC LibGV_prim_buffer_allocate_texture_and_shade_40730A(Prim_Mesh_0x5C* pMesh
 void CC LibGV_void_active_prim_buffer_4073E8(Prim_Mesh_0x5C* pMesh, int activeBuffer);
 void CC MarkObjectQueueVoid_4018E0();
 
+void CC LibGV_prim_buffer_set_shade_colour_4072B7(Prim_Mesh_0x5C* pMesh, int activeBuffer);
+
 void DoDGTests();

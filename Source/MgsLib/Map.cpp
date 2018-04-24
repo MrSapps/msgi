@@ -10,15 +10,6 @@
 
 #define MAP_IMPL true
 
-struct Light
-{
-    short field_0_r;
-    short field_2_g;
-    short field_4_b;
-    short field_6_a;
-};
-MGS_ASSERT_SIZEOF(Light, 0x8);
-
 struct LitHeader
 {
     DWORD field_0_num_lights;
@@ -291,10 +282,6 @@ void CC Map_FreeKmds_44F3B5()
     gMapOrKmdCount_dword_722868 = 0;
 }
 MGS_FUNC_IMPLEX(0x44F3B5, Map_FreeKmds_44F3B5, MAP_IMPL);
-
-
-MGS_FUNC_NOT_IMPL(0x443A4E, signed int CC (Prim_unknown_0x48 *pObj, Light* pLights, int lightCount), PrimObjRelated_443A4E);
-
 
 void CC Map_LitLoad_44F53B(int resourceNameHashed, const map_record* pMapStruct)
 {

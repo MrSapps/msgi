@@ -11,7 +11,7 @@ struct KmdHeader;
 struct kmdObject
 {
     WORD field_0_numObj;
-    WORD numUnk;
+    WORD numLights;
     DWORD field_4_numFaces;
     int boundingBox[6];
     int translation[3];
@@ -37,7 +37,7 @@ struct Prim_Mesh_0x5C
     PSX_MATRIX field_0_mtx;
     PSX_MATRIX field_20_mtx;
     kmdObject* field_40_pKmdObj;
-    CVECTOR* field_44_colour_buffer; // 16 bytes with rgbp for each POLY_GT4
+    CVECTOR* field_44_light_colour_buffer; // 16 bytes with rgbp for each POLY_GT4
     Prim_Mesh_0x5C* field_48_pLinked;
     WORD field_4C_bounding_ret;
     WORD field_4E_counter;
@@ -155,6 +155,22 @@ void CC Prim_free_colour_buffer_443FCB(Prim_unknown_0x48* pPrim);
 void CC Prim_void_and_free_4440BE(Prim_unknown_0x48* pPrim);
 Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, __int16 usuallyZero);
 int CC Object_Add_40178F(Prim_Union* pPrim);
+
+struct Light
+{
+    short int field_0_x;
+    short int field_2_y;
+    short int field_4_z;
+    short int field_6_w;
+    short int field_8_r;
+    short int field_A_g;
+    short int field_C_b;
+    short int field_E_a;
+};
+MGS_ASSERT_SIZEOF(Light, 16);
+
+signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLights, int lightCount);
+int CC Kmd_TotalLightSizeInBytes_443FAF(const KmdHeader* pKmdHeader);
 
 void CC RotMatrixZYX_gte_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx);
 void CC RotMatrixY_44C270(__int16 value, PSX_MATRIX* pMtx);

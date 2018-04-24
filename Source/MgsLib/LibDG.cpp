@@ -1919,7 +1919,7 @@ void CC LibGV_prim_buffer_set_shade_colour_4072B7(Prim_Mesh_0x5C* pMesh, int act
     Prim_Mesh_0x5C* pMeshIter = pMesh;
     do
     {
-        CVECTOR* pVec = pMeshIter->field_44_colour_buffer;
+        CVECTOR* pVec = pMeshIter->field_44_light_colour_buffer;
         for (int i = 0; i < pMeshIter->field_52_num_faces; i++)
         {
             setRGB0(pPrimBufferIter, pVec[0].r, pVec[0].g, pVec[0].b);
