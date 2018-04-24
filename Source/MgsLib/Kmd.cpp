@@ -896,7 +896,10 @@ void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, SVECTOR* 
     SVECTOR* pScratchIter = pScratchBuffer;
     for (int i = 0; i < vertCount; i++)
     {
-        gGte_VXY0_993EC0 = *(Reg_VXY0 *)&pVerts[i];
+        gGte_VXY0_993EC0.regs.VX = pVerts[i].field_0_x;
+        gGte_VXY0_993EC0.regs.VY = pVerts[i].field_2_y;
+        gGte_VXY0_993EC0.regs.VZ = pVerts[i].field_4_z;
+      
         Psx_gte_RT1TR_rt_4477A0();
 
         const Light* pLightIter = pLights;
