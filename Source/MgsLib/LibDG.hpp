@@ -208,6 +208,7 @@ union Psx_ScratchPad
 {
     Psx_ScratchPad_Raw field_0_raw;
     SVECTOR field_1_8Vecs[8];
+    SVECTOR vecs_42[42];
     Psx_ScratchPad_Matrix field_2_Matrix;
 };
 MGS_ASSERT_SIZEOF(Psx_ScratchPad, 1024);

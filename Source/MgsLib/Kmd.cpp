@@ -952,7 +952,27 @@ void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, SVECTOR* 
         pScratchIter += 3;
     }
 }
-MGS_FUNC_IMPLEX(0x443C39, Kmd_verts_unknown_443C39, true); // TODO
+MGS_FUNC_IMPLEX(0x443C39, Kmd_verts_unknown_443C39, KMD_IMPL);
+
+MGS_ARY(1, 0x721EA0, SVECTOR, 252, gBiggerScratch_unk_721EA0, {});
+
+void CC Kmd_verts_unknown_443BEC(const kmdObject* pKmdObj, const Light* pLights, int lightCount)
+{
+    SVECTOR* pScratch = gScratchPadMemory_991E40.vecs_42;
+    unsigned int vertCount = pKmdObj->numVerts_34;
+    SVECTOR* pVerts = pKmdObj->vertOfs_38;
+    if (vertCount > 42)
+    {
+        Kmd_verts_unknown_443C39(pVerts, 42, pScratch, pLights, lightCount);
+        // 42*8 (vector size) *3 (vectors per vert) = 1008 bytes of scratch ?
+        pVerts += 42;
+        vertCount -= 42;
+        // 2016 = 84 items, or 126 counting the other 42
+        pScratch = gBiggerScratch_unk_721EA0;
+    }
+    Kmd_verts_unknown_443C39(pVerts, vertCount, pScratch, pLights, lightCount);
+}
+MGS_FUNC_IMPLEX(0x443BEC, Kmd_verts_unknown_443BEC, KMD_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x40241F, int __cdecl(SVECTOR *a1, PSX_MATRIX *pMtxAry), Res_base_unknown_40241F); // TODO
 
