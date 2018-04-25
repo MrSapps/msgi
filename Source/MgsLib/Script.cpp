@@ -938,8 +938,8 @@ MGS_VAR(1, 0x6BEE70, short int, light_r_word_6BEE70, 0);
 MGS_VAR(1, 0x6BEE72, short int, light_g_word_6BEE72, 0);
 MGS_VAR(1, 0x6BEE74, short int, light_b_word_6BEE74, 0);
 
-const CVECTOR kOpaque = { 0x80, 0x80, 0x80, 0x3C };
-const CVECTOR kTransparent = { 0x80, 0x80, 0x80, 0x3E };
+const CVECTOR kOpaque = { 128, 128, 128, 0x3C };
+const CVECTOR kTransparent = { 128, 128, 128, 0x3E };
 
 MGS_VAR(1, 0x650168, CVECTOR, light_opaque_colour_650168, kOpaque);
 MGS_VAR(1, 0x65016C, CVECTOR, light_transparent_colour_65016C, kTransparent);
@@ -952,8 +952,8 @@ void CC LightSettingsRelated_4020F5(int r, int g, int b)
     gGte_background_colour_993E74.x = 16 * r;
     gGte_background_colour_993E74.y = 16 * g;
     gGte_background_colour_993E74.z = 16 * b;
-    light_opaque_colour_650168 = { 0x80, 0x80, 0x80, 0x3C };
-    light_transparent_colour_65016C = { 0x80, 0x80, 0x80, 0x3E };
+    light_opaque_colour_650168 = { 255, 255, 255, 0x3C };
+    light_transparent_colour_65016C = { 255, 255, 255, 0x3E };
 }
 MGS_FUNC_IMPLEX(0x004020F5, LightSettingsRelated_4020F5, SCRIPT_IMPL);
 
