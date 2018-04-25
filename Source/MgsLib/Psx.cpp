@@ -500,9 +500,7 @@ MGS_VAR(1, 0x993EC0, Reg_VXY0, gGte_VXY0_993EC0, {});
 MGS_VAR(1, 0x993EC8, Reg_VXY1, gGte_VXY1_993EC8, {});
 MGS_VAR(1, 0x993ED0, Reg_VXY2, gGte_VXY2_993ED0, {});
 
-MGS_VAR(1, 0x993ED8, BYTE, gGte_r_993ED8, 0);
-MGS_VAR(1, 0x993ED9, BYTE, gGte_g_993ED9, 0);
-MGS_VAR(1, 0x993EDA, BYTE, gGte_b_993EDA, 0);
+MGS_VAR(1, 0x993ED8, CVECTOR, gGte_light_colour_993ED8, {});
 MGS_VAR(1, 0x993EDB, short, gGte_OTZ_993EDB, 0);
 
 MGS_VAR(1, 0x993EE0, IR_Reg, gGte_IR0_993EE0, {});
@@ -843,9 +841,9 @@ void CC Psx_gte_nccs_445F20()
         + (double)gGte_background_colour_993E74.z) / 4096.0;
     clamp(light_colour_matrix_2, 0.0, 7.999);
 
-    const double light_r = (double)gGte_r_993ED8 * light_colour_matrix_0 * 16.0;
-    const double light_g = (double)gGte_g_993ED9 * light_colour_matrix_1 * 16.0;
-    const double light_b = (double)gGte_b_993EDA * light_colour_matrix_2 * 16.0;
+    const double light_r = (double)gGte_light_colour_993ED8.r * light_colour_matrix_0 * 16.0;
+    const double light_g = (double)gGte_light_colour_993ED8.g * light_colour_matrix_1 * 16.0;
+    const double light_b = (double)gGte_light_colour_993ED8.b * light_colour_matrix_2 * 16.0;
 
     gGte_IR1_993EE4.IR_32 = ToScaledFixedPoint<int>(light_r, 16.0, 4095.0);
     gGte_IR2_993EE8.IR_32 = ToScaledFixedPoint<int>(light_g, 16.0, 4095.0);
@@ -877,9 +875,9 @@ void CC Psx_gte_dpcs_446530()
 {
     ++gGteData_722688.gte_dpcs_count_722704;      // Depth Cueing single
 
-    double r = (double)gGte_r_993ED8 * 0.00390625;
-    double g = (double)gGte_g_993ED9 * 0.00390625;
-    double b = (double)gGte_b_993EDA * 0.00390625;
+    double r = (double)gGte_light_colour_993ED8.r * 0.00390625;
+    double g = (double)gGte_light_colour_993ED8.g * 0.00390625;
+    double b = (double)gGte_light_colour_993ED8.b * 0.00390625;
     double ir0 = (double)gGte_IR0_993EE0.IR_16 * 0.000244140625;
     double z_r = (double)gGte_far_colour_993E94.x * 0.0625 - r;
     double z_g = (double)gGte_far_colour_993E94.y * 0.0625 - g;
@@ -1151,9 +1149,9 @@ void CC Psx_gte_ncs_446930()
     gGte_RGB0_993F10.r = gGte_RGB1_993F14.r;
     gGte_RGB1_993F14.r = gGte_RGB2_993F18.r;
 
-    const double r_value = (double)gGte_r_993ED8 * light_colour_matrix_1 * 0.00390625;
-    const double g_value = (double)gGte_g_993ED9 * light_colour_matrix_2 * 0.00390625;
-    const double b_value = (double)gGte_b_993EDA * light_colour_matrix_3 * 0.00390625;
+    const double r_value = (double)gGte_light_colour_993ED8.r * light_colour_matrix_1 * 0.00390625;
+    const double g_value = (double)gGte_light_colour_993ED8.g * light_colour_matrix_2 * 0.00390625;
+    const double b_value = (double)gGte_light_colour_993ED8.b * light_colour_matrix_3 * 0.00390625;
 
     if (r_value * 256.0 >= 0.0)
     {
