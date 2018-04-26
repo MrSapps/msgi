@@ -1952,6 +1952,42 @@ static void Test_LibGV_prim_buffer_init_polyGT4s_40738D()
     ASSERT_EQ(prim.code, 0x3C);
 }
 
+void CC LibGV_406168(struct_gv* pGv, int activeBuffer)
+{
+    Prim_Union** ppObjects = pGv->gObjects_dword_6BC3C4;
+    for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
+    {
+        Prim_unknown_0x48* pObject = &ppObjects[i]->prim_48;
+        if (pObject->field_32)
+        {
+            Prim_Mesh_0x5C* pMeshIter = DataAfterStructure<Prim_Mesh_0x5C*>(pObject);
+            for (int j = 0; j < pObject->field_2E_UnknownOrNumFaces; j++)
+            {
+                if (pMeshIter[j].field_4C_bounding_ret)
+                {
+                    int totalFaceCount = 0;
+                    Prim_Mesh_0x5C* pLinked = pMeshIter;
+                    do
+                    {
+                        totalFaceCount += pLinked->field_52_num_faces;
+                        pLinked = pLinked->field_48_pLinked;
+                    } while (pLinked);
+
+                    if (pMeshIter->field_54_prim_buffers[activeBuffer])
+                    {
+                        for (int k = 0; k < totalFaceCount; k++)
+                        {
+                            POLY_GT4* pPoly = pMeshIter->field_54_prim_buffers[activeBuffer];
+                            pPoly[k].pad2 = 0; // TODO: Check if its this or actually tag that is set to 0
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x406168, LibGV_406168, LIBDG_IMPL);
+
 void CC LibGV_prim_buffer_apply_textures_407163(Prim_Mesh_0x5C* pMeshObj, int activeBuffer)
 {
     Prim_Mesh_0x5C* pLinked = pMeshObj;
