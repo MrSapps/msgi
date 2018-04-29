@@ -13,3 +13,6 @@ signed int CC FS_LoadRequest(const char* fileName, void** buffer, signed int typ
 void CC j_FS_CloseFile_40907E();
 int Res_loader_load_file_to_mem_408FAE();
 signed int CC File_GetStreamState_45837C();
+void CC FS_StreamEnd_521210();
+void CC FS_StreamActorStop_4583BB();
+char* FS_StreamDebugStr_52078F();

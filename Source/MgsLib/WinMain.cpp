@@ -73,7 +73,6 @@ struct ActorList;
 MGS_FUNC_NOT_IMPL(0x004397D7, bool __cdecl(), AskUserToContinueIfNoSoundCard);
 MGS_FUNC_NOT_IMPL(0x0051D120, void __cdecl(int, int), CheckForMmf);
 MGS_FUNC_NOT_IMPL(0x005202FE, DWORD __cdecl(float, float, float, float), FreeCameraMove_5202FE);
-MGS_FUNC_NOT_IMPL(0x00521210, void __cdecl(), FS_StreamEnd_521210);
 
 MGS_VAR(1, 0x71D1CC, HGDIOBJ, gScreenBitmap_71D1CC, nullptr);
 MGS_VAR(1, 0x71D17C, DWORD, dword_71D17C, 0);
@@ -176,7 +175,6 @@ MGS_FUNC_NOT_IMPL(0x00431865, signed int __cdecl(), MakeFonts);
 MGS_FUNC_NOT_IMPL(0x0051F5B8, signed int __stdcall(GUID*, const char*, char*, void*, HMONITOR), DeviceEnumCallBack);
 MGS_FUNC_NOT_IMPL(0x52008A, int __cdecl(DWORD), DoSleep);
 MGS_FUNC_NOT_IMPL(0x42BE0A, int __cdecl(), MainLoop_helper_42BE0A);
-EXTERN_MGS_FUNC_NOT_IMPL(0x004583BB, void CC(), StreamActorStop_4583BB);
 MGS_FUNC_NOT_IMPL(0x4317B3, BOOL __cdecl(), Fonts_Release_sub_4317B3);
 
 MGS_VAR(1, 0x6FC748, IDirect3D7 *, g_pDirect3D, nullptr);
@@ -336,7 +334,7 @@ int CC HandleExclusiveMode()
     }
 
     Sound_StopSample();
-    StreamActorStop_4583BB();
+    FS_StreamActorStop_4583BB();
     Task_Pause();
 
     do

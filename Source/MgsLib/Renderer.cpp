@@ -6,6 +6,7 @@
 #include "WinMain.hpp"
 #include "Actor_GameD.hpp"
 #include "Font.hpp"
+#include "Fs.hpp"
 #include <time.h>
 
 #define RENDERER_IMPL true
@@ -55,8 +56,6 @@ signed int CC Render_ComputeTextureIdx_40CC50(__int16 tpage, __int16 u, __int16 
     return 1;
 }
 MGS_FUNC_IMPLEX(0x40CC50, Render_ComputeTextureIdx_40CC50, RENDERER_IMPL);
-
-MGS_FUNC_NOT_IMPL(0x52078F, const char* __cdecl(), SoundGetName_52078F);
 
 MGS_VAR(RENDERER_IMPL, 0x776858, int, gSurfaceStackIdx_dword_776858, 0);
 MGS_ARY(RENDERER_IMPL, 0x774F48, IDirectDrawSurface7*, 1024, gSurfaceStack_dword_774F48, {});
@@ -265,15 +264,13 @@ void CC Render_Loop_SetWinTitle_422210()
     //if (false)
     {
         HDC hdc = {};
-        const char* lpString = SoundGetName_52078F();
-        if (lpString)
-        {
-            g_pBackBuffer_6FC738->GetDC(&hdc);
-            SetBkMode(hdc, 1);
-            SetTextColor(hdc, 0xC03050u);
-            TextOutA(hdc, 20, 20, lpString, strlen(lpString));
-            g_pBackBuffer_6FC738->ReleaseDC(hdc);
-        }
+        const char* lpString = FS_StreamDebugStr_52078F();
+        g_pBackBuffer_6FC738->GetDC(&hdc);
+        SetBkMode(hdc, 1);
+        SetTextColor(hdc, 0xC03050u);
+        TextOutA(hdc, 20, 20, lpString, strlen(lpString));
+        g_pBackBuffer_6FC738->ReleaseDC(hdc);
+
     }
 
     if (!gSkipFrame_dword_6FC720)

@@ -62,7 +62,6 @@ MGS_FUNC_NOT_IMPL(0x004553C5, void CC(), sub_4553C5);
 MGS_FUNC_NOT_IMPL(0x00455017, void CC(), GM_SoundStart_455017);
 MGS_FUNC_NOT_IMPL(0x0044E8F1, void CC(), sub_44E8F1);
 MGS_FUNC_NOT_IMPL(0x0044E969, void CC(), sub_44E969);
-MGS_FUNC_NOT_IMPL(0x004583BB, void CC(), StreamActorStop_4583BB);
 MGS_FUNC_NOT_IMPL(0x0044F28B, void CC(), GameD_update_helper_44F28B);
 MGS_FUNC_NOT_IMPL(0x004552CB, void CC(), GameD_Sound_4552CB);
 MGS_FUNC_NOT_IMPL(0x004502CD, Actor* CC(__int16 bShowContinue), Res_over_create_4502CD);
@@ -913,7 +912,7 @@ static void GameD_Update_helper(DWORD buttons)
     {
         if (gpActiveButtons_995324[2].field_2_button_pressed & 0x840)
         {
-            StreamActorStop_4583BB();
+            FS_StreamActorStop_4583BB();
         }
     }
     if (GameD_Input_445610() & 0x20)
@@ -1092,7 +1091,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
             }
             else if (File_GetStreamState_45837C() == 1)
             {
-                StreamActorStop_4583BB();
+                FS_StreamActorStop_4583BB();
             }
         }
         else
@@ -1141,7 +1140,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
     Actor_KillActorsAtLevel_40A23D(4);
     gActorPauseFlags_dword_791A0C = gActorPauseFlags_dword_791A0C & 0xF7;
     Map_FreeKmds_44F3B5();
-    StreamActorStop_4583BB();
+    FS_StreamActorStop_4583BB();
     pGameD->gamed_unk_722784 = 3;
     game_state_dword_72279C.flags |= 0x104A6000u;
 }

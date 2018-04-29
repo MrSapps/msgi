@@ -1261,8 +1261,8 @@ signed int CC FS_LoadRequest(const char* fileName, void** ppBuffer, signed int t
 }
 MGS_FUNC_IMPLEX(0x00408EEF, FS_LoadRequest, FS_IMPL)
 
-MGS_VAR(1, 0x724AE0, WORD, gStream_state_word_724AE0, 0);
-MGS_VAR(1, 0x9B0A10, DWORD, fs_busy_dword_9B0A10, 0);
+MGS_VAR(1, 0x724AE0, short, gStream_state_word_724AE0, 0);
+MGS_VAR(1, 0x9B0A10, int, fs_busy_dword_9B0A10, 0);
 
 int CC FS_StreamIsBusy_521122()
 {
@@ -1279,6 +1279,136 @@ signed int CC File_GetStreamState_45837C()
     return 2;
 }
 MGS_FUNC_IMPLEX(0x0045837C, File_GetStreamState_45837C, FS_IMPL)
+
+struct StreamBuffer
+{
+    int field_0_currrent_buffer;
+    int field_4_num_buffers;
+    DWORD** field_8_malloc_buffers;
+};
+MGS_ASSERT_SIZEOF(StreamBuffer, 0xC);
+
+
+MGS_ARY(1, 0x77D228, char, 256, gSoundDebugString_byte_77D228, {});
+MGS_ARY(1, 0x77D140, StreamBuffer, 17, gFS_StreamBuffers_77D140, {});
+MGS_VAR(1, 0x77D330, DWORD, gStreamTask_bMoreData_77D330, 0);
+MGS_VAR(1, 0x77D32C, BYTE*, gStreamChunkBuffer_77D32C, nullptr);
+MGS_VAR(1, 0x77D224, FILE*, gStreamedFileHandle_dword_77D224, nullptr);
+MGS_VAR(1, 0x77D334, int, gFS_exit_task_proc_dword_77D334, 0);
+MGS_VAR(1, 0x77D338, int, gFs_task_proc_running_dword_77D338, 0);
+
+MGS_VAR(1, 0x9B0A0C, int, gFs_StreamErr_9B0A0C, 0);
+MGS_VAR(1, 0x77D220, int, fs_dword_77D220, 0);
+MGS_VAR(1, 0x77D210, int, fs_dword_77D210, 0);
+MGS_VAR(1, 0x77D21C, int, fs_time_dword_77D21C, 0);
+MGS_VAR(1, 0x791DF8, int, fs_time_dword_791DF8, 0);
+MGS_VAR(1, 0x724AC0, Actor, gstrctrl_actor_724AC0, {});
+
+void CC FS_StreamClose_520FB8()
+{
+    gFS_exit_task_proc_dword_77D334 = 1;
+
+    while (gFs_task_proc_running_dword_77D338)
+    {
+        Sleep(4 * (clock() % 4) + 4);
+    }
+
+    if (gStreamChunkBuffer_77D32C)
+    {
+        free(gStreamChunkBuffer_77D32C);
+        gStreamChunkBuffer_77D32C = nullptr;
+    }
+
+    if (gStreamedFileHandle_dword_77D224)
+    {
+        //File_Abstracted_Close_5210F9(gStreamedFileHandle_dword_77D224); - no mmf support
+        File_Close_51F183(gStreamedFileHandle_dword_77D224);
+        gStreamedFileHandle_dword_77D224 = 0;
+    }
+
+    for (int i = 0; i < 17; ++i)
+    {
+        if (gFS_StreamBuffers_77D140[i].field_8_malloc_buffers)
+        {
+            for (int j = 0; j < gFS_StreamBuffers_77D140[i].field_4_num_buffers; ++j)
+            {
+                if (gFS_StreamBuffers_77D140[i].field_8_malloc_buffers[j])
+                {
+                    free(gFS_StreamBuffers_77D140[i].field_8_malloc_buffers[j]);
+                    gFS_StreamBuffers_77D140[i].field_8_malloc_buffers[j] = nullptr;
+                }
+            }
+            free(gFS_StreamBuffers_77D140[i].field_8_malloc_buffers);
+            gFS_StreamBuffers_77D140[i].field_8_malloc_buffers = nullptr;
+        }
+        gFS_StreamBuffers_77D140[i].field_4_num_buffers = 0;
+        gFS_StreamBuffers_77D140[i].field_0_currrent_buffer = 0;
+    }
+}
+MGS_FUNC_IMPLEX(0x520FB8, FS_StreamClose_520FB8, FS_IMPL);
+
+void CC FS_StreamEnd_521210()
+{
+    FS_StreamClose_520FB8();
+    gFs_StreamErr_9B0A0C = 1;
+    fs_busy_dword_9B0A10 = 0;
+    fs_dword_77D220 = 0;
+    fs_dword_77D210 = 0;
+    fs_time_dword_77D21C = -1;
+    fs_time_dword_791DF8 = -1;
+}
+MGS_FUNC_IMPLEX(0x521210, FS_StreamEnd_521210, FS_IMPL);
+
+void CC FS_StreamActorStop_4583BB()
+{
+    FS_StreamEnd_521210();
+    if (gStream_state_word_724AE0 == 1 || gStream_state_word_724AE0 == 2)
+    {
+        Actor_Remove_40A3FC(&gstrctrl_actor_724AC0);
+    }
+}
+MGS_FUNC_IMPLEX(0x4583BB, FS_StreamActorStop_4583BB, FS_IMPL);
+
+char* FS_StreamDebugStr_52078F()
+{
+    if (gStreamTask_bMoreData_77D330)
+    {
+        sprintf(
+            gSoundDebugString_byte_77D228,
+            "pcm %03d %03d %04d jim %03d %03d %04d dem %03d %03d %04d %s",
+            gFS_StreamBuffers_77D140[1].field_0_currrent_buffer,// pcm 1
+            gFS_StreamBuffers_77D140[1].field_4_num_buffers,// pcm 2
+            gFS_StreamBuffers_77D140[1].field_4_num_buffers - gFS_StreamBuffers_77D140[1].field_0_currrent_buffer,// pcm 3
+            gFS_StreamBuffers_77D140[3].field_0_currrent_buffer,// jim 1
+            gFS_StreamBuffers_77D140[7].field_4_num_buffers,// jim 2
+            gFS_StreamBuffers_77D140[4].field_4_num_buffers - gFS_StreamBuffers_77D140[6].field_0_currrent_buffer,// jim 3
+            gFS_StreamBuffers_77D140[5].field_0_currrent_buffer,// dem 1
+            gFS_StreamBuffers_77D140[5].field_4_num_buffers,// dem 2
+            gFS_StreamBuffers_77D140[5].field_4_num_buffers - gFS_StreamBuffers_77D140[5].field_0_currrent_buffer,// dem 3
+            "EOF");
+    }
+    else
+    {
+        sprintf(
+            gSoundDebugString_byte_77D228,
+            "pcm %03d %03d %04d jim %03d %03d %04d dem %03d %03d %04d %s",
+            gFS_StreamBuffers_77D140[1].field_0_currrent_buffer,
+            gFS_StreamBuffers_77D140[1].field_4_num_buffers,
+            gFS_StreamBuffers_77D140[1].field_4_num_buffers - gFS_StreamBuffers_77D140[1].field_0_currrent_buffer,
+            gFS_StreamBuffers_77D140[3].field_0_currrent_buffer,
+            gFS_StreamBuffers_77D140[7].field_4_num_buffers,
+            gFS_StreamBuffers_77D140[4].field_4_num_buffers - gFS_StreamBuffers_77D140[6].field_0_currrent_buffer,
+            gFS_StreamBuffers_77D140[5].field_0_currrent_buffer,
+            gFS_StreamBuffers_77D140[5].field_4_num_buffers,
+            gFS_StreamBuffers_77D140[5].field_4_num_buffers - gFS_StreamBuffers_77D140[5].field_0_currrent_buffer,
+            "");
+    }
+    return gSoundDebugString_byte_77D228;
+}
+MGS_FUNC_IMPLEX(0x52078F, FS_StreamDebugStr_52078F, FS_IMPL);
+
+
+
 
 void Fs_Cpp_ForceLink()
 {

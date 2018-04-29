@@ -1719,7 +1719,6 @@ void CC LibGV_4066ED(Prim_Union* pObj)
 }
 MGS_FUNC_IMPLEX(0x4066ED, LibGV_4066ED, LIBDG_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x405668, void CC(struct_gv* pGv, int activeBuffer), LibGV_405668);
 MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
 
 
@@ -1987,6 +1986,60 @@ void CC LibGV_406168(struct_gv* pGv, int activeBuffer)
     }
 }
 MGS_FUNC_IMPLEX(0x406168, LibGV_406168, LIBDG_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x4057A0, void __cdecl (Prim_Mesh_0x5C* pMesh, int activeBuffer), LibGV_4057A0);
+
+struct ScratchPad_405668 // TODO: Add to union and figure out other pad fields
+{
+    WORD pad1[255];
+    WORD flags;
+    WORD pad2[252];
+    POLY_GT4* pPolys;
+    SVECTOR* pVerts;
+};
+
+void CC LibGV_405668(struct_gv* pGv, int activeBuffer)
+{
+    LibGV_406168(pGv, activeBuffer);
+    Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
+
+    ScratchPad_405668* pScratch = (ScratchPad_405668*)&gScratchPadMemory_991E40;
+
+    for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
+    {
+        Prim_unknown_0x48* pObject = &pGv->gObjects_dword_6BC3C4[i]->prim_48;
+        if (pObject->field_32)
+        {
+            const unsigned int bFlag5 = (~pObject->field_28_flags_or_type >> 5) & 1;
+            Prim_Mesh_0x5C* pMesh = DataAfterStructure<Prim_Mesh_0x5C*>(pObject);
+            for (int j = 0; j < pObject->field_2E_UnknownOrNumFaces; j++)
+            {
+                if (pMesh[j].field_4C_bounding_ret)
+                {
+                    kmdObject* pObjKmd = pMesh[j].field_40_pKmdObj;
+
+                    // TODO: Why 23? 2D array?
+                    pScratch->pPolys = pMesh->field_54_prim_buffers[gActiveBuffer_dword_791A08 + (23 * pObjKmd->mRef_2C_parentObjIndex)];
+                    pScratch->pVerts = pObjKmd->vertOfs_38;
+
+                    memcpy(&gte_rotation_matrix_993E40.m, &pMesh[j].field_20_mtx.m, sizeof(PSX_MATRIX::m));
+                    gGte_translation_vector_993E54.x = pMesh[j].field_20_mtx.t[0];
+                    gGte_translation_vector_993E54.y = pMesh[j].field_20_mtx.t[1];
+                    gGte_translation_vector_993E54.z = pMesh[j].field_20_mtx.t[2];
+
+                    pScratch->flags = bFlag5 && pMesh[j].field_4C_bounding_ret == 1;
+
+                    if (pObject->field_28_flags_or_type & 8)
+                    {
+                        pScratch->flags |= 4u;
+                    }
+                    LibGV_4057A0(&pMesh[j], activeBuffer);
+                }
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x405668, LibGV_405668, LIBDG_IMPL);
 
 void CC LibGV_prim_buffer_apply_textures_407163(Prim_Mesh_0x5C* pMeshObj, int activeBuffer)
 {
@@ -2569,7 +2622,7 @@ MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0,
 {
     LibGV_407122,
     LibGV_4061E7,
-    LibGV_405668.Ptr(),
+    LibGV_405668,
     LibGV_lights_405180,
     LibGV_4041A5,
     LibGV_403528.Ptr(),

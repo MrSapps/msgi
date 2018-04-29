@@ -9,7 +9,6 @@
 void Actor_RankCPP_ForceLink();
 void DoActor_RankTests();
 
-struct Prim_unknown;
 struct ButtonStates;
 
 enum DiffcultyLevels

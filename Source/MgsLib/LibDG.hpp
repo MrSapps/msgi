@@ -50,31 +50,6 @@ MGS_VAR_EXTERN(PSX_MATRIX, gIdentity_matrix_6501F8);
 
 void* CC MemClearUnknown_40B231(void* pMem, int size);
 
-
-struct Prim_unknown
-{
-    PSX_MATRIX field_0_matrix;
-    void* field_20;
-    DWORD field_24_maybe_flags;
-    WORD field_28_dword_9942A0;
-    WORD field_2A_num_items;
-    WORD field_2C_index;
-    WORD field_2E_w_or_h;
-    WORD field_30_size;
-    WORD field_32;
-    WORD field_34;
-    WORD field_36;
-    DWORD field_38_size24b;
-    DWORD field_3C;
-    BYTE* field_40_pDataStart[2];
-    DWORD field_48; // Prim_unknown** ?
-    DWORD field_4C;
-    DWORD field_50; // field_68 == ?? // 0x54-0x68=0x14 20 bytes into first prim ?? 
-    // field_84
-};
-MGS_ASSERT_SIZEOF(Prim_unknown, 0x54);
-
-
 #pragma pack(push)
 #pragma pack(2)
 struct Prim_Object

@@ -5,8 +5,6 @@
 #include "Kmd.hpp"
 #include "Font.hpp"
 
-struct Prim_unknown;
-
 struct Actor_Debug
 {
     Actor mBase;

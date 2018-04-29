@@ -23,7 +23,7 @@ struct kmdObject
     unsigned int *indexOfs_3C;
 
     DWORD numNorms_40;
-    DWORD normOfs_44;
+    DWORD* normOfs_44;
     DWORD normIndex_48;
 
     BYTE* ofsUV_4C;
