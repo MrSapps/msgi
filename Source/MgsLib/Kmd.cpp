@@ -1281,11 +1281,10 @@ void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size)
     MemClearUnknown_40B231(pObj, sizeof(struc_kmd));
     pObj->field_4_size = size;
     pObj->field_8_light_mtx_array = &gLightNormalVec_650128;
-    // TODO
-    //pObj->field_C_mapflags_or_script_binds = (signed __int16)mapChangeFlagsOrScriptBinds;
+    pObj->field_C_mapflags_or_script_binds = (signed __int16)mapChangeFlagsOrScriptBinds_9942A0;
     LoadKmdImpl_450243(pObj, resHash);
 }
-MGS_FUNC_IMPLEX(0x44FF7C, LoadKmdRelated_44FF7C, false); // TODO
+MGS_FUNC_IMPLEX(0x44FF7C, LoadKmdRelated_44FF7C, BOXKERI_IMPL);
 
 int CC Res_Enemy_boxkeri_loader_5B702E(Actor_boxkeri* pBox, PSX_MATRIX* pMtx, SVECTOR* pVec)
 {

@@ -1055,7 +1055,7 @@ void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 }
 MGS_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
 
-MGS_VAR_EXTERN(u32, dword_9942A0); // From Actor
+MGS_VAR_EXTERN(u32, mapChangeFlagsOrScriptBinds_9942A0); // From Actor
 
 
 MGS_FUNC_NOT_IMPL(0x475BCE, __int16 __cdecl(Actor_Rank *pRank), Rank_RankCalcs_475BCE);
@@ -1071,7 +1071,7 @@ MGS_FUNC_IMPLEX(0x4742E1, Rank_set_font_and_colour_4742E1, ACTOR_RANK_IMPL);
 
 int CC Res_rank_loader(Actor_Rank* pRank, int a3)
 {
-    dword_9942A0 = (u32)a3;
+    mapChangeFlagsOrScriptBinds_9942A0 = (u32)a3;
     pRank->field_5E0_896 = 896;
     pRank->field_5E4_256 = 256;
     pRank->field_5E8_896 = 896;
@@ -1081,7 +1081,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     if (pPrim16Data)
     {
         PrimAdd_401805(pPrim16Data);
-        pPrim16Data->prim_54.field_28_flags_or_type = (signed __int16)dword_9942A0;
+        pPrim16Data->prim_54.field_28_flags_or_type = (signed __int16)mapChangeFlagsOrScriptBinds_9942A0;
     }
     pRank->field_24_ptr_16_prims = &pPrim16Data->prim_54;
     
@@ -1089,7 +1089,7 @@ int CC Res_rank_loader(Actor_Rank* pRank, int a3)
     if (pPrim9Data)
     {
         PrimAdd_401805(pPrim9Data);
-        pPrim9Data->prim_54.field_28_flags_or_type = (signed __int16)dword_9942A0;
+        pPrim9Data->prim_54.field_28_flags_or_type = (signed __int16)mapChangeFlagsOrScriptBinds_9942A0;
     }
     pRank->field_28_ptr_9_prims = &pPrim9Data->prim_54;
 

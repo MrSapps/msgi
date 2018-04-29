@@ -513,7 +513,7 @@ static void CC Debug_Shutdown(Actor_Debug* pDebug)
     }
 }
 
-MGS_VAR_EXTERN(u32, dword_9942A0);
+MGS_VAR_EXTERN(u32, mapChangeFlagsOrScriptBinds_9942A0);
 
 static void Debug_InitTestPOLYFT4s(Actor_Debug* pDebug)
 {
@@ -524,7 +524,7 @@ static void Debug_InitTestPOLYFT4s(Actor_Debug* pDebug)
     if (pPrim16Data)
     {
         PrimAdd_401805(pPrim16Data);
-        pPrim16Data->prim_54.field_28_flags_or_type = (signed __int16)dword_9942A0;
+        pPrim16Data->prim_54.field_28_flags_or_type = (signed __int16)mapChangeFlagsOrScriptBinds_9942A0;
     }
     pDebug->mPrimData = &pPrim16Data->prim_54;
 

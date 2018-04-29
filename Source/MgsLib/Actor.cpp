@@ -27,7 +27,7 @@ MGS_ARY(1, 0x6507EC, const PauseKill, 9, gPauseKills,
 });
 MGS_ARY(1, 0x006BFC78, ActorList, 9, gActorsList, {});
 MGS_VAR(1, 0x791A0C, u32, gActorPauseFlags_dword_791A0C, 0);
-MGS_VAR(1, 0x9942A0, u32, dword_9942A0, 0);
+MGS_VAR(1, 0x9942A0, u32, mapChangeFlagsOrScriptBinds_9942A0, 0);
 
 template<class bShouldEnterList, class bShouldContinue>
 static bool IterateActors(bShouldEnterList fnEnterList, bShouldContinue fnShouldContinue)
@@ -46,7 +46,7 @@ static bool IterateActors(bShouldEnterList fnEnterList, bShouldContinue fnShould
                 {
                     return true;
                 }
-                dword_9942A0 = 0;
+                mapChangeFlagsOrScriptBinds_9942A0 = 0;
                 pActor = pNext;
             } while (pNext);
         }

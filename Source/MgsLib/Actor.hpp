@@ -30,6 +30,7 @@ struct ActorList
 MGS_ASSERT_SIZEOF(ActorList, 0x44);
 
 MGS_VAR_EXTERN(u32, gActorPauseFlags_dword_791A0C);
+MGS_VAR_EXTERN(u32, mapChangeFlagsOrScriptBinds_9942A0);
 
 // Helper to avoid casting all over the place
 template<class T>
