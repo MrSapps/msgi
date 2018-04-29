@@ -2018,8 +2018,7 @@ void CC LibGV_405668(struct_gv* pGv, int activeBuffer)
                 {
                     kmdObject* pObjKmd = pMesh[j].field_40_pKmdObj;
 
-                    // TODO: Why 23? 2D array?
-                    pScratch->pPolys = pMesh->field_54_prim_buffers[gActiveBuffer_dword_791A08 + (23 * pObjKmd->mRef_2C_parentObjIndex)];
+                    pScratch->pPolys = pMesh[pObjKmd->mRef_2C_parentObjIndex].field_54_prim_buffers[gActiveBuffer_dword_791A08];
                     pScratch->pVerts = pObjKmd->vertOfs_38;
 
                     memcpy(&gte_rotation_matrix_993E40.m, &pMesh[j].field_20_mtx.m, sizeof(PSX_MATRIX::m));
