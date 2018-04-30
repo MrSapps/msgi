@@ -161,10 +161,10 @@ struct Light
     short int field_0_x;
     short int field_2_y;
     short int field_4_z;
-    short int field_6_w;
-    short int field_8_r;
-    short int field_A_g;
-    int field_C_b;
+    short int field_6_w; // padding?
+    short int field_8_brightness;
+    short int field_A_radius;
+    CVECTOR field_C_colour;
 };
 MGS_ASSERT_SIZEOF(Light, 16);
 
