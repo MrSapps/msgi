@@ -433,6 +433,17 @@ MGS_VAR_EXTERN(IR_Reg, gGte_IR1_993EE4);
 MGS_VAR_EXTERN(IR_Reg, gGte_IR2_993EE8);
 MGS_VAR_EXTERN(IR_Reg, gGte_IR3_993EEC);
 
+struct Reg_RGB
+{
+    unsigned char r, g, b, cd;
+};
+MGS_ASSERT_SIZEOF(Reg_RGB, 4);
+
+MGS_VAR_EXTERN(Reg_RGB, gGte_RGB0_993F10);
+MGS_VAR_EXTERN(Reg_RGB, gGte_RGB1_993F14);
+MGS_VAR_EXTERN(Reg_RGB, gGte_RGB2_993F18);
+MGS_VAR_EXTERN(CVECTOR, gGte_light_colour_993ED8);
+
 signed int CC Resetgraph_AndPrintPsxStructureSizes(int mode);
 int CC SetGraphDebug(int debug);
 void CC SetDispMask(int mask);
@@ -450,3 +461,4 @@ void CC Psx_gte_RT1TR_rt_4477A0();
 void CC Gte_project_distance_rect_401DA8(const PSX_RECT* pRect, int projectDistance);
 void CC Psx_gte_rtpt_445990();
 void CC Psx_gte_sqr0_44B030(const VECTOR3* pIn, VECTOR3* pOut);
+void CC Psx_gte_ncs_446930();

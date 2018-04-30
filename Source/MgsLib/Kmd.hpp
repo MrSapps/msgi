@@ -5,13 +5,13 @@
 #include "Psx.hpp"
 
 void ForceLinkKmdCpp();
+void DoKmdTests();
 
 struct KmdHeader;
 
 struct kmdObject
 {
-    WORD field_0_numObj;
-    WORD numLights;
+    DWORD field_0_numObj;
     DWORD field_4_numFaces;
     int boundingBox[6];
     int translation[3];
@@ -20,11 +20,11 @@ struct kmdObject
 
     DWORD numVerts_34;
     SVECTOR* vertOfs_38;
-    unsigned int *indexOfs_3C;
+    BYTE *indexOfs_3C;
 
     DWORD numNorms_40;
-    DWORD* normOfs_44;
-    DWORD normIndex_48;
+    SVECTOR* normOfs_44;
+    BYTE* normIndex_48;
 
     BYTE* ofsUV_4C;
     WORD* ofsTextureNameHashes_50;
@@ -164,8 +164,7 @@ struct Light
     short int field_6_w;
     short int field_8_r;
     short int field_A_g;
-    short int field_C_b;
-    short int field_E_a;
+    int field_C_b;
 };
 MGS_ASSERT_SIZEOF(Light, 16);
 

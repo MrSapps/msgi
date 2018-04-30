@@ -461,12 +461,6 @@ void CC VectorNormalSS_44CC00(const SVECTOR* pVec, SVECTOR* pUnitVec)
 }
 MGS_FUNC_IMPLEX(0x44CC00, VectorNormalSS_44CC00, IMPL_PSX);
 
-struct Reg_RGB
-{
-    unsigned char r, g, b, cd;
-};
-MGS_ASSERT_SIZEOF(Reg_RGB, 4);
-
 struct Unk_72270C_Sub
 {
     float field_0_v;

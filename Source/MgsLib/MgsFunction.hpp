@@ -24,7 +24,7 @@ public:
     static void ApplyFunctions();
 protected:
     virtual void Apply() = 0;
-    static std::map<DWORD, MgsFunctionBase*>& GetMgsFunctionTable();
+    static std::map<void*, MgsFunctionBase*>& GetMgsFunctionTable();
 };
 
 enum class CallingConvention
@@ -41,7 +41,7 @@ enum class HookType
     eImpl
 };
 
-template <DWORD kOldAddr, void* kNewAddr, HookType kHookType, CallingConvention convention, class Signature, class ReturnType, class... Args>
+template <void* kOldAddr, void* kNewAddr, HookType kHookType, CallingConvention convention, class Signature, class ReturnType, class... Args>
 class MgsFunctionImpl : public MgsFunctionBase
 {
 public:
@@ -257,12 +257,12 @@ private:
     const char* mFnName = nullptr;
 };
 
-template<DWORD kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType>
+template<void* kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType>
 class MgsFunction;
 
 // __cdecl partial specialization
-template<DWORD kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType, class... Args>
-class MgsFunction    <kOldAddr, kNewAddr, kHookType, ReturnType __cdecl(Args...) > : public
+template<void* kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType, class... Args>
+class MgsFunction  <kOldAddr, kNewAddr, kHookType, ReturnType __cdecl(Args...) > : public
     MgsFunctionImpl<kOldAddr, kNewAddr, kHookType, CallingConvention::eCDecl, ReturnType __cdecl(Args...), ReturnType, Args...>
 {
 public:
@@ -270,8 +270,8 @@ public:
 };
 
 // __stdcall partial specialization
-template<DWORD kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType, class ... Args>
-class MgsFunction    <kOldAddr, kNewAddr, kHookType, ReturnType __stdcall(Args...) > : public
+template<void* kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType, class ... Args>
+class MgsFunction  <kOldAddr, kNewAddr, kHookType, ReturnType __stdcall(Args...) > : public
     MgsFunctionImpl<kOldAddr, kNewAddr, kHookType, CallingConvention::eStdCall, ReturnType __stdcall(Args...), ReturnType, Args...>
 {
 public:
@@ -279,8 +279,8 @@ public:
 };
 
 // __fastcall partial specialization
-template<DWORD kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType, class ... Args>
-class MgsFunction    <kOldAddr, kNewAddr, kHookType, ReturnType __fastcall(Args...) > : public
+template<void* kOldAddr, void* kNewAddr, HookType kHookType, class ReturnType, class ... Args>
+class MgsFunction  <kOldAddr, kNewAddr, kHookType, ReturnType __fastcall(Args...) > : public
     MgsFunctionImpl<kOldAddr, kNewAddr, kHookType, CallingConvention::eFastCall, ReturnType __fastcall(Args...), ReturnType, Args...>
 {
 public:
@@ -318,15 +318,15 @@ extern MgsVar Var_##VarName;\
 extern TypeName* VarName ;
 
 
-#define MGS_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<addr, nullptr, HookType::eNotImpl, signature> name(#name);
-#define EXTERN_MGS_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<addr, nullptr, HookType::eNotImpl, signature> name;
+#define MGS_FUNC_NOT_IMPL(addr, signature, name) MgsFunction<(void*)addr, nullptr, HookType::eNotImpl, signature> name(#name);
+#define EXTERN_MGS_FUNC_NOT_IMPL(addr, signature, name) extern MgsFunction<(void*)addr, nullptr, HookType::eNotImpl, signature> name;
 
-#define MGS_FUNC_IMPL(addr, funcName) MgsFunction<addr, funcName, HookType::eImpl, decltype(funcName)> funcName##_(#funcName);
+#define MGS_FUNC_IMPL(addr, funcName) MgsFunction<(void*)addr, funcName, HookType::eImpl, decltype(funcName)> funcName##_(#funcName);
 
 // isImplemented == false means redirect game func to our func. isImplemented == true means redirect our func to game func.
-#define MGS_FUNC_IMPLEX(addr, funcName, isImplemented) MgsFunction<addr, funcName, isImplemented ? HookType::eImpl : HookType::eNotImplWithStub, decltype(funcName)> funcName##_(#funcName);
+#define MGS_FUNC_IMPLEX(addr, funcName, isImplemented) MgsFunction<(void*)addr, funcName, isImplemented ? HookType::eImpl : HookType::eNotImplWithStub, decltype(funcName)> funcName##_(#funcName);
 
-#define MGS_REDIRECT(addr, func) DoDetour(addr, (DWORD)func)
+#define MGS_REDIRECT(addr, func) DoDetour((DWORD)addr, (DWORD)func)
 
 #define MGS_ASSERT_SIZEOF(structureName, expectedSize) static_assert(sizeof(structureName) == expectedSize, "sizeof(" #structureName ") must be " #expectedSize)
 
@@ -342,3 +342,65 @@ extern TypeName* VarName ;
 #define MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR __asm { __asm nop __asm nop __asm nop __asm nop __asm nop }
 
 void CheckVars();
+
+
+class ScopedDetour
+{
+public:
+    template<class T, class Y>
+    ScopedDetour(T src, Y dst)
+    {
+        auto applyDetour = [this]()
+        {
+            return DetourAttach(&(PVOID&)mReal, (PVOID)mDst);
+        };
+        mReal = (PVOID)src;
+        mDst = (PVOID)dst;
+        DoDetour(applyDetour);
+    }
+
+    ~ScopedDetour()
+    {
+        auto removeDetour = [this]()
+        {
+            return  DetourDetach(&(PVOID&)mReal, (PVOID)mDst);
+        };
+        DoDetour(removeDetour);
+    }
+
+private:
+    template<class T>
+    void DoDetour(T fn)
+    {
+        LONG err = DetourTransactionBegin();
+
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
+
+        err = DetourUpdateThread(GetCurrentThread());
+
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
+
+        err = fn();
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
+
+        err = DetourTransactionCommit();
+        if (err != NO_ERROR)
+        {
+            abort();
+        }
+    }
+
+    void* mReal;
+    void* mDst;
+};
+
+#define SCOPED_REDIRECT(real, stub) ScopedDetour real##_scoped(real, stub)

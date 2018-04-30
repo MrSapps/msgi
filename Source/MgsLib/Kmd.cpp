@@ -878,14 +878,28 @@ void CC VectorSqr_40225C(const VECTOR3* pInVec, signed int value, SVECTOR* pResu
 }
 MGS_FUNC_IMPLEX(0x40225C, VectorSqr_40225C, KMD_IMPL);
 
-void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, SVECTOR* pScratchBuffer, const Light* pLights, int lightCount)
+struct LightUnknown
+{
+    DWORD field_0;
+    DWORD field_4;
+};
+MGS_ASSERT_SIZEOF(LightUnknown, 8);
+
+struct LightScratch
+{
+    SVECTOR vectors[2];
+    LightUnknown light;
+};
+MGS_ASSERT_SIZEOF(LightScratch, 24);
+
+void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, LightScratch* pScratchBuffer, const Light* pLights, int lightCount)
 {
     if (vertCount - 1 < 0)
     {
         return;
     }
 
-    SVECTOR* pScratchIter = pScratchBuffer;
+    LightScratch* pScratchIter = pScratchBuffer;
     for (int i = 0; i < vertCount; i++)
     {
         gGte_VXY0_993EC0.regs.VX = pVerts[i].field_0_x;
@@ -912,14 +926,12 @@ void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, SVECTOR* 
                         halvesWrote++;
                         if (halvesWrote == 2)
                         {
-                            VectorSqr_40225C(&vec, pLightIter[j].field_8_r, pScratchIter + 1);
-                            pScratchIter[2].field_4_z = pLightIter[j].field_C_b;
-                            pScratchIter[2].field_6_padding = pLightIter[j].field_E_a;
+                            VectorSqr_40225C(&vec, pLightIter[j].field_8_r, &pScratchIter->vectors[1]);
+                            pScratchIter->light.field_4 = pLightIter[j].field_C_b;
                             break;
                         }
-                        VectorSqr_40225C(&vec, pLightIter[j].field_8_r, pScratchIter);
-                        pScratchIter[2].field_0_x = pLightIter[j].field_C_b;
-                        pScratchIter[2].field_2_y = pLightIter[j].field_E_a;
+                        VectorSqr_40225C(&vec, pLightIter[j].field_8_r, &pScratchIter->vectors[0]);
+                        pScratchIter->light.field_0 = pLightIter[j].field_C_b;
                     }
                 }
             }
@@ -928,28 +940,24 @@ void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, SVECTOR* 
         if (halvesWrote == 0)
         {
             // Nothing wrote, zero everything.
-            pScratchIter[2].field_0_x = 0;
-            pScratchIter[2].field_2_y = 0;
-            pScratchIter[2].field_4_z = 0;
-            pScratchIter[2].field_6_padding = 0;
+            pScratchIter->light.field_0 = 0;
+            pScratchIter->light.field_4 = 0;
         }
         else if (halvesWrote == 1)
         {
             // Only the first half wrote, zero out the 2nd half.
-            pScratchIter[2].field_4_z = 0;
-            pScratchIter[2].field_6_padding = 0;
+            pScratchIter->light.field_4 = 0;
         }
-
-        pScratchIter += 3;
+        pScratchIter++;
     }
 }
 MGS_FUNC_IMPLEX(0x443C39, Kmd_verts_unknown_443C39, KMD_IMPL);
 
-MGS_ARY(1, 0x721EA0, SVECTOR, 252, gBiggerScratch_unk_721EA0, {});
+MGS_ARY(1, 0x721EA0, LightScratch, 84, gBiggerScratch_unk_721EA0, {});
 
 void CC Kmd_verts_unknown_443BEC(const kmdObject* pKmdObj, const Light* pLights, int lightCount)
 {
-    SVECTOR* pScratch = gScratchPadMemory_991E40.vecs_42;
+    LightScratch* pScratch = (LightScratch*)&gScratchPadMemory_991E40; // TODO: Add to union
     unsigned int vertCount = pKmdObj->numVerts_34;
     SVECTOR* pVerts = pKmdObj->vertOfs_38;
     if (vertCount > 42)
@@ -965,7 +973,109 @@ void CC Kmd_verts_unknown_443BEC(const kmdObject* pKmdObj, const Light* pLights,
 }
 MGS_FUNC_IMPLEX(0x443BEC, Kmd_verts_unknown_443BEC, KMD_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x443D4F, CVECTOR* __cdecl(const kmdObject *a1, CVECTOR* a2, Prim_unknown_0x48 *a3), PrimObjRelated_helper_443D4F); // TODO
+CVECTOR* CC PrimObjRelated_helper_443D4F(const kmdObject* pKmdObj, CVECTOR* pColourBuffer, const Prim_unknown_0x48* pObj)
+{
+    const SVECTOR lightMtxVec =
+    {
+        gLightMatrix_650148.m[0][0],
+        gLightMatrix_650148.m[1][0],
+        gLightMatrix_650148.m[2][0]
+    };
+    
+    if (!(pKmdObj->field_0_numObj & 2))
+    {
+        gGte_light_colour_993ED8 = light_transparent_colour_65016C;
+    }
+    else
+    {
+        gGte_light_colour_993ED8 = light_opaque_colour_650168;
+    }
+
+    const BYTE* pNormIdxIter = pKmdObj->normIndex_48;
+    const BYTE* pIndeciesIter = pKmdObj->indexOfs_3C;
+    const SVECTOR* pNormalIter = pKmdObj->normOfs_44;
+
+    for (DWORD i = 0; i < 4 * pKmdObj->field_4_numFaces; i++) // Num verts
+    {
+        const unsigned int idx = *pIndeciesIter;
+
+        LightScratch* pScratch = nullptr;
+        if (idx >= 42)
+        {
+            pScratch = &gBiggerScratch_unk_721EA0[idx - 42];
+        }
+        else
+        {
+            pScratch = &((LightScratch *)&gScratchPadMemory_991E40)[idx];
+        }
+
+        gte_rotation_matrix_993E40.m[0][0] = gLightNormalVec_650128.m[0][0];
+        gte_rotation_matrix_993E40.m[0][1] = gLightNormalVec_650128.m[0][1];
+        gte_rotation_matrix_993E40.m[0][2] = gLightNormalVec_650128.m[0][2];
+
+        gte_rotation_matrix_993E40.m[1][0] = pScratch->vectors[0].field_0_x;
+        gte_rotation_matrix_993E40.m[1][1] = pScratch->vectors[0].field_2_y;
+        gte_rotation_matrix_993E40.m[1][2] = pScratch->vectors[0].field_4_z;
+
+        gte_rotation_matrix_993E40.m[2][0] = pScratch->vectors[1].field_0_x;
+        gte_rotation_matrix_993E40.m[2][1] = pScratch->vectors[1].field_2_y;
+        gte_rotation_matrix_993E40.m[2][2] = pScratch->vectors[1].field_4_z;
+
+
+        gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][0];
+        gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][0];
+        gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][0];
+        Psx_gte_RT1_rtir_447480();
+        gGte_light_source_matrix_993E60.m[0][0] = gGte_IR1_993EE4.IR_16;
+        gGte_light_source_matrix_993E60.m[1][0] = gGte_IR2_993EE8.IR_16;
+        gGte_light_source_matrix_993E60.m[2][0] = gGte_IR3_993EEC.IR_16;
+
+        gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][1];
+        gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][1];
+        gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][1];
+        Psx_gte_RT1_rtir_447480();
+        gGte_light_source_matrix_993E60.m[0][1] = gGte_IR1_993EE4.IR_16;
+        gGte_light_source_matrix_993E60.m[1][1] = gGte_IR2_993EE8.IR_16;
+        gGte_light_source_matrix_993E60.m[2][1] = gGte_IR3_993EEC.IR_16;
+
+        gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][2];
+        gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][2];
+        gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][2];
+        Psx_gte_RT1_rtir_447480();
+        gGte_light_source_matrix_993E60.m[0][2] = gGte_IR1_993EE4.IR_16;
+        gGte_light_source_matrix_993E60.m[1][2] = gGte_IR2_993EE8.IR_16;
+        gGte_light_source_matrix_993E60.m[2][2] = gGte_IR3_993EEC.IR_16;
+
+        gGte_light_colour_matrix_source_993E80.m[0][0] = lightMtxVec.field_0_x;
+        gGte_light_colour_matrix_source_993E80.m[0][1] = 16 * LOBYTE(pScratch->light.field_0);
+        gGte_light_colour_matrix_source_993E80.m[0][2] = 16 * LOBYTE(pScratch->light.field_4);
+
+        gGte_light_colour_matrix_source_993E80.m[1][0] = lightMtxVec.field_2_y;
+        gGte_light_colour_matrix_source_993E80.m[1][1] = 16 * BYTE1(pScratch->light.field_0);
+        gGte_light_colour_matrix_source_993E80.m[1][2] = 16 * BYTE1(pScratch->light.field_4);
+
+        gGte_light_colour_matrix_source_993E80.m[2][0] = lightMtxVec.field_4_z;
+        gGte_light_colour_matrix_source_993E80.m[2][1] = 16 * BYTE2(pScratch->light.field_0);
+        gGte_light_colour_matrix_source_993E80.m[2][2] = 16 * BYTE2(pScratch->light.field_4);
+
+        const int normalIdxVal = *pNormIdxIter;
+        gGte_VXY0_993EC0.regs.VX = pNormalIter[normalIdxVal].field_0_x;
+        gGte_VXY0_993EC0.regs.VY = pNormalIter[normalIdxVal].field_2_y;
+        gGte_VXY0_993EC0.regs.VZ = pNormalIter[normalIdxVal].field_4_z;
+        gGte_VXY0_993EC0.regs.Zero = 0;// pNormalIter[normalIdxVal].field_6_padding;
+        Psx_gte_ncs_446930();
+        pColourBuffer->r = gGte_RGB2_993F18.r;
+        pColourBuffer->g = gGte_RGB2_993F18.g;
+        pColourBuffer->b = gGte_RGB2_993F18.b;
+        pColourBuffer->cd = gGte_RGB2_993F18.cd;
+
+        pNormIdxIter++;
+        pIndeciesIter++;
+        pColourBuffer++;
+    }
+    return pColourBuffer;
+}
+MGS_FUNC_IMPLEX(0x443D4F, PrimObjRelated_helper_443D4F, KMD_IMPL);
 
 signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLights, int lightCount)
 {
@@ -1002,14 +1112,14 @@ signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLight
         // Flag 4 = don't apply lights or apply dynamically?
         if (pKmd->field_0_numObj & 4)
         {
-            for (int j = 0; j < pKmd->numLights; j++)
+            for (DWORD j = 0; j < pKmd->field_4_numFaces; j++)
             {
                 pLightsBuffer[j].r = 0x80;
                 pLightsBuffer[j].g = 0x80;
                 pLightsBuffer[j].b = 0x80;
                 pLightsBuffer[j].cd = 0x3C | (pKmd->field_0_numObj & 2);
             }
-            pLightsBuffer += pKmd->numLights;
+            pLightsBuffer += pKmd->field_4_numFaces;
         }
         else
         {
@@ -1357,3 +1467,8 @@ Actor_boxkeri* CC Res_Enemy_boxkeri_create_5B6EA9(PSX_MATRIX* pMtx, SVECTOR* pVe
     return nullptr;
 }
 MGS_FUNC_IMPLEX(0x5B6EA9, Res_Enemy_boxkeri_create_5B6EA9, BOXKERI_IMPL);
+
+void DoKmdTests()
+{
+
+}

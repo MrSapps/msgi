@@ -2534,6 +2534,7 @@ static void RunTests()
     DoMenuTests();
     DoFontTests();
     DoDGTests();
+    DoKmdTests();
 }
 
 int Sink()

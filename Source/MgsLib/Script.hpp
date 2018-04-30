@@ -46,6 +46,9 @@ MGS_ARY_EXTERN(__int16, 96, save_data_192_word_78E7E0);
 MGS_ARY_EXTERN(DWORD, 512, save_data_2048_unk_78D7C0);
 MGS_VAR_EXTERN(PSX_MATRIX, gLightNormalVec_650128);
 MGS_VAR_EXTERN(DWORD, byte1_flags_word_9942A8);
+MGS_VAR_EXTERN(MATRIX3x3, gLightMatrix_650148);
+MGS_VAR_EXTERN(CVECTOR, light_opaque_colour_650168);
+MGS_VAR_EXTERN(CVECTOR, light_transparent_colour_65016C);
 
 enum GCLOperators
 {
