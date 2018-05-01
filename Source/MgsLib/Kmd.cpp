@@ -504,12 +504,13 @@ void CC Res_base_unknown_407B79(const SVECTOR* pRotVec)
 }
 MGS_FUNC_IMPLEX(0x407B79, Res_base_unknown_407B79, KMD_IMPL);
 
-const VECTOR sVec_650118_value = { 0, 0xFFFFF000, 0 };
+const VECTOR sVec_650118_value = { 0, -4096, 0 };
 MGS_VAR(1, 0x650118, VECTOR, sVec_650118, sVec_650118_value);
 MGS_ARY(1, 0x6BED08, VECTOR, 2, stru_6BED08, {});
 
 void CC Res_base_unknown_401C22(struct_gv* pGv, SVECTOR* pVec1, SVECTOR* pVec2, __int16 gvWord)
 {
+    
     pGv->word_6BC3BC = gvWord;
     pGv->dword_6BC39C.t.field_0_x = pVec1->field_0_x;
     pGv->dword_6BC39C.t.field_4_y = pVec1->field_2_y;
@@ -522,24 +523,25 @@ void CC Res_base_unknown_401C22(struct_gv* pGv, SVECTOR* pVec1, SVECTOR* pVec2, 
 
     Vector_op_44B200(&sVec_650118, &vec2[1], &vec2[0]);
 
-    VECTOR* pV1 = nullptr;
-    VECTOR* pV2 = nullptr;
+    
+    VECTOR* pSrc = nullptr;
+    VECTOR* pDst = nullptr;
     if (vec2[0].field_0_x || vec2[0].field_4_y || vec2[0].field_8_z)
     {
-        pV1 = &vec2[0];
-        pV2 = &stru_6BED08[0];
+        pSrc = &vec2[0];
+        pDst = &stru_6BED08[0];
     }
     else
     {
-        pV1 = &stru_6BED08[0];
-        pV2 = &vec2[0];
+        pSrc = &stru_6BED08[0];
+        pDst = &vec2[0];
     }
+    
+    pDst[0].field_0_x = pSrc[0].field_0_x;
+    pDst[0].field_4_y = pSrc[0].field_4_y;
+    pDst[0].field_8_z = pSrc[0].field_8_z;
 
-    pV2[0].field_0_x = pV1[0].field_0_x;
-    pV2[0].field_4_y = pV1[0].field_4_y;
-    pV2[0].field_8_z = pV1[0].field_8_z;
-
-    pV2[1].field_0_x = pV1[1].field_0_x;
+    pDst[1].field_0_x = pSrc[1].field_0_x;
 
     VectorNormal_44CAE0(&vec2[0], &vec2[0]);
     VectorNormal_44CAE0(&vec2[1], &vec2[1]);
@@ -566,8 +568,39 @@ void CC Res_base_unknown_401C22(struct_gv* pGv, SVECTOR* pVec1, SVECTOR* pVec2, 
     vec2[1].field_8_z = -pGv->dword_6BC39C.t.field_8_z;
     MatrixXVectorFixed_44B320(&pGv->field_10_matrix.m, &vec2[1], &pGv->field_10_matrix.t);
 }
-MGS_FUNC_IMPLEX(0x401C22, Res_base_unknown_401C22, true);
+MGS_FUNC_IMPLEX(0x401C22, Res_base_unknown_401C22, KMD_IMPL);
 
+static void CC Stub_Vector_op_44B200(const VECTOR* /*pVec1*/, const VECTOR* /*pVec2*/, VECTOR* pResult)
+{
+    pResult->field_0_x = 20;
+    pResult->field_4_y = 30;
+    pResult->field_8_z = 40;
+}
+
+static VECTOR sLastVectorNormalStubResult = {};
+
+static void CC Stub_VectorNormal_44CAE0(const VECTOR* pVec, VECTOR* /*pUnitVec*/)
+{
+    sLastVectorNormalStubResult = *pVec;
+}
+
+static void Test_Res_base_unknown_401C22()
+{
+    SCOPED_REDIRECT(Vector_op_44B200, Stub_Vector_op_44B200);
+    SCOPED_REDIRECT(VectorNormal_44CAE0, Stub_VectorNormal_44CAE0);
+    {
+        SVECTOR vec1 = { 10, 15, 25 };
+        SVECTOR vec2 = { 20, 20, 20 };
+        struct_gv gv = {};
+        Res_base_unknown_401C22(&gv, &vec1, &vec2, 8);
+
+        const VECTOR expected = { 10, 5, -5 };
+
+        ASSERT_EQ(expected.field_0_x, sLastVectorNormalStubResult.field_0_x);
+        ASSERT_EQ(expected.field_4_y, sLastVectorNormalStubResult.field_4_y);
+        ASSERT_EQ(expected.field_8_z, sLastVectorNormalStubResult.field_8_z);
+    }
+}
 
 void CC RotMatrixYXZ_gte_44BD00(const SVECTOR* pVec, PSX_MATRIX* pMtx)
 {
@@ -1529,5 +1562,5 @@ MGS_FUNC_IMPLEX(0x5B6EA9, Res_Enemy_boxkeri_create_5B6EA9, BOXKERI_IMPL);
 
 void DoKmdTests()
 {
-
+    Test_Res_base_unknown_401C22();
 }
