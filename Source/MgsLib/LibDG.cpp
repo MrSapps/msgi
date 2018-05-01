@@ -651,11 +651,11 @@ MGS_FUNC_IMPLEX(0x4028C1, GV_kmd_zmd_file_handler_helper_4028C1, LIBDG_IMPL); //
 void CC GV_kmd_zmd_file_handler_helper_4028C1(kmdObject* pKmdObj, kmdObject* pParentObj)
 {
     unsigned int indexFlags = 0;
-    BYTE* vertexIndices = (BYTE*)pKmdObj->indexOfs_3C;
+    BYTE* vertexIndices = pKmdObj->indexOfs_3C;
     for (int i = pKmdObj->field_4_numFaces * 4; i > 0; --i, ++vertexIndices)
     {
         const SVECTOR& vertexData = pKmdObj->vertOfs_38[*vertexIndices];
-        unsigned short linkedVertexIndex = vertexData.field_6_padding;
+        const unsigned short linkedVertexIndex = vertexData.field_6_padding;
 
         if (0xFFFF == linkedVertexIndex)
             continue;
@@ -665,7 +665,7 @@ void CC GV_kmd_zmd_file_handler_helper_4028C1(kmdObject* pKmdObj, kmdObject* pPa
     }
 
     // determine whether vertex index data has already been processed
-    bool processed = (0x80 & indexFlags) != 0;
+    const bool processed = (0x80 & indexFlags) != 0;
 
     if (processed)
         return;
@@ -673,23 +673,26 @@ void CC GV_kmd_zmd_file_handler_helper_4028C1(kmdObject* pKmdObj, kmdObject* pPa
     SVECTOR* vertexData = pKmdObj->vertOfs_38;
     for (int i = pKmdObj->numVerts_34; i > 0; --i, ++vertexData)
     {
-        unsigned short linkedVertexIndex = vertexData->field_6_padding;
+        const unsigned short linkedVertexIndex = vertexData->field_6_padding;
 
         if (0xFFFF == linkedVertexIndex)
             continue;
 
-        BYTE* parentVertexIndices = (BYTE*)pParentObj->indexOfs_3C;
+        const BYTE* parentVertexIndices = pParentObj->indexOfs_3C;
         for (int j = pParentObj->field_4_numFaces * 4; j > 0; --j, ++parentVertexIndices)
         {
             if ((*parentVertexIndices & 0x7F) == linkedVertexIndex)
                 break;
         }
 
-        int offset = (parentVertexIndices - (BYTE*)pParentObj->indexOfs_3C);
-        int faceIndex = offset / 4;
-        int faceVertexIndex = offset % 4;
+        const int offset = (parentVertexIndices - pParentObj->indexOfs_3C);
+        const int faceIndex = offset / 4;
+        const int faceVertexIndex = offset % 4;
 
         // compute offset of linked poly data
+        // 0xC == size of each transformed vertex section (rgb, code/p, xy, uv, clut/tpage/pad) within POLY_GT4
+        // 0x8 == start offset to xy data of first transformed vertex section within POLY_GT4
+        // k0132_byte_650174 provides the indexing order for referencing the transformed vertex sections
         vertexData->field_6_padding = (sizeof(POLY_GT4) * faceIndex) + (0xC * k0132_byte_650174[faceVertexIndex]) + 8;
     }
 }
