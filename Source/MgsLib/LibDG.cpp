@@ -645,12 +645,53 @@ MGS_FUNC_IMPLEX(0x401A4F, LibGvInitDispEnv_401A4F, LIBDG_IMPL);
 const char k0132_byte_650174[4] = { 0, 1, 3, 2 };
 
 void CC GV_kmd_zmd_file_handler_helper_4028C1(kmdObject* pKmdObj, kmdObject* pParentObj);
-MGS_FUNC_IMPLEX(0x4028C1, GV_kmd_zmd_file_handler_helper_4028C1, false); // TODO
+MGS_FUNC_IMPLEX(0x4028C1, GV_kmd_zmd_file_handler_helper_4028C1, LIBDG_IMPL); // TODO
 
 
 void CC GV_kmd_zmd_file_handler_helper_4028C1(kmdObject* pKmdObj, kmdObject* pParentObj)
 {
-   
+    unsigned int indexFlags = 0;
+    BYTE* vertexIndices = (BYTE*)pKmdObj->indexOfs_3C;
+    for (int i = pKmdObj->field_4_numFaces * 4; i > 0; --i, ++vertexIndices)
+    {
+        const SVECTOR& vertexData = pKmdObj->vertOfs_38[*vertexIndices];
+        unsigned short linkedVertexIndex = vertexData.field_6_padding;
+
+        if (0xFFFF == linkedVertexIndex)
+            continue;
+
+        indexFlags |= *vertexIndices;
+        *vertexIndices |= 0x80;
+    }
+
+    // determine whether vertex index data has already been processed
+    bool processed = (0x80 & indexFlags) != 0;
+
+    if (processed)
+        return;
+
+    SVECTOR* vertexData = pKmdObj->vertOfs_38;
+    for (int i = pKmdObj->numVerts_34; i > 0; --i, ++vertexData)
+    {
+        unsigned short linkedVertexIndex = vertexData->field_6_padding;
+
+        if (0xFFFF == linkedVertexIndex)
+            continue;
+
+        BYTE* parentVertexIndices = (BYTE*)pParentObj->indexOfs_3C;
+        for (int j = pParentObj->field_4_numFaces * 4; j > 0; --j, ++parentVertexIndices)
+        {
+            if ((*parentVertexIndices & 0x7F) == linkedVertexIndex)
+                break;
+        }
+
+        int offset = (parentVertexIndices - (BYTE*)pParentObj->indexOfs_3C);
+        int faceIndex = offset / 4;
+        int faceVertexIndex = offset % 4;
+
+        // compute offset of linked poly data
+        vertexData->field_6_padding = (sizeof(POLY_GT4) * faceIndex) + (0xC * k0132_byte_650174[faceVertexIndex]) + 8;
+    }
 }
 
 int CC GV_kmd_file_handler_402796(void* fileData, TFileNameHash /*fileNameHash*/)
