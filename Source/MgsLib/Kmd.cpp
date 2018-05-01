@@ -418,7 +418,7 @@ MGS_FUNC_IMPLEX(0x44C880, RotMatrixZYX_gte_44C880, KMD_IMPL);
 
 void CC VectorRotationMatrix_unknown_44C620(const SVECTOR* pVec, PSX_MATRIX* pMatrix)
 {
-    memcpy(pMatrix->m.m, gIdentityMatrix_6659BC.m, sizeof(MATRIX3x3));
+    pMatrix->m = gIdentityMatrix_6659BC;
 
     // ============================================================================
 
@@ -500,7 +500,7 @@ void CC Res_base_unknown_407B79(const SVECTOR* pRotVec)
     PSX_MATRIX rotMatrix = {};
     VectorRotationMatrix_unknown_44C620(pRotVec, &rotMatrix);
     sub_44B690(&rotMatrix);
-    memcpy(gte_rotation_matrix_993E40.m, rotMatrix.m.m, sizeof(MATRIX3x3::m));
+    gte_rotation_matrix_993E40 = rotMatrix.m;
 }
 MGS_FUNC_IMPLEX(0x407B79, Res_base_unknown_407B79, KMD_IMPL);
 
@@ -566,7 +566,7 @@ void CC Res_base_unknown_401C22(struct_gv* pGv, SVECTOR* pVec1, SVECTOR* pVec2, 
     vec2[1].field_8_z = -pGv->dword_6BC39C.t.field_8_z;
     MatrixXVectorFixed_44B320(&pGv->field_10_matrix.m, &vec2[1], &pGv->field_10_matrix.t);
 }
-MGS_FUNC_IMPLEX(0x401C22, Res_base_unknown_401C22, KMD_IMPL);
+MGS_FUNC_IMPLEX(0x401C22, Res_base_unknown_401C22, true);
 
 
 void CC RotMatrixYXZ_gte_44BD00(const SVECTOR* pVec, PSX_MATRIX* pMtx)
@@ -892,9 +892,7 @@ MGS_FUNC_IMPLEX(0x44B250, Vector_unknown_44B250, KMD_IMPL);
 
 void CC Gte_set_translation_vector_from_mtx_44AE60(const PSX_MATRIX* pMtx)
 {
-    gGte_translation_vector_993E54.field_0_x = pMtx->t.field_0_x;
-    gGte_translation_vector_993E54.field_4_y = pMtx->t.field_4_y;
-    gGte_translation_vector_993E54.field_8_z = pMtx->t.field_8_z;
+    gGte_translation_vector_993E54 = pMtx->t;
 }
 MGS_FUNC_IMPLEX(0x44AE60, Gte_set_translation_vector_from_mtx_44AE60, KMD_IMPL);
 
@@ -906,7 +904,7 @@ MGS_FUNC_IMPLEX(0x44AE80, Gte_set_light_source_matrix_44AE80, KMD_IMPL);
 
 void CC Gte_set_light_colour_matrix_source_44AEB0(const MATRIX3x3* pMtx)
 {
-    memcpy(&gGte_light_colour_matrix_source_993E80, pMtx, sizeof(MATRIX3x3));
+    gGte_light_colour_matrix_source_993E80 = *pMtx;
 }
 MGS_FUNC_IMPLEX(0x44AEB0, Gte_set_light_colour_matrix_source_44AEB0, KMD_IMPL);
 

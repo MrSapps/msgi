@@ -1297,9 +1297,7 @@ void CC LibGV_allocate_in_bounds_and_void_out_of_bounds_4064B1(Prim_unknown_0x48
             if (flags & 0x10)
             {
                 gte_rotation_matrix_993E40 = pMeshObj->field_20_mtx.m;
-                gGte_translation_vector_993E54.field_0_x = pMeshObj->field_20_mtx.t.field_0_x;
-                gGte_translation_vector_993E54.field_4_y = pMeshObj->field_20_mtx.t.field_4_y;
-                gGte_translation_vector_993E54.field_8_z = pMeshObj->field_20_mtx.t.field_8_z;
+                gGte_translation_vector_993E54 = pMeshObj->field_20_mtx.t;
                 LibGV_Helper_4062CB(pMeshObj->field_40_pKmdObj->boundingBox);
                 boundingRet = LibGV_Helper_40640F();
             }
@@ -1541,8 +1539,8 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
 
     if (pObj->field_3C)
     {
-        pScratch->mtx[27].m = pScratch->mtx[1].m;
-        pScratch->mtx[1].m = gIdentity_matrix_6501F8.m;
+        pScratch->mtx[27] = pScratch->mtx[1];
+        pScratch->mtx[1] = gIdentity_matrix_6501F8;
     }
     else
     {
@@ -2019,9 +2017,7 @@ void CC LibGV_405668(struct_gv* pGv, int activeBuffer)
                     pScratch->pVerts = pObjKmd->vertOfs_38;
 
                     gte_rotation_matrix_993E40 = pMesh[j].field_20_mtx.m;
-                    gGte_translation_vector_993E54.field_0_x = pMesh[j].field_20_mtx.t.field_0_x;
-                    gGte_translation_vector_993E54.field_4_y = pMesh[j].field_20_mtx.t.field_4_y;
-                    gGte_translation_vector_993E54.field_8_z = pMesh[j].field_20_mtx.t.field_8_z;
+                    gGte_translation_vector_993E54 = pMesh[j].field_20_mtx.t;
 
                     pScratch->flags = bFlag5 && pMesh[j].field_4C_bounding_ret == 1;
 
