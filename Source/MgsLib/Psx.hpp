@@ -12,12 +12,17 @@ struct MATRIX3x3
 };
 MGS_ASSERT_SIZEOF(MATRIX3x3, 18);
 
+struct VECTOR
+{
+    int field_0_x, field_4_y, field_8_z;
+};
+MGS_ASSERT_SIZEOF(VECTOR, 0xc);
 
 struct PSX_MATRIX
 {
-    short int m[3][3];
+    MATRIX3x3 m;
     short pad;
-    int t[3];
+    VECTOR t;
 };
 MGS_ASSERT_SIZEOF(PSX_MATRIX, 32);
 
@@ -254,15 +259,6 @@ struct DISPENV
 };
 MGS_ASSERT_SIZEOF(DISPENV, 20);
 
-struct VECTOR
-{
-    int field_0_x;
-    int field_4_y;
-    int field_8_z;
-    int padding;
-};
-MGS_ASSERT_SIZEOF(VECTOR, 0x10);
-
 struct SVECTOR
 {
     short int field_0_x;
@@ -277,12 +273,6 @@ struct CVECTOR
     BYTE r, g, b, cd;
 };
 MGS_ASSERT_SIZEOF(CVECTOR, 0x4);
-
-struct VECTOR3
-{
-    int x, y, z;
-};
-MGS_ASSERT_SIZEOF(VECTOR3, 0xc);
 
 struct GTE_Data
 {
@@ -326,11 +316,11 @@ MGS_VAR_EXTERN(DISPENV, gDispEnv_6BECF0);
 MGS_VAR_EXTERN(DRAWENV, gDrawEnv_6C0E98);
 MGS_VAR_EXTERN(GTE_Data, gGteData_722688);
 
-MGS_VAR_EXTERN(VECTOR3, gGte_background_colour_993E74);
+MGS_VAR_EXTERN(VECTOR, gGte_background_colour_993E74);
 MGS_VAR_EXTERN(MATRIX3x3, gte_rotation_matrix_993E40);
-MGS_VAR_EXTERN(VECTOR3, gGte_translation_vector_993E54);
+MGS_VAR_EXTERN(VECTOR, gGte_translation_vector_993E54);
 MGS_VAR_EXTERN(MATRIX3x3, gGte_light_source_matrix_993E60);
-MGS_VAR_EXTERN(VECTOR3, gGte_background_colour_993E74);
+MGS_VAR_EXTERN(VECTOR, gGte_background_colour_993E74);
 MGS_VAR_EXTERN(MATRIX3x3, gGte_light_colour_matrix_source_993E80);
 
 struct Regs_SYSX
@@ -455,10 +445,13 @@ void CC SetDrawEnv_40DDE0(DR_ENV* pPacked, DRAWENV* drawEnv);
 void CC VectorNormal_44CAE0(const VECTOR* pVec, VECTOR* pUnitVec);
 void CC PsxSetRotationAndTranslation_407A8F(const PSX_MATRIX* pMatrix);
 void CC PsxGetRotationAndTranslation_407BC1(PSX_MATRIX* pMatrix);
+void CC Vector_op_44B200(const VECTOR* pVec1, const VECTOR* pVec2, VECTOR* pResult);
+void CC Matrix_transpose_40771B(const MATRIX3x3* pMatrix1, MATRIX3x3* pOutMatrix);
+void CC MatrixXVectorFixed_44B320(const MATRIX3x3* pMatrix, const VECTOR* pInVec, VECTOR* pOutVec);
 
 void CC Psx_gte_RT1_rtir_447480();
 void CC Psx_gte_RT1TR_rt_4477A0();
 void CC Gte_project_distance_rect_401DA8(const PSX_RECT* pRect, int projectDistance);
 void CC Psx_gte_rtpt_445990();
-void CC Psx_gte_sqr0_44B030(const VECTOR3* pIn, VECTOR3* pOut);
+void CC Psx_gte_sqr0_44B030(const VECTOR* pIn, VECTOR* pOut);
 void CC Psx_gte_ncs_446930();

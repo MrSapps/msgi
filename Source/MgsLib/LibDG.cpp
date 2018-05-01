@@ -1296,10 +1296,10 @@ void CC LibGV_allocate_in_bounds_and_void_out_of_bounds_4064B1(Prim_unknown_0x48
             boundingRet = 2;
             if (flags & 0x10)
             {
-                memcpy(&gte_rotation_matrix_993E40, pMeshObj->field_20_mtx.m, sizeof(PSX_MATRIX::m));
-                gGte_translation_vector_993E54.x = pMeshObj->field_20_mtx.t[0];
-                gGte_translation_vector_993E54.y = pMeshObj->field_20_mtx.t[1];
-                gGte_translation_vector_993E54.z = pMeshObj->field_20_mtx.t[2];
+                gte_rotation_matrix_993E40 = pMeshObj->field_20_mtx.m;
+                gGte_translation_vector_993E54.field_0_x = pMeshObj->field_20_mtx.t.field_0_x;
+                gGte_translation_vector_993E54.field_4_y = pMeshObj->field_20_mtx.t.field_4_y;
+                gGte_translation_vector_993E54.field_8_z = pMeshObj->field_20_mtx.t.field_8_z;
                 LibGV_Helper_4062CB(pMeshObj->field_40_pKmdObj->boundingBox);
                 boundingRet = LibGV_Helper_40640F();
             }
@@ -1353,8 +1353,8 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
             if (flags & 0x20)
             {
                 Prim_Mesh_0x5C* pMesh = (Prim_Mesh_0x5C*)&pObj48[1];
-                memcpy(gte_rotation_matrix_993E40.m, pMesh->field_20_mtx.m, sizeof(PSX_MATRIX::m));
-                memcpy(&gGte_translation_vector_993E54, &pMesh->field_20_mtx.t, sizeof(PSX_MATRIX::t));
+                gte_rotation_matrix_993E40 = pMesh->field_20_mtx.m;
+                gGte_translation_vector_993E54 = pMesh->field_20_mtx.t;
 
                 LibGV_Helper_4062CB(pObj48->field_24_pKmdFileData->mBoundingBox);
                 unknownArg3 = LibGV_Helper_40640F();
@@ -1376,55 +1376,56 @@ MGS_VAR(1, 0x991E40, Psx_ScratchPad, gScratchPadMemory_991E40, {});
 void CC LibGV_40674E(Prim_unknown_0x48* pPrim, int faceCount)
 {
     Psx_ScratchPad_Matrix* pScratch = &gScratchPadMemory_991E40.field_2_Matrix;
-    memcpy(&gte_rotation_matrix_993E40.m, &pScratch->mtx[0].m, sizeof(PSX_MATRIX::m));
+
+    gte_rotation_matrix_993E40 = pScratch->mtx[0].m;
     
-    gGte_IR1_993EE4.IR_32 = pScratch->mtx[1].m[0][0];
-    gGte_IR2_993EE8.IR_32 = pScratch->mtx[1].m[1][0];
-    gGte_IR3_993EEC.IR_32 = pScratch->mtx[1].m[2][0];
+    gGte_IR1_993EE4.IR_32 = pScratch->mtx[1].m.m[0][0];
+    gGte_IR2_993EE8.IR_32 = pScratch->mtx[1].m.m[1][0];
+    gGte_IR3_993EEC.IR_32 = pScratch->mtx[1].m.m[2][0];
     Psx_gte_RT1_rtir_447480();
 
-    pScratch->mtx[2].m[0][0] = gGte_IR1_993EE4.IR_16;
-    pScratch->mtx[2].m[1][0] = gGte_IR2_993EE8.IR_16;
-    pScratch->mtx[2].m[2][0] = gGte_IR3_993EEC.IR_16;
+    pScratch->mtx[2].m.m[0][0] = gGte_IR1_993EE4.IR_16;
+    pScratch->mtx[2].m.m[1][0] = gGte_IR2_993EE8.IR_16;
+    pScratch->mtx[2].m.m[2][0] = gGte_IR3_993EEC.IR_16;
 
-    gGte_IR1_993EE4.IR_32 = pScratch->mtx[1].m[0][1];
-    gGte_IR2_993EE8.IR_32 = pScratch->mtx[1].m[1][1];
-    gGte_IR3_993EEC.IR_32 = pScratch->mtx[1].m[2][1];
+    gGte_IR1_993EE4.IR_32 = pScratch->mtx[1].m.m[0][1];
+    gGte_IR2_993EE8.IR_32 = pScratch->mtx[1].m.m[1][1];
+    gGte_IR3_993EEC.IR_32 = pScratch->mtx[1].m.m[2][1];
     Psx_gte_RT1_rtir_447480();
 
-    pScratch->mtx[2].m[0][1] = gGte_IR1_993EE4.IR_16;
-    pScratch->mtx[2].m[1][1] = gGte_IR2_993EE8.IR_16;
-    pScratch->mtx[2].m[2][1] = gGte_IR3_993EEC.IR_16;
+    pScratch->mtx[2].m.m[0][1] = gGte_IR1_993EE4.IR_16;
+    pScratch->mtx[2].m.m[1][1] = gGte_IR2_993EE8.IR_16;
+    pScratch->mtx[2].m.m[2][1] = gGte_IR3_993EEC.IR_16;
 
-    gGte_IR1_993EE4.IR_32 = pScratch->mtx[1].m[0][2];
-    gGte_IR2_993EE8.IR_32 = pScratch->mtx[1].m[1][2];
-    gGte_IR3_993EEC.IR_32 = pScratch->mtx[1].m[2][2];
+    gGte_IR1_993EE4.IR_32 = pScratch->mtx[1].m.m[0][2];
+    gGte_IR2_993EE8.IR_32 = pScratch->mtx[1].m.m[1][2];
+    gGte_IR3_993EEC.IR_32 = pScratch->mtx[1].m.m[2][2];
     Psx_gte_RT1_rtir_447480();
 
-    pScratch->mtx[2].m[0][2] = gGte_IR1_993EE4.IR_16;
-    pScratch->mtx[2].m[1][2] = gGte_IR2_993EE8.IR_16;
-    pScratch->mtx[2].m[2][2] = gGte_IR3_993EEC.IR_16;
+    pScratch->mtx[2].m.m[0][2] = gGte_IR1_993EE4.IR_16;
+    pScratch->mtx[2].m.m[1][2] = gGte_IR2_993EE8.IR_16;
+    pScratch->mtx[2].m.m[2][2] = gGte_IR3_993EEC.IR_16;
 
-    gGte_translation_vector_993E54.x = pScratch->mtx[0].t[0];
-    gGte_translation_vector_993E54.y = pScratch->mtx[0].t[1];
-    gGte_translation_vector_993E54.z = pScratch->mtx[0].t[2];
+    gGte_translation_vector_993E54.field_0_x = pScratch->mtx[0].t.field_0_x;
+    gGte_translation_vector_993E54.field_4_y = pScratch->mtx[0].t.field_4_y;
+    gGte_translation_vector_993E54.field_8_z = pScratch->mtx[0].t.field_8_z;
 
-    gGte_VXY0_993EC0.regs.VX = static_cast<short>(pScratch->mtx[1].t[0]);
-    gGte_VXY0_993EC0.regs.VY = static_cast<short>(pScratch->mtx[1].t[1]);
-    gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pScratch->mtx[1].t[2]);
+    gGte_VXY0_993EC0.regs.VX = static_cast<short>(pScratch->mtx[1].t.field_0_x);
+    gGte_VXY0_993EC0.regs.VY = static_cast<short>(pScratch->mtx[1].t.field_4_y);
+    gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pScratch->mtx[1].t.field_8_z);
 
     Psx_gte_RT1TR_rt_4477A0();
 
-    pScratch->mtx[2].t[0] = gGte_MAC1_993F24.MAC_32;
-    pScratch->mtx[2].t[1] = gGte_MAC2_993F28.MAC_32;
-    pScratch->mtx[2].t[2] = gGte_MAC3_993F2C.MAC_32;
+    pScratch->mtx[2].t.field_0_x = gGte_MAC1_993F24.MAC_32;
+    pScratch->mtx[2].t.field_4_y = gGte_MAC2_993F28.MAC_32;
+    pScratch->mtx[2].t.field_8_z = gGte_MAC3_993F2C.MAC_32;
 
     // Pointer to data after the main structure
     Prim_Mesh_0x5C* pData = reinterpret_cast<Prim_Mesh_0x5C*>(&pPrim[1]);
     for (int i = 0; i < faceCount; i++)
     {
-        memcpy(&pData[i].field_0_mtx,  &pScratch->mtx[1], sizeof(PSX_MATRIX));
-        memcpy(&pData[i].field_20_mtx, &pScratch->mtx[2], sizeof(PSX_MATRIX));
+        pData[i].field_0_mtx = pScratch->mtx[1];
+        pData[i].field_20_mtx = pScratch->mtx[2];
     }
 }
 MGS_FUNC_IMPLEX(0x40674E, LibGV_40674E, LIBDG_IMPL);
@@ -1432,7 +1433,8 @@ MGS_FUNC_IMPLEX(0x40674E, LibGV_40674E, LIBDG_IMPL);
 void CC LibGV_406A78(Prim_unknown_0x48* pObj, int innerCount)
 {
     Psx_ScratchPad_Matrix* pScratch = &gScratchPadMemory_991E40.field_2_Matrix;
-    memcpy(&gte_rotation_matrix_993E40.m, &pScratch->mtx[1].m, sizeof(PSX_MATRIX::m));
+
+    gte_rotation_matrix_993E40 = pScratch->mtx[1].m;
 
     SVECTOR* field_44_iter = pObj->field_44;
     Prim_Mesh_0x5C* pMeshObj = (Prim_Mesh_0x5C *)&pObj[1];
@@ -1442,9 +1444,7 @@ void CC LibGV_406A78(Prim_unknown_0x48* pObj, int innerCount)
     {
         PSX_MATRIX* pScratchMatrix = &pScratch->mtx[pMeshObj->field_40_pKmdObj->mRef_2C_parentObjIndex + 2]; // + 2 because matrix 0 and 1 are in use
 
-        gGte_translation_vector_993E54.x = pScratchMatrix->t[0];
-        gGte_translation_vector_993E54.y = pScratchMatrix->t[1];
-        gGte_translation_vector_993E54.z = pScratchMatrix->t[2];
+        gGte_translation_vector_993E54 = pScratchMatrix->t;
 
         gGte_VXY0_993EC0.regs.VX = field_44_iter->field_0_x;
         gGte_VXY0_993EC0.regs.VY = field_44_iter->field_2_y;
@@ -1453,18 +1453,15 @@ void CC LibGV_406A78(Prim_unknown_0x48* pObj, int innerCount)
 
         Psx_gte_RT1TR_rt_4477A0();
     
-        memcpy(&pScratch3->m, &gte_rotation_matrix_993E40.m, sizeof(PSX_MATRIX::m));
-
-        pScratch3->t[0] = gGte_translation_vector_993E54.x;
-        pScratch3->t[1] = gGte_translation_vector_993E54.y;
-        pScratch3->t[2] = gGte_translation_vector_993E54.z;
+        pScratch3->m = gte_rotation_matrix_993E40;
+        pScratch3->t = gGte_translation_vector_993E54;
 
         // This makes the above stores pointless..
-        pScratch3->t[0] = gGte_MAC1_993F24.MAC_32;
-        pScratch3->t[1] = gGte_MAC2_993F28.MAC_32;
-        pScratch3->t[2] = gGte_MAC3_993F2C.MAC_32;
+        pScratch3->t.field_0_x = gGte_MAC1_993F24.MAC_32;
+        pScratch3->t.field_4_y = gGte_MAC2_993F28.MAC_32;
+        pScratch3->t.field_8_z = gGte_MAC3_993F2C.MAC_32;
 
-        memcpy(&pMeshObj->field_0_mtx, pScratch3, sizeof(PSX_MATRIX));
+        pMeshObj->field_0_mtx = *pScratch3;
         pMeshObj++;
         pScratch3++;
         field_44_iter++;
@@ -1476,48 +1473,49 @@ MGS_FUNC_IMPLEX(0x406A78, LibGV_406A78, LIBDG_IMPL);
 void CC LibGV_406906(Prim_unknown_0x48* pObj, int innerCount)
 {
     Psx_ScratchPad_Matrix* pScratch = &gScratchPadMemory_991E40.field_2_Matrix;
-    memcpy(&gte_rotation_matrix_993E40.m, &pScratch->mtx[0].m, sizeof(PSX_MATRIX::m));
 
-    gGte_translation_vector_993E54.x = pScratch->mtx[0].t[0];
-    gGte_translation_vector_993E54.y = pScratch->mtx[0].t[1];
-    gGte_translation_vector_993E54.z = pScratch->mtx[0].t[2];
+    gte_rotation_matrix_993E40 = pScratch->mtx[0].m;
+
+    gGte_translation_vector_993E54.field_0_x = pScratch->mtx[0].t.field_0_x;
+    gGte_translation_vector_993E54.field_4_y = pScratch->mtx[0].t.field_4_y;
+    gGte_translation_vector_993E54.field_8_z = pScratch->mtx[0].t.field_8_z;
 
     for (int i = 0; i < innerCount; i++)
     {
         PSX_MATRIX* pMtx = (&gScratchPadMemory_991E40.field_2_Matrix.mtx[2]) + i;
         Prim_Mesh_0x5C* pMesh = ((Prim_Mesh_0x5C*)&pObj[1]) + i;
 
-        gGte_VXY0_993EC0.regs.VX = static_cast<short>(pMtx->t[0]);
-        gGte_VXY0_993EC0.regs.VY = static_cast<short>(pMtx->t[1]);
-        gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pMtx->t[2]);
+        gGte_VXY0_993EC0.regs.VX = static_cast<short>(pMtx->t.field_0_x);
+        gGte_VXY0_993EC0.regs.VY = static_cast<short>(pMtx->t.field_4_y);
+        gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pMtx->t.field_8_z);
         Psx_gte_RT1TR_rt_4477A0();
-        pMesh->field_20_mtx.t[0] = gGte_MAC1_993F24.MAC_32;
-        pMesh->field_20_mtx.t[1] = gGte_MAC2_993F28.MAC_32;
-        pMesh->field_20_mtx.t[2] = gGte_MAC3_993F2C.MAC_32;
+        pMesh->field_20_mtx.t.field_0_x = gGte_MAC1_993F24.MAC_32;
+        pMesh->field_20_mtx.t.field_4_y = gGte_MAC2_993F28.MAC_32;
+        pMesh->field_20_mtx.t.field_8_z = gGte_MAC3_993F2C.MAC_32;
 
-        gGte_IR1_993EE4.IR_32 = pMtx->m[0][0];
-        gGte_IR2_993EE8.IR_32 = pMtx->m[1][0];
-        gGte_IR3_993EEC.IR_32 = pMtx->m[2][0];
+        gGte_IR1_993EE4.IR_32 = pMtx->m.m[0][0];
+        gGte_IR2_993EE8.IR_32 = pMtx->m.m[1][0];
+        gGte_IR3_993EEC.IR_32 = pMtx->m.m[2][0];
         Psx_gte_RT1_rtir_447480();
-        pMesh->field_20_mtx.m[0][0] = gGte_IR1_993EE4.IR_16;
-        pMesh->field_20_mtx.m[1][0] = gGte_IR2_993EE8.IR_16;
-        pMesh->field_20_mtx.m[2][0] = gGte_IR3_993EEC.IR_16;
+        pMesh->field_20_mtx.m.m[0][0] = gGte_IR1_993EE4.IR_16;
+        pMesh->field_20_mtx.m.m[1][0] = gGte_IR2_993EE8.IR_16;
+        pMesh->field_20_mtx.m.m[2][0] = gGte_IR3_993EEC.IR_16;
 
-        gGte_IR1_993EE4.IR_32 = pMtx->m[0][1];
-        gGte_IR2_993EE8.IR_32 = pMtx->m[1][1];
-        gGte_IR3_993EEC.IR_32 = pMtx->m[2][1];
+        gGte_IR1_993EE4.IR_32 = pMtx->m.m[0][1];
+        gGte_IR2_993EE8.IR_32 = pMtx->m.m[1][1];
+        gGte_IR3_993EEC.IR_32 = pMtx->m.m[2][1];
         Psx_gte_RT1_rtir_447480();
-        pMesh->field_20_mtx.m[0][1] = gGte_IR1_993EE4.IR_16;
-        pMesh->field_20_mtx.m[1][1] = gGte_IR2_993EE8.IR_16;
-        pMesh->field_20_mtx.m[2][1] = gGte_IR3_993EEC.IR_16;
+        pMesh->field_20_mtx.m.m[0][1] = gGte_IR1_993EE4.IR_16;
+        pMesh->field_20_mtx.m.m[1][1] = gGte_IR2_993EE8.IR_16;
+        pMesh->field_20_mtx.m.m[2][1] = gGte_IR3_993EEC.IR_16;
 
-        gGte_IR1_993EE4.IR_32 = pMtx->m[0][2];
-        gGte_IR2_993EE8.IR_32 = pMtx->m[1][2];
-        gGte_IR3_993EEC.IR_32 = pMtx->m[2][2];
+        gGte_IR1_993EE4.IR_32 = pMtx->m.m[0][2];
+        gGte_IR2_993EE8.IR_32 = pMtx->m.m[1][2];
+        gGte_IR3_993EEC.IR_32 = pMtx->m.m[2][2];
         Psx_gte_RT1_rtir_447480();
-        pMesh->field_20_mtx.m[0][2] = gGte_IR1_993EE4.IR_16;
-        pMesh->field_20_mtx.m[1][2] = gGte_IR2_993EE8.IR_16;
-        pMesh->field_20_mtx.m[2][2] = gGte_IR3_993EEC.IR_16;
+        pMesh->field_20_mtx.m.m[0][2] = gGte_IR1_993EE4.IR_16;
+        pMesh->field_20_mtx.m.m[1][2] = gGte_IR2_993EE8.IR_16;
+        pMesh->field_20_mtx.m.m[2][2] = gGte_IR3_993EEC.IR_16;
     }
 }
 MGS_FUNC_IMPLEX(0x406906, LibGV_406906, LIBDG_IMPL);
@@ -1537,44 +1535,44 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
         RotMatrixZYX_gte_44C880(pObj->field_38_size24b, (MATRIX3x3 *)&pScratch->mtx[26]);
     }
 
-    pScratch->mtx[26].t[0] = pKmd->translation[0];
-    pScratch->mtx[26].t[1] = pKmd->translation[1];
-    pScratch->mtx[26].t[2] = pKmd->translation[2];
+    pScratch->mtx[26].t.field_0_x = pKmd->translation[0];
+    pScratch->mtx[26].t.field_4_y = pKmd->translation[1];
+    pScratch->mtx[26].t.field_8_z = pKmd->translation[2];
 
     if (pObj->field_3C)
     {
-        memcpy(&pScratch->mtx[27], &pScratch->mtx[1],        sizeof(PSX_MATRIX));
-        memcpy(&pScratch->mtx[1],  &gIdentity_matrix_6501F8, sizeof(PSX_MATRIX));
+        pScratch->mtx[27].m = pScratch->mtx[1].m;
+        pScratch->mtx[1].m = gIdentity_matrix_6501F8.m;
     }
     else
     {
-        memcpy(&gte_rotation_matrix_993E40.m, &pScratch->mtx[1], sizeof(PSX_MATRIX::m));
-        memcpy(&gGte_translation_vector_993E54, &pScratch->mtx[1].t, sizeof(PSX_MATRIX::t)); // should this be copied ?
+        gte_rotation_matrix_993E40 = pScratch->mtx[1].m;
+        gGte_translation_vector_993E54 = pScratch->mtx[1].t;
 
         for (int i = 0; i < 3; i++)
         {
-            gGte_IR1_993EE4.IR_32 = pScratch->mtx[26].m[0][i];
-            gGte_IR2_993EE8.IR_32 = pScratch->mtx[26].m[1][i];
-            gGte_IR3_993EEC.IR_32 = pScratch->mtx[26].m[2][i];
+            gGte_IR1_993EE4.IR_32 = pScratch->mtx[26].m.m[0][i];
+            gGte_IR2_993EE8.IR_32 = pScratch->mtx[26].m.m[1][i];
+            gGte_IR3_993EEC.IR_32 = pScratch->mtx[26].m.m[2][i];
             Psx_gte_RT1_rtir_447480();
-            pScratch->mtx[26].m[0][i] = static_cast<short>(gGte_IR1_993EE4.IR_32);
-            pScratch->mtx[26].m[1][i] = static_cast<short>(gGte_IR2_993EE8.IR_32);
-            pScratch->mtx[26].m[2][i] = static_cast<short>(gGte_IR3_993EEC.IR_32);
+            pScratch->mtx[26].m.m[0][i] = static_cast<short>(gGte_IR1_993EE4.IR_32);
+            pScratch->mtx[26].m.m[1][i] = static_cast<short>(gGte_IR2_993EE8.IR_32);
+            pScratch->mtx[26].m.m[2][i] = static_cast<short>(gGte_IR3_993EEC.IR_32);
         }
 
-        gGte_translation_vector_993E54.x = pScratch->mtx[1].t[0];
-        gGte_translation_vector_993E54.y = pScratch->mtx[1].t[1];
-        gGte_translation_vector_993E54.z = pScratch->mtx[1].t[2];
+        gGte_translation_vector_993E54.field_0_x = pScratch->mtx[1].t.field_0_x;
+        gGte_translation_vector_993E54.field_4_y = pScratch->mtx[1].t.field_4_y;
+        gGte_translation_vector_993E54.field_8_z = pScratch->mtx[1].t.field_8_z;
 
-        gGte_VXY0_993EC0.regs.VX = static_cast<short>(pScratch->mtx[26].t[0]);
-        gGte_VXY0_993EC0.regs.VY = static_cast<short>(pScratch->mtx[26].t[1]);
-        gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pScratch->mtx[26].t[2]);
+        gGte_VXY0_993EC0.regs.VX = static_cast<short>(pScratch->mtx[26].t.field_0_x);
+        gGte_VXY0_993EC0.regs.VY = static_cast<short>(pScratch->mtx[26].t.field_4_y);
+        gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pScratch->mtx[26].t.field_8_z);
 
         Psx_gte_RT1TR_rt_4477A0();
 
-        pScratch->mtx[26].t[0] = gGte_MAC1_993F24.MAC_32;
-        pScratch->mtx[26].t[1] = gGte_MAC2_993F28.MAC_32;
-        pScratch->mtx[26].t[2] = gGte_MAC3_993F2C.MAC_32;
+        pScratch->mtx[26].t.field_0_x = gGte_MAC1_993F24.MAC_32;
+        pScratch->mtx[26].t.field_4_y = gGte_MAC2_993F28.MAC_32;
+        pScratch->mtx[26].t.field_8_z = gGte_MAC3_993F2C.MAC_32;
     }
 
 
@@ -1588,10 +1586,10 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
         do
         {
             PSX_MATRIX* pMtx = &pScratch->mtx[pMeshIter->field_40_pKmdObj->mRef_2C_parentObjIndex + 2];
-            RotMatrixZYX_gte_44C880(pLightsIter, (MATRIX3x3 *)pScratchMtx);
-            pScratchMtx->t[0] = pMeshIter->field_40_pKmdObj->translation[0];
-            pScratchMtx->t[1] = pMeshIter->field_40_pKmdObj->translation[1];
-            pScratchMtx->t[2] = pMeshIter->field_40_pKmdObj->translation[2];
+            RotMatrixZYX_gte_44C880(pLightsIter, &pScratchMtx->m);
+            pScratchMtx->t.field_0_x = pMeshIter->field_40_pKmdObj->translation[0];
+            pScratchMtx->t.field_4_y = pMeshIter->field_40_pKmdObj->translation[1];
+            pScratchMtx->t.field_8_z = pMeshIter->field_40_pKmdObj->translation[2];
             PSX_MATRIX* v10 = &pScratch->mtx[26];
 
             if (faceCount2 != faceCount - 1)
@@ -1599,32 +1597,32 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
                 v10 = pMtx;
             }
 
-            memcpy(&gte_rotation_matrix_993E40.m, &v10->m, sizeof(PSX_MATRIX::m));
-            memcpy(&gGte_translation_vector_993E54, &v10->t, sizeof(PSX_MATRIX::t)); // ??
+            gte_rotation_matrix_993E40 = v10->m;
+            gGte_translation_vector_993E54 = v10->t;
 
             for (int i = 0; i < 3; i++)
             {
-                gGte_IR1_993EE4.IR_32 = pScratchMtx->m[0][i];
-                gGte_IR2_993EE8.IR_32 = pScratchMtx->m[1][i];
-                gGte_IR3_993EEC.IR_32 = pScratchMtx->m[2][i];
+                gGte_IR1_993EE4.IR_32 = pScratchMtx->m.m[0][i];
+                gGte_IR2_993EE8.IR_32 = pScratchMtx->m.m[1][i];
+                gGte_IR3_993EEC.IR_32 = pScratchMtx->m.m[2][i];
                 Psx_gte_RT1_rtir_447480();
-                pScratchMtx->m[0][i] = static_cast<short>(gGte_IR1_993EE4.IR_32);
-                pScratchMtx->m[1][i] = static_cast<short>(gGte_IR2_993EE8.IR_32);
-                pScratchMtx->m[2][i] = static_cast<short>(gGte_IR3_993EEC.IR_32);
+                pScratchMtx->m.m[0][i] = static_cast<short>(gGte_IR1_993EE4.IR_32);
+                pScratchMtx->m.m[1][i] = static_cast<short>(gGte_IR2_993EE8.IR_32);
+                pScratchMtx->m.m[2][i] = static_cast<short>(gGte_IR3_993EEC.IR_32);
             }
 
-            gGte_translation_vector_993E54.x = v10->t[0];
-            gGte_translation_vector_993E54.y = v10->t[1];
-            gGte_translation_vector_993E54.z = v10->t[2];
+            gGte_translation_vector_993E54.field_0_x = v10->t.field_0_x;
+            gGte_translation_vector_993E54.field_4_y = v10->t.field_4_y;
+            gGte_translation_vector_993E54.field_8_z = v10->t.field_8_z;
 
-            gGte_VXY0_993EC0.regs.VX = static_cast<short>(pScratchMtx->t[0]);
-            gGte_VXY0_993EC0.regs.VY = static_cast<short>(pScratchMtx->t[1]);
-            gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pScratchMtx->t[2]);
+            gGte_VXY0_993EC0.regs.VX = static_cast<short>(pScratchMtx->t.field_0_x);
+            gGte_VXY0_993EC0.regs.VY = static_cast<short>(pScratchMtx->t.field_4_y);
+            gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pScratchMtx->t.field_8_z);
 
             Psx_gte_RT1TR_rt_4477A0();
-            pScratchMtx->t[0] = gGte_MAC1_993F24.MAC_32;
-            pScratchMtx->t[1] = gGte_MAC2_993F28.MAC_32;
-            pScratchMtx->t[2] = gGte_MAC3_993F2C.MAC_32;
+            pScratchMtx->t.field_0_x = gGte_MAC1_993F24.MAC_32;
+            pScratchMtx->t.field_4_y = gGte_MAC2_993F28.MAC_32;
+            pScratchMtx->t.field_8_z = gGte_MAC3_993F2C.MAC_32;
 
             if (field_3C_ptr)
             {
@@ -1645,7 +1643,7 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
             }
             else
             {
-                memcpy(&pMeshIter->field_0_mtx, pScratchMtx, sizeof(PSX_MATRIX));
+                pMeshIter->field_0_mtx = *pScratchMtx;
             }
 
             pMeshIter++;
@@ -1658,33 +1656,33 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
 
     if (pObj->field_3C)
     {
-        memcpy(&gte_rotation_matrix_993E40, &pScratch->mtx[27], sizeof(PSX_MATRIX::m));
-        memcpy(&gGte_translation_vector_993E54, &pScratch->mtx[27].t, sizeof(PSX_MATRIX::t));
+        gte_rotation_matrix_993E40 = pScratch->mtx[27].m;
+        gGte_translation_vector_993E54 = pScratch->mtx[27].t;
 
         PSX_MATRIX* pMtxAry = &pScratch->mtx[2];
         Prim_Mesh_0x5C* pMeshIter = pMesh;
 
         for (int i = 0; i < faceCount; i++)
         {
-            gGte_VXY0_993EC0.regs.VX = static_cast<short>(pMtxAry[i].t[0]);
-            gGte_VXY0_993EC0.regs.VY = static_cast<short>(pMtxAry[i].t[1]);
-            gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pMtxAry[i].t[2]);
+            gGte_VXY0_993EC0.regs.VX = static_cast<short>(pMtxAry[i].t.field_0_x);
+            gGte_VXY0_993EC0.regs.VY = static_cast<short>(pMtxAry[i].t.field_4_y);
+            gGte_VXY0_993EC0.regs.VZ = static_cast<short>(pMtxAry[i].t.field_8_z);
             Psx_gte_RT1TR_rt_4477A0();
-            pMtxAry[i].t[0] = gGte_MAC1_993F24.MAC_32;
-            pMtxAry[i].t[1] = gGte_MAC2_993F28.MAC_32;
-            pMtxAry[i].t[2] = gGte_MAC3_993F2C.MAC_32;
+            pMtxAry[i].t.field_0_x = gGte_MAC1_993F24.MAC_32;
+            pMtxAry[i].t.field_4_y = gGte_MAC2_993F28.MAC_32;
+            pMtxAry[i].t.field_8_z = gGte_MAC3_993F2C.MAC_32;
 
             for (int k = 0; k < 3; k++)
             {
-                gGte_IR1_993EE4.IR_32 = pMtxAry[i].m[0][k];
-                gGte_IR2_993EE8.IR_32 = pMtxAry[i].m[1][k];
-                gGte_IR3_993EEC.IR_32 = pMtxAry[i].m[2][k];
+                gGte_IR1_993EE4.IR_32 = pMtxAry[i].m.m[0][k];
+                gGte_IR2_993EE8.IR_32 = pMtxAry[i].m.m[1][k];
+                gGte_IR3_993EEC.IR_32 = pMtxAry[i].m.m[2][k];
                 Psx_gte_RT1_rtir_447480();
-                pMtxAry[i].m[0][k] = gGte_IR1_993EE4.IR_16;
-                pMtxAry[i].m[1][k] = gGte_IR2_993EE8.IR_16;
-                pMtxAry[i].m[2][k] = gGte_IR3_993EEC.IR_16;
+                pMtxAry[i].m.m[0][k] = gGte_IR1_993EE4.IR_16;
+                pMtxAry[i].m.m[1][k] = gGte_IR2_993EE8.IR_16;
+                pMtxAry[i].m.m[2][k] = gGte_IR3_993EEC.IR_16;
             }
-            memcpy(&pMeshIter[i], &pMtxAry[i], sizeof(PSX_MATRIX));
+            pMeshIter[i].field_0_mtx = pMtxAry[i];
         }
     }
 }
@@ -1695,10 +1693,10 @@ void CC LibGV_4066ED(Prim_Union* pObj)
     const int count = pObj->prim_48.field_2E_UnknownOrNumFaces;
     if (pObj->prim_48.field_20)
     {
-        memcpy(&pObj->prim_48.field_0_matrix, pObj->prim_48.field_20, sizeof(PSX_MATRIX));
+        pObj->prim_48.field_0_matrix = *pObj->prim_48.field_20;
     }
 
-    memcpy(&gScratchPadMemory_991E40.field_2_Matrix.mtx[1], &pObj->prim_48.field_0_matrix, sizeof(PSX_MATRIX));
+    gScratchPadMemory_991E40.field_2_Matrix.mtx[1] = pObj->prim_48.field_0_matrix;
 
     if (pObj->prim_48.field_28_flags_or_type & 0x40)
     {
@@ -1749,15 +1747,14 @@ void CC LibGV_lights_405180(struct_gv* pGv, int activeBuffer)
                     {
                         if (pObject->prim_48.field_28_flags_or_type & 8)
                         {
-                            memcpy(&gte_rotation_matrix_993E40, &pLightMtxAry[0], sizeof(PSX_MATRIX::m));
-                            memcpy(&gGte_light_colour_matrix_source_993E80, &pLightMtxAry[1], sizeof(PSX_MATRIX::m));
-
+                            gte_rotation_matrix_993E40 = pLightMtxAry[0].m;
+                            gGte_light_colour_matrix_source_993E80 = pLightMtxAry[1].m;
 
                             if (pObject->prim_48.field_28_flags_or_type & 0x100)
                             {
-                                gGte_background_colour_993E74.x = 16 * pObject->prim_48.field_34_light_mtx_array->t[0];
-                                gGte_background_colour_993E74.y = 16 * pObject->prim_48.field_34_light_mtx_array->t[1];
-                                gGte_background_colour_993E74.z = 16 * pObject->prim_48.field_34_light_mtx_array->t[2];
+                                gGte_background_colour_993E74.field_0_x = 16 * pObject->prim_48.field_34_light_mtx_array->t.field_0_x;
+                                gGte_background_colour_993E74.field_4_y = 16 * pObject->prim_48.field_34_light_mtx_array->t.field_4_y;
+                                gGte_background_colour_993E74.field_8_z = 16 * pObject->prim_48.field_34_light_mtx_array->t.field_8_z;
                             }
 
                             Prim_Mesh_0x5C* pMeshIter = (Prim_Mesh_0x5C *)(&pObject->prim_48 + 1);
@@ -1769,31 +1766,31 @@ void CC LibGV_lights_405180(struct_gv* pGv, int activeBuffer)
                                 {
                                     if (pMeshIter->field_4C_bounding_ret)
                                     {
-                                        gGte_IR1_993EE4.IR_32 = pMeshIter->field_0_mtx.m[0][0];
-                                        gGte_IR2_993EE8.IR_32 = pMeshIter->field_0_mtx.m[1][0];
-                                        gGte_IR3_993EEC.IR_32 = pMeshIter->field_0_mtx.m[2][0];
+                                        gGte_IR1_993EE4.IR_32 = pMeshIter->field_0_mtx.m.m[0][0];
+                                        gGte_IR2_993EE8.IR_32 = pMeshIter->field_0_mtx.m.m[1][0];
+                                        gGte_IR3_993EEC.IR_32 = pMeshIter->field_0_mtx.m.m[2][0];
                                         Psx_gte_RT1_rtir_447480();
-                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m[0][0] = gGte_IR1_993EE4.IR_16;
-                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m[1][0] = gGte_IR2_993EE8.IR_16;
-                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m[2][0] = gGte_IR3_993EEC.IR_16;
+                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m.m[0][0] = gGte_IR1_993EE4.IR_16;
+                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m.m[1][0] = gGte_IR2_993EE8.IR_16;
+                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m.m[2][0] = gGte_IR3_993EEC.IR_16;
 
-                                        gGte_IR1_993EE4.IR_32 = pMeshIter->field_0_mtx.m[0][1];
-                                        gGte_IR2_993EE8.IR_32 = pMeshIter->field_0_mtx.m[1][1];
-                                        gGte_IR3_993EEC.IR_32 = pMeshIter->field_0_mtx.m[2][1];
+                                        gGte_IR1_993EE4.IR_32 = pMeshIter->field_0_mtx.m.m[0][1];
+                                        gGte_IR2_993EE8.IR_32 = pMeshIter->field_0_mtx.m.m[1][1];
+                                        gGte_IR3_993EEC.IR_32 = pMeshIter->field_0_mtx.m.m[2][1];
                                         Psx_gte_RT1_rtir_447480();
-                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m[0][1] = gGte_IR1_993EE4.IR_16;
-                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m[1][1] = gGte_IR2_993EE8.IR_16;
-                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m[2][1] = gGte_IR3_993EEC.IR_16;
+                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m.m[0][1] = gGte_IR1_993EE4.IR_16;
+                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m.m[1][1] = gGte_IR2_993EE8.IR_16;
+                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m.m[2][1] = gGte_IR3_993EEC.IR_16;
 
-                                        gGte_IR1_993EE4.IR_32 = pMeshIter->field_0_mtx.m[0][2];
-                                        gGte_IR2_993EE8.IR_32 = pMeshIter->field_0_mtx.m[1][2];
-                                        gGte_IR3_993EEC.IR_32 = pMeshIter->field_0_mtx.m[2][2];
+                                        gGte_IR1_993EE4.IR_32 = pMeshIter->field_0_mtx.m.m[0][2];
+                                        gGte_IR2_993EE8.IR_32 = pMeshIter->field_0_mtx.m.m[1][2];
+                                        gGte_IR3_993EEC.IR_32 = pMeshIter->field_0_mtx.m.m[2][2];
                                         Psx_gte_RT1_rtir_447480();
-                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m[0][2] = gGte_IR1_993EE4.IR_16;
-                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m[1][2] = gGte_IR2_993EE8.IR_16;
-                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m[2][2] = gGte_IR3_993EEC.IR_16;
+                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m.m[0][2] = gGte_IR1_993EE4.IR_16;
+                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m.m[1][2] = gGte_IR2_993EE8.IR_16;
+                                        gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m.m[2][2] = gGte_IR3_993EEC.IR_16;
 
-                                        memcpy(&gGte_light_source_matrix_993E60.m, &gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m, sizeof(PSX_MATRIX::m));
+                                        gGte_light_source_matrix_993E60 = gScratchPadMemory_991E40.field_2_Matrix.mtx[0].m;
                                         LibGV_4053D1(pMeshIter, activeBuffer);
                                     }
                                     ++pMeshIter;
@@ -1804,9 +1801,9 @@ void CC LibGV_lights_405180(struct_gv* pGv, int activeBuffer)
 
                             if (pObject->prim_48.field_28_flags_or_type & 0x100)
                             {
-                                gGte_background_colour_993E74.x = 16 * light_r_word_6BEE70;
-                                gGte_background_colour_993E74.y = 16 * light_g_word_6BEE72;
-                                gGte_background_colour_993E74.z = 16 * light_b_word_6BEE74;
+                                gGte_background_colour_993E74.field_0_x = 16 * light_r_word_6BEE70;
+                                gGte_background_colour_993E74.field_4_y = 16 * light_g_word_6BEE72;
+                                gGte_background_colour_993E74.field_8_z = 16 * light_b_word_6BEE74;
                             }
                         }
                     }
@@ -2021,10 +2018,10 @@ void CC LibGV_405668(struct_gv* pGv, int activeBuffer)
                     pScratch->pPolys = pMesh[pObjKmd->mRef_2C_parentObjIndex].field_54_prim_buffers[gActiveBuffer_dword_791A08];
                     pScratch->pVerts = pObjKmd->vertOfs_38;
 
-                    memcpy(&gte_rotation_matrix_993E40.m, &pMesh[j].field_20_mtx.m, sizeof(PSX_MATRIX::m));
-                    gGte_translation_vector_993E54.x = pMesh[j].field_20_mtx.t[0];
-                    gGte_translation_vector_993E54.y = pMesh[j].field_20_mtx.t[1];
-                    gGte_translation_vector_993E54.z = pMesh[j].field_20_mtx.t[2];
+                    gte_rotation_matrix_993E40 = pMesh[j].field_20_mtx.m;
+                    gGte_translation_vector_993E54.field_0_x = pMesh[j].field_20_mtx.t.field_0_x;
+                    gGte_translation_vector_993E54.field_4_y = pMesh[j].field_20_mtx.t.field_4_y;
+                    gGte_translation_vector_993E54.field_8_z = pMesh[j].field_20_mtx.t.field_8_z;
 
                     pScratch->flags = bFlag5 && pMesh[j].field_4C_bounding_ret == 1;
 
@@ -2242,49 +2239,49 @@ void CC LibGV_404E08(const PSX_MATRIX* pMtx, const Prim_unknown_0x54* pObj)
 {
     PSX_MATRIX mtx = {};
 
-    memcpy(&gte_rotation_matrix_993E40.m, &pMtx->m, sizeof(PSX_MATRIX::m));
+    gte_rotation_matrix_993E40 = pMtx->m;
 
-    gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][0];
-    gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][0];
-    gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][0];
+    gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m.m[0][0];
+    gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m.m[1][0];
+    gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m.m[2][0];
     Psx_gte_RT1_rtir_447480();
-    mtx.m[0][0] = gGte_IR1_993EE4.IR_16;
-    mtx.m[1][0] = gGte_IR2_993EE8.IR_16;
-    mtx.m[2][0] = gGte_IR3_993EEC.IR_16;
+    mtx.m.m[0][0] = gGte_IR1_993EE4.IR_16;
+    mtx.m.m[1][0] = gGte_IR2_993EE8.IR_16;
+    mtx.m.m[2][0] = gGte_IR3_993EEC.IR_16;
 
-    gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][1];
-    gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][1];
-    gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][1];
+    gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m.m[0][1];
+    gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m.m[1][1];
+    gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m.m[2][1];
     Psx_gte_RT1_rtir_447480();
-    mtx.m[0][1] = gGte_IR1_993EE4.IR_16;
-    mtx.m[1][1] = gGte_IR2_993EE8.IR_16;
-    mtx.m[2][1] = gGte_IR3_993EEC.IR_16;
+    mtx.m.m[0][1] = gGte_IR1_993EE4.IR_16;
+    mtx.m.m[1][1] = gGte_IR2_993EE8.IR_16;
+    mtx.m.m[2][1] = gGte_IR3_993EEC.IR_16;
 
-    gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][2];
-    gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][2];
-    gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][2];
+    gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m.m[0][2];
+    gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m.m[1][2];
+    gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m.m[2][2];
     Psx_gte_RT1_rtir_447480();
-    mtx.m[0][2] = gGte_IR1_993EE4.IR_16;
-    mtx.m[1][2] = gGte_IR2_993EE8.IR_16;
-    mtx.m[2][2] = gGte_IR3_993EEC.IR_16;
+    mtx.m.m[0][2] = gGte_IR1_993EE4.IR_16;
+    mtx.m.m[1][2] = gGte_IR2_993EE8.IR_16;
+    mtx.m.m[2][2] = gGte_IR3_993EEC.IR_16;
 
-    gGte_translation_vector_993E54.x = pMtx->t[0];
-    gGte_translation_vector_993E54.y = pMtx->t[1];
-    gGte_translation_vector_993E54.z = pMtx->t[2];
+    gGte_translation_vector_993E54.field_0_x = pMtx->t.field_0_x;
+    gGte_translation_vector_993E54.field_4_y = pMtx->t.field_4_y;
+    gGte_translation_vector_993E54.field_8_z = pMtx->t.field_8_z;
 
-    gGte_VXY0_993EC0.regs.VX = static_cast<short int>(pObj->field_0_matrix.t[0]);
-    gGte_VXY0_993EC0.regs.VY = static_cast<short int>(pObj->field_0_matrix.t[1]);
-    gGte_VXY0_993EC0.regs.VZ = static_cast<short int>(pObj->field_0_matrix.t[2]);
+    gGte_VXY0_993EC0.regs.VX = static_cast<short int>(pObj->field_0_matrix.t.field_0_x);
+    gGte_VXY0_993EC0.regs.VY = static_cast<short int>(pObj->field_0_matrix.t.field_4_y);
+    gGte_VXY0_993EC0.regs.VZ = static_cast<short int>(pObj->field_0_matrix.t.field_8_z);
     Psx_gte_RT1TR_rt_4477A0();
-    mtx.m[1][0] = 58 * mtx.m[1][0] / 64;
-    mtx.m[1][1] = 58 * mtx.m[1][1] / 64;
-    mtx.m[1][2] = 58 * mtx.m[1][2] / 64;
+    mtx.m.m[1][0] = 58 * mtx.m.m[1][0] / 64;
+    mtx.m.m[1][1] = 58 * mtx.m.m[1][1] / 64;
+    mtx.m.m[1][2] = 58 * mtx.m.m[1][2] / 64;
 
-    memcpy(&gte_rotation_matrix_993E40.m, &mtx.m, sizeof(PSX_MATRIX::m));
+    gte_rotation_matrix_993E40 = mtx.m;
 
-    gGte_translation_vector_993E54.x = gGte_MAC1_993F24.MAC_32;
-    gGte_translation_vector_993E54.y = 58 * gGte_MAC2_993F28.MAC_32 / 64;
-    gGte_translation_vector_993E54.z = gGte_MAC3_993F2C.MAC_32;
+    gGte_translation_vector_993E54.field_0_x = gGte_MAC1_993F24.MAC_32;
+    gGte_translation_vector_993E54.field_4_y = 58 * gGte_MAC2_993F28.MAC_32 / 64;
+    gGte_translation_vector_993E54.field_8_z = gGte_MAC3_993F2C.MAC_32;
 
 }
 MGS_FUNC_IMPLEX(0x404E08, LibGV_404E08, LIBDG_IMPL);
@@ -2292,18 +2289,18 @@ MGS_FUNC_IMPLEX(0x404E08, LibGV_404E08, LIBDG_IMPL);
 static void Test_LibGV_404E08()
 {
     Prim_unknown_0x54 obj = {};
-    obj.field_0_matrix.t[0] = 50;
-    obj.field_0_matrix.t[1] = 100;
-    obj.field_0_matrix.t[2] = 150;
+    obj.field_0_matrix.t.field_0_x = 50;
+    obj.field_0_matrix.t.field_4_y = 100;
+    obj.field_0_matrix.t.field_8_z = 150;
 
-    obj.field_0_matrix.m[0][0] = 4096 * 2;
-    obj.field_0_matrix.m[0][1] = 0;
+    obj.field_0_matrix.m.m[0][0] = 4096 * 2;
+    obj.field_0_matrix.m.m[0][1] = 0;
   
-    obj.field_0_matrix.m[1][0] = 0;
-    obj.field_0_matrix.m[1][1] = 4096 * 2;
+    obj.field_0_matrix.m.m[1][0] = 0;
+    obj.field_0_matrix.m.m[1][1] = 4096 * 2;
 
-    obj.field_0_matrix.m[2][0] = 0;
-    obj.field_0_matrix.m[2][1] = 4096 * 2;
+    obj.field_0_matrix.m.m[2][0] = 0;
+    obj.field_0_matrix.m.m[2][1] = 4096 * 2;
 
     LibGV_404E08(&obj.field_0_matrix, &obj);
 
@@ -2316,9 +2313,9 @@ static void Test_LibGV_404E08()
     ASSERT_EQ(gte_rotation_matrix_993E40.m[2][0], 0);
     ASSERT_EQ(gte_rotation_matrix_993E40.m[2][1], 16384);
 
-    ASSERT_EQ(gGte_translation_vector_993E54.x, 150);
-    ASSERT_EQ(gGte_translation_vector_993E54.y, 271);
-    ASSERT_EQ(gGte_translation_vector_993E54.z, 350);
+    ASSERT_EQ(gGte_translation_vector_993E54.field_0_x, 150);
+    ASSERT_EQ(gGte_translation_vector_993E54.field_4_y, 271);
+    ASSERT_EQ(gGte_translation_vector_993E54.field_8_z, 350);
 }
 
 Prim_24b* CC LibGV_ProcessAndStoreInScratch_4045A5(Prim_24b* pIn, int count)
@@ -2373,9 +2370,9 @@ MGS_FUNC_IMPLEX(0x4045A5, LibGV_ProcessAndStoreInScratch_4045A5, LIBDG_IMPL);
 
 static void Test_LibGV_4045A5()
 {
-    gGte_translation_vector_993E54.x = 50;
-    gGte_translation_vector_993E54.y = 100;
-    gGte_translation_vector_993E54.z = 150;
+    gGte_translation_vector_993E54.field_0_x = 50;
+    gGte_translation_vector_993E54.field_4_y = 100;
+    gGte_translation_vector_993E54.field_8_z = 150;
 
     Prim_24b test[2] = {};
     test[0].field_0_v1.field_0_x = 1345;
@@ -2424,14 +2421,14 @@ void CC LibGV_4041A5(struct_gv* pGv, int activeBuffer)
             {
                 if (flags & 0x200)
                 {
-                    memcpy(&gte_rotation_matrix_993E40, &gIdentity_matrix_6501F8.m, sizeof(PSX_MATRIX::m));
-                    memcpy(&gGte_translation_vector_993E54, &gIdentity_matrix_6501F8.t, sizeof(PSX_MATRIX::t));
+                    gte_rotation_matrix_993E40 = gIdentity_matrix_6501F8.m;
+                    gGte_translation_vector_993E54 = gIdentity_matrix_6501F8.t;
                 }
                 else
                 {
                     if (pObj->field_20)
                     {
-                        memcpy(&pObj->field_0_matrix, pObj->field_20, sizeof(PSX_MATRIX));
+                        pObj->field_0_matrix = *pObj->field_20;
                     }
                     LibGV_404E08(&pGv->field_10_matrix, pObj);
                 }
@@ -2499,11 +2496,11 @@ MGS_FUNC_IMPLEX(0x4018E0, MarkObjectQueueVoid_4018E0, LIBDG_IMPL);
 
 const PSX_MATRIX gIdentity_matrix =
 { 
-    { 
+    {{
         { 4096, 0, 0 },
         { 0, 4096, 0 },
-        { 0, 0, 4096 } 
-    },
+        { 0, 0, 4096 }
+    }},
     { 0 },
     { 0, 0, 0 }
 };
@@ -2513,16 +2510,16 @@ MGS_VAR(1, 0x6501F8, PSX_MATRIX, gIdentity_matrix_6501F8, { gIdentity_matrix });
 
 void CC sub_401D64(PSX_MATRIX* pMatrix)
 {
-    pMatrix->m[1][0] = 58 * pMatrix->m[1][0] / 64;
-    pMatrix->m[1][1] = 58 * pMatrix->m[1][1] / 64;
-    pMatrix->m[1][2] = 58 * pMatrix->m[1][2] / 64;
-    pMatrix->t[1] = 58 * pMatrix->t[1] / 64;
+    pMatrix->m.m[1][0] = 58 * pMatrix->m.m[1][0] / 64;
+    pMatrix->m.m[1][1] = 58 * pMatrix->m.m[1][1] / 64;
+    pMatrix->m.m[1][2] = 58 * pMatrix->m.m[1][2] / 64;
+    pMatrix->t.field_4_y = 58 * pMatrix->t.field_4_y / 64;
 }
 MGS_FUNC_IMPLEX(0x401D64, sub_401D64, LIBDG_IMPL);
 
 void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
 {
-    memcpy(&gScratchPadMemory_991E40.field_2_Matrix.mtx[0], &pGv->field_10_matrix, sizeof(PSX_MATRIX));
+    gScratchPadMemory_991E40.field_2_Matrix.mtx[0] = pGv->field_10_matrix;
     sub_401D64(&gScratchPadMemory_991E40.field_2_Matrix.mtx[0]);
 
     for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)

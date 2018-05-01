@@ -49,59 +49,6 @@ MGS_VAR_EXTERN(DWORD, gBinds_dword_722A40);
 MGS_VAR_EXTERN(PSX_MATRIX, gIdentity_matrix_6501F8);
 
 void* CC MemClearUnknown_40B231(void* pMem, int size);
-
-#pragma pack(push)
-#pragma pack(2)
-struct Prim_Object
-{
-    int field_0;
-    int field_4;
-    int field_8;
-    int field_C;
-    int field_10;
-    int field_14;
-    int field_18;
-    int field_1C;
-    int field_20_size0x20;
-    int field_24;
-    int field_28_flags;
-    s16 field_2C;
-    s16 field_2E_inner_count;
-    s16 field_30;
-    s16 field_32_hasInners;
-    int field_34;
-    int field_38;
-    int field_3C;
-    int field_40;
-    int field_44;
-    int field_48_92b_size;
-    int field_4C;
-    s16 field_50_fn_ptr;
-    s16 field_52;
-    s16 field_54;
-    int field_56;
-    s16 field_5A;  // This de-aligns the rest of the struct
-    int field_5C;
-    int field_60;
-    int field_64;
-    int field_68_92b_size;
-    int field_6C;
-    int field_70_pInners;
-    int field_74;
-    int field_78;
-    int field_7C;
-    int field_80;
-    int field_84;
-    int field_88;
-    int field_8C;
-    int field_90;
-    int field_94;
-    int field_98;
-    int field_9C_array_ptr;
-    int field_A0;
-};
-MGS_ASSERT_SIZEOF(Prim_Object, 0xA4);
-
 struct struct_gv
 {
     // These vars are named to match how they look from gLibGVStruct1_6BC36C position, it was later discovered
@@ -113,16 +60,8 @@ struct struct_gv
     s16 word_6BC378_1;
     s16 word_6BC37A_0_1EC_size;
     PSX_MATRIX field_10_matrix;
-    int dword_6BC39C;
-    s16 word_6BC3A0;
-    s16 word_6BC3A6;
-    PSX_RECT rect;
-    s16 word_6BC3AC;
-    int align1;
-    s16 align2;
-    int dword_6BC3B4;
-    int dword_6BC3B8;
-    s16 word_6BC3BC;
+    PSX_MATRIX dword_6BC39C;
+    s16 word_6BC3BC; // Camera number?
     s16 g_PrimQueue1_word_6BC3BE_256;
     s16 gPrimQueue2_word_6BC3C0_256;
     s16 gObjectQueue_word_6BC3C2_0;
@@ -137,7 +76,6 @@ struct struct_gv
     DR_ENV dword_6BC518_src_offsetted_dr_evn;
 };
 MGS_ASSERT_SIZEOF(struct_gv, 0x1EC);
-#pragma pack(pop)
 
 MGS_VAR_EXTERN(struct_gv, gLibGvStruct0_6BC180);
 MGS_VAR_EXTERN(struct_gv, gLibGVStruct1_6BC36C);

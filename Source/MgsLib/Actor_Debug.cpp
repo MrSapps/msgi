@@ -218,11 +218,11 @@ MGS_FUNC_NOT_IMPL(0x5FE56D, Actor *__cdecl(PSX_MATRIX *pMtx, int a2, int a3, int
 
 PSX_MATRIX gIdentity_matrix2 =
 {
-    {
-        { 4096*3, 0, 0 },
+    {{
+        { 4096 * 3, 0, 0 },
         { 0, 4096 , 0 },
         { 0, 0, 4096 * 3 }
-    },
+    }},
     { 0 },
     { 4096 , -4096, -4096 }
 };

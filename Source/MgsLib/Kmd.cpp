@@ -94,7 +94,7 @@ Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, 
     if (pAllocated)
     {
         MemClearUnknown_40B231(pAllocated, primSize);
-        memcpy(&pAllocated->field_0_matrix, &gIdentity_matrix_6501F8, sizeof(PSX_MATRIX));
+        pAllocated->field_0_matrix = gIdentity_matrix_6501F8;
         pAllocated->field_24_pKmdFileData = pFileData;
         pAllocated->field_2E_UnknownOrNumFaces = static_cast<WORD>(pFileData->mNumberOfMeshes);
         pAllocated->field_28_flags_or_type = countOrType_0x40Flag;
@@ -139,7 +139,7 @@ Prim_Union* CC PrimAlloc_405050(int maybeFlags, int numItems, __int16 gv_index, 
     if (pMem)
     {
         MemClearUnknown_40B231(pMem, sizeof(Prim_unknown_0x54));
-        memcpy(&pMem->field_0_matrix, &gIdentity_matrix_6501F8, sizeof(PSX_MATRIX));
+        pMem->field_0_matrix = gIdentity_matrix_6501F8;
         pMem->field_24_flags2 = maybeFlags;
         pMem->field_2A_num_prims = static_cast<WORD>(numItems);
         pMem->field_2C_gv_index = gv_index;
@@ -210,12 +210,12 @@ MGS_FUNC_IMPLEX(0x44ADB0, j_sqrt, KMD_IMPL);
 
 __int64 CC Vector_unknown_40B51D(const SVECTOR* pVec)
 {
-    VECTOR3 vec = {};
-    vec.x = pVec->field_0_x;
-    vec.y = pVec->field_2_y;
-    vec.z = pVec->field_4_z;
+    VECTOR vec = {};
+    vec.field_0_x = pVec->field_0_x;
+    vec.field_4_y = pVec->field_2_y;
+    vec.field_8_z = pVec->field_4_z;
     Psx_gte_sqr0_44B030(&vec, &vec);
-    return j_sqrt(vec.x + vec.y + vec.z);
+    return j_sqrt(vec.field_0_x + vec.field_4_y + vec.field_8_z);
 }
 MGS_FUNC_IMPLEX(0x40B51D, Vector_unknown_40B51D, KMD_IMPL);
 
@@ -247,9 +247,9 @@ void CC Res_base_unknown_407B3D(const SVECTOR* pVec)
     gGte_VXY0_993EC0.regs.Zero = pVec->field_6_padding;
 
     Psx_gte_RT1TR_rt_4477A0(); // Also called MVMVA?
-    gGte_translation_vector_993E54.x = gGte_MAC1_993F24.MAC_32;
-    gGte_translation_vector_993E54.y = gGte_MAC2_993F28.MAC_32;
-    gGte_translation_vector_993E54.z = gGte_MAC3_993F2C.MAC_32;
+    gGte_translation_vector_993E54.field_0_x = gGte_MAC1_993F24.MAC_32;
+    gGte_translation_vector_993E54.field_4_y = gGte_MAC2_993F28.MAC_32;
+    gGte_translation_vector_993E54.field_8_z = gGte_MAC3_993F2C.MAC_32;
 }
 MGS_FUNC_IMPLEX(0x407B3D, Res_base_unknown_407B3D, KMD_IMPL);
 
@@ -257,13 +257,13 @@ void CC sub_44B690(PSX_MATRIX* pMtx)
 {
     for (int i = 0; i < 3; i++)
     {
-        gGte_IR1_993EE4.IR_32 = (unsigned __int16)pMtx->m[0][i];
-        gGte_IR2_993EE8.IR_32 = (unsigned __int16)pMtx->m[1][i];
-        gGte_IR3_993EEC.IR_32 = (unsigned __int16)pMtx->m[2][i];
+        gGte_IR1_993EE4.IR_32 = (unsigned __int16)pMtx->m.m[0][i];
+        gGte_IR2_993EE8.IR_32 = (unsigned __int16)pMtx->m.m[1][i];
+        gGte_IR3_993EEC.IR_32 = (unsigned __int16)pMtx->m.m[2][i];
         Psx_gte_RT1_rtir_447480();
-        pMtx->m[0][i] = gGte_IR1_993EE4.IR_16;
-        pMtx->m[1][i] = gGte_IR2_993EE8.IR_16;
-        pMtx->m[2][i] = gGte_IR3_993EEC.IR_16;
+        pMtx->m.m[0][i] = gGte_IR1_993EE4.IR_16;
+        pMtx->m.m[1][i] = gGte_IR2_993EE8.IR_16;
+        pMtx->m.m[2][i] = gGte_IR3_993EEC.IR_16;
     }
 }
 MGS_FUNC_IMPLEX(0x44B690, sub_44B690, KMD_IMPL);
@@ -279,20 +279,20 @@ void CC RotMatrixY_44C270(__int16 value, PSX_MATRIX* pMtx)
     const int tbl1 = dword_665A3C[(value + 1024) & 4095];
     const int tbl2 = dword_665A3C[value & 4095];
 
-    const int m_2_0 = pMtx->m[2][0];
-    const int m_0_0 = pMtx->m[0][0];
-    pMtx->m[2][0] = static_cast<short>((tbl1 * m_2_0 - tbl2 * m_0_0) >> 12);
-    pMtx->m[0][0] = static_cast<short>((tbl2 * m_2_0 + tbl1 * m_0_0) >> 12);
+    const int m_2_0 = pMtx->m.m[2][0];
+    const int m_0_0 = pMtx->m.m[0][0];
+    pMtx->m.m[2][0] = static_cast<short>((tbl1 * m_2_0 - tbl2 * m_0_0) >> 12);
+    pMtx->m.m[0][0] = static_cast<short>((tbl2 * m_2_0 + tbl1 * m_0_0) >> 12);
 
-    const int m_2_1 = pMtx->m[2][1];
-    const int m_0_1 = pMtx->m[0][1];
-    pMtx->m[2][1] = static_cast<short>((tbl1 * m_2_1 - tbl2 * m_0_1) >> 12);
-    pMtx->m[0][1] = static_cast<short>((tbl2 * m_2_1 + tbl1 * m_0_1) >> 12);
+    const int m_2_1 = pMtx->m.m[2][1];
+    const int m_0_1 = pMtx->m.m[0][1];
+    pMtx->m.m[2][1] = static_cast<short>((tbl1 * m_2_1 - tbl2 * m_0_1) >> 12);
+    pMtx->m.m[0][1] = static_cast<short>((tbl2 * m_2_1 + tbl1 * m_0_1) >> 12);
 
-    const int m_2_2 = pMtx->m[2][2];
-    const int m_0_2 = pMtx->m[0][2];
-    pMtx->m[2][2] = static_cast<short>((tbl1 * m_2_2 - tbl2 * m_0_2) >> 12);
-    pMtx->m[0][2] = static_cast<short>((tbl2 * m_2_2 + tbl1 * m_0_2) >> 12);
+    const int m_2_2 = pMtx->m.m[2][2];
+    const int m_0_2 = pMtx->m.m[0][2];
+    pMtx->m.m[2][2] = static_cast<short>((tbl1 * m_2_2 - tbl2 * m_0_2) >> 12);
+    pMtx->m.m[0][2] = static_cast<short>((tbl2 * m_2_2 + tbl1 * m_0_2) >> 12);
 }
 MGS_FUNC_IMPLEX(0x44C270, RotMatrixY_44C270, KMD_IMPL);
 
@@ -301,20 +301,20 @@ void CC RotMatrixX_44C1C0(__int16 value, PSX_MATRIX* pMatrix)
     const int tbl1 = dword_665A3C[(value + 1024) & 4095];
     const int tbl2 = dword_665A3C[value & 4095];
 
-    const int m_1_0 = pMatrix->m[1][0];
-    const int m_2_0 = pMatrix->m[2][0];
-    pMatrix->m[2][0] = static_cast<short>((tbl2 * m_1_0 + tbl1 * m_2_0) >> 12);
-    pMatrix->m[1][0] = static_cast<short>((tbl1 * m_1_0 - tbl2 * m_2_0) >> 12);
+    const int m_1_0 = pMatrix->m.m[1][0];
+    const int m_2_0 = pMatrix->m.m[2][0];
+    pMatrix->m.m[2][0] = static_cast<short>((tbl2 * m_1_0 + tbl1 * m_2_0) >> 12);
+    pMatrix->m.m[1][0] = static_cast<short>((tbl1 * m_1_0 - tbl2 * m_2_0) >> 12);
 
-    const int m_1_1 = pMatrix->m[1][1];
-    const int m_2_1 = pMatrix->m[2][1];
-    pMatrix->m[2][1] = static_cast<short>((tbl2 * m_1_1 + tbl1 * m_2_1) >> 12);
-    pMatrix->m[1][1] = static_cast<short>((tbl1 * m_1_1 - tbl2 * m_2_1) >> 12);
+    const int m_1_1 = pMatrix->m.m[1][1];
+    const int m_2_1 = pMatrix->m.m[2][1];
+    pMatrix->m.m[2][1] = static_cast<short>((tbl2 * m_1_1 + tbl1 * m_2_1) >> 12);
+    pMatrix->m.m[1][1] = static_cast<short>((tbl1 * m_1_1 - tbl2 * m_2_1) >> 12);
 
-    const int m_1_2 = pMatrix->m[1][2];
-    const int m_2_2 = pMatrix->m[2][2];
-    pMatrix->m[2][2] = static_cast<short>((tbl2 * m_1_2 + tbl1 * m_2_2) >> 12);
-    pMatrix->m[1][2] = static_cast<short>((tbl1 * m_1_2 - tbl2 * m_2_2) >> 12);
+    const int m_1_2 = pMatrix->m.m[1][2];
+    const int m_2_2 = pMatrix->m.m[2][2];
+    pMatrix->m.m[2][2] = static_cast<short>((tbl2 * m_1_2 + tbl1 * m_2_2) >> 12);
+    pMatrix->m.m[1][2] = static_cast<short>((tbl1 * m_1_2 - tbl2 * m_2_2) >> 12);
 }
 MGS_FUNC_IMPLEX(0x44C1C0, RotMatrixX_44C1C0, KMD_IMPL);
 
@@ -323,20 +323,20 @@ void CC RotMatrixZ_44C320(__int16 value, PSX_MATRIX* pMatrix)
     const int tbl1 = dword_665A3C[(value + 1024) & 4095];
     const int tbl2 = dword_665A3C[value & 4095];
 
-    const int m_0_0 = pMatrix->m[0][0];
-    const int m_1_0 = pMatrix->m[1][0];
-    pMatrix->m[1][0] = static_cast<short>((tbl2 * m_0_0 + tbl1 * m_1_0) >> 12);
-    pMatrix->m[0][0] = static_cast<short>((tbl1 * m_0_0 - tbl2 * m_1_0) >> 12);
+    const int m_0_0 = pMatrix->m.m[0][0];
+    const int m_1_0 = pMatrix->m.m[1][0];
+    pMatrix->m.m[1][0] = static_cast<short>((tbl2 * m_0_0 + tbl1 * m_1_0) >> 12);
+    pMatrix->m.m[0][0] = static_cast<short>((tbl1 * m_0_0 - tbl2 * m_1_0) >> 12);
 
-    const int m_0_1 = pMatrix->m[0][1];
-    const int m_1_1 = pMatrix->m[1][1];
-    pMatrix->m[1][1] = static_cast<short>((tbl2 * m_0_1 + tbl1 * m_1_1) >> 12);
-    pMatrix->m[0][1] = static_cast<short>((tbl1 * m_0_1 - tbl2 * m_1_1) >> 12);
+    const int m_0_1 = pMatrix->m.m[0][1];
+    const int m_1_1 = pMatrix->m.m[1][1];
+    pMatrix->m.m[1][1] = static_cast<short>((tbl2 * m_0_1 + tbl1 * m_1_1) >> 12);
+    pMatrix->m.m[0][1] = static_cast<short>((tbl1 * m_0_1 - tbl2 * m_1_1) >> 12);
 
-    const int m_0_2 = pMatrix->m[0][2];
-    const int m_1_2 = pMatrix->m[1][2];
-    pMatrix->m[1][2] = static_cast<short>((tbl2 * m_0_2 + tbl1 * m_1_2) >> 12);
-    pMatrix->m[0][2] = static_cast<short>((tbl1 * m_0_2 - tbl2 * m_1_2) >> 12);
+    const int m_0_2 = pMatrix->m.m[0][2];
+    const int m_1_2 = pMatrix->m.m[1][2];
+    pMatrix->m.m[1][2] = static_cast<short>((tbl2 * m_0_2 + tbl1 * m_1_2) >> 12);
+    pMatrix->m.m[0][2] = static_cast<short>((tbl1 * m_0_2 - tbl2 * m_1_2) >> 12);
 }
 MGS_FUNC_IMPLEX(0x44C320, RotMatrixZ_44C320, KMD_IMPL);
 
@@ -418,66 +418,66 @@ MGS_FUNC_IMPLEX(0x44C880, RotMatrixZYX_gte_44C880, KMD_IMPL);
 
 void CC VectorRotationMatrix_unknown_44C620(const SVECTOR* pVec, PSX_MATRIX* pMatrix)
 {
-    memcpy(pMatrix->m, gIdentityMatrix_6659BC.m, sizeof(MATRIX3x3::m));
+    memcpy(pMatrix->m.m, gIdentityMatrix_6659BC.m, sizeof(MATRIX3x3));
 
     // ============================================================================
 
     const int tbl_vec_z_1 = dword_665A3C[(pVec->field_4_z + 1024) & 4095];
     const int tbl_vec_z_2 = dword_665A3C[pVec->field_4_z & 4095];
 
-    const int matrix_0_0 = pMatrix->m[0][0];
-    const int matrix_1_0 = pMatrix->m[1][0];
-    pMatrix->m[1][0] = static_cast<short>((tbl_vec_z_2 * matrix_0_0 + tbl_vec_z_1 * matrix_1_0) >> 12);
-    pMatrix->m[0][0] = static_cast<short>((tbl_vec_z_1 * matrix_0_0 - tbl_vec_z_2 * matrix_1_0) >> 12);
+    const int matrix_0_0 = pMatrix->m.m[0][0];
+    const int matrix_1_0 = pMatrix->m.m[1][0];
+    pMatrix->m.m[1][0] = static_cast<short>((tbl_vec_z_2 * matrix_0_0 + tbl_vec_z_1 * matrix_1_0) >> 12);
+    pMatrix->m.m[0][0] = static_cast<short>((tbl_vec_z_1 * matrix_0_0 - tbl_vec_z_2 * matrix_1_0) >> 12);
 
-    const int matrix_0_1 = pMatrix->m[0][1];
-    const int matrix_1_1 = pMatrix->m[1][1];
-    pMatrix->m[0][1] = static_cast<short>((tbl_vec_z_1 * matrix_0_1 - tbl_vec_z_2 * matrix_1_1) >> 12);
-    pMatrix->m[1][1] = static_cast<short>((tbl_vec_z_2 * matrix_0_1 + tbl_vec_z_1 * matrix_1_1) >> 12);
+    const int matrix_0_1 = pMatrix->m.m[0][1];
+    const int matrix_1_1 = pMatrix->m.m[1][1];
+    pMatrix->m.m[0][1] = static_cast<short>((tbl_vec_z_1 * matrix_0_1 - tbl_vec_z_2 * matrix_1_1) >> 12);
+    pMatrix->m.m[1][1] = static_cast<short>((tbl_vec_z_2 * matrix_0_1 + tbl_vec_z_1 * matrix_1_1) >> 12);
 
-    const int matrix_1_2 = pMatrix->m[1][2];
-    const int matrix_0_2 = pMatrix->m[0][2];
-    pMatrix->m[1][2] = static_cast<short>((tbl_vec_z_2 * matrix_0_2 + tbl_vec_z_1 * matrix_1_2) >> 12);
-    pMatrix->m[0][2] = static_cast<short>((tbl_vec_z_1 * matrix_0_2 - tbl_vec_z_2 * matrix_1_2) >> 12);
+    const int matrix_1_2 = pMatrix->m.m[1][2];
+    const int matrix_0_2 = pMatrix->m.m[0][2];
+    pMatrix->m.m[1][2] = static_cast<short>((tbl_vec_z_2 * matrix_0_2 + tbl_vec_z_1 * matrix_1_2) >> 12);
+    pMatrix->m.m[0][2] = static_cast<short>((tbl_vec_z_1 * matrix_0_2 - tbl_vec_z_2 * matrix_1_2) >> 12);
 
     // ============================================================================
 
     const int tbl_vec_x_1 = dword_665A3C[(pVec->field_0_x + 1024) & 4095];
     const int tbl_vec_x_2 = dword_665A3C[pVec->field_0_x & 4095];
 
-    const int matrix_1_0_2 = pMatrix->m[1][0];
-    const int matrix_2_0 = pMatrix->m[2][0];
-    pMatrix->m[1][0] = static_cast<short>((tbl_vec_x_1 * matrix_1_0_2 - tbl_vec_x_2 * matrix_2_0) >> 12);
-    pMatrix->m[2][0] = static_cast<short>((tbl_vec_x_2 * matrix_1_0_2 + tbl_vec_x_1 * matrix_2_0) >> 12);
+    const int matrix_1_0_2 = pMatrix->m.m[1][0];
+    const int matrix_2_0 = pMatrix->m.m[2][0];
+    pMatrix->m.m[1][0] = static_cast<short>((tbl_vec_x_1 * matrix_1_0_2 - tbl_vec_x_2 * matrix_2_0) >> 12);
+    pMatrix->m.m[2][0] = static_cast<short>((tbl_vec_x_2 * matrix_1_0_2 + tbl_vec_x_1 * matrix_2_0) >> 12);
 
-    const int matrix_1_1_1 = pMatrix->m[1][1];
-    const int matrix_2_1_1 = pMatrix->m[2][1];
-    pMatrix->m[1][1] = static_cast<short>((tbl_vec_x_1 * matrix_1_1_1 - tbl_vec_x_2 * matrix_2_1_1) >> 12);
-    pMatrix->m[2][1] = static_cast<short>((tbl_vec_x_2 * matrix_1_1_1 + tbl_vec_x_1 * matrix_2_1_1) >> 12);
+    const int matrix_1_1_1 = pMatrix->m.m[1][1];
+    const int matrix_2_1_1 = pMatrix->m.m[2][1];
+    pMatrix->m.m[1][1] = static_cast<short>((tbl_vec_x_1 * matrix_1_1_1 - tbl_vec_x_2 * matrix_2_1_1) >> 12);
+    pMatrix->m.m[2][1] = static_cast<short>((tbl_vec_x_2 * matrix_1_1_1 + tbl_vec_x_1 * matrix_2_1_1) >> 12);
 
-    const int matrix_2_2_2 = pMatrix->m[2][2];
-    pMatrix->m[1][2] = static_cast<short>((tbl_vec_x_1 * matrix_1_2 - tbl_vec_x_2 * matrix_2_2_2) >> 12);
-    pMatrix->m[2][2] = static_cast<short>((tbl_vec_x_2 * matrix_1_2 + tbl_vec_x_1 * matrix_2_2_2) >> 12);
+    const int matrix_2_2_2 = pMatrix->m.m[2][2];
+    pMatrix->m.m[1][2] = static_cast<short>((tbl_vec_x_1 * matrix_1_2 - tbl_vec_x_2 * matrix_2_2_2) >> 12);
+    pMatrix->m.m[2][2] = static_cast<short>((tbl_vec_x_2 * matrix_1_2 + tbl_vec_x_1 * matrix_2_2_2) >> 12);
 
     // ============================================================================
 
     const int tbl_vec_y_1 = dword_665A3C[pVec->field_2_y & 4095];
     const int tbl_vec_y_2 = dword_665A3C[(pVec->field_2_y + 1024) & 4095];
 
-    const int matrix_0_0_1 = pMatrix->m[0][0];
-    const int matrix_2_0_1 = pMatrix->m[2][0];
-    pMatrix->m[0][0] = static_cast<short>((tbl_vec_y_1 * matrix_2_0_1 + tbl_vec_y_2 * matrix_0_0_1) >> 12);
-    pMatrix->m[2][0] = static_cast<short>((tbl_vec_y_2 * matrix_2_0_1 - tbl_vec_y_1 * matrix_0_0_1) >> 12);
+    const int matrix_0_0_1 = pMatrix->m.m[0][0];
+    const int matrix_2_0_1 = pMatrix->m.m[2][0];
+    pMatrix->m.m[0][0] = static_cast<short>((tbl_vec_y_1 * matrix_2_0_1 + tbl_vec_y_2 * matrix_0_0_1) >> 12);
+    pMatrix->m.m[2][0] = static_cast<short>((tbl_vec_y_2 * matrix_2_0_1 - tbl_vec_y_1 * matrix_0_0_1) >> 12);
 
-    const int matrix_0_1_1 = pMatrix->m[0][1];
-    const int matrix_2_1 = pMatrix->m[2][1];
-    pMatrix->m[0][1] = static_cast<short>((tbl_vec_y_1 * matrix_2_1 + tbl_vec_y_2 * matrix_0_1_1) >> 12);
-    pMatrix->m[2][1] = static_cast<short>((tbl_vec_y_2 * matrix_2_1 - tbl_vec_y_1 * matrix_0_1_1) >> 12);
+    const int matrix_0_1_1 = pMatrix->m.m[0][1];
+    const int matrix_2_1 = pMatrix->m.m[2][1];
+    pMatrix->m.m[0][1] = static_cast<short>((tbl_vec_y_1 * matrix_2_1 + tbl_vec_y_2 * matrix_0_1_1) >> 12);
+    pMatrix->m.m[2][1] = static_cast<short>((tbl_vec_y_2 * matrix_2_1 - tbl_vec_y_1 * matrix_0_1_1) >> 12);
 
-    const int matrix_0_2_1 = pMatrix->m[0][2];
-    const int matrix_2_2_1 = pMatrix->m[2][2];
-    pMatrix->m[0][2] = static_cast<short>((tbl_vec_y_1 * matrix_2_2_1 + tbl_vec_y_2 * matrix_0_2_1) >> 12);
-    pMatrix->m[2][2] = static_cast<short>((tbl_vec_y_2 * matrix_2_2_1 - tbl_vec_y_1 * matrix_0_2_1) >> 12);
+    const int matrix_0_2_1 = pMatrix->m.m[0][2];
+    const int matrix_2_2_1 = pMatrix->m.m[2][2];
+    pMatrix->m.m[0][2] = static_cast<short>((tbl_vec_y_1 * matrix_2_2_1 + tbl_vec_y_2 * matrix_0_2_1) >> 12);
+    pMatrix->m.m[2][2] = static_cast<short>((tbl_vec_y_2 * matrix_2_2_1 - tbl_vec_y_1 * matrix_0_2_1) >> 12);
 }
 MGS_FUNC_IMPLEX(0x44C620, VectorRotationMatrix_unknown_44C620, KMD_IMPL);
 
@@ -487,11 +487,11 @@ void CC Res_base_unknown_407ADA(const SVECTOR* pVec1, SVECTOR* pVec2)
 
     VectorRotationMatrix_unknown_44C620(pVec2, &matrix);
 
-    memcpy(&gte_rotation_matrix_993E40.m, &matrix.m, sizeof(PSX_MATRIX::m));
+    gte_rotation_matrix_993E40 = matrix.m;
 
-    gGte_translation_vector_993E54.x = pVec1->field_0_x;
-    gGte_translation_vector_993E54.y = pVec1->field_2_y;
-    gGte_translation_vector_993E54.z = pVec1->field_4_z;
+    gGte_translation_vector_993E54.field_0_x = pVec1->field_0_x;
+    gGte_translation_vector_993E54.field_4_y = pVec1->field_2_y;
+    gGte_translation_vector_993E54.field_8_z = pVec1->field_4_z;
 }
 MGS_FUNC_IMPLEX(0x407ADA, Res_base_unknown_407ADA, KMD_IMPL);
 
@@ -500,9 +500,74 @@ void CC Res_base_unknown_407B79(const SVECTOR* pRotVec)
     PSX_MATRIX rotMatrix = {};
     VectorRotationMatrix_unknown_44C620(pRotVec, &rotMatrix);
     sub_44B690(&rotMatrix);
-    memcpy(gte_rotation_matrix_993E40.m, rotMatrix.m, sizeof(MATRIX3x3::m));
+    memcpy(gte_rotation_matrix_993E40.m, rotMatrix.m.m, sizeof(MATRIX3x3::m));
 }
 MGS_FUNC_IMPLEX(0x407B79, Res_base_unknown_407B79, KMD_IMPL);
+
+const VECTOR sVec_650118_value = { 0, 0xFFFFF000, 0 };
+MGS_VAR(1, 0x650118, VECTOR, sVec_650118, sVec_650118_value);
+MGS_ARY(1, 0x6BED08, VECTOR, 2, stru_6BED08, {});
+
+void CC Res_base_unknown_401C22(struct_gv* pGv, SVECTOR* pVec1, SVECTOR* pVec2, __int16 gvWord)
+{
+    pGv->word_6BC3BC = gvWord;
+    pGv->dword_6BC39C.t.field_0_x = pVec1->field_0_x;
+    pGv->dword_6BC39C.t.field_4_y = pVec1->field_2_y;
+    pGv->dword_6BC39C.t.field_8_z = pVec1->field_4_z;
+
+    VECTOR vec2[2] = {};
+    vec2[1].field_0_x = (pVec2->field_0_x - pVec1->field_0_x);
+    vec2[1].field_8_z = (pVec2->field_4_z - pVec1->field_4_z);
+    vec2[1].field_4_y = (pVec2->field_2_y - pVec1->field_2_y);
+
+    Vector_op_44B200(&sVec_650118, &vec2[1], &vec2[0]);
+
+    VECTOR* pV1 = nullptr;
+    VECTOR* pV2 = nullptr;
+    if (vec2[0].field_0_x || vec2[0].field_4_y || vec2[0].field_8_z)
+    {
+        pV1 = &vec2[0];
+        pV2 = &stru_6BED08[0];
+    }
+    else
+    {
+        pV1 = &stru_6BED08[0];
+        pV2 = &vec2[0];
+    }
+
+    pV2[0].field_0_x = pV1[0].field_0_x;
+    pV2[0].field_4_y = pV1[0].field_4_y;
+    pV2[0].field_8_z = pV1[0].field_8_z;
+
+    pV2[1].field_0_x = pV1[1].field_0_x;
+
+    VectorNormal_44CAE0(&vec2[0], &vec2[0]);
+    VectorNormal_44CAE0(&vec2[1], &vec2[1]);
+
+    VECTOR vec1 = {};
+    Vector_op_44B200(&vec2[1], &vec2[0], &vec1);
+
+    pGv->dword_6BC39C.m.m[0][0] = static_cast<short>(vec2[0].field_0_x);
+    pGv->dword_6BC39C.m.m[0][1] = static_cast<short>(vec1.field_0_x);
+    pGv->dword_6BC39C.m.m[0][2] = static_cast<short>(vec2[1].field_0_x);
+
+    pGv->dword_6BC39C.m.m[1][0] = static_cast<short>(vec2[0].field_4_y);
+    pGv->dword_6BC39C.m.m[1][1] = static_cast<short>(vec1.field_4_y);
+    pGv->dword_6BC39C.m.m[1][2] = static_cast<short>(vec2[1].field_4_y);
+
+    pGv->dword_6BC39C.m.m[2][0] = static_cast<short>(vec2[0].field_8_z);
+    pGv->dword_6BC39C.m.m[2][1] = static_cast<short>(vec1.field_8_z);
+    pGv->dword_6BC39C.m.m[2][2] = static_cast<short>(vec2[1].field_8_z);
+
+    Matrix_transpose_40771B(&pGv->dword_6BC39C.m, &pGv->field_10_matrix.m);
+
+    vec2[1].field_0_x = -pGv->dword_6BC39C.t.field_0_x;
+    vec2[1].field_4_y = -pGv->dword_6BC39C.t.field_4_y;
+    vec2[1].field_8_z = -pGv->dword_6BC39C.t.field_8_z;
+    MatrixXVectorFixed_44B320(&pGv->field_10_matrix.m, &vec2[1], &pGv->field_10_matrix.t);
+}
+MGS_FUNC_IMPLEX(0x401C22, Res_base_unknown_401C22, KMD_IMPL);
+
 
 void CC RotMatrixYXZ_gte_44BD00(const SVECTOR* pVec, PSX_MATRIX* pMtx)
 {
@@ -513,20 +578,20 @@ void CC RotMatrixYXZ_gte_44BD00(const SVECTOR* pVec, PSX_MATRIX* pMtx)
         const int vec_z_table1 = dword_665A3C[(pVec->field_4_z + 1024) & 4095];
         const int vec_z_table2 = dword_665A3C[pVec->field_4_z & 4095];
 
-        const int mtx_0_0 = pMtx->m[0][0];
-        const int mtx_1_0 = pMtx->m[1][0];
-        pMtx->m[0][0] = static_cast<short>((vec_z_table1 * mtx_0_0 - vec_z_table2 * mtx_1_0) >> 12);
-        pMtx->m[1][0] = static_cast<short>((vec_z_table2 * mtx_0_0 + vec_z_table1 * mtx_1_0) >> 12);
+        const int mtx_0_0 = pMtx->m.m[0][0];
+        const int mtx_1_0 = pMtx->m.m[1][0];
+        pMtx->m.m[0][0] = static_cast<short>((vec_z_table1 * mtx_0_0 - vec_z_table2 * mtx_1_0) >> 12);
+        pMtx->m.m[1][0] = static_cast<short>((vec_z_table2 * mtx_0_0 + vec_z_table1 * mtx_1_0) >> 12);
 
-        const int mtx_0_1 = pMtx->m[0][1];
-        const int mtx_1_1 = pMtx->m[1][1];
-        pMtx->m[0][1] = static_cast<short>((vec_z_table1 * mtx_0_1 - vec_z_table2 * mtx_1_1) >> 12);
-        pMtx->m[1][1] = static_cast<short>((vec_z_table2 * mtx_0_1 + vec_z_table1 * mtx_1_1) >> 12);
+        const int mtx_0_1 = pMtx->m.m[0][1];
+        const int mtx_1_1 = pMtx->m.m[1][1];
+        pMtx->m.m[0][1] = static_cast<short>((vec_z_table1 * mtx_0_1 - vec_z_table2 * mtx_1_1) >> 12);
+        pMtx->m.m[1][1] = static_cast<short>((vec_z_table2 * mtx_0_1 + vec_z_table1 * mtx_1_1) >> 12);
 
-        const int mtx_0_2 = pMtx->m[0][2];
-        const int mtx_1_2 = pMtx->m[1][2];
-        pMtx->m[0][2] = static_cast<short>((vec_z_table1 * mtx_0_2 - vec_z_table2 * mtx_1_2) >> 12);
-        pMtx->m[1][2] = static_cast<short>((vec_z_table2 * mtx_0_2 + vec_z_table1 * mtx_1_2) >> 12);
+        const int mtx_0_2 = pMtx->m.m[0][2];
+        const int mtx_1_2 = pMtx->m.m[1][2];
+        pMtx->m.m[0][2] = static_cast<short>((vec_z_table1 * mtx_0_2 - vec_z_table2 * mtx_1_2) >> 12);
+        pMtx->m.m[1][2] = static_cast<short>((vec_z_table2 * mtx_0_2 + vec_z_table1 * mtx_1_2) >> 12);
     }
 
     // ============================================================================
@@ -535,20 +600,20 @@ void CC RotMatrixYXZ_gte_44BD00(const SVECTOR* pVec, PSX_MATRIX* pMtx)
         const int vec_x_table1 = dword_665A3C[(pVec->field_0_x + 1024) & 4095];
         const int vec_x_table2 = dword_665A3C[pVec->field_0_x & 4095];
 
-        const int mtx_1_0 = pMtx->m[1][0];
-        const int mtx_2_0 = pMtx->m[2][0];
-        pMtx->m[1][0] = static_cast<short>((vec_x_table1 * mtx_1_0 - vec_x_table2 * mtx_2_0) >> 12);
-        pMtx->m[2][0] = static_cast<short>((vec_x_table2 * mtx_1_0 + vec_x_table1 * mtx_2_0) >> 12);
+        const int mtx_1_0 = pMtx->m.m[1][0];
+        const int mtx_2_0 = pMtx->m.m[2][0];
+        pMtx->m.m[1][0] = static_cast<short>((vec_x_table1 * mtx_1_0 - vec_x_table2 * mtx_2_0) >> 12);
+        pMtx->m.m[2][0] = static_cast<short>((vec_x_table2 * mtx_1_0 + vec_x_table1 * mtx_2_0) >> 12);
 
-        const int mtx_1_1 = pMtx->m[1][1];
-        const int mtx_2_1 = pMtx->m[2][1];
-        pMtx->m[1][1] = static_cast<short>((vec_x_table1 * mtx_1_1 - vec_x_table2 * mtx_2_1) >> 12);
-        pMtx->m[2][1] = static_cast<short>((vec_x_table2 * mtx_1_1 + vec_x_table1 * mtx_2_1) >> 12);
+        const int mtx_1_1 = pMtx->m.m[1][1];
+        const int mtx_2_1 = pMtx->m.m[2][1];
+        pMtx->m.m[1][1] = static_cast<short>((vec_x_table1 * mtx_1_1 - vec_x_table2 * mtx_2_1) >> 12);
+        pMtx->m.m[2][1] = static_cast<short>((vec_x_table2 * mtx_1_1 + vec_x_table1 * mtx_2_1) >> 12);
 
-        const int mtx_1_2 = pMtx->m[1][2];
-        const int mtx_2_2 = pMtx->m[2][2];
-        pMtx->m[1][2] = static_cast<short>((vec_x_table1 * mtx_1_2 - vec_x_table2 * mtx_2_2) >> 12);
-        pMtx->m[2][2] = static_cast<short>((vec_x_table2 * mtx_1_2 + vec_x_table1 * mtx_2_2) >> 12);
+        const int mtx_1_2 = pMtx->m.m[1][2];
+        const int mtx_2_2 = pMtx->m.m[2][2];
+        pMtx->m.m[1][2] = static_cast<short>((vec_x_table1 * mtx_1_2 - vec_x_table2 * mtx_2_2) >> 12);
+        pMtx->m.m[2][2] = static_cast<short>((vec_x_table2 * mtx_1_2 + vec_x_table1 * mtx_2_2) >> 12);
     }
 
     // ============================================================================
@@ -557,47 +622,47 @@ void CC RotMatrixYXZ_gte_44BD00(const SVECTOR* pVec, PSX_MATRIX* pMtx)
         const int tbl2 = dword_665A3C[(pVec->field_2_y + 1024) & 4095];
         const int tbl1 = dword_665A3C[pVec->field_2_y & 4095];
 
-        const int mtx_0_0 = pMtx->m[0][0];
-        const int mtx_2_0 = pMtx->m[2][0];
-        pMtx->m[0][0] = static_cast<short>((tbl1 * mtx_2_0 + tbl2 * mtx_0_0) >> 12);
-        pMtx->m[2][0] = static_cast<short>((tbl2 * mtx_2_0 - tbl1 * mtx_0_0) >> 12);
+        const int mtx_0_0 = pMtx->m.m[0][0];
+        const int mtx_2_0 = pMtx->m.m[2][0];
+        pMtx->m.m[0][0] = static_cast<short>((tbl1 * mtx_2_0 + tbl2 * mtx_0_0) >> 12);
+        pMtx->m.m[2][0] = static_cast<short>((tbl2 * mtx_2_0 - tbl1 * mtx_0_0) >> 12);
 
-        const int mtx_0_1 = pMtx->m[0][1];
-        const int mtx_2_1 = pMtx->m[2][1];
-        pMtx->m[0][1] = static_cast<short>((tbl1 * mtx_2_1 + tbl2 * mtx_0_1) >> 12);
-        pMtx->m[2][1] = static_cast<short>((tbl2 * mtx_2_1 - tbl1 * mtx_0_1) >> 12);
+        const int mtx_0_1 = pMtx->m.m[0][1];
+        const int mtx_2_1 = pMtx->m.m[2][1];
+        pMtx->m.m[0][1] = static_cast<short>((tbl1 * mtx_2_1 + tbl2 * mtx_0_1) >> 12);
+        pMtx->m.m[2][1] = static_cast<short>((tbl2 * mtx_2_1 - tbl1 * mtx_0_1) >> 12);
 
-        const int mtx_0_2 = pMtx->m[0][2];
-        const int mtx_2_2 = pMtx->m[2][2];
-        pMtx->m[0][2] = static_cast<short>((tbl1 * mtx_2_2 + tbl2 * mtx_0_2) >> 12);
-        pMtx->m[2][2] = static_cast<short>((tbl2 * mtx_2_2 - tbl1 * mtx_0_2) >> 12);
+        const int mtx_0_2 = pMtx->m.m[0][2];
+        const int mtx_2_2 = pMtx->m.m[2][2];
+        pMtx->m.m[0][2] = static_cast<short>((tbl1 * mtx_2_2 + tbl2 * mtx_0_2) >> 12);
+        pMtx->m.m[2][2] = static_cast<short>((tbl2 * mtx_2_2 - tbl1 * mtx_0_2) >> 12);
     }
 }
 MGS_FUNC_IMPLEX(0x44BD00, RotMatrixYXZ_gte_44BD00, KMD_IMPL);
 
 void CC RotMatrixZYX_gte_44BF60(const SVECTOR* pVec, PSX_MATRIX* pMtx)
 {
-    memcpy(&pMtx->m, &gIdentityMatrix_6659BC.m, sizeof(PSX_MATRIX::m));
+    pMtx->m = gIdentityMatrix_6659BC;
 
     // ============================================================================
     {
         const int tbl_vec_x1 = dword_665A3C[(pVec->field_0_x + 1024) & 4095];
         const int tbl_vec_x2 = dword_665A3C[pVec->field_0_x & 4095];
 
-        const int mtx_1_0 = pMtx->m[1][0];
-        const int mtx_2_0 = pMtx->m[2][0];
-        pMtx->m[2][0] = static_cast<short int>((tbl_vec_x2 * mtx_1_0 + tbl_vec_x1 * mtx_2_0) >> 12);
-        pMtx->m[1][0] = static_cast<short int>((tbl_vec_x1 * mtx_1_0 - tbl_vec_x2 * mtx_2_0) >> 12);
+        const int mtx_1_0 = pMtx->m.m[1][0];
+        const int mtx_2_0 = pMtx->m.m[2][0];
+        pMtx->m.m[2][0] = static_cast<short int>((tbl_vec_x2 * mtx_1_0 + tbl_vec_x1 * mtx_2_0) >> 12);
+        pMtx->m.m[1][0] = static_cast<short int>((tbl_vec_x1 * mtx_1_0 - tbl_vec_x2 * mtx_2_0) >> 12);
 
-        const int mtx_1_1 = pMtx->m[1][1];
-        const int mtx_2_1 = pMtx->m[2][1];
-        pMtx->m[1][1] = static_cast<short int>((tbl_vec_x1 * mtx_1_1 - tbl_vec_x2 * mtx_2_1) >> 12);
-        pMtx->m[2][1] = static_cast<short int>((tbl_vec_x2 * mtx_1_1 + tbl_vec_x1 * mtx_2_1) >> 12);
+        const int mtx_1_1 = pMtx->m.m[1][1];
+        const int mtx_2_1 = pMtx->m.m[2][1];
+        pMtx->m.m[1][1] = static_cast<short int>((tbl_vec_x1 * mtx_1_1 - tbl_vec_x2 * mtx_2_1) >> 12);
+        pMtx->m.m[2][1] = static_cast<short int>((tbl_vec_x2 * mtx_1_1 + tbl_vec_x1 * mtx_2_1) >> 12);
 
-        const int mtx_1_2 = pMtx->m[1][2];
-        const int mtx_2_2 = pMtx->m[2][2];
-        pMtx->m[1][2] = static_cast<short int>((tbl_vec_x1 * mtx_1_2 - tbl_vec_x2 * mtx_2_2) >> 12);
-        pMtx->m[2][2] = static_cast<short int>((tbl_vec_x2 * mtx_1_2 + tbl_vec_x1 * mtx_2_2) >> 12);
+        const int mtx_1_2 = pMtx->m.m[1][2];
+        const int mtx_2_2 = pMtx->m.m[2][2];
+        pMtx->m.m[1][2] = static_cast<short int>((tbl_vec_x1 * mtx_1_2 - tbl_vec_x2 * mtx_2_2) >> 12);
+        pMtx->m.m[2][2] = static_cast<short int>((tbl_vec_x2 * mtx_1_2 + tbl_vec_x1 * mtx_2_2) >> 12);
     }
 
     // ============================================================================
@@ -605,20 +670,20 @@ void CC RotMatrixZYX_gte_44BF60(const SVECTOR* pVec, PSX_MATRIX* pMtx)
         const int tbl_vec_y1 = dword_665A3C[(pVec->field_2_y + 1024) & 4095];
         const int tbl_vec_y2 = dword_665A3C[pVec->field_2_y & 4095];
 
-        const int mtx_2_0 = pMtx->m[2][0];
-        const int mtx_0_0 = pMtx->m[0][0];
-        pMtx->m[0][0] = static_cast<short int>((tbl_vec_y2 * mtx_2_0 + tbl_vec_y1 * mtx_0_0) >> 12);
-        pMtx->m[2][0] = static_cast<short int>((tbl_vec_y1 * mtx_2_0 - tbl_vec_y2 * mtx_0_0) >> 12);
+        const int mtx_2_0 = pMtx->m.m[2][0];
+        const int mtx_0_0 = pMtx->m.m[0][0];
+        pMtx->m.m[0][0] = static_cast<short int>((tbl_vec_y2 * mtx_2_0 + tbl_vec_y1 * mtx_0_0) >> 12);
+        pMtx->m.m[2][0] = static_cast<short int>((tbl_vec_y1 * mtx_2_0 - tbl_vec_y2 * mtx_0_0) >> 12);
 
-        const int mtx_2_1 = pMtx->m[2][1];
-        const int mtx_0_1 = pMtx->m[0][1];
-        pMtx->m[0][1] = static_cast<short int>((tbl_vec_y2 * mtx_2_1 + tbl_vec_y1 * mtx_0_1) >> 12);
-        pMtx->m[2][1] = static_cast<short int>((tbl_vec_y1 * mtx_2_1 - tbl_vec_y2 * mtx_0_1) >> 12);
+        const int mtx_2_1 = pMtx->m.m[2][1];
+        const int mtx_0_1 = pMtx->m.m[0][1];
+        pMtx->m.m[0][1] = static_cast<short int>((tbl_vec_y2 * mtx_2_1 + tbl_vec_y1 * mtx_0_1) >> 12);
+        pMtx->m.m[2][1] = static_cast<short int>((tbl_vec_y1 * mtx_2_1 - tbl_vec_y2 * mtx_0_1) >> 12);
 
-        const int mtx_2_2 = pMtx->m[2][2];
-        const int mtx_0_2 = pMtx->m[0][2];
-        pMtx->m[2][2] = static_cast<short int>((tbl_vec_y1 * mtx_2_2 - tbl_vec_y2 * mtx_0_2) >> 12);
-        pMtx->m[0][2] = static_cast<short int>((tbl_vec_y2 * mtx_2_2 + tbl_vec_y1 * mtx_0_2) >> 12);
+        const int mtx_2_2 = pMtx->m.m[2][2];
+        const int mtx_0_2 = pMtx->m.m[0][2];
+        pMtx->m.m[2][2] = static_cast<short int>((tbl_vec_y1 * mtx_2_2 - tbl_vec_y2 * mtx_0_2) >> 12);
+        pMtx->m.m[0][2] = static_cast<short int>((tbl_vec_y2 * mtx_2_2 + tbl_vec_y1 * mtx_0_2) >> 12);
     }
 
     // ============================================================================
@@ -626,47 +691,47 @@ void CC RotMatrixZYX_gte_44BF60(const SVECTOR* pVec, PSX_MATRIX* pMtx)
         const int tbl_vec_z1 = dword_665A3C[(pVec->field_4_z + 1024) & 4095];
         const int tbl_vec_z2 = dword_665A3C[pVec->field_4_z & 4095];
 
-        const int mtx_0_0 = pMtx->m[0][0];
-        const int mtx_1_0 = pMtx->m[1][0];
-        pMtx->m[0][0] = static_cast<short int>((tbl_vec_z1 * mtx_0_0 - tbl_vec_z2 * mtx_1_0) >> 12);
-        pMtx->m[1][0] = static_cast<short int>((tbl_vec_z2 * mtx_0_0 + tbl_vec_z1 * mtx_1_0) >> 12);
+        const int mtx_0_0 = pMtx->m.m[0][0];
+        const int mtx_1_0 = pMtx->m.m[1][0];
+        pMtx->m.m[0][0] = static_cast<short int>((tbl_vec_z1 * mtx_0_0 - tbl_vec_z2 * mtx_1_0) >> 12);
+        pMtx->m.m[1][0] = static_cast<short int>((tbl_vec_z2 * mtx_0_0 + tbl_vec_z1 * mtx_1_0) >> 12);
 
-        const int mtx_0_1 = pMtx->m[0][1];
-        const int mtx_1_1 = pMtx->m[1][1];
-        pMtx->m[0][1] = static_cast<short int>((tbl_vec_z1 * mtx_0_1 - tbl_vec_z2 * mtx_1_1) >> 12);
-        pMtx->m[1][1] = static_cast<short int>((tbl_vec_z2 * mtx_0_1 + tbl_vec_z1 * mtx_1_1) >> 12);
+        const int mtx_0_1 = pMtx->m.m[0][1];
+        const int mtx_1_1 = pMtx->m.m[1][1];
+        pMtx->m.m[0][1] = static_cast<short int>((tbl_vec_z1 * mtx_0_1 - tbl_vec_z2 * mtx_1_1) >> 12);
+        pMtx->m.m[1][1] = static_cast<short int>((tbl_vec_z2 * mtx_0_1 + tbl_vec_z1 * mtx_1_1) >> 12);
 
-        const int mtx_0_2 = pMtx->m[0][2];
-        const int mtx_1_2 = pMtx->m[1][2];
-        pMtx->m[0][2] = static_cast<short int>((tbl_vec_z1 * mtx_0_2 - tbl_vec_z2 * mtx_1_2) >> 12);
-        pMtx->m[1][2] = static_cast<short int>((tbl_vec_z2 * mtx_0_2 + tbl_vec_z1 * mtx_1_2) >> 12);
+        const int mtx_0_2 = pMtx->m.m[0][2];
+        const int mtx_1_2 = pMtx->m.m[1][2];
+        pMtx->m.m[0][2] = static_cast<short int>((tbl_vec_z1 * mtx_0_2 - tbl_vec_z2 * mtx_1_2) >> 12);
+        pMtx->m.m[1][2] = static_cast<short int>((tbl_vec_z2 * mtx_0_2 + tbl_vec_z1 * mtx_1_2) >> 12);
     }
 }
 MGS_FUNC_IMPLEX(0x44BF60, RotMatrixZYX_gte_44BF60, KMD_IMPL);
 
 void CC RotMatrix_gte_44BAB0(const SVECTOR* pVec, PSX_MATRIX* pMtx)
 {
-    memcpy(&pMtx->m, &gIdentityMatrix_6659BC.m, sizeof(PSX_MATRIX::m));
+    pMtx->m = gIdentityMatrix_6659BC;
 
     // ============================================================================
     {
         const int tbl_vec_z1 = dword_665A3C[(pVec->field_4_z + 1024) & 4095];
         const int tbl_vec_z2 = dword_665A3C[pVec->field_4_z & 4095];
 
-        const int mtx_1_0 = pMtx->m[1][0];
-        const int mtx_0_0 = pMtx->m[0][0];
-        pMtx->m[1][0] = static_cast<short int>((tbl_vec_z2 * mtx_0_0 + tbl_vec_z1 * mtx_1_0) >> 12);
-        pMtx->m[0][0] = static_cast<short int>((tbl_vec_z1 * mtx_0_0 - tbl_vec_z2 * mtx_1_0) >> 12);
+        const int mtx_1_0 = pMtx->m.m[1][0];
+        const int mtx_0_0 = pMtx->m.m[0][0];
+        pMtx->m.m[1][0] = static_cast<short int>((tbl_vec_z2 * mtx_0_0 + tbl_vec_z1 * mtx_1_0) >> 12);
+        pMtx->m.m[0][0] = static_cast<short int>((tbl_vec_z1 * mtx_0_0 - tbl_vec_z2 * mtx_1_0) >> 12);
 
-        const int mtx_0_1 = pMtx->m[0][1];
-        const int mtx_1_1 = pMtx->m[1][1];
-        pMtx->m[0][1] = static_cast<short int>((tbl_vec_z1 * mtx_0_1 - tbl_vec_z2 * mtx_1_1) >> 12);
-        pMtx->m[1][1] = static_cast<short int>((tbl_vec_z2 * mtx_0_1 + tbl_vec_z1 * mtx_1_1) >> 12);
+        const int mtx_0_1 = pMtx->m.m[0][1];
+        const int mtx_1_1 = pMtx->m.m[1][1];
+        pMtx->m.m[0][1] = static_cast<short int>((tbl_vec_z1 * mtx_0_1 - tbl_vec_z2 * mtx_1_1) >> 12);
+        pMtx->m.m[1][1] = static_cast<short int>((tbl_vec_z2 * mtx_0_1 + tbl_vec_z1 * mtx_1_1) >> 12);
 
-        const int mtx_1_2 = pMtx->m[1][2];
-        const int mtx_0_2 = pMtx->m[0][2];
-        pMtx->m[1][2] = static_cast<short int>((tbl_vec_z2 * mtx_0_2 + tbl_vec_z1 * mtx_1_2) >> 12);
-        pMtx->m[0][2] = static_cast<short int>((tbl_vec_z1 * mtx_0_2 - tbl_vec_z2 * mtx_1_2) >> 12);
+        const int mtx_1_2 = pMtx->m.m[1][2];
+        const int mtx_0_2 = pMtx->m.m[0][2];
+        pMtx->m.m[1][2] = static_cast<short int>((tbl_vec_z2 * mtx_0_2 + tbl_vec_z1 * mtx_1_2) >> 12);
+        pMtx->m.m[0][2] = static_cast<short int>((tbl_vec_z1 * mtx_0_2 - tbl_vec_z2 * mtx_1_2) >> 12);
     }
 
     // ============================================================================
@@ -674,20 +739,20 @@ void CC RotMatrix_gte_44BAB0(const SVECTOR* pVec, PSX_MATRIX* pMtx)
         const int tbl_vec_y1 = dword_665A3C[(pVec->field_2_y + 1024) & 4095];
         const int tbl_vec_y2 = dword_665A3C[pVec->field_2_y & 4095];
 
-        const int mtx_2_0 = pMtx->m[2][0];
-        const int mtx_0_0 = pMtx->m[0][0];
-        pMtx->m[0][0] = static_cast<short int>((tbl_vec_y2 * mtx_2_0 + tbl_vec_y1 * mtx_0_0) >> 12);
-        pMtx->m[2][0] = static_cast<short int>((tbl_vec_y1 * mtx_2_0 - tbl_vec_y2 * mtx_0_0) >> 12);
+        const int mtx_2_0 = pMtx->m.m[2][0];
+        const int mtx_0_0 = pMtx->m.m[0][0];
+        pMtx->m.m[0][0] = static_cast<short int>((tbl_vec_y2 * mtx_2_0 + tbl_vec_y1 * mtx_0_0) >> 12);
+        pMtx->m.m[2][0] = static_cast<short int>((tbl_vec_y1 * mtx_2_0 - tbl_vec_y2 * mtx_0_0) >> 12);
 
-        const int mtx_0_1 = pMtx->m[0][1];
-        const int mtx_2_1 = pMtx->m[2][1];
-        pMtx->m[0][1] = static_cast<short int>((tbl_vec_y2 * mtx_2_1 + tbl_vec_y1 * mtx_0_1) >> 12);
-        pMtx->m[2][1] = static_cast<short int>((tbl_vec_y1 * mtx_2_1 - tbl_vec_y2 * mtx_0_1) >> 12);
+        const int mtx_0_1 = pMtx->m.m[0][1];
+        const int mtx_2_1 = pMtx->m.m[2][1];
+        pMtx->m.m[0][1] = static_cast<short int>((tbl_vec_y2 * mtx_2_1 + tbl_vec_y1 * mtx_0_1) >> 12);
+        pMtx->m.m[2][1] = static_cast<short int>((tbl_vec_y1 * mtx_2_1 - tbl_vec_y2 * mtx_0_1) >> 12);
 
-        const int mtx_0_2 = pMtx->m[0][2];
-        const int mtx_2_2 = pMtx->m[2][2];
-        pMtx->m[0][2] = static_cast<short int>((tbl_vec_y2 * mtx_2_2 + tbl_vec_y1 * mtx_0_2) >> 12);
-        pMtx->m[2][2] = static_cast<short int>((tbl_vec_y1 * mtx_2_2 - tbl_vec_y2 * mtx_0_2) >> 12);
+        const int mtx_0_2 = pMtx->m.m[0][2];
+        const int mtx_2_2 = pMtx->m.m[2][2];
+        pMtx->m.m[0][2] = static_cast<short int>((tbl_vec_y2 * mtx_2_2 + tbl_vec_y1 * mtx_0_2) >> 12);
+        pMtx->m.m[2][2] = static_cast<short int>((tbl_vec_y1 * mtx_2_2 - tbl_vec_y2 * mtx_0_2) >> 12);
     }
 
     // ============================================================================
@@ -695,47 +760,47 @@ void CC RotMatrix_gte_44BAB0(const SVECTOR* pVec, PSX_MATRIX* pMtx)
         const int tbl_vec_x1 = dword_665A3C[(pVec->field_0_x + 1024) & 4095];
         const int tbl_vec_x2 = dword_665A3C[pVec->field_0_x & 4095];
 
-        const int mtx_2_0 = pMtx->m[2][0];
-        const int mtx_1_0 = pMtx->m[1][0];
-        pMtx->m[2][0] = static_cast<short int>((tbl_vec_x2 * mtx_1_0 + tbl_vec_x1 * mtx_2_0) >> 12);
-        pMtx->m[1][0] = static_cast<short int>((tbl_vec_x1 * mtx_1_0 - tbl_vec_x2 * mtx_2_0) >> 12);
+        const int mtx_2_0 = pMtx->m.m[2][0];
+        const int mtx_1_0 = pMtx->m.m[1][0];
+        pMtx->m.m[2][0] = static_cast<short int>((tbl_vec_x2 * mtx_1_0 + tbl_vec_x1 * mtx_2_0) >> 12);
+        pMtx->m.m[1][0] = static_cast<short int>((tbl_vec_x1 * mtx_1_0 - tbl_vec_x2 * mtx_2_0) >> 12);
 
-        const int mtx_1_1 = pMtx->m[1][1];
-        const int mtx_2_1 = pMtx->m[2][1];
-        pMtx->m[2][1] = static_cast<short int>((tbl_vec_x2 * mtx_1_1 + tbl_vec_x1 * mtx_2_1) >> 12);
-        pMtx->m[1][1] = static_cast<short int>((tbl_vec_x1 * mtx_1_1 - tbl_vec_x2 * mtx_2_1) >> 12);
+        const int mtx_1_1 = pMtx->m.m[1][1];
+        const int mtx_2_1 = pMtx->m.m[2][1];
+        pMtx->m.m[2][1] = static_cast<short int>((tbl_vec_x2 * mtx_1_1 + tbl_vec_x1 * mtx_2_1) >> 12);
+        pMtx->m.m[1][1] = static_cast<short int>((tbl_vec_x1 * mtx_1_1 - tbl_vec_x2 * mtx_2_1) >> 12);
 
-        const int mtx_1_2 = pMtx->m[1][2];
-        const int mtx_2_2 = pMtx->m[2][2];
-        pMtx->m[2][2] = static_cast<short int>((tbl_vec_x2 * mtx_1_2 + tbl_vec_x1 * mtx_2_2) >> 12);
-        pMtx->m[1][2] = static_cast<short int>((tbl_vec_x1 * mtx_1_2 - tbl_vec_x2 * mtx_2_2) >> 12);
+        const int mtx_1_2 = pMtx->m.m[1][2];
+        const int mtx_2_2 = pMtx->m.m[2][2];
+        pMtx->m.m[2][2] = static_cast<short int>((tbl_vec_x2 * mtx_1_2 + tbl_vec_x1 * mtx_2_2) >> 12);
+        pMtx->m.m[1][2] = static_cast<short int>((tbl_vec_x1 * mtx_1_2 - tbl_vec_x2 * mtx_2_2) >> 12);
     }
 }
 MGS_FUNC_IMPLEX(0x44BAB0, RotMatrix_gte_44BAB0, KMD_IMPL);
 
 void CC RotMatrixC_44C3D0(const SVECTOR* pVec, PSX_MATRIX* pMtx)
 {
-    memcpy(&pMtx->m, &gIdentityMatrix_6659BC.m, sizeof(PSX_MATRIX::m));
+    pMtx->m = gIdentityMatrix_6659BC;
 
     // ============================================================================
     {
         const int tbl_vec_z1 = dword_665A3C[(pVec->field_4_z + 1024) & 4095];
         const int tbl_vec_z2 = dword_665A3C[pVec->field_4_z & 4095];
 
-        const int m_1_0 = pMtx->m[1][0];
-        const int m_0_0 = pMtx->m[0][0];
-        pMtx->m[1][0] = static_cast<short int>((tbl_vec_z2 * m_0_0 + tbl_vec_z1 * m_1_0) >> 12);
-        pMtx->m[0][0] = static_cast<short int>((tbl_vec_z1 * m_0_0 - tbl_vec_z2 * m_1_0) >> 12);
+        const int m_1_0 = pMtx->m.m[1][0];
+        const int m_0_0 = pMtx->m.m[0][0];
+        pMtx->m.m[1][0] = static_cast<short int>((tbl_vec_z2 * m_0_0 + tbl_vec_z1 * m_1_0) >> 12);
+        pMtx->m.m[0][0] = static_cast<short int>((tbl_vec_z1 * m_0_0 - tbl_vec_z2 * m_1_0) >> 12);
 
-        const int m_0_1 = pMtx->m[0][1];
-        const int m_1_1 = pMtx->m[1][1];
-        pMtx->m[0][1] = static_cast<short int>((tbl_vec_z1 * m_0_1 - tbl_vec_z2 * m_1_1) >> 12);
-        pMtx->m[1][1] = static_cast<short int>((tbl_vec_z2 * m_0_1 + tbl_vec_z1 * m_1_1) >> 12);
+        const int m_0_1 = pMtx->m.m[0][1];
+        const int m_1_1 = pMtx->m.m[1][1];
+        pMtx->m.m[0][1] = static_cast<short int>((tbl_vec_z1 * m_0_1 - tbl_vec_z2 * m_1_1) >> 12);
+        pMtx->m.m[1][1] = static_cast<short int>((tbl_vec_z2 * m_0_1 + tbl_vec_z1 * m_1_1) >> 12);
 
-        const int m_1_2 = pMtx->m[1][2];
-        const int m_0_2 = pMtx->m[0][2];
-        pMtx->m[1][2] = static_cast<short int>((tbl_vec_z2 * m_0_2 + tbl_vec_z1 * m_1_2) >> 12);
-        pMtx->m[0][2] = static_cast<short int>((tbl_vec_z1 * m_0_2 - tbl_vec_z2 * m_1_2) >> 12);
+        const int m_1_2 = pMtx->m.m[1][2];
+        const int m_0_2 = pMtx->m.m[0][2];
+        pMtx->m.m[1][2] = static_cast<short int>((tbl_vec_z2 * m_0_2 + tbl_vec_z1 * m_1_2) >> 12);
+        pMtx->m.m[0][2] = static_cast<short int>((tbl_vec_z1 * m_0_2 - tbl_vec_z2 * m_1_2) >> 12);
     }
 
     // ============================================================================
@@ -743,20 +808,20 @@ void CC RotMatrixC_44C3D0(const SVECTOR* pVec, PSX_MATRIX* pMtx)
         const int tbl_vec_y1 = dword_665A3C[(pVec->field_2_y + 1024) & 4095];
         const int tbl_vec_y2 = dword_665A3C[pVec->field_2_y & 4095]; // Not Z2 ?
 
-        const int m_2_0 = pMtx->m[2][0];
-        const int m_0_0 = pMtx->m[0][0];
-        pMtx->m[0][0] = static_cast<short int>((tbl_vec_y2 * m_2_0 + tbl_vec_y1 * m_0_0) >> 12);
-        pMtx->m[2][0] = static_cast<short int>((tbl_vec_y1 * m_2_0 - tbl_vec_y2 * m_0_0) >> 12);
+        const int m_2_0 = pMtx->m.m[2][0];
+        const int m_0_0 = pMtx->m.m[0][0];
+        pMtx->m.m[0][0] = static_cast<short int>((tbl_vec_y2 * m_2_0 + tbl_vec_y1 * m_0_0) >> 12);
+        pMtx->m.m[2][0] = static_cast<short int>((tbl_vec_y1 * m_2_0 - tbl_vec_y2 * m_0_0) >> 12);
 
-        const int m_2_1 = pMtx->m[2][1];
-        const int m_0_1 = pMtx->m[0][1];
-        pMtx->m[0][1] = static_cast<short int>((tbl_vec_y2 * m_2_1 + tbl_vec_y1 * m_0_1) >> 12);
-        pMtx->m[2][1] = static_cast<short int>((tbl_vec_y1 * m_2_1 - tbl_vec_y2 * m_0_1) >> 12);
+        const int m_2_1 = pMtx->m.m[2][1];
+        const int m_0_1 = pMtx->m.m[0][1];
+        pMtx->m.m[0][1] = static_cast<short int>((tbl_vec_y2 * m_2_1 + tbl_vec_y1 * m_0_1) >> 12);
+        pMtx->m.m[2][1] = static_cast<short int>((tbl_vec_y1 * m_2_1 - tbl_vec_y2 * m_0_1) >> 12);
 
-        const int m_0_2 = pMtx->m[0][2];
-        const int m_2_2 = pMtx->m[2][2];
-        pMtx->m[0][2] = static_cast<short int>((tbl_vec_y2 * m_2_2 + tbl_vec_y1 * m_0_2) >> 12);
-        pMtx->m[2][2] = static_cast<short int>((tbl_vec_y1 * m_2_2 - tbl_vec_y2 * m_0_2) >> 12);
+        const int m_0_2 = pMtx->m.m[0][2];
+        const int m_2_2 = pMtx->m.m[2][2];
+        pMtx->m.m[0][2] = static_cast<short int>((tbl_vec_y2 * m_2_2 + tbl_vec_y1 * m_0_2) >> 12);
+        pMtx->m.m[2][2] = static_cast<short int>((tbl_vec_y1 * m_2_2 - tbl_vec_y2 * m_0_2) >> 12);
     }
 
     // ============================================================================
@@ -764,20 +829,20 @@ void CC RotMatrixC_44C3D0(const SVECTOR* pVec, PSX_MATRIX* pMtx)
         const int tbl_vec_x1 = dword_665A3C[pVec->field_0_x & 4095];
         const int tbl_vec_x2 = dword_665A3C[(pVec->field_0_x + 1024) & 4095];
 
-        const int m_2_0 = pMtx->m[2][0];
-        const int m_1_0 = pMtx->m[1][0];
-        pMtx->m[2][0] = static_cast<short int>((tbl_vec_x1 * m_1_0 + tbl_vec_x2 * m_2_0) >> 12);
-        pMtx->m[1][0] = static_cast<short int>((tbl_vec_x2 * m_1_0 - tbl_vec_x1 * m_2_0) >> 12);
+        const int m_2_0 = pMtx->m.m[2][0];
+        const int m_1_0 = pMtx->m.m[1][0];
+        pMtx->m.m[2][0] = static_cast<short int>((tbl_vec_x1 * m_1_0 + tbl_vec_x2 * m_2_0) >> 12);
+        pMtx->m.m[1][0] = static_cast<short int>((tbl_vec_x2 * m_1_0 - tbl_vec_x1 * m_2_0) >> 12);
 
-        const int m_1_1 = pMtx->m[1][1];
-        const int m_2_1 = pMtx->m[2][1];
-        pMtx->m[2][1] = static_cast<short int>((tbl_vec_x1 * m_1_1 + tbl_vec_x2 * m_2_1) >> 12);
-        pMtx->m[1][1] = static_cast<short int>((tbl_vec_x2 * m_1_1 - tbl_vec_x1 * m_2_1) >> 12);
+        const int m_1_1 = pMtx->m.m[1][1];
+        const int m_2_1 = pMtx->m.m[2][1];
+        pMtx->m.m[2][1] = static_cast<short int>((tbl_vec_x1 * m_1_1 + tbl_vec_x2 * m_2_1) >> 12);
+        pMtx->m.m[1][1] = static_cast<short int>((tbl_vec_x2 * m_1_1 - tbl_vec_x1 * m_2_1) >> 12);
 
-        const int m_1_2 = pMtx->m[1][2];
-        const int m_2_2 = pMtx->m[2][2];
-        pMtx->m[2][2] = static_cast<short int>((tbl_vec_x1 * m_1_2 + tbl_vec_x2 * m_2_2) >> 12);
-        pMtx->m[1][2] = static_cast<short int>((tbl_vec_x2 * m_1_2 - tbl_vec_x1 * m_2_2) >> 12);
+        const int m_1_2 = pMtx->m.m[1][2];
+        const int m_2_2 = pMtx->m.m[2][2];
+        pMtx->m.m[2][2] = static_cast<short int>((tbl_vec_x1 * m_1_2 + tbl_vec_x2 * m_2_2) >> 12);
+        pMtx->m.m[1][2] = static_cast<short int>((tbl_vec_x2 * m_1_2 - tbl_vec_x1 * m_2_2) >> 12);
     }
 }
 MGS_FUNC_IMPLEX(0x44C3D0, RotMatrixC_44C3D0, KMD_IMPL);
@@ -796,16 +861,14 @@ MGS_FUNC_IMPLEX(0x44AEE0, Res_base_get_constant_44AEE0, KMD_IMPL);
 
 void CC Res_base_get_gte_rot_mtx_44AE10(PSX_MATRIX* pMtx)
 {
-    memcpy(&pMtx->m, &gte_rotation_matrix_993E40.m, sizeof(PSX_MATRIX::m));
-    pMtx->t[0] = gGte_translation_vector_993E54.x;
-    pMtx->t[1] = gGte_translation_vector_993E54.y;
-    pMtx->t[2] = gGte_translation_vector_993E54.z;
+    pMtx->m = gte_rotation_matrix_993E40;
+    pMtx->t = gGte_translation_vector_993E54;
 }
 MGS_FUNC_IMPLEX(0x44AE10, Res_base_get_gte_rot_mtx_44AE10, KMD_IMPL);
 
 void CC Gte_set_rot_matrix_44ADE0(const MATRIX3x3* pMatrix)
 {
-    memcpy(&gte_rotation_matrix_993E40.m, pMatrix, sizeof(MATRIX3x3));
+    gte_rotation_matrix_993E40 = *pMatrix;
 }
 MGS_FUNC_IMPLEX(0x44ADE0, Gte_set_rot_matrix_44ADE0, KMD_IMPL);
 
@@ -813,25 +876,25 @@ void CC VectorMatrix_40B66B(const SVECTOR* pVec, int value, SVECTOR* pOutVec)
 {
     PSX_MATRIX mtx = {};
     RotMatrixYXZ_gte_44BD00(pVec, &mtx);
-    pOutVec->field_0_x = static_cast<short int>(value * mtx.m[0][2] / 4096);
-    pOutVec->field_2_y = static_cast<short int>(value * mtx.m[1][2] / 4096);
-    pOutVec->field_4_z = static_cast<short int>(value * mtx.m[2][2] / 4096);
+    pOutVec->field_0_x = static_cast<short int>(value * mtx.m.m[0][2] / 4096);
+    pOutVec->field_2_y = static_cast<short int>(value * mtx.m.m[1][2] / 4096);
+    pOutVec->field_4_z = static_cast<short int>(value * mtx.m.m[2][2] / 4096);
 }
 MGS_FUNC_IMPLEX(0x40B66B, VectorMatrix_40B66B, KMD_IMPL);
 
-void CC Vector_unknown_44B250(const VECTOR3* pVec1, const VECTOR3* pVec2, VECTOR3* pOut)
+void CC Vector_unknown_44B250(const VECTOR* pVec1, const VECTOR* pVec2, VECTOR* pOut)
 {
-    pOut->x = pVec1->y * pVec2->z - pVec2->y * pVec1->z;
-    pOut->y = pVec2->x * pVec1->z - pVec2->z * pVec1->x;
-    pOut->z = pVec2->y * pVec1->x - pVec1->y * pVec2->x;
+    pOut->field_0_x = pVec1->field_4_y * pVec2->field_8_z - pVec2->field_4_y * pVec1->field_8_z;
+    pOut->field_4_y = pVec2->field_0_x * pVec1->field_8_z - pVec2->field_8_z * pVec1->field_0_x;
+    pOut->field_8_z = pVec2->field_4_y * pVec1->field_0_x - pVec1->field_4_y * pVec2->field_0_x;
 }
 MGS_FUNC_IMPLEX(0x44B250, Vector_unknown_44B250, KMD_IMPL);
 
 void CC Gte_set_translation_vector_from_mtx_44AE60(const PSX_MATRIX* pMtx)
 {
-    gGte_translation_vector_993E54.x = pMtx->t[0];
-    gGte_translation_vector_993E54.y = pMtx->t[1];
-    gGte_translation_vector_993E54.z = pMtx->t[2];
+    gGte_translation_vector_993E54.field_0_x = pMtx->t.field_0_x;
+    gGte_translation_vector_993E54.field_4_y = pMtx->t.field_4_y;
+    gGte_translation_vector_993E54.field_8_z = pMtx->t.field_8_z;
 }
 MGS_FUNC_IMPLEX(0x44AE60, Gte_set_translation_vector_from_mtx_44AE60, KMD_IMPL);
 
@@ -849,19 +912,17 @@ MGS_FUNC_IMPLEX(0x44AEB0, Gte_set_light_colour_matrix_source_44AEB0, KMD_IMPL);
 
 void CC Gte_get_rot_matrix_and_trans_vec_407C0D(PSX_MATRIX* pMatrix)
 {
-    memcpy(&pMatrix->m, &gte_rotation_matrix_993E40.m, sizeof(PSX_MATRIX::m));
-    pMatrix->t[0] = gGte_translation_vector_993E54.x;
-    pMatrix->t[1] = gGte_translation_vector_993E54.y;
-    pMatrix->t[2] = gGte_translation_vector_993E54.z;
+    pMatrix->m = gte_rotation_matrix_993E40;
+    pMatrix->t = gGte_translation_vector_993E54;
 }
 MGS_FUNC_IMPLEX(0x407C0D, Gte_get_rot_matrix_and_trans_vec_407C0D, KMD_IMPL);
 
-void CC VectorSqr_40225C(const VECTOR3* pInVec, signed int value, SVECTOR* pResult)
+void CC VectorSqr_40225C(const VECTOR* pInVec, signed int value, SVECTOR* pResult)
 {
-    VECTOR3 sqrtVec = {};
+    VECTOR sqrtVec = {};
     Psx_gte_sqr0_44B030(pInVec, &sqrtVec);
 
-    __int64 squareRoot = j_sqrt(sqrtVec.x + sqrtVec.y + sqrtVec.z);
+    __int64 squareRoot = j_sqrt(sqrtVec.field_0_x + sqrtVec.field_4_y + sqrtVec.field_8_z);
     if (!squareRoot)
     {
         squareRoot = 1;
@@ -872,9 +933,9 @@ void CC VectorSqr_40225C(const VECTOR3* pInVec, signed int value, SVECTOR* pResu
     {
         calc = 0;
     }
-    pResult->field_0_x = static_cast<short int>(calc * (3072 * pInVec->x / squareRoot) / value);// 3072 fixed point of 0.75f
-    pResult->field_2_y = static_cast<short int>(calc * (3072 * pInVec->y / squareRoot) / value);
-    pResult->field_4_z = static_cast<short int>(calc * (3072 * pInVec->z / squareRoot) / value);
+    pResult->field_0_x = static_cast<short int>(calc * (3072 * pInVec->field_0_x / squareRoot) / value);// 3072 fixed point of 0.75f
+    pResult->field_2_y = static_cast<short int>(calc * (3072 * pInVec->field_4_y / squareRoot) / value);
+    pResult->field_4_z = static_cast<short int>(calc * (3072 * pInVec->field_8_z / squareRoot) / value);
 }
 MGS_FUNC_IMPLEX(0x40225C, VectorSqr_40225C, KMD_IMPL);
 
@@ -912,16 +973,16 @@ void CC Kmd_verts_unknown_443C39(const SVECTOR* pVerts, int vertCount, LightScra
         int halvesWrote = 0;
         for (int j = 0; j < lightCount; j++)
         {
-            VECTOR3 vec = {};
+            VECTOR vec = {};
             const int radius = pLightIter[j].field_A_radius;
-            vec.x = gGte_MAC1_993F24.MAC_32 - pLightIter[j].field_0_x;
-            if (!(vec.x < -radius || vec.x > radius))
+            vec.field_0_x = gGte_MAC1_993F24.MAC_32 - pLightIter[j].field_0_x;
+            if (!(vec.field_0_x < -radius || vec.field_0_x > radius))
             {
-                vec.y = gGte_MAC2_993F28.MAC_32 - pLightIter[j].field_2_y;
-                if (!(vec.y < -radius || vec.y > radius))
+                vec.field_4_y = gGte_MAC2_993F28.MAC_32 - pLightIter[j].field_2_y;
+                if (!(vec.field_4_y < -radius || vec.field_4_y > radius))
                 {
-                    vec.z = gGte_MAC3_993F2C.MAC_32 - pLightIter[j].field_4_z;
-                    if (!(vec.z < -radius || vec.z > radius))
+                    vec.field_8_z = gGte_MAC3_993F2C.MAC_32 - pLightIter[j].field_4_z;
+                    if (!(vec.field_8_z < -radius || vec.field_8_z > radius))
                     {
                         halvesWrote++;
                         if (halvesWrote == 2)
@@ -1009,9 +1070,9 @@ CVECTOR* CC PrimObjRelated_helper_443D4F(const kmdObject* pKmdObj, CVECTOR* pCol
             pScratch = &((LightScratch *)&gScratchPadMemory_991E40)[idx];
         }
 
-        gte_rotation_matrix_993E40.m[0][0] = gLightNormalVec_650128.m[0][0];
-        gte_rotation_matrix_993E40.m[0][1] = gLightNormalVec_650128.m[0][1];
-        gte_rotation_matrix_993E40.m[0][2] = gLightNormalVec_650128.m[0][2];
+        gte_rotation_matrix_993E40.m[0][0] = gLightNormalVec_650128.m.m[0][0];
+        gte_rotation_matrix_993E40.m[0][1] = gLightNormalVec_650128.m.m[0][1];
+        gte_rotation_matrix_993E40.m[0][2] = gLightNormalVec_650128.m.m[0][2];
 
         gte_rotation_matrix_993E40.m[1][0] = pScratch->vectors[0].field_0_x;
         gte_rotation_matrix_993E40.m[1][1] = pScratch->vectors[0].field_2_y;
@@ -1022,25 +1083,25 @@ CVECTOR* CC PrimObjRelated_helper_443D4F(const kmdObject* pKmdObj, CVECTOR* pCol
         gte_rotation_matrix_993E40.m[2][2] = pScratch->vectors[1].field_4_z;
 
 
-        gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][0];
-        gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][0];
-        gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][0];
+        gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m.m[0][0];
+        gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m.m[1][0];
+        gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m.m[2][0];
         Psx_gte_RT1_rtir_447480();
         gGte_light_source_matrix_993E60.m[0][0] = gGte_IR1_993EE4.IR_16;
         gGte_light_source_matrix_993E60.m[1][0] = gGte_IR2_993EE8.IR_16;
         gGte_light_source_matrix_993E60.m[2][0] = gGte_IR3_993EEC.IR_16;
 
-        gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][1];
-        gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][1];
-        gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][1];
+        gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m.m[0][1];
+        gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m.m[1][1];
+        gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m.m[2][1];
         Psx_gte_RT1_rtir_447480();
         gGte_light_source_matrix_993E60.m[0][1] = gGte_IR1_993EE4.IR_16;
         gGte_light_source_matrix_993E60.m[1][1] = gGte_IR2_993EE8.IR_16;
         gGte_light_source_matrix_993E60.m[2][1] = gGte_IR3_993EEC.IR_16;
 
-        gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m[0][2];
-        gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m[1][2];
-        gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m[2][2];
+        gGte_IR1_993EE4.IR_32 = pObj->field_0_matrix.m.m[0][2];
+        gGte_IR2_993EE8.IR_32 = pObj->field_0_matrix.m.m[1][2];
+        gGte_IR3_993EEC.IR_32 = pObj->field_0_matrix.m.m[2][2];
         Psx_gte_RT1_rtir_447480();
         gGte_light_source_matrix_993E60.m[0][2] = gGte_IR1_993EE4.IR_16;
         gGte_light_source_matrix_993E60.m[1][2] = gGte_IR2_993EE8.IR_16;
@@ -1092,7 +1153,7 @@ signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLight
     }
 
     const MATRIX3x3 rotMatrixBackup = gte_rotation_matrix_993E40;
-    const VECTOR3 translationVecBackup = gGte_translation_vector_993E54;
+    const VECTOR translationVecBackup = gGte_translation_vector_993E54;
 
     CVECTOR* pLightsBuffer = pMeshIter->field_44_light_colour_buffer;
     KmdHeader* pKmdFileData = pObj->field_24_pKmdFileData;
@@ -1102,10 +1163,10 @@ signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLight
         pMeshIter[i].field_44_light_colour_buffer = pLightsBuffer;
 
         // Real game always sets this.. although it seems it only needs doing once
-        memcpy(&gte_rotation_matrix_993E40.m, &pObj->field_0_matrix.m, sizeof(PSX_MATRIX::m));
-        gGte_translation_vector_993E54.x = pObj->field_0_matrix.t[0];
-        gGte_translation_vector_993E54.y = pObj->field_0_matrix.t[1];
-        gGte_translation_vector_993E54.z = pObj->field_0_matrix.t[2];
+        gte_rotation_matrix_993E40 = pObj->field_0_matrix.m;
+        gGte_translation_vector_993E54.field_0_x = pObj->field_0_matrix.t.field_0_x;
+        gGte_translation_vector_993E54.field_4_y = pObj->field_0_matrix.t.field_4_y;
+        gGte_translation_vector_993E54.field_8_z = pObj->field_0_matrix.t.field_8_z;
 
         Kmd_verts_unknown_443BEC(pKmd, pLights, lightCount);// put data in scratch
 

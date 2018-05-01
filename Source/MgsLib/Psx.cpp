@@ -478,13 +478,13 @@ MGS_ASSERT_SIZEOF(Unk_72270C, 0x30);
 
 
 MGS_VAR(1, 0x993E40, MATRIX3x3, gte_rotation_matrix_993E40, {});
-MGS_VAR(1, 0x993E54, VECTOR3, gGte_translation_vector_993E54, {});
+MGS_VAR(1, 0x993E54, VECTOR, gGte_translation_vector_993E54, {});
 
 MGS_VAR(1, 0x993E60, MATRIX3x3, gGte_light_source_matrix_993E60, {});
-MGS_VAR(1, 0x993E74, VECTOR3, gGte_background_colour_993E74, {});
+MGS_VAR(1, 0x993E74, VECTOR, gGte_background_colour_993E74, {});
 MGS_VAR(1, 0x993E80, MATRIX3x3, gGte_light_colour_matrix_source_993E80, {});
 
-MGS_VAR(1, 0x993E94, VECTOR3, gGte_far_colour_993E94, {});
+MGS_VAR(1, 0x993E94, VECTOR, gGte_far_colour_993E94, {});
 MGS_VAR(1, 0x993EA0, int, gGte_ScreenOffsetX_993EA0, 0);
 MGS_VAR(1, 0x993EA4, int, gGte_ScreenOffSetY_993EA4, 0);
 MGS_VAR(1, 0x993EA8, int, gGte_project_plane_distance_993EA8, 0);
@@ -597,7 +597,7 @@ void CC Psx_gte_rtps_445630()
         ((double)gte_rotation_matrix_993E40.m[2][2] * vz
             + (double)gte_rotation_matrix_993E40.m[2][1] * vy
             + (double)gte_rotation_matrix_993E40.m[2][0] * vx
-            + (double)gGte_translation_vector_993E54.z) / 4096.0;
+            + (double)gGte_translation_vector_993E54.field_8_z) / 4096.0;
 
     double scaled_project_plane_distance;
     if (matrix_2 >= (double)((unsigned __int16)gGte_project_plane_distance_993EA8 >> 1) / 4096.0)
@@ -613,13 +613,13 @@ void CC Psx_gte_rtps_445630()
           * (((double)gte_rotation_matrix_993E40.m[0][2] * vz
             + (double)gte_rotation_matrix_993E40.m[0][1] * vy
             + (double)gte_rotation_matrix_993E40.m[0][0] * vx
-            + (double)gGte_translation_vector_993E54.x) / 4096.0);
+            + (double)gGte_translation_vector_993E54.field_0_x) / 4096.0);
 
     double matrix_1 = scaled_project_plane_distance
           * (((double)gte_rotation_matrix_993E40.m[1][2] * vz
             + (double)gte_rotation_matrix_993E40.m[1][1] * vy
             + (double)gte_rotation_matrix_993E40.m[1][0] * vx
-            + (double)gGte_translation_vector_993E54.y) / 4096.0);
+            + (double)gGte_translation_vector_993E54.field_4_y) / 4096.0);
 
 
     matrix_0 = clamp(matrix_0, -1024.0, 1023.0);
@@ -678,9 +678,9 @@ void CC Psx_gte_rtpt_445990()
     vy[2] = (double)gGte_VXY2_993ED0.regs.VY / 4096.0;
     vz[2] = (double)gGte_VXY2_993ED0.regs.VZ / 4096.0;
 
-    const double gte_x = (double)gGte_translation_vector_993E54.x / 4096.0;
-    const double gte_y = (double)gGte_translation_vector_993E54.y / 4096.0;
-    const double gte_z = (double)gGte_translation_vector_993E54.z / 4096.0;
+    const double gte_x = (double)gGte_translation_vector_993E54.field_0_x / 4096.0;
+    const double gte_y = (double)gGte_translation_vector_993E54.field_4_y / 4096.0;
+    const double gte_z = (double)gGte_translation_vector_993E54.field_8_z / 4096.0;
 
     const double m_0_0 = (double)gte_rotation_matrix_993E40.m[0][0] / 4096.0;
     const double m_0_1 = (double)gte_rotation_matrix_993E40.m[0][1] / 4096.0;
@@ -818,21 +818,21 @@ void CC Psx_gte_nccs_445F20()
          ((double)gGte_light_colour_matrix_source_993E80.m[0][2] * light_source_matrix_2
         + (double)gGte_light_colour_matrix_source_993E80.m[0][1] * light_source_matrix_1
         + (double)gGte_light_colour_matrix_source_993E80.m[0][0] * light_source_matrix_0
-        + (double)gGte_background_colour_993E74.x) / 4096.0;
+        + (double)gGte_background_colour_993E74.field_0_x) / 4096.0;
     clamp(light_source_matrix_0, 0.0, 7.999);
 
     double light_colour_matrix_1 =
          ((double)gGte_light_colour_matrix_source_993E80.m[1][2] * light_source_matrix_2
         + (double)gGte_light_colour_matrix_source_993E80.m[1][1] * light_source_matrix_1
         + (double)gGte_light_colour_matrix_source_993E80.m[1][0] * light_source_matrix_0
-        + (double)gGte_background_colour_993E74.y) / 4096.0;
+        + (double)gGte_background_colour_993E74.field_4_y) / 4096.0;
     clamp(light_colour_matrix_1, 0.0, 7.999);
 
     double light_colour_matrix_2 =
          ((double)gGte_light_colour_matrix_source_993E80.m[2][2] * light_source_matrix_2
         + (double)gGte_light_colour_matrix_source_993E80.m[2][1] * light_source_matrix_1
         + (double)gGte_light_colour_matrix_source_993E80.m[2][0] * light_source_matrix_0
-        + (double)gGte_background_colour_993E74.z) / 4096.0;
+        + (double)gGte_background_colour_993E74.field_8_z) / 4096.0;
     clamp(light_colour_matrix_2, 0.0, 7.999);
 
     const double light_r = (double)gGte_light_colour_993ED8.r * light_colour_matrix_0 * 16.0;
@@ -873,9 +873,9 @@ void CC Psx_gte_dpcs_446530()
     double g = (double)gGte_light_colour_993ED8.g * 0.00390625;
     double b = (double)gGte_light_colour_993ED8.b * 0.00390625;
     double ir0 = (double)gGte_IR0_993EE0.IR_16 * 0.000244140625;
-    double z_r = (double)gGte_far_colour_993E94.x * 0.0625 - r;
-    double z_g = (double)gGte_far_colour_993E94.y * 0.0625 - g;
-    double z_b = (double)gGte_far_colour_993E94.z * 0.0625 - b;
+    double z_r = (double)gGte_far_colour_993E94.field_0_x * 0.0625 - r;
+    double z_g = (double)gGte_far_colour_993E94.field_4_y * 0.0625 - g;
+    double z_b = (double)gGte_far_colour_993E94.field_8_z * 0.0625 - b;
 
     if (z_r >= -7.999)
     {
@@ -1093,21 +1093,21 @@ void CC Psx_gte_ncs_446930()
           (double)gGte_light_colour_matrix_source_993E80.m[0][2] * light_matrix_2
         + (double)gGte_light_colour_matrix_source_993E80.m[0][1] * light_matrix_1
         + (double)gGte_light_colour_matrix_source_993E80.m[0][0] * light_matrix_0
-        + (double)gGte_background_colour_993E74.x)
+        + (double)gGte_background_colour_993E74.field_0_x)
         * 0.000244140625;
 
     double light_colour_matrix_2 = (
           (double)gGte_light_colour_matrix_source_993E80.m[1][2] * light_matrix_2
         + (double)gGte_light_colour_matrix_source_993E80.m[1][1] * light_matrix_1
         + (double)gGte_light_colour_matrix_source_993E80.m[1][0] * light_matrix_0
-        + (double)gGte_background_colour_993E74.y)
+        + (double)gGte_background_colour_993E74.field_4_y)
         * 0.000244140625;
 
     double light_colour_matrix_3 = (
           (double)gGte_light_colour_matrix_source_993E80.m[2][2] * light_matrix_2 
         + (double)gGte_light_colour_matrix_source_993E80.m[2][1] * light_matrix_1
         + (double)gGte_light_colour_matrix_source_993E80.m[2][0] * light_matrix_0
-        + (double)gGte_background_colour_993E74.z)
+        + (double)gGte_background_colour_993E74.field_8_z)
         * 0.000244140625;
 
     if (light_colour_matrix_1 < 0.0)
@@ -1208,9 +1208,9 @@ MGS_FUNC_IMPLEX(0x446930, Psx_gte_ncs_446930, IMPL_PSX);
 
 void CC Psx_gte_446E10()
 {
-    gGte_IR1_993EE4.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.x) + ((4096 - gGte_IR0_993EE0.IR_32) * gGte_IR1_993EE4.IR_32)) / 4096;
-    gGte_IR2_993EE8.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.y) + ((4096 - gGte_IR0_993EE0.IR_32) * gGte_IR2_993EE8.IR_32)) / 4096;
-    gGte_IR3_993EEC.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.z) + ((4096 - gGte_IR0_993EE0.IR_32) * gGte_IR3_993EEC.IR_32)) / 4096;
+    gGte_IR1_993EE4.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.field_0_x) + ((4096 - gGte_IR0_993EE0.IR_32) * gGte_IR1_993EE4.IR_32)) / 4096;
+    gGte_IR2_993EE8.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.field_4_y) + ((4096 - gGte_IR0_993EE0.IR_32) * gGte_IR2_993EE8.IR_32)) / 4096;
+    gGte_IR3_993EEC.IR_32 = ((gGte_IR0_993EE0.IR_32 * gGte_far_colour_993E94.field_8_z) + ((4096 - gGte_IR0_993EE0.IR_32) * gGte_IR3_993EEC.IR_32)) / 4096;
 }
 MGS_FUNC_IMPLEX(0x446E10, Psx_gte_446E10, true);
 
@@ -1256,16 +1256,16 @@ void CC Psx_gte_sqr0_446EE0()
 }
 MGS_FUNC_IMPLEX(0x446EE0, Psx_gte_sqr0_446EE0, IMPL_PSX);
 
-static inline void Psx_gte_regs_mult_matrix(const Regs_VXYZ& regs, const MATRIX3x3& matrix, const VECTOR3* translation = nullptr)
+static inline void Psx_gte_regs_mult_matrix(const Regs_VXYZ& regs, const MATRIX3x3& matrix, const VECTOR* translation = nullptr)
 {
     int v0 = (regs.VX * matrix.m[0][0] + regs.VY * matrix.m[0][1] + regs.VZ * matrix.m[0][2]) >> 12;
     int v1 = (regs.VX * matrix.m[1][0] + regs.VY * matrix.m[1][1] + regs.VZ * matrix.m[1][2]) >> 12;
     int v2 = (regs.VX * matrix.m[2][0] + regs.VY * matrix.m[2][1] + regs.VZ * matrix.m[2][2]) >> 12;
     if (translation)
     {
-        v0 += translation->x;
-        v1 += translation->y;
-        v2 += translation->z;
+        v0 += translation->field_0_x;
+        v1 += translation->field_4_y;
+        v2 += translation->field_8_z;
     }
 
     gGte_MAC1_993F24.MAC_32 = v0;
@@ -1404,9 +1404,9 @@ void CC Psx_gte_nct_449B30()
     double ls_mtx_2_1 = (double)gGte_light_source_matrix_993E60.m[2][1] * 0.000244140625;
     double ls_mtx_2_2 = (double)gGte_light_source_matrix_993E60.m[2][2] * 0.000244140625;
 
-    double background_colour_x = (double)gGte_background_colour_993E74.x * 0.000244140625;
-    double background_colour_y = (double)gGte_background_colour_993E74.y * 0.000244140625;
-    double background_colour_z = (double)gGte_background_colour_993E74.z * 0.000244140625;
+    double background_colour_x = (double)gGte_background_colour_993E74.field_0_x * 0.000244140625;
+    double background_colour_y = (double)gGte_background_colour_993E74.field_4_y * 0.000244140625;
+    double background_colour_z = (double)gGte_background_colour_993E74.field_8_z * 0.000244140625;
 
     double lc_mtx_0_0 = (double)gGte_light_colour_matrix_source_993E80.m[0][0] * 0.000244140625;
     double lc_mtx_0_1 = (double)gGte_light_colour_matrix_source_993E80.m[0][1] * 0.000244140625;
@@ -1789,20 +1789,15 @@ MGS_FUNC_IMPLEX(0x40771B, Matrix_transpose_40771B, IMPL_PSX);
 
 void CC PsxSetRotationAndTranslation_407A8F(const PSX_MATRIX* pMatrix)
 {
-    memcpy(gte_rotation_matrix_993E40.m, pMatrix->m, sizeof(PSX_MATRIX::m));
-    gGte_translation_vector_993E54.x = pMatrix->t[0];
-    gGte_translation_vector_993E54.y = pMatrix->t[1];
-    gGte_translation_vector_993E54.z = pMatrix->t[2];
+    gte_rotation_matrix_993E40 = pMatrix->m;
+    gGte_translation_vector_993E54 = pMatrix->t;
 }
 MGS_FUNC_IMPLEX(0x407A8F, PsxSetRotationAndTranslation_407A8F, IMPL_PSX);
 
 void CC PsxGetRotationAndTranslation_407BC1(PSX_MATRIX* pMatrix)
 {
-    memcpy(&pMatrix->m, gte_rotation_matrix_993E40.m, sizeof(MATRIX3x3));
-
-    pMatrix->t[0] = gGte_translation_vector_993E54.x;
-    pMatrix->t[1] = gGte_translation_vector_993E54.y;
-    pMatrix->t[2] = gGte_translation_vector_993E54.z;
+    pMatrix->m = gte_rotation_matrix_993E40;
+    pMatrix->t = gGte_translation_vector_993E54;
 }
 MGS_FUNC_IMPLEX(0x407BC1, PsxGetRotationAndTranslation_407BC1, IMPL_PSX);
 
@@ -1829,15 +1824,15 @@ void CC MatrixXVectorFixed_44B320(const MATRIX3x3* pMatrix, const VECTOR* pInVec
 }
 MGS_FUNC_IMPLEX(0x44B320, MatrixXVectorFixed_44B320, IMPL_PSX);
 
-void CC Psx_gte_sqr0_44B030(const VECTOR3* pIn, VECTOR3* pOut)
+void CC Psx_gte_sqr0_44B030(const VECTOR* pIn, VECTOR* pOut)
 {
-    gGte_IR1_993EE4.IR_32 = pIn->x;
-    gGte_IR2_993EE8.IR_32 = pIn->y;
-    gGte_IR3_993EEC.IR_32 = pIn->z;
+    gGte_IR1_993EE4.IR_32 = pIn->field_0_x;
+    gGte_IR2_993EE8.IR_32 = pIn->field_4_y;
+    gGte_IR3_993EEC.IR_32 = pIn->field_8_z;
     Psx_gte_sqr0_446EE0();
-    pOut->x = gGte_MAC1_993F24.MAC_32;
-    pOut->y = gGte_MAC2_993F28.MAC_32;
-    pOut->z = gGte_MAC3_993F2C.MAC_32;
+    pOut->field_0_x = gGte_MAC1_993F24.MAC_32;
+    pOut->field_4_y = gGte_MAC2_993F28.MAC_32;
+    pOut->field_8_z = gGte_MAC3_993F2C.MAC_32;
 }
 MGS_FUNC_IMPLEX(0x44B030, Psx_gte_sqr0_44B030, IMPL_PSX);
 

@@ -892,11 +892,11 @@ MGS_FUNC_IMPLEX(0x451B0E, Script_tbl_start_sub_451B0E, SCRIPT_IMPL);
 
 const PSX_MATRIX gLightNormalVec_650128_tmp = 
 { 
-    { 
+    { {
         { 0, 0, 4096 },
         { 0, 0, 0 },
         { 0, 0, 0 }
-    },
+    }},
     0,
     { 0, 0, 0 }
 };
@@ -912,9 +912,9 @@ void CC Script_light_vec_402144(int x, int y, int z)
 
     VECTOR vec1Normal = {};
     VectorNormal_44CAE0(&vec1, &vec1Normal);
-    gLightNormalVec_650128.m[0][0] = static_cast<short int>(vec1Normal.field_0_x);
-    gLightNormalVec_650128.m[0][1] = static_cast<short int>(vec1Normal.field_4_y);
-    gLightNormalVec_650128.m[0][2] = static_cast<short int>(vec1Normal.field_8_z);
+    gLightNormalVec_650128.m.m[0][0] = static_cast<short int>(vec1Normal.field_0_x);
+    gLightNormalVec_650128.m.m[0][1] = static_cast<short int>(vec1Normal.field_4_y);
+    gLightNormalVec_650128.m.m[0][2] = static_cast<short int>(vec1Normal.field_8_z);
 }
 MGS_FUNC_IMPLEX(0x00402144, Script_light_vec_402144, SCRIPT_IMPL);
 
@@ -951,9 +951,9 @@ void CC LightSettingsRelated_4020F5(int r, int g, int b)
     light_r_word_6BEE70 = static_cast<WORD>(r);
     light_g_word_6BEE72 = static_cast<WORD>(g);
     light_b_word_6BEE74 = static_cast<WORD>(b);
-    gGte_background_colour_993E74.x = 16 * r;
-    gGte_background_colour_993E74.y = 16 * g;
-    gGte_background_colour_993E74.z = 16 * b;
+    gGte_background_colour_993E74.field_0_x = 16 * r;
+    gGte_background_colour_993E74.field_4_y = 16 * g;
+    gGte_background_colour_993E74.field_8_z = 16 * b;
     light_opaque_colour_650168 = { 255, 255, 255, 0x3C };
     light_transparent_colour_65016C = { 255, 255, 255, 0x3E };
 }

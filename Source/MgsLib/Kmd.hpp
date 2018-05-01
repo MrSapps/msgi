@@ -107,7 +107,7 @@ MGS_ASSERT_SIZEOF(Prim_Union, 0x54);
 
 struct struc_kmd_14
 {
-    VECTOR3 v;
+    VECTOR v;
 };
 
 struct struc_kmd
