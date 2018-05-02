@@ -359,10 +359,10 @@ void CC Gv3StructsInit_4012F2(int k320)
     dg_dword_6BBD5C_k320 = k320;
     gLibGvStruct0_6BC180.mOrderingTables[0] = (BYTE*)ot_gv0_0_6BCB44;// ot start?
     gLibGvStruct0_6BC180.mOrderingTables[1] = (BYTE*)ot_gv0_1_6BCBC8;// also part of ot?
-    gLibGvStruct0_6BC180.gPrimQueue2_word_6BC3C0_256 = 8;
-    gLibGvStruct0_6BC180.g_PrimQueue1_word_6BC3BE_256 = 8;
-    gLibGvStruct0_6BC180.gObjectQueue_word_6BC3C2_0 = 0;
-    gLibGvStruct0_6BC180.gObjects_dword_6BC3C4 = dg_dword_6BBD60_prim_ptrs;// Might be 8 instead of 256?
+    gLibGvStruct0_6BC180.mFreePrimCount = 8;
+    gLibGvStruct0_6BC180.mTotalQueueSize = 8;
+    gLibGvStruct0_6BC180.mTotalObjectCount = 0;
+    gLibGvStruct0_6BC180.mQueue = dg_dword_6BBD60_prim_ptrs;// Might be 8 instead of 256?
     gLibGvStruct0_6BC180.word_6BC374_8 = 5;
     gLibGvStruct0_6BC180.word_6BC378_1 = 1;
     gLibGvStruct0_6BC180.word_6BC37A_0_1EC_size = 0;// used in other func
@@ -386,10 +386,10 @@ void CC Gv3StructsInit_4012F2(int k320)
 
     gLibGVStruct1_6BC36C.mOrderingTables[0] = (BYTE*)&ot_gv1_0_6BD04C[0];
     gLibGVStruct1_6BC36C.mOrderingTables[1] = (BYTE*)&ot_gv1_1_6BD450[0];
-    gLibGVStruct1_6BC36C.gPrimQueue2_word_6BC3C0_256 = 256;
-    gLibGVStruct1_6BC36C.g_PrimQueue1_word_6BC3BE_256 = 256;
-    gLibGVStruct1_6BC36C.gObjectQueue_word_6BC3C2_0 = 0;
-    gLibGVStruct1_6BC36C.gObjects_dword_6BC3C4 = dg_dword_6BB95C_prim_ptrs;
+    gLibGVStruct1_6BC36C.mFreePrimCount = 256;
+    gLibGVStruct1_6BC36C.mTotalQueueSize = 256;
+    gLibGVStruct1_6BC36C.mTotalObjectCount = 0;
+    gLibGVStruct1_6BC36C.mQueue = dg_dword_6BB95C_prim_ptrs;
     gLibGVStruct1_6BC36C.word_6BC374_8 = 8;
     gLibGVStruct1_6BC36C.word_6BC376_16 = 16;
     gLibGVStruct1_6BC36C.word_6BC378_1 = 1;
@@ -417,10 +417,10 @@ void CC Gv3StructsInit_4012F2(int k320)
 
     gLibGvStruct2_6BC558.mOrderingTables[0] = (BYTE*)&ot_gv2_0_6BDC54[0];
     gLibGvStruct2_6BC558.mOrderingTables[1] = (BYTE*)&ot_gv2_1_6BDC5C[0];
-    gLibGvStruct2_6BC558.gPrimQueue2_word_6BC3C0_256 = 0;
-    gLibGvStruct2_6BC558.g_PrimQueue1_word_6BC3BE_256 = 0;
-    gLibGvStruct2_6BC558.gObjectQueue_word_6BC3C2_0 = 0;
-    gLibGvStruct2_6BC558.gObjects_dword_6BC3C4 = 0;
+    gLibGvStruct2_6BC558.mFreePrimCount = 0;
+    gLibGvStruct2_6BC558.mTotalQueueSize = 0;
+    gLibGvStruct2_6BC558.mTotalObjectCount = 0;
+    gLibGvStruct2_6BC558.mQueue = 0;
     gLibGvStruct2_6BC558.word_6BC374_8 = 0;
     gLibGvStruct2_6BC558.word_6BC376_16 = 8;
     gLibGvStruct2_6BC558.word_6BC378_1 = 1;
@@ -618,10 +618,10 @@ void CC LibDG_4010A6()
     jImageMove_401A31();
     LibDG_40B9FF(); // Just sets var 6C0644 = 0
     LibDG_SetRGB_401931(0, 0, 0);
-    printf("Object Queue %d\n", gLibGVStruct1_6BC36C.gObjectQueue_word_6BC3C2_0);
-    printf("Primitive Queue %d\n", gLibGVStruct1_6BC36C.g_PrimQueue1_word_6BC3BE_256 - gLibGVStruct1_6BC36C.gPrimQueue2_word_6BC3C0_256);
-    gLibGVStruct1_6BC36C.gObjectQueue_word_6BC3C2_0 = 0;
-    gLibGVStruct1_6BC36C.gPrimQueue2_word_6BC3C0_256 = gLibGVStruct1_6BC36C.g_PrimQueue1_word_6BC3BE_256;
+    printf("Object Queue %d\n", gLibGVStruct1_6BC36C.mTotalObjectCount);
+    printf("Primitive Queue %d\n", gLibGVStruct1_6BC36C.mTotalQueueSize - gLibGVStruct1_6BC36C.mFreePrimCount);
+    gLibGVStruct1_6BC36C.mTotalObjectCount = 0;
+    gLibGVStruct1_6BC36C.mFreePrimCount = gLibGVStruct1_6BC36C.mTotalQueueSize;
 }
 MGS_FUNC_IMPLEX(0x4010A6, LibDG_4010A6, LIBDG_IMPL);
 
@@ -1282,9 +1282,9 @@ void CC LibGV_Helper_4065AA(struct_gv* pGv, int activeBuffer)
 {
     if (game_state_dword_72279C.mParts.flags0 & 8)
     {
-        for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
+        for (int i = 0; i < pGv->mTotalObjectCount; i++)
         {
-            Prim_unknown_0x48* pObj = &pGv->gObjects_dword_6BC3C4[i]->prim_48;
+            Prim_unknown_0x48* pObj = &pGv->mQueue[i]->prim_48;
             if (pObj->field_28_flags_or_type & 0x200)
             {
                 if (pObj->field_32)
@@ -1303,9 +1303,9 @@ void CC LibGV_Helper_4065AA(struct_gv* pGv, int activeBuffer)
     }
     else
     {
-        for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
+        for (int i = 0; i < pGv->mTotalObjectCount; i++)
         {
-            Prim_unknown_0x48* pObj = &pGv->gObjects_dword_6BC3C4[i]->prim_48;
+            Prim_unknown_0x48* pObj = &pGv->mQueue[i]->prim_48;
             if (pObj->field_28_flags_or_type & 0x200)
             {
                 if (pObj->field_32)
@@ -1386,9 +1386,9 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
 
     Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
 
-    for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
+    for (int i = 0; i < pGv->mTotalObjectCount; i++)
     {
-        Prim_Union* pObject = pGv->gObjects_dword_6BC3C4[i];
+        Prim_Union* pObject = pGv->mQueue[i];
         Prim_unknown_0x48* pObj48 = &pObject->prim_48;
 
         signed int unknownArg3 = 0;
@@ -1775,10 +1775,10 @@ MGS_FUNC_NOT_IMPL(0x4053D1, void __cdecl (Prim_Mesh_0x5C *pMesh, int activeBuffe
 
 void CC LibGV_lights_405180(struct_gv* pGv, int activeBuffer)
 {
-    Prim_Union** pObjects = pGv->gObjects_dword_6BC3C4;
-    if (pGv->gObjectQueue_word_6BC3C2_0 > 0)
+    Prim_Union** pObjects = pGv->mQueue;
+    if (pGv->mTotalObjectCount > 0)
     {
-        int numObjects = pGv->gObjectQueue_word_6BC3C2_0;
+        int numObjects = pGv->mTotalObjectCount;
         do
         {
             Prim_Union* pObject = *pObjects;
@@ -1995,8 +1995,8 @@ static void Test_LibGV_prim_buffer_init_polyGT4s_40738D()
 
 void CC LibGV_406168(struct_gv* pGv, int activeBuffer)
 {
-    Prim_Union** ppObjects = pGv->gObjects_dword_6BC3C4;
-    for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
+    Prim_Union** ppObjects = pGv->mQueue;
+    for (int i = 0; i < pGv->mTotalObjectCount; i++)
     {
         Prim_unknown_0x48* pObject = &ppObjects[i]->prim_48;
         if (pObject->field_32)
@@ -2047,9 +2047,9 @@ void CC LibGV_405668(struct_gv* pGv, int activeBuffer)
 
     ScratchPad_405668* pScratch = (ScratchPad_405668*)&gScratchPadMemory_991E40;
 
-    for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
+    for (int i = 0; i < pGv->mTotalObjectCount; i++)
     {
-        Prim_unknown_0x48* pObject = &pGv->gObjects_dword_6BC3C4[i]->prim_48;
+        Prim_unknown_0x48* pObject = &pGv->mQueue[i]->prim_48;
         if (pObject->field_32)
         {
             const unsigned int bFlag5 = (~pObject->field_28_flags_or_type >> 5) & 1;
@@ -2450,12 +2450,12 @@ MGS_FUNC_IMPLEX(0x404DBA, LibGV_404DBA, LIBDG_IMPL);
 
 void CC LibGV_4041A5(struct_gv* pGv, int activeBuffer)
 {
-    if (pGv->g_PrimQueue1_word_6BC3BE_256 != pGv->gPrimQueue2_word_6BC3C0_256)
+    if (pGv->mTotalQueueSize != pGv->mFreePrimCount)
     {
         Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
-        Prim_Union** ppObjs = &pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256];
+        Prim_Union** ppObjs = &pGv->mQueue[pGv->mFreePrimCount];
         const unsigned __int16 primTypeMask = dword_78D32C;
-        const int counter = pGv->g_PrimQueue1_word_6BC3BE_256 - pGv->gPrimQueue2_word_6BC3C0_256;
+        const int counter = pGv->mTotalQueueSize - pGv->mFreePrimCount;
         for (int i = 0; i < counter; i++)
         {
             Prim_unknown_0x54* pObj = &ppObjs[i]->prim_54;
@@ -2528,8 +2528,8 @@ MGS_FUNC_IMPLEX(0x40744A, MarkObjectVoided_40744A, LIBDG_IMPL);
 void CC MarkObjectQueueVoid_4018E0()
 {
     gLibDG_ExecPtrs_6BECE8 = 1;
-    Prim_Union** pObj = gLibGVStruct1_6BC36C.gObjects_dword_6BC3C4;
-    for (int i = 0; i < gLibGVStruct1_6BC36C.gObjectQueue_word_6BC3C2_0; i++)
+    Prim_Union** pObj = gLibGVStruct1_6BC36C.mQueue;
+    for (int i = 0; i < gLibGVStruct1_6BC36C.mTotalObjectCount; i++)
     {
         MarkObjectVoided_40744A(&pObj[i]->prim_48, 0);
         MarkObjectVoided_40744A(&pObj[i]->prim_48, 1);
@@ -2565,9 +2565,9 @@ void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
     gScratchPadMemory_991E40.field_2_Matrix.mtx[0] = pGv->field_10_matrix;
     sub_401D64(&gScratchPadMemory_991E40.field_2_Matrix.mtx[0]);
 
-    for (int i = 0; i < pGv->gObjectQueue_word_6BC3C2_0; i++)
+    for (int i = 0; i < pGv->mTotalObjectCount; i++)
     {
-        Prim_Union* pObj = pGv->gObjects_dword_6BC3C4[i];
+        Prim_Union* pObj = pGv->mQueue[i];
         LibGV_4066ED(pObj);
     }
 }
@@ -2640,10 +2640,10 @@ void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
 
     DWORD pMtx = dword_78D32C & 0xFFFF;
 
-    const int primCount = pGv->g_PrimQueue1_word_6BC3BE_256 - pGv->gPrimQueue2_word_6BC3C0_256;
+    const int primCount = pGv->mTotalQueueSize - pGv->gPrimQueue2_word_6BC3C0_256;
     for (int i = 0; i < primCount; i++)
     {
-        Prim_unknown* p = pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
+        Prim_unknown* p = pGv->mQueue[pGv->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
         if (!(BYTE1(p->field_24_maybe_flags) & 1) && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & pMtx))
         {
             gMatrix_dword_991E40[2] = p->field_2E_w_or_h;

@@ -163,25 +163,59 @@ signed int CC PrimAdd_401805(Prim_Union* pPrimBuffer)
 {
     assert(pPrimBuffer->prim_54.field_2C_gv_index == 0);
     struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrimBuffer->prim_54.field_2C_gv_index; // Always 0?
-    if (pGv->gPrimQueue2_word_6BC3C0_256 > pGv->gObjectQueue_word_6BC3C2_0)
+    if (pGv->mFreePrimCount > pGv->mTotalObjectCount)
     {
-        pGv->gObjects_dword_6BC3C4[pGv->gPrimQueue2_word_6BC3C0_256 - 1] = pPrimBuffer; // PrimObject = Prim_unknown + extra ??
-        pGv->gPrimQueue2_word_6BC3C0_256--;
+        pGv->mQueue[pGv->mFreePrimCount - 1] = pPrimBuffer;
+        pGv->mFreePrimCount--;
         return 0;
     }
     return -1;
 }
 MGS_FUNC_IMPLEX(0x401805, PrimAdd_401805, KMD_IMPL);
 
+void CC Prim_Remove_401839(Prim_unknown_0x54* pPrimUnknown)
+{
+    assert(pPrimUnknown->field_2C_gv_index == 0);
+    struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrimUnknown->field_2C_gv_index;
+    const int queueSize = pGv->mTotalQueueSize;
+    const int primcount = pGv->mFreePrimCount;
+    const int primsUsed = queueSize - primcount;
+    Prim_Union** pPrimIter = &pGv->mQueue[queueSize];
+    for (int i = primsUsed; i > 0; --i)
+    {
+        pPrimIter--;
+
+        // Is it the item to remove?
+        if (&(*pPrimIter)->prim_54 == pPrimUnknown)
+        {
+            // Move everything "up" by 1 to remove the item
+            int remainderCount = i - 1;
+            if (remainderCount > 0)
+            {
+                do
+                {
+                    *pPrimIter = *(pPrimIter - 1);
+                    --remainderCount;
+                    --pPrimIter;
+                } while (remainderCount);
+            }
+            pGv->mFreePrimCount++;
+            return;
+        }
+
+    }
+}
+MGS_FUNC_IMPLEX(0x401839, Prim_Remove_401839, true);
+
 int CC Object_Add_40178F(Prim_Union* pPrim)
 {
     assert(pPrim->prim_48.field_30_size == 0);
     struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrim->prim_48.field_30_size;
-    if (pGv->gObjectQueue_word_6BC3C2_0 >= pGv->gPrimQueue2_word_6BC3C0_256)
+    if (pGv->mTotalObjectCount >= pGv->mFreePrimCount)
     {
         return -1;
     }
-    pGv->gObjects_dword_6BC3C4[pGv->gObjectQueue_word_6BC3C2_0++] = pPrim;
+    pGv->mQueue[pGv->mTotalObjectCount++] = pPrim;
     return 0;
 }
 MGS_FUNC_IMPLEX(0x40178F, Object_Add_40178F, KMD_IMPL);
@@ -1382,11 +1416,11 @@ MGS_FUNC_IMPLEX(0x443FAF, Kmd_TotalLightSizeInBytes_443FAF, BOXKERI_IMPL);
 void CC Object_Remove_4017C3(Prim_unknown_0x48* pPrim)
 {
     struct_gv* pGv = &gLibGVStruct1_6BC36C + pPrim->field_30_size;
-    int used = pGv->gObjectQueue_word_6BC3C2_0;
+    int used = pGv->mTotalObjectCount;
     if (used > 0)
     {
         // Find position in the array
-        Prim_unknown_0x48** ppPrimIter = (Prim_unknown_0x48**)pGv->gObjects_dword_6BC3C4;
+        Prim_unknown_0x48** ppPrimIter = (Prim_unknown_0x48**)pGv->mQueue;
         int locationOfItemToRemove = used;
         while (*ppPrimIter != pPrim)
         {
@@ -1404,7 +1438,7 @@ void CC Object_Remove_4017C3(Prim_unknown_0x48* pPrim)
             // Overwrite the old item with everything after it up to the new count
             memcpy(ppPrimIter, ppPrimIter + 1, sizeof(Prim_unknown_0x48*) * newCount);
         }
-        pGv->gObjectQueue_word_6BC3C2_0 = static_cast<s16>(used - 1);
+        pGv->mTotalObjectCount = static_cast<s16>(used - 1);
     }
 }
 MGS_FUNC_IMPLEX(0x4017C3, Object_Remove_4017C3, BOXKERI_IMPL);

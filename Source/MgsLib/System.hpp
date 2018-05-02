@@ -53,6 +53,7 @@ void CC System_HouseKeeping_40ACB2(int idx);
 void CC System_2_free_40B2A7(void* pAlloc);
 void* CC System_2_zerod_allocate_memory_40B296(int size);
 void CC System_VoidAllocation_40B187(int idx, void** pMem);
+void CC Safe_System_2_VoidAllocation_40513B(void *ptr);
 
 template<class T>
 T* CC System_2_zerod_allocate_memory_40B296_T()

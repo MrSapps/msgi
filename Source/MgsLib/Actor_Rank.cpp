@@ -1032,9 +1032,6 @@ MGS_FUNC_IMPLEX(0x46EC75, Rank_update_46EC75, ACTOR_RANK_IMPL);
 
 void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-
-    /*
     if (pRank->field_24_ptr_16_prims)
     {
         Prim_Remove_401839(pRank->field_24_ptr_16_prims);
@@ -1049,11 +1046,10 @@ void CC Res_rank_shutdown_474D08(Actor_Rank* pRank)
 
     for (int i = 0; i < 1; ++i)
     {
-        System_Free_40B099(2, Font_get_alloc_474D8D(&pRank->field_4B8_font[i]));
+        System_Free_40B099(2, Font_Get_Palette_474D8D(&pRank->field_4B8_font[i]));
     }
-    */
 }
-MGS_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, false) // TODO
+MGS_FUNC_IMPLEX(0x474D08, Res_rank_shutdown_474D08, ACTOR_RANK_IMPL);
 
 MGS_VAR_EXTERN(u32, mapChangeFlagsOrScriptBinds_9942A0); // From Actor
 
