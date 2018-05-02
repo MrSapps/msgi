@@ -48,6 +48,24 @@ system_struct* CC System_init_40AC6C(int index, int bIsDynamic, void* pMemory, i
 }
 MGS_FUNC_IMPLEX(0x40AC6C, System_init_40AC6C, SYSTEM_IMPL);
 
+system_struct* CC System_Get_Max_Allocatable_Element_Count_4036A7(int index, DWORD* maxAllocatableElements, unsigned int elementSizeInBytes)
+{
+    int totalElementCount = 0;  
+    LibGV_MemoryAllocation* pAllocIter = gSystems_dword_78E980[index].mAllocs;
+    for (DWORD i = 0; i < gSystems_dword_78E980[index].mUnitsCount; i++)
+    {
+        if (!pAllocIter->mAllocType)
+        {
+            totalElementCount += (pAllocIter[1].mPDataStart - pAllocIter->mPDataStart) / elementSizeInBytes;
+        }
+        ++pAllocIter;
+    }
+
+    *maxAllocatableElements = totalElementCount;
+    return &gSystems_dword_78E980[index];
+}
+MGS_FUNC_IMPLEX(0x4036A7, System_Get_Max_Allocatable_Element_Count_4036A7, SYSTEM_IMPL);
+
 void CC System_DeInit_Systems_0_to_2_sub_40AC52()
 {
     for (int i = 0; i < 3; i++)
