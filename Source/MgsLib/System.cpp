@@ -66,6 +66,41 @@ system_struct* CC System_Get_Max_Allocatable_Element_Count_4036A7(int index, DWO
 }
 MGS_FUNC_IMPLEX(0x4036A7, System_Get_Max_Allocatable_Element_Count_4036A7, SYSTEM_IMPL);
 
+BYTE* CC System_allocate_with_hint_4036ED(system_struct* pSystem, LibGV_MemoryAllocation** pAllocated, DWORD* pAllocatedSizeBytes)
+{
+    LibGV_MemoryAllocation* pAlloc = nullptr;
+
+    if (*pAllocated)
+    {
+        // Use after the passed in alloc
+        pAlloc = (*pAllocated) + 1;
+    }
+    else
+    {
+        // Start from the first alloc
+        pAlloc = pSystem->mAllocs;
+    }
+
+    char* startPtr = reinterpret_cast<char*>(pAlloc);
+    char* endPtr = reinterpret_cast<char*>(pSystem);
+
+    const int totalUnitsCount = pSystem->mUnitsCount - ((startPtr - endPtr - offsetof(system_struct, mUnitsCount)) / sizeof(LibGV_MemoryAllocation));
+    for (int i=0; i<totalUnitsCount; i++)
+    {
+        if (!pAlloc[i].mAllocType)
+        {
+            // Update the allocation pointer, the size and return the raw allocation pointer
+            *pAllocated = &pAlloc[i];
+            *pAllocatedSizeBytes = pAlloc[i+1].mPDataStart - pAlloc[i].mPDataStart;
+            return pAlloc[i].mPDataStart;
+        }
+    }
+
+    // Alloc failure
+    *pAllocatedSizeBytes = 0;
+    return nullptr;
+}
+
 void CC System_DeInit_Systems_0_to_2_sub_40AC52()
 {
     for (int i = 0; i < 3; i++)
