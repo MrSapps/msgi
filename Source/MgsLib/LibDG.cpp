@@ -642,60 +642,63 @@ void CC LibGvInitDispEnv_401A4F(int ClipX1, __int16 clipY1, __int16 clipX2, __in
 }
 MGS_FUNC_IMPLEX(0x401A4F, LibGvInitDispEnv_401A4F, LIBDG_IMPL);
 
-const char k0132_byte_650174[4] = { 0, 1, 3, 2 };
+// kVertexIndexingOrder_650174 provides the indexing order for referencing the transformed vertex sections
+const char kVertexIndexingOrder_650174[4] = { 0, 1, 3, 2 };
+// kVertexIndexingOffsets provides the offsets to the transformed vertex sections based on the indexing order
+const char kVertexIndexingOffsets[4] = { offsetof(POLY_GT4, x0), offsetof(POLY_GT4, x1), offsetof(POLY_GT4, x3), offsetof(POLY_GT4, x2) };
 
-void CC GV_kmd_zmd_file_handler_helper_4028C1(kmdObject* pKmdObj, kmdObject* pParentObj);
-MGS_FUNC_IMPLEX(0x4028C1, GV_kmd_zmd_file_handler_helper_4028C1, LIBDG_IMPL); // TODO
-
-
-void CC GV_kmd_zmd_file_handler_helper_4028C1(kmdObject* pKmdObj, kmdObject* pParentObj)
+void CC GV_kmd_link_vertices_to_parent_4028C1(kmdObject* pKmdObj, kmdObject* pParentObj)
 {
     unsigned int indexFlags = 0;
-    BYTE* vertexIndices = pKmdObj->indexOfs_3C;
-    for (int i = pKmdObj->field_4_numFaces * 4; i > 0; --i, ++vertexIndices)
+    for (int i = 0; i < pKmdObj->field_4_numFaces * 4; ++i)
     {
-        const SVECTOR& vertexData = pKmdObj->vertOfs_38[*vertexIndices];
+        const SVECTOR& vertexData = pKmdObj->vertOfs_38[pKmdObj->indexOfs_3C[i]];
         const unsigned short linkedVertexIndex = vertexData.field_6_padding;
 
-        if (0xFFFF == linkedVertexIndex)
+        if (linkedVertexIndex == 0xFFFF)
+        {
             continue;
+        }
 
-        indexFlags |= *vertexIndices;
-        *vertexIndices |= 0x80;
+        indexFlags |= pKmdObj->indexOfs_3C[i];
+        pKmdObj->indexOfs_3C[i] |= 0x80;
     }
 
     // determine whether vertex index data has already been processed
     const bool processed = (0x80 & indexFlags) != 0;
 
     if (processed)
-        return;
-
-    SVECTOR* vertexData = pKmdObj->vertOfs_38;
-    for (int i = pKmdObj->numVerts_34; i > 0; --i, ++vertexData)
     {
-        const unsigned short linkedVertexIndex = vertexData->field_6_padding;
+        return;
+    }
 
-        if (0xFFFF == linkedVertexIndex)
-            continue;
+    for (int i = 0; i < pKmdObj->numVerts_34; ++i)
+    {
+        const unsigned short linkedVertexIndex = pKmdObj->vertOfs_38[i].field_6_padding;
 
-        const BYTE* parentVertexIndices = pParentObj->indexOfs_3C;
-        for (int j = pParentObj->field_4_numFaces * 4; j > 0; --j, ++parentVertexIndices)
+        if (linkedVertexIndex == 0xFFFF)
         {
-            if ((*parentVertexIndices & 0x7F) == linkedVertexIndex)
-                break;
+            continue;
         }
 
-        const int offset = (parentVertexIndices - pParentObj->indexOfs_3C);
-        const int faceIndex = offset / 4;
-        const int faceVertexIndex = offset % 4;
+        // find first usage of linked vertex index in parent
+        int j = 0;
+        for (; j < pParentObj->field_4_numFaces * 4; ++j)
+        {
+            if ((pParentObj->indexOfs_3C[j] & 0x7F) == linkedVertexIndex)
+            {
+                break;
+            }
+        }
+
+        const int faceIndex = j / 4;
+        const int faceVertexIndex = j % 4;
 
         // compute offset of linked poly data
-        // 0xC == size of each transformed vertex section (rgb, code/p, xy, uv, clut/tpage/pad) within POLY_GT4
-        // 0x8 == start offset to xy data of first transformed vertex section within POLY_GT4
-        // k0132_byte_650174 provides the indexing order for referencing the transformed vertex sections
-        vertexData->field_6_padding = (sizeof(POLY_GT4) * faceIndex) + (0xC * k0132_byte_650174[faceVertexIndex]) + 8;
+        pKmdObj->vertOfs_38[i].field_6_padding = (sizeof(POLY_GT4) * faceIndex) + kVertexIndexingOffsets[faceVertexIndex];
     }
 }
+MGS_FUNC_IMPLEX(0x4028C1, GV_kmd_link_vertices_to_parent_4028C1, LIBDG_IMPL);
 
 int CC GV_kmd_file_handler_402796(void* fileData, TFileNameHash /*fileNameHash*/)
 {
@@ -735,7 +738,7 @@ int CC GV_kmd_file_handler_402796(void* fileData, TFileNameHash /*fileNameHash*/
 
         if (pKmdObj->mRef_2C_parentObjIndex >= 0)
         {
-            GV_kmd_zmd_file_handler_helper_4028C1(pKmdObj, &DataAfterStructure<kmdObject*>(pFileBuffer)[pKmdObj->mRef_2C_parentObjIndex]);
+            GV_kmd_link_vertices_to_parent_4028C1(pKmdObj, &DataAfterStructure<kmdObject*>(pFileBuffer)[pKmdObj->mRef_2C_parentObjIndex]);
         }
     }
     return 1;
