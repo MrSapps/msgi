@@ -100,6 +100,7 @@ BYTE* CC System_allocate_with_hint_4036ED(system_struct* pSystem, LibGV_MemoryAl
     *pAllocatedSizeBytes = 0;
     return nullptr;
 }
+MGS_FUNC_IMPLEX(0x4036ED, System_allocate_with_hint_4036ED, SYSTEM_IMPL);
 
 void CC System_DeInit_Systems_0_to_2_sub_40AC52()
 {

@@ -2511,6 +2511,41 @@ void CC LibGV_4041A5(struct_gv* pGv, int activeBuffer)
 }
 MGS_FUNC_IMPLEX(0x4041A5, LibGV_4041A5, LIBDG_IMPL);
 
+struct ScratchPad_Allocs
+{
+    int* field_0_1024_unk_ptr;
+    __int16 field_4;
+    __int16 field_6_numObjTranslated;
+    int field_8;
+    int field_C;
+    float field_10_float;
+    int field_14_unknown;
+    int field_18_2048;
+    int field_1C_project_distance;
+    int field_20_pPolyBufferIter;
+    system_struct* field_24_sys_ptr;
+    LibGV_MemoryAllocation* field_28_gv_alloc;
+    DWORD field_2C_max_possible_elements;
+    BYTE* field_30_alloc_ptr;
+    DWORD field_34_allocated_size;
+    int field_38_288;
+};
+MGS_ASSERT_SIZEOF(ScratchPad_Allocs, 0x3C);
+
+BYTE* CC LibGV_prims_scratch_alloc_403672(int system_index)
+{
+    ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40; // TODO: Add to union
+
+    system_struct* pSystem = System_Get_Max_Allocatable_Element_Count_4036A7(system_index, &pScratch->field_2C_max_possible_elements, sizeof(POLY_GT4));
+
+    pScratch->field_28_gv_alloc = nullptr;
+    pScratch->field_24_sys_ptr = pSystem;
+    pScratch->field_30_alloc_ptr = System_allocate_with_hint_4036ED(pSystem, &pScratch->field_28_gv_alloc, &pScratch->field_34_allocated_size);
+
+    return pScratch->field_30_alloc_ptr;
+}
+MGS_FUNC_IMPLEX(0x403672, LibGV_prims_scratch_alloc_403672, LIBDG_IMPL);
+
 void CC MarkObjectVoided_40744A(Prim_unknown_0x48* pObj, int bufferIndex)
 {
     for (int i = 0; i < pObj->field_2E_UnknownOrNumFaces; i++)
@@ -2571,7 +2606,7 @@ void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
         LibGV_4066ED(pObj);
     }
 }
-MGS_FUNC_IMPLEX(0x407122, LibGV_407122, true); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x407122, LibGV_407122, LIBDG_IMPL);
 
 void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 {
