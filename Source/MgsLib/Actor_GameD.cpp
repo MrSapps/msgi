@@ -1266,10 +1266,18 @@ MGS_ARY(1, 0x942E20, BYTE, 192512, gSystem1_memory_unk_942E20, {});
 
 void CC System_Init_0_And_1_40A465()
 {
-    System_init_40AC6C(0, 1, &gSystem0_memory_unk_913E20[0], 192512);
-    System_init_40AC6C(1, 1, &gSystem1_memory_unk_942E20[0], 192512);
+    System_init_40AC6C(0, 1, &gSystem0_memory_unk_913E20[0], 0x2F000);
+    System_init_40AC6C(1, 1, &gSystem1_memory_unk_942E20[0], 0x2F000);
 }
 MGS_FUNC_IMPLEX(0x0040A465, System_Init_0_And_1_40A465, ACTOR_GAMED_IMPL);
+
+void CC System_Init_0_And_DeInit_1_40A48E()
+{
+    System_init_40AC6C(0, 0, &gSystem0_memory_unk_913E20[0], 0x5E000);
+    System_init_40AC6C(1, 0, 0, 0);
+}
+MGS_FUNC_IMPLEX(0x40A48E, System_Init_0_And_DeInit_1_40A48E, ACTOR_GAMED_IMPL);
+
 
 void CC LibGV_40A4BB()
 {
