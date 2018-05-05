@@ -23,6 +23,7 @@ MGS_VAR_EXTERN(DWORD, gInput_MouseX_dword_734908);
 MGS_VAR_EXTERN(DWORD, dword_732E64);
 MGS_VAR_EXTERN(DWORD, gInput_MouseY_dword_73490C);
 MGS_VAR_EXTERN(DWORD, gEscapePressed_NoMouseNoBgState_dword_717354);
+MGS_VAR_EXTERN(DWORD, dword_688CD8);
 
 union UGameStates
 {

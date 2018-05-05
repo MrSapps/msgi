@@ -1762,9 +1762,6 @@ void CC LibGV_4066ED(Prim_Union* pObj)
 }
 MGS_FUNC_IMPLEX(0x4066ED, LibGV_4066ED, LIBDG_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x403528, void CC(struct_gv* pGv, int activeBuffer), LibGV_403528);
-
-
 MGS_FUNC_NOT_IMPL(0x404A0F, BYTE *__cdecl (Prim_unknown_0x54 *pPrim, BYTE *primBuffer, int count), LibGV_404A0F);
 MGS_FUNC_NOT_IMPL(0x40466A, BYTE *__cdecl (Prim_unknown_0x54 *pPrim, BYTE *pPrims, int count), LibGV_40466A);
 
@@ -2513,7 +2510,7 @@ MGS_FUNC_IMPLEX(0x4041A5, LibGV_4041A5, LIBDG_IMPL);
 
 struct ScratchPad_Allocs
 {
-    int* field_0_1024_unk_ptr;
+    DWORD* field_0_1024_unk_ptr;
     __int16 field_4;
     __int16 field_6_numObjTranslated;
     int field_8;
@@ -2545,6 +2542,108 @@ BYTE* CC LibGV_prims_scratch_alloc_403672(int system_index)
     return pScratch->field_30_alloc_ptr;
 }
 MGS_FUNC_IMPLEX(0x403672, LibGV_prims_scratch_alloc_403672, LIBDG_IMPL);
+
+MGS_FUNC_NOT_IMPL(0x404139, void __cdecl(Prim_Mesh_0x5C *pMesh, int activeBuffer), LibGV_404139); // TODO
+MGS_FUNC_NOT_IMPL(0x403778, POLY_GT4 *__cdecl(POLY_GT4 *pPolyBuffer, int numFaces, SVECTOR *pVerts, unsigned int *pIndcies), LibGV_Helper_403778); // TODO
+
+void __cdecl LibGV_Helper_40373E(Prim_Mesh_0x5C *pMesh, int system_index)
+{
+    ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40; // TODO: Add to union
+
+
+    Prim_Mesh_0x5C *pMeshIter; // esi
+    POLY_GT4 *pPolyBuffer; // eax
+
+    pMeshIter = pMesh;
+    pPolyBuffer = pMesh->field_54_prim_buffers[system_index];
+    pScratch->field_6_numObjTranslated = pMesh->field_50_numObjTranslated;
+    while (pMeshIter)
+    {
+        pPolyBuffer = LibGV_Helper_403778(
+            pPolyBuffer,
+            pMeshIter->field_52_num_faces,
+            pMeshIter->field_40_pKmdObj->vertOfs_38,
+            (unsigned int *)pMeshIter->field_40_pKmdObj->indexOfs_3C);
+        pMeshIter = pMeshIter->field_48_pLinked;
+    }
+}
+MGS_FUNC_IMPLEX(0x40373E, LibGV_Helper_40373E, LIBDG_IMPL);
+
+
+void CC LibGV_prims_403528(struct_gv* pGv, int activeBuffer)
+{
+    ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40; // TODO: Add to union
+
+    if (LibGV_prims_scratch_alloc_403672(activeBuffer))
+    {
+        Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
+        pScratch->field_0_1024_unk_ptr = (DWORD*)gUnkSize_1024_6BE4E8; // TODO: !?
+        pScratch->field_18_2048 = 2048;
+        pScratch->field_1C_project_distance = (unsigned __int16)(pGv->word_6BC3BC <= 1000 ? 0 : 0xCA60) + 0x2000;
+
+        if (!dword_688CD8)
+        {
+            pScratch->field_1C_project_distance = 0;
+        }
+
+        Prim_unknown_0x48** pPrimIter = (Prim_unknown_0x48 **)pGv->mQueue;
+        if (pGv->mTotalObjectCount > 0)
+        {
+            int objCounter = pGv->mTotalObjectCount;
+            while (1)
+            {
+                Prim_unknown_0x48* pPrim = *pPrimIter;
+                Prim_unknown_0x48 ** pNextPrim = pPrimIter + 1;
+                if ((*pPrimIter)->field_32)
+                {
+                    const int bFlag20Set = (pPrim->field_28_flags_or_type & 0x20) == 0;
+                    Prim_Mesh_0x5C* pMesh = DataAfterStructure<Prim_Mesh_0x5C*>(pPrim);
+                    const int total = pPrim->field_2E_UnknownOrNumFaces;
+                    if (bFlag20Set)
+                    {
+                        if (total > 0)
+                        {
+                            int count1 = total;
+                            do
+                            {
+                                if (pMesh->field_4C_bounding_ret)
+                                {
+                                    gte_rotation_matrix_993E40 = pMesh->field_20_mtx.m;
+                                    gGte_translation_vector_993E54 = pMesh->field_20_mtx.t;
+                                    pScratch->field_14_unknown = ~(pMesh->field_40_pKmdObj->field_0_numObj >> 1) & 1;
+                                    LibGV_Helper_40373E(pMesh, activeBuffer);
+                                }
+                                ++pMesh;
+                                --count1;
+                            } while (count1);
+                        }
+                    }
+                    else if (total > 0)
+                    {
+                        int count2 = total;
+                        do
+                        {
+                            if (pMesh->field_4C_bounding_ret)
+                            {
+                                LibGV_404139(pMesh, activeBuffer);
+                            }
+                            ++pMesh;
+                            --count2;
+                        } while (count2);
+                    }
+                }
+
+                if (!--objCounter)
+                {
+                    break;
+                }
+
+                pPrimIter = pNextPrim;
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x403528, LibGV_prims_403528, LIBDG_IMPL);
 
 void CC MarkObjectVoided_40744A(Prim_unknown_0x48* pObj, int bufferIndex)
 {
@@ -2699,7 +2798,7 @@ MGS_ARY(1, 0x6500E0, TDG_FnPtr, 8, gLibDg_FuncPtrs_off_6500E0,
     LibGV_405668,
     LibGV_lights_405180,
     LibGV_4041A5,
-    LibGV_403528.Ptr(),
+    LibGV_prims_403528,
     LibGV_40340A,
     nullptr
 });
