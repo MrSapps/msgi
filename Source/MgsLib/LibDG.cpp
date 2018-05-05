@@ -2733,14 +2733,14 @@ void CC OrderingTableAdd_4034C6(BYTE* pPrimDataStart, int count, int size)
     const DWORD dword_991E40_2_field_2E_w_or_h = pScratch->field_8;
     for (int i = 0; i < count; ++i, pPrimDataStart += size)
     {
-        const DWORD value0 = *(WORD*)pPrimDataStart;
+        const DWORD polyTagLowPart = *(WORD*)pPrimDataStart;
 
-        if (value0 <= 0)
+        if (polyTagLowPart <= 0)
         {
             continue;
         }
 
-        long offset = (value0 - dword_991E40_2_field_2E_w_or_h);
+        long offset = (polyTagLowPart - dword_991E40_2_field_2E_w_or_h);
         if (offset < 0)
         {
             offset = 0;
