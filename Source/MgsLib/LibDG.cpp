@@ -33,6 +33,10 @@ struct Actor_Open
 
 Actor* CC Res_open_create_486BD4(DWORD scriptData, int scriptBinds, BYTE* pScript)
 {
+    std::ignore = scriptData;
+    std::ignore = scriptBinds;
+    std::ignore = pScript;
+
     return &AddDebugActor()->mBase;
 //    return Res_sndtst_create_455BB8(scriptData, scriptBinds, pScript);
 //    return Res_env_test_create_62130E(scriptData, scriptBinds, pScript);
@@ -336,15 +340,15 @@ void CC sub_401570(struct_gv* gv, DRAWENV* pDrawEnv, int bNotBg)
     gv->dword_6BC3D0_rect.x2 = drawEnv.clip.x2;
     gv->dword_6BC3D0_rect.y2 = drawEnv.clip.y2;
     SetDrawEnv_40DDE0(&gv->dword_6BC4D8_src_dr_env1, &drawEnv);
-    drawEnv.clip.x1 += xoff;
-    drawEnv.offx += xoff;
+    drawEnv.clip.x1 += static_cast<s16>(xoff);
+    drawEnv.offx += static_cast<s16>(xoff);
     SetDrawEnv_40DDE0(&gv->dword_6BC518_src_offsetted_dr_evn, &drawEnv);
     if (bNotBg)
     {
         drawEnv.isbg = 0;
         SetDrawEnv_40DDE0(&pPacked_6BE0A8, &drawEnv);
-        drawEnv.clip.x1 -= xoff;
-        drawEnv.offx -= xoff;
+        drawEnv.clip.x1 -= static_cast<s16>(xoff);
+        drawEnv.offx -= static_cast<s16>(xoff);
         SetDrawEnv_40DDE0(&stru_6BE068, &drawEnv);
     }
 }
@@ -650,7 +654,7 @@ const char kVertexIndexingOffsets[4] = { offsetof(POLY_GT4, x0), offsetof(POLY_G
 void CC GV_kmd_link_vertices_to_parent_4028C1(kmdObject* pKmdObj, kmdObject* pParentObj)
 {
     unsigned int indexFlags = 0;
-    for (int i = 0; i < pKmdObj->field_4_numFaces * 4; ++i)
+    for (DWORD i = 0; i < pKmdObj->field_4_numFaces * 4; ++i)
     {
         const SVECTOR& vertexData = pKmdObj->vertOfs_38[pKmdObj->indexOfs_3C[i]];
         const unsigned short linkedVertexIndex = vertexData.field_6_padding;
@@ -672,7 +676,7 @@ void CC GV_kmd_link_vertices_to_parent_4028C1(kmdObject* pKmdObj, kmdObject* pPa
         return;
     }
 
-    for (int i = 0; i < pKmdObj->numVerts_34; ++i)
+    for (DWORD i = 0; i < pKmdObj->numVerts_34; ++i)
     {
         const unsigned short linkedVertexIndex = pKmdObj->vertOfs_38[i].field_6_padding;
 
@@ -682,7 +686,7 @@ void CC GV_kmd_link_vertices_to_parent_4028C1(kmdObject* pKmdObj, kmdObject* pPa
         }
 
         // find first usage of linked vertex index in parent
-        int j = 0;
+        DWORD j = 0;
         for (; j < pParentObj->field_4_numFaces * 4; ++j)
         {
             if ((pParentObj->indexOfs_3C[j] & 0x7F) == linkedVertexIndex)
@@ -695,7 +699,7 @@ void CC GV_kmd_link_vertices_to_parent_4028C1(kmdObject* pKmdObj, kmdObject* pPa
         const int faceVertexIndex = j % 4;
 
         // compute offset of linked poly data
-        pKmdObj->vertOfs_38[i].field_6_padding = (sizeof(POLY_GT4) * faceIndex) + kVertexIndexingOffsets[faceVertexIndex];
+        pKmdObj->vertOfs_38[i].field_6_padding = static_cast<short int>((sizeof(POLY_GT4) * faceIndex) + kVertexIndexingOffsets[faceVertexIndex]);
     }
 }
 MGS_FUNC_IMPLEX(0x4028C1, GV_kmd_link_vertices_to_parent_4028C1, LIBDG_IMPL);
@@ -752,35 +756,35 @@ signed int CC GV_lit_file_handler_402B1D(void*, TFileNameHash)
 }
 MGS_FUNC_IMPLEX(0x402B1D, GV_lit_file_handler_402B1D, LIBDG_IMPL);
 
-int CC GV_n_file_handler_402A03(void* fileData, TFileNameHash fileNameHash)
+int CC GV_n_file_handler_402A03(void* /*fileData*/, TFileNameHash /*fileNameHash*/)
 {
     LOG_WARNING("N loader not impl");
     return 1;
 }
 MGS_FUNC_IMPLEX(0x402A03, GV_n_file_handler_402A03, false); // TODO
 
-int CC GV_oar_file_handler_402A29(void* fileData, TFileNameHash fileNameHash)
+int CC GV_oar_file_handler_402A29(void* /*fileData*/, TFileNameHash /*fileNameHash*/)
 {
     LOG_WARNING("OAR loader not impl");
     return 1;
 }
 MGS_FUNC_IMPLEX(0x402A29, GV_oar_file_handler_402A29, false); // TODO
 
-int CC GV_zmd_file_handler_403290(void* fileData, TFileNameHash fileNameHash)
+int CC GV_zmd_file_handler_403290(void* /*fileData*/, TFileNameHash /*fileNameHash*/)
 {
     LOG_WARNING("ZMD loader not impl");
     return 1;
 }
 MGS_FUNC_IMPLEX(0x403290, GV_zmd_file_handler_403290, false); // TODO
 
-int CC GV_img_file_handler_402A5F(void* fileData, TFileNameHash fileNameHash)
+int CC GV_img_file_handler_402A5F(void* /*fileData*/, TFileNameHash /*fileNameHash*/)
 {
     LOG_WARNING("IMG loader not impl");
     return 1;
 }
 MGS_FUNC_IMPLEX(0x402A5F, GV_img_file_handler_402A5F, false); // TODO
 
-int CC GV_sgt_file_handler_402AA9(void* fileData, TFileNameHash fileNameHash)
+int CC GV_sgt_file_handler_402AA9(void* /*fileData*/, TFileNameHash /*fileNameHash*/)
 {
     LOG_WARNING("SGT loader not impl");
     return 1;
@@ -1009,8 +1013,7 @@ LABEL_10:
                         || (signed __int16)((unsigned __int16)(((unsigned __int8)padDeltas[1].field_3_left_dy - 128) / 8) << 8) <= -2048
                         || (signed __int16)((unsigned __int16)(((unsigned __int8)padDeltas[1].field_3_left_dy - 128) / 8) << 8) >= 2048)
                     {
-                        pBackingArray_0xA->field_8_dir = LOWORD(g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4_left_stick) 
-                                                              + Res_base_unknown_40B612(&vec);
+                        pBackingArray_0xA->field_8_dir = static_cast<WORD>(LOWORD(g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4_left_stick) + Res_base_unknown_40B612(&vec));
                     }
                     else
                     {
@@ -1096,10 +1099,10 @@ LABEL_10:
             f_2_button_pressed = f_2_other_pressed;
             f_3_button_released = gamedInputMapped_released;
         }
-        gButtonsArray4_7919C0[i].field_0_button_status = f_1_button_status;
-        gButtonsArray4_7919C0[i].field_2_button_pressed = f_2_button_pressed;
-        gButtonsArray4_7919C0[i].field_4_button_release = f_3_button_released;
-        gButtonsArray4_7919C0[i].field_6_button_quick = f_4_button_quick;
+        gButtonsArray4_7919C0[i].field_0_button_status = static_cast<WORD>(f_1_button_status);
+        gButtonsArray4_7919C0[i].field_2_button_pressed = static_cast<WORD>(f_2_button_pressed);
+        gButtonsArray4_7919C0[i].field_4_button_release = static_cast<WORD>(f_3_button_released);
+        gButtonsArray4_7919C0[i].field_6_button_quick = static_cast<WORD>(f_4_button_quick);
 
         // 16 bits for buttons 0,1, then gets reset after setting 2 items of the 
         // array for 16bits for button 2,3
@@ -1140,7 +1143,7 @@ void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
 
         if (sTimeStamp_dword_650094 == -1)
         {
-            sTimeStamp_dword_650094 = TimeGetElapsed_4455A0();
+            sTimeStamp_dword_650094 = static_cast<int>(TimeGetElapsed_4455A0()); // TODO: Check truncation is correct here
             bDontFlipBuffers = 0;
             gLibDG_2_stru_6BB930.dword_6BB950_do_not_flip_buffers = 0;
         }
@@ -1154,7 +1157,7 @@ void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
         // dword_6BB950_do_not_flip_buffers can ever be set to 1?
         //MGS_WARN_ONCE("Possibly wrong behavior here"); // TODO: Impl MGS_WARN_ONCE
 
-        int elapsed = TimeGetElapsed_4455A0();
+        __int64 elapsed = TimeGetElapsed_4455A0();
         if (elapsed - (sTimeStamp_dword_650094 + 2) < 0)
         {
             sTimeStamp_dword_650094 += 2;
@@ -1350,7 +1353,7 @@ void CC LibGV_allocate_in_bounds_and_void_out_of_bounds_4064B1(Prim_unknown_0x48
             }
         }
 
-        pMeshObj->field_4C_bounding_ret = boundingRet;
+        pMeshObj->field_4C_bounding_ret = static_cast<WORD>(boundingRet);
 
         if (boundingRet)
         {
@@ -1382,7 +1385,7 @@ MGS_FUNC_IMPLEX(0x4064B1, LibGV_allocate_in_bounds_and_void_out_of_bounds_4064B1
 
 void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
 {
-    const unsigned __int16 dword_78D32C_copy = dword_78D32C;
+    const unsigned __int16 dword_78D32C_copy = static_cast<unsigned __int16>(dword_78D32C);
 
     Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
 
@@ -1409,7 +1412,7 @@ void CC LibGV_4061E7(struct_gv* pGv, int activeBuffer)
                 unknownArg3 = 2;
             }
         }
-        pObj48->field_32 = unknownArg3;
+        pObj48->field_32 = static_cast<WORD>(unknownArg3);
         LibGV_allocate_in_bounds_and_void_out_of_bounds_4064B1(&pObject->prim_48, activeBuffer, static_cast<BYTE>(flags), unknownArg3);
     }
     LibGV_Helper_4065AA(pGv, activeBuffer);
@@ -2412,8 +2415,8 @@ static void Test_LibGV_4045A5()
     test[0].field_0_v1.field_0_x = 1345;
     test[0].field_0_v1.field_2_y = 50;
     test[0].field_0_v1.field_4_z = 70;
-    test[0].field_0_v1.field_6_padding = 99999;
-
+    test[0].field_0_v1.field_6_padding = 9999;
+    
     test[0].field_8_v2.field_0_x = 6000;
     test[0].field_8_v2.field_2_y = 2;
     test[0].field_8_v2.field_4_z = 9999;
@@ -2439,13 +2442,13 @@ void CC LibGV_404DBA(Prim_unknown_0x54* pObj)
 }
 MGS_FUNC_IMPLEX(0x404DBA, LibGV_404DBA, LIBDG_IMPL);
 
-void CC LibGV_4041A5(struct_gv* pGv, int activeBuffer)
+void CC LibGV_4041A5(struct_gv* pGv, int /*activeBuffer*/)
 {
     if (pGv->mTotalQueueSize != pGv->mFreePrimCount)
     {
         Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
         Prim_Union** ppObjs = &pGv->mQueue[pGv->mFreePrimCount];
-        const unsigned __int16 primTypeMask = dword_78D32C;
+        const unsigned __int16 primTypeMask = static_cast<__int16>(dword_78D32C);
         const int counter = pGv->mTotalQueueSize - pGv->mFreePrimCount;
         for (int i = 0; i < counter; i++)
         {
@@ -2537,7 +2540,6 @@ BYTE* CC LibGV_prims_scratch_alloc_403672(int system_index)
 }
 MGS_FUNC_IMPLEX(0x403672, LibGV_prims_scratch_alloc_403672, LIBDG_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x404139, void __cdecl(Prim_Mesh_0x5C *pMesh, int activeBuffer), LibGV_404139); // TODO
 MGS_FUNC_NOT_IMPL(0x403778, POLY_GT4 *__cdecl(POLY_GT4 *pPolyBuffer, int numFaces, SVECTOR *pVerts, unsigned int *pIndcies), LibGV_Helper_403778); // TODO
 
 void CC LibGV_Helper_40373E(Prim_Mesh_0x5C* pMesh, int activeBuffer)
@@ -2557,6 +2559,33 @@ void CC LibGV_Helper_40373E(Prim_Mesh_0x5C* pMesh, int activeBuffer)
     }
 }
 MGS_FUNC_IMPLEX(0x40373E, LibGV_Helper_40373E, LIBDG_IMPL);
+
+void CC LibGV_404139(Prim_Mesh_0x5C* pMesh, int activeBuffer)
+{
+    ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40; // TODO: Add to union
+    POLY_GT4* pPolyIter = pMesh->field_54_prim_buffers[activeBuffer];
+    Prim_Mesh_0x5C* pMeshIter = pMesh;
+    const __int16 field_50_numObjTranslated = pMesh->field_50_numObjTranslated;
+    do
+    {
+        DWORD* pScratchOt = pScratch->field_0_1024_unk_ptr;
+        //pPolyIter = (POLY_GT4 *)((unsigned int)pPolyIter & 0xFFFFFF);
+        for (int i = 0; i < pMeshIter->field_52_num_faces; i++)
+        {
+            if (LOWORD(pPolyIter[i].tag))
+            {
+                int tagLo = (unsigned __int16)(LOWORD(pPolyIter[i].tag) - field_50_numObjTranslated);
+                tagLo = tagLo & 0x00FFFFFFFF;
+                //LOBYTE(tagLo) = 0;
+                int tagIdx = (unsigned __int8)(LOBYTE(pPolyIter[i].tag) - field_50_numObjTranslated);
+                pPolyIter[i].tag = pScratchOt[tagIdx] | (tagLo << 16);
+                pScratchOt[tagIdx] = (DWORD)&pPolyIter[i];
+            }
+        }
+        pMeshIter = pMeshIter->field_48_pLinked;
+    } while (pMeshIter);
+}
+MGS_FUNC_IMPLEX(0x404139, LibGV_404139, false); // TODO: Implement me
 
 void CC LibGV_prims_403528(struct_gv* pGv, int activeBuffer)
 {
@@ -2652,7 +2681,7 @@ void CC sub_401D64(PSX_MATRIX* pMatrix)
 }
 MGS_FUNC_IMPLEX(0x401D64, sub_401D64, LIBDG_IMPL);
 
-void CC LibGV_407122(struct_gv* pGv, int activeBuffer)
+void CC LibGV_407122(struct_gv* pGv, int /*activeBuffer*/)
 {
     gScratchPadMemory_991E40.field_2_Matrix.mtx[0] = pGv->field_10_matrix;
     sub_401D64(&gScratchPadMemory_991E40.field_2_Matrix.mtx[0]);
@@ -2703,7 +2732,7 @@ void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 }
 MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, false); // TODO: Implement me
 
-void __cdecl LibGV_40340A(struct_gv* pGv, int activeBuffer)
+void __cdecl LibGV_40340A(struct_gv* /*pGv*/, int /*activeBuffer*/)
 {
     MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
     /*
