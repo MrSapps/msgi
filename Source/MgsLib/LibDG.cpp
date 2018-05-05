@@ -2727,41 +2727,28 @@ MGS_FUNC_IMPLEX(0x407122, LibGV_407122, LIBDG_IMPL);
 
 void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-
-    /*
-    DWORD* dword_991E40_1_ot_ptr = (DWORD*)gMatrix_dword_991E40[1];
-    const int dword_991E40_2_field_2E_w_or_h = gMatrix_dword_991E40[2];
-    if (count - 1 >= 0)
+    DWORD* dword_991E40_1_ot_ptr = (DWORD*)((DWORD*)gScratchPadMemory_991E40.field_0_raw.field_0)[1];
+    const DWORD dword_991E40_2_field_2E_w_or_h = ((DWORD*)gScratchPadMemory_991E40.field_0_raw.field_0)[2];
+    BYTE* pData = (BYTE*)pPrimDataStart;
+    for (int i = 0; i < count; ++i, pData += size)
     {
-        int pData = pPrimDataStart;
-        do
+        const DWORD value0 = *(WORD*)pData;
+
+        if (value0 <= 0)
         {
-            const int tag = *(WORD *)pData;
-            if (tag > 0)
-            {
-                signed int v6 = tag - dword_991E40_2_field_2E_w_or_h;
-                if (v6 < 0)
-                {
-                    v6 = 0;
-                }
+            continue;
+        }
 
-                const signed int maybe_z = v6 >> 8;
+        long offset = (value0 - dword_991E40_2_field_2E_w_or_h);
+        if (offset < 0)
+        {
+            offset = 0;
+        }
 
-                // Start of prim points to next OT entry?
-                *(DWORD *)pData &= 0xFF000000;
-                *(DWORD *)pData |= dword_991E40_1_ot_ptr[maybe_z] & 0x00FFFFFF;
-
-                // OT points to prim
-                dword_991E40_1_ot_ptr[maybe_z] &= 0xFF000000;
-                dword_991E40_1_ot_ptr[maybe_z] |= pData & 0x00FFFFFF;
-            }
-            pData += size;
-            --count;
-        } while (count);
-    }*/
+        addPrim(dword_991E40_1_ot_ptr + (offset / 256), pData);
+    }
 }
-MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, false); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, LIBDG_IMPL);
 
 void __cdecl LibGV_40340A(struct_gv* /*pGv*/, int /*activeBuffer*/)
 {
