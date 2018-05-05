@@ -2521,7 +2521,7 @@ struct ScratchPad_Allocs
     LibGV_MemoryAllocation* field_28_gv_alloc;
     DWORD field_2C_max_possible_elements;
     BYTE* field_30_alloc_ptr;
-    DWORD field_34_allocated_size;
+    int field_34_allocated_size;
     int field_38_288;
 };
 MGS_ASSERT_SIZEOF(ScratchPad_Allocs, 0x3C);
@@ -2540,6 +2540,37 @@ BYTE* CC LibGV_prims_scratch_alloc_403672(int system_index)
 }
 MGS_FUNC_IMPLEX(0x403672, LibGV_prims_scratch_alloc_403672, LIBDG_IMPL);
 
+BYTE* CC LibGV_Scratch_alloc_POLY_GT4_403ED1()
+{
+    ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40; // TODO: Add to union
+    BYTE* pPoly = nullptr;
+    while (1)
+    {
+        pScratch->field_34_allocated_size -= sizeof(POLY_GT4);
+        if (pScratch->field_34_allocated_size >= 0)
+        {
+            break;
+        }
+
+        pPoly = System_allocate_with_hint_4036ED(
+            pScratch->field_24_sys_ptr,
+            &pScratch->field_28_gv_alloc,
+            &pScratch->field_34_allocated_size);
+        pScratch->field_30_alloc_ptr = pPoly;
+
+        if (pPoly == nullptr)
+        {
+            pScratch->field_2C_max_possible_elements = 0;
+            return nullptr;
+        }
+    }
+    pPoly = pScratch->field_30_alloc_ptr;
+    pScratch->field_2C_max_possible_elements--;
+    pScratch->field_30_alloc_ptr += sizeof(POLY_GT4);
+    return pPoly;
+}
+MGS_FUNC_IMPLEX(0x403ED1, LibGV_Scratch_alloc_POLY_GT4_403ED1, LIBDG_IMPL);
+
 MGS_FUNC_NOT_IMPL(0x403778, POLY_GT4 *__cdecl(POLY_GT4 *pPolyBuffer, int numFaces, SVECTOR *pVerts, unsigned int *pIndcies), LibGV_Helper_403778); // TODO
 
 void CC LibGV_Helper_40373E(Prim_Mesh_0x5C* pMesh, int activeBuffer)
@@ -2554,7 +2585,7 @@ void CC LibGV_Helper_40373E(Prim_Mesh_0x5C* pMesh, int activeBuffer)
             pPolyBuffer,
             pMeshIter->field_52_num_faces,
             pMeshIter->field_40_pKmdObj->vertOfs_38,
-            (unsigned int *)pMeshIter->field_40_pKmdObj->indexOfs_3C);
+            (unsigned int *)pMeshIter->field_40_pKmdObj->indexOfs_3C); // TODO: Check types - is actually used as BYTE* else where?
         pMeshIter = pMeshIter->field_48_pLinked;
     }
 }

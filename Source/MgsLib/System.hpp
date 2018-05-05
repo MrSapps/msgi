@@ -55,7 +55,7 @@ void* CC System_2_zerod_allocate_memory_40B296(int size);
 void CC System_VoidAllocation_40B187(int idx, void** pMem);
 void CC Safe_System_2_VoidAllocation_40513B(void *ptr);
 system_struct* CC System_Get_Max_Allocatable_Element_Count_4036A7(int index, DWORD* maxAllocatableElements, unsigned int elementSizeInBytes);
-BYTE* CC System_allocate_with_hint_4036ED(system_struct* pSystem, LibGV_MemoryAllocation** pAllocated, DWORD* pAllocatedSizeBytes);
+BYTE* CC System_allocate_with_hint_4036ED(system_struct* pSystem, LibGV_MemoryAllocation** pAllocated, int* pAllocatedSizeBytes);
 
 template<class T>
 T* CC System_2_zerod_allocate_memory_40B296_T()
