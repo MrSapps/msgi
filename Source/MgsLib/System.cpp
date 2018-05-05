@@ -8,7 +8,6 @@
 MGS_ARY(1, 0x78E980, system_struct, 3, gSystems_dword_78E980, {});
 
 MGS_FUNC_NOT_IMPL(0x40AD58, LibGV_MemoryAllocation* CC(system_struct* pSystem), System_sub_40AD58);
-MGS_FUNC_NOT_IMPL(0x40ACF4, int CC (system_struct* pSystem), System_sub_40ACF4);
 
 void SystemCpp_ForceLink() { }
 
@@ -28,6 +27,37 @@ static DWORD RoundDownPowerOf2(DWORD numToRound, int multiple)
     assert(multiple && IsPowerOf2(multiple));
     return numToRound & -multiple;
 }
+
+void CC System_ClearVoidedAllocs_40ACF4(system_struct* pSystem)
+{
+    bool bValidAllocCopied = false;
+    LibGV_MemoryAllocation* pDst = pSystem->mAllocs;
+    LibGV_MemoryAllocation* pSrc = pSystem->mAllocs;
+    for (DWORD i = 0; i < pSystem->mUnitsCount; i++)
+    {
+        const int srcAllocType = pSrc->mAllocType;
+        if (srcAllocType && srcAllocType != LibGV_MemoryAllocation::eVoid)
+        {
+            *pDst = *pSrc;
+            pDst++;
+            bValidAllocCopied = false;
+        }
+        else if (!bValidAllocCopied)
+        {
+            BYTE* pSrcDataStart = pSrc->mPDataStart;
+            pDst->mAllocType = LibGV_MemoryAllocation::eFree;
+            pDst->mPDataStart = pSrcDataStart;
+            pDst++;
+            bValidAllocCopied = true;
+        }
+        pSrc++;
+    }
+
+    pDst->mAllocType = LibGV_MemoryAllocation::eUsed;
+    pDst->mPDataStart = pSystem->mEndAddr;
+    pSystem->mUnitsCount = ((char *)pDst - (char *)pSystem - offsetof(system_struct, mUnitsCount)) / sizeof(LibGV_MemoryAllocation);
+}
+MGS_FUNC_IMPLEX(0x40ACF4, System_ClearVoidedAllocs_40ACF4, SYSTEM_IMPL);
 
 system_struct* CC System_init_40AC6C(int index, int bIsDynamic, void* pMemory, int size)
 {
@@ -406,7 +436,7 @@ void CC System_HouseKeeping_40ACB2(int idx)
 
         if (flags & system_struct::eVoided)
         {
-            System_sub_40ACF4(pSystem);
+            System_ClearVoidedAllocs_40ACF4(pSystem);
             pSystem->mFlags &= ~system_struct::eVoided;
         }
     }
