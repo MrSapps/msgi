@@ -2725,14 +2725,15 @@ void CC LibGV_407122(struct_gv* pGv, int /*activeBuffer*/)
 }
 MGS_FUNC_IMPLEX(0x407122, LibGV_407122, LIBDG_IMPL);
 
-void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
+void CC OrderingTableAdd_4034C6(BYTE* pPrimDataStart, int count, int size)
 {
-    DWORD* dword_991E40_1_ot_ptr = (DWORD*)((DWORD*)gScratchPadMemory_991E40.field_0_raw.field_0)[1];
-    const DWORD dword_991E40_2_field_2E_w_or_h = ((DWORD*)gScratchPadMemory_991E40.field_0_raw.field_0)[2];
-    BYTE* pData = (BYTE*)pPrimDataStart;
-    for (int i = 0; i < count; ++i, pData += size)
+    ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40; // TODO: Add to union
+
+    DWORD* dword_991E40_1_ot_ptr = *(DWORD**)&pScratch->field_4;
+    const DWORD dword_991E40_2_field_2E_w_or_h = pScratch->field_8;
+    for (int i = 0; i < count; ++i, pPrimDataStart += size)
     {
-        const DWORD value0 = *(WORD*)pData;
+        const DWORD value0 = *(WORD*)pPrimDataStart;
 
         if (value0 <= 0)
         {
@@ -2745,7 +2746,7 @@ void CC OrderingTableAdd_4034C6(int pPrimDataStart, int count, int size)
             offset = 0;
         }
 
-        addPrim(dword_991E40_1_ot_ptr + (offset / 256), pData);
+        addPrim(&dword_991E40_1_ot_ptr[offset / 256], pPrimDataStart);
     }
 }
 MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, LIBDG_IMPL);
