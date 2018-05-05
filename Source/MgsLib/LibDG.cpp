@@ -2546,16 +2546,11 @@ MGS_FUNC_IMPLEX(0x403672, LibGV_prims_scratch_alloc_403672, LIBDG_IMPL);
 MGS_FUNC_NOT_IMPL(0x404139, void __cdecl(Prim_Mesh_0x5C *pMesh, int activeBuffer), LibGV_404139); // TODO
 MGS_FUNC_NOT_IMPL(0x403778, POLY_GT4 *__cdecl(POLY_GT4 *pPolyBuffer, int numFaces, SVECTOR *pVerts, unsigned int *pIndcies), LibGV_Helper_403778); // TODO
 
-void __cdecl LibGV_Helper_40373E(Prim_Mesh_0x5C *pMesh, int system_index)
+void CC LibGV_Helper_40373E(Prim_Mesh_0x5C* pMesh, int activeBuffer)
 {
     ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40; // TODO: Add to union
-
-
-    Prim_Mesh_0x5C *pMeshIter; // esi
-    POLY_GT4 *pPolyBuffer; // eax
-
-    pMeshIter = pMesh;
-    pPolyBuffer = pMesh->field_54_prim_buffers[system_index];
+    Prim_Mesh_0x5C* pMeshIter = pMesh;
+    POLY_GT4* pPolyBuffer = pMesh->field_54_prim_buffers[activeBuffer];
     pScratch->field_6_numObjTranslated = pMesh->field_50_numObjTranslated;
     while (pMeshIter)
     {
@@ -2568,7 +2563,6 @@ void __cdecl LibGV_Helper_40373E(Prim_Mesh_0x5C *pMesh, int system_index)
     }
 }
 MGS_FUNC_IMPLEX(0x40373E, LibGV_Helper_40373E, LIBDG_IMPL);
-
 
 void CC LibGV_prims_403528(struct_gv* pGv, int activeBuffer)
 {
@@ -2586,59 +2580,29 @@ void CC LibGV_prims_403528(struct_gv* pGv, int activeBuffer)
             pScratch->field_1C_project_distance = 0;
         }
 
-        Prim_unknown_0x48** pPrimIter = (Prim_unknown_0x48 **)pGv->mQueue;
-        if (pGv->mTotalObjectCount > 0)
+        for (int i = 0; i < pGv->mTotalObjectCount; i++)
         {
-            int objCounter = pGv->mTotalObjectCount;
-            while (1)
+            Prim_unknown_0x48* pPrim = &pGv->mQueue[i]->prim_48;
+            if (pPrim->field_32)
             {
-                Prim_unknown_0x48* pPrim = *pPrimIter;
-                Prim_unknown_0x48 ** pNextPrim = pPrimIter + 1;
-                if ((*pPrimIter)->field_32)
+                Prim_Mesh_0x5C* pMesh = DataAfterStructure<Prim_Mesh_0x5C*>(pPrim);
+                for (int j = 0; j < pPrim->field_2E_UnknownOrNumFaces; j++)
                 {
-                    const int bFlag20Set = (pPrim->field_28_flags_or_type & 0x20) == 0;
-                    Prim_Mesh_0x5C* pMesh = DataAfterStructure<Prim_Mesh_0x5C*>(pPrim);
-                    const int total = pPrim->field_2E_UnknownOrNumFaces;
-                    if (bFlag20Set)
+                    if (pMesh[j].field_4C_bounding_ret)
                     {
-                        if (total > 0)
+                        if ((pPrim->field_28_flags_or_type & 0x20) == 0)
                         {
-                            int count1 = total;
-                            do
-                            {
-                                if (pMesh->field_4C_bounding_ret)
-                                {
-                                    gte_rotation_matrix_993E40 = pMesh->field_20_mtx.m;
-                                    gGte_translation_vector_993E54 = pMesh->field_20_mtx.t;
-                                    pScratch->field_14_unknown = ~(pMesh->field_40_pKmdObj->field_0_numObj >> 1) & 1;
-                                    LibGV_Helper_40373E(pMesh, activeBuffer);
-                                }
-                                ++pMesh;
-                                --count1;
-                            } while (count1);
+                            gte_rotation_matrix_993E40 = pMesh[j].field_20_mtx.m;
+                            gGte_translation_vector_993E54 = pMesh[j].field_20_mtx.t;
+                            pScratch->field_14_unknown = ~(pMesh[j].field_40_pKmdObj->field_0_numObj >> 1) & 1;
+                            LibGV_Helper_40373E(&pMesh[j], activeBuffer);
+                        }
+                        else
+                        {
+                            LibGV_404139(&pMesh[j], activeBuffer);
                         }
                     }
-                    else if (total > 0)
-                    {
-                        int count2 = total;
-                        do
-                        {
-                            if (pMesh->field_4C_bounding_ret)
-                            {
-                                LibGV_404139(pMesh, activeBuffer);
-                            }
-                            ++pMesh;
-                            --count2;
-                        } while (count2);
-                    }
                 }
-
-                if (!--objCounter)
-                {
-                    break;
-                }
-
-                pPrimIter = pNextPrim;
             }
         }
     }
