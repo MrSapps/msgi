@@ -11,10 +11,10 @@ struct KmdHeader;
 
 struct kmdObject
 {
-    DWORD field_0_numObj;
+    DWORD field_0_flags;
     DWORD field_4_numFaces;
-    int boundingBox[6];
-    int translation[3];
+    VECTOR boundingBox[2];
+    VECTOR translation;
     int mRef_2C_parentObjIndex;
     int mObjPosNum_30_translationUnk;
 
@@ -142,7 +142,7 @@ struct KmdHeader
 {
     DWORD mNumberOfMeshes;
     DWORD mNumberOfObjects;
-    int mBoundingBox[6];
+    VECTOR mBoundingBox[2];
 };
 MGS_ASSERT_SIZEOF(KmdHeader, 0x20);
 

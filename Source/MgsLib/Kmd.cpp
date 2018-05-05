@@ -20,7 +20,7 @@ struct kmdObject;
 
 int CC Prim_444096(kmdObject* pKmdObj)
 {
-    DWORD field_0 = pKmdObj->field_0_numObj;
+    DWORD field_0 = pKmdObj->field_0_flags;
     int result = 0;
     if (field_0 & 768)
     {
@@ -1108,7 +1108,7 @@ CVECTOR* CC PrimObjRelated_helper_443D4F(const kmdObject* pKmdObj, CVECTOR* pCol
         gLightMatrix_650148.m[2][0]
     };
     
-    if (!(pKmdObj->field_0_numObj & 2))
+    if (!(pKmdObj->field_0_flags & 2))
     {
         gGte_light_colour_993ED8 = light_transparent_colour_65016C;
     }
@@ -1236,14 +1236,14 @@ signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLight
         Kmd_verts_unknown_443BEC(pKmd, pLights, lightCount);// put data in scratch
 
         // Flag 4 = don't apply lights or apply dynamically?
-        if (pKmd->field_0_numObj & 4)
+        if (pKmd->field_0_flags & 4)
         {
             for (DWORD j = 0; j < pKmd->field_4_numFaces; j++)
             {
                 pLightsBuffer[j].r = 0x80;
                 pLightsBuffer[j].g = 0x80;
                 pLightsBuffer[j].b = 0x80;
-                pLightsBuffer[j].cd = 0x3C | (pKmd->field_0_numObj & 2);
+                pLightsBuffer[j].cd = 0x3C | (pKmd->field_0_flags & 2);
             }
             pLightsBuffer += pKmd->field_4_numFaces;
         }

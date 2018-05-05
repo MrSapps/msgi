@@ -1220,7 +1220,7 @@ MGS_FUNC_IMPLEX(0x40B231, MemClearUnknown_40B231, LIBDG_IMPL);
 
 using TDG_FnPtr = void(CC*)(struct_gv* pGv, int activeBuffer);
 
-MGS_FUNC_NOT_IMPL(0x4062CB, void __cdecl (int* pBoundingBox), LibGV_Helper_4062CB);
+MGS_FUNC_NOT_IMPL(0x4062CB, void __cdecl (VECTOR* pBoundingBox), LibGV_Helper_4062CB);
 MGS_FUNC_NOT_IMPL(0x40640F, signed int (), LibGV_Helper_40640F);
 
 void CC LibGV_prim_buffer_set_all_cluts_to_3FFF_406649(Prim_Mesh_0x5C* pMeshObj, int activeBuffer)
@@ -1580,9 +1580,7 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
         RotMatrixZYX_gte_44C880(pObj->field_38_size24b, (MATRIX3x3 *)&pScratch->mtx[26]);
     }
 
-    pScratch->mtx[26].t.field_0_x = pKmd->translation[0];
-    pScratch->mtx[26].t.field_4_y = pKmd->translation[1];
-    pScratch->mtx[26].t.field_8_z = pKmd->translation[2];
+    pScratch->mtx[26].t = pKmd->translation;
 
     if (pObj->field_3C)
     {
@@ -1632,9 +1630,7 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
         {
             PSX_MATRIX* pMtx = &pScratch->mtx[pMeshIter->field_40_pKmdObj->mRef_2C_parentObjIndex + 2];
             RotMatrixZYX_gte_44C880(pLightsIter, &pScratchMtx->m);
-            pScratchMtx->t.field_0_x = pMeshIter->field_40_pKmdObj->translation[0];
-            pScratchMtx->t.field_4_y = pMeshIter->field_40_pKmdObj->translation[1];
-            pScratchMtx->t.field_8_z = pMeshIter->field_40_pKmdObj->translation[2];
+            pScratchMtx->t = pMeshIter->field_40_pKmdObj->translation;
             PSX_MATRIX* v10 = &pScratch->mtx[26];
 
             if (faceCount2 != faceCount - 1)
@@ -1656,9 +1652,7 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
                 pScratchMtx->m.m[2][i] = static_cast<short>(gGte_IR3_993EEC.IR_32);
             }
 
-            gGte_translation_vector_993E54.field_0_x = v10->t.field_0_x;
-            gGte_translation_vector_993E54.field_4_y = v10->t.field_4_y;
-            gGte_translation_vector_993E54.field_8_z = v10->t.field_8_z;
+            gGte_translation_vector_993E54 = v10->t;
 
             gGte_VXY0_993EC0.regs.VX = static_cast<short>(pScratchMtx->t.field_0_x);
             gGte_VXY0_993EC0.regs.VY = static_cast<short>(pScratchMtx->t.field_4_y);
@@ -1939,7 +1933,7 @@ void CC LibGV_prim_buffer_init_polyGT4s_40738D(Prim_Mesh_0x5C* pMesh, int active
         for (int i = 0; i < pMeshIter->field_52_num_faces; i++)
         {
             setPolyGT4(pPrimBufferIter);
-            pPrimBufferIter->code |= pMesh->field_40_pKmdObj->field_0_numObj & 2;
+            pPrimBufferIter->code |= pMesh->field_40_pKmdObj->field_0_flags & 2;
             setRGB0(pPrimBufferIter, 128, 128, 128);
             setRGB1(pPrimBufferIter, 128, 128, 128);
             setRGB2(pPrimBufferIter, 128, 128, 128);
@@ -1978,14 +1972,14 @@ static void Test_LibGV_prim_buffer_init_polyGT4s_40738D()
     Prim_Mesh_0x5C mesh = {};
     kmdObject kmdObj = {};
     mesh.field_40_pKmdObj = &kmdObj;
-    mesh.field_40_pKmdObj->field_0_numObj = 2;
+    mesh.field_40_pKmdObj->field_0_flags = 2;
     mesh.field_52_num_faces = 1;
     mesh.field_54_prim_buffers[0] = &prim;
 
     LibGV_prim_buffer_init_polyGT4s_40738D(&mesh, 0);
     ASSERT_EQ(prim.code, 0x3E);
 
-    mesh.field_40_pKmdObj->field_0_numObj = 0;
+    mesh.field_40_pKmdObj->field_0_flags = 0;
     LibGV_prim_buffer_init_polyGT4s_40738D(&mesh, 0);
     ASSERT_EQ(prim.code, 0x3C);
 }
@@ -2594,7 +2588,7 @@ void CC LibGV_prims_403528(struct_gv* pGv, int activeBuffer)
                         {
                             gte_rotation_matrix_993E40 = pMesh[j].field_20_mtx.m;
                             gGte_translation_vector_993E54 = pMesh[j].field_20_mtx.t;
-                            pScratch->field_14_unknown = ~(pMesh[j].field_40_pKmdObj->field_0_numObj >> 1) & 1;
+                            pScratch->field_14_unknown = ~(pMesh[j].field_40_pKmdObj->field_0_flags >> 1) & 1;
                             LibGV_Helper_40373E(&pMesh[j], activeBuffer);
                         }
                         else
