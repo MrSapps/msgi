@@ -8,6 +8,7 @@
 #include "Psx.hpp"
 #include "Table_665A3C.hpp"
 #include "Menu.hpp"
+#include "WinMain.hpp"
 
 #define KMD_IMPL true
 
@@ -1271,8 +1272,28 @@ signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLight
 }
 MGS_FUNC_IMPLEX(0x443A4E, PrimObjRelated_443A4E, KMD_IMPL);
 
+MGS_FUNC_NOT_IMPL(0x4022EC, int __cdecl (const SVECTOR* pVec, PSX_MATRIX* pMtxAry), Res_base_update_helper_4022EC);
 
-MGS_FUNC_NOT_IMPL(0x40241F, int __cdecl(SVECTOR *a1, PSX_MATRIX *pMtxAry), Res_base_unknown_40241F); // TODO
+int CC Res_base_unknown_40241F(const SVECTOR* pVec, PSX_MATRIX* pMtxAry)
+{ 
+    if (game_state_dword_72279C.mParts.flags0 & 8)
+    {
+        pMtxAry[1].m = {};
+        pMtxAry->t.field_0_x = 130;
+        pMtxAry->t.field_4_y = 104;
+        pMtxAry->t.field_8_z = 80;
+        return 2;
+    }
+    else
+    {
+        const int result = Res_base_update_helper_4022EC(pVec, pMtxAry);
+        pMtxAry->t.field_0_x = light_r_word_6BEE70;
+        pMtxAry->t.field_4_y = light_g_word_6BEE72;
+        pMtxAry->t.field_8_z = light_b_word_6BEE74;
+        return result;
+    }
+}
+MGS_FUNC_IMPLEX(0x40241F, Res_base_unknown_40241F, KMD_IMPL);
 
 
 void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
