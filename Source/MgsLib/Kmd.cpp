@@ -1239,14 +1239,15 @@ signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLight
         // Flag 4 = don't apply lights or apply dynamically?
         if (pKmd->field_0_flags & 4)
         {
-            for (DWORD j = 0; j < pKmd->field_4_numFaces; j++)
+            const DWORD numVerts = pKmd->field_4_numFaces * 4; // 4 verts per quad face
+            for (DWORD j = 0; j < numVerts; j++)
             {
                 pLightsBuffer[j].r = 0x80;
                 pLightsBuffer[j].g = 0x80;
                 pLightsBuffer[j].b = 0x80;
                 pLightsBuffer[j].cd = 0x3C | (pKmd->field_0_flags & 2);
             }
-            pLightsBuffer += pKmd->field_4_numFaces;
+            pLightsBuffer += numVerts;
         }
         else
         {
