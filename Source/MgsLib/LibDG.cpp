@@ -361,8 +361,8 @@ void CC Gv3StructsInit_4012F2(int k320)
 
     gLibGvStruct0_6BC180.word_6BC376_16 = -1;
     dg_dword_6BBD5C_k320 = k320;
-    gLibGvStruct0_6BC180.mOrderingTables[0] = (BYTE*)ot_gv0_0_6BCB44;// ot start?
-    gLibGvStruct0_6BC180.mOrderingTables[1] = (BYTE*)ot_gv0_1_6BCBC8;// also part of ot?
+    gLibGvStruct0_6BC180.mOrderingTables[0] = ot_gv0_0_6BCB44;// ot start?
+    gLibGvStruct0_6BC180.mOrderingTables[1] = ot_gv0_1_6BCBC8;// also part of ot?
     gLibGvStruct0_6BC180.mFreePrimCount = 8;
     gLibGvStruct0_6BC180.mTotalQueueSize = 8;
     gLibGvStruct0_6BC180.mTotalObjectCount = 0;
@@ -388,8 +388,8 @@ void CC Gv3StructsInit_4012F2(int k320)
         &gLibGvStruct0_6BC180.dword_6BC518_src_offsetted_dr_evn,
         sizeof(gLibGvStruct0_6BC180.dword_6BC418_dst));
 
-    gLibGVStruct1_6BC36C.mOrderingTables[0] = (BYTE*)&ot_gv1_0_6BD04C[0];
-    gLibGVStruct1_6BC36C.mOrderingTables[1] = (BYTE*)&ot_gv1_1_6BD450[0];
+    gLibGVStruct1_6BC36C.mOrderingTables[0] = &ot_gv1_0_6BD04C[0];
+    gLibGVStruct1_6BC36C.mOrderingTables[1] = &ot_gv1_1_6BD450[0];
     gLibGVStruct1_6BC36C.mFreePrimCount = 256;
     gLibGVStruct1_6BC36C.mTotalQueueSize = 256;
     gLibGVStruct1_6BC36C.mTotalObjectCount = 0;
@@ -419,8 +419,8 @@ void CC Gv3StructsInit_4012F2(int k320)
     memcpy(gLibGVStruct1_6BC36C.dword_6BC458, &stru_6BE068, sizeof(gLibGVStruct1_6BC36C.dword_6BC458));
     memcpy(gLibGVStruct1_6BC36C.dword_6BC498, &pPacked_6BE0A8, sizeof(gLibGVStruct1_6BC36C.dword_6BC498));
 
-    gLibGvStruct2_6BC558.mOrderingTables[0] = (BYTE*)&ot_gv2_0_6BDC54[0];
-    gLibGvStruct2_6BC558.mOrderingTables[1] = (BYTE*)&ot_gv2_1_6BDC5C[0];
+    gLibGvStruct2_6BC558.mOrderingTables[0] = &ot_gv2_0_6BDC54[0];
+    gLibGvStruct2_6BC558.mOrderingTables[1] = &ot_gv2_1_6BDC5C[0];
     gLibGvStruct2_6BC558.mFreePrimCount = 0;
     gLibGvStruct2_6BC558.mTotalQueueSize = 0;
     gLibGvStruct2_6BC558.mTotalObjectCount = 0;
@@ -2725,74 +2725,80 @@ void CC LibGV_407122(struct_gv* pGv, int /*activeBuffer*/)
 }
 MGS_FUNC_IMPLEX(0x407122, LibGV_407122, LIBDG_IMPL);
 
+struct ScratchPad_40340A
+{
+    DWORD** field_0_1024_unk_ptr;
+    DWORD* field_4_ordering_table;
+    DWORD field_8_face_count;
+};
+
 void CC OrderingTableAdd_4034C6(BYTE* pPrimDataStart, int count, int size)
 {
-    ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40; // TODO: Add to union
+    ScratchPad_40340A* pScratch = (ScratchPad_40340A*)&gScratchPadMemory_991E40; // TODO: Add to union
 
-    DWORD* dword_991E40_1_ot_ptr = *(DWORD**)&pScratch->field_4;
-    const DWORD dword_991E40_2_field_2E_w_or_h = pScratch->field_8;
+    DWORD* pOrderingTable = pScratch->field_4_ordering_table;
+    const DWORD faceCount = pScratch->field_8_face_count;
     for (int i = 0; i < count; ++i, pPrimDataStart += size)
     {
         const DWORD polyTagLowPart = *(WORD*)pPrimDataStart;
 
-        if (polyTagLowPart <= 0)
+        if (polyTagLowPart <= 0) // TODO: Can't ever be true unless its == 0
         {
             continue;
         }
 
-        long offset = (polyTagLowPart - dword_991E40_2_field_2E_w_or_h);
+        long offset = (polyTagLowPart - faceCount);
         if (offset < 0)
         {
             offset = 0;
         }
 
-        addPrim(&dword_991E40_1_ot_ptr[offset / 256], pPrimDataStart);
+        addPrim(&pOrderingTable[offset / 256], pPrimDataStart);
     }
 }
 MGS_FUNC_IMPLEX(0x4034C6, OrderingTableAdd_4034C6, LIBDG_IMPL);
 
-void __cdecl LibGV_40340A(struct_gv* /*pGv*/, int /*activeBuffer*/)
+void CC LibGV_40340A(struct_gv* pGv, int activeBuffer)
 {
-    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
-    /*
-    int unkByte012Ptr; // edi@3
+    ScratchPad_40340A* pScratch = (ScratchPad_40340A*)&gScratchPadMemory_991E40; // TODO: Add to union
+    pScratch->field_0_1024_unk_ptr = gUnkSize_1024_6BE4E8;// 256 DWORD's.. or 512?
+    pScratch->field_4_ordering_table = pGv->mOrderingTables[activeBuffer] + 1;
 
-    gMatrix_dword_991E40[0] = (int)gUnkSize_1024_6BE4E8;  // 256 DWORD's
-    int otPtr = (int)*(&pGv->mOrderingTables[activeBuffer]);
-    gMatrix_dword_991E40[1] = otPtr + 4;
-    DWORD** otrPtrNext = (DWORD**)gMatrix_dword_991E40[1];
-    for (int i = 0; i < 256; i++)
+    DWORD** unk1024 = pScratch->field_0_1024_unk_ptr;
+    DWORD* otrPtrNext = pScratch->field_4_ordering_table;
+    for (int i=0; i<256; i++)
     {
-        DWORD* unkItem = gUnkSize_1024_6BE4E8[i];
-        if (unkItem) // Only has ptrs for "3d objects" ?
+        DWORD* unkItem = unk1024[i];
+        if (unkItem)
         {
+            DWORD otItem24BitsPtr = 0;
             do
             {
-                DWORD unkByte3Idx = *unkItem >> 24; // Get single 3rd byte
-                DWORD** otItemPtrPtr = &otrPtrNext[unkByte3Idx]; // Index into the OT using this byte
-                unkByte012Ptr = *unkItem & 0xFFFFFF; // Other 3 bytes
-                *unkItem = (unsigned int)*otItemPtrPtr | 0xC000000; // Set UNK to point to the OT
-                *otItemPtrPtr = unkItem; // Set OT to point to the UNK
-                unkItem = (DWORD *)unkByte012Ptr; // To next unk entry ?
-            } while (unkByte012Ptr);
+                DWORD* otPosPtr = &otrPtrNext[*unkItem >> 24];
+                otItem24BitsPtr = *unkItem & 0xFFFFFF;
+                *unkItem = (unsigned int)*otPosPtr | 0x0C000000; // 0x0c000000 POLY_GT4 tag/size?
+                *otPosPtr = (DWORD)unkItem;
+                unkItem = (DWORD *)otItem24BitsPtr;
+            } while (otItem24BitsPtr);
         }
     }
 
-    DWORD pMtx = dword_78D32C & 0xFFFF;
-
-    const int primCount = pGv->mTotalQueueSize - pGv->gPrimQueue2_word_6BC3C0_256;
+    const DWORD mask = dword_78D32C;
+    Prim_Union** ppPrims = &pGv->mQueue[pGv->mFreePrimCount];
+    const int primCount = pGv->mTotalQueueSize - pGv->mFreePrimCount;
     for (int i = 0; i < primCount; i++)
     {
-        Prim_unknown* p = pGv->mQueue[pGv->gPrimQueue2_word_6BC3C0_256 + i]; // 006bbd58
-        if (!(BYTE1(p->field_24_maybe_flags) & 1) && (!p->field_28_dword_9942A0 || p->field_28_dword_9942A0 & pMtx))
+        Prim_unknown_0x54* pPrim = &ppPrims[i]->prim_54;
+        if (!(pPrim->field_24_flags2 & 256)  // maybe count?
+        && (pPrim->field_28_flags_or_type == 0 || pPrim->field_28_flags_or_type & mask))
         {
-            gMatrix_dword_991E40[2] = p->field_2E_w_or_h;
+            pScratch->field_8_face_count = pPrim->field_2E_UnknownOrNumFaces;
             OrderingTableAdd_4034C6(
-                (int)p->field_40_pDataStart[activeBuffer],
-                p->field_2A_num_items,
-                p->field_30_size);
+                pPrim->field_40_pDataStart[activeBuffer],
+                pPrim->field_2A_num_prims,
+                pPrim->field_30_prim_size);
         }
-    }*/
+    }
 }
 MGS_FUNC_IMPLEX(0x40340A, LibGV_40340A, false); // TODO: Implement me
 

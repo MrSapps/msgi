@@ -2625,7 +2625,7 @@ void CC Menu_TextReset_459ACE()
     gTextConfig_66C4C0.gTextRGB_dword_66C4CC = 0x64808080;
     gMenuPrimBuffer_7265E0.mFreeLocation = gMenuPrimBufferArrays_7265EC[gActiveBuffer_dword_791A08];
     gMenuPrimBuffer_7265E0.mOtEnd = gMenuPrimBuffer_7265E0.mFreeLocation + 8192; // sizeof gMenuPrimArray1_7269F4/gMenuPrimArray2_7289F4
-    gMenuPrimBuffer_7265E0.mOt = gLibGvStruct2_6BC558.mOrderingTables[gActiveBuffer_dword_791A08];
+    gMenuPrimBuffer_7265E0.mOt = reinterpret_cast<BYTE*>(gLibGvStruct2_6BC558.mOrderingTables[gActiveBuffer_dword_791A08]);
 }
 MGS_FUNC_IMPLEX(0x00459ACE, Menu_TextReset_459ACE, MENU_IMPL);
 

@@ -54,7 +54,7 @@ struct struct_gv
     // These vars are named to match how they look from gLibGVStruct1_6BC36C position, it was later discovered
     // that these are item 1 in an array of 3 struct_gvs
 
-    BYTE* mOrderingTables[2]; // 257 pointers? // One for each active buffer
+    DWORD* mOrderingTables[2]; // 257 pointers? // One for each active buffer
     s16 word_6BC374_8;
     s16 word_6BC376_16;
     s16 word_6BC378_1;

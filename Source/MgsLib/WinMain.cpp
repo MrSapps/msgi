@@ -2265,7 +2265,7 @@ void CC OT_Related_40162D(int activeBuffer)
         {
             pCurGV = &gLibGvStruct2_6BC558;
         }
-        DWORD** curGVOtPtr = (DWORD**)&pCurGV->mOrderingTables[activeBuffer];// pick ot1 or ot2 ?
+        DWORD** curGVOtPtr = &pCurGV->mOrderingTables[activeBuffer];// pick ot1 or ot2 ?
         DWORD* pActiveBufArray = activeBuffer ? (DWORD*)pCurGV->dword_6BC498 : (DWORD*)pCurGV->dword_6BC458;
 
         char otSize = (pCurGV->word_6BC374_8 & 0xFF);
