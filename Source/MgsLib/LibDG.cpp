@@ -1765,7 +1765,140 @@ MGS_FUNC_NOT_IMPL(0x40466A, BYTE *__cdecl (Prim_unknown_0x54 *pPrim, BYTE *pPrim
 MGS_FUNC_NOT_IMPL(0x404823, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404823);
 MGS_FUNC_NOT_IMPL(0x404B36, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404B36);
 
-MGS_FUNC_NOT_IMPL(0x4053D1, void __cdecl (Prim_Mesh_0x5C *pMesh, int activeBuffer), LibGV_4053D1);
+
+MGS_FUNC_NOT_IMPL(0x40556A, POLY_GT4 *__cdecl (unsigned int *pNorms, POLY_GT4 *pPoly, int faceCount, unsigned int *pIndices), LibGV_indexed_normals_40556A);
+MGS_FUNC_NOT_IMPL(0x4054F2, POLY_GT4 *__cdecl (unsigned int *pNormIdx, POLY_GT4 *pPoly, int faceCount), LibGV_normals_4054F2);
+
+
+struct ColourVecs3
+{
+    DWORD field_38_colours[3]; // TODO: CVECTOR's
+};
+
+struct Scratch_405428
+{
+    PSX_MATRIX field_0;
+    ColourVecs3 field_20; // TODO: Make array of 1024-0x20/sizeof(DWORD*3)
+};
+
+void CC Psx_gte_nct_449B30();
+
+void CC LibGV_405428(kmdObject *pKmd)
+{
+    if (pKmd->field_0_flags & 2)
+    {
+        gGte_light_colour_993ED8 = light_transparent_colour_65016C;
+    }
+    else
+    {
+        gGte_light_colour_993ED8 = light_opaque_colour_650168;
+    }
+
+    Scratch_405428* pScratcPad = (Scratch_405428*)&gScratchPadMemory_991E40; // TODO: Add to union
+
+    SVECTOR* pNormIter = pKmd->normOfs_44;
+    ColourVecs3* pScratch = &pScratcPad->field_20;
+
+    const int normCount = (pKmd->numNorms_40 + 2) / 3u; // TODO: Add clarity to this calculation (rounding to multiple of 3??)
+    for (int i = 0; i < normCount; i++)
+    {
+        // NOTE: The real function will put the normals into the scratch pad first, this is tricky because
+        // it means writing 3 normals and then overwriting with 3 RGB values. And then advancing by the size
+        // of 3 RGB values and writing 3 more normals. Because using the scratch pad is irrelevant on PC 
+        // I just copy from normal directly to GTE registers, it's much more simple to understand this way.
+        gGte_VXY0_993EC0.regs.VX = pNormIter[0].field_0_x;
+        gGte_VXY0_993EC0.regs.VY = pNormIter[0].field_2_y;
+        gGte_VXY0_993EC0.regs.VZ = pNormIter[0].field_4_z;
+
+        gGte_VXY1_993EC8.regs.VX = pNormIter[1].field_0_x;
+        gGte_VXY1_993EC8.regs.VY = pNormIter[1].field_2_y;
+        gGte_VXY1_993EC8.regs.VZ = pNormIter[1].field_4_z;
+
+        gGte_VXY2_993ED0.regs.VX = pNormIter[2].field_0_x;
+        gGte_VXY2_993ED0.regs.VY = pNormIter[2].field_2_y;
+        gGte_VXY2_993ED0.regs.VZ = pNormIter[2].field_4_z;
+        
+        pNormIter += 3;
+
+        Psx_gte_nct_449B30();
+
+        pScratch[i].field_38_colours[0] = *(DWORD *)&gGte_RGB0_993F10; // TODO: Copy as CVECTOR's
+        pScratch[i].field_38_colours[1] = *(DWORD *)&gGte_RGB1_993F14;
+        pScratch[i].field_38_colours[2] = *(DWORD *)&gGte_RGB2_993F18;
+    }
+}
+MGS_FUNC_IMPLEX(0x405428, LibGV_405428, LIBDG_IMPL);
+
+static void Stub_Psx_gte_nct_449B30()
+{
+    gGte_RGB0_993F10 = { 10,11,12,13 };
+    gGte_RGB1_993F14 = { 14,15,16,17 };
+    gGte_RGB2_993F18 = { 18,19,110,111 };
+}
+
+static void Test_LibGV_405428()
+{
+    SCOPED_REDIRECT(Psx_gte_nct_449B30, Stub_Psx_gte_nct_449B30);
+
+    memset(&gScratchPadMemory_991E40, 0, 1024);
+
+    SVECTOR normals[9] = 
+    {
+        {1,2,3,4},
+        {5,6,7,8},
+        {40,50,60,70},
+
+        { 21,22,23,24 },
+        { 25,26,27,28 },
+        { 29,210,211,212 },
+
+        { 1,2,3,4 },
+        { 5,6,7,8 },
+        { 33,44,55,66 },
+
+    };
+    kmdObject kmdObj = {};
+    kmdObj.numNorms_40 = 6;
+    kmdObj.normOfs_44 = normals;
+
+    LibGV_405428(&kmdObj);
+
+    Scratch_405428* pScratcPad = (Scratch_405428*)&gScratchPadMemory_991E40;
+
+    auto ptr = &pScratcPad->field_20;
+ 
+    ASSERT_EQ(0x0d0c0b0a, ptr->field_38_colours[0]); // TODO: Compare as CVECTORs
+    ASSERT_EQ(0x11100f0e, ptr->field_38_colours[1]);
+    ASSERT_EQ(0x6f6e1312, ptr->field_38_colours[2]);
+}
+
+
+void CC LibGV_4053D1(Prim_Mesh_0x5C* pMesh, int activeBuffer)
+{
+    POLY_GT4* pPrimBufferIter = pMesh->field_54_prim_buffers[activeBuffer];
+    Prim_Mesh_0x5C* pMeshIter = pMesh;
+    do
+    {
+        LibGV_405428(pMeshIter->field_40_pKmdObj);  // populate scratch 
+        if (pMeshIter->field_40_pKmdObj->field_0_flags & 0x10000)
+        {
+            pPrimBufferIter = LibGV_indexed_normals_40556A(
+                (unsigned int*)pMeshIter->field_40_pKmdObj->normIndex_48, // TODO: Check types
+                pPrimBufferIter,
+                pMeshIter->field_52_num_faces,
+                (unsigned int*)pMeshIter->field_40_pKmdObj->indexOfs_3C); // TODO: Check types
+        }
+        else
+        {
+            pPrimBufferIter = LibGV_normals_4054F2(
+                (unsigned int*)pMeshIter->field_40_pKmdObj->normIndex_48,  // TODO: Check types
+                pPrimBufferIter, 
+                pMeshIter->field_52_num_faces);
+        }
+        pMeshIter = pMeshIter->field_48_pLinked;
+    } while (pMeshIter);
+}
+MGS_FUNC_IMPLEX(0x4053D1, LibGV_4053D1, LIBDG_IMPL);
 
 void CC LibGV_lights_405180(struct_gv* pGv, int activeBuffer)
 {
@@ -2943,4 +3076,5 @@ void DoDGTests()
     Test_LibGV_apply_texture_to_quads_4071E1();
     Test_LibGV_prim_buffer_init_polyGT4s_40738D();
     Test_LibGV_404139();
+    Test_LibGV_405428();
 }
