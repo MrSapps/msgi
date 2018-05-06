@@ -1956,9 +1956,8 @@ int CC ConvertPolys_Hardware(TaggedOrderingTablePointer* otItem, int otItemSize)
 
             gDrawEnv_6C0E98.texturePage = pStructVert->field0 & 0x1FF;
 
-            // Set dtd and dfe TODO: Check right way around
-            gDrawEnv_6C0E98.dtd = ((pStructVert->field0 >> 10) & 1);
-            gDrawEnv_6C0E98.dfe = ((pStructVert->field0 >> 9) & 1);
+            gDrawEnv_6C0E98.dtd = ((pStructVert->field0 >> 9) & 1);
+            gDrawEnv_6C0E98.dfe = ((pStructVert->field0 >> 10) & 1);
 
             size_dword_791C58 = 1;
             break;
