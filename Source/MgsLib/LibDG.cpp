@@ -1772,18 +1772,18 @@ MGS_FUNC_NOT_IMPL(0x4054F2, POLY_GT4 *__cdecl (unsigned int *pNormIdx, POLY_GT4 
 
 struct ColourVecs3
 {
-    DWORD field_38_colours[3]; // TODO: CVECTOR's
+    CVECTOR field_38_colours[3];
 };
 
 struct Scratch_405428
 {
     PSX_MATRIX field_0;
-    ColourVecs3 field_20; // TODO: Make array of 1024-0x20/sizeof(DWORD*3)
+    ColourVecs3 field_20[82];
 };
 
 void CC Psx_gte_nct_449B30();
 
-void CC LibGV_405428(kmdObject *pKmd)
+void CC LibGV_405428(kmdObject* pKmd)
 {
     if (pKmd->field_0_flags & 2)
     {
@@ -1797,9 +1797,10 @@ void CC LibGV_405428(kmdObject *pKmd)
     Scratch_405428* pScratcPad = (Scratch_405428*)&gScratchPadMemory_991E40; // TODO: Add to union
 
     SVECTOR* pNormIter = pKmd->normOfs_44;
-    ColourVecs3* pScratch = &pScratcPad->field_20;
-
+    ColourVecs3* pScratch = &pScratcPad->field_20[0];
     const int normCount = (pKmd->numNorms_40 + 2) / 3u; // TODO: Add clarity to this calculation (rounding to multiple of 3??)
+    assert(normCount < 82);
+
     for (int i = 0; i < normCount; i++)
     {
         // NOTE: The real function will put the normals into the scratch pad first, this is tricky because
@@ -1822,9 +1823,9 @@ void CC LibGV_405428(kmdObject *pKmd)
 
         Psx_gte_nct_449B30();
 
-        pScratch[i].field_38_colours[0] = *(DWORD *)&gGte_RGB0_993F10; // TODO: Copy as CVECTOR's
-        pScratch[i].field_38_colours[1] = *(DWORD *)&gGte_RGB1_993F14;
-        pScratch[i].field_38_colours[2] = *(DWORD *)&gGte_RGB2_993F18;
+        pScratch[i].field_38_colours[0] = gGte_RGB0_993F10;
+        pScratch[i].field_38_colours[1] = gGte_RGB1_993F14;
+        pScratch[i].field_38_colours[2] = gGte_RGB2_993F18;
     }
 }
 MGS_FUNC_IMPLEX(0x405428, LibGV_405428, LIBDG_IMPL);
@@ -1834,6 +1835,11 @@ static void Stub_Psx_gte_nct_449B30()
     gGte_RGB0_993F10 = { 10,11,12,13 };
     gGte_RGB1_993F14 = { 14,15,16,17 };
     gGte_RGB2_993F18 = { 18,19,110,111 };
+}
+
+inline bool operator == (const CVECTOR& lhs, const CVECTOR& rhs)
+{
+    return (lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.cd == rhs.cd);
 }
 
 static void Test_LibGV_405428()
@@ -1863,13 +1869,12 @@ static void Test_LibGV_405428()
 
     LibGV_405428(&kmdObj);
 
-    Scratch_405428* pScratcPad = (Scratch_405428*)&gScratchPadMemory_991E40;
-
-    auto ptr = &pScratcPad->field_20;
+    const Scratch_405428* pScratcPad = (Scratch_405428*)&gScratchPadMemory_991E40;
+    const ColourVecs3* ptr = &pScratcPad->field_20[0];
  
-    ASSERT_EQ(0x0d0c0b0a, ptr->field_38_colours[0]); // TODO: Compare as CVECTORs
-    ASSERT_EQ(0x11100f0e, ptr->field_38_colours[1]);
-    ASSERT_EQ(0x6f6e1312, ptr->field_38_colours[2]);
+    ASSERT_EQ(gGte_RGB0_993F10, ptr->field_38_colours[0]);
+    ASSERT_EQ(gGte_RGB1_993F14, ptr->field_38_colours[1]);
+    ASSERT_EQ(gGte_RGB2_993F18, ptr->field_38_colours[2]);
 }
 
 
