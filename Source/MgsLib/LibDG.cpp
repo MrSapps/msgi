@@ -2507,7 +2507,7 @@ MGS_FUNC_IMPLEX(0x4041A5, LibGV_4041A5, LIBDG_IMPL);
 
 struct ScratchPad_Allocs
 {
-    DWORD* field_0_1024_unk_ptr;
+    DWORD** field_0_1024_unk_ptr;
     __int16 field_4;
     __int16 field_6_numObjTranslated;
     int field_8;
@@ -2591,6 +2591,15 @@ void CC LibGV_Helper_40373E(Prim_Mesh_0x5C* pMesh, int activeBuffer)
 }
 MGS_FUNC_IMPLEX(0x40373E, LibGV_Helper_40373E, LIBDG_IMPL);
 
+struct PolyTag
+{
+    BYTE field_0_OTZ;
+    BYTE field_1_unknown;
+    BYTE field_2_not_used;
+    BYTE field_3_prim_length_words;
+};
+MGS_ASSERT_SIZEOF(PolyTag, 0x4);
+
 void CC LibGV_404139(Prim_Mesh_0x5C* pMesh, int activeBuffer)
 {
     ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40; // TODO: Add to union
@@ -2599,24 +2608,70 @@ void CC LibGV_404139(Prim_Mesh_0x5C* pMesh, int activeBuffer)
     const __int16 field_50_numObjTranslated = pMesh->field_50_numObjTranslated;
     do
     {
-        DWORD* pScratchOt = pScratch->field_0_1024_unk_ptr;
+        DWORD** pScratchOt = pScratch->field_0_1024_unk_ptr;
         //pPolyIter = (POLY_GT4 *)((unsigned int)pPolyIter & 0xFFFFFF);
+
+        //assert(pMeshIter->field_52_num_faces < 256);
         for (int i = 0; i < pMeshIter->field_52_num_faces; i++)
         {
-            if (LOWORD(pPolyIter[i].tag))
+            PolyTag* pTag = (PolyTag*)&pPolyIter[i].tag;
+            if (pTag->field_0_OTZ || pTag->field_1_unknown)
             {
-                int tagLo = (unsigned __int16)(LOWORD(pPolyIter[i].tag) - field_50_numObjTranslated);
-                tagLo = tagLo & 0x00FFFFFFFF;
-                //LOBYTE(tagLo) = 0;
-                int tagIdx = (unsigned __int8)(LOBYTE(pPolyIter[i].tag) - field_50_numObjTranslated);
-                pPolyIter[i].tag = pScratchOt[tagIdx] | (tagLo << 16);
-                pScratchOt[tagIdx] = (DWORD)&pPolyIter[i];
+                pTag->field_3_prim_length_words = 0;
+                const int otPos = pTag->field_0_OTZ - pMesh->field_50_numObjTranslated;
+                const BYTE newLen = pTag->field_1_unknown;
+
+               
+                addPrim(&pScratchOt[otPos], &pPolyIter[i]);
+                setlen(&pPolyIter[i].tag, newLen);
             }
         }
         pMeshIter = pMeshIter->field_48_pLinked;
     } while (pMeshIter);
 }
-MGS_FUNC_IMPLEX(0x404139, LibGV_404139, false); // TODO: Implement me
+MGS_FUNC_IMPLEX(0x404139, LibGV_404139, false); // TODO: Implement me - snakes shadow is broken so impl is still wrong somehow
+
+
+static void Test_LibGV_404139()
+{
+    DWORD* ot[256] = {};
+
+    ScratchPad_Allocs* pScratch = (ScratchPad_Allocs*)&gScratchPadMemory_991E40;
+    pScratch->field_0_1024_unk_ptr = ot;
+
+    Prim_Mesh_0x5C mesh = {};
+    POLY_GT4 polys[4] = {};
+    for (int i = 0; i < 4; i++)
+    {
+        setPolyGT4(&polys[i]);
+
+        PolyTag* pTag = (PolyTag*)&polys[i].tag;
+        pTag->field_0_OTZ = 10;
+        pTag->field_1_unknown = 6;
+        pTag->field_2_not_used = 7;
+    }
+
+    mesh.field_54_prim_buffers[0] = polys;
+    mesh.field_52_num_faces = 2;
+    mesh.field_50_numObjTranslated = 5;
+
+    DWORD test[20] = {};
+    DWORD* pTest = &test[0];
+   // DWORD* pTest2 = &test[3];
+    ot[10 - 5] = pTest;
+
+    LibGV_404139(&mesh, 0);
+
+    DWORD newTag1 = 0x06000000 | ((DWORD)pTest);
+    ASSERT_EQ(polys[0].tag, newTag1);
+
+    DWORD newTag2 = 0x06000000 | ((DWORD)&polys[0].tag);
+    ASSERT_EQ(polys[1].tag, newTag2);
+    //ASSERT_EQ(polys[2].tag, 0);
+
+    ASSERT_EQ(ot[10-5], (DWORD*)&polys[1].tag);
+
+}
 
 void CC LibGV_prims_403528(struct_gv* pGv, int activeBuffer)
 {
@@ -2625,7 +2680,7 @@ void CC LibGV_prims_403528(struct_gv* pGv, int activeBuffer)
     if (LibGV_prims_scratch_alloc_403672(activeBuffer))
     {
         Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
-        pScratch->field_0_1024_unk_ptr = (DWORD*)gUnkSize_1024_6BE4E8; // TODO: !?
+        pScratch->field_0_1024_unk_ptr = gUnkSize_1024_6BE4E8; // TODO: !?
         pScratch->field_18_2048 = 2048;
         pScratch->field_1C_project_distance = (unsigned __int16)(pGv->word_6BC3BC <= 1000 ? 0 : 0xCA60) + 0x2000;
 
@@ -2771,15 +2826,15 @@ void CC LibGV_40340A(struct_gv* pGv, int activeBuffer)
         DWORD* unkItem = unk1024[i];
         if (unkItem)
         {
-            DWORD otItem24BitsPtr = 0;
+            DWORD unkPtr = 0;
             do
             {
                 DWORD* otPosPtr = &otrPtrNext[*unkItem >> 24];
-                otItem24BitsPtr = *unkItem & 0xFFFFFF;
-                *unkItem = (unsigned int)*otPosPtr | 0x0C000000; // 0x0c000000 POLY_GT4 tag/size?
+                unkPtr = *unkItem & 0xFFFFFF;
+                *unkItem = *otPosPtr | 0x0C000000; // 0x0c000000 POLY_GT4 tag/size?
                 *otPosPtr = (DWORD)unkItem;
-                unkItem = (DWORD *)otItem24BitsPtr;
-            } while (otItem24BitsPtr);
+                unkItem = (DWORD *)unkPtr;
+            } while (unkPtr);
         }
     }
 
@@ -2887,4 +2942,5 @@ void DoDGTests()
     Test_LibGV_404E08();
     Test_LibGV_apply_texture_to_quads_4071E1();
     Test_LibGV_prim_buffer_init_polyGT4s_40738D();
+    Test_LibGV_404139();
 }
