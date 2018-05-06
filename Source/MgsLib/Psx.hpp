@@ -145,7 +145,7 @@ struct DRAWENV
     WORD offx;
     WORD offy;
     PSX_RECT textureWindow;
-    BYTE texturePage;
+    WORD texturePage;
     BYTE dtd;
     BYTE dfe;
     BYTE isbg;
