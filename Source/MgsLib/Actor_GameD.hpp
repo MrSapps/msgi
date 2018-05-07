@@ -4,7 +4,7 @@
 #include "System.hpp"
 #include "types.hpp"
 
-void CC Init_Gamed_Create_44E12B();
+void CC GM_Init_44E12B();
 
 void* CC ResidentTopAllocate_40B379(int size);
 void CC Stage_LoadRelated_44EB27(WORD stageNameHashed, const char* pStageName);

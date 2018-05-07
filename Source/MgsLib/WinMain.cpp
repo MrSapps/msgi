@@ -2345,7 +2345,7 @@ signed int __cdecl Main()
 
     Resetgraph_AndPrintPsxStructureSizes(0);
     SetGraphDebug(0);
-    //null_44AC80();
+    //CdInit_44AC80();
     SetDispMask(0);
     PSX_RECT clearRect;
     clearRect.x1 = 0;
@@ -2353,19 +2353,19 @@ signed int __cdecl Main()
     clearRect.x2 = 1024;
     clearRect.y2 = 511;
     ClearImage(&clearRect, 0, 0, 0);
-    //null_44AB50();
+    //DrawSync_44AB50();
     SetDispMask(1);
-    //nullsub_14();
-    //nullsub_13();
-    //nullsub_8();
+    //InitGeom_14();
+    //VSyncInit_13();
+    //GetNewVblControlTable_8();
     MemCardsInit();
-    //nullsub_9();
-    LibGv_Init_sub_40A4F6();
-    j_FS_CloseFile_40907E();
-    LibDg_Init_40111A();
-    ScriptEngineInit_4090A7();
-    LibGv_Set_Load_HZM_CallBack_40B725();
-    Init_Gamed_Create_44E12B();
+    // PadInit_9();
+    GV_Init_40A4F6();
+    FS_Init_40907E();
+    DG_Init_40111A();
+    GCL_Init_4090A7();
+    HZD_Init_40B725();
+    GM_Init_44E12B();
 
     for (;;)
     {

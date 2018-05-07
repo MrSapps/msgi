@@ -482,33 +482,33 @@ void CC LibGV_Update_40A54E(Actor* /*pActor*/)
 }
 MGS_FUNC_IMPLEX(0x40A54E, LibGV_Update_40A54E, LIBGV_IMPL);
 
-void LibGv_Init_sub_40A4F6()
+void GV_Init_40A4F6()
 {
     ActorList_Init_40A006();
     LibGV_Reset_System2_Memory_40B35E();
-    LibGv_ClearFunctionPointers_40A69D();
+    LibGv_FileFormatHandlersArray_40A69D();
     LibGV_Init_FileCache_40A6AC();
     LibGV_40A4B1();
     Actor_PushBack_40A2AF(0, &g_lib_gv_stru_6BFEE0.mBase, nullptr);
     Actor_Init_40A347(&g_lib_gv_stru_6BFEE0.mBase, LibGV_Update_40A54E, nullptr, "C:\\mgs\\source\\LibGV\\gvd.c");
     gActiveBuffer_dword_791A08 = 0;
     g_lib_gv_stru_6BFEE0.gRenderedFramesCount_dword_6BFF00 = 0;
-    //nullsub_6(nullsub_4);
+    //SetHangupFunc_6(HangupDebugFunc_4);
 }
-MGS_FUNC_IMPLEX(0x40A4F6, LibGv_Init_sub_40A4F6, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40A4F6, GV_Init_40A4F6, LIBGV_IMPL);
 
 
-void CC LibGv_ClearFunctionPointers_40A69D()
+void CC LibGv_FileFormatHandlersArray_40A69D()
 {
     memset(g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs, 0, sizeof(g_lib_gv_stru_6BFEE0.dword_6BFF0C_fn_ptrs));
 }
-MGS_FUNC_IMPLEX(0x40A69D, LibGv_ClearFunctionPointers_40A69D, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40A69D, LibGv_FileFormatHandlersArray_40A69D, LIBGV_IMPL);
 
-void CC LibGv_Set_Load_HZM_CallBack_40B725()
+void CC HZD_Init_40B725()
 {
     LibGV_Set_FileExtHandler_40A68D('h', Gv_hzm_file_handler_40B734.Ptr());
 }
-MGS_FUNC_IMPLEX(0x40B725, LibGv_Set_Load_HZM_CallBack_40B725, LIBGV_IMPL);
+MGS_FUNC_IMPLEX(0x40B725, HZD_Init_40B725, LIBGV_IMPL);
 
 void CC LibGV_Set_FileExtHandler_40A68D(char id, GV_FnPtr fn)
 {

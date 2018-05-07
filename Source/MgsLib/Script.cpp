@@ -1222,7 +1222,7 @@ signed int CC GV_gcx_file_handler_4090CF(void* pScript, TFileNameHash fileNameHa
 }
 MGS_FUNC_IMPLEX(0x004090CF, GV_gcx_file_handler_4090CF, SCRIPT_IMPL);
 
-void CC ScriptEngineInit_4090A7()
+void CC GCL_Init_4090A7()
 {
     Script_sub_409A3A(); // Stack setup?
     SaveDataStructuresRelated_4093ED(); // Script vars memory?
@@ -1230,7 +1230,7 @@ void CC ScriptEngineInit_4090A7()
     LibGV_Set_FileExtHandler_40A68D('g', GV_gcx_file_handler_4090CF); // .gcx
     Script_Set_MainOrDemo_40908E(0);
 }
-MGS_FUNC_IMPLEX(0x004090A7, ScriptEngineInit_4090A7, SCRIPT_IMPL); // TODO
+MGS_FUNC_IMPLEX(0x004090A7, GCL_Init_4090A7, SCRIPT_IMPL); // TODO
 
 BYTE* CC Script_FindProc(WORD procId)
 {

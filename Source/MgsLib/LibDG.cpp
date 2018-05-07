@@ -3028,7 +3028,7 @@ void CC LibDG_Update1_4012ED(Actor* /*pActor*/)
 }
 MGS_FUNC_IMPLEX(0x4012ED, LibDG_Update1_4012ED, LIBDG_IMPL);
 
-void CC LibDg_Init_40111A()
+void CC DG_Init_40111A()
 {
     //nullsub_8();
     //nullsub_7(DeadCode_4011F8);
@@ -3049,7 +3049,7 @@ void CC LibDg_Init_40111A()
     Actor_PushBack_40A2AF(8, &gLibDGD_1_stru_6BB910, 0); // Handles 3D rendering?
     Actor_Init_40A347(&gLibDGD_1_stru_6BB910, LibDG_Update1_4012ED, nullptr, "C:\\mgs\\source\\LibDG\\dgd.c");
 }
-MGS_FUNC_IMPLEX(0x40111A, LibDg_Init_40111A, LIBDG_IMPL);
+MGS_FUNC_IMPLEX(0x40111A, DG_Init_40111A, LIBDG_IMPL);
 
 void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
 {

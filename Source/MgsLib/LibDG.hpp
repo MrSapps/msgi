@@ -88,7 +88,7 @@ signed int CC GV_bin_file_handler_44E9D2(void* pData, TFileNameHash fileNameHash
 void CC LibDG_SetActiveResourceInitFuncPtrs_457B5B();
 void CC LibDG_ClearActiveResourceFunctionPointerList_457B7C();
 ResInitFn CC LibDG_GetResourceInitFuncPtr_457BAC(WORD hashedName);
-void CC LibDg_Init_40111A();
+void CC DG_Init_40111A();
 
 signed int CC Script_tbl_chara_451AC3(BYTE* pScript);
 signed int CC PrimAdd_401805(Prim_Union* pPrimBuffer);

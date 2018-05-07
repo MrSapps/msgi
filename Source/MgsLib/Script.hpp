@@ -31,7 +31,7 @@ signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs);
 DWORD CC Script_ParamExists(char paramId);
 DWORD CC Script_get_int();
 BYTE* CC Script_GetReturnAddress();
-void CC ScriptEngineInit_4090A7();
+void CC GCL_Init_4090A7();
 void CC ScriptSetArgs_409893(DWORD* pArgs);
 int CC Script_Operator_Evaluate(int operation, int v1, int v2);
 void CC Script_RunMainProc_409D49();

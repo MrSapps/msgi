@@ -64,10 +64,10 @@ MGS_ASSERT_SIZEOF(LibGv_Struct, 0x75C);
 
 int CC LibGV_mesg_write_40B3ED(const LibGV_Msg* pSrcMsg);
 
-void LibGv_Init_sub_40A4F6();
+void GV_Init_40A4F6();
 void CC LibGV_Set_FileExtHandler_40A68D(char id, GV_FnPtr fn);
-void CC LibGv_ClearFunctionPointers_40A69D();
-void CC LibGv_Set_Load_HZM_CallBack_40B725();
+void CC LibGv_FileFormatHandlersArray_40A69D();
+void CC HZD_Init_40B725();
 __int64 CC TimeGetElapsed_4455A0();
 int CC LibGV_LoadFile_40A77F(void* fileData, signed int fileNameHash, int allocType);
 void CC LibGV_Save_File_Cache_Records_To_Resident_Memory_40A6CD();

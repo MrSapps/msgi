@@ -48,12 +48,12 @@ MGS_VAR(1, 0x78E964, BYTE*, gSavedTop_78E964, 0);
 MGS_VAR(1, 0x9942A4, DWORD, dword_9942A4, 0);
 MGS_VAR(1, 0x791E08, DWORD, dword_791E08, 0);
 MGS_VAR(1, 0x7227C4, DWORD, dword_7227C4, 0);
-MGS_VAR(1, 0x722794, DWORD, dword_722794, 0);
+MGS_VAR(1, 0x722794, DWORD, soft_reset_remaining_ticks_722794, 0);
 
 
 MGS_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 
-MGS_FUNC_NOT_IMPL(0x00521892, int CC(), sub_521892);
+MGS_FUNC_NOT_IMPL(0x00521892, int CC(), CdGetStatus_521892);
 MGS_FUNC_NOT_IMPL(0x0044DEDE, int CC(), sub_44DEDE);
 MGS_FUNC_NOT_IMPL(0x00453B11, void CC(), Res_game_camera_create_453B11);
 MGS_FUNC_NOT_IMPL(0x00455299, void CC(), sub_455299);
@@ -880,32 +880,34 @@ static void GameD_Update_helper(DWORD buttons)
         //game_state_dword_72279C = 0xa46000;
     }
 
+    // bit mask for L2+R2+L1+R1+Select+Start ?
+
     if ((buttons & 0x90F) != 0x90F || dword_7227C4)
     {
-        dword_722794 = 90;
+        soft_reset_remaining_ticks_722794 = 90;
     }
-    else if (--dword_722794 < 0)
+    else if (--soft_reset_remaining_ticks_722794 < 0)
     {
         static char sPsxBinaryName_byte_722740[32] = {};
         //sprintf(sPsxBinaryName_byte_722740, "cdrom:\\MGS\\%s;1", (&gBinaries_off_650068)[4 * gBinaryIndex_dword_78D7B0]);
         SetDispMask(0);
-        //nullsub_70();
-        //nullsub_69();
-        //Ret0_44AC80();
-        //RetInput_6465B0(0);
-        //nullsub_11(v6);
-        //CloseEvents_40842A();
+        //PadStopCom_3();
+        //SpuInit_69();
+        //CdInit_44AC80();
+        //SpuSetIRQ_6465B0(0);
+        //MTSExit_11(v6);
+        //DisableMC_40842A();
         Resetgraph_AndPrintPsxStructureSizes(3);
-        //Ret0_6465E0();
-        //Ret0_44D000();
-        //Re0_6465D0();
-        //Ret0_6465E0();
-        //nullsub_18();
-        //nullsub_17();
+        //StopCallback_6465E0();
+        //SetConf_44D000();
+        //ResetCallback_6465D0();
+        //StopCallback_6465E0();
+        //_96_remove_18();
+        //_96_init_17();
         for (;;)
         {
             printf("load %s\n", sPsxBinaryName_byte_722740);
-            //Ret0_44CFD0();
+            //LoadExec_44CFD0();
         }
     }
     if (game_state_dword_72279C.flags & 0x80000000)
@@ -917,7 +919,7 @@ static void GameD_Update_helper(DWORD buttons)
     }
     if (GameD_Input_445610() & 0x20)
     {
-        //nullsub_68();
+        //SpuGetAllKeysStatus_68();
         int v10 = 0;
         char v11[24];
         for (int i = 0; i < 24; ++i)
@@ -956,16 +958,16 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
 
     if (gActorPauseFlags_dword_791A0C & 8)
     {
-        if (dword_791E08 || sub_521892() == 3)
+        if (dword_791E08 || CdGetStatus_521892() == 3)
         {
-            sub_44DEDE();
+            sub_44DEDE(); // Would render CD busy or something on PSX?
         }
         else
         {
             gActorPauseFlags_dword_791A0C = (gActorPauseFlags_dword_791A0C & 0xF7);
         }
     }
-    else if (dword_791E08 || sub_521892() == 3)
+    else if (dword_791E08 || CdGetStatus_521892() == 3)
     {
         gActorPauseFlags_dword_791A0C = (gActorPauseFlags_dword_791A0C | 8) & 0xFF;
     }
@@ -1289,7 +1291,7 @@ void CC LibGV_40A4BB()
 }
 MGS_FUNC_IMPLEX(0x0040A4BB, LibGV_40A4BB, ACTOR_GAMED_IMPL);
 
-void CC Init_Gamed_Create_44E12B()
+void CC GM_Init_44E12B()
 {
     gTotalFrameTime_dword_995344 = 0;
     gGameOverTimer_dword_7227A4 = 0;
@@ -1298,7 +1300,7 @@ void CC Init_Gamed_Create_44E12B()
     Res_MenuMan_create_459A9A();
     Stage_GetNameHashStack_44EAED();
     LibDG_SetActiveResourceInitFuncPtrs_457B5B();
-    Script_BindInits_452610();
+    Script_BindInits_452610(); // CopyStageBinary in PSX ver?
     LibGV_Set_FileExtHandler_40A68D('b', GV_bin_file_handler_44E9D2); // Handles loading ".bin" files which sets loadable objects table
     sub_44E1E0();
     Actor_PushBack_40A2AF(1, &gGameD_stru_722760.mBase, nullptr);
@@ -1315,4 +1317,4 @@ void CC Init_Gamed_Create_44E12B()
     Create_loader_44E226();
    // AddDebugActor();
 }
-MGS_FUNC_IMPLEX(0x44E12B, Init_Gamed_Create_44E12B, ACTOR_GAMED_IMPL);
+MGS_FUNC_IMPLEX(0x44E12B, GM_Init_44E12B, ACTOR_GAMED_IMPL);
