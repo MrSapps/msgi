@@ -1767,19 +1767,104 @@ MGS_FUNC_NOT_IMPL(0x404B36, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimB
 
 
 MGS_FUNC_NOT_IMPL(0x40556A, POLY_GT4 *__cdecl (unsigned int *pNorms, POLY_GT4 *pPoly, int faceCount, unsigned int *pIndices), LibGV_indexed_normals_40556A);
-MGS_FUNC_NOT_IMPL(0x4054F2, POLY_GT4 *__cdecl (unsigned int *pNormIdx, POLY_GT4 *pPoly, int faceCount), LibGV_normals_4054F2);
-
-
-struct ColourVecs3
-{
-    CVECTOR field_38_colours[3];
-};
 
 struct Scratch_405428
 {
     PSX_MATRIX field_0;
-    ColourVecs3 field_20[82];
+    CVECTOR field_20[82*3]; // Max of 992 bytes
 };
+
+POLY_GT4* CC LibGV_normals_4054F2(const unsigned int* pNormIdx, POLY_GT4* pPoly, int faceCount)
+{
+    if (faceCount - 1 < 0)
+    {
+        return pPoly;
+    }
+
+    const unsigned int* pNormIdxIter = pNormIdx;
+    POLY_GT4* pPolyIter = pPoly;
+    Scratch_405428* pScratch = (Scratch_405428*)&gScratchPadMemory_991E40; // TODO: Add to union
+    for (int i=0; i<faceCount; i++)
+    {
+        if (LOWORD(pPolyIter[i].tag))
+        {
+            const DWORD idx = pNormIdxIter[i];
+            // TODO: Do not cast, copy each rgb field by itself
+            *(DWORD *)&pPolyIter[i].r0 = *(DWORD *)&pScratch->field_20[idx & 255]; // Max 246 idx
+            *(DWORD *)&pPolyIter[i].r1 = *(DWORD *)&pScratch->field_20[((idx >> 6) & 1020) / sizeof(CVECTOR)];
+            *(DWORD *)&pPolyIter[i].r2 = *(DWORD *)&pScratch->field_20[((idx >> 22) & 1020) / sizeof(CVECTOR)];
+            *(DWORD *)&pPolyIter[i].r3 = *(DWORD *)&pScratch->field_20[((idx >> 14) & 1020) / sizeof(CVECTOR)];
+        }
+    }
+    return pPolyIter;
+}
+MGS_FUNC_IMPLEX(0x4054F2, LibGV_normals_4054F2, LIBDG_IMPL);
+
+static void Test_LibGV_normals_4054F2()
+{
+    Scratch_405428* pScratcPad = (Scratch_405428*)&gScratchPadMemory_991E40; // TODO: Add to union
+    BYTE c = 0;
+    for (int i = 0; i < 4 * 2; i++)
+    {
+        pScratcPad->field_20[i].r = c++;
+        pScratcPad->field_20[i].g = c++;
+        pScratcPad->field_20[i].b = c++;
+        pScratcPad->field_20[i].cd = c++;
+    }
+
+    BYTE normals[4*2] = 
+    {
+        2 | 0x80,
+        1 | 0x80,
+        0 | 0x80,
+        3 | 0x80,
+        4,
+        5,
+        6,
+        7,
+    };
+
+    POLY_GT4 polys[2] = {};
+    for (int i = 0; i < 2; i++)
+    {
+        polys[i].tag = 0xFFFF;
+    }
+
+    LibGV_normals_4054F2((unsigned int*)normals, polys, 2);
+
+    ASSERT_EQ(polys[0].r0, pScratcPad->field_20[normals[0]].r);
+    ASSERT_EQ(polys[0].g0, pScratcPad->field_20[normals[0]].g);
+    ASSERT_EQ(polys[0].b0, pScratcPad->field_20[normals[0]].b);
+
+    ASSERT_EQ(polys[0].r1, pScratcPad->field_20[normals[1]].r);
+    ASSERT_EQ(polys[0].g1, pScratcPad->field_20[normals[1]].g);
+    ASSERT_EQ(polys[0].b1, pScratcPad->field_20[normals[1]].b);
+
+    ASSERT_EQ(polys[0].r2, pScratcPad->field_20[normals[3]].r);
+    ASSERT_EQ(polys[0].g2, pScratcPad->field_20[normals[3]].g);
+    ASSERT_EQ(polys[0].b2, pScratcPad->field_20[normals[3]].b);
+
+    ASSERT_EQ(polys[0].r3, pScratcPad->field_20[normals[2]].r);
+    ASSERT_EQ(polys[0].g3, pScratcPad->field_20[normals[2]].g);
+    ASSERT_EQ(polys[0].b3, pScratcPad->field_20[normals[2]].b);
+
+    ASSERT_EQ(polys[1].r0, pScratcPad->field_20[normals[4]].r);
+    ASSERT_EQ(polys[1].g0, pScratcPad->field_20[normals[4]].g);
+    ASSERT_EQ(polys[1].b0, pScratcPad->field_20[normals[4]].b);
+
+    ASSERT_EQ(polys[1].r1, pScratcPad->field_20[normals[5]].r);
+    ASSERT_EQ(polys[1].g1, pScratcPad->field_20[normals[5]].g);
+    ASSERT_EQ(polys[1].b1, pScratcPad->field_20[normals[5]].b);
+
+    ASSERT_EQ(polys[1].r2, pScratcPad->field_20[normals[7]].r);
+    ASSERT_EQ(polys[1].g2, pScratcPad->field_20[normals[7]].g);
+    ASSERT_EQ(polys[1].b2, pScratcPad->field_20[normals[7]].b);
+
+    ASSERT_EQ(polys[1].r3, pScratcPad->field_20[normals[6]].r);
+    ASSERT_EQ(polys[1].g3, pScratcPad->field_20[normals[6]].g);
+    ASSERT_EQ(polys[1].b3, pScratcPad->field_20[normals[6]].b);
+}
+
 
 void CC Psx_gte_nct_449B30();
 
@@ -1797,7 +1882,7 @@ void CC LibGV_405428(kmdObject* pKmd)
     Scratch_405428* pScratcPad = (Scratch_405428*)&gScratchPadMemory_991E40; // TODO: Add to union
 
     SVECTOR* pNormIter = pKmd->normOfs_44;
-    ColourVecs3* pScratch = &pScratcPad->field_20[0];
+    CVECTOR* pScratch = &pScratcPad->field_20[0];
     const int normCount = (pKmd->numNorms_40 + 2) / 3u; // TODO: Add clarity to this calculation (rounding to multiple of 3??)
     assert(normCount < 82);
 
@@ -1823,9 +1908,11 @@ void CC LibGV_405428(kmdObject* pKmd)
 
         Psx_gte_nct_449B30();
 
-        pScratch[i].field_38_colours[0] = gGte_RGB0_993F10;
-        pScratch[i].field_38_colours[1] = gGte_RGB1_993F14;
-        pScratch[i].field_38_colours[2] = gGte_RGB2_993F18;
+        pScratch[0] = gGte_RGB0_993F10;
+        pScratch[1] = gGte_RGB1_993F14;
+        pScratch[2] = gGte_RGB2_993F18;
+
+        pScratch += 3;
     }
 }
 MGS_FUNC_IMPLEX(0x405428, LibGV_405428, LIBDG_IMPL);
@@ -1870,11 +1957,11 @@ static void Test_LibGV_405428()
     LibGV_405428(&kmdObj);
 
     const Scratch_405428* pScratcPad = (Scratch_405428*)&gScratchPadMemory_991E40;
-    const ColourVecs3* ptr = &pScratcPad->field_20[0];
+    const CVECTOR* ptr = &pScratcPad->field_20[0];
  
-    ASSERT_EQ(gGte_RGB0_993F10, ptr->field_38_colours[0]);
-    ASSERT_EQ(gGte_RGB1_993F14, ptr->field_38_colours[1]);
-    ASSERT_EQ(gGte_RGB2_993F18, ptr->field_38_colours[2]);
+    ASSERT_EQ(gGte_RGB0_993F10, ptr[0]);
+    ASSERT_EQ(gGte_RGB1_993F14, ptr[1]);
+    ASSERT_EQ(gGte_RGB2_993F18, ptr[2]);
 }
 
 
@@ -1896,9 +1983,9 @@ void CC LibGV_4053D1(Prim_Mesh_0x5C* pMesh, int activeBuffer)
         else
         {
             pPrimBufferIter = LibGV_normals_4054F2(
-                (unsigned int*)pMeshIter->field_40_pKmdObj->normIndex_48,  // TODO: Check types
+                (unsigned int*)pMeshIter->field_40_pKmdObj->normIndex_48,// TODO: Check types
                 pPrimBufferIter, 
-                pMeshIter->field_52_num_faces);
+                pMeshIter->field_52_num_faces); 
         }
         pMeshIter = pMeshIter->field_48_pLinked;
     } while (pMeshIter);
@@ -3030,8 +3117,8 @@ MGS_FUNC_IMPLEX(0x4012ED, LibDG_Update1_4012ED, LIBDG_IMPL);
 
 void CC DG_Init_40111A()
 {
-    //nullsub_8();
-    //nullsub_7(DeadCode_4011F8);
+    //GetNewVblControlTable_8();
+    //SetVblankControlFunc_7(PrimitiveQueueEmpty_4011F8);
     LibGvInitDispEnv_401A4F(0, 0, 320, 240, 320);
     Gv3StructsInit_4012F2(320);
     LibDG_Clear_Resident_Texture_Cache_Copy_4026E6();
@@ -3082,4 +3169,5 @@ void DoDGTests()
     Test_LibGV_prim_buffer_init_polyGT4s_40738D();
     Test_LibGV_404139();
     Test_LibGV_405428();
+    Test_LibGV_normals_4054F2();
 }
