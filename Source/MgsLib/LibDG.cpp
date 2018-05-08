@@ -2276,23 +2276,50 @@ static void Test_LibGV_406168()
     ASSERT_EQ(faces[0].pad2, 0);
 }
 
-MGS_FUNC_NOT_IMPL(0x4057A0, void __cdecl (Prim_Mesh_0x5C* pMesh, int activeBuffer), LibGV_4057A0);
-
 struct ScratchPad_405668 // TODO: Add to union and figure out other pad fields
 {
-    WORD pad1[255];
+    WORD pad1[254];
+    WORD field_1FC_flags2;
     WORD flags;
     WORD pad2[252];
     POLY_GT4* pPolys;
     SVECTOR* pVerts;
 };
 
+MGS_FUNC_NOT_IMPL(0x4057FF, void __cdecl (SVECTOR *vertPtr, int vertCount), LibGV_4057FF);
+MGS_FUNC_NOT_IMPL(0x405B8A, void __cdecl (SVECTOR *vertPtr, int vertCount), LibGV_helper_405B8A);
+MGS_FUNC_NOT_IMPL(0x405DAF, POLY_GT4 *__cdecl (unsigned int* pVertIdxes, POLY_GT4 *pPoly, int faceCount), LibGV_helper_405DAF);
+
+void CC LibGV_4057A0(Prim_Mesh_0x5C* pMesh, int activeBuffer)
+{
+    ScratchPad_405668* pScratch = (ScratchPad_405668*)&gScratchPadMemory_991E40; // TODO: Add to union
+    POLY_GT4* pPolyIter = pMesh->field_54_prim_buffers[activeBuffer];
+    Prim_Mesh_0x5C* pMeshIter = pMesh;
+    do
+    {
+        kmdObject* pKmd = pMeshIter->field_40_pKmdObj;
+        if (pScratch->flags & 1)
+        {
+            LibGV_4057FF(pKmd->vertOfs_38, pKmd->numVerts_34);
+        }
+        else
+        {
+            LibGV_helper_405B8A(pKmd->vertOfs_38, pKmd->numVerts_34);
+        }
+        pScratch->field_1FC_flags2 = pKmd->field_0_flags & 0x400;
+        // TODO: Check type of indexOfs_3C
+        pPolyIter = LibGV_helper_405DAF((unsigned int*)pKmd->indexOfs_3C, pPolyIter, pMeshIter->field_52_num_faces);
+        pMeshIter = pMeshIter->field_48_pLinked;
+    } while (pMeshIter);
+}
+MGS_FUNC_IMPLEX(0x4057A0, LibGV_4057A0, LIBDG_IMPL);
+
 void CC LibGV_405668(struct_gv* pGv, int activeBuffer)
 {
     LibGV_406168(pGv, activeBuffer);
     Gte_project_distance_rect_401DA8(&pGv->dword_6BC3C8_pStructure_rect, pGv->word_6BC3BC);
 
-    ScratchPad_405668* pScratch = (ScratchPad_405668*)&gScratchPadMemory_991E40;
+    ScratchPad_405668* pScratch = (ScratchPad_405668*)&gScratchPadMemory_991E40; // TODO: Add to union
 
     for (int i = 0; i < pGv->mTotalObjectCount; i++)
     {
