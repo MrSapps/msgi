@@ -2238,7 +2238,7 @@ void CC LibGV_406168(struct_gv* pGv, int activeBuffer)
                         for (int k = 0; k < totalFaceCount; k++)
                         {
                             POLY_GT4* pPoly = pMeshIter->field_54_prim_buffers[activeBuffer];
-                            pPoly[k].pad2 = 0; // TODO: Check if its this or actually tag that is set to 0
+                            pPoly[k].pad2 = 0;
                         }
                     }
                 }
@@ -2247,6 +2247,34 @@ void CC LibGV_406168(struct_gv* pGv, int activeBuffer)
     }
 }
 MGS_FUNC_IMPLEX(0x406168, LibGV_406168, LIBDG_IMPL);
+
+static void Test_LibGV_406168()
+{
+    struct_gv gv = {};
+    gv.mTotalObjectCount = 1;
+ 
+    struct TestPrim
+    {
+        Prim_unknown_0x48 mPrim;
+        Prim_Mesh_0x5C mMesh[2];
+    };
+
+    TestPrim prim = {};
+    POLY_GT4 faces[2] = {};
+    prim.mPrim.field_32 = 1;
+    prim.mPrim.field_2E_UnknownOrNumFaces = 1;
+    prim.mMesh[0].field_4C_bounding_ret = 1;
+    prim.mMesh[0].field_52_num_faces = 1;
+    prim.mMesh[0].field_54_prim_buffers[0] = faces;
+    memset(&faces[0], 1, sizeof(POLY_GT4));
+
+    Prim_Union* prims[] = { reinterpret_cast<Prim_Union*>(&prim) };
+    gv.mQueue = prims;
+
+    ASSERT_EQ(faces[0].pad2, 0x0101);
+    LibGV_406168(&gv, 0);
+    ASSERT_EQ(faces[0].pad2, 0);
+}
 
 MGS_FUNC_NOT_IMPL(0x4057A0, void __cdecl (Prim_Mesh_0x5C* pMesh, int activeBuffer), LibGV_4057A0);
 
@@ -3170,4 +3198,5 @@ void DoDGTests()
     Test_LibGV_404139();
     Test_LibGV_405428();
     Test_LibGV_normals_4054F2();
+    Test_LibGV_406168();
 }
