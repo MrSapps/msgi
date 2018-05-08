@@ -535,6 +535,12 @@ void Test_LibGV_Init_FileCache_40A6AC()
 
 }
 
+void CC LibGV_Set_gGv_dword_6C03A4_40AC17(int value)
+{
+    g_lib_gv_stru_6BFEE0.gGv_dword_6C03A4_left_stick = value;
+}
+MGS_FUNC_IMPLEX(0x40AC17, LibGV_Set_gGv_dword_6C03A4_40AC17, LIBGV_IMPL);
+
 void DoLibGv_Tests()
 {
     Test_mesg();

@@ -543,6 +543,20 @@ const VECTOR sVec_650118_value = { 0, -4096, 0 };
 MGS_VAR(1, 0x650118, VECTOR, sVec_650118, sVec_650118_value);
 MGS_ARY(1, 0x6BED08, VECTOR, 2, stru_6BED08, {});
 
+int CC Res_base_unknown_444158(int value1, int value2)
+{
+    const int valueDiff = value2 - value1;
+    if (value2 - value1 <= -8 || valueDiff >= 8)
+    {
+        return value1 + valueDiff / 8;
+    }
+    else
+    {
+        return value2;
+    }
+}
+MGS_FUNC_IMPLEX(0x444158, Res_base_unknown_444158, KMD_IMPL);
+
 void CC Res_base_unknown_401C22(struct_gv* pGv, SVECTOR* pVec1, SVECTOR* pVec2, __int16 gvWord)
 {
     
