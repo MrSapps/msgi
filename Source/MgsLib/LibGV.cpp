@@ -8,6 +8,7 @@
 #include "ResourceNameHash.hpp"
 #include "Actor_GameD.hpp"
 #include "WinMain.hpp"
+#include "Map.hpp"
 #include <gmock/gmock.h>
 
 #define REDIRECT_LIBGV_DATA 1
@@ -42,8 +43,6 @@ void CC LibGV_40A4B1()
     memset(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388_history, 0, sizeof(g_lib_gv_stru_6BFEE0.gGv_dword_6C0388_history));
 }
 MGS_FUNC_IMPLEX(0x40A4B1, LibGV_40A4B1, LIBGV_IMPL);
-
-MGS_FUNC_NOT_IMPL(0x40B734, int CC(void*, TFileNameHash), Gv_hzm_file_handler_40B734);
 
 void CC LibGV_Init_FileCache_40A6AC()
 {
@@ -506,7 +505,7 @@ MGS_FUNC_IMPLEX(0x40A69D, LibGv_FileFormatHandlersArray_40A69D, LIBGV_IMPL);
 
 void CC HZD_Init_40B725()
 {
-    LibGV_Set_FileExtHandler_40A68D('h', Gv_hzm_file_handler_40B734.Ptr());
+    LibGV_Set_FileExtHandler_40A68D('h', Gv_hzm_file_handler_40B734);
 }
 MGS_FUNC_IMPLEX(0x40B725, HZD_Init_40B725, LIBGV_IMPL);
 

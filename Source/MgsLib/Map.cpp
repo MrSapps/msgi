@@ -351,3 +351,131 @@ void CC Map_Reshade_all_44F8C3()
     }
 }
 MGS_FUNC_IMPLEX(0x44F8C3, Map_Reshade_all_44F8C3, MAP_IMPL);
+
+struct hzm_if_camera
+{
+    short field_0;
+    short field_2;
+    short field_4;
+    short field_6;
+    short field_8;
+    short field_A;
+    char field_C;
+    char field_D_type;
+    short field_E;
+};
+MGS_ASSERT_SIZEOF(hzm_if_camera, 0x10);
+
+struct hzm_if_trigger
+{
+    char field_0_tag_name[12];
+    char field_C_type;
+    char field_D_pad;
+    WORD field_E_tag_name_hashed;
+    DWORD field_10_pad;
+};
+MGS_ASSERT_SIZEOF(hzm_if_trigger, 0x14);
+
+union hzm_flags_union
+{
+    hzm_if_trigger u_hzm_if_trigger;
+    hzm_if_camera u_hzm_if_camera;
+};
+MGS_ASSERT_SIZEOF(hzm_flags_union, 0x14);
+
+struct hzm_flags_record
+{
+    short field_0;
+    short field_2;
+    short field_4;
+    short field_6;
+    short field_8;
+    short field_A;
+    short field_C;
+    short field_E;
+    hzm_flags_union field_10_union;
+};
+MGS_ASSERT_SIZEOF(hzm_flags_record, 0x24);
+
+struct hzm_pathfinding_record
+{
+    int field_0; // Order ?
+    void* field_4_pUnknown;
+};
+MGS_ASSERT_SIZEOF(hzm_pathfinding_record, 0x8);
+
+struct hzm_table_record
+{
+    short field_0_n_flags;
+    short field_2_n_walls;
+    short field_4_n_heights;
+    short field_6_n_unknown;
+    void* field_8_wall_offset;
+    void* field_C_height_offset;
+    hzm_flags_record* field_10_flag_offset;
+    void* field_14_wall_config_offset;
+};
+MGS_ASSERT_SIZEOF(hzm_table_record, 0x18);
+
+struct hzm_header_data
+{
+    short field_0_num_navmeshes;
+    short field_2_num_pathfindings;
+    hzm_table_record* field_4_offset_tables;
+    void* field_8_offset_navmeshes;
+    hzm_pathfinding_record* field_C_offset_pathfindings;
+};
+MGS_ASSERT_SIZEOF(hzm_header_data, 0x10);
+
+union hzm_version_and_nav_mesh_ptr
+{
+    int* pNavMesh;
+    short version;
+};
+MGS_ASSERT_SIZEOF(hzm_version_and_nav_mesh_ptr, 4);
+
+struct hzm_header
+{
+    hzm_version_and_nav_mesh_ptr field_0_version_and_ptr_to_nav_meshes;
+    int field_4;
+    short field_8;
+    short field_A_table_count;
+    hzm_header_data field_C_pSub;
+};
+MGS_ASSERT_SIZEOF(hzm_header, 0x1C);
+
+MGS_FUNC_NOT_IMPL(0x40B7A3, void __cdecl (hzm_flags_record *pFlags, int flagsCount), HZM_Process_TableFlagIfTriggers_40B7A3);
+
+
+int CC Gv_hzm_file_handler_40B734(void* pFileData, TFileNameHash)
+{
+    hzm_header* pHzm = reinterpret_cast<hzm_header*>(pFileData);
+
+    if (pHzm->field_0_version_and_ptr_to_nav_meshes.version < 2)
+    {
+        printf("Warning:old version hzm\n");
+    }
+
+    pHzm->field_0_version_and_ptr_to_nav_meshes.pNavMesh = nullptr; // For some reason first 4 bytes get re-used as a pointer.. 
+    OffsetToPointer(pHzm, &pHzm->field_C_pSub.field_4_offset_tables);
+    OffsetToPointer(pHzm, &pHzm->field_C_pSub.field_8_offset_navmeshes);
+    OffsetToPointer(pHzm, &pHzm->field_C_pSub.field_C_offset_pathfindings);
+
+    hzm_pathfinding_record* pPathFindingRecord = pHzm->field_C_pSub.field_C_offset_pathfindings;
+    for (int i = 0; i < pHzm->field_C_pSub.field_2_num_pathfindings; i++)
+    {
+        OffsetToPointer(pHzm, &pPathFindingRecord[i].field_4_pUnknown);
+    }
+
+    hzm_table_record* pTableRecord = pHzm->field_C_pSub.field_4_offset_tables;
+    for (int i = 0; i < pHzm->field_A_table_count; i++)
+    {
+        OffsetToPointer(pHzm, &pTableRecord[i].field_10_flag_offset);
+        OffsetToPointer(pHzm, &pTableRecord[i].field_8_wall_offset);
+        OffsetToPointer(pHzm, &pTableRecord[i].field_C_height_offset);
+        OffsetToPointer(pHzm, &pTableRecord[i].field_14_wall_config_offset);
+        HZM_Process_TableFlagIfTriggers_40B7A3(pTableRecord[i].field_10_flag_offset, pTableRecord[i].field_0_n_flags);
+    }
+    return 1;
+}
+MGS_FUNC_IMPLEX(0x40B734, Gv_hzm_file_handler_40B734, MAP_IMPL);
