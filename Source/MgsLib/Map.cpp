@@ -7,8 +7,11 @@
 #include "LibDG.hpp"
 #include "ResourceNameHash.hpp"
 #include "Menu.hpp"
+#include "Actor_GameD.hpp"
 
 #define MAP_IMPL true
+
+void CC Map_LoadMapData_44F66F(int mapNum, int resourceNameHashed);
 
 struct LitHeader
 {
@@ -160,18 +163,6 @@ int CC Map_ScriptReloadMaps_44F75E(int zeroOrOne)
     return 0;
 }
 MGS_FUNC_IMPLEX(0x44F75E, Map_ScriptReloadMaps_44F75E, MAP_IMPL);
-
-MGS_FUNC_NOT_IMPL(0x44F5AF, void* CC(int resource_name_hashed, int default_0, __int16 bitIndex, int default_48, int default_24), Map_HZD_Load_44F5AF)
-
-void CC Map_LoadMapData_44F66F(int mapNum, int resourceNameHashed)
-{
-    printf("set map %d\n", mapNum);
-    map_record* pMap = Map_GetNextFreeRecord_44F505(static_cast<short>(mapNum));
-    pMap->field_8_hzd = Map_HZD_Load_44F5AF(resourceNameHashed, 0, static_cast<short>(pMap->field_0_map_index_bit), 48, 24);
-    pMap->field_C_l_file = reinterpret_cast<LitHeader*>(LibGV_FindFile_40A603(HashFileName_40A58B(resourceNameHashed, 'l')));
-    Map_LitLoad_44F53B(resourceNameHashed, pMap);
-}
-MGS_FUNC_IMPLEX(0x44F66F, Map_LoadMapData_44F66F, MAP_IMPL);
 
 map_record* CC Map_ScriptLoadMapBlocks_44F640()
 {
@@ -507,3 +498,57 @@ int CC Gv_hzm_file_handler_40B734(void* pFileData, TFileNameHash)
     return 1;
 }
 MGS_FUNC_IMPLEX(0x40B734, Gv_hzm_file_handler_40B734, MAP_IMPL);
+
+
+struct HzdMap
+{
+    void* field_0_pHzmHeader;
+    void* field_4_pTableRec;
+    short field_8_bitIdx;
+    short field_A;
+    short field_C;
+    short field_E_flagsIndex;
+    short field_10_24Size;
+    short field_12_48size;
+    short field_14_pnav_meshes;
+    void* field_18_pFlags;
+    void* field_1C_pAfterStructure_24;
+    void* field_20_pAfterStructure_48;
+    void* field_24_pAfterStructure48_End;
+};
+MGS_ASSERT_SIZEOF(HzdMap, 0x28);
+
+MGS_FUNC_NOT_IMPL(0x40B7E0, HzdMap *__cdecl(hzm_header *pHzdData, int default_0_flags_index, int default_48, int default_24), Map_HZD_Load_Helper_40B7E0);
+
+HzdMap* CC Map_HZD_Load_44F5AF(int resource_name_hashed, int default_0, __int16 bitIndex, int default_48, int default_24)
+{
+    hzm_header* pFileData = reinterpret_cast<hzm_header*>(LibGV_FindFile_40A603(HashFileName_40A58B(resource_name_hashed, 'h')));
+    if (!pFileData)
+    {
+        // Not found use null
+        pFileData = reinterpret_cast<hzm_header*>(LibGV_FindFile_40A603(HashFileName_40A58B(ResourceNameHash("null"), 'h')));
+        if (!pFileData)
+        {
+            // Still not found, use abst.hzd if the current stage is abst
+            const WORD abst_hashed = ResourceNameHash("abst");
+            if (GetStageNameHashed_44EAE5() == abst_hashed)
+            {
+                pFileData = reinterpret_cast<hzm_header*>(LibGV_FindFile_40A603(HashFileName_40A58B(abst_hashed, 'h')));
+            }
+        }
+    }
+    HzdMap* hzdMap = Map_HZD_Load_Helper_40B7E0(pFileData, default_0, default_48, default_24);
+    hzdMap->field_8_bitIdx = bitIndex;
+    return hzdMap;
+}
+MGS_FUNC_IMPLEX(0x44F5AF, Map_HZD_Load_44F5AF, MAP_IMPL);
+
+void CC Map_LoadMapData_44F66F(int mapNum, int resourceNameHashed)
+{
+    printf("set map %d\n", mapNum);
+    map_record* pMap = Map_GetNextFreeRecord_44F505(static_cast<short>(mapNum));
+    pMap->field_8_hzd = Map_HZD_Load_44F5AF(resourceNameHashed, 0, static_cast<short>(pMap->field_0_map_index_bit), 48, 24);
+    pMap->field_C_l_file = reinterpret_cast<LitHeader*>(LibGV_FindFile_40A603(HashFileName_40A58B(resourceNameHashed, 'l')));
+    Map_LitLoad_44F53B(resourceNameHashed, pMap);
+}
+MGS_FUNC_IMPLEX(0x44F66F, Map_LoadMapData_44F66F, MAP_IMPL);

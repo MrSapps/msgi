@@ -123,6 +123,7 @@ DWORD CC GameD_Input_Wrapper_4455F0();
 void GiveAllItemsCheat();
 void CC System_Init_0_And_1_40A465();
 DWORD CC GameD_Input_445610();
+WORD CC GetStageNameHashed_44EAE5();
 
 // Not really like this in the real game, but we need something like this
 // so we have an end marker to allocate backwards
