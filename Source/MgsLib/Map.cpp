@@ -380,8 +380,9 @@ union hzm_flags_union
 {
     hzm_if_trigger u_hzm_if_trigger;
     hzm_if_camera u_hzm_if_camera;
+    BYTE pad[0x14 + 0xC]; // TODO: Probably not padding ??
 };
-MGS_ASSERT_SIZEOF(hzm_flags_union, 0x14);
+MGS_ASSERT_SIZEOF(hzm_flags_union, 0x20);
 
 struct hzm_flags_record
 {
@@ -393,9 +394,9 @@ struct hzm_flags_record
     short field_A;
     short field_C;
     short field_E;
-    hzm_flags_union field_10_union;
+    hzm_flags_union field_10_union; // Actually many records after structure
 };
-MGS_ASSERT_SIZEOF(hzm_flags_record, 0x24);
+MGS_ASSERT_SIZEOF(hzm_flags_record, 0x10 + sizeof(hzm_flags_union));
 
 struct hzm_pathfinding_record
 {
@@ -450,33 +451,29 @@ void CC HZM_Process_TableFlagIfTriggers_40B7A3(hzm_flags_record* pFlags, int fla
     for (int i = 0; i < flagsCount; i++)
     {
         // If its a camera then skip
-        if (pUnion->u_hzm_if_camera.field_D_type == -1)
+        if (pUnion[i].u_hzm_if_camera.field_D_type == -1)
         {
             break;
         }
         else
         {
             // Otherwise find the final space in the string
-            char* hzmChar = pUnion->u_hzm_if_trigger.field_0_tag_name;
-            for (int j = 0; j < 13; j++)
+            for (char& hzmChar : pUnion[i].u_hzm_if_trigger.field_0_tag_name)
             {
-                if (*hzmChar == ' ')
-                {
+                if (hzmChar == ' ')
+                { 
+                    // Null terminate it so we can use it as a C-string
+                    hzmChar = 0;
                     break;
                 }
-                ++hzmChar;
             }
 
-            // Null terminate it so we can use it as a C-string
-            *hzmChar = 0;
-
             // And calculate the hashed name
-            pUnion->u_hzm_if_trigger.field_E_tag_name_hashed = ResourceNameHash(pUnion->u_hzm_if_trigger.field_0_tag_name);
+            pUnion[i].u_hzm_if_trigger.field_E_tag_name_hashed = ResourceNameHash(pUnion[i].u_hzm_if_trigger.field_0_tag_name);
         }
-        pUnion++;
     }
 }
-MGS_FUNC_IMPLEX(0x40B7A3, HZM_Process_TableFlagIfTriggers_40B7A3, false);
+MGS_FUNC_IMPLEX(0x40B7A3, HZM_Process_TableFlagIfTriggers_40B7A3, MAP_IMPL);
 
 int CC Gv_hzm_file_handler_40B734(void* pFileData, TFileNameHash)
 {
