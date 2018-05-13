@@ -343,68 +343,63 @@ void CC Map_Reshade_all_44F8C3()
 }
 MGS_FUNC_IMPLEX(0x44F8C3, Map_Reshade_all_44F8C3, MAP_IMPL);
 
-struct hzm_if_camera
+struct hzm_vec4
 {
-    short field_0;
-    short field_2;
-    short field_4;
-    short field_6;
-    short field_8;
-    short field_A;
-    char field_C;
-    char field_D_type;
-    short field_E;
+    short field_0_x;
+    short field_2_y;
+    short field_4_z;
+    short field_6_w;
 };
-MGS_ASSERT_SIZEOF(hzm_if_camera, 0x10);
+MGS_ASSERT_SIZEOF(hzm_vec4, 0x8);
 
-struct hzm_if_trigger
+struct hzm_camera
 {
-    char field_0_tag_name[12];
-    char field_C_type;
-    char field_D_pad;
-    WORD field_E_tag_name_hashed;
-    DWORD field_10_pad;
+    hzm_vec4 field_0_trigger_pos;
+    hzm_vec4 field_8_camera_pos;
+    hzm_vec4 field_10_orientation_pos;
 };
-MGS_ASSERT_SIZEOF(hzm_if_trigger, 0x14);
+MGS_ASSERT_SIZEOF(hzm_camera, 0x18);
 
-union hzm_flags_union
+struct hzm_trigger
 {
-    hzm_if_trigger u_hzm_if_trigger;
-    hzm_if_camera u_hzm_if_camera;
-    BYTE pad[0x14 + 0xC]; // TODO: Probably not padding ??
+    hzm_vec4 field_0_trigger_pos;
+    char field_8_tag_name[12];
+    char field_14_id1;
+    char field_15_id2;
+    short field_16_name_hashed; // Hash of field_8_tag_name generated at run time
 };
-MGS_ASSERT_SIZEOF(hzm_flags_union, 0x20);
+MGS_ASSERT_SIZEOF(hzm_trigger, 0x18);
 
-struct hzm_flags_record
+union hzm_trigger_or_camera
 {
-    short field_0;
-    short field_2;
-    short field_4;
-    short field_6;
-    short field_8;
-    short field_A;
-    short field_C;
-    short field_E;
-    hzm_flags_union field_10_union; // Actually many records after structure
+    hzm_trigger trigger;
+    hzm_camera camera;
 };
-MGS_ASSERT_SIZEOF(hzm_flags_record, 0x10 + sizeof(hzm_flags_union));
+MGS_ASSERT_SIZEOF(hzm_trigger_or_camera, 0x18);
+
+struct hzm_positioned_camera_or_trigger
+{
+    hzm_vec4 field_0_area_pos;
+    hzm_trigger_or_camera any;
+};
+MGS_ASSERT_SIZEOF(hzm_positioned_camera_or_trigger, 0x20);
 
 struct hzm_pathfinding_record
 {
     int field_0; // Order ?
-    void* field_4_pUnknown;
+    void* field_4_pUnknown; // TODO: Types
 };
 MGS_ASSERT_SIZEOF(hzm_pathfinding_record, 0x8);
 
 struct hzm_table_record
 {
-    short field_0_n_flags;
+    short field_0_n_cameras_and_triggers;
     short field_2_n_walls;
     short field_4_n_heights;
     short field_6_n_unknown;
-    void* field_8_wall_offset;
-    void* field_C_height_offset;
-    hzm_flags_record* field_10_flag_offset;
+    void* field_8_wall_offset; // TODO: Types
+    void* field_C_height_offset; // TODO: Types
+    hzm_positioned_camera_or_trigger* field_10_cameras_and_triggers;
     void* field_14_wall_config_offset;
 };
 MGS_ASSERT_SIZEOF(hzm_table_record, 0x18);
@@ -421,7 +416,7 @@ MGS_ASSERT_SIZEOF(hzm_header_data, 0x10);
 
 union hzm_version_and_nav_mesh_ptr
 {
-    int* pNavMesh;
+    BYTE* pNavMesh; // TODO: Types
     short version;
 };
 MGS_ASSERT_SIZEOF(hzm_version_and_nav_mesh_ptr, 4);
@@ -436,23 +431,23 @@ struct hzm_header
 };
 MGS_ASSERT_SIZEOF(hzm_header, 0x1C);
 
-void CC HZM_Process_TableFlagIfTriggers_40B7A3(hzm_flags_record* pFlags, int flagsCount)
+void CC HZM_Process_TableFlagIfTriggers_40B7A3(hzm_positioned_camera_or_trigger* pFlags, int flagsCount)
 {
-    hzm_flags_union* pUnion = &pFlags->field_10_union;
+    hzm_positioned_camera_or_trigger* pUnion = pFlags;
     for (int i = 0; i < flagsCount; i++)
     {
         // If its a camera then skip
-        if (pUnion[i].u_hzm_if_camera.field_D_type == -1)
+        if (pUnion[i].any.trigger.field_15_id2 == -1)
         {
             break;
         }
         else
         {
             // Otherwise find the final space in the string
-            for (char& hzmChar : pUnion[i].u_hzm_if_trigger.field_0_tag_name)
+            for (char& hzmChar : pUnion[i].any.trigger.field_8_tag_name)
             {
                 if (hzmChar == ' ')
-                { 
+                {
                     // Null terminate it so we can use it as a C-string
                     hzmChar = 0;
                     break;
@@ -460,7 +455,7 @@ void CC HZM_Process_TableFlagIfTriggers_40B7A3(hzm_flags_record* pFlags, int fla
             }
 
             // And calculate the hashed name
-            pUnion[i].u_hzm_if_trigger.field_E_tag_name_hashed = ResourceNameHash(pUnion[i].u_hzm_if_trigger.field_0_tag_name);
+            pUnion[i].any.trigger.field_16_name_hashed = ResourceNameHash(pUnion[i].any.trigger.field_8_tag_name);
         }
     }
 }
@@ -489,11 +484,11 @@ int CC Gv_hzm_file_handler_40B734(void* pFileData, TFileNameHash)
     hzm_table_record* pTableRecord = pHzm->field_C_pSub.field_4_offset_tables;
     for (int i = 0; i < pHzm->field_A_table_count; i++)
     {
-        OffsetToPointer(pHzm, &pTableRecord[i].field_10_flag_offset);
+        OffsetToPointer(pHzm, &pTableRecord[i].field_10_cameras_and_triggers);
         OffsetToPointer(pHzm, &pTableRecord[i].field_8_wall_offset);
         OffsetToPointer(pHzm, &pTableRecord[i].field_C_height_offset);
         OffsetToPointer(pHzm, &pTableRecord[i].field_14_wall_config_offset);
-        HZM_Process_TableFlagIfTriggers_40B7A3(pTableRecord[i].field_10_flag_offset, pTableRecord[i].field_0_n_flags);
+        HZM_Process_TableFlagIfTriggers_40B7A3(pTableRecord[i].field_10_cameras_and_triggers, pTableRecord[i].field_0_n_cameras_and_triggers);
     }
     return 1;
 }
@@ -502,23 +497,77 @@ MGS_FUNC_IMPLEX(0x40B734, Gv_hzm_file_handler_40B734, MAP_IMPL);
 
 struct HzdMap
 {
-    void* field_0_pHzmHeader;
-    void* field_4_pTableRec;
+    hzm_header* field_0_pHzmHeader;
+    hzm_table_record* field_4_pTableRec;
     short field_8_bitIdx;
     short field_A;
     short field_C;
-    short field_E_flagsIndex;
-    short field_10_24Size;
-    short field_12_48size;
-    short field_14_pnav_meshes;
-    void* field_18_pFlags;
-    void* field_1C_pAfterStructure_24;
-    void* field_20_pAfterStructure_48;
-    void* field_24_pAfterStructure48_End;
+    short field_E_trigger_count; // Num items in field_18_pTriggers
+    short field_10_24Size; // field_1C_pAfterStructure_24 size
+    short field_12_48size; // field_20_pAfterStructure_48 size
+    BYTE* field_14_pnav_meshes;
+    hzm_positioned_camera_or_trigger* field_18_pTriggers;
+    void* field_1C_pAfterStructure_24; // TODO: Types
+    void* field_20_pAfterStructure_48; // TODO: Types
+    void* field_24_pAfterStructure48_End; // TODO: Types
 };
 MGS_ASSERT_SIZEOF(HzdMap, 0x28);
 
-MGS_FUNC_NOT_IMPL(0x40B7E0, HzdMap *__cdecl(hzm_header *pHzdData, int default_0_flags_index, int default_48, int default_24), Map_HZD_Load_Helper_40B7E0);
+void CC Map_HZD_NavMesh_40B8A5(hzm_header* pHzm, BYTE* pOut)
+{
+    // TODO: Implement
+    MGS_FORCE_ENOUGH_SPACE_FOR_A_DETOUR;
+}
+MGS_FUNC_IMPLEX(0x40B8A5, Map_HZD_NavMesh_40B8A5, false); // TODO
+
+HzdMap* CC Map_HZD_Load_Helper_40B7E0(hzm_header* pHzdData, int default_0_flags_index, int default_48, int default_24)
+{
+    if (pHzdData->field_0_version_and_ptr_to_nav_meshes.pNavMesh == nullptr)
+    {
+        if (pHzdData->field_C_pSub.field_0_num_navmeshes > 1)
+        {
+            const signed int numNavMeshes = pHzdData->field_C_pSub.field_0_num_navmeshes;
+            BYTE* pNavMeshes = reinterpret_cast<BYTE*>(System_2_zerod_allocate_memory_40B296((numNavMeshes - 1) * (numNavMeshes - 2) / 2 + numNavMeshes - 1));
+            Map_HZD_NavMesh_40B8A5(pHzdData, pNavMeshes);
+            pHzdData->field_0_version_and_ptr_to_nav_meshes.pNavMesh = pNavMeshes;
+        }
+    }
+
+    HzdMap* pHzdMap = reinterpret_cast<HzdMap*>(System_2_zerod_allocate_memory_40B296((6 * default_48) + (4 * default_24) + sizeof(HzdMap)));
+    if (pHzdMap)
+    {
+        pHzdMap->field_12_48size = static_cast<short>(default_48);
+        pHzdMap->field_10_24Size = static_cast<short>(default_24);
+
+        pHzdMap->field_1C_pAfterStructure_24 = (void*)&pHzdMap[1]; // TODO: Types
+
+        DWORD* p24 = (DWORD*)&pHzdMap[1] + default_24; // TODO: Types
+        pHzdMap->field_0_pHzmHeader = pHzdData;
+        pHzdMap->field_20_pAfterStructure_48 = (void*)p24; // TODO: Types
+        pHzdMap->field_24_pAfterStructure48_End = &p24[default_48]; // TODO: Types
+
+        pHzdMap->field_A = 0;
+        pHzdMap->field_C = 0;
+
+        pHzdMap->field_4_pTableRec = &pHzdData->field_C_pSub.field_4_offset_tables[default_0_flags_index];
+        pHzdMap->field_14_pnav_meshes = pHzdData->field_0_version_and_ptr_to_nav_meshes.pNavMesh;
+
+        hzm_positioned_camera_or_trigger* pCamerasAndTriggers = pHzdMap->field_4_pTableRec->field_10_cameras_and_triggers;
+
+        // Find the last item from the end that is not a camera, thus yielding the count and pointer to the triggers
+        short int triggerCount = pHzdMap->field_4_pTableRec->field_0_n_cameras_and_triggers;
+        while (triggerCount > 0 && pCamerasAndTriggers->any.trigger.field_15_id2 != -1)
+        {
+            pCamerasAndTriggers++;
+            triggerCount--;
+        }
+        pHzdMap->field_E_trigger_count = triggerCount;
+        pHzdMap->field_18_pTriggers = pCamerasAndTriggers;
+    }
+    return pHzdMap;
+}
+MGS_FUNC_IMPLEX(0x40B7E0, Map_HZD_Load_Helper_40B7E0, MAP_IMPL);
+
 
 HzdMap* CC Map_HZD_Load_44F5AF(int resource_name_hashed, int default_0, __int16 bitIndex, int default_48, int default_24)
 {
@@ -552,3 +601,8 @@ void CC Map_LoadMapData_44F66F(int mapNum, int resourceNameHashed)
     Map_LitLoad_44F53B(resourceNameHashed, pMap);
 }
 MGS_FUNC_IMPLEX(0x44F66F, Map_LoadMapData_44F66F, MAP_IMPL);
+
+void DoMapTests()
+{
+
+}

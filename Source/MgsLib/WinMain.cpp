@@ -41,6 +41,7 @@
 #include "Imports.hpp"
 #include "Menu.hpp"
 #include "Kmd.hpp"
+#include "Map.hpp"
 
 #define _ELPP_THREAD_SAFE
 #include "easylogging++.h"
@@ -2535,6 +2536,7 @@ static void RunTests()
     DoFontTests();
     DoDGTests();
     DoKmdTests();
+    DoMapTests();
 }
 
 int Sink()
