@@ -62,7 +62,6 @@ MGS_FUNC_NOT_IMPL(0x004553C5, void CC(), sub_4553C5);
 MGS_FUNC_NOT_IMPL(0x00455017, void CC(), GM_SoundStart_455017);
 MGS_FUNC_NOT_IMPL(0x0044E8F1, void CC(), sub_44E8F1);
 MGS_FUNC_NOT_IMPL(0x0044E969, void CC(), sub_44E969);
-MGS_FUNC_NOT_IMPL(0x0044F28B, void CC(), GameD_update_helper_44F28B);
 MGS_FUNC_NOT_IMPL(0x004552CB, void CC(), GameD_Sound_4552CB);
 MGS_FUNC_NOT_IMPL(0x004502CD, Actor* CC(__int16 bShowContinue), Res_over_create_4502CD);
 MGS_FUNC_NOT_IMPL(0x0044E932, void CC(), sub_44E932);
@@ -1129,7 +1128,7 @@ void CC GameD_update_44E381(GameD_Struct* pGameD)
                 }
             }
         }
-        GameD_update_helper_44F28B();
+        Map_update_if_changed_44F28B();
         GameD_Update_helper(buttons);
         return;
     }

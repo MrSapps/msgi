@@ -12,3 +12,4 @@ void CC Map_FreeKmds_44F3B5();
 struct map_record;
 void CC Map_LitLoad_44F53B(int resourceNameHashed, const map_record* pMapStruct);
 int CC Gv_hzm_file_handler_40B734(void*, TFileNameHash);
+void CC Map_update_if_changed_44F28B();

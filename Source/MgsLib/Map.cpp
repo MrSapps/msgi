@@ -602,6 +602,19 @@ void CC Map_LoadMapData_44F66F(int mapNum, int resourceNameHashed)
 }
 MGS_FUNC_IMPLEX(0x44F66F, Map_LoadMapData_44F66F, MAP_IMPL);
 
+
+MGS_FUNC_NOT_IMPL(0x44F2A4, void CC(int mapNum), Map_update_44F2A4);
+
+void CC Map_update_if_changed_44F28B()
+{
+    if (gMapsChanged_dword_7229B0)
+    {
+        Map_update_44F2A4(gMapsChanged_dword_7229B0 - 1);
+        gMapsChanged_dword_7229B0 = 0;
+    }
+}
+MGS_FUNC_IMPLEX(0x44F28B, Map_update_if_changed_44F28B, MAP_IMPL);
+
 void DoMapTests()
 {
 
