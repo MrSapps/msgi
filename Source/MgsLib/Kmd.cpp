@@ -1218,6 +1218,14 @@ CVECTOR* CC PrimObjRelated_helper_443D4F(const kmdObject* pKmdObj, CVECTOR* pCol
 }
 MGS_FUNC_IMPLEX(0x443D4F, PrimObjRelated_helper_443D4F, KMD_IMPL);
 
+int CC Kmd_set_vec_45850D(struc_kmd* pKmd, SVECTOR* pVec)
+{
+    pKmd->field_0_pObj->prim_48.field_3C = pVec;
+    return 0;
+}
+MGS_FUNC_IMPLEX(0x45850D, Kmd_set_vec_45850D, KMD_IMPL);
+
+
 signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLights, int lightCount)
 {
     // Allocate light buffer if we don't have one already
