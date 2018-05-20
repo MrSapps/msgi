@@ -382,7 +382,9 @@ MGS_FUNC_IMPLEX(0x40AFA4, System_mem_zerod_alloc_40AFA4, SYSTEM_IMPL);
 
 void* CC System_2_zerod_allocate_memory_40B296(int size)
 {
-    void* ptr = System_mem_zerod_alloc_40AFA4(2, size, (void**)LibGV_MemoryAllocation::eUsed);;
+    void* ptr = System_mem_zerod_alloc_40AFA4(2, size, (void**)LibGV_MemoryAllocation::eUsed);
+    // This can fail and mostly isn't fatal, for instance blowing up a camera can create more sparks
+    // than can be allocated.
     assert(ptr != nullptr);
     return ptr;
 }

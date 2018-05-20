@@ -24,7 +24,7 @@ struct map_record
     DWORD field_0_map_index_bit;
     WORD field_4_map_num;
     WORD field_6_bUsed;
-    void* field_8_hzd;
+    struct HzdMap* field_8_hzd;
     LitHeader* field_C_l_file;
     DWORD field_10_script_z_param_bit_index_zone_id;
 };
@@ -569,7 +569,7 @@ HzdMap* CC Map_HZD_Load_Helper_40B7E0(hzm_header* pHzdData, int default_0_flags_
 MGS_FUNC_IMPLEX(0x40B7E0, Map_HZD_Load_Helper_40B7E0, MAP_IMPL);
 
 
-HzdMap* CC Map_HZD_Load_44F5AF(int resource_name_hashed, int default_0, __int16 bitIndex, int default_48, int default_24)
+HzdMap* CC Map_HZD_Load_44F5AF(DWORD resource_name_hashed, int flagsIndex, __int16 bitIndex, int default_48, int default_24)
 {
     hzm_header* pFileData = reinterpret_cast<hzm_header*>(LibGV_FindFile_40A603(HashFileName_40A58B(resource_name_hashed, 'h')));
     if (!pFileData)
@@ -586,7 +586,7 @@ HzdMap* CC Map_HZD_Load_44F5AF(int resource_name_hashed, int default_0, __int16 
             }
         }
     }
-    HzdMap* hzdMap = Map_HZD_Load_Helper_40B7E0(pFileData, default_0, default_48, default_24);
+    HzdMap* hzdMap = Map_HZD_Load_Helper_40B7E0(pFileData, flagsIndex, default_48, default_24);
     hzdMap->field_8_bitIdx = bitIndex;
     return hzdMap;
 }
@@ -602,8 +602,166 @@ void CC Map_LoadMapData_44F66F(int mapNum, int resourceNameHashed)
 }
 MGS_FUNC_IMPLEX(0x44F66F, Map_LoadMapData_44F66F, MAP_IMPL);
 
+MGS_FUNC_NOT_IMPL(0x444903, void __cdecl (unsigned __int16 flags), Binds_444903);
 
-MGS_FUNC_NOT_IMPL(0x44F2A4, void CC(int mapNum), Map_update_44F2A4);
+MGS_VAR(1, 0x99535C, DWORD, map_change_flags_dword_99535C, 0);
+MGS_VAR(1, 0x791A10, DWORD, gMapUseTableIndicesBits_791A10, 0);
+
+
+MGS_FUNC_NOT_IMPL(0x4021B3, void __cdecl (), LibDG_Init_Lights_4021B3);
+MGS_FUNC_NOT_IMPL(0x4021C9, void __cdecl (Light *pLights, int lightCount), Light_add_4021C9);
+
+map_record* CC Script_tbl_hzd_impl_44F415()
+{
+    // Allocate a map record
+    map_record* pMapStruct = Map_GetNextFreeRecord_44F505(static_cast<short>(Script_get_int()));
+    int hzd_param4 = 0;
+    int hzd_param5 = 0;
+
+    if (Script_ParamExists('d'))
+    {
+        hzd_param4 = Script_get_int();
+        hzd_param5 = Script_get_int();
+    }
+    else
+    {
+        hzd_param4 = 48;
+        hzd_param5 = 24;
+    }
+
+    if (!Script_ParamExists('h'))
+    {
+        printf("no hzd\n");
+        return nullptr;
+    }
+
+    // Load the HZD map
+    const DWORD nameHashed = Script_get_int();
+    const DWORD flagsIndex = Script_get_int();
+    pMapStruct->field_8_hzd = Map_HZD_Load_44F5AF(
+        nameHashed,
+        flagsIndex,
+        static_cast<short>(pMapStruct->field_0_map_index_bit),
+        hzd_param4,
+        hzd_param5);
+
+    // Light file
+    if (Script_ParamExists('l'))
+    {
+        pMapStruct->field_C_l_file = reinterpret_cast<LitHeader*>(LibGV_FindFile_40A603(HashFileName_40A58B(Script_get_int(), 'l')));
+    }
+    else
+    {
+        pMapStruct->field_C_l_file = nullptr;
+    }
+
+    // Lights
+    if (Script_ParamExists('k'))
+    {
+        while (Script_GetReturnAddress())
+        {
+            Map_LitLoad_44F53B(Script_get_int(), pMapStruct);
+        }
+    }
+
+    // Zones
+    pMapStruct->field_10_script_z_param_bit_index_zone_id = 0;
+    if (Script_ParamExists('z'))
+    {
+        while (Script_GetReturnAddress())
+        {
+            pMapStruct->field_10_script_z_param_bit_index_zone_id |= 1 << Script_get_int();
+        }
+    }
+
+    return pMapStruct;
+}
+MGS_FUNC_IMPLEX(0x44F415, Script_tbl_hzd_impl_44F415, MAP_IMPL);
+
+void CC Map_update_44F2A4(int bLightUpdate)
+{
+    DWORD usedTableIndicesAsBits = 0;
+    DWORD usedMapBits = 0;
+
+    LibDG_Init_Lights_4021B3();
+
+    for (DWORD i = 0; i < gMap_count_dword_7229B4; i++)
+    {
+        if (gMap_20_array_722870[i].field_6_bUsed)
+        {
+            usedMapBits |= gMap_20_array_722870[i].field_0_map_index_bit;
+            for (DWORD j = 0; j < gMapOrKmdCount_dword_722868; j++)
+            {
+                if (gMapOrKmd_Array_dword_7229B8[j]->field_2C_index & gMap_20_array_722870[i].field_0_map_index_bit)
+                {
+                    LitHeader* pLitFile = gMap_20_array_722870[i].field_C_l_file;
+                    if (pLitFile->field_0_num_lights)
+                    {
+                        Light_add_4021C9(DataAfterStructure<Light*>(pLitFile), pLitFile->field_0_num_lights);
+                        if (bLightUpdate)
+                        {
+                            PrimObjRelated_443A4E(gMapOrKmd_Array_dword_7229B8[j], DataAfterStructure<Light*>(pLitFile), pLitFile->field_0_num_lights);
+                        }
+                    }
+                    else
+                    {
+                        Light_add_4021C9(nullptr, 0);
+                        if (bLightUpdate)
+                        {
+                            PrimObjRelated_443A4E(gMapOrKmd_Array_dword_7229B8[j], 0, 0);
+                        }
+                    }
+                }
+            }
+            hzm_table_record* pFirstTable = gMap_20_array_722870[i].field_8_hzd->field_0_pHzmHeader->field_C_pSub.field_4_offset_tables;
+            hzm_table_record* pCurrentTable = gMap_20_array_722870[i].field_8_hzd->field_4_pTableRec;
+            const DWORD tableIndex = pCurrentTable - pFirstTable;
+            usedTableIndicesAsBits |= 1 << (tableIndex);
+        }
+    }
+    map_change_flags_dword_99535C = usedMapBits;
+    gMapUseTableIndicesBits_791A10 = usedTableIndicesAsBits;
+    dword_78D32C = usedMapBits;
+    Binds_444903(static_cast<WORD>(usedMapBits));
+}
+MGS_FUNC_IMPLEX(0x44F2A4, Map_update_44F2A4, true);
+
+struct TestHzm
+{
+    hzm_header mHeader;
+    hzm_table_record mTables[32];
+    hzm_positioned_camera_or_trigger mTriggers[8];
+};
+
+static void Test_Map_update_44F2A4()
+{
+    gMapOrKmdCount_dword_722868 = 0;
+    gMapUseTableIndicesBits_791A10 = 0;
+
+    TestHzm testHzm = {};
+    testHzm.mHeader.field_A_table_count = 2;
+    testHzm.mHeader.field_C_pSub.field_4_offset_tables = testHzm.mTables;
+
+    testHzm.mTables[0].field_0_n_cameras_and_triggers = 5;
+    testHzm.mTables[0].field_10_cameras_and_triggers = &testHzm.mTriggers[0];
+
+    for (int i = 0; i < 32; i++)
+    {
+        HzdMap hzd[2] = {};
+        hzd[0].field_0_pHzmHeader = &testHzm.mHeader;
+        hzd[0].field_18_pTriggers = &testHzm.mTriggers[0];
+        hzd[0].field_4_pTableRec = &testHzm.mTables[i];
+        hzd[0].field_E_trigger_count = 5;
+        gMap_20_array_722870[0].field_6_bUsed = 2;
+        gMap_20_array_722870[0].field_8_hzd = &hzd[0];
+
+        gMap_count_dword_7229B4 = 1;
+
+        Map_update_44F2A4(0);
+
+        ASSERT_EQ(gMapUseTableIndicesBits_791A10, 1 << i);
+    }
+}
 
 void CC Map_update_if_changed_44F28B()
 {
@@ -617,5 +775,5 @@ MGS_FUNC_IMPLEX(0x44F28B, Map_update_if_changed_44F28B, MAP_IMPL);
 
 void DoMapTests()
 {
-
+    Test_Map_update_44F2A4();
 }
