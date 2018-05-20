@@ -352,6 +352,14 @@ struct hzm_vec4
 };
 MGS_ASSERT_SIZEOF(hzm_vec4, 0x8);
 
+struct hzm_vec3
+{
+    short field_0_x;
+    short field_2_y;
+    short field_4_z;
+};
+MGS_ASSERT_SIZEOF(hzm_vec3, 0x6);
+
 struct hzm_camera
 {
     hzm_vec4 field_0_trigger_pos;
@@ -384,12 +392,38 @@ struct hzm_positioned_camera_or_trigger
 };
 MGS_ASSERT_SIZEOF(hzm_positioned_camera_or_trigger, 0x20);
 
+struct hzm_path_record
+{
+    hzm_vec3 field_0_vector;
+    short animationCode;
+};
+MGS_ASSERT_SIZEOF(hzm_path_record, 8);
+
 struct hzm_pathfinding_record
 {
     int field_0; // Order ?
-    void* field_4_pUnknown; // TODO: Types
+    hzm_path_record* field_4_pRecord;
 };
 MGS_ASSERT_SIZEOF(hzm_pathfinding_record, 0x8);
+
+struct hzm_wall
+{
+    hzm_vec3 init_coord;
+    short unknown1;
+    hzm_vec3 end_coord;
+    short unknown2;
+};
+MGS_ASSERT_SIZEOF(hzm_wall, 16);
+
+struct hzm_altimetry
+{
+    hzm_vec3 init_coord;
+    short unknown1;
+    hzm_vec3 end_coord;
+    short unknown2;
+    short unknown3[16];
+};
+MGS_ASSERT_SIZEOF(hzm_altimetry, 48);
 
 struct hzm_table_record
 {
@@ -397,26 +431,35 @@ struct hzm_table_record
     short field_2_n_walls;
     short field_4_n_heights;
     short field_6_n_unknown;
-    void* field_8_wall_offset; // TODO: Types
-    void* field_C_height_offset; // TODO: Types
+    hzm_wall* field_8_wall_offset;
+    hzm_altimetry* field_C_height_offset;
     hzm_positioned_camera_or_trigger* field_10_cameras_and_triggers;
-    void* field_14_wall_config_offset;
+    DWORD* field_14_wall_config_offset; // bit flags array
 };
 MGS_ASSERT_SIZEOF(hzm_table_record, 0x18);
+
+struct hzm_nav_mesh
+{
+    hzm_vec3 field_0_vec;
+    short width;
+    short height;
+    short unknown[7]; // TODO: Type recovery
+};
+MGS_ASSERT_SIZEOF(hzm_table_record, 24);
 
 struct hzm_header_data
 {
     short field_0_num_navmeshes;
     short field_2_num_pathfindings;
     hzm_table_record* field_4_offset_tables;
-    void* field_8_offset_navmeshes;
+    hzm_nav_mesh* field_8_offset_navmeshes;
     hzm_pathfinding_record* field_C_offset_pathfindings;
 };
 MGS_ASSERT_SIZEOF(hzm_header_data, 0x10);
 
 union hzm_version_and_nav_mesh_ptr
 {
-    BYTE* pNavMesh; // TODO: Types
+    BYTE* pNavMesh; // Some sort of ordering table into the nav meshes?
     short version;
 };
 MGS_ASSERT_SIZEOF(hzm_version_and_nav_mesh_ptr, 4);
@@ -478,7 +521,7 @@ int CC Gv_hzm_file_handler_40B734(void* pFileData, TFileNameHash)
     hzm_pathfinding_record* pPathFindingRecord = pHzm->field_C_pSub.field_C_offset_pathfindings;
     for (int i = 0; i < pHzm->field_C_pSub.field_2_num_pathfindings; i++)
     {
-        OffsetToPointer(pHzm, &pPathFindingRecord[i].field_4_pUnknown);
+        OffsetToPointer(pHzm, &pPathFindingRecord[i].field_4_pRecord);
     }
 
     hzm_table_record* pTableRecord = pHzm->field_C_pSub.field_4_offset_tables;
@@ -505,7 +548,7 @@ struct HzdMap
     short field_E_trigger_count; // Num items in field_18_pTriggers
     short field_10_24Size; // field_1C_pAfterStructure_24 size
     short field_12_48size; // field_20_pAfterStructure_48 size
-    BYTE* field_14_pnav_meshes;
+    BYTE* field_14_pnav_meshes; // Ordering/index of meshes?
     hzm_positioned_camera_or_trigger* field_18_pTriggers;
     void* field_1C_pAfterStructure_24; // TODO: Types
     void* field_20_pAfterStructure_48; // TODO: Types

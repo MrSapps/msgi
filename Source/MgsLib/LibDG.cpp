@@ -2802,9 +2802,10 @@ struct ScratchPad_Allocs
     DWORD field_2C_max_possible_elements;
     BYTE* field_30_alloc_ptr;
     int field_34_allocated_size;
-    int field_38_288;
+    PSX_MATRIX* field_38_pMatrix;
+    PSX_MATRIX field_3C_matrix;
 };
-MGS_ASSERT_SIZEOF(ScratchPad_Allocs, 0x3C);
+MGS_ASSERT_SIZEOF(ScratchPad_Allocs, 0x5C);
 
 BYTE* CC LibGV_prims_scratch_alloc_403672(int system_index)
 {
