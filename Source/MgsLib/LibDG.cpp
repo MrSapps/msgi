@@ -1761,7 +1761,6 @@ MGS_FUNC_IMPLEX(0x4066ED, LibGV_4066ED, LIBDG_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x404A0F, BYTE *__cdecl (Prim_unknown_0x54 *pPrim, BYTE *primBuffer, int count), LibGV_404A0F);
 
-MGS_FUNC_NOT_IMPL(0x404823, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404823);
 MGS_FUNC_NOT_IMPL(0x404B36, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404B36);
 
 
@@ -2522,6 +2521,8 @@ void CC LibGV_4044E8(Prim_unknown_0x54* pPrim)
 }
 MGS_FUNC_IMPLEX(0x4044E8, LibGV_4044E8, LIBDG_IMPL);
 
+MGS_FUNC_NOT_IMPL(0x404823, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404823);
+
 void CC LibGV_404766(Prim_unknown_0x54* pPrim)
 {
     const int vertCount = pPrim->field_32_primF2_vert_count;
@@ -2548,6 +2549,7 @@ void CC LibGV_404766(Prim_unknown_0x54* pPrim)
     LibGV_ProcessAndStoreInScratch_4045A5(p24Struct, (vertCount * i + 2) / 3);
     LibGV_404823(pPrim, pPrimBuffer, i);
 }
+MGS_FUNC_IMPLEX(0x404766, LibGV_404766, LIBDG_IMPL);
 
 void CC LibGV_SingleVert_40498B(Prim_unknown_0x54* pPrim)
 {
