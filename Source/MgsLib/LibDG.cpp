@@ -1760,7 +1760,6 @@ void CC LibGV_4066ED(Prim_Union* pObj)
 MGS_FUNC_IMPLEX(0x4066ED, LibGV_4066ED, LIBDG_IMPL);
 
 MGS_FUNC_NOT_IMPL(0x404A0F, BYTE *__cdecl (Prim_unknown_0x54 *pPrim, BYTE *primBuffer, int count), LibGV_404A0F);
-MGS_FUNC_NOT_IMPL(0x40466A, BYTE *__cdecl (Prim_unknown_0x54 *pPrim, BYTE *pPrims, int count), LibGV_40466A);
 
 MGS_FUNC_NOT_IMPL(0x404823, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404823);
 MGS_FUNC_NOT_IMPL(0x404B36, BYTE *__cdecl (Prim_unknown_0x54 *pObj, BYTE *pPrimBuffer, int count), LibGV_404B36);
@@ -2410,6 +2409,91 @@ int CC LibGV_prim_buffer_allocate_texture_and_shade_40730A(Prim_Mesh_0x5C* pMesh
 }
 MGS_FUNC_IMPLEX(0x40730A, LibGV_prim_buffer_allocate_texture_and_shade_40730A, LIBDG_IMPL);
 
+BYTE* CC LibGV_40466A(Prim_unknown_0x54* pObj, BYTE* pPolys, int polyCount)
+{
+    struct XY
+    {
+        short x, y;
+    };
+
+    SVECTOR* pScratch = (SVECTOR *)&gScratchPadMemory_991E40; // TODO: Add to union
+    for (int i=0; i<polyCount; i++)
+    {
+        BYTE* pCurrentPolyXY = &pPolys[pObj->field_34_primF3];
+
+        // Set OTZ
+        *reinterpret_cast<WORD*>(pPolys) = pScratch->field_4_z;
+
+        for (int j=0; j<(pObj->field_32_primF2_vert_count & 4); j++)
+        {
+            // Set X,Y
+            XY* pXy = reinterpret_cast<XY*>(pCurrentPolyXY);
+            pXy->x = pScratch->field_0_x;
+            pXy->y = pScratch->field_2_y;
+
+            // To next X,Y
+            pCurrentPolyXY += pObj->field_36_primF4;
+
+            // To next source X,Y
+            pScratch++;
+        }
+        pPolys += pObj->field_30_prim_size;
+    }
+    return pPolys;
+}
+MGS_FUNC_IMPLEX(0x40466A, LibGV_40466A, LIBDG_IMPL);
+
+struct Test_Prim_unknown_0x54
+{
+    Prim_unknown_0x54 mPrim;
+    POLY_FT4 mPolys[5];
+};
+
+static void Test_LibGV_40466A()
+{
+    Test_Prim_unknown_0x54 test = {};
+    test.mPrim.field_30_prim_size = 40;
+    test.mPrim.field_32_primF2_vert_count = 4;
+    test.mPrim.field_34_primF3 = 8;
+    test.mPrim.field_36_primF4 = 8;
+    test.mPrim.field_40_pDataStart[0] = reinterpret_cast<BYTE*>(&test.mPolys[0]);
+
+    memset(gScratchPadMemory_991E40.field_0_raw.field_0, 0, 1024);
+    SVECTOR* pScratch = (SVECTOR *)&gScratchPadMemory_991E40;
+    short v = 0;
+    short z = 1234;
+    for (int i = 0; i < 5 * 4; i++)
+    {
+        pScratch[i].field_0_x = v++;
+        pScratch[i].field_2_y = v++;
+        pScratch[i].field_4_z = z++;
+        pScratch[i].field_6_padding = 0; // Padding is never used by the func
+ 
+    }
+
+    LibGV_40466A(&test.mPrim, test.mPrim.field_40_pDataStart[0], 5);
+
+    ASSERT_EQ(1234, test.mPolys[0].tag);
+    ASSERT_EQ(0, test.mPolys[0].x0);
+    ASSERT_EQ(1, test.mPolys[0].y0);
+    ASSERT_EQ(2, test.mPolys[0].x1);
+    ASSERT_EQ(3, test.mPolys[0].y1);
+    ASSERT_EQ(4, test.mPolys[0].x2);
+    ASSERT_EQ(5, test.mPolys[0].y2);
+    ASSERT_EQ(6, test.mPolys[0].x3);
+    ASSERT_EQ(7, test.mPolys[0].y3);
+
+    ASSERT_EQ(1238, test.mPolys[1].tag);
+    ASSERT_EQ(8, test.mPolys[1].x0);
+    ASSERT_EQ(9, test.mPolys[1].y0);
+    ASSERT_EQ(10, test.mPolys[1].x1);
+    ASSERT_EQ(11, test.mPolys[1].y1);
+    ASSERT_EQ(12, test.mPolys[1].x2);
+    ASSERT_EQ(13, test.mPolys[1].y2);
+    ASSERT_EQ(14, test.mPolys[1].x3);
+    ASSERT_EQ(15, test.mPolys[1].y3);
+}
+
 void CC LibGV_4044E8(Prim_unknown_0x54* pPrim)
 {
     const int vertCount = pPrim->field_32_primF2_vert_count;
@@ -2637,7 +2721,7 @@ static void Test_LibGV_404E08()
 
 Prim_24b* CC LibGV_ProcessAndStoreInScratch_4045A5(Prim_24b* pIn, int count)
 {
-    Prim_24b* pOut = (Prim_24b *)&gScratchPadMemory_991E40.field_0_raw.field_0[0];
+    SVECTOR* pOut = (SVECTOR *)&gScratchPadMemory_991E40.field_0_raw.field_0[0]; // TODO: Add to union
     for (int i=0; i<count; i++)
     {
         // Copy inputs
@@ -2658,28 +2742,26 @@ Prim_24b* CC LibGV_ProcessAndStoreInScratch_4045A5(Prim_24b* pIn, int count)
 
         Psx_gte_rtpt_445990();
 
-        // Copy output X/Y's
-        pOut->field_0_v1.field_0_x = gGte_SXY0_993EF0.regs.SX;
-        pOut->field_0_v1.field_2_y = gGte_SXY0_993EF0.regs.SY;
+        // Copy output X/Y's and Z's
+        pOut->field_0_x = gGte_SXY0_993EF0.regs.SX;
+        pOut->field_2_y = gGte_SXY0_993EF0.regs.SY;
+        pOut->field_4_z = gGte_SZ1_993F04.regs.hi;
+        pOut->field_6_padding = 0;
+        pOut++;
 
-        pOut->field_8_v2.field_0_x = gGte_SXY1_993EF4.regs.SX;
-        pOut->field_8_v2.field_2_y = gGte_SXY1_993EF4.regs.SY;
+        pOut->field_0_x = gGte_SXY1_993EF4.regs.SX;
+        pOut->field_2_y = gGte_SXY1_993EF4.regs.SY;
+        pOut->field_4_z = gGte_SZ2_993F08.regs.hi;
+        pOut->field_6_padding = 0;
+        pOut++;
 
-        pOut->field_10_v3.field_0_x = gGte_SXY2_993EF8.regs.SX;
-        pOut->field_10_v3.field_2_y = gGte_SXY2_993EF8.regs.SY;
-
-        // Copy output Z's
-        pOut->field_0_v1.field_4_z = gGte_SZ1_993F04.regs.hi;
-        pOut->field_0_v1.field_6_padding = 0;
-
-        pOut->field_8_v2.field_4_z = gGte_SZ2_993F08.regs.hi;
-        pOut->field_8_v2.field_6_padding = 0;
-
-        pOut->field_10_v3.field_4_z = gGte_SZ3_993F0C.regs.hi;
-        pOut->field_10_v3.field_6_padding = 0;
+        pOut->field_0_x = gGte_SXY2_993EF8.regs.SX;
+        pOut->field_2_y = gGte_SXY2_993EF8.regs.SY;
+        pOut->field_4_z = gGte_SZ3_993F0C.regs.hi;
+        pOut->field_6_padding = 0;
+        pOut++;
 
         pIn++;
-        pOut++;
     }
     return pIn;
 }
@@ -3227,4 +3309,5 @@ void DoDGTests()
     Test_LibGV_405428();
     Test_LibGV_normals_4054F2();
     Test_LibGV_406168();
+    Test_LibGV_40466A();
 }
