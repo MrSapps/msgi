@@ -3301,6 +3301,39 @@ void CC LibDG_ExecFnPtrs_40171C(int activeBuffer)
 }
 MGS_FUNC_IMPLEX(0x40171C, LibDG_ExecFnPtrs_40171C, LIBDG_IMPL);
 
+struct DG_Light
+{
+    DWORD field_0_lightCount;
+    Light* field_4_pLights;
+};
+MGS_ASSERT_SIZEOF(DG_Light, 0x8);
+
+MGS_ARY(1, 0x6BEE30, DG_Light, 8, gLights_6BEE30, {});
+
+void CC LibDG_Init_Lights_4021B3()
+{
+    for (int i = 0; i < 8; i++)
+    {
+        gLights_6BEE30[i].field_0_lightCount = 0;
+        gLights_6BEE30[i].field_4_pLights = nullptr;
+    }
+}
+MGS_FUNC_IMPLEX(0x4021B3, LibDG_Init_Lights_4021B3, LIBDG_IMPL);
+
+void CC Light_add_4021C9(Light* pLights, int lightCount)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        if (gLights_6BEE30[i].field_4_pLights != pLights && gLights_6BEE30[i].field_0_lightCount == 0)
+        {
+            gLights_6BEE30[i].field_0_lightCount = lightCount;
+            gLights_6BEE30[i].field_4_pLights = pLights;
+            return;
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x4021C9, Light_add_4021C9, LIBDG_IMPL);
+
 void DoDGTests()
 {
     Test_LibGV_4045A5();

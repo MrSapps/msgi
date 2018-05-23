@@ -650,10 +650,6 @@ MGS_FUNC_NOT_IMPL(0x444903, void __cdecl (unsigned __int16 flags), Binds_444903)
 MGS_VAR(1, 0x99535C, DWORD, map_change_flags_dword_99535C, 0);
 MGS_VAR(1, 0x791A10, DWORD, gMapUseTableIndicesBits_791A10, 0);
 
-
-MGS_FUNC_NOT_IMPL(0x4021B3, void __cdecl (), LibDG_Init_Lights_4021B3);
-MGS_FUNC_NOT_IMPL(0x4021C9, void __cdecl (Light *pLights, int lightCount), Light_add_4021C9);
-
 map_record* CC Script_tbl_hzd_impl_44F415()
 {
     // Allocate a map record
