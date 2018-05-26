@@ -486,25 +486,64 @@ MGS_VAR(1, 0x721E78, DWORD, dword_721E78, 0);
 MGS_VAR(1, 0x650D4C, DWORD, gInfiniteAmmoCheat_650D4C, 0);
 MGS_ARY(1, 0x0078E7C0, char, 32, gDest_78E7C0, {});
 
+struct Res_Control_unknown
+{
+    __int16 field_0_scriptData_orHashedName;
+    __int16 field_2_name_hash;
+    __int16 field_4_trigger_Hash_Name_or_camera_w;
+    __int16 field_6_count;
+    int field_8_wordPtr;
+    int field_C;
+    int field_10;
+    SVECTOR field_14_vec;
+};
+MGS_ASSERT_SIZEOF(Res_Control_unknown, 0x1c);
+
+struct Res_Control
+{
+    SVECTOR field_0_vec;
+    SVECTOR field_8_vec;
+    Res_Control_unknown field_10_pStruct_hzd_unknown;
+    map_record *field_2C_map;
+    __int16 field_30_scriptData;
+    __int16 field_32_height;
+    __int16 field_34;
+    __int16 field_36;
+    __int16 field_38;
+    __int16 field_3A;
+    __int16 field_3C;
+    __int16 field_3E;
+    __int16 field_40;
+    __int16 field_42;
+    SVECTOR field_44_vec;
+    SVECTOR field_4C_turn_vec;
+    char field_54;
+    char field_55_flags;
+    char field_56;
+    char field_57;
+    char field_58;
+    char field_59;
+    __int16 field_5A;
+    int field_5C_mesg;
+    SVECTOR field_60_vecs_ary[2];
+    int field_70;
+    int field_74;
+    __int16 field_78;
+    __int16 field_7A;
+};
+MGS_ASSERT_SIZEOF(Res_Control, 0x7c);
+
 struct weapon_famas
 {
     Actor mBase;
-    DWORD field_20;
-    DWORD field_24;
-    DWORD field_28;
-    DWORD field_2C;
-    DWORD field_30;
-    DWORD field_34;
-    DWORD field_38;
-    DWORD field_3C;
-    DWORD field_40;
-    DWORD field_44_a1;
-    DWORD field_48_a2;
-    DWORD field_4C_a3;
-    DWORD field_50_a4;
-    DWORD field_54;
-    DWORD field_58;
-    DWORD mbIsMp5;
+    struc_kmd field_20_kmd;
+    Res_Control *field_44_pCtrl;
+    struc_kmd *field_48_pKmd;
+    int field_4C_idx;
+    int field_50_pUnknown;
+    int field_54;
+    int field_58_counter;
+    int mbIsMp5;
 };
 MGS_ASSERT_SIZEOF(weapon_famas, 96);
 
@@ -515,52 +554,45 @@ MGS_FUNC_NOT_IMPL(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_update_640CD
 MGS_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), Res_famas_shutdown_640E9E);
 
 
-//MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
-signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, struc_kmd* a2, int a3, int bMp5)
+signed int CC Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, struc_kmd* pParentKmd, int parentKmdMeshIdx, int bMp5)
 {
-    WORD resNameHashed = 0;
-    if (bMp5)
+    Kmd_Load_44FF7C(&pFamas->field_20_kmd, bMp5 ? ResourceNameHash("mpfive") : ResourceNameHash("famas"), 'm');
+    if (pFamas->field_20_kmd.field_0_pObj)
     {
-        resNameHashed = ResourceNameHash("mpfive");
-    }
-    else
-    {
-        resNameHashed = ResourceNameHash("famas");
-    }
-
-    struc_kmd* pField20 = (struc_kmd*)&pFamas->field_20;
-    Kmd_Load_44FF7C(pField20, resNameHashed, 'm');
-
-    if (pField20->field_0_pObj)
-    {
-        Kmd_Link_To_Parent_Mesh_45011B(pField20, a2, a3);
+        Kmd_Link_To_Parent_Mesh_45011B(&pFamas->field_20_kmd, pParentKmd, parentKmdMeshIdx);
         return 0;
     }
-
     return -1;
 }
+MGS_FUNC_IMPLEX(0x640EAD, Res_Weapon_famas_loader_640EAD, WINMAIN_IMPL);
 
-weapon_famas* CC Res_Weapon_famas_96_sub_640C24(ActorList* a1, struc_kmd *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
+
+weapon_famas* CC Res_Weapon_famas_create_640C24(Res_Control* pCtrl, struc_kmd* pParentKmd, int parentKmdMeshIdx, int pUnknown, int bMp5)
 {
     weapon_famas* pFamas = Actor_ResourceAllocT<weapon_famas>(6);
     if (pFamas)
     {
-        Actor_Init_40A347(&pFamas->mBase, (TActorFunction)Res_famas_update_640CDC.Ptr(), (TActorFunction)Res_famas_shutdown_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
-        if (Res_Weapon_famas_loader_640EAD(pFamas, a2, (int)a3, bMp5) < 0)
+        Actor_Init_40A347(&pFamas->mBase, 
+            (TActorFunction)Res_famas_update_640CDC.Ptr(),
+            (TActorFunction)Res_famas_shutdown_640E9E.Ptr(),
+            "C:\\mgs\\source\\Weapon\\famas.c");
+
+        if (Res_Weapon_famas_loader_640EAD(pFamas, pParentKmd, parentKmdMeshIdx, bMp5) < 0)
         {
             Actor_DestroyOnNextUpdate_40A3ED(&pFamas->mBase);
             return 0;
         }
-        pFamas->field_58 = 0;
-        pFamas->field_44_a1 = (int)a1;
-        pFamas->field_48_a2 = (int)a2;
-        pFamas->field_4C_a3 = (int)a3;
-        pFamas->field_50_a4 = (int)a4;
+        pFamas->field_58_counter = 0;
+        pFamas->field_44_pCtrl = pCtrl;
+        pFamas->field_48_pKmd = pParentKmd;
+        pFamas->field_4C_idx = parentKmdMeshIdx;
+        pFamas->field_50_pUnknown = pUnknown;
         pFamas->field_54 = 1;
         pFamas->mbIsMp5 = bMp5;
     }
 
-    const WORD mp5ClipSize = (word_995368 != 0) + 25;                 // 25 is the ammo clip size
+    // 25 is the ammo clip size
+    const WORD mp5ClipSize = (word_995368 != 0) + 25;
     if (bMp5)
     {
         word_995320 = mp5ClipSize;
@@ -578,7 +610,7 @@ weapon_famas* CC Res_Weapon_famas_96_sub_640C24(ActorList* a1, struc_kmd *a2, vo
     }
     return pFamas;
 }
-MGS_FUNC_IMPLEX(0x640C24, Res_Weapon_famas_96_sub_640C24, WINMAIN_IMPL);
+MGS_FUNC_IMPLEX(0x640C24, Res_Weapon_famas_create_640C24, WINMAIN_IMPL);
 
 void __cdecl Input_AcquireOrUnAcquire();
 

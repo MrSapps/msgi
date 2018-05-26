@@ -188,7 +188,7 @@ MGS_ASSERT_SIZEOF(Light, 16);
 
 signed int CC PrimObjRelated_443A4E(Prim_unknown_0x48* pObj, const Light* pLights, int lightCount);
 int CC Kmd_TotalLightSizeInBytes_443FAF(const KmdHeader* pKmdHeader);
-void CC Kmd_Link_To_Parent_Mesh_45011B(struc_kmd* pFirstKmd, struc_kmd* pSecondKmd, int idx);
+void CC Kmd_Link_To_Parent_Mesh_45011B(struc_kmd* pKmd, struc_kmd* pParentKmd, int idx);
 
 void CC RotMatrixZYX_gte_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx);
 void CC RotMatrixY_44C270(__int16 value, PSX_MATRIX* pMtx);
