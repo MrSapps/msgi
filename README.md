@@ -4,7 +4,7 @@
 
 #### What?
 
-This project aims to be a full source reverse enginnering project of Metal Gear Solid Integral PC. This means "converting" all of the MGSI.EXE to recompilable source code.
+This project aims to be a full source reverse engineering project of Metal Gear Solid Integral PC. This means "converting" all of the MGSI.EXE to recompilable source code.
 
 #### How?
 
@@ -27,7 +27,7 @@ void CC Actor_DestroyOnNextUpdate(Actor* pActor)
 MGS_FUNC_IMPLEX(0x0040A3ED, Actor_DestroyOnNextUpdate, true);
 ```
 
-Will cause the function in MGSI.EXE at address 0x0040A3ED to call the replacement function Actor_DestroyOnNextUpdate. This allows verfication of this single function without having to reimplement everything up to its call point.
+Will cause the function in MGSI.EXE at address 0x0040A3ED to call the replacement function Actor_DestroyOnNextUpdate. This allows verification of this single function without having to reimplement everything up to its call point.
 
 #### Why?
 
