@@ -612,6 +612,17 @@ weapon_famas* CC Res_Weapon_famas_create_640C24(Res_Control* pCtrl, struc_kmd* p
 }
 MGS_FUNC_IMPLEX(0x640C24, Res_Weapon_famas_create_640C24, WINMAIN_IMPL);
 
+weapon_famas* CC Res_famas_pre_create_640BFE(Res_Control* pCtrl, struc_kmd* pParentKmd, int parentKmdMeshIdx, int pUnknown)
+{
+    return Res_Weapon_famas_create_640C24(
+        pCtrl,
+        pParentKmd,
+        parentKmdMeshIdx,
+        pUnknown,
+        gGameStates_78E7E0.gDiffcultyLevel_78E7E2 == DiffcultyLevels::eVeryEasy);
+}
+MGS_FUNC_IMPLEX(0x640BFE, Res_famas_pre_create_640BFE, WINMAIN_IMPL);
+
 void __cdecl Input_AcquireOrUnAcquire();
 
 LRESULT CALLBACK MainWindowProc_51C2D3(HWND hWnd, UINT msg, UINT wParam, LPARAM lParam)
