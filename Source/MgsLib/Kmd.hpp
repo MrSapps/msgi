@@ -47,6 +47,8 @@ struct Prim_Mesh_0x5C
 };
 MGS_ASSERT_SIZEOF(Prim_Mesh_0x5C, 0x5C);
 
+struct kmd_ex_data;
+
 struct Prim_unknown_0x48
 {
     PSX_MATRIX field_0_matrix;
@@ -58,14 +60,14 @@ struct Prim_unknown_0x48
     WORD field_30_size;
     WORD field_32;
     PSX_MATRIX* field_34_light_mtx_array;
-    SVECTOR* field_38_size24b;
+    kmd_ex_data* field_38_size24b;
     SVECTOR* field_3C;
     SVECTOR* field_40;
     SVECTOR* field_44;
 };
 MGS_ASSERT_SIZEOF(Prim_unknown_0x48, 0x48);
 
-struct Prim_24b
+struct Prim_24b // TODO: Probably kmd_ex_data ?
 {
     SVECTOR field_0_v1;
     SVECTOR field_8_v2;
@@ -115,13 +117,28 @@ struct struc_kmd
     Prim_Union* field_0_pObj;
     int field_4_size;
     PSX_MATRIX* field_8_light_mtx_array;
-    short field_C_mapflags_or_script_binds;
+    WORD field_C_mapflags_or_script_binds;
     short field_E_anim_id;
     int field_10;
     struc_kmd_14 field_14_struc;
     int field_20;
 };
 MGS_ASSERT_SIZEOF(struc_kmd, 0x24);
+
+struct kmd_ex_data
+{
+    SVECTOR field_0[24];
+};
+MGS_ASSERT_SIZEOF(kmd_ex_data, 0xC0);
+
+struct struct_kmd_ex
+{
+    struc_kmd field_0_mBase;
+    kmd_ex_data field_24_mEx;
+};
+MGS_ASSERT_SIZEOF(struct_kmd_ex, 0xE4);
+
+
 
 struct Actor_boxkeri
 {

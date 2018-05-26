@@ -1529,10 +1529,10 @@ MGS_FUNC_IMPLEX(0x4500DD, Kmd_free_4500DD, BOXKERI_IMPL);
 signed int CC Kmd_Load_Impl_450243(struc_kmd* pKmd, int resHash)
 {
     Prim_unknown_0x48* pOldObj = &pKmd->field_0_pObj->prim_48;
-    KmdHeader* pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(resHash, 'k'));
+    KmdHeader* pFileData = reinterpret_cast<KmdHeader*>(LibGV_FindFile_40A603(HashFileName_40A58B(resHash, 'k')));
     if (!pFileData)
     {
-        pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(ResourceNameHash("null"), 'k'));
+        pFileData = reinterpret_cast<KmdHeader*>(LibGV_FindFile_40A603(HashFileName_40A58B(ResourceNameHash("null"), 'k')));
     }
 
     Prim_Union* pPrimObj = Obj_Alloc_443FEC(pFileData, pKmd->field_4_size, 0);
@@ -1561,10 +1561,27 @@ void CC Kmd_Load_44FF7C(struc_kmd* pObj, int resHash, int size)
     MemClearUnknown_40B231(pObj, sizeof(struc_kmd));
     pObj->field_4_size = size;
     pObj->field_8_light_mtx_array = &gLightNormalVec_650128;
-    pObj->field_C_mapflags_or_script_binds = (signed __int16)mapChangeFlagsOrScriptBinds_9942A0;
+    pObj->field_C_mapflags_or_script_binds = static_cast<WORD>(mapChangeFlagsOrScriptBinds_9942A0);
     Kmd_Load_Impl_450243(pObj, resHash);
 }
 MGS_FUNC_IMPLEX(0x44FF7C, Kmd_Load_44FF7C, BOXKERI_IMPL);
+
+void CC Kmd_Load_Ex_44FFB0(struct_kmd_ex* pKmd, int modelNameHashed, int size)
+{
+    MemClearUnknown_40B231(&pKmd->field_24_mEx, sizeof(kmd_ex_data));
+    MemClearUnknown_40B231(&pKmd->field_0_mBase, sizeof(struc_kmd));
+    pKmd->field_0_mBase.field_4_size = size;
+    pKmd->field_0_mBase.field_8_light_mtx_array = &gLightNormalVec_650128;
+    pKmd->field_0_mBase.field_C_mapflags_or_script_binds = static_cast<WORD>(mapChangeFlagsOrScriptBinds_9942A0);
+    Kmd_Load_Impl_450243(&pKmd->field_0_mBase, modelNameHashed);
+}
+MGS_FUNC_IMPLEX(0x44FFB0, Kmd_Load_Ex_44FFB0, BOXKERI_IMPL);
+
+void CC KmdEx_SetPrim_ExPtr_45015C(struct_kmd_ex* pKmdEx)
+{
+    pKmdEx->field_0_mBase.field_0_pObj->prim_48.field_38_size24b = &pKmdEx->field_24_mEx;
+}
+MGS_FUNC_IMPLEX(0x45015C, KmdEx_SetPrim_ExPtr_45015C, BOXKERI_IMPL);
 
 int CC Res_Enemy_boxkeri_loader_5B702E(Actor_boxkeri* pBox, PSX_MATRIX* pMtx, SVECTOR* pVec)
 {

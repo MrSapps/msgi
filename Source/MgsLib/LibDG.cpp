@@ -1580,7 +1580,7 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
     }
     else
     {
-        RotMatrixZYX_gte_44C880(pObj->field_38_size24b, (MATRIX3x3 *)&pScratch->mtx[26]);
+        RotMatrixZYX_gte_44C880(pObj->field_38_size24b->field_0, (MATRIX3x3 *)&pScratch->mtx[26]);
     }
 
     pScratch->mtx[26].t = pKmd->translation;
@@ -1627,7 +1627,7 @@ void CC LibGV_406B97(Prim_unknown_0x48* pObj, int faceCount)
     if (faceCount > 0) // TODO: Refactor to a for loop
     {
         Prim_Mesh_0x5C *pMeshIter = pMesh;
-        SVECTOR* pLightsIter = pObj->field_38_size24b;
+        SVECTOR* pLightsIter = pObj->field_38_size24b->field_0;
         PSX_MATRIX* pScratchMtx = &pScratch->mtx[2];
         do
         {
