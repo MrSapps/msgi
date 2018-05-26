@@ -28,7 +28,7 @@ signed int CC Script_Run(BYTE* pScriptBytes, GCL_Proc_Arguments* pArgs);
 int CC Script_RunProc(BYTE* pScript);
 BYTE* CC Script_GCL_Execute(BYTE* pScript, DWORD* ppScript, DWORD* pRet);
 signed int CC Script_ProcCancelOrRun(WORD id, GCL_Proc_Arguments* pArgs);
-DWORD CC Script_ParamExists(char paramId);
+BYTE* CC Script_ParamExists(char paramId);
 DWORD CC Script_get_int();
 BYTE* CC Script_GetReturnAddress();
 void CC GCL_Init_4090A7();
@@ -37,7 +37,7 @@ int CC Script_Operator_Evaluate(int operation, int v1, int v2);
 void CC Script_RunMainProc_409D49();
 char* CC Script_read_string_arg_40997B(BYTE* pScript);
 DWORD CC Script_Unknown8_409924(BYTE* pScript);
-int CC Script_Read3Words_409945(BYTE* pScript, WORD* pOut);
+int CC Script_Read3Words_409945(BYTE* pScript, SVECTOR* pOut);
 
 
 MGS_VAR_EXTERN(int, gGameOverTimer_dword_7227A4);

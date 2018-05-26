@@ -101,7 +101,7 @@ int CC Script_InitCommandTable(proc_struct* pCmdTbl)
 }
 MGS_FUNC_IMPLEX(0x00409A4F, Script_InitCommandTable, SCRIPT_IMPL);
 
-DWORD CC Script_ParamExists(char paramId)
+BYTE* CC Script_ParamExists(char paramId)
 {
     DWORD ret = 0;
     DWORD ppScript = 0;
@@ -120,7 +120,7 @@ DWORD CC Script_ParamExists(char paramId)
         if ((BYTE)ppScript == 0x50 && (signed int)ppScript >> 16 == paramId)
         {
             gScriptExecuteRet_dword_78D7B4 = (BYTE*)ret;
-            return ret;
+            return gScriptExecuteRet_dword_78D7B4;
         }
     }
     return 0;
@@ -729,15 +729,20 @@ char* CC Script_read_string_arg_40997B(BYTE* pScript)
 }
 MGS_FUNC_IMPLEX(0x40997B, Script_read_string_arg_40997B, SCRIPT_IMPL);
 
-int CC Script_Read3Words_409945(BYTE* pScript, WORD* pOut)
+int CC Script_Read3Words_409945(BYTE* pScript, SVECTOR* pOut)
 {
     DWORD ret = 0;
     DWORD cmd = 0;
-    for (int i=0; i<3; i++)
-    {
-        pScript = Script_GCL_Execute(pScript, &cmd, &ret);
-        pOut[i] = static_cast<WORD>(ret);
-    }
+
+    pScript = Script_GCL_Execute(pScript, &cmd, &ret);
+    pOut->field_0_x = static_cast<WORD>(ret);
+
+    pScript = Script_GCL_Execute(pScript, &cmd, &ret);
+    pOut->field_2_y = static_cast<WORD>(ret);
+
+    pScript = Script_GCL_Execute(pScript, &cmd, &ret);
+    pOut->field_4_z = static_cast<WORD>(ret);
+
     gScriptExecuteRet_dword_78D7B4 = pScript;
     return 0;
 }
@@ -802,11 +807,11 @@ int CC Script_tbl_load_451BBF(BYTE* /*pScript*/)
             if (Script_ParamExists('p'))
             {
                 // Snakes starting position in the map?
-                WORD pWordArray3[3] = {};
-                Script_Read3Words_409945(Script_GetReturnAddress(), pWordArray3);
-                gGameStates_78E7E0.gScript_loader_param_p_78E7F0[0] = pWordArray3[0];
-                gGameStates_78E7E0.gScript_loader_param_p_78E7F0[1] = pWordArray3[1];
-                gGameStates_78E7E0.gScript_loader_param_p_78E7F0[2] = pWordArray3[2];
+                SVECTOR pWordArray3 = {};
+                Script_Read3Words_409945(Script_GetReturnAddress(), &pWordArray3);
+                gGameStates_78E7E0.gScript_loader_param_p_78E7F0[0] = pWordArray3.field_0_x;
+                gGameStates_78E7E0.gScript_loader_param_p_78E7F0[1] = pWordArray3.field_2_y;
+                gGameStates_78E7E0.gScript_loader_param_p_78E7F0[2] = pWordArray3.field_4_z;
             }
 
             if (Script_ParamExists('s'))
@@ -963,22 +968,22 @@ int CC Script_tbl_light_sub_451239(BYTE* /*pScript*/)
 {
     SVECTOR vec = {};
 
-    DWORD scriptParam = Script_ParamExists('d');
+    BYTE* scriptParam = Script_ParamExists('d');
     if (scriptParam)
     {
-        Script_Read3Words_409945((BYTE *)scriptParam, (WORD *)&vec.field_0_x);
+        Script_Read3Words_409945(scriptParam, &vec);
         Script_light_vec_402144(vec.field_0_x, vec.field_2_y, vec.field_4_z);
     }
     scriptParam = Script_ParamExists('c');
     if (scriptParam)
     {
-        Script_Read3Words_409945((BYTE *)scriptParam, (WORD *)&vec.field_0_x);
+        Script_Read3Words_409945(scriptParam, &vec);
         Script_tbl_light_helper_param_c_40218B(vec.field_0_x, vec.field_2_y, vec.field_4_z);
     }
     scriptParam = Script_ParamExists('a');
     if (scriptParam)
     {
-        Script_Read3Words_409945((BYTE *)scriptParam, (WORD *)&vec.field_0_x);
+        Script_Read3Words_409945(scriptParam, &vec);
         LightSettingsRelated_4020F5(vec.field_0_x, vec.field_2_y, vec.field_4_z);
     }
     return 0;

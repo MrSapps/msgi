@@ -191,15 +191,15 @@ void CC Res_Control_set_vecs_from_mtx_44F11D(Res_Control* pControl, PSX_MATRIX* 
     pControl->field_4C_turn_vec = pControl->field_8_vec;
 }
 
-void CC Res_Control_Read_vecs_from_script_44F158(Res_Control* pControl, int script_param_p, int script_param_d)
+void CC Res_Control_Read_vecs_from_script_44F158(Res_Control* pControl, BYTE* script_param_p, BYTE* script_param_d)
 {
     if (script_param_p)
     {
-        Script_Read3Words_409945((BYTE *)script_param_p, (WORD *)pControl);
+        Script_Read3Words_409945(script_param_p, &pControl->field_0_vec);
     }
     if (script_param_d)
     {
-        Script_Read3Words_409945((BYTE *)script_param_d, (WORD *)&pControl->field_8_vec);
+        Script_Read3Words_409945(script_param_d, &pControl->field_8_vec);
     }
     pControl->field_4C_turn_vec = pControl->field_8_vec;
 }

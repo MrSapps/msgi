@@ -240,9 +240,9 @@ signed int CC Script_tbl_map_45151D(BYTE* /*pScript*/)
 
     if (Script_ParamExists('b'))
     {
-        WORD param_b[3];
-        Script_Read3Words_409945(Script_GetReturnAddress(), param_b);
-        LibDG_SetRGB_401931(static_cast<BYTE>(param_b[0]), static_cast<BYTE>(param_b[1]), static_cast<BYTE>(param_b[2]));
+        SVECTOR param_b;
+        Script_Read3Words_409945(Script_GetReturnAddress(), &param_b);
+        LibDG_SetRGB_401931(param_b.field_0_x & 0xFF, param_b.field_2_y & 0xFF, param_b.field_4_z & 0xFF);
     }
 
     return 0;
