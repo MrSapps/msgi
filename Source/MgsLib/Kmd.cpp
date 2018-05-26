@@ -1526,7 +1526,7 @@ void CC Kmd_free_4500DD(struc_kmd* pKmd)
 }
 MGS_FUNC_IMPLEX(0x4500DD, Kmd_free_4500DD, BOXKERI_IMPL);
 
-signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
+signed int CC Kmd_Load_Impl_450243(struc_kmd* pKmd, int resHash)
 {
     Prim_unknown_0x48* pOldObj = &pKmd->field_0_pObj->prim_48;
     KmdHeader* pFileData = (KmdHeader *)LibGV_FindFile_40A603(HashFileName_40A58B(resHash, 'k'));
@@ -1554,7 +1554,7 @@ signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
     Object_Add_40178F(pPrimObj);
     return 0;
 }
-MGS_FUNC_IMPLEX(0x450243, LoadKmdImpl_450243, BOXKERI_IMPL);
+MGS_FUNC_IMPLEX(0x450243, Kmd_Load_Impl_450243, BOXKERI_IMPL);
 
 void CC Kmd_Load_44FF7C(struc_kmd* pObj, int resHash, int size)
 {
@@ -1562,7 +1562,7 @@ void CC Kmd_Load_44FF7C(struc_kmd* pObj, int resHash, int size)
     pObj->field_4_size = size;
     pObj->field_8_light_mtx_array = &gLightNormalVec_650128;
     pObj->field_C_mapflags_or_script_binds = (signed __int16)mapChangeFlagsOrScriptBinds_9942A0;
-    LoadKmdImpl_450243(pObj, resHash);
+    Kmd_Load_Impl_450243(pObj, resHash);
 }
 MGS_FUNC_IMPLEX(0x44FF7C, Kmd_Load_44FF7C, BOXKERI_IMPL);
 
