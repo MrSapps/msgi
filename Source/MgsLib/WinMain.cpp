@@ -532,7 +532,7 @@ signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, 
     }
 
     struc_kmd* pField20 = (struc_kmd*)&pFamas->field_20;
-    LoadKmdRelated_44FF7C(pField20, resNameHashed, 'm');
+    Kmd_Load_44FF7C(pField20, resNameHashed, 'm');
 
     if (pField20->field_0_pObj)
     {

@@ -148,7 +148,7 @@ MGS_ASSERT_SIZEOF(KmdHeader, 0x20);
 
 
 Actor_boxkeri* CC Res_Enemy_boxkeri_create_5B6EA9(PSX_MATRIX* pMtx, SVECTOR* pVec);
-void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size);
+void CC Kmd_Load_44FF7C(struc_kmd* pObj, int resHash, int size);
 void CC Kmd_free_4500DD(struc_kmd* pKmd);
 void CC Object_Remove_4017C3(Prim_unknown_0x48* pPrim);
 void CC Prim_free_colour_buffer_443FCB(Prim_unknown_0x48* pPrim);

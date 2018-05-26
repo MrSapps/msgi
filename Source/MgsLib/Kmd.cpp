@@ -1556,7 +1556,7 @@ signed int CC LoadKmdImpl_450243(struc_kmd* pKmd, int resHash)
 }
 MGS_FUNC_IMPLEX(0x450243, LoadKmdImpl_450243, BOXKERI_IMPL);
 
-void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size)
+void CC Kmd_Load_44FF7C(struc_kmd* pObj, int resHash, int size)
 {
     MemClearUnknown_40B231(pObj, sizeof(struc_kmd));
     pObj->field_4_size = size;
@@ -1564,13 +1564,13 @@ void CC LoadKmdRelated_44FF7C(struc_kmd* pObj, int resHash, int size)
     pObj->field_C_mapflags_or_script_binds = (signed __int16)mapChangeFlagsOrScriptBinds_9942A0;
     LoadKmdImpl_450243(pObj, resHash);
 }
-MGS_FUNC_IMPLEX(0x44FF7C, LoadKmdRelated_44FF7C, BOXKERI_IMPL);
+MGS_FUNC_IMPLEX(0x44FF7C, Kmd_Load_44FF7C, BOXKERI_IMPL);
 
 int CC Res_Enemy_boxkeri_loader_5B702E(Actor_boxkeri* pBox, PSX_MATRIX* pMtx, SVECTOR* pVec)
 {
     // TODO
     //mapChangeFlagsOrScriptBinds = (char *)map_change_flags_dword_99535C;
-    LoadKmdRelated_44FF7C(&pBox->field_20_kmd, ResourceNameHash("cb_box"), 109);
+    Kmd_Load_44FF7C(&pBox->field_20_kmd, ResourceNameHash("cb_box"), 109);
     Kmd_Set_Light_matrices_450109(&pBox->field_20_kmd, pBox->field_7C_set_on_kmd_light_matrix_ptrs);
 
     //pBox->field_20_kmd[2].field_0_matrix.m[1][1] = 500;
