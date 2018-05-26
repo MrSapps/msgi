@@ -1733,9 +1733,9 @@ MGS_FUNC_IMPLEX(0x406B97, LibGV_406B97, LIBDG_IMPL);
 void CC LibGV_4066ED(Prim_Union* pObj)
 {
     const int count = pObj->prim_48.field_2E_UnknownOrNumFaces;
-    if (pObj->prim_48.field_20)
+    if (pObj->prim_48.field_20_pMesh)
     {
-        pObj->prim_48.field_0_matrix = *pObj->prim_48.field_20;
+        pObj->prim_48.field_0_matrix = pObj->prim_48.field_20_pMesh->field_0_mtx;
     }
 
     gScratchPadMemory_991E40.field_2_Matrix.mtx[1] = pObj->prim_48.field_0_matrix;

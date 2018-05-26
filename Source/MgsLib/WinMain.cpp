@@ -515,11 +515,8 @@ MGS_FUNC_NOT_IMPL(0x00640CDC, int __cdecl(weapon_famas*), Res_famas_update_640CD
 MGS_FUNC_NOT_IMPL(0x00640E9E, int* __cdecl(weapon_famas*), Res_famas_shutdown_640E9E);
 
 
-
-MGS_FUNC_NOT_IMPL(0x0045011B, int __cdecl(int, int, int), sub_45011B);
-
 //MSG_FUNC_NOT_IMPL(0x00640EAD, signed int __cdecl(weapon_famas*, int, int, int), Res_Weapon_famas_init_sub_640EAD);
-signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, int a3, int bMp5)
+signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, struc_kmd* a2, int a3, int bMp5)
 {
     WORD resNameHashed = 0;
     if (bMp5)
@@ -536,20 +533,20 @@ signed int __cdecl Res_Weapon_famas_loader_640EAD(weapon_famas* pFamas, int a2, 
 
     if (pField20->field_0_pObj)
     {
-        sub_45011B((int)pField20, a2, a3);
+        Kmd_Link_To_Parent_Mesh_45011B(pField20, a2, a3);
         return 0;
     }
 
     return -1;
 }
 
-weapon_famas* CC Res_Weapon_famas_96_sub_640C24(ActorList* a1, ActorList *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
+weapon_famas* CC Res_Weapon_famas_96_sub_640C24(ActorList* a1, struc_kmd *a2, void(__cdecl *a3)(ActorList *), void(__cdecl *a4)(DWORD), int bMp5)
 {
     weapon_famas* pFamas = Actor_ResourceAllocT<weapon_famas>(6);
     if (pFamas)
     {
         Actor_Init_40A347(&pFamas->mBase, (TActorFunction)Res_famas_update_640CDC.Ptr(), (TActorFunction)Res_famas_shutdown_640E9E.Ptr(), "C:\\mgs\\source\\Weapon\\famas.c");
-        if (Res_Weapon_famas_loader_640EAD(pFamas, (int)a2, (int)a3, bMp5) < 0)
+        if (Res_Weapon_famas_loader_640EAD(pFamas, a2, (int)a3, bMp5) < 0)
         {
             Actor_DestroyOnNextUpdate_40A3ED(&pFamas->mBase);
             return 0;

@@ -1554,7 +1554,7 @@ signed int CC Kmd_Load_Impl_450243(struc_kmd* pKmd, int resHash)
     Object_Add_40178F(pPrimObj);
     return 0;
 }
-MGS_FUNC_IMPLEX(0x450243, Kmd_Load_Impl_450243, BOXKERI_IMPL);
+MGS_FUNC_IMPLEX(0x450243, Kmd_Load_Impl_450243, KMD_IMPL);
 
 void CC Kmd_Load_44FF7C(struc_kmd* pObj, int resHash, int size)
 {
@@ -1564,7 +1564,7 @@ void CC Kmd_Load_44FF7C(struc_kmd* pObj, int resHash, int size)
     pObj->field_C_mapflags_or_script_binds = static_cast<WORD>(mapChangeFlagsOrScriptBinds_9942A0);
     Kmd_Load_Impl_450243(pObj, resHash);
 }
-MGS_FUNC_IMPLEX(0x44FF7C, Kmd_Load_44FF7C, BOXKERI_IMPL);
+MGS_FUNC_IMPLEX(0x44FF7C, Kmd_Load_44FF7C, KMD_IMPL);
 
 void CC Kmd_Load_Ex_44FFB0(struct_kmd_ex* pKmd, int modelNameHashed, int size)
 {
@@ -1575,13 +1575,31 @@ void CC Kmd_Load_Ex_44FFB0(struct_kmd_ex* pKmd, int modelNameHashed, int size)
     pKmd->field_0_mBase.field_C_mapflags_or_script_binds = static_cast<WORD>(mapChangeFlagsOrScriptBinds_9942A0);
     Kmd_Load_Impl_450243(&pKmd->field_0_mBase, modelNameHashed);
 }
-MGS_FUNC_IMPLEX(0x44FFB0, Kmd_Load_Ex_44FFB0, BOXKERI_IMPL);
+MGS_FUNC_IMPLEX(0x44FFB0, Kmd_Load_Ex_44FFB0, KMD_IMPL);
 
 void CC KmdEx_SetPrim_ExPtr_45015C(struct_kmd_ex* pKmdEx)
 {
     pKmdEx->field_0_mBase.field_0_pObj->prim_48.field_38_size24b = &pKmdEx->field_24_mEx;
 }
-MGS_FUNC_IMPLEX(0x45015C, KmdEx_SetPrim_ExPtr_45015C, BOXKERI_IMPL);
+MGS_FUNC_IMPLEX(0x45015C, KmdEx_SetPrim_ExPtr_45015C, KMD_IMPL);
+
+void CC Kmd_Link_To_Parent_Mesh_45011B(struc_kmd* pKmd, struc_kmd* pParentKmd, int idx)
+{
+    Prim_unknown_0x48* pFirstKmdPrimObj = &pKmd->field_0_pObj->prim_48;
+    if (pParentKmd && idx >= 0)
+    {
+        pFirstKmdPrimObj->field_20_pMesh = DataAfterStructure<Prim_Mesh_0x5C*>(&pParentKmd->field_0_pObj->prim_48) + idx;
+        pKmd->field_8_light_mtx_array = pParentKmd->field_8_light_mtx_array;
+        pFirstKmdPrimObj->field_34_light_mtx_array = pParentKmd->field_8_light_mtx_array;
+    }
+    else
+    {
+        pFirstKmdPrimObj->field_20_pMesh = nullptr;
+        pKmd->field_8_light_mtx_array = &gLightNormalVec_650128;
+        pFirstKmdPrimObj->field_34_light_mtx_array = &gLightNormalVec_650128;
+    }
+}
+MGS_FUNC_IMPLEX(0x45011B, Kmd_Link_To_Parent_Mesh_45011B, KMD_IMPL);
 
 int CC Res_Enemy_boxkeri_loader_5B702E(Actor_boxkeri* pBox, PSX_MATRIX* pMtx, SVECTOR* pVec)
 {
