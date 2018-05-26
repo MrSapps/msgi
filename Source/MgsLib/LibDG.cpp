@@ -42,7 +42,7 @@ Actor* CC Res_open_create_486BD4(DWORD scriptData, int scriptBinds, BYTE* pScrip
 //    return Res_env_test_create_62130E(scriptData, scriptBinds, pScript);
 //    return Res_met_logo_create_4B54AB(scriptData, scriptBinds, pScript);
 }
-MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, false); // TODO
+MGS_FUNC_IMPLEX(0x486BD4, Res_open_create_486BD4, true); // TODO
 
 
 MGS_ARY(REDIRECT_LIBDG_DATA, 0x669AE0, Res_Init_Record, 512, gKnownResInitFuncs_669AE0,

@@ -138,23 +138,6 @@ struct struct_kmd_ex
 };
 MGS_ASSERT_SIZEOF(struct_kmd_ex, 0xE4);
 
-
-
-struct Actor_boxkeri
-{
-    Actor mBase;
-    struc_kmd field_20_kmd;
-    SVECTOR field_44;
-    SVECTOR field_4C;
-    PSX_MATRIX field_54_mtx;
-    __int16 field_74_ticks;
-    __int16 field_76_state;
-    __int16 field_78_pos2;
-    __int16 field_7A_pos1;
-    PSX_MATRIX field_7C_set_on_kmd_light_matrix_ptrs[2];
-};
-MGS_ASSERT_SIZEOF(Actor_boxkeri, 0xBC);
-
 struct KmdHeader
 {
     DWORD mNumberOfMeshes;
@@ -164,7 +147,6 @@ struct KmdHeader
 MGS_ASSERT_SIZEOF(KmdHeader, 0x20);
 
 
-Actor_boxkeri* CC Res_Enemy_boxkeri_create_5B6EA9(PSX_MATRIX* pMtx, SVECTOR* pVec);
 void CC Kmd_Load_44FF7C(struc_kmd* pObj, int resHash, int size);
 void CC Kmd_free_4500DD(struc_kmd* pKmd);
 void CC Object_Remove_4017C3(Prim_unknown_0x48* pPrim);
@@ -173,6 +155,12 @@ void CC Prim_void_and_free_4440BE(Prim_unknown_0x48* pPrim);
 Prim_Union* CC Obj_Alloc_443FEC(KmdHeader* pFileData, int countOrType_0x40Flag, __int16 usuallyZero);
 int CC Object_Add_40178F(Prim_Union* pPrim);
 void CC Prim_Remove_401839(Prim_unknown_0x54* pPrimUnknown);
+void CC Kmd_Set_Light_matrices_450109(struc_kmd* pKmd, PSX_MATRIX* pLightMtxAry);
+void CC Vector_subtract_40B4ED(const SVECTOR* aLhs, const SVECTOR* aRhs, SVECTOR* out);
+int CC FixedSubtract_40B6BD(__int16 value1, __int16 value2);
+void CC Res_base_unknown_407B3D(const SVECTOR* pVec);
+void CC Res_base_unknown_407B79(const SVECTOR* pRotVec);
+int CC Res_base_unknown_40241F(const SVECTOR* pVec, PSX_MATRIX* pMtxAry);
 
 struct Light
 {

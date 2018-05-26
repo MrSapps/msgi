@@ -6,6 +6,7 @@
 #include "WinMain.hpp"
 #include "Actor_GameD.hpp"
 #include "Actor_Movie.hpp"
+#include "Actor_BoxKeri.hpp"
 
 union PolyTag2
 {

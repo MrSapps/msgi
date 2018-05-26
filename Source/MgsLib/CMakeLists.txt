@@ -67,6 +67,8 @@ add_library(MgsLib
     Control.hpp
     Table_665A3C.cpp
     Table_665A3C.hpp
+    Actor_BoxKeri.cpp
+    Actor_BoxKeri.hpp
     WinMain.cpp
     WinMain.hpp)
 

@@ -15,3 +15,5 @@ int CC Gv_hzm_file_handler_40B734(void*, TFileNameHash);
 void CC Map_update_if_changed_44F28B();
 map_record* CC Script_tbl_hzd_impl_44F415();
 map_record* CC Map_FromId_44F79E(signed int mapChangeFlags);
+
+MGS_VAR_EXTERN(DWORD, map_change_flags_dword_99535C);
