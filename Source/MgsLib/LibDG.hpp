@@ -137,5 +137,6 @@ void CC MarkObjectQueueVoid_4018E0();
 void CC LibGV_prim_buffer_set_shade_colour_4072B7(Prim_Mesh_0x5C* pMesh, int activeBuffer);
 void CC LibDG_Init_Lights_4021B3();
 void CC Light_add_4021C9(Light* pLights, int lightCount);
+int CC Res_base_unknown_44CCD0(signed int a1, signed int a2);
 
 void DoDGTests();

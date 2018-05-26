@@ -1318,6 +1318,37 @@ int CC Res_base_unknown_40241F(const SVECTOR* pVec, PSX_MATRIX* pMtxAry)
 }
 MGS_FUNC_IMPLEX(0x40241F, Res_base_unknown_40241F, KMD_IMPL);
 
+void CC Vector_unknown_407549(PSX_MATRIX* pMtx, SVECTOR* pVec)
+{
+    const int m_1_2_neg = -pMtx->m.m[1][2];
+    const int squareRoot = static_cast<int>(j_sqrt(0x1000000 - m_1_2_neg * m_1_2_neg));
+    if (squareRoot >= 128)
+    {
+        pVec->field_0_x = Res_base_unknown_44CCD0(m_1_2_neg, squareRoot) & 4095;
+        pVec->field_2_y = Res_base_unknown_44CCD0((pMtx->m.m[0][2] << 12) / squareRoot, (pMtx->m.m[2][2] << 12) / squareRoot) & 4095;
+        pVec->field_4_z = Res_base_unknown_44CCD0((pMtx->m.m[1][0] << 12) / squareRoot, (pMtx->m.m[1][1] << 12) / squareRoot) & 4095;
+    }
+    else
+    {
+        pVec->field_0_x = (m_1_2_neg < 0) || (m_1_2_neg == 0) ? 3072 : 1024;
+        pVec->field_2_y = Res_base_unknown_44CCD0(-pMtx->m.m[2][0], pMtx->m.m[0][0]) & 4095;
+        pVec->field_4_z = 0;
+    }
+
+    int vecZCopy = pVec->field_4_z;
+    if (pVec->field_4_z < 0)
+    {
+        vecZCopy = -pVec->field_4_z;
+    }
+
+    if (vecZCopy > 1024)
+    {
+        pVec->field_4_z = (pVec->field_4_z - 2048) & 4095;
+        pVec->field_2_y = (pVec->field_2_y - 2048) & 4095;
+        pVec->field_0_x = (-2048 - pVec->field_0_x) & 4095;
+    }
+}
+MGS_FUNC_IMPLEX(0x407549, Vector_unknown_407549, KMD_IMPL);
 
 void CC Res_Enemy_boxkeri_update_5B6EF7(Actor_boxkeri* pBox)
 {

@@ -194,3 +194,4 @@ void CC RotMatrixZYX_gte_44C880(const SVECTOR* pVec, MATRIX3x3* pMtx);
 void CC RotMatrixY_44C270(__int16 value, PSX_MATRIX* pMtx);
 void CC RotMatrixX_44C1C0(__int16 value, PSX_MATRIX* pMatrix);
 void CC RotMatrixZ_44C320(__int16 value, PSX_MATRIX* pMatrix);
+void CC Vector_unknown_407549(PSX_MATRIX* pMtx, SVECTOR* pVec);

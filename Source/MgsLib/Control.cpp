@@ -2,6 +2,7 @@
 #include "Control.hpp"
 #include "LibDG.hpp"
 #include "Map.hpp"
+#include "Script.hpp"
 
 #define RES_CONTROL_IMPL true
 
@@ -133,6 +134,75 @@ void CC Res_Control_remove_if_scriptData_44F098(Res_Control* pControl)
     }
 }
 MGS_FUNC_IMPLEX(0x44F098, Res_Control_remove_if_scriptData_44F098, RES_CONTROL_IMPL);
+
+void CC Res_Control_set_Field_3A_44F1B3(Res_Control* pControl, __int16 field_3a)
+{
+    pControl->field_3A = field_3a;
+}
+MGS_FUNC_IMPLEX(0x44F1B3, Res_Control_set_Field_3A_44F1B3, RES_CONTROL_IMPL);
+
+void CC Res_Control_set_Field_54_44F1C1(Res_Control* pControl, char field_54)
+{
+    pControl->field_54 = field_54;
+}
+MGS_FUNC_IMPLEX(0x44F1C1, Res_Control_set_Field_54_44F1C1, RES_CONTROL_IMPL);
+
+void CC Res_Control_unset_field_55_flags_44F253(Res_Control* pControl)
+{
+    pControl->field_55_flags &= 0xFDu; // TODO Use ~ for clarity
+}
+MGS_FUNC_IMPLEX(0x44F253, Res_Control_unset_field_55_flags_44F253, RES_CONTROL_IMPL);
+
+void CC Res_Control_set_fields_3c_3e_40_42_44F22B(Res_Control* pControl, __int16 a2, __int16 a3, __int16 a4, __int16 a5)
+{
+    pControl->field_3C = a2;
+    pControl->field_3E = a3;
+    pControl->field_40 = a4;
+    pControl->field_42 = a5;
+}
+MGS_FUNC_IMPLEX(0x44F22B, Res_Control_set_fields_3c_3e_40_42_44F22B, RES_CONTROL_IMPL);
+
+void CC Res_Control_set_unknown_44F193(Res_Control* pControl, __int16 field_32, __int16 field_36, __int16 field_38)
+{
+    pControl->field_32_height = field_32;
+    pControl->field_36 = field_36;
+    pControl->field_38 = field_38;
+}
+
+void CC Res_Control_set_vecs_44F0F3(Res_Control* pControl, SVECTOR *pVec1, SVECTOR *pVec2)
+{
+    if (pVec1)
+    {
+        pControl->field_0_vec = *pVec1;
+    }
+
+    if (pVec2)
+    {
+        pControl->field_8_vec = *pVec2;
+    }
+}
+
+void CC Res_Control_set_vecs_from_mtx_44F11D(Res_Control* pControl, PSX_MATRIX* pMtx)
+{
+    pControl->field_0_vec.field_0_x = static_cast<short>(pMtx->t.field_0_x);
+    pControl->field_0_vec.field_2_y = static_cast<short>(pMtx->t.field_4_y);
+    pControl->field_0_vec.field_4_z = static_cast<short>(pMtx->t.field_8_z);
+    Vector_unknown_407549(pMtx, &pControl->field_8_vec);
+    pControl->field_4C_turn_vec = pControl->field_8_vec;
+}
+
+void CC Res_Control_Read_vecs_from_script_44F158(Res_Control* pControl, int script_param_p, int script_param_d)
+{
+    if (script_param_p)
+    {
+        Script_Read3Words_409945((BYTE *)script_param_p, (WORD *)pControl);
+    }
+    if (script_param_d)
+    {
+        Script_Read3Words_409945((BYTE *)script_param_d, (WORD *)&pControl->field_8_vec);
+    }
+    pControl->field_4C_turn_vec = pControl->field_8_vec;
+}
 
 static void TestAddRemove()
 {
