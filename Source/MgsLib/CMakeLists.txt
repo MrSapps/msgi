@@ -63,6 +63,8 @@ add_library(MgsLib
     masher_tables.hpp
     Masher.cpp
     Masher.hpp
+    Control.cpp
+    Control.hpp
     Table_665A3C.cpp
     Table_665A3C.hpp
     WinMain.cpp
