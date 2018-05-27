@@ -21,3 +21,5 @@ struct Actor_boxkeri
 MGS_ASSERT_SIZEOF(Actor_boxkeri, 0xBC);
 
 Actor_boxkeri* CC Res_Enemy_boxkeri_create_5B6EA9(PSX_MATRIX* pMtx, SVECTOR* pVec);
+
+MGS_VAR_EXTERN(struct Res_Control*, gSnakeResControl_dword_99534C);

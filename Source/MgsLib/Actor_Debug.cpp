@@ -7,6 +7,7 @@
 #include "Actor_GameD.hpp"
 #include "Actor_Movie.hpp"
 #include "Actor_BoxKeri.hpp"
+#include "Control.hpp"
 
 union PolyTag2
 {
@@ -232,6 +233,8 @@ MGS_VAR(1, 0x99534C, PSX_MATRIX*, dword_99534C, 0);
 
 void Debug_BoxKickSpawn()
 {
+    static Res_Control sTempControl = {};
+    gSnakeResControl_dword_99534C = &sTempControl;
     // HACK
     if (!dword_99534C)
     {
