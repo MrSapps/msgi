@@ -976,6 +976,14 @@ int CC Vector_unknown_40B5BC(const SVECTOR* pVec1, const SVECTOR* pVec2)
 }
 MGS_FUNC_IMPLEX(0x40B5BC, Vector_unknown_40B5BC, KMD_IMPL);
 
+void CC Vector_unknown_40B62C(int fixedAng, int len, SVECTOR* pOutVec)
+{
+    pOutVec->field_2_y = 0;
+    pOutVec->field_0_x = static_cast<short>(len * Res_get_constant_44AF00(static_cast<short>(fixedAng)) / 4096);
+    pOutVec->field_4_z = static_cast<short>(len * Res_base_get_constant_44AEE0(static_cast<short>(fixedAng)) / 4096);
+}
+MGS_FUNC_IMPLEX(0x40B62C, Vector_unknown_40B62C, KMD_IMPL);
+
 void CC Gte_set_translation_vector_from_mtx_44AE60(const PSX_MATRIX* pMtx)
 {
     gGte_translation_vector_993E54 = pMtx->t;
