@@ -1508,6 +1508,12 @@ void CC KmdEx_SetPrim_ExPtr_45015C(struct_kmd_ex* pKmdEx)
 }
 MGS_FUNC_IMPLEX(0x45015C, KmdEx_SetPrim_ExPtr_45015C, KMD_IMPL);
 
+void CC Kmd_SetPrimVecPtrToEx_450169(struct_kmd_ex* pKmdEx)
+{
+    pKmdEx->field_0_mBase.field_0_pObj->prim_48.field_44 = pKmdEx->field_24_mEx.field_0;
+}
+MGS_FUNC_IMPLEX(0x450169, Kmd_SetPrimVecPtrToEx_450169, KMD_IMPL);
+
 void CC Kmd_Link_To_Parent_Mesh_45011B(struc_kmd* pKmd, struc_kmd* pParentKmd, int idx)
 {
     Prim_unknown_0x48* pFirstKmdPrimObj = &pKmd->field_0_pObj->prim_48;
