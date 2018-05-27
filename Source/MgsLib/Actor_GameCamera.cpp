@@ -95,3 +95,47 @@ void CC Res_game_camera_create_453B11()
     gCamera_zoom_copy_dword_993F7C = 320;
 }
 MGS_FUNC_IMPLEX(0x453B11, Res_game_camera_create_453B11, GAME_CAMERA_IMPL);
+
+int CC sub_44419A(int a1, int a2, int a3)
+{
+    int ret = a2 - a3;
+    if (a1 >= a2 - a3)
+    {
+        ret = a2 + a3;
+        if (a1 <= a2 + a3)
+        {
+            ret = a1;
+        }
+    }
+    return ret;
+}
+MGS_FUNC_IMPLEX(0x44419A, sub_44419A, GAME_CAMERA_IMPL);
+
+void CC Res_game_camera_update_helper_4539BC(SVECTOR* pResult, const SVECTOR* pVec)
+{
+    // Causes the active camera to direct towards the subject?
+    pResult->field_0_x = static_cast<short>(sub_44419A(pResult->field_0_x, pVec->field_0_x, 500));
+    pResult->field_4_z = static_cast<short>(sub_44419A(pResult->field_4_z, pVec->field_4_z, 500));
+    pResult->field_2_y = static_cast<short>(sub_44419A(pResult->field_2_y, pVec->field_2_y, 150));
+}
+MGS_FUNC_IMPLEX(0x4539BC, Res_game_camera_update_helper_4539BC, GAME_CAMERA_IMPL);
+
+MGS_VAR(1, 0x724878, SVECTOR, stru_724878, {});
+MGS_VAR(1, 0x724880, int, gCamera_track_724880, 0);
+
+
+void CC Res_game_camera_454D66(const SVECTOR* pVec)
+{
+    gCamera_66B720 = *pVec;
+    if (gCameraFlags_dword_993FF8 & 0x20)
+    {
+        gCamera_unk_993FA0.field_10_vec = stru_724878;
+        gCamera_unk_993FA0.field_18_track = gCamera_track_724880;
+    }
+    else
+    {
+        gCamera_unk_993FA0.field_10_vec = *pVec;
+        gCamera_unk_993FA0.field_18_track = gCamera_Track_dword_66B718;
+    }
+}
+MGS_FUNC_IMPLEX(0x454D66, Res_game_camera_454D66, GAME_CAMERA_IMPL);
