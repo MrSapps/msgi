@@ -13,6 +13,7 @@
 #include "Menu.hpp"
 #include "Renderer.hpp"
 #include "Input.hpp"
+#include "Actor_GameCamera.hpp"
 
 #define ACTOR_GAMED_IMPL true
 
@@ -55,7 +56,6 @@ MGS_FUNC_NOT_IMPL(0x0044E287, void __cdecl(), sub_44E287);
 
 MGS_FUNC_NOT_IMPL(0x00521892, int CC(), CdGetStatus_521892);
 MGS_FUNC_NOT_IMPL(0x0044DEDE, int CC(), sub_44DEDE);
-MGS_FUNC_NOT_IMPL(0x00453B11, void CC(), Res_game_camera_create_453B11);
 MGS_FUNC_NOT_IMPL(0x00455299, void CC(), sub_455299);
 MGS_FUNC_NOT_IMPL(0x0040945D, void CC(), sub_40945D);
 MGS_FUNC_NOT_IMPL(0x004553C5, void CC(), sub_4553C5);

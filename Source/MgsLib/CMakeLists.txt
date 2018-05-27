@@ -69,6 +69,8 @@ add_library(MgsLib
     Table_665A3C.hpp
     Actor_BoxKeri.cpp
     Actor_BoxKeri.hpp
+    Actor_GameCamera.cpp
+    Actor_GameCamera.hpp
     WinMain.cpp
     WinMain.hpp)
 
