@@ -965,6 +965,17 @@ void CC Vector_unknown_44B250(const VECTOR* pVec1, const VECTOR* pVec2, VECTOR* 
 }
 MGS_FUNC_IMPLEX(0x44B250, Vector_unknown_44B250, KMD_IMPL);
 
+int CC Vector_unknown_40B5BC(const SVECTOR* pVec1, const SVECTOR* pVec2)
+{
+    VECTOR vec = {};
+    vec.field_0_x = pVec1->field_0_x - pVec2->field_0_x;
+    vec.field_4_y = pVec1->field_2_y - pVec2->field_2_y;
+    vec.field_8_z = pVec1->field_4_z - pVec2->field_4_z;
+    Psx_gte_sqr0_44B030(&vec, &vec);
+    return static_cast<int>(j_sqrt(vec.field_0_x + vec.field_4_y + vec.field_8_z));
+}
+MGS_FUNC_IMPLEX(0x40B5BC, Vector_unknown_40B5BC, KMD_IMPL);
+
 void CC Gte_set_translation_vector_from_mtx_44AE60(const PSX_MATRIX* pMtx)
 {
     gGte_translation_vector_993E54 = pMtx->t;
