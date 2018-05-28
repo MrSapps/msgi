@@ -461,22 +461,6 @@ void CC VectorNormalSS_44CC00(const SVECTOR* pVec, SVECTOR* pUnitVec)
 }
 MGS_FUNC_IMPLEX(0x44CC00, VectorNormalSS_44CC00, IMPL_PSX);
 
-struct Unk_72270C_Sub
-{
-    float field_0_v;
-    float field_4_prev_8[3];
-    //float field_8_prev_C;
-    //float field_C_v;
-};
-MGS_ASSERT_SIZEOF(Unk_72270C_Sub, 0x10);
-
-struct Unk_72270C
-{
-    Unk_72270C_Sub d[3];
-};
-MGS_ASSERT_SIZEOF(Unk_72270C, 0x30);
-
-
 MGS_VAR(1, 0x993E40, MATRIX3x3, gte_rotation_matrix_993E40, {});
 MGS_VAR(1, 0x993E54, VECTOR, gGte_translation_vector_993E54, {});
 

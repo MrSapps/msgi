@@ -449,3 +449,21 @@ void CC Gte_project_distance_rect_401DA8(const PSX_RECT* pRect, int projectDista
 void CC Psx_gte_rtpt_445990();
 void CC Psx_gte_sqr0_44B030(const VECTOR* pIn, VECTOR* pOut);
 void CC Psx_gte_ncs_446930();
+
+
+struct Unk_72270C_Sub
+{
+    float field_0_v;
+    float field_4_prev_8[3];
+    //float field_8_prev_C;
+    //float field_C_v;
+};
+MGS_ASSERT_SIZEOF(Unk_72270C_Sub, 0x10);
+
+struct Unk_72270C
+{
+    Unk_72270C_Sub d[3];
+};
+MGS_ASSERT_SIZEOF(Unk_72270C, 0x30);
+
+MGS_VAR_EXTERN(Unk_72270C, gGte_unknown_72270C);
