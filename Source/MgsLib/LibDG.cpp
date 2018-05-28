@@ -1202,7 +1202,7 @@ void CC LibDG_Update2_401234(Actor* /*pLibDg*/)
 MGS_FUNC_IMPLEX(0x401234, LibDG_Update2_401234, LIBDG_IMPL);
 
 
-MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 1);
+MGS_VAR(1, 0x6BECE8, DWORD, gLibDG_ExecPtrs_6BECE8, 0);
 
 void CC sub_40191F()
 {
@@ -1750,7 +1750,7 @@ void CC LibGV_4066ED(Prim_Union* pObj)
         {
             LibGV_406B97(&pObj->prim_48, count);
         }
-        else if (pObj->prim_54.field_40_pDataStart[1])
+        else if (pObj->prim_48.field_44)
         {
             LibGV_406A78(&pObj->prim_48, count);
         }
@@ -2880,7 +2880,7 @@ struct ScratchPad_Allocs
     int field_14_unknown;
     int field_18_2048;
     int field_1C_project_distance;
-    int field_20_pPolyBufferIter;
+    POLY_GT4* field_20_pPolyBufferIter;
     system_struct* field_24_sys_ptr;
     LibGV_MemoryAllocation* field_28_gv_alloc;
     DWORD field_2C_max_possible_elements;
@@ -2936,7 +2936,165 @@ BYTE* CC LibGV_Scratch_alloc_POLY_GT4_403ED1()
 }
 MGS_FUNC_IMPLEX(0x403ED1, LibGV_Scratch_alloc_POLY_GT4_403ED1, LIBDG_IMPL);
 
-MGS_FUNC_NOT_IMPL(0x403778, POLY_GT4 *__cdecl(POLY_GT4 *pPolyBuffer, int numFaces, SVECTOR *pVerts, unsigned int *pIndcies), LibGV_Helper_403778); // TODO
+
+// TODO: Impl
+void CC Psx_gte_403F3C(SVECTOR *, unsigned int *, POLY_GT4 *);
+MGS_FUNC_IMPLEX(0x403F3C, Psx_gte_403F3C, true);
+
+void CC Psx_gte_403F3C(SVECTOR * a, unsigned int *b, POLY_GT4 *c)
+{
+    Psx_gte_403F3C_.Ptr()(a,b,c);
+}
+
+// TODO: Impl
+void CC LibGV_403845();
+MGS_FUNC_IMPLEX(0x403845, LibGV_403845, true);
+
+void CC LibGV_403845()
+{
+    LibGV_403845_.Ptr()();
+}
+
+// TODO: Refactor
+POLY_GT4* CC LibGV_Helper_403778(POLY_GT4* pPolyBuffer, int numFaces, SVECTOR* pVerts, unsigned int* pIndcies)
+{
+    if (numFaces - 1 < 0)
+    {
+        return pPolyBuffer;
+    }
+
+    ScratchPad_Allocs* pAllocs = (ScratchPad_Allocs*)gScratchPadMemory_991E40.field_0_raw.field_0;
+    for (int i=0; i<numFaces; i++)
+    {
+        struct PolyTag2
+        {
+            WORD field_0_distance;
+            BYTE field_2;
+            BYTE field_3;
+        };
+
+        PolyTag2* polTag = (PolyTag2*)&pPolyBuffer[i].tag;
+        int tagByte = pPolyBuffer[i].tag >> 8;
+        if (tagByte <= pAllocs->field_18_2048
+            || polTag->field_0_distance >= pAllocs->field_1C_project_distance
+            || pAllocs->field_2C_max_possible_elements < 4)
+        {
+            if (polTag->field_0_distance)
+            {
+                const WORD depth = (polTag->field_0_distance - pAllocs->field_6_numObjTranslated) & 0xFFFF;
+                const DWORD otPos = LOBYTE(depth);
+                const DWORD size = HIBYTE(depth);
+                const DWORD ptrWithSize = (DWORD)(pAllocs->field_0_1024_unk_ptr[otPos]) | (size << 24);
+                pPolyBuffer[i].tag = ptrWithSize;
+                addPrim(&pAllocs->field_0_1024_unk_ptr[otPos], &pPolyBuffer[i]);
+            }
+        }
+        else
+        {
+            polTag->field_0_distance = 0;
+            int field_c = pAllocs->field_14_unknown;
+            pAllocs->field_20_pPolyBufferIter = &pPolyBuffer[i];
+            if (tagByte & 256)
+            {
+                field_c = -pAllocs->field_14_unknown;
+            }
+            pAllocs->field_C = field_c;
+            pAllocs->field_38_pMatrix = &pAllocs->field_3C_matrix;
+            pAllocs->field_10_float = static_cast<float>(field_c * 0.5);
+         
+            Psx_gte_403F3C(pVerts, &pIndcies[i], &pPolyBuffer[i]);
+            LibGV_403845();
+        }
+    }
+    return &pPolyBuffer[numFaces];
+}
+MGS_FUNC_IMPLEX(0x403778, LibGV_Helper_403778, LIBDG_IMPL);
+
+static void CC Stub_Psx_gte_403F3C(SVECTOR *, unsigned int *, POLY_GT4 *)
+{
+    LOG_INFO("Stub_Psx_gte_403F3C");
+}
+
+static void CC Stub_LibGV_403845()
+{
+    LOG_INFO("Stub_LibGV_403845");
+}
+
+static void Test_LibGV_Helper_403778()
+{
+    ScratchPad_Allocs* pAllocs = (ScratchPad_Allocs*)gScratchPadMemory_991E40.field_0_raw.field_0;
+    pAllocs->field_6_numObjTranslated = 0;
+    pAllocs->field_18_2048 = 5;
+    pAllocs->field_1C_project_distance = 20;
+    pAllocs->field_2C_max_possible_elements = 3;
+    DWORD* buffer[1024] = {};
+    pAllocs->field_0_1024_unk_ptr = buffer;
+
+    // Check 0'ed tag does nothing
+    {
+        POLY_GT4 polys[2] = {};
+        LibGV_Helper_403778(polys, 2, nullptr, nullptr);
+        ASSERT_EQ(buffer[0], nullptr);
+    }
+
+    // Check the 4th tag byte becomes OTZ and the 3rd is inserted
+    // into the start of the OT pointer.
+    // First 2 bytes are checked against the projection distance.
+    {
+        POLY_GT4 polys[2] = {};
+        polys[0].tag |= 0xCCDD2130;
+        buffer[0x30] = (DWORD*)0x00febaee;
+
+        LibGV_Helper_403778(polys, 2, nullptr, nullptr);
+        ASSERT_EQ(buffer[0x30], (DWORD*)&polys[0]);
+        ASSERT_EQ(polys[0].tag, (DWORD)(0x21febaee));
+    }
+
+    {
+        SCOPED_REDIRECT(Psx_gte_403F3C, Stub_Psx_gte_403F3C);
+        SCOPED_REDIRECT(LibGV_403845, Stub_LibGV_403845);
+
+        pAllocs->field_14_unknown = 3;
+        pAllocs->field_18_2048 = 1;
+        pAllocs->field_1C_project_distance = 999999;
+        pAllocs->field_2C_max_possible_elements = 4;
+
+        POLY_GT4 polys[2] = {};
+        polys[0].tag |= 0x11ffbaee;
+        buffer[0x30] = 0;
+
+        LibGV_Helper_403778(polys, 2, nullptr, nullptr);
+
+        ASSERT_EQ(pAllocs->field_10_float, -1.5f);
+        ASSERT_EQ(pAllocs->field_C, -3);
+
+
+        ASSERT_EQ(buffer[0x30], nullptr);
+        ASSERT_EQ(polys[0].tag, (DWORD)(0x11ff0000));
+    }
+
+    {
+        SCOPED_REDIRECT(Psx_gte_403F3C, Stub_Psx_gte_403F3C);
+        SCOPED_REDIRECT(LibGV_403845, Stub_LibGV_403845);
+
+        pAllocs->field_14_unknown = 3;
+        pAllocs->field_18_2048 = 1;
+        pAllocs->field_1C_project_distance = 999999;
+        pAllocs->field_2C_max_possible_elements = 4;
+
+        POLY_GT4 polys[2] = {};
+        polys[0].tag |= 0x11febaee;
+        buffer[0x30] = 0;
+
+        LibGV_Helper_403778(polys, 2, nullptr, nullptr);
+
+        ASSERT_EQ(pAllocs->field_10_float, 1.5f);
+        ASSERT_EQ(pAllocs->field_C, 3);
+
+        ASSERT_EQ(buffer[0x30], nullptr);
+        ASSERT_EQ(polys[0].tag, (DWORD)(0x11fe0000));
+    }
+}
 
 void CC LibGV_Helper_40373E(Prim_Mesh_0x5C* pMesh, int activeBuffer)
 {
@@ -3345,4 +3503,5 @@ void DoDGTests()
     Test_LibGV_normals_4054F2();
     Test_LibGV_406168();
     Test_LibGV_40466A();
+    Test_LibGV_Helper_403778();
 }
