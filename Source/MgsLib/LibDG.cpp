@@ -2283,10 +2283,228 @@ struct ScratchPad_405668 // TODO: Add to union and figure out other pad fields
     POLY_GT4* pPolys;
     SVECTOR* pVerts;
 };
+MGS_ASSERT_SIZEOF(ScratchPad_405668, 0x400);
 
 MGS_FUNC_NOT_IMPL(0x4057FF, void __cdecl (SVECTOR *vertPtr, int vertCount), LibGV_4057FF);
-MGS_FUNC_NOT_IMPL(0x405B8A, void __cdecl (SVECTOR *vertPtr, int vertCount), LibGV_helper_405B8A);
 MGS_FUNC_NOT_IMPL(0x405DAF, POLY_GT4 *__cdecl (unsigned int* pVertIdxes, POLY_GT4 *pPoly, int faceCount), LibGV_helper_405DAF);
+
+template<class T>
+static void Vec2Reg(T& reg, const SVECTOR& v)
+{
+    reg.regs.VX = v.field_0_x;
+    reg.regs.VY = v.field_2_y;
+    reg.regs.VZ = v.field_4_z;
+    reg.regs.Zero = v.field_6_padding;
+}
+
+struct FVECTOR
+{
+    float field_0_x, field_4_y, field_8_z;
+};
+MGS_ASSERT_SIZEOF(FVECTOR, 0xC);
+
+struct UnknownData
+{
+    FVECTOR mArray[42];
+    DWORD pad[2];
+};
+MGS_ARY(1, 0x992240, UnknownData, 3, stru_992240, {});
+
+struct ScratchPad_ProjectedVerts // TODO: Add to union
+{
+    struct XYRet
+    {
+        short x;
+        short y;
+    };
+
+    struct XYVec
+    {
+        XYRet mXY[3];
+    };
+
+    struct OTZAry
+    {
+        int mZ[3];
+    };
+
+    XYVec xys[42];
+    DWORD pad[2];
+    OTZAry zs[42];
+};
+
+void CC LibGV_helper_405B8A(SVECTOR* vertPtr, int vertCount)
+{
+    assert(vertCount <= 42*3);
+
+    ScratchPad_ProjectedVerts* pScratch = (ScratchPad_ProjectedVerts*)&gScratchPadMemory_991E40; // TODO: Add to union
+
+    // TODO: Move duplication to a helper
+    Vec2Reg(gGte_VXY0_993EC0, *vertPtr);
+    vertPtr++;
+
+    Vec2Reg(gGte_VXY1_993EC8, *vertPtr);
+    vertPtr++;
+
+    Vec2Reg(gGte_VXY2_993ED0, *vertPtr);
+    vertPtr++;
+
+    Psx_gte_rtpt_445990();
+
+    pScratch->xys[0].mXY[0].x = gGte_SXY0_993EF0.regs.SX;
+    pScratch->xys[0].mXY[0].y = gGte_SXY0_993EF0.regs.SY;
+
+    pScratch->xys[0].mXY[1].x = gGte_SXY1_993EF4.regs.SX;
+    pScratch->xys[0].mXY[1].y = gGte_SXY1_993EF4.regs.SY;
+
+    pScratch->xys[0].mXY[2].x = gGte_SXY2_993EF8.regs.SX;
+    pScratch->xys[0].mXY[2].y = gGte_SXY2_993EF8.regs.SY;
+    
+    pScratch->zs[0].mZ[0] = gGte_SZ1_993F04.Z_32;
+    pScratch->zs[0].mZ[1] = gGte_SZ2_993F08.Z_32;
+    pScratch->zs[0].mZ[2] = gGte_SZ3_993F0C.Z_32;
+
+    for (int j = 0; j < 3; j++)
+    {
+        stru_992240[j].mArray[0].field_0_x = gGte_unknown_72270C.d[j].field_4_prev_8[0];
+        stru_992240[j].mArray[0].field_4_y = gGte_unknown_72270C.d[j].field_4_prev_8[1];
+        stru_992240[j].mArray[0].field_8_z = gGte_unknown_72270C.d[j].field_4_prev_8[2];
+    }
+
+    if (vertCount - 3 > 0)
+    {
+        const int count = (vertCount - 3 + 2) / 3u;
+        for (int i = 1; i < count + 1; i++)
+        {
+            Vec2Reg(gGte_VXY0_993EC0, *vertPtr);
+            vertPtr++;
+
+            Vec2Reg(gGte_VXY1_993EC8, *vertPtr);
+            vertPtr++;
+
+            Vec2Reg(gGte_VXY2_993ED0, *vertPtr);
+            vertPtr++;
+
+            Psx_gte_rtpt_445990();
+
+            // Store projected 3D -> 2D coordinates
+            pScratch->xys[i].mXY[0].x = gGte_SXY0_993EF0.regs.SX;
+            pScratch->xys[i].mXY[0].y = gGte_SXY0_993EF0.regs.SY;
+
+            pScratch->xys[i].mXY[1].x = gGte_SXY1_993EF4.regs.SX;
+            pScratch->xys[i].mXY[1].y = gGte_SXY1_993EF4.regs.SY;
+
+            pScratch->xys[i].mXY[2].x = gGte_SXY2_993EF8.regs.SX;
+            pScratch->xys[i].mXY[2].y = gGte_SXY2_993EF8.regs.SY;
+
+            // Store OTZ's
+            pScratch->zs[i].mZ[0] = gGte_SZ1_993F04.Z_32;
+            pScratch->zs[i].mZ[1] = gGte_SZ2_993F08.Z_32;
+            pScratch->zs[i].mZ[2] = gGte_SZ3_993F0C.Z_32;
+
+            // Extra higher precision float copies of the projected values to fix the polygon "wobble"
+            for (int j = 0; j < 3; j++)
+            {
+                stru_992240[j].mArray[i].field_0_x = gGte_unknown_72270C.d[j].field_4_prev_8[0];
+                stru_992240[j].mArray[i].field_4_y = gGte_unknown_72270C.d[j].field_4_prev_8[1];
+                stru_992240[j].mArray[i].field_8_z = gGte_unknown_72270C.d[j].field_4_prev_8[2];
+            }
+        }
+    }
+}
+MGS_FUNC_IMPLEX(0x405B8A, LibGV_helper_405B8A, LIBDG_IMPL);
+
+static void CC Stub_Psx_gte_rtpt_445990()
+{
+    static int c = 0;
+
+    gGte_SXY0_993EF0.regs.SX = static_cast<short>(10 + c);
+    gGte_SXY0_993EF0.regs.SY = static_cast<short>(20 + c);
+
+    gGte_SXY1_993EF4.regs.SX = static_cast<short>(30 + c);
+    gGte_SXY1_993EF4.regs.SY = static_cast<short>(40 + c);
+
+    gGte_SXY2_993EF8.regs.SX = static_cast<short>(50 + c);
+    gGte_SXY2_993EF8.regs.SY = static_cast<short>(60 + c);
+
+    gGte_SZ1_993F04.Z_32 = 70 + c;
+    gGte_SZ2_993F08.Z_32 = 80 + c;
+    gGte_SZ3_993F0C.Z_32 = 90 + c;
+    c++;
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            gGte_unknown_72270C.d[i].field_4_prev_8[j] = 1.0f * (i + 1) * (j + 1) + c;
+        }
+    }
+}
+
+static void Test_LibGV_helper_405B8A()
+{
+    SCOPED_REDIRECT(Psx_gte_rtpt_445990, Stub_Psx_gte_rtpt_445990);
+
+    SVECTOR verts[126] = {};
+    for (int i = 0; i < _countof(verts); i++)
+    {
+        verts[i].field_0_x = static_cast<short>(10 + i);
+        verts[i].field_2_y = static_cast<short>(20 + i);
+        verts[i].field_4_z = static_cast<short>(30 + i);
+        verts[i].field_6_padding = static_cast<short>(40 + i);
+    }
+
+    memset(&gScratchPadMemory_991E40, 0, 1024);
+
+    LibGV_helper_405B8A(verts, _countof(verts));
+
+
+    ScratchPad_ProjectedVerts* pScratch = (ScratchPad_ProjectedVerts*)&gScratchPadMemory_991E40; // TODO: Add to union
+
+    ASSERT_EQ(pScratch->xys[0].mXY[0].x, 10);
+    ASSERT_EQ(pScratch->xys[0].mXY[0].y, 20);
+
+    ASSERT_EQ(pScratch->xys[0].mXY[1].x, 30);
+    ASSERT_EQ(pScratch->xys[0].mXY[1].y, 40);
+
+    ASSERT_EQ(pScratch->xys[0].mXY[2].x, 50);
+    ASSERT_EQ(pScratch->xys[0].mXY[2].y, 60);
+
+    ASSERT_EQ(pScratch->xys[41].mXY[0].x, 51);
+    ASSERT_EQ(pScratch->xys[41].mXY[0].y, 61);
+
+    ASSERT_EQ(pScratch->xys[41].mXY[1].x, 71);
+    ASSERT_EQ(pScratch->xys[41].mXY[1].y, 81);
+
+    ASSERT_EQ(pScratch->xys[41].mXY[2].x, 91);
+    ASSERT_EQ(pScratch->xys[41].mXY[2].y, 101);
+    
+    ASSERT_EQ(pScratch->zs[0].mZ[0], 70);
+    ASSERT_EQ(pScratch->zs[0].mZ[1], 80);
+    ASSERT_EQ(pScratch->zs[0].mZ[2], 90);
+
+    ASSERT_EQ(pScratch->zs[41].mZ[0], 111);
+    ASSERT_EQ(pScratch->zs[41].mZ[1], 121);
+    ASSERT_EQ(pScratch->zs[41].mZ[2], 131);
+    
+    ASSERT_EQ(stru_992240[0].mArray[0].field_0_x, 2.0f);
+    ASSERT_EQ(stru_992240[0].mArray[0].field_4_y, 3.0f);
+    ASSERT_EQ(stru_992240[0].mArray[0].field_8_z, 4.0f);
+
+    ASSERT_EQ(stru_992240[0].mArray[41].field_0_x, 43.0f);
+    ASSERT_EQ(stru_992240[0].mArray[41].field_4_y, 44.0f);
+    ASSERT_EQ(stru_992240[0].mArray[41].field_8_z, 45.0f);
+
+    UnknownData* pStru1= &stru_992240[1];
+    ASSERT_EQ(pStru1->mArray[0].field_0_x, 3.0f);
+    ASSERT_EQ(pStru1->mArray[0].field_4_y, 5.0f);
+    ASSERT_EQ(pStru1->mArray[0].field_8_z, 7.0f);
+
+    UnknownData* pStru2 = &stru_992240[2];
+    ASSERT_EQ(pStru2->mArray[0].field_0_x, 4.0f);
+    ASSERT_EQ(pStru2->mArray[0].field_4_y, 7.0f);
+    ASSERT_EQ(pStru2->mArray[0].field_8_z, 10.0f); 
+}
 
 void CC LibGV_4057A0(Prim_Mesh_0x5C* pMesh, int activeBuffer)
 {
@@ -3504,4 +3722,5 @@ void DoDGTests()
     Test_LibGV_406168();
     Test_LibGV_40466A();
     Test_LibGV_Helper_403778();
+    Test_LibGV_helper_405B8A();
 }
